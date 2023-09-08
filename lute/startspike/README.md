@@ -1,0 +1,1 @@
+Scrap dir and test file to get pytest working only.
