@@ -4,6 +4,7 @@ App configuration.
 
 import os
 import yaml
+from platformdirs import PlatformDirs
 
 class AppConfig:
     """
@@ -14,7 +15,8 @@ class AppConfig:
         """
         Load the required configuration file.
         """
-        self.config = self.__load_config(config_file_path)
+        self.__load_config(config_file_path)
+
 
     def __load_config(self, config_file_path):
         """
@@ -32,7 +34,19 @@ class AppConfig:
         if 'DBNAME' not in config:
             raise ValueError("Config file must have 'DBNAME'")
 
+        self.__db_name = config.get('DBNAME')
+        self.__data_path = config.get('DATAPATH', None)
+        if self.__data_path is None:
+            self.__data_path = self.__get_appdata_dir()
+
         return config
+
+
+    def __get_appdata_dir(self):
+        "Get user's appdata directory from platformdirs."
+        dirs = PlatformDirs("Lute3", "Lute3")
+        return dirs.user_data_dir
+
 
     @property
     def datapath(self):
@@ -40,14 +54,17 @@ class AppConfig:
         Path to user data / app data.  If not present in the
         dictionary, falls back to platformdirs user_data_dir.
         """
-        return self.config.get('DATAPATH', 'default')
+        return self.__data_path
+
 
     @property
     def dbname(self):
-        """Database name."""
-        return self.config.get('DBNAME')
+        "Database name."
+        return self.__db_name
+
 
     @property
     def sqliteconn(self):
-        """sqlite connection string."""
-        return f'sqlite:///{self.dbname}'
+        "Full sqlite connection string."
+        fullpath = os.path.join(self.datapath, self.dbname)
+        return f'sqlite:///{fullpath}'
