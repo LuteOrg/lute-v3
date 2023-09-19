@@ -1,0 +1,1 @@
+Fake schema files for tests.
