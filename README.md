@@ -38,4 +38,5 @@ make test        # python -m pytest
 make testprint   # python -m pytest -s
 
 # Run specific
+ARGS="-k test_setup" make test
 ```

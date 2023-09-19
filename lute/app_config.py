@@ -15,10 +15,10 @@ class AppConfig:
         """
         Load the required configuration file.
         """
-        self.__load_config(config_file_path)
+        self._load_config(config_file_path)
 
 
-    def __load_config(self, config_file_path):
+    def _load_config(self, config_file_path):
         """
         Load and validate the config file.
         """
@@ -34,15 +34,15 @@ class AppConfig:
         if 'DBNAME' not in config:
             raise ValueError("Config file must have 'DBNAME'")
 
-        self.__db_name = config.get('DBNAME')
-        self.__data_path = config.get('DATAPATH', None)
-        if self.__data_path is None:
-            self.__data_path = self.__get_appdata_dir()
+        self._db_name = config.get('DBNAME')
+        self._data_path = config.get('DATAPATH', None)
+        if self._data_path is None:
+            self._data_path = self._get_appdata_dir()
 
         return config
 
 
-    def __get_appdata_dir(self):
+    def _get_appdata_dir(self):
         "Get user's appdata directory from platformdirs."
         dirs = PlatformDirs("Lute3", "Lute3")
         return dirs.user_data_dir
@@ -54,13 +54,13 @@ class AppConfig:
         Path to user data / app data.  If not present in the
         dictionary, falls back to platformdirs user_data_dir.
         """
-        return self.__data_path
+        return self._data_path
 
 
     @property
     def dbname(self):
         "Database name."
-        return self.__db_name
+        return self._db_name
 
 
     @property
