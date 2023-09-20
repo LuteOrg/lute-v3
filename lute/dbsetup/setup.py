@@ -12,6 +12,28 @@ import sqlite3
 
 from .migrator import SqliteMigrator
 
+
+class BackupManager: # pylint: disable=too-few-public-methods
+    """
+    Creates db backups when needed, prunes old backups.
+    """
+
+    def __init__(
+        self,
+        dbfile,
+        backup_dir,
+        next_backup_filename,
+        backup_count
+    ):
+        pass
+
+    def handle_backup(self):
+        """
+        Perform the db file backup to backup_dir,
+        pruning old backups.
+        """
+
+
 class Setup: # pylint: disable=too-few-public-methods
     """
     Main setup class, coordinates other classes.
@@ -20,11 +42,11 @@ class Setup: # pylint: disable=too-few-public-methods
     def __init__(
             self,
             db_filename: str,
-            backup_folder: str,
+            backup_manager,
             migration_files: dict
     ):
         self._db_filename = db_filename
-        self._backup_folder = backup_folder
+        self._backup_mgr = backup_manager
         self._migrations = migration_files
 
 
@@ -36,6 +58,7 @@ class Setup: # pylint: disable=too-few-public-methods
         if not os.path.exists(self._db_filename):
             self._create_baseline()
         self._run_migrations()
+        self._backup_mgr.handle_backup()
 
 
     def _open_connection(self):
