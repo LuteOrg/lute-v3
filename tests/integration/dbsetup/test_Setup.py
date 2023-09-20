@@ -48,4 +48,4 @@ def test_happy_path_no_existing_database(tmp_path):
         tnames = [t[0] for t in tnames]
         assert tnames == [ 'A', 'B' ], 'migrations run'
 
-    # assert no backup
+    assert list(backups.glob('*.gz')) == [], 'no backups'
