@@ -21,6 +21,7 @@ def test_happy_path_no_existing_database(tmp_path):
     backups.mkdir()
 
     thisdir = os.path.dirname(os.path.realpath(__file__))
+
     baseline = os.path.join(thisdir, 'schema', 'baseline', 'schema.sql')
     migdir = os.path.join(thisdir, 'schema', 'migrations')
     repeatable = os.path.join(thisdir, 'schema', 'repeatable')
@@ -35,6 +36,6 @@ def test_happy_path_no_existing_database(tmp_path):
 
     assert os.path.exists(dbfile), 'db was created'
 
-    # todo: check tables exist
+    # check tables exist
     # migrations run
     # no backup

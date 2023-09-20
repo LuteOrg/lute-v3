@@ -6,7 +6,7 @@ test: lint
 
 # Run tests and show print() messages
 testprint:
-	python -m pytest -s tests/
+	python -m pytest -s tests/ $(ARGS)
 
 # Generate test coverage report, excluding the tests from the report
 coverage:

@@ -6,7 +6,9 @@ Runs migrations.
 Manages backups pre-migration.a
 """
 
+from contextlib import closing
 import os
+import sqlite3
 
 class Setup: # pylint: disable=too-few-public-methods
     """
@@ -33,8 +35,22 @@ class Setup: # pylint: disable=too-few-public-methods
             self._create_baseline()
 
 
+    def _open_connection(self):
+        """
+        Get connection to db_filename.  Callers must close.
+        """
+        return sqlite3.connect(
+            self._db_filename,
+            detect_types=sqlite3.PARSE_DECLTYPES
+        )
+
+
     def _create_baseline(self):
         """
         Create baseline database.
         """
-        # get connection, run script
+        b = self._migrations['baseline']
+        with open(b, 'r', encoding='utf8') as f:
+            sql = f.read()
+        with closing(self._open_connection()) as conn:
+            conn.executescript(sql)
