@@ -44,7 +44,8 @@ def test_happy_path_no_existing_database(tmp_path):
         sql = """SELECT name FROM sqlite_master
         WHERE type='table' AND name in ('A', 'B')
         order by name;"""
-        listOfTables = cur.execute(sql).fetchall()
-        assert listOfTables == [ 'A', 'B' ], 'migrations run'
+        tnames = cur.execute(sql).fetchall()
+        tnames = [t[0] for t in tnames]
+        assert tnames == [ 'A', 'B' ], 'migrations run'
 
     # assert no backup

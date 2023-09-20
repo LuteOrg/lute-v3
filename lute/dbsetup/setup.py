@@ -10,6 +10,8 @@ from contextlib import closing
 import os
 import sqlite3
 
+from .migrator import SqliteMigrator
+
 class Setup: # pylint: disable=too-few-public-methods
     """
     Main setup class, coordinates other classes.
@@ -33,6 +35,7 @@ class Setup: # pylint: disable=too-few-public-methods
 
         if not os.path.exists(self._db_filename):
             self._create_baseline()
+        self._run_migrations()
 
 
     def _open_connection(self):
@@ -54,3 +57,23 @@ class Setup: # pylint: disable=too-few-public-methods
             sql = f.read()
         with closing(self._open_connection()) as conn:
             conn.executescript(sql)
+
+
+    def _run_migrations(self):
+        """
+        Migrate the db.
+        """
+        def get_valid_folder(fname):
+            f = self._migrations[fname]
+            if f is None:
+                raise RuntimeError(f'Missing key {fname}')
+            if not os.path.exists(f):
+                raise RuntimeError(f'Missing required folder {f}')
+            return f
+
+        migrations = get_valid_folder('migrations')
+        repeatable = get_valid_folder('repeatable')
+
+        with closing(self._open_connection()) as conn:
+            migrator = SqliteMigrator(conn, migrations, repeatable)
+            migrator.process()
