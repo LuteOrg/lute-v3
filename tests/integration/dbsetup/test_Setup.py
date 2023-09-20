@@ -4,6 +4,9 @@ DB setup tests using fake baseline, migration files.
 
 import os
 import pytest
+import sqlite3
+from contextlib import closing
+
 from lute.dbsetup.setup import Setup
 
 def test_happy_path_no_existing_database(tmp_path):
@@ -36,6 +39,12 @@ def test_happy_path_no_existing_database(tmp_path):
 
     assert os.path.exists(dbfile), 'db was created'
 
-    # check tables exist
-    # migrations run
-    # no backup
+    with closing(sqlite3.connect(dbfile)) as conn:
+        cur = conn.cursor()
+        sql = """SELECT name FROM sqlite_master
+        WHERE type='table' AND name in ('A', 'B')
+        order by name;"""
+        listOfTables = cur.execute(sql).fetchall()
+        assert listOfTables == [ 'A', 'B' ], 'migrations run'
+
+    # assert no backup
