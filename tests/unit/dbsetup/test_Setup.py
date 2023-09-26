@@ -19,7 +19,7 @@ class MockBackupManager: # pylint: disable=too-few-public-methods
     def __init__(self):
         self.backup_called = False
 
-    def handle_backup(self):
+    def do_backup(self):
         """
         Record if backup was called.
         """

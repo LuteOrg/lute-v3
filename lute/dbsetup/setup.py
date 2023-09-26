@@ -35,7 +35,7 @@ class BackupManager: # pylint: disable=too-few-public-methods
 
         if next_backup_datetime is None:
             now = datetime.now()
-            next_backup_datetime = now.strftime("%Y%m%d%H%M%S%f")
+            next_backup_datetime = now.strftime("%Y%m%d-%H%M%S-%f")
 
         bname = os.path.basename(self.file_to_backup)
         backup_filename = f'{bname}.{next_backup_datetime}.gz'
@@ -91,7 +91,7 @@ class Setup: # pylint: disable=too-few-public-methods
             self._create_baseline()
         self._run_migrations()
         if not new_db:
-            self._backup_mgr.handle_backup()
+            self._backup_mgr.do_backup()
 
 
     def _open_connection(self):
