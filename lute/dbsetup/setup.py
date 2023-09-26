@@ -61,7 +61,7 @@ class Setup: # pylint: disable=too-few-public-methods
         if not os.path.exists(self._db_filename):
             new_db = True
             self._create_baseline()
-        self._run_migrations()
+        has_migrations = self._run_migrations()
         if not new_db and has_migrations:
             self._backup_mgr.handle_backup()
 
@@ -89,7 +89,11 @@ class Setup: # pylint: disable=too-few-public-methods
 
     def _run_migrations(self):
         """
-        Migrate the db.
+        Migrate the db.  Return true if migrations were run, else false.
         """
+        has_migs = False
         with closing(self._open_connection()) as conn:
-            self._migrator.do_migration(conn)
+            has_migs = self._migrator.has_migrations(conn)
+            if has_migs:
+                self._migrator.do_migration(conn)
+        return has_migs

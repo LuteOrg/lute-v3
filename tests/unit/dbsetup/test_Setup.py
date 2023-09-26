@@ -3,8 +3,6 @@ DB setup tests using fake baseline, migration files.
 """
 
 import os
-import sqlite3
-from contextlib import closing
 import pytest
 
 from lute.dbsetup.setup import Setup
@@ -34,9 +32,15 @@ class MockMigrator: # pylint: disable=too-few-public-methods
     """
 
     def __init__(self):
-        self.has_migrations = False
+        self.has_pending_migrations = False
         self.throw_on_migration = False
         self.migrations_run = False
+
+    def has_migrations(self, conn): # pylint: disable=unused-argument
+        """
+        Refs self.has_pending_migrations.
+        """
+        return self.has_pending_migrations
 
     def do_migration(self, conn): # pylint: disable=unused-argument
         """
@@ -84,7 +88,7 @@ def test_new_database(baseline, tmp_path, fakebackupmanager, fakemigrator):
     dbfile = tmp_path / 'testdb.db'
     assert os.path.exists(dbfile) is False, 'no db exists'
 
-    fakemigrator.has_migrations = True
+    fakemigrator.has_pending_migrations = True
     setup = Setup(dbfile, baseline, fakebackupmanager, fakemigrator)
     setup.setup()
 
@@ -93,7 +97,7 @@ def test_new_database(baseline, tmp_path, fakebackupmanager, fakemigrator):
     assert fakebackupmanager.backup_called is False, 'no backup called'
 
 
-def test_existing_database_new_migrations(tmp_path, fakebackupmanager, fakemigrator):
+def test_existing_database_new_migrations(baseline, tmp_path, fakebackupmanager, fakemigrator):
     """
     If db exists, setup should:
     - run any migrations
@@ -101,43 +105,31 @@ def test_existing_database_new_migrations(tmp_path, fakebackupmanager, fakemigra
     - should only keep the last X migrations
     """
     dbfile = tmp_path / 'testdb.db'
-    assert os.path.exists(dbfile) is False, 'no db exists'
+    dbfile.write_text('content')
+    assert os.path.exists(dbfile), 'db exists'
 
-    thisdir = os.path.dirname(os.path.realpath(__file__))
-    baseline = os.path.join(thisdir, 'schema', 'baseline', 'schema.sql')
-    with open(baseline, 'r', encoding='utf8') as f:
-        sql = f.read()
-    with closing(sqlite3.connect(dbfile)) as conn:
-        conn.executescript(sql)
-
-    fakemigrator.has_migrations = True
+    fakemigrator.has_pending_migrations = True
     setup = Setup(dbfile, baseline, fakebackupmanager, fakemigrator)
     setup.setup()
 
-    assert os.path.exists(dbfile), 'db was created'
+    assert os.path.exists(dbfile), 'db still there'
     assert fakemigrator.migrations_run, 'migrations were run'
     assert fakebackupmanager.backup_called, 'backup was called'
 
 
-def test_existing_database_no_new_migrations(tmp_path, fakebackupmanager, fakemigrator):
+def test_existing_db_no_migrations(baseline, tmp_path, fakebackupmanager, fakemigrator):
     """
     DB should be left as-is, no migrations run, no backup.
     """
     dbfile = tmp_path / 'testdb.db'
-    assert os.path.exists(dbfile) is False, 'no db exists'
+    dbfile.write_text('content')
+    assert os.path.exists(dbfile), 'db exists'
 
-    thisdir = os.path.dirname(os.path.realpath(__file__))
-    baseline = os.path.join(thisdir, 'schema', 'baseline', 'schema.sql')
-    with open(baseline, 'r', encoding='utf8') as f:
-        sql = f.read()
-    with closing(sqlite3.connect(dbfile)) as conn:
-        conn.executescript(sql)
-
-    fakemigrator.has_migrations = False
+    fakemigrator.has_pending_migrations = False
     setup = Setup(dbfile, baseline, fakebackupmanager, fakemigrator)
     setup.setup()
 
-    assert os.path.exists(dbfile), 'db was created'
+    assert os.path.exists(dbfile), 'db still there'
     assert fakemigrator.migrations_run is False, 'no migrations were run'
     assert fakebackupmanager.backup_called is False, 'no backup was called'
 
