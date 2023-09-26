@@ -42,23 +42,28 @@ class Setup: # pylint: disable=too-few-public-methods
     def __init__(
             self,
             db_filename: str,
-            backup_manager,
-            migration_files: dict
+            baseline_schema_file: str,
+            backup_manager: BackupManager,
+            migrator: SqliteMigrator
     ):
         self._db_filename = db_filename
+        self._baseline_schema_file = baseline_schema_file
         self._backup_mgr = backup_manager
-        self._migrations = migration_files
+        self._migrator = migrator
 
 
     def setup(self):
         """
         Do database setup, making backup if necessary, running migrations.
         """
-
+        new_db = False
+        has_migrations = False
         if not os.path.exists(self._db_filename):
+            new_db = True
             self._create_baseline()
         self._run_migrations()
-        self._backup_mgr.handle_backup()
+        if not new_db and has_migrations:
+            self._backup_mgr.handle_backup()
 
 
     def _open_connection(self):
@@ -75,7 +80,7 @@ class Setup: # pylint: disable=too-few-public-methods
         """
         Create baseline database.
         """
-        b = self._migrations['baseline']
+        b = self._baseline_schema_file
         with open(b, 'r', encoding='utf8') as f:
             sql = f.read()
         with closing(self._open_connection()) as conn:
@@ -86,17 +91,5 @@ class Setup: # pylint: disable=too-few-public-methods
         """
         Migrate the db.
         """
-        def get_valid_folder(fname):
-            f = self._migrations[fname]
-            if f is None:
-                raise RuntimeError(f'Missing key {fname}')
-            if not os.path.exists(f):
-                raise RuntimeError(f'Missing required folder {f}')
-            return f
-
-        migrations = get_valid_folder('migrations')
-        repeatable = get_valid_folder('repeatable')
-
         with closing(self._open_connection()) as conn:
-            migrator = SqliteMigrator(conn, migrations, repeatable)
-            migrator.process()
+            self._migrator.do_migration(conn)
