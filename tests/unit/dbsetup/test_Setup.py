@@ -132,9 +132,3 @@ def test_existing_db_no_migrations(baseline, tmp_path, fakebackupmanager, fakemi
     assert os.path.exists(dbfile), 'db still there'
     assert fakemigrator.migrations_run is False, 'no migrations were run'
     assert fakebackupmanager.backup_called is False, 'no backup was called'
-
-
-# Tests to write:
-# BackupManager tests:
-# - backup created
-# - max number of files remain

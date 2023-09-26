@@ -9,6 +9,10 @@ Manages backups pre-migration.a
 from contextlib import closing
 import os
 import sqlite3
+import gzip
+import shutil
+from datetime import datetime
+import glob
 
 from .migrator import SqliteMigrator
 
@@ -18,20 +22,45 @@ class BackupManager: # pylint: disable=too-few-public-methods
     Creates db backups when needed, prunes old backups.
     """
 
-    def __init__(
-        self,
-        dbfile,
-        backup_dir,
-        next_backup_filename,
-        backup_count
-    ):
-        pass
+    def __init__(self, file_to_backup, backup_directory, max_number_of_backups):
+        self.file_to_backup = file_to_backup
+        self.backup_directory = backup_directory
+        self.max_number_of_backups = max_number_of_backups
 
-    def handle_backup(self):
+    def do_backup(self, next_backup_datetime = None):
         """
         Perform the db file backup to backup_dir,
         pruning old backups.
         """
+
+        if next_backup_datetime is None:
+            now = datetime.now()
+            next_backup_datetime = now.strftime("%Y%m%d%H%M%S%f")
+
+        bname = os.path.basename(self.file_to_backup)
+        backup_filename = f'{bname}.{next_backup_datetime}.gz'
+        backup_path = os.path.join(self.backup_directory, backup_filename)
+
+        os.makedirs(self.backup_directory, exist_ok=True)
+
+        # Copy the file to the backup directory and gzip it
+        with open(self.file_to_backup, 'rb') as source_file, \
+             gzip.open(backup_path, 'wb') as backup_file:
+            shutil.copyfileobj(source_file, backup_file)
+        assert os.path.exists(backup_path)
+
+        # List all backup files in the directory, sorted by name.
+        # Since this includes the timestamp, the oldest files will be
+        # listed first.
+        globname = f'{bname}.*.gz'
+        globpath = os.path.join(self.backup_directory, globname)
+        backup_files = glob.glob(globpath)
+        backup_files.sort(key=os.path.basename)
+
+        # Delete excess backup files if necessary
+        while len(backup_files) > self.max_number_of_backups:
+            file_to_delete = backup_files.pop(0)
+            os.remove(file_to_delete)
 
 
 class Setup: # pylint: disable=too-few-public-methods
