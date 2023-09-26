@@ -90,3 +90,28 @@ def test_bad_migration_throws(db, migdirs):
         migrator.do_migration(db)
 
     assert migrator.has_migrations(db), 'bad file still pending!!!'
+
+
+def test_repeatable_migs_are_always_applied(db, migdirs):
+    """
+    Always applied, even if no migrations.
+    """
+    migrator = SqliteMigrator(migdirs / 'migrations', migdirs / 'repeatable')
+
+    migfile = migdirs / 'repeatable' / 'r.sql'
+    migfile.write_text('drop view if exists v1; create view v1 as select 1;')
+    assert migrator.has_migrations(db) is False, 'have migrations'
+    migrator.do_migration(db)
+
+    cur = db.cursor()
+    vals = cur.execute("SELECT * from v1;").fetchall()
+    assert vals == [ (1,) ], 'migrations run'
+
+    migfile = migdirs / 'repeatable' / 'r.sql'
+    migfile.write_text('drop view if exists v1; create view v1 as select 2;')
+    assert migrator.has_migrations(db) is False, 'have migrations'
+    migrator.do_migration(db)
+
+    cur = db.cursor()
+    vals = cur.execute("SELECT * from v1;").fetchall()
+    assert vals == [ (2,) ], 'changed'

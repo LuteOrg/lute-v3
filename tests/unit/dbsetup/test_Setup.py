@@ -101,8 +101,7 @@ def test_existing_database_new_migrations(baseline, tmp_path, fakebackupmanager,
     """
     If db exists, setup should:
     - run any migrations
-    - create a backup, with today's datetime
-    - should only keep the last X migrations
+    - create a backup
     """
     dbfile = tmp_path / 'testdb.db'
     dbfile.write_text('content')
@@ -119,7 +118,7 @@ def test_existing_database_new_migrations(baseline, tmp_path, fakebackupmanager,
 
 def test_existing_db_no_migrations(baseline, tmp_path, fakebackupmanager, fakemigrator):
     """
-    DB should be left as-is, no migrations run, no backup.
+    DB should be left as-is, no migrations run, backup created.
     """
     dbfile = tmp_path / 'testdb.db'
     dbfile.write_text('content')
@@ -130,5 +129,5 @@ def test_existing_db_no_migrations(baseline, tmp_path, fakebackupmanager, fakemi
     setup.setup()
 
     assert os.path.exists(dbfile), 'db still there'
-    assert fakemigrator.migrations_run is False, 'no migrations were run'
-    assert fakebackupmanager.backup_called is False, 'no backup was called'
+    assert fakemigrator.migrations_run, 'migrations were run'
+    assert fakebackupmanager.backup_called, 'backup was called'
