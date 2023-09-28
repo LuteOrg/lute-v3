@@ -73,9 +73,8 @@ def test_existing_database(tmp_path, migrator):
     thisdir = os.path.dirname(os.path.realpath(__file__))
     baseline = os.path.join(thisdir, 'schema', 'baseline', 'schema.sql')
     with open(baseline, 'r', encoding='utf8') as f:
-        sql = f.read()
-    with closing(sqlite3.connect(dbfile)) as conn:
-        conn.executescript(sql)
+        with closing(sqlite3.connect(dbfile)) as conn:
+            conn.executescript(f.read())
     assert os.path.exists(dbfile) is True, 'db exists'
 
     def assert_tables(expected: list, msg: str):
@@ -105,8 +104,7 @@ def test_existing_database(tmp_path, migrator):
     assert len(backup_files) == 1, 'backup created'
 
     # Restore backup
-    bkp_file = backup_files[0]
-    with gzip.open(bkp_file, 'rb') as gzipped_file, \
+    with gzip.open(backup_files[0], 'rb') as gzipped_file, \
          open(dbfile, 'wb') as output_file:
         data = gzipped_file.read()
         output_file.write(data)

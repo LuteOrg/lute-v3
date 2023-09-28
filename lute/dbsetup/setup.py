@@ -89,9 +89,9 @@ class Setup: # pylint: disable=too-few-public-methods
         if not os.path.exists(self._db_filename):
             new_db = True
             self._create_baseline()
-        self._run_migrations()
         if not new_db:
             self._backup_mgr.do_backup()
+        self._run_migrations()
 
 
     def _open_connection(self):
