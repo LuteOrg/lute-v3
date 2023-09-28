@@ -3,6 +3,7 @@ DB setup tests using fake baseline, migration files.
 """
 
 import os
+import gzip
 import sqlite3
 from contextlib import closing
 import pytest
@@ -77,6 +78,17 @@ def test_existing_database(tmp_path, migrator):
         conn.executescript(sql)
     assert os.path.exists(dbfile) is True, 'db exists'
 
+    def assert_tables(expected: list, msg: str):
+        with closing(sqlite3.connect(dbfile)) as conn:
+            cur = conn.cursor()
+            sql = """SELECT name FROM sqlite_master
+            WHERE type='table' AND name in ('A', 'B')
+            order by name;"""
+            tnames = cur.execute(sql).fetchall()
+            tnames = [t[0] for t in tnames]
+            assert tnames == expected, msg
+    assert_tables([ 'A' ], 'initial state')
+
     backup_dir = tmp_path / 'backups'
     backup_dir.mkdir()
 
@@ -85,17 +97,18 @@ def test_existing_database(tmp_path, migrator):
     setup = Setup(dbfile, baseline, bm, migrator)
     setup.setup()
 
-    assert os.path.exists(dbfile), 'db was created'
-
-    with closing(sqlite3.connect(dbfile)) as conn:
-        cur = conn.cursor()
-        sql = """SELECT name FROM sqlite_master
-        WHERE type='table' AND name in ('A', 'B')
-        order by name;"""
-        tnames = cur.execute(sql).fetchall()
-        tnames = [t[0] for t in tnames]
-        assert tnames == [ 'A', 'B' ], 'migrations run'
+    assert os.path.exists(dbfile), 'db still exists'
+    assert_tables([ 'A', 'B' ], 'migrations run')
 
     backup_files = list(backup_dir.glob('*.gz'))
     print(backup_files)
     assert len(backup_files) == 1, 'backup created'
+
+    # Restore backup
+    bkp_file = backup_files[0]
+    with gzip.open(bkp_file, 'rb') as gzipped_file, \
+         open(dbfile, 'wb') as output_file:
+        data = gzipped_file.read()
+        output_file.write(data)
+
+    assert_tables([ 'A' ], 'back to initial state')
