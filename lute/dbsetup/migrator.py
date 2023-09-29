@@ -15,10 +15,9 @@ class SqliteMigrator:
     https://github.com/jzohrab/DbMigrator/blob/master/docs/managing_database_changes.md
     """
 
-    def __init__(self, location, repeatable, showlogging=False):
+    def __init__(self, location, repeatable):
         self.location = location
         self.repeatable = repeatable
-        self.showlogging = showlogging
 
     def has_migrations(self, conn):
         """
@@ -45,20 +44,12 @@ class SqliteMigrator:
         self._process_folder(conn)
         self._process_repeatable(conn)
 
-    def _log(self, message):
-        """
-        Hacky debug logging.
-        """
-        if self.showlogging:
-            print(message)
-
     def _process_folder(self, conn):
         """
         Run all pending migrations.  Write executed script to
         _migrations table.
         """
         outstanding = self._get_pending(conn)
-        self._log(f"running {len(outstanding)} migrations in {self.location}")
         for f in outstanding:
             try:
                 self._process_file(conn, f)
@@ -75,10 +66,9 @@ class SqliteMigrator:
         folder = self.repeatable
         os.chdir(folder)
         files = [f for f in os.listdir() if f.endswith('.sql')]
-        self._log(f"running {len(files)} repeatable migrations in {folder}")
         for f in files:
             try:
-                self._process_file(conn, f, False)
+                self._process_file(conn, f)
             except Exception as e:
                 msg = str(e)
                 print(f"\nFile {f} exception:\n{msg}\n")
@@ -88,8 +78,6 @@ class SqliteMigrator:
         """
         True if a migration hasn't been run yet.
         """
-        if os.path.isdir(filename):
-            return False
         sql = f"select count(filename) from _migrations where filename = '{filename}'"
         res = conn.execute(sql).fetchone()
         return res[0] == 0
@@ -98,17 +86,14 @@ class SqliteMigrator:
         """
         Track the executed migration in _migrations.
         """
-        self._log(f'  tracking migration {filename}')
         conn.execute('begin transaction')
         conn.execute(f"INSERT INTO _migrations values ('{filename}')")
         conn.execute('commit transaction')
 
-    def _process_file(self, conn, f, showmsg=True):
+    def _process_file(self, conn, f):
         """
         Run the given file.
         """
-        if showmsg:
-            self._log(f"  running {f}")
         with open(f, 'r', encoding='utf8') as sql_file:
             commands = sql_file.read()
             self._exec_commands(conn, commands)

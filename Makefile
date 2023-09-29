@@ -13,5 +13,10 @@ coverage:
 	coverage run -m pytest tests/
 	coverage report --omit="*/test*"
 
+# Coverage with html report to see missing lines.
+coveragehtml:
+	coverage html --omit="*/test*"
+	open htmlcov/index.html
+
 lint:
 	pylint lute/ tests/

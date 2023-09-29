@@ -33,7 +33,6 @@ class MockMigrator: # pylint: disable=too-few-public-methods
 
     def __init__(self):
         self.has_pending_migrations = False
-        self.throw_on_migration = False
         self.migrations_run = False
 
     def has_migrations(self, conn): # pylint: disable=unused-argument
@@ -46,8 +45,6 @@ class MockMigrator: # pylint: disable=too-few-public-methods
         """
         Record if migrations run.
         """
-        if self.throw_on_migration:
-            raise RuntimeError('some error')
         self.migrations_run = True
 
 

@@ -115,3 +115,15 @@ def test_repeatable_migs_are_always_applied(db, migdirs):
     cur = db.cursor()
     vals = cur.execute("SELECT * from v1;").fetchall()
     assert vals == [ (2,) ], 'changed'
+
+
+def test_bad_repeatable_migs_throws(db, migdirs):
+    """
+    Bad repeatable should throw.
+    """
+    migrator = SqliteMigrator(migdirs / 'migrations', migdirs / 'repeatable')
+    migfile = migdirs / 'repeatable' / 'r.sql'
+    migfile.write_text('drop view if exists v1; create blahblah')
+
+    with pytest.raises(sqlite3.OperationalError):
+        migrator.do_migration(db)
