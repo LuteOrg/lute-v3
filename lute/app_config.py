@@ -64,7 +64,12 @@ class AppConfig:
 
 
     @property
+    def dbfilename(self):
+        "Full database file name and path."
+        return os.path.join(self.datapath, self.dbname)
+
+
+    @property
     def sqliteconn(self):
         "Full sqlite connection string."
-        fullpath = os.path.join(self.datapath, self.dbname)
-        return f'sqlite:///{fullpath}'
+        return f'sqlite:///{self.dbfilename}'

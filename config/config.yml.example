@@ -1,0 +1,13 @@
+# Copy this file to config.yml, and edit it as needed.
+
+# The database file name.
+# For tests, this must be "test_<name>.db" (e.g test_lute.db).
+# REQUIRED
+DBNAME: lute.db
+
+# Folder where data should be stored.
+# If not set, this returns the "app data" folder
+# as indicated by PlatformDirs.user_data_dir
+# (ref https://pypi.org/project/platformdirs/).
+# OPTIONAL (but REQUIRED for developer tests)
+# DATAPATH: yourpathhere

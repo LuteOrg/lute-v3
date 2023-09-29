@@ -102,13 +102,4 @@ class SqliteMigrator:
         """
         Execute all commands in the given file.
         """
-        commands = [ c.strip() for c in sql.split(';') ]
-        commands = [ c for c in commands if c != '' ]
-        try:
-            conn.execute('begin transaction')
-            for c in commands:
-                conn.execute(c)
-            conn.execute('commit transaction')
-        except Exception as e:
-            conn.execute('rollback')
-            raise e
+        conn.executescript(sql)

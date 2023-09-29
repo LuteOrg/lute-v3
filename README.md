@@ -27,8 +27,16 @@ TODO:windows - get instructions from https://flask.palletsprojects.com/en/2.3.x/
 
 TODO
 
-
 ## Testing
+
+### Config
+
+For tests, the config/config.yml must have:
+
+* `DBNAME` set to `test_<something>.db`
+* `DATAPATH` set to some existing folder
+
+### Commands
 
 ```
 # Run all
@@ -39,4 +47,9 @@ make testprint   # python -m pytest -s
 
 # Run specific
 ARGS="-k test_setup" make test
+
+# or if working on a specific test:
+export ARGS="-k test_setup"
+make test
+export ARGS=""  # when done
 ```
