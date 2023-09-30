@@ -72,6 +72,15 @@ def init_db_and_app():
 
     @app.route('/')
     def index():
-        return '<p>Welcome to Lute</p>'
+        content = f"""
+        <html>
+        <body>
+        <p>Welcome to Lute</p>
+        <p>DB = {app_config.dbname}</p>
+        <p>Data path = {app_config.datapath}</p>
+        </body>
+        </html>
+        """
+        return content
 
     return app

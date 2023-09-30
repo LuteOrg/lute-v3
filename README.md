@@ -25,7 +25,23 @@ TODO:windows - get instructions from https://flask.palletsprojects.com/en/2.3.x/
 
 # Usage
 
-TODO
+> Note: this section is for usage when you clone the repo.
+
+> TODO: notes about usage when installing from pre-packaged thing
+
+* Copy config/config.yml.example to config/config.yml, making changes as you see fit
+* Start the virtual environment, and run main:
+
+```
+source .venv/bin/activate   # if necessary
+python main.py
+```
+
+* Open web browser to http://localhost:5000
+
+# Development
+
+TODO notes
 
 ## Testing
 
