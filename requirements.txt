@@ -18,5 +18,6 @@ pylint==2.17.5
 pytest==7.4.2
 PyYAML==6.0.1
 tomlkit==0.12.1
+waitress==2.1.2
 Werkzeug==2.3.7
 wrapt==1.15.0
