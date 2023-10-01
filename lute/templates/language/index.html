@@ -1,0 +1,16 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Language index{% endblock %}
+
+{% block header %}Language index{% endblock %}
+
+{% block content %}
+
+  <ul>
+    {% for lang in languages %}
+    <li>{{ lang.LgName }}</li>
+    {% endfor %}
+  </ul>
+
+{% endblock %}

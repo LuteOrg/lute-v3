@@ -3,7 +3,9 @@
   <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
-  <h1>Content here:</h1>
+
+  <h1>{% block header %}{% endblock %}</h1>
+
   {% block content %}{% endblock %}
 </body>
 </html>

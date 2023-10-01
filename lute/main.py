@@ -9,6 +9,7 @@ from lute.dbsetup.migrator import SqliteMigrator
 from lute.dbsetup.setup import BackupManager, Setup
 
 from lute.db import db
+from . import language
 
 def _get_config():
     """
@@ -83,9 +84,7 @@ def _create_app(app_config):
 
     db.init_app(app)
 
-    # Blueprints to come
-    # from . import auth
-    # app.register_blueprint(auth.bp)
+    app.register_blueprint(language.bp)
 
     @app.route('/')
     def index():
