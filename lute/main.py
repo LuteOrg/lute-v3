@@ -3,7 +3,7 @@ Main entry point.
 """
 
 import os
-from flask import Flask
+from flask import Flask, render_template
 from lute.app_config import AppConfig
 from lute.dbsetup.migrator import SqliteMigrator
 from lute.dbsetup.setup import BackupManager, Setup
@@ -89,16 +89,11 @@ def _create_app(app_config):
 
     @app.route('/')
     def index():
-        content = f"""
-        <html>
-        <body>
-        <p>Welcome to Lute</p>
-        <p>DB = {app_config.dbname}</p>
-        <p>Data path = {app_config.datapath}</p>
-        </body>
-        </html>
-        """
-        return content
+        return render_template(
+            'index.html',
+            dbname = app_config.dbname,
+            datapath = app_config.datapath
+        )
 
     return app
 
