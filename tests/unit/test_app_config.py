@@ -22,7 +22,7 @@ def test_valid_config(tmp_path):
 
     app_config = AppConfig(config_file)
     assert app_config.datapath == 'data_path'
-    assert app_config.sqliteconn == 'sqlite:///data_path/my_db'
+    assert app_config.sqliteconnstring == 'sqlite:///data_path/my_db'
 
 
 def test_missing_dbname_throws(tmp_path):

@@ -70,6 +70,6 @@ class AppConfig:
 
 
     @property
-    def sqliteconn(self):
+    def sqliteconnstring(self):
         "Full sqlite connection string."
         return f'sqlite:///{self.dbfilename}'
