@@ -7,6 +7,7 @@ import yaml
 import pytest
 
 from lute.app_config import AppConfig
+from lute.main import init_db_and_app
 
 @pytest.fixture(name="testconfig")
 def fixture_config():
@@ -42,3 +43,13 @@ def fixture_config():
 
     ac = AppConfig(configfile)
     yield ac
+
+
+@pytest.fixture(name="_demo_db")
+def fixture_demo_db(testconfig):
+    """
+    A clean instance of the demo database.
+    """
+    if os.path.exists(testconfig.dbfilename):
+        os.unlink(testconfig.dbfilename)
+    init_db_and_app(testconfig)
