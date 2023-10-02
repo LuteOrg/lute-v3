@@ -48,26 +48,15 @@ def fixture_config():
     yield ac
 
 
-# Prefixing fixture name with _ to prevent pylint unused-argument
-# (ref https://gist.github.com/needs/2cf888b317d07c3bd78e71d95bc16f10)
-@pytest.fixture(name="_testdb")
-def fixture_testdb(testconfig):
-    """
-    Set up new db for testing.
-    """
-    dbfullfilepath = os.path.join(testconfig.datapath, testconfig.dbname)
-    if os.path.exists(dbfullfilepath):
-        os.unlink(dbfullfilepath)
-
-
-def test_init_no_existing_database(testconfig, _testdb):
+def test_init_no_existing_database(testconfig):
     """
     If no db exists, init should:
     - do the db setup
     - create the flask app
     """
+    if os.path.exists(testconfig.dbfilename):
+        os.unlink(testconfig.dbfilename)
 
-    assert os.path.exists(testconfig.dbfilename) is False, 'no db'
     app = init_db_and_app()
 
     assert os.path.exists(testconfig.dbfilename) is True, 'db exists'
