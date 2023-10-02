@@ -1,8 +1,12 @@
 # Makefile for Python tasks.
 
-# Run tests only
+# Run tests only.  export some ARGS before using if you want to filter tests.
 test:
 	python -m pytest tests/ $(ARGS)
+
+# Test all (no args) and lint
+testall: lint
+	python -m pytest tests/
 
 # Run tests and show print() messages
 testprint:
