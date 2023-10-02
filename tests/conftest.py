@@ -90,5 +90,5 @@ def fixture_empty_db(testconfig):
     with app.app_context():
         with db.engine.begin() as conn:
             for t in tables:
-                conn.execute(text(f"delete from {t}"));
+                conn.execute(text(f"delete from {t}"))
         yield

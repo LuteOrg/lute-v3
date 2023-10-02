@@ -27,12 +27,12 @@ def test_save_new_language_smoke_test(_empty_db):
     """
     Validating model save only.
     """
-    sql = "select LgName from languages";
+    sql = "select LgName from languages"
     assert_sql_result(sql, [], 'empty table')
 
     lang = Language()
-    lang.LgName = 'abc'
-    lang.LgDict1URI = 'something'
+    lang.name = 'abc'
+    lang.dict_1_uri = 'something'
 
     db.session.add(lang)
     db.session.commit()

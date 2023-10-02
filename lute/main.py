@@ -9,8 +9,6 @@ from lute.dbsetup.setup import BackupManager, Setup
 
 from lute.db import db
 
-from lute.models.language import Language
-
 from . import language
 
 
