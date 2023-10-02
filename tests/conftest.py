@@ -6,7 +6,10 @@ import os
 import yaml
 import pytest
 
+from sqlalchemy import text
+
 from lute.app_config import AppConfig
+from lute.db import db
 from lute.main import init_db_and_app
 
 @pytest.fixture(name="testconfig")
@@ -53,3 +56,39 @@ def fixture_demo_db(testconfig):
     if os.path.exists(testconfig.dbfilename):
         os.unlink(testconfig.dbfilename)
     init_db_and_app(testconfig)
+
+
+@pytest.fixture(name="_empty_db")
+def fixture_empty_db(testconfig):
+    """
+    An empty db!
+    """
+    if os.path.exists(testconfig.dbfilename):
+        os.unlink(testconfig.dbfilename)
+    # Clearing everything out in ref-integrity order.
+    tables = [
+        "sentences",
+        "settings",
+
+        "booktags",
+        "bookstats",
+
+        "wordtags",
+        "wordparents",
+        "wordimages",
+        "wordflashmessages",
+
+        "tags",
+        "tags2",
+        "texts",
+        "books",
+        "words",
+        "languages"
+    ]
+
+    app = init_db_and_app(testconfig)
+    with app.app_context():
+        with db.engine.begin() as conn:
+            for t in tables:
+                conn.execute(text(f"delete from {t}"));
+        yield

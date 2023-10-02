@@ -8,6 +8,9 @@ from lute.dbsetup.migrator import SqliteMigrator
 from lute.dbsetup.setup import BackupManager, Setup
 
 from lute.db import db
+
+from lute.models.language import Language
+
 from . import language
 
 
@@ -74,6 +77,9 @@ def _create_app(app_config):
     app.config.from_mapping(config)
 
     db.init_app(app)
+
+    with app.app_context():
+        db.create_all()
 
     app.register_blueprint(language.bp)
 
