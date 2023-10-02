@@ -18,7 +18,7 @@ def test_init_no_existing_database(testconfig):
     if os.path.exists(testconfig.dbfilename):
         os.unlink(testconfig.dbfilename)
 
-    app = init_db_and_app()
+    app = init_db_and_app(testconfig)
 
     assert os.path.exists(testconfig.dbfilename) is True, 'db exists'
     assert testconfig.dbname.startswith('test_')

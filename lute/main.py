@@ -4,20 +4,11 @@ Main entry point.
 
 import os
 from flask import Flask, render_template
-from lute.app_config import AppConfig
 from lute.dbsetup.migrator import SqliteMigrator
 from lute.dbsetup.setup import BackupManager, Setup
 
 from lute.db import db
 from . import language
-
-def _get_config():
-    """
-    Build config using ../config/config.yml
-    """
-    thisdir = os.path.dirname(os.path.realpath(__file__))
-    configfile = os.path.join(thisdir, '..', 'config', 'config.yml')
-    return AppConfig(configfile)
 
 
 def _setup_app_dirs(app_config):
@@ -97,12 +88,11 @@ def _create_app(app_config):
     return app
 
 
-def init_db_and_app():
+def init_db_and_app(app_config):
     """
     Main entry point.  Calls dbsetup, and returns Flask app.
     """
 
-    app_config = _get_config()
     _setup_app_dirs(app_config)
     _setup_db(app_config)
 
