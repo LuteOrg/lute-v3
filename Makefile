@@ -1,7 +1,7 @@
 # Makefile for Python tasks.
 
-# Run tests
-test: lint
+# Run tests only
+test:
 	python -m pytest tests/ $(ARGS)
 
 # Run tests and show print() messages
