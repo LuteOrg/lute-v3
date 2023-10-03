@@ -27,7 +27,7 @@ def test_save_new_language_smoke_test(_empty_db):
     """
     Validating model save only.
     """
-    sql = "select LgName from languages"
+    sql = "select LgName, LgRightToLeft from languages"
     assert_sql_result(sql, [], 'empty table')
 
     lang = Language()
@@ -37,4 +37,10 @@ def test_save_new_language_smoke_test(_empty_db):
     db.session.add(lang)
     db.session.commit()
 
-    assert_sql_result(sql, ['abc'], 'have language')
+    assert_sql_result(sql, ['abc; 0'], 'have language')
+
+    lang.right_to_left = True
+
+    db.session.add(lang)
+    db.session.commit()
+    assert_sql_result(sql, ['abc; 1'], 'rtl is True')

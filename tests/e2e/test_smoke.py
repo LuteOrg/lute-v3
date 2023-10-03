@@ -2,33 +2,30 @@
 Smoke tests, just hitting various pages and ensuring things work.
 """
 
-def test_smoke_pages(demo_client):
+def _run_checks(client, pagechecks):
     """
-    All pages should work.
+    Check all pages return 200, have content.
     """
+    for p, checks in pagechecks.items():
+        resp = client.get(p)
+        assert resp.status_code == 200, f"{p} OK"
+        for c in checks:
+            assert bytes(c, 'utf-8') in resp.data, f"{p} content"
 
-    checks = {
+
+def test_smoke_pages(demo_client):
+    "Hit pages, ensure 200 status, and expected content is present."
+    pagechecks = {
         '/': [ 'Lute' ],  # TODO:add_Tutorial_check
         '/language/index': [ 'English' ],
     }
-    for p in checks.keys():
-        resp = demo_client.get(p)
-        assert resp.status_code == 200, f"{p} OK"
-        for c in checks[p]:
-            assert bytes(c, 'utf-8') in resp.data, f"{p} content"
+    _run_checks(demo_client, pagechecks)
 
 
 def test_smoke_empty_db_pages(empty_client):
-    """
-    All pages should work.
-    """
-
-    checks = {
-        '/': [ 'Lute' ],  # TODO:add_Tutorial_check
+    "Some pages have special content blocks when no data is defined."
+    pagechecks = {
+        '/': [ 'Lute' ],  # TODO:add_no_books_check
         '/language/index': [ 'No languages defined' ],
     }
-    for p in checks.keys():
-        resp = empty_client.get(p)
-        assert resp.status_code == 200, f"{p} OK"
-        for c in checks[p]:
-            assert bytes(c, 'utf-8') in resp.data, f"{p} content"
+    _run_checks(empty_client, pagechecks)

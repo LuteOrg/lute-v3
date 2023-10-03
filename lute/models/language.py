@@ -34,6 +34,9 @@ class Language(db.Model): # pylint: disable=too-few-public-methods
     show_romanization = db.Column('LgShowRomanization', db.Boolean, default=False)
     parser_type = db.Column('LgParserType', db.String(20), default='spacedel')
 
+    def __repr__(self):
+        return f"<Language {self.id} '{self.name}'>"
+
     # relationships.
     # books = db.relationship('Book', backref='language', lazy='extra')
     # terms = db.relationship('Term', backref='language', lazy='extra')
