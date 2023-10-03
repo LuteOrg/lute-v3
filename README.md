@@ -37,11 +37,30 @@ source .venv/bin/activate   # if necessary
 python main.py
 ```
 
+# When done, Ctl-C then
+
+```
+deactivate
+```
+
 * Open web browser to http://localhost:5000
 
 # Development
 
 TODO notes
+
+## Running in dev mode
+
+The script `dev.py` runs the built-in Flask server in dev/debug mode.
+
+For some reason, you have to supply the full path when running that file.  See that file's comments for notes.
+
+e.g. for Mac:
+
+```
+# cd /path/to/lute3
+python `pwd`/dev.py
+```
 
 ## Testing
 
