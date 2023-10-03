@@ -46,3 +46,27 @@ def edit(id):
             flash(e, 'error')
 
     return render_template('language/edit.html', form=form, language=language)
+
+
+@bp.route('/new', methods=['GET', 'POST'])
+def new():
+    """
+    Create a new language.
+    """
+    language = Language()
+    form = LanguageForm(obj=language)
+
+    if form.validate_on_submit():
+        try:
+            form.populate_obj(language)
+            current_app.db.session.add(language)
+            current_app.db.session.commit()
+            flash(f'Language {language.name} created', 'success')
+            return redirect(url_for('language.index'))
+        except IntegrityError as e:
+            # TODO:better_integrity_error - currently shows raw message.
+            flash(e.orig.args, 'error')
+        except Error as e:
+            flash(e, 'error')
+
+    return render_template('language/edit.html', form=form, language=language)
