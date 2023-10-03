@@ -10,6 +10,8 @@ from lute.app_config import AppConfig
 
 def write_file(config_file, config_data):
     "Write config file."
+    if 'ENV' not in config_data:
+        config_data['ENV'] = 'dev'
     with open(config_file, 'w', encoding='utf-8') as file:
         yaml.dump(config_data, file)
 
@@ -23,6 +25,7 @@ def test_valid_config(tmp_path):
     app_config = AppConfig(config_file)
     assert app_config.datapath == 'data_path'
     assert app_config.sqliteconnstring == 'sqlite:///data_path/my_db'
+    assert app_config.env == 'dev'
 
 
 def test_missing_dbname_throws(tmp_path):
@@ -54,10 +57,23 @@ def test_system_specific_datapath_returned_if_DATAPATH_not_specified(tmp_path):
     assert 'Lute3' in app_config.datapath
 
 
+def test_env_can_only_be_prod_or_dev(tmp_path):
+    """
+    Throws error if not prod or dev.
+    """
+    config_file = tmp_path / 'default_datapath.yaml'
+    config_data = {'DBNAME': 'my_db', 'ENV': 'blah'}
+    write_file(config_file, config_data)
+
+    with pytest.raises(ValueError, match="Invalid ENV blah, can only be prod or dev."):
+        AppConfig(config_file)
+
+
 def test_invalid_yaml_throws(tmp_path):
     "File must be valid."
     config_file = tmp_path / 'invalid_yaml.yaml'
-    write_file(config_file, 'bad_config_data')
+    with open(config_file, 'w', encoding='utf-8') as f:
+        f.write('bad_data')
 
     with pytest.raises(ValueError, match="Invalid configuration format. Expected a dictionary."):
         AppConfig(config_file)

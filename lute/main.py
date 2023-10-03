@@ -65,6 +65,7 @@ def _create_app(app_config):
     config = {
         'SECRET_KEY': 'some_secret',
         'DATABASE': app_config.dbfilename,
+        'ENV': app_config.env,
         'SQLALCHEMY_DATABASE_URI': f'sqlite:///{app_config.dbfilename}',
 
         # ref https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/

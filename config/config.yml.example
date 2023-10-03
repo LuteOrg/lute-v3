@@ -1,5 +1,8 @@
 # Copy this file to config.yml, and edit it as needed.
 
+# The environment.  Either 'prod' or 'dev'
+ENV: prod
+
 # The database file name.
 # For tests, this must be "test_<name>.db" (e.g test_lute.db).
 # REQUIRED

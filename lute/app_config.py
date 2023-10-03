@@ -34,6 +34,14 @@ class AppConfig:
         if 'DBNAME' not in config:
             raise ValueError("Config file must have 'DBNAME'")
 
+        if 'ENV' not in config:
+            raise ValueError("Config file must have 'ENV'")
+
+        env = config.get('ENV')
+        if env not in [ 'prod', 'dev']:
+            raise ValueError(f"Invalid ENV {env}, can only be prod or dev.")
+        self._env = env
+
         self._db_name = config.get('DBNAME')
         self._data_path = config.get('DATAPATH', None)
         if self._data_path is None:
@@ -46,6 +54,12 @@ class AppConfig:
         "Get user's appdata directory from platformdirs."
         dirs = PlatformDirs("Lute3", "Lute3")
         return dirs.user_data_dir
+
+
+    @property
+    def env(self):
+        "App environment (dev or prod)."
+        return self._env
 
 
     @property
