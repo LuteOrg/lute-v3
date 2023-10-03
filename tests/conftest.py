@@ -58,14 +58,9 @@ def fixture_demo_db(testconfig):
     init_db_and_app(testconfig, { 'TESTING': True })
 
 
-@pytest.fixture(name="_empty_db")
-def fixture_empty_db(testconfig):
-    """
-    An empty db!
-    """
-    if os.path.exists(testconfig.dbfilename):
-        os.unlink(testconfig.dbfilename)
-    # Clearing everything out in ref-integrity order.
+def _delete_all_from_database(app):
+    "Clean out all db tables."
+        # Clearing everything out in ref-integrity order.
     tables = [
         "sentences",
         "settings",
@@ -85,12 +80,22 @@ def fixture_empty_db(testconfig):
         "words",
         "languages"
     ]
-
-    app = init_db_and_app(testconfig, { 'TESTING': True })
     with app.app_context():
         with db.engine.begin() as conn:
             for t in tables:
                 conn.execute(text(f"delete from {t}"))
+
+
+@pytest.fixture(name="_empty_db")
+def fixture_empty_db(testconfig):
+    """
+    An empty db!
+    """
+    if os.path.exists(testconfig.dbfilename):
+        os.unlink(testconfig.dbfilename)
+    app = init_db_and_app(testconfig, { 'TESTING': True })
+    _delete_all_from_database(app)
+    with app.app_context():
         yield
 
 
@@ -110,4 +115,13 @@ def fixture_demo_client(app_with_demo):
     """
     Client using demo-data-loaded application.
     """
+    return app_with_demo.test_client()
+
+
+@pytest.fixture(name = "empty_client")
+def fixture_empty_client(app_with_demo):
+    """
+    Client using empty database application.
+    """
+    _delete_all_from_database(app_with_demo)
     return app_with_demo.test_client()
