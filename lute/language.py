@@ -2,7 +2,7 @@
 /language endpoints.
 """
 
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, current_app, render_template, redirect, url_for, flash
 from lute.models.language import Language
 from lute.forms import LanguageForm
 from lute import db
@@ -26,16 +26,16 @@ def edit(id):
     """
     language = Language.query.get(id)
     if not language:
-        flash('Language not found', 'danger')
+        flash(f'Language {id} not found', 'danger')
         return redirect(url_for('language.index'))
 
     form = LanguageForm(obj=language)
 
     if form.validate_on_submit():
         form.populate_obj(language)
-        db.session.add(language)
-        db.session.commit()
-        flash('Language updated successfully', 'success')
+        current_app.db.session.add(language)
+        current_app.db.session.commit()
+        flash(f'Language {language.name} updated', 'success')
         return redirect(url_for('language.index'))
 
     return render_template('language/edit.html', form=form, language=language)

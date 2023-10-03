@@ -81,6 +81,8 @@ def _create_app(app_config, extra_config):
     with app.app_context():
         db.create_all()
 
+    app.db = db
+
     app.register_blueprint(language.bp)
 
     @app.route('/')
