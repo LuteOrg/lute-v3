@@ -2,6 +2,7 @@
 /language endpoints.
 """
 
+from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
 from lute.models.language import Language
 from lute.forms import LanguageForm
@@ -32,10 +33,16 @@ def edit(id):
     form = LanguageForm(obj=language)
 
     if form.validate_on_submit():
-        form.populate_obj(language)
-        current_app.db.session.add(language)
-        current_app.db.session.commit()
-        flash(f'Language {language.name} updated', 'success')
-        return redirect(url_for('language.index'))
+        try:
+            form.populate_obj(language)
+            current_app.db.session.add(language)
+            current_app.db.session.commit()
+            flash(f'Language {language.name} updated', 'success')
+            return redirect(url_for('language.index'))
+        except IntegrityError as e:
+            # TODO:better_integrity_error - currently shows raw message.
+            flash(e.orig.args, 'error')
+        except Error as e:
+            flash(e, 'error')
 
     return render_template('language/edit.html', form=form, language=language)
