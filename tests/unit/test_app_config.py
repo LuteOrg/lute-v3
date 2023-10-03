@@ -28,6 +28,16 @@ def test_valid_config(tmp_path):
     assert app_config.env == 'dev'
 
 
+def test_ENV_required(tmp_path):
+    "Throws otherwise."
+    config_file = tmp_path / 'valid_config.yaml'
+    config_data = {'DBNAME': 'my_db', 'DATAPATH': 'data_path'}
+    with open(config_file, 'w', encoding='utf-8') as file:
+        yaml.dump(config_data, file)
+    with pytest.raises(ValueError, match="Config file must have 'ENV'"):
+        app_config = AppConfig(config_file)
+
+
 def test_missing_dbname_throws(tmp_path):
     """
     File must contain DBNAME.  Testing/dev environment will have
