@@ -7,10 +7,12 @@
 
 {% block content %}
 
+<p>
   <ul>
     {% for lang in languages %}
-    <li>{{ lang.LgName }}</li>
+    <li>{{ lang.name }}</li>
     {% endfor %}
   </ul>
+</p>
 
 {% endblock %}

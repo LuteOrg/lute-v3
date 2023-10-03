@@ -14,5 +14,5 @@ def index():
     """
     List all languages.
     """
-    languages = db.session.execute(db.select(Language).order_by(Language.LgName)).scalars()
+    languages = db.session.execute(db.select(Language).order_by(Language.name)).scalars()
     return render_template('language/index.html', languages=languages)

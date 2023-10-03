@@ -86,9 +86,28 @@ def fixture_empty_db(testconfig):
         "languages"
     ]
 
-    app = init_db_and_app(testconfig)
+    app = init_db_and_app(testconfig, { 'TESTING': True })
     with app.app_context():
         with db.engine.begin() as conn:
             for t in tables:
                 conn.execute(text(f"delete from {t}"))
         yield
+
+
+@pytest.fixture(name="app_with_demo")
+def fixture_demo_app(testconfig):
+    """
+    App with database loaded with demo data.
+    """
+    if os.path.exists(testconfig.dbfilename):
+        os.unlink(testconfig.dbfilename)
+    app = init_db_and_app(testconfig, { 'TESTING': True })
+    yield app
+
+
+@pytest.fixture(name = "demo_client")
+def fixture_demo_client(app_with_demo):
+    """
+    Client using demo-data-loaded application.
+    """
+    return app_with_demo.test_client()
