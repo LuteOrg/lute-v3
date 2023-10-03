@@ -55,7 +55,7 @@ def fixture_demo_db(testconfig):
     """
     if os.path.exists(testconfig.dbfilename):
         os.unlink(testconfig.dbfilename)
-    init_db_and_app(testconfig)
+    init_db_and_app(testconfig, { 'TESTING': True })
 
 
 @pytest.fixture(name="_empty_db")

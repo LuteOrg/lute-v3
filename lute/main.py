@@ -54,7 +54,7 @@ def _setup_db(app_config):
     setup.setup()
 
 
-def _create_app(app_config):
+def _create_app(app_config, extra_config):
     """
     Create the app using the given configuration,
     and init the SqlAlchemy db.
@@ -73,7 +73,8 @@ def _create_app(app_config):
         'SQLALCHEMY_TRACK_MODIFICATIONS': False,
     }
 
-    app.config.from_mapping(config)
+    final_config = { **config, **extra_config }
+    app.config.from_mapping(final_config)
 
     db.init_app(app)
 
@@ -93,14 +94,18 @@ def _create_app(app_config):
     return app
 
 
-def init_db_and_app(app_config):
+def init_db_and_app(app_config, extra_config = None):
     """
     Main entry point.  Calls dbsetup, and returns Flask app.
+
+    Use extra_config to pass { 'TESTING': True } during unit tests.
     """
 
     _setup_app_dirs(app_config)
     _setup_db(app_config)
 
-    app = _create_app(app_config)
+    if extra_config is None:
+        extra_config = {}
+    app = _create_app(app_config, extra_config)
 
     return app
