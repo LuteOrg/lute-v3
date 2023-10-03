@@ -1,0 +1,650 @@
+/**
+ * \file
+ * \brief Main stylesheet for the default theme.
+ */
+
+ body
+ {
+   background-color: #FFFFFF;
+   color: #000000;
+   font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
+   margin-left: 30px;
+   padding: 0px;
+ }
+
+ .lutelogo
+ {
+     margin-right: 15px;
+     float: left;
+     width: 75px;
+     height: auto;
+ }
+
+ .lutelogo_small
+ {
+     margin-right: 2px;
+     float: left;
+     width: 50px;
+     height: auto;
+ }
+
+ .flash-notice {
+     margin-top: 20px;
+     padding: 20px;
+     background-color: #fff3cd;
+     border-color: #ffeeba;
+ }
+
+ .small-flash-notice {
+     margin-top: 3px;
+     padding: 3px;
+     background-color: #fff3cd;
+     border-color: #ffeeba;
+ }
+
+ input[type=text]
+ {
+   font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
+   border: 1px solid #C6C6C6;
+   padding: 3px;
+ }
+
+ ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+   color: #D8D8D8;
+   opacity: 1; /* Firefox */
+ }
+
+ div#thetext {
+     margin-left: 20px;
+     margin-right: 20px;
+ }
+
+ div#thetext p {
+     line-height: 1.25;
+     margin-top: 1em;
+     margin-bottom: 1em;
+ }
+
+ table#text
+ {
+     width: 70%;
+ }
+
+ th, td {
+     padding: 2px;
+ }
+
+ table#text thead, table#text tr, table#text th:first-child, table#text tbody, table#text tr, table#text td:first-child {
+     width: 20%;
+     min-width: 20%;
+     max-width: 20%;
+     vertical-align: top;
+     word-break: break-all;
+ }
+
+ table#book
+ {
+     width: 70%;
+ }
+
+ table#book thead, table#book tr, table#book th:first-child, table#book tbody, table#book tr, table#book td:first-child {
+     width: 20%;
+     min-width: 20%;
+     max-width: 20%;
+     vertical-align: top;
+     word-break: break-all;
+ }
+
+ table#termimport
+ {
+     width: 70%;
+ }
+
+ table#termimport thead, table#termimport tr, table#termimport th:first-child, table#termimport tbody, table#termimport tr, table#termimport td:first-child {
+     width: 10%;
+     min-width: 10%;
+     max-width: 10%;
+     vertical-align: top;
+     word-break: break-all;
+ }
+ 
+ table#language
+ {
+     width: 80%;
+ }
+
+ table#language thead, table#language tr, table#language th:first-child, table#language tbody, table#language tr, table#language td:first-child {
+     width: 30%;
+     min-width: 30%;
+     max-width: 30%;
+     vertical-align: top;
+     word-break: break-word;
+ }
+
+ table#language ul
+ {
+     color: red;
+     list-style-type: none;
+     margin-block-start: 0em;
+     margin-block-end: 0em;
+     margin-inline-start: 0px;
+     margin-inline-end: 0px;
+     padding-inline-start: 0px;
+ }
+
+ input[type=text].form-text
+ {
+     width: 100%;
+     /* padding: 5px 5px; */
+     margin: 2px 0;
+     box-sizing: border-box;
+ }
+
+ textarea.form-largetextarea
+ {
+     /*
+     1em is /supposedly/ = the current font size, roughly
+     (ref https://stackoverflow.com/questions/2034544/
+     textareas-rows-and-cols-attribute-in-css),
+     but on my machine at least it doesn't appear to be so!
+     */
+     width:50em;
+     height:20em;
+     padding: 5px 5px;
+     margin: 2px 0;
+     box-sizing: border-box;
+     font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
+     border: 1px solid #C6C6C6;
+ }
+
+ div.help-text {
+     font-size: 0.8em;
+     font-style: italic;
+     color: gray !important;
+ }
+
+ .nomarginblock {
+     margin-block-start: 0px;
+     margin-block-end: 0px;
+ }
+
+ p
+ {
+   margin: 5px 0 5px 0;
+   padding: 0;
+ }
+ 
+ h3
+ {
+   margin: 0px 0 0px 0;
+   padding: 0;
+ }
+ 
+ h4
+ {
+   margin: 5px 0 10px 0;
+   padding: 0;
+ }
+
+ span.flashtextcopy {
+   background-color: yellow !important;
+ }
+
+ span.status0
+ {
+   background-color: #D5FFFF;
+   color: #000000;
+ }
+ 
+ span.status1
+ {
+   background-color: #F5B8A9;
+   color: #000000;
+ }
+ 
+ span.status2
+ {
+   background-color: #F5CCA9;
+   color: #000000;
+ }
+ 
+ span.status3
+ {
+   background-color: #F5E1A9;
+   color: #000000;
+ }
+ 
+ span.status4
+ {
+   background-color: #F5F3A9;
+   color: #000000;
+ }
+ 
+ span.status5
+ {
+   background-color: #DDFFDD;
+   color: #000000;
+ }
+
+ span.status99
+ {
+   /* no styling, just regular text.
+   background-color: #F8F8F8;
+   border-bottom: solid 2px #CCFFCC;
+   color: #000000;
+   */
+ }
+ 
+ span.status98
+ {
+   /* no styling, just regular text.
+   background-color: #F8F8F8;
+   border-bottom: dashed 1px #000000;
+   color: #000000;
+   */
+ }
+
+ span.hasflash:after {
+    content: "*";
+    color: black;
+ }
+
+ span.overlapped:before {
+    content: "\207A";
+    color: black;
+ }
+
+ span.textsentence {
+     /* The weird "font-size: 0%" prevents excess space between the spans! */
+     /* span.textitem then re-sets the font size for the words. */
+     font-size: 0%;
+ }
+
+ /** A word shown in the reading pane. */
+ span.textitem
+ {
+   font-size: 16px;
+   color: #000000;
+   display:inline-block;
+
+   /* disallow select, only allow mouse-down-drag-up to define multiword
+   terms. */
+   user-select: none;
+
+   /* Add a transparent border so that when the .wordhover or .kwordmarked
+   style is added, things don't get pushed around. */
+   border-bottom: 1px solid transparent;
+ }
+ 
+ span.status5stat
+ {
+   background-color: #BBFFBB;
+   color: #000000;
+ }
+ 
+ .textarea
+ {
+   font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
+   border: 1px solid #C6C6C6;
+   padding: 3px;
+ }
+ 
+ table.tab1
+ {
+   background-color: #f8f8f8;
+   margin-bottom: 10px;
+   margin-top: 10px;
+   border-top: 1px solid #808080;
+   border-left: 1px solid #808080;
+   width: 850px;
+ }
+ 
+ table.tab2
+ {
+   background-color: #f8f8f8;
+   margin-bottom: 10px;
+   margin-top: 10px;
+   border-top: 1px solid #808080;
+   border-left: 1px solid #808080;
+   width: 100%;
+ }
+ 
+ table.tab3
+ {
+   background-color: #f8f8f8;
+   margin-bottom: 10px;
+   margin-top: 10px;
+   border-top: 1px solid #808080;
+   border-left: 1px solid #808080;
+   width: auto;
+ }
+ 
+ td.td1
+ {
+   border-bottom: 1px solid #808080;
+   border-right: 1px solid #808080;
+   vertical-align: top;
+ }
+ 
+ td.td1bot
+ {
+   border-bottom: 1px solid #808080;
+   border-right: 1px solid #808080;
+   vertical-align: bottom;
+ }
+ 
+ th.th1
+ {
+   border-bottom: 1px solid #808080;
+   border-right: 1px solid #808080;
+   background-color: #DDDDDD;
+   vertical-align: top;
+ }
+ 
+ th.clickable
+ {
+   cursor: pointer;
+ }
+ 
+ .click
+ {
+   cursor: pointer;
+   color: #C00000;
+ }
+ 
+ .hide
+ {
+   display: none;
+ }
+ 
+a {
+    text-decoration: none;
+    color: #0000FF;
+}
+ 
+a:link {
+    color: #0000EE;
+}
+
+a:visited {
+    color: #0000EE;
+}
+
+a:hover {
+    color: #C00000;
+    text-decoration: underline;
+}
+
+a:focus {
+    color: #C00000;
+}
+
+a:active {
+    color: #C00000;
+}
+ 
+ 
+ img
+ {
+   border: 0pt none;
+ }
+ 
+ .red
+ {
+   color: #FF0000;
+   font-weight: bold;
+   background-color: #FFFFD0;
+   text-align: center;
+   font-size: 120%;
+ }
+ 
+ .left
+ {
+   text-align: left;
+ }
+ 
+ .right
+ {
+   text-align: right;
+ }
+ 
+ .center
+ {
+   text-align: center;
+ }
+ 
+ .bigger
+ {
+   font-size: 130%;
+ }
+ 
+ .smaller
+ {
+   font-size: 80%;
+ }
+ 
+ .backgray
+ {
+   background-color: #DDDDDD;
+ }
+ 
+ .backlightyellow
+ {
+   background-color: #FFFACD;
+ }
+ 
+ .small
+ {
+   color: black;
+   font-size: 60%;
+ }
+ 
+ #learnstatus
+ {
+   color: #000000;
+   font-size: 120%;
+   font-weight: bold;
+ }
+
+ #myfooter
+ {
+     clear: both;
+     font-size: 0.8em;
+     font-style: italic;
+     border-top: 1px groove #aaaaaa;
+     /* color: White; */
+     padding: 0;
+     /* text-align: center; */
+     vertical-align: middle;
+     line-height: normal;
+     margin: 0;
+     position: fixed;
+     bottom: 0px;
+     width: 100%;
+ }
+
+ .inline
+ {
+   display: inline;
+ }
+ 
+ .grayborder
+ {
+   border: 1pt solid #808080;
+ }
+ 
+ 
+ .width50px
+ {
+   width: 50px;
+ }
+ 
+ .width99pc
+ {
+   width: 99%;
+ }
+ 
+ .width45pc
+ {
+   width: 45%;
+ }
+ 
+ .borderl
+ {
+   border-left: 1px solid #000000;
+   border-top: 1px solid #000000;
+   border-bottom: 1px solid #000000;
+ }
+ 
+ .borderr
+ {
+   border-top: 1px solid #000000;
+   border-bottom: 1px solid #000000;
+   border-right: 1px solid #000000;
+ }
+ 
+ .uwordmarked
+ {
+   font-weight: bold;
+   border-top: 3px solid red;
+   border-bottom: 3px solid red;
+   border-right: 3px solid red;
+   border-left: 3px solid red;
+ }
+
+ .wordhover
+ {
+   border-bottom: 1px solid blue !important;
+ }
+
+ .kwordmarked
+ {
+   border-bottom: 1px solid red !important;
+ }
+
+ .newmultiterm
+ {
+   background: yellow !important;
+ }
+
+ #termtags
+ {
+   width: 340px;
+   margin-top: 0px;
+   margin-bottom: 0px;
+   margin-left: 2px;
+ }
+ 
+ #texttags
+ {
+   width: 340px;
+   margin-top: 0px;
+   margin-bottom: 0px;
+   margin-left: 2px;
+ }
+ 
+ .editable_textarea
+ {
+   display: inline;
+ }
+ 
+ .nowrap
+ {
+   white-space: nowrap;
+   margin-left: 20pt;
+ }
+ 
+ .borderleft
+ {
+   border-left: 1px solid black;
+   border-top: 1px solid black;
+   border-bottom: 1px solid black;
+   background-color: #EEEEEE;
+ }
+ 
+ .bordermiddle
+ {
+   border-top: 1px solid black;
+   border-bottom: 1px solid black;
+   background-color: #EEEEEE;
+ }
+ 
+ .borderright
+ {
+   border-right: 1px solid black;
+   border-top: 1px solid black;
+   border-bottom: 1px solid black;
+   background-color: #EEEEEE;
+ }
+ 
+ /** Make any block resizable */
+ .resizable
+ {
+  min-height: 30px;
+  min-width: 30px;
+  resize: both;
+  overflow: auto;
+  max-height: fit-content;
+  max-width: fit-content;
+ }
+
+ /* Widening the tooltip. */
+ div.ui-tooltip {
+    max-width: 400px !important;
+ }
+
+ .tooltip-image {
+     max-width: 150px;
+     max-height: 150px;
+     width: auto;
+     height: auto;
+ }
+
+ ul.sentencelist {
+     margin-block-start: 3px;
+ }
+
+ .termpopup-tag {
+     background-color: #e7e7e7;
+     color: black;
+     padding: 0 1px 0 1px;
+     border: 1px solid darkgrey;
+ }
+
+ /* */
+
+ ul.shorttaglist {
+     margin: 0;
+     padding: 0;
+     font-size: 1em;
+     margin-block-start: 0em;
+     margin-block-end: 0em;
+ }
+
+ ul.shorttaglist li {
+     padding: 0 18px 0 0.5em;
+     padding-left: 3px !important;
+     margin: 0 5px 0 0;
+     font-size: 85%;
+ }
+
+
+ ul.shorttaglist li.tagit-new {
+     padding: 0 18px 0 0.5em;
+     margin: 0 5px 0 0;
+     font-size: 85%;
+ }
+
+ ul.shorttaglist li.tagit-choice {
+     padding: 0 18px 0 0.5em;
+     margin: 0 5px 0 0;
+     font-size: 85%;
+ }
+
+ ul.shorttaglist li.tagit-choice-editable {
+     padding: 0 18px 0 0.5em;
+     margin: 0 5px 0 0;
+     font-size: 85%;
+ }
+
+ /* */

@@ -1,0 +1,68 @@
+/**
+ * Stylesheet for forms shown in right-hand frame in /read page.
+ */
+
+ body
+ {
+   background-color: #FFFFFF;
+   color: #000000;
+   font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
+   margin: 20px;
+   padding: 0px;
+ }
+ 
+ input[type=text]
+ {
+   font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
+   border: 1px solid #C6C6C6;
+   padding: 1px;
+ }
+
+ th, td {
+     padding: 0px;
+ }
+ 
+ table#term
+ {
+     width: 70%;
+ }
+
+ input[type=text].form-text
+ {
+     width: 100%;
+     /* padding: 5px 5px; */
+     margin: 0;
+     box-sizing: border-box;
+ }
+
+ .textarea
+ {
+   font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
+   border: 1px solid #C6C6C6;
+   padding: 3px;
+ }
+
+ .nomarginblock {
+     margin-block-start: 0px;
+     margin-block-end: 0px;
+ }
+
+ p
+ {
+   margin: 1px 0 1px 0;
+   padding: 0;
+ }
+ 
+ img
+ {
+   border: 0pt none;
+ }
+
+ .zoomableTermImage {
+     width: 25px;
+     transition: transform .2s; /* Animation */
+ }
+
+ .zoomableTermImage:hover {
+     transform: scale(10) translate(10px);
+ }
