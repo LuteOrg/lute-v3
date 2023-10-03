@@ -4,6 +4,10 @@
 </head>
 <body>
 
+  {% if config.ENV == 'dev' %}
+  <p style="background-color: red; color: white; margin: 2px; padding: 2px;">Dev environment.</p>
+  {% endif %}
+
   <h1>{% block header %}{% endblock %}</h1>
 
   {% block body %}{% endblock %}

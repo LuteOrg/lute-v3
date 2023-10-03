@@ -6,12 +6,32 @@
 
 {% block body %}
 
-<p>
-  <ul>
-    {% for lang in languages %}
-    <li>{{ lang.name }}</li>
+{% if languages|length == 0 %}
+  <p>No languages defined.</p>
+{% else %}
+
+<table class="table dataTable no-footer" style="width: 50%; margin: 0;">
+  <thead>
+    <tr>
+      <th>Language</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for language in languages %}
+    <tr>
+      <td>
+        <a href="/language/{{ language.id }}/edit">
+          {{ language.name }}
+        </a>
+      </td>
+
+      <!-- TODO:add_active_books_term_count -->
+    </tr>
     {% endfor %}
-  </ul>
-</p>
+  </tbody>
+</table>
+
+{% endif %}
+
 
 {% endblock %}
