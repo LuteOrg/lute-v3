@@ -35,7 +35,7 @@ def test_ENV_required(tmp_path):
     with open(config_file, 'w', encoding='utf-8') as file:
         yaml.dump(config_data, file)
     with pytest.raises(ValueError, match="Config file must have 'ENV'"):
-        app_config = AppConfig(config_file)
+        AppConfig(config_file)
 
 
 def test_missing_dbname_throws(tmp_path):

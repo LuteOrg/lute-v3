@@ -4,7 +4,6 @@
 
 from flask import Blueprint, render_template
 
-from lute.db import db
 from lute.models.language import Language
 
 bp = Blueprint('language', __name__, url_prefix='/language')
