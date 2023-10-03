@@ -47,7 +47,9 @@ deactivate
 
 # Development
 
-TODO notes
+## Using invoke for tasks
+
+Lute3 uses [Invoke](https://docs.pyinvoke.org/en/stable/index.html) to run tasks.  Tasks are in `tasks.py`.
 
 ## Running in dev mode
 
@@ -74,17 +76,9 @@ For tests, the config/config.yml must have:
 ### Commands
 
 ```
-# Run all
-make test        # python -m pytest
-
-# Run all and see any print statements
-make testprint   # python -m pytest -s
-
-# Run specific
-ARGS="-k test_setup" make test
-
-# or if working on a specific test:
-export ARGS="-k test_setup"
-make test
-export ARGS=""  # when done
+inv lint
+inv test   # Run all
+inv test --print   # Run all and see any print statements
+inv test --args="-k test_setup"   # Run specific
+inv coverage   # Coverage
 ```
