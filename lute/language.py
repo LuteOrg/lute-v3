@@ -20,16 +20,10 @@ def index():
     return render_template('language/index.html', languages=languages)
 
 
-@bp.route('/edit/<int:id>', methods=['GET', 'POST'])
-def edit(id):
+def _handle_form(language):
     """
-    Edit a language.
+    Handle the language processing.
     """
-    language = Language.query.get(id)
-    if not language:
-        flash(f'Language {id} not found', 'danger')
-        return redirect(url_for('language.index'))
-
     form = LanguageForm(obj=language)
 
     if form.validate_on_submit():
@@ -48,25 +42,22 @@ def edit(id):
     return render_template('language/edit.html', form=form, language=language)
 
 
+@bp.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit(id):
+    """
+    Edit a language.
+    """
+    language = Language.query.get(id)
+    if not language:
+        flash(f'Language {id} not found', 'danger')
+        return redirect(url_for('language.index'))
+    return _handle_form(language)
+
+
 @bp.route('/new', methods=['GET', 'POST'])
 def new():
     """
     Create a new language.
     """
     language = Language()
-    form = LanguageForm(obj=language)
-
-    if form.validate_on_submit():
-        try:
-            form.populate_obj(language)
-            current_app.db.session.add(language)
-            current_app.db.session.commit()
-            flash(f'Language {language.name} created', 'success')
-            return redirect(url_for('language.index'))
-        except IntegrityError as e:
-            # TODO:better_integrity_error - currently shows raw message.
-            flash(e.orig.args, 'error')
-        except Error as e:
-            flash(e, 'error')
-
-    return render_template('language/edit.html', form=form, language=language)
+    return _handle_form(language)
