@@ -5,6 +5,11 @@
 good-names=ex,_
 good-names-rgxs=[a-z]
 
+[MISCELLANEOUS]
+
+# List of note tags to take in consideration, separated by a comma.
+notes=FIXME,XXX
+
 ### placeholder - available settings
 ###
 ###
