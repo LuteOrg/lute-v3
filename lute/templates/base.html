@@ -10,13 +10,9 @@
   {% endif %}
 
   {% with messages = get_flashed_messages() %}
-  {% if messages %}
-  <ul class=flashes>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
+  {% for message in messages %}
+  <div class="flash-notice">{{ message }}</div>
+  {% endfor %}
   {% endwith %}
 
   <h1>{% block header %}{% endblock %}</h1>
