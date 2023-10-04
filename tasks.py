@@ -58,3 +58,11 @@ def coverage(c, html=False):
         c.run('open htmlcov/index.html')
     else:
         c.run('coverage report --omit="*/test*"')
+
+
+@task
+def todos(c):
+    """
+    Print code TODOs.
+    """
+    c.run('python utils/todos.py')

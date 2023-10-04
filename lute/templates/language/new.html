@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}New Language{% endblock %}
+
+{% block body %}
+<h2>Create new Language</h2>
+
+<p><i>Load from predefined:</i>
+  <select id="predefined">
+    {% for p in predefined %}
+    <option value="{{ p }}">{{ p }}</option>
+    {% endfor %}
+  </select>
+  <button onclick="location.href='/language/new/' + document.getElementById('predefined').value;">go</button>
+</p>
+
+<h1>TODO EXTRACT COMMON _form.html</h1>
+
+{% for field_name, field_errors in form.errors.items() %}
+<p>{{ field_name }}
+  <ul>
+    {% for error in field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+</p>
+{% endfor %}
+
+<form method="POST">
+  {{ form.hidden_tag() }}
+
+  <table id="language">
+  <tbody>
+
+    {% for field in form %}
+    {% if field.name != 'csrf_token' %}
+    <tr>
+      <td>{{ field.label(class="form-control-label") }}</td>
+      <td>{{ field(class="form-control") }}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+
+  </tbody>
+  </table>
+
+  <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<button onclick="window.location = '{{ url_for('language.index') }}'">Cancel</button>
+
+{% endblock %}

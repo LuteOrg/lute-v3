@@ -82,3 +82,41 @@ inv test --print   # Run all and see any print statements
 inv test --args="-k test_setup"   # Run specific
 inv coverage   # Coverage
 ```
+
+## TODOs
+
+Todos are in the code as comments, e.g.:
+
+```
+# TODO [<group name>:] detail
+```
+
+`inv todos` collects all of these in a simple report, eg:
+
+```
+-----------------
+lute
+
+Group: <None>
+  File: ./language.py
+    # TODO:better_integrity_error - currently shows raw message.
+  ...
+  
+Group: book
+  File: ./templates/index.html
+    <p>TODO book: book listing</p>
+
+Group: something
+  File: ./app_config.py
+    # TODO something: fix this
+
+-----------------
+tests
+
+Group: <None>
+  File: ./e2e/test_smoke.py
+    '/': [ 'Lute' ],  # TODO:add_Tutorial_check
+    '/': [ 'Lute' ],  # TODO:add_no_books_check
+```
+
+Keeping the TODOs standard simplifies the grepping, grouping, etc.

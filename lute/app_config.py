@@ -61,7 +61,6 @@ class AppConfig:
         "App environment (dev or prod)."
         return self._env
 
-
     @property
     def datapath(self):
         """
