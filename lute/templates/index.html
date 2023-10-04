@@ -3,9 +3,36 @@
 {% block title %}Lute index{% endblock %}
 
 {% block body %}
-<p>Welcome to Lute!</p>
-<p><a href="language/index">Languages</a></p>
 
-<hr />
-<p>DB = {{ dbname }}, Data path = {{ datapath }}</p>
+<!-- I'm not *supposed* to use tables for layout, but it works. -->
+<table style="table-layout: fixed">
+  <tr>
+    <td width="5px">
+      <img src="{{ url_for('static', filename='img/lute.png') }}" class="lutelogo" style="width: 75px; height: auto;" />
+    </td>
+    <td>
+      <h1 style="margin-block-end: 0px">Learning Using Texts (LUTE)</h1>
+      <p style="margin: 0px; font-size: 0.6em; font-style: italic;">{{ version }}</p>
+    </td>
+  </tr>
+</table>
+
+<br />
+<p>TODO book listing</p>
+
+<div id="userlinks" style="margin-top: 10px;">
+  <ul>
+    <li><a href="language/index">Languages</a></li>
+  </ul>
+</div>
+
+<footer id="myfooter">
+  <p>DB = {{ dbname }}, Data path = {{ datapath }}</p>
+  <p>
+    Lute is free and unencumbered software released into the
+    <a href="https://en.wikipedia.org/wiki/Public_domain_software" target="_blank">PUBLIC DOMAIN</a>. 
+    Ref <a href="http://unlicense.org/" target="_blank">http://unlicense.org/</a>
+  </p>
+</footer>
+
 {% endblock %}
