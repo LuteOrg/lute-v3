@@ -1,12 +1,67 @@
 <!doctype html>
 <head>
-  <title>{% block title %}{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>{% block title %}LUTE{% endblock %}</title>
+
+  {% if config.ENV == 'dev' %}
+  <link rel="icon" href="{{ url_for('static', filename='favicon_dev.ico') }}" type="image/x-icon"/>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon_dev.ico') }}" type="image/x-icon"/>
+  {% else %}
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico?v=2') }}" type="image/x-icon"/>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico?v=2') }}" type="image/x-icon"/>
+  {% endif %}
+
+  <meta name="viewport" content="width=900" />
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon-57x57.png') }}" />
+  <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='img/apple-touch-icon-72x72.png') }}" />
+  <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='img/apple-touch-icon-114x114.png') }}" />
+  <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='img/apple-touch-startup.png') }}" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+    
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-ui.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery.tagit.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/datatables.min.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+
+  <!-- TODO:add_custom_styles -->
+
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.scrollTo.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"  charset="utf-8"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.jeditable.mini.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/tag-it.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.hoverIntent.js') }}" charset="utf-8"></script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='js/lute.js') }}" charset="utf-8"></script>
+
+  <!-- TODO:add_STATUSES_TAGS_TEXTTAGS -->
 </head>
 <body>
 
+  {% if hide_home_link %}
+
   {% if config.ENV == 'dev' %}
-  <p style="background-color: red; color: white; margin: 2px; padding: 2px;">Dev environment.</p>
+  <p style="background-color: blue; color: white; margin: 2px; padding: 2px;">Dev environment.</p>
+  {% endif %}
+
+  {% else %}
+
+  <!-- I'm not *supposed* to use tables for layout, but it works. -->
+  <table style="table-layout: fixed; border-spacing: 0; ">
+    <tr>
+      <td width="2px">
+        <img src="{{ url_for('static', filename='img/lute.png') }}" class="lutelogo_small" />
+      </td>
+      <td>
+        <a href="/" tabindex="-1">Home</a>
+        {% if config.ENV == 'dev' %}
+        <span style="background-color: blue; color: white; margin: 2px; padding: 2px;">Dev environment</span>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+
   {% endif %}
 
   {% with messages = get_flashed_messages() %}
@@ -16,7 +71,6 @@
   {% endwith %}
 
   <h1>{% block header %}{% endblock %}</h1>
-
   {% block body %}{% endblock %}
 </body>
 </html>

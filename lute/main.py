@@ -90,7 +90,8 @@ def _create_app(app_config, extra_config):
         return render_template(
             'index.html',
             dbname = app_config.dbname,
-            datapath = app_config.datapath
+            datapath = app_config.datapath,
+            hide_home_link = True
         )
 
     return app
