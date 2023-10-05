@@ -1,8 +1,16 @@
+"""
+Flask-wtf forms.
+"""
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, SelectField
-from wtforms.validators import DataRequired, URL
+from wtforms.validators import DataRequired
+
 
 class LanguageForm(FlaskForm):
+    """
+    Language.
+    """
     name = StringField('Name', validators=[DataRequired()])
     dict_1_uri = StringField('Dictionary 1', validators=[DataRequired()])
     dict_2_uri = StringField('Dictionary 2')
