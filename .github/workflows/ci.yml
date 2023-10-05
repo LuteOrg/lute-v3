@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: [ "develop", "master" ]
+  pull_request:
+    branches: [ "develop", "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+
+  # Basic linting and tests.
+  base-ci:
+
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        cache: 'pip' # caching pip dependencies
+
+    - run: pip install -r requirements.txt
+
+    - name: Setup config
+      run: |
+        echo "ENV: dev" > config.yml
+        echo "DBNAME: test_lute.db" >> config.yml
+
+    - name: Lint
+      run: inv lint
+
+    - name: Test
+      run: inv test
