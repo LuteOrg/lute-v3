@@ -106,7 +106,11 @@ def fixture_demo_app(testconfig):
     """
     if os.path.exists(testconfig.dbfilename):
         os.unlink(testconfig.dbfilename)
-    app = init_db_and_app(testconfig, { 'TESTING': True })
+    extra_config = {
+        'WTF_CSRF_ENABLED': False,
+        'TESTING': True
+    }
+    app = init_db_and_app(testconfig, extra_config)
     yield app
 
 
