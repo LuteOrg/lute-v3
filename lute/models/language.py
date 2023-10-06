@@ -2,7 +2,9 @@
 Language entity.
 """
 
+import yaml
 from lute.db import db
+
 
 class Language(db.Model): # pylint: disable=too-few-public-methods
     """
@@ -53,26 +55,26 @@ class Language(db.Model): # pylint: disable=too-few-public-methods
                 val = d[key]
                 # Handle boolean values
                 if isinstance(val, str):
-                    val = val.lower()
-                    if val == 'true':
+                    temp = val.lower()
+                    if temp == 'true':
                         val = True
-                    elif val == 'false':
+                    elif temp == 'false':
                         val = False
                 setattr(lang, method, val)
 
         # Define mappings for fields
         mappings = {
-            'name': 'setLgName',
-            'dict_1': 'setLgDict1URI',
-            'dict_2': 'setLgDict2URI',
-            'sentence_translation': 'setLgGoogleTranslateURI',
-            'show_romanization': 'setLgShowRomanization',
-            'right_to_left': 'setLgRightToLeft',
-            'parser_type': 'setLgParserType',
-            'character_substitutions': 'setLgCharacterSubstitutions',
-            'split_sentences': 'setLgRegexpSplitSentences',
-            'split_sentence_exceptions': 'setLgExceptionsSplitSentences',
-            'word_chars': 'setLgRegexpWordCharacters',
+            'name': 'name',
+            'dict_1': 'dict_1_uri',
+            'dict_2': 'dict_2_uri',
+            'sentence_translation': 'sentence_translate_uri',
+            'show_romanization': 'show_romanization',
+            'right_to_left': 'right_to_left',
+            'parser_type': 'parser_type',
+            'character_substitutions': 'character_substitutions',
+            'split_sentences': 'regexp_split_sentences',
+            'split_sentence_exceptions': 'exceptions_split_sentences',
+            'word_chars': 'word_characters',
         }
 
         for key in d.keys():

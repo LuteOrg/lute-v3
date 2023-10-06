@@ -50,20 +50,22 @@ def test_save_new_language_smoke_test(_empty_db):
 
 
 @pytest.fixture
-def yaml_test_file():
-    test_file_path = "../../../demo/languages/english.yaml"
-    absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__), test_file_path))
+def yaml_folder():
+    lang_path = "../../../demo/languages/"
+    absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__), lang_path))
     return absolute_path
 
 
-def test_new_language_from_yaml_file(yaml_test_file):
+def test_new_english_from_yaml_file(yaml_folder):
     """
-    Can load a new language from yaml definition.
+    Smoke test, can load a new language from yaml definition.
     """
-    lang = Language.fromYaml(yaml_test_file)
+    f = os.path.join(yaml_folder, 'english.yaml')
+    lang = Language.fromYaml(f)
 
     # Replace the following assertions with your specific expectations
-    assert lang.lgName == "Some Name"
-    assert lang.lgDict1URI == "Dict1 URI"
-    assert lang.lgDict2URI == "Dict2 URI"
-    # Add more assertions for other attributes as needed
+    assert lang.name == "English"
+    assert lang.dict_1_uri == "https://en.thefreedictionary.com/###"
+    assert lang.sentence_translate_uri == "*https://www.deepl.com/translator#en/en/###"
+    assert lang.show_romanization == False, 'uses default'
+    assert lang.right_to_left == False, 'uses default'
