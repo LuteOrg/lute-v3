@@ -16,8 +16,11 @@ def _run_checks(client, pagechecks):
 def test_smoke_pages(demo_client):
     "Hit pages, ensure 200 status, and expected content is present."
     pagechecks = {
-        '/': [ 'Lute' ],  # TODO:add_Tutorial_check
+        '/': [ 'Lute' ],  # TODO smoke: add_Tutorial_check
         '/language/index': [ 'English' ],
+        '/language/new': [ 'Create new Language' ],
+        '/language/new/English': [ 'Create new Language', 'https://en.thefreedictionary.com/###' ],
+        '/language/edit/1': [ 'Edit Language' ],
     }
     _run_checks(demo_client, pagechecks)
 
@@ -25,7 +28,7 @@ def test_smoke_pages(demo_client):
 def test_smoke_empty_db_pages(empty_client):
     "Some pages have special content blocks when no data is defined."
     pagechecks = {
-        '/': [ 'Lute' ],  # TODO:add_no_books_check
+        '/': [ 'Lute' ],  # TODO smoke: add_no_books_check
         '/language/index': [ 'No languages defined' ],
     }
     _run_checks(empty_client, pagechecks)
