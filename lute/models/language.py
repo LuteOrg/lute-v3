@@ -39,6 +39,17 @@ class Language(db.Model): # pylint: disable=too-few-public-methods
     def __repr__(self):
         return f"<Language {self.id} '{self.name}'>"
 
+    def __init__(self):
+        self.character_substitutions = "´='|`='|’='|‘='|...=…|..=‥"
+        self.regexp_split_sentences = '.!?'
+        self.exceptions_split_sentences = 'Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.'
+        self.word_characters = 'a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ'
+        self.remove_spaces = False
+        self.split_each_char = False
+        self.right_to_left = False
+        self.show_romanization = False
+        self.parser_type = 'spacedel'
+
 
     @classmethod
     def fromYaml(cls, filename):
