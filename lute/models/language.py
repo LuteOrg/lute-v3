@@ -106,6 +106,7 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
         # if no_mecab:
         #    ret = [lang for lang in ret if lang.get_lg_parser_type() != 'japanese']
 
+        ret.sort(key=lambda x: x.name)
         return ret
 
 
