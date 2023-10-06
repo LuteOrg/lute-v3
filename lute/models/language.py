@@ -37,6 +37,51 @@ class Language(db.Model): # pylint: disable=too-few-public-methods
     def __repr__(self):
         return f"<Language {self.id} '{self.name}'>"
 
+
+    @classmethod
+    def fromYaml(cls, filename):
+        """
+        Create a new Language object from a yaml definition.
+        """
+        with open(filename, 'r') as file:
+            d = yaml.safe_load(file)
+
+        lang = cls()
+
+        def load(key, method):
+            if key in d:
+                val = d[key]
+                # Handle boolean values
+                if isinstance(val, str):
+                    val = val.lower()
+                    if val == 'true':
+                        val = True
+                    elif val == 'false':
+                        val = False
+                setattr(lang, method, val)
+
+        # Define mappings for fields
+        mappings = {
+            'name': 'setLgName',
+            'dict_1': 'setLgDict1URI',
+            'dict_2': 'setLgDict2URI',
+            'sentence_translation': 'setLgGoogleTranslateURI',
+            'show_romanization': 'setLgShowRomanization',
+            'right_to_left': 'setLgRightToLeft',
+            'parser_type': 'setLgParserType',
+            'character_substitutions': 'setLgCharacterSubstitutions',
+            'split_sentences': 'setLgRegexpSplitSentences',
+            'split_sentence_exceptions': 'setLgExceptionsSplitSentences',
+            'word_chars': 'setLgRegexpWordCharacters',
+        }
+
+        for key in d.keys():
+            funcname = mappings.get(key, '')
+            if funcname:
+                load(key, funcname)
+
+        return lang
+
     # relationships.
     # books = db.relationship('Book', backref='language', lazy='extra')
     # terms = db.relationship('Term', backref='language', lazy='extra')
