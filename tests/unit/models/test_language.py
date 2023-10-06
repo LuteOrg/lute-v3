@@ -4,8 +4,8 @@ Language model tests - getting, saving, etc.
 Low value but ensure that the db mapping is correct.
 """
 
-import pytest
 import os
+import pytest
 
 from lute.models.language import Language
 from lute.db import db
@@ -35,10 +35,10 @@ def test_new_language_has_sane_defaults():
     assert lang.regexp_split_sentences == '.!?'
     assert lang.exceptions_split_sentences == 'Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.'
     assert lang.word_characters == 'a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ'
-    assert lang.remove_spaces == False
-    assert lang.split_each_char == False
-    assert lang.right_to_left == False
-    assert lang.show_romanization == False
+    assert lang.remove_spaces is False
+    assert lang.split_each_char is False
+    assert lang.right_to_left is False
+    assert lang.show_romanization is False
     assert lang.parser_type == 'spacedel'
 
 
@@ -67,8 +67,9 @@ def test_save_new_language_smoke_test(_empty_db):
     assert_sql_result(sql, ['abc; 1; .!?'], 'rtl is True')
 
 
-@pytest.fixture
-def yaml_folder():
+@pytest.fixture(name="yaml_folder")
+def fixture_yaml_folder():
+    "Path to the demo files."
     lang_path = "../../../demo/languages/"
     absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__), lang_path))
     return absolute_path
@@ -85,5 +86,5 @@ def test_new_english_from_yaml_file(yaml_folder):
     assert lang.name == "English"
     assert lang.dict_1_uri == "https://en.thefreedictionary.com/###"
     assert lang.sentence_translate_uri == "*https://www.deepl.com/translator#en/en/###"
-    assert lang.show_romanization == False, 'uses default'
-    assert lang.right_to_left == False, 'uses default'
+    assert lang.show_romanization is False, 'uses default'
+    assert lang.right_to_left is False, 'uses default'
