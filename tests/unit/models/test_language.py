@@ -80,7 +80,7 @@ def test_new_english_from_yaml_file(yaml_folder):
     Smoke test, can load a new language from yaml definition.
     """
     f = os.path.join(yaml_folder, 'english.yaml')
-    lang = Language.fromYaml(f)
+    lang = Language.from_yaml(f)
 
     # Replace the following assertions with your specific expectations
     assert lang.name == "English"
@@ -88,3 +88,13 @@ def test_new_english_from_yaml_file(yaml_folder):
     assert lang.sentence_translate_uri == "*https://www.deepl.com/translator#en/en/###"
     assert lang.show_romanization is False, 'uses default'
     assert lang.right_to_left is False, 'uses default'
+
+
+def test_get_predefined():
+    """
+    Returns all the languages using the files in the demo folder.
+    """
+    langs = Language.get_predefined()
+    langnames = [lang.name for lang in langs]
+    for expected in [ 'English', 'French', 'Turkish' ]:
+        assert expected in langnames, expected

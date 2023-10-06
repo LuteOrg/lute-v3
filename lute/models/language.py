@@ -2,6 +2,8 @@
 Language entity.
 """
 
+import glob
+import os
 import yaml
 from lute.db import db
 
@@ -46,7 +48,7 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
 
 
     @classmethod
-    def fromYaml(cls, filename):
+    def from_yaml(cls, filename):
         """
         Create a new Language object from a yaml definition.
         """
@@ -88,6 +90,24 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
                 load(key, funcname)
 
         return lang
+
+
+    @classmethod
+    def get_predefined(cls):
+        """
+        Return languages that have yaml definitions in demo/languages.
+        """
+        current_dir = os.path.dirname(__file__)
+        demoglob = os.path.join(current_dir, '../../demo/languages/*.yaml')
+        ret = [Language.from_yaml(f) for f in glob.glob(demoglob)]
+
+        # TODO mecab: remove japanese if no mecab
+        # no_mecab = not JapaneseParser.mecab_installed()
+        # if no_mecab:
+        #    ret = [lang for lang in ret if lang.get_lg_parser_type() != 'japanese']
+
+        return ret
+
 
     # relationships.
     # books = db.relationship('Book', backref='language', lazy='extra')
