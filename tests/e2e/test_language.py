@@ -37,8 +37,8 @@ def test_edit_language(demo_client, dummy_lang):
 
     assert response.status_code == 200
     print(response.data)
-    assert b'Language index' in response.data, f"title content"
-    assert b'updated_name' in response.data, f"name content"
+    assert b'Language index' in response.data, "title content"
+    assert b'updated_name' in response.data, "name content"
 
 
 def test_new_language(demo_client, dummy_lang):
@@ -51,5 +51,5 @@ def test_new_language(demo_client, dummy_lang):
 
     assert response.status_code == 200
     print(response.data)
-    assert b'Language index' in response.data, f"title content"
-    assert b'updated_name' in response.data, f"name content"
+    assert b'Language index' in response.data, "title content"
+    assert b'updated_name' in response.data, "name content"
