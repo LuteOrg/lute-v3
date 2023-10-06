@@ -1,0 +1,12 @@
+name: Turkish
+dict_1: https://www.wordreference.com/tren/###
+dict_2: https://tr.wiktionary.org/###
+sentence_translation: "*https://www.deepl.com/translator#tr/en/###"
+show_romanization: true
+# right_to_left: 
+
+parser_type: turkish
+# character_substitutions:
+# split_sentences: 
+# split_sentence_exceptions:
+word_chars: a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑğĞıİöÖüÜşŞçÇ

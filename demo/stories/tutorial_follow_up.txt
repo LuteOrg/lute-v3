@@ -1,0 +1,37 @@
+# title: Tutorial follow-up
+# language: English
+#
+Hopefully you've gone through the Tutorial, and created some Terms.
+
+From the Tutorial, you've already told Lute that you know most of the words on this page.  You can hover over words to see information about them, such as your information you might have added about dogs.
+
+There are still a few blue words, which according to Lute are still "unknown" to you.  You can process them like you did on the last text.
+
+(fyi - If a text has a spelling mikstaske, you can edit it by clicking the small Edit icon next to the title.  If you'd like, correct the mistake now, and resave this text.)
+
+
+Appendix: A few other things Lute does
+
+A1. Term sentences
+
+In the "Term" edit form, you can click on the "Sentences" link to see where that term or its relations have been used.  Click on "elephant", and then click the Sentences link shown to see where that term has been used.
+
+A2. Archiving, Unarchiving, and Deleting Texts
+
+When you're done reading a text, you can either Archive it, or Delete it.  Archiving clears out the parsing data for a given text, but the text is still available and can be unarchived and re-read.  The sentences are also available for searching with the Term "Sentences" link.  Deletion completely removes a text, the parsing data, and its sentences.  Neither archiving nor deleting touch any Terms you've created, it just clears out the texts.
+
+On the last page of every book, Lute shows a link for you to archive the book.  You can also delete it from the Home screen by clicking on the "Archive" action (the image with the little down arrow) in the right-most column.
+
+To unarchive the text, go to Home, Text Archive, and click the "Unarchive" action (the little up arrow).
+
+
+
+===
+
+Those are the the core feature of Lute!  There are some sample stories for other languages.  Try those out or create your own.
+
+When you're done with the demo, go back to the Home screen and click the link to clear out the database.  Lute will delete all of the demo data, and you can get started.
+
+There is a Lute Discord and Wiki as well -- see the GitHub repository for links.
+
+I hope that you find Lute a fun tool to use for learning languages.  Cheers and best wishes!

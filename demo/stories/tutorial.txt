@@ -1,0 +1,84 @@
+# title: Tutorial
+# language: English
+#
+Welcome to Lute!  This short guide should get you going.
+
+Navigation
+
+This tutorial has multiple pages.  Above the title are some arrows to navigate forwards and backwards.  In longer texts, you can jump forward or back ten pages at a time as well.
+
+1. The Basics
+
+All of these words are blue because they are "unknown" - according to Lute, this is the first time you're seeing these words.
+
+You can click on a word, and create a definition.  For example, click on this word: elephant.
+
+When the form pops up in the right-hand frame, a dictionary is loaded below.  Copy-paste something from the dictionary into the translation, or make up your own, mark the status, add some tags if you want (eg, type "noun" in the tags field), and click save.  From now on, every English text that you read that contains the word "elephant" will show the status.  If you hover over any "elephant", you'll see some information.
+
+1.1 Multiple dictionaries.
+
+Next to the term is a small arrow, "Lookup".  If you click on this repeatedly, Lute cycles through the dictionaries that you configure for the language in the "Languages" link on the homepage.
+
+1.2 Images
+
+For this demo, English has been configured to do an image search for the second English dictinary, so if you click on the arrow, you'll see some happy elephants (if you clicked on elephant!).
+
+You can also click on the little "eye icon" next to the term, and it opens up a common image search URL.
+
+In either case, if you click on one of the images shown in the list, that image is saved in your public/media/images folder.  When you hover over the word in the reading pane, that picture is included in the word hover.  Try adding an image for your elephant by clicking on the term, clicking the eye icon, and clicking a picture you like.  Then hover over your elephant.
+
+Note: sometimes these images make _no sense_ -- it's using Bing image search, and it does the best it can with the limited context it has.
+
+2. Multi-word Terms
+
+You can create multi-word terms by clicking and dragging across multiple words, then release the mouse.  Try creating a term for the phrase "the cat's pyjamas", and add a translation and set the status.
+
+(A brief side note: Lute keeps track of where you are in any text.  If you click the Home link above to leave this tutorial, and later click the Tutorial link from the Text listing, Lute will open the last page you were at.)
+
+3. Parent Terms
+
+Sometimes it helps to associate terms with a "parent".  For example, the verb "to have" is conjugated in various forms as "I have a cold", "he has a dog", "they had dinner".  First create a Term for "have".  Then create a Term for "has", and in the Parent field start typing "have".  Lute will show the existing Term "have" in the drop down, and if you select it, "has" will be associated with that on save, and when you hover over "has" you'll see the parent's information as well.
+
+If you enter a non-existent Parent word, Lute will create a placeholder Term for that Parent, copying some content from your term.  For example, try creating a Term for the word "dogs", associating it with the non-existent Term "dog".  When you save "dogs", both will be updated.
+
+Terms can have multiple parents, too.  Hit the Enter (or Return) key after each parent.  For example, if you wanted to associate the Term "puppies" with both "puppy" and "dog", click on "puppies", and in the Parents text box type "puppy", hit Enter, type "dog", and hit Enter.  Sometimes this is necessary: for example, in Spanish, "se sienta" can either be a conjugation of "sentirse" (to feel) or "sentarse" (to sit), depending on the context.
+
+4. Mark the remainder as "Well Known"
+
+When you're done creating Terms on a page, you will likely still have a bunch of blue words, or "unknowns", left over, even though you really know these words.  You can set all of these to "Well Known" in one shot with the green checkmark at the bottom of the page ("Mark rest as known").  Try that now to see what happens.  This button only affects words on the current page, so when you go to the next page, you'll see that some words are still unknown.
+
+There are other buttons at the bottom of the page.  The green checkmark with the arrow sets the remaining unknowns on the current page, and also goes to the next page.
+
+5. Keyboard shortcuts
+
+The small blue question mark in the header shows some keyboard shortcuts.
+
+5.1 Updating Status
+
+If you've worked through the tutorial, you'll have noted that words are underlined in blue when you move the mouse over them.  You can quickly change the status of the current word by hitting 1, 2, 3, 4, 5, w (for Well-Known), or i (for Ignore).  Try hovering over the following words and hit the status buttons: apple, banana, cranberry, donut.
+
+If you click on a word, it's underlined in red, and the Term edit form is shown.  (Before you switch over to the Term editing form, you can still update its status.)  You can jump over to the edit form by hitting Tab, and then start editing.
+
+When a word has been clicked, it's "active", so it keeps the focus.  Hovering the mouse over other words won't underline them in blue anymore, and hitting status update hotkeys (1 - 5, w, i) will only update the active word.  To "un-click" a word underlined in red, click it again, or hit Escape or Return.  Then you'll be back in "Hover mode".  Try clicking and un-clicking or Escaping any word in this paragraph to get a feel for it.
+
+Note that for the keyboard shortcuts to work, the reading pane (where the text is) must have the "focus".  Click anywhere on the reading pane to re-establish focus.
+
+5.1 Bulk updates
+
+If you hold down Shift and click a bunch of words, you can bulk update their statuses.
+
+5.2 Arrow keys
+
+The Right and Left arrow keys click the next and previous words.  Hit Escape or Return to get back to "hover mode".
+
+5.3 Copying text
+
+When a word is hovered over or clicked, hit "c" to copy that word's sentence to your clipboard.  Hit "C" to copy the word's full paragraph (multiple sentences).  You can also copy arbitrary sections of text by holding down the Shift key while highlighting the text with your mouse.
+
+6. Next steps
+
+All done this text!
+
+Lute keeps track of all of this in your database, so any time you create or import a new Book, all the info you've created is carried forward.
+
+There's a tutorial follow-up: go to the Home screen, and click the "Tutorial follow-up" in the table.

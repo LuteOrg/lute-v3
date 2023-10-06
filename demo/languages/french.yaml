@@ -1,0 +1,12 @@
+name: French
+dict_1: https://fr.thefreedictionary.com/###
+dict_2: https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle
+sentence_translation: "*https://www.deepl.com/translator#fr/en/###"
+# show_romanization: 
+# right_to_left: 
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+# split_sentences: 
+# split_sentence_exceptions:
+# word_chars: 

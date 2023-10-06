@@ -1,0 +1,12 @@
+name: Greek
+dict_1: https://www.wordreference.com/gren/###
+dict_2: https://en.wiktionary.org/wiki/###
+sentence_translation: "*https://www.deepl.com/translator#el/en/###"
+show_romanization: true
+# right_to_left:
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+# split_sentences:
+# split_sentence_exceptions:
+word_chars: a-zA-ZÀ-ÖØ-öø-ȳͰ-Ͽἀ-ῼ

@@ -1,0 +1,12 @@
+name: Spanish
+dict_1: https://es.thefreedictionary.com/###
+dict_2: https://www.wordreference.com/es/en/translation.asp?spen=###
+sentence_translation: "*https://www.deepl.com/translator#es/en/###"
+# show_romanization: false
+# right_to_left: false
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+# split_sentences: .!?؟۔‎
+# split_sentence_exceptions:
+# word_chars: \x{0600}-\x{06FF}\x{FE70}-\x{FEFC}

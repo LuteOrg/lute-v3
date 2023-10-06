@@ -1,0 +1,12 @@
+name: Arabic
+dict_1: https://www.arabicstudentsdictionary.com/search?q=###
+dict_2: "*https://translate.google.com/?hl=es&sl=ar&tl=en&text=###&op=translate"
+sentence_translation: "*https://translate.google.com/?hl=es&sl=ar&tl=en&text=###"
+show_romanization: true
+right_to_left: true
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+split_sentences: .!?؟۔‎
+# split_sentence_exceptions:
+word_chars: \x{0600}-\x{06FF}\x{FE70}-\x{FEFC}

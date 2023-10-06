@@ -1,0 +1,12 @@
+name: German
+dict_1: https://de.thefreedictionary.com/###
+dict_2: https://www.wordreference.com/deen/###
+sentence_translation: "*https://www.deepl.com/translator#de/en/###"
+# show_romanization: 
+# right_to_left: 
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+# split_sentences: 
+# split_sentence_exceptions:
+# word_chars: 
