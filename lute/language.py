@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
 from lute.models.language import Language
 from lute.forms import LanguageForm
+from lute.db import db
 
 bp = Blueprint('language', __name__, url_prefix='/language')
 
@@ -46,7 +47,7 @@ def edit(langid):
     """
     Edit a language.
     """
-    language = Language.query.get(langid)
+    language = db.session.get(Language, langid)
 
     if not language:
         flash(f'Language {langid} not found', 'danger')
@@ -56,7 +57,6 @@ def edit(langid):
     if _handle_form(language, form):
         return redirect(url_for('language.index'))
     return render_template('language/edit.html', form=form, language=language)
-    
 
 
 @bp.route('/new', defaults={'langname': None}, methods=['GET', 'POST'])
