@@ -59,16 +59,21 @@ def edit(langid):
     
 
 
-@bp.route('/new', methods=['GET', 'POST'])
-def new():
+@bp.route('/new', defaults={'langname': None}, methods=['GET', 'POST'])
+@bp.route('/new/<string:langname>', methods=['GET', 'POST'])
+def new(langname):
     """
     Create a new language.
     """
+    predefined = Language.get_predefined()
     language = Language()
+    if langname is not None:
+        candidates = [lang for lang in predefined if lang.name == langname]
+        if len(candidates) == 1:
+            language = candidates[0]
 
     form = LanguageForm(obj=language)
     if _handle_form(language, form):
         return redirect(url_for('language.index'))
 
-    predefined = Language.get_predefined()
     return render_template('language/new.html', form=form, language=language, predefined=predefined)

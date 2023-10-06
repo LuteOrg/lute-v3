@@ -24,6 +24,7 @@ class LanguageForm(FlaskForm):
             ('spacedel', 'Space Delimited'),
             ('japanese', 'Japanese (MeCab)'),
             ('classicalchinese', 'Classical Chinese'),
+            ('turkish', 'Turkish'),
         ])
     character_substitutions = StringField('Character substitutions')
 
