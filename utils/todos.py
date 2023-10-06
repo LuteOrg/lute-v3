@@ -102,7 +102,10 @@ def write_report(data):
             print("  File: " + f)
             for d in curr_group_data:
                 if d['file'] == f:
-                    print("    " + d['line'])
+                    outline = d['line']
+                    outline = outline.replace('<!-- ', '')
+                    outline = outline.replace(' -->', '')
+                    print("    " + outline)
 
 t = Todout()
 t.verbose = False
@@ -111,11 +114,13 @@ parent_directory = os.path.dirname(current_script_path)
 rootdir = os.path.join(parent_directory, '..', 'lute')
 testdir = os.path.join(parent_directory, '..', 'tests')
 
+print()
 print('-----------------')
 print('lute')
 d = t.get_todo_data(rootdir, [], [])
 write_report(d)
 
+print()
 print('-----------------')
 print('tests')
 d = t.get_todo_data(testdir, [], [])

@@ -36,7 +36,7 @@ def _handle_form(language, form) -> bool:
             flash(f'Language {language.name} updated', 'success')
             result = True
         except IntegrityError as e:
-            # TODO:better_integrity_error - currently shows raw message.
+            # TODO language: better integrity error message - currently shows raw message.
             flash(e.orig.args, 'error')
 
     return result
@@ -77,3 +77,6 @@ def new(langname):
         return redirect(url_for('language.index'))
 
     return render_template('language/new.html', form=form, language=language, predefined=predefined)
+
+
+# TODO language delete: method for posting

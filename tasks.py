@@ -17,11 +17,6 @@ invoke --help <cmd>    # See docstrings and help notes
 from invoke import task
 import pytest
 
-@task(help={'clean': 'clean message'})
-def hello(c, clean=False):
-    "Say hi"
-    print("Hello!")
-
 @task
 def lint(c):
     "Run pylint on lute/ and tests/."
