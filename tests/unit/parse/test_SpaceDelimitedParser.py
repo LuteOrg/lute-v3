@@ -13,7 +13,7 @@ def assert_tokens_equals(text, lang, expected):
     p = SpaceDelimitedParser()
     actual = p.get_parsed_tokens(text, lang)
     expected = [ParsedToken(*a) for a in expected]
-    assert actual == expected
+    assert [ str(a) for a in actual ] == [ str(e) for e in expected ]
 
 
 def test_end_of_sentence_stored_in_parsed_tokens(spanish):
@@ -40,7 +40,8 @@ def test_end_of_sentence_stored_in_parsed_tokens(spanish):
 
 def test_exceptions_are_considered_when_splitting_sentences(english):
     p = SpaceDelimitedParser()
-    actual = p.get_parsed_tokens("1. Mrs. Jones is here.", english)
+    s = "1. Mrs. Jones is here."
+    actual = p.get_parsed_tokens(s, english)
 
     expected = [
         ('1. ', False, True),
@@ -54,13 +55,13 @@ def test_exceptions_are_considered_when_splitting_sentences(english):
         ('.', False, True)
     ]
 
-    assert_tokens_equals(s, e, expected)
+    assert_tokens_equals(s, english, expected)
 
 
 def test_check_tokens(english):
     p = SpaceDelimitedParser()
     s = "1. Mrs. Jones is here."
-    actual = p.get_parsed_tokens(s, e)
+    actual = p.get_parsed_tokens(s, english)
 
     expected = [
         ('1. ', False, True),
@@ -74,7 +75,7 @@ def test_check_tokens(english):
         ('.', False, True)
     ]
 
-    self.assert_tokens_equals(s, english, expected)
+    assert_tokens_equals(s, english, expected)
 
 
 def test_single_que(spanish):
@@ -89,13 +90,13 @@ def test_single_que(spanish):
         ('qué', True, False),
         ('.', False, True)
     ]
-    self.assert_tokens_equals(text, spanish, expected)
+    assert_tokens_equals(text, spanish, expected)
 
 
 def test_EE_UU_exception_should_be_considered(spanish):
     p = SpaceDelimitedParser()
     s = "Estamos en EE.UU. hola."
-    spanish.set_lg_exceptions_split_sentences("EE.UU.")
+    spanish.exceptions_split_sentences = "EE.UU."
     actual = p.get_parsed_tokens(s, spanish)
 
     expected = [
@@ -115,14 +116,14 @@ def test_EE_UU_exception_should_be_considered(spanish):
 def test_just_EE_UU(spanish):
     p = SpaceDelimitedParser()
     s = "EE.UU."
-    spanish.set_lg_exceptions_split_sentences("EE.UU.")
+    spanish.exceptions_split_sentences = "EE.UU."
     actual = p.get_parsed_tokens(s, spanish)
 
     expected = [
         ('EE.UU.', True, False),
     ]
 
-    self.assert_tokens_equals(s, sp, expected)
+    assert_tokens_equals(s, spanish, expected)
 
 
 def assert_string_equals(text, lang, expected):

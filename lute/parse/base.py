@@ -22,6 +22,9 @@ class ParsedToken:
         self.is_word = is_word
         self.is_end_of_sentence = is_end_of_sentence
 
+    def __repr__(self):
+        return f"<\"{self.token}\" (word: {self.is_word}, eos: {self.is_end_of_sentence})>";
+
 
 class AbstractParser(ABC):
     """

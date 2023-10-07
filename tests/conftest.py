@@ -149,7 +149,7 @@ def fixture_spanish(demo_yaml_folder):
 
 
 @pytest.fixture(name="english")
-def fixture_spanish(demo_yaml_folder):
+def fixture_english(demo_yaml_folder):
     "Make spanish from demo file."
     f = os.path.join(demo_yaml_folder, 'english.yaml')
     return Language.from_yaml(f)
