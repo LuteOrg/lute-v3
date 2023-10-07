@@ -20,31 +20,9 @@ class SpaceDelimitedParser(AbstractParser):
     def get_parsed_tokens(self, text: str, lang: Language) -> List[ParsedToken]:
         return self.parse_to_tokens(text, lang)
 
-    def preg_match_capture(self, pattern, subject, offset=0):
-        if offset != 0:
-            offset = len(subject[:offset])
-
-        match_info = []
-        flag = re.MULTILINE | re.UNICODE
-        n = len(re.findall(pattern, subject[offset:], flags=flag))
-        if n != 0:
-            matches = re.finditer(pattern, subject[offset:], flags=flag)
-            for match in matches:
-                positions = []
-                for m in match.groups():
-                    matched_text = m[0]
-                    matched_length = len(m[1])
-                    positions.append((matched_text, len(subject[:matched_length])))
-                match_info.append(positions)
-
-        result = []
-        if n != 0 and match_info:
-            for matches in match_info:
-                positions = []
-                for match in matches:
-                    positions.append((match[0], len(match[1])))
-                result.append(positions)
-
+    def preg_match_capture(self, pattern, subject):
+        matches = re.finditer(pattern, subject, flags=re.IGNORECASE)
+        result = [[match.group(), match.start()] for match in matches]
         return result
 
     def parse_to_tokens(self, text: str, lang: Language):
@@ -74,14 +52,14 @@ class SpaceDelimitedParser(AbstractParser):
         termchar = lang.word_characters
         split_sentence = re.escape(lang.regexp_split_sentences)
         splitex = lang.exceptions_split_sentences.replace('.', '\\.')
-        m = self.preg_match_capture(fr"({splitex}|[{termchar}]*)", text, 0)
-        wordtoks = list(filter(lambda t: t[0] != "", m[0]))
+        m = self.preg_match_capture(fr"({splitex}|[{termchar}]*)", text)
+        wordtoks = list(filter(lambda t: t[0] != "", m))
 
         def add_non_words(s):
             if not s:
                 return
             pattern = f"[{split_sentence}]"
-            allmatches = self.preg_match_capture(pattern, s, 0)
+            allmatches = self.preg_match_capture(pattern, s)
             has_eos = len(allmatches) > 0
             tokens.append(ParsedToken(s, False, has_eos))
 
