@@ -12,6 +12,8 @@ from lute.app_config import AppConfig
 from lute.db import db
 from lute.main import init_db_and_app
 
+from lute.models.language import Language
+
 @pytest.fixture(name="testconfig")
 def fixture_config():
     """
@@ -129,3 +131,25 @@ def fixture_empty_client(app_with_demo):
     """
     _delete_all_from_database(app_with_demo)
     return app_with_demo.test_client()
+
+
+@pytest.fixture(name="demo_yaml_folder")
+def fixture_yaml_folder():
+    "Path to the demo files."
+    lang_path = "../demo/languages/"
+    absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__), lang_path))
+    return absolute_path
+
+
+@pytest.fixture(name="spanish")
+def fixture_spanish(demo_yaml_folder):
+    "Make spanish from demo file."
+    f = os.path.join(demo_yaml_folder, 'spanish.yaml')
+    return Language.from_yaml(f)
+
+
+@pytest.fixture(name="english")
+def fixture_spanish(demo_yaml_folder):
+    "Make spanish from demo file."
+    f = os.path.join(demo_yaml_folder, 'english.yaml')
+    return Language.from_yaml(f)

@@ -48,7 +48,7 @@ class SpaceDelimitedParser(AbstractParser):
         return result
 
     def parse_to_tokens(self, text: str, lang: Language):
-        replacements = lang.get_lg_character_substitutions().split("|")
+        replacements = lang.character_substitutions.split("|")
         for replacement in replacements:
             fromto = replacement.strip().split("=")
             if len(fromto) >= 2:
@@ -71,9 +71,9 @@ class SpaceDelimitedParser(AbstractParser):
         return tokens
 
     def parse_para(self, text: str, lang: Language, tokens: List[ParsedToken]):
-        termchar = lang.get_lg_regexp_word_characters()
-        split_sentence = re.escape(lang.get_lg_regexp_split_sentences())
-        splitex = lang.get_lg_exceptions_split_sentences().replace('.', '\\.')
+        termchar = lang.word_characters
+        split_sentence = re.escape(lang.regexp_split_sentences)
+        splitex = lang.exceptions_split_sentences.replace('.', '\\.')
         m = self.preg_match_capture(fr"({splitex}|[{termchar}]*)", text, 0)
         wordtoks = list(filter(lambda t: t[0] != "", m[0]))
 

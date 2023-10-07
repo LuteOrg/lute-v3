@@ -35,13 +35,14 @@ class AbstractParser(ABC):
         """
         pass
 
-    @abstractmethod
+
     def get_reading(self, text: str):
         """
         Get the pronunciation for the given text.  For most
         languages, this can't be automated.
         """
         return None
+
 
     def get_lowercase(self, text: str):
         """
