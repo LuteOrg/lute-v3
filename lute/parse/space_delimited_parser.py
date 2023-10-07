@@ -17,15 +17,27 @@ class SpaceDelimitedParser(AbstractParser):
     such as English, French, Spanish ... etc.
     """
 
-    def get_parsed_tokens(self, text: str, lang: Language) -> List[ParsedToken]:
-        return self.parse_to_tokens(text, lang)
+    def get_parsed_tokens(self, text: str, language: Language) -> List[ParsedToken]:
+        "Return parsed tokens."
+        return self.parse_to_tokens(text, language)
+
 
     def preg_match_capture(self, pattern, subject):
+        """
+        Return the matched text and their start positions in the subject.
+
+        E.g. search for r'cat' in "there is a CAT and a Cat" returns:
+        [['CAT', 11], ['Cat', 21]]
+        """
         matches = re.finditer(pattern, subject, flags=re.IGNORECASE)
         result = [[match.group(), match.start()] for match in matches]
         return result
 
+
     def parse_to_tokens(self, text: str, lang: Language):
+        """
+        Returns ParsedToken array for given language.
+        """
         replacements = lang.character_substitutions.split("|")
         for replacement in replacements:
             fromto = replacement.strip().split("=")
@@ -48,10 +60,15 @@ class SpaceDelimitedParser(AbstractParser):
 
         return tokens
 
+
     def parse_para(self, text: str, lang: Language, tokens: List[ParsedToken]):
+        """
+        Parse a single paragraph, appending the tokens to the list of tokens.
+        """
         termchar = lang.word_characters
         split_sentence = re.escape(lang.regexp_split_sentences)
         splitex = lang.exceptions_split_sentences.replace('.', '\\.')
+
         m = self.preg_match_capture(fr"({splitex}|[{termchar}]*)", text)
         wordtoks = list(filter(lambda t: t[0] != "", m))
 
@@ -63,6 +80,7 @@ class SpaceDelimitedParser(AbstractParser):
             has_eos = len(allmatches) > 0
             tokens.append(ParsedToken(s, False, has_eos))
 
+        # TODO comments: add notes about how this works, it's slightly opaque.
         pos = 0
         for wt in wordtoks:
             w = wt[0]

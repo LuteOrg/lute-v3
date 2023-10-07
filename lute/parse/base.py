@@ -23,7 +23,7 @@ class ParsedToken:
         self.is_end_of_sentence = is_end_of_sentence
 
     def __repr__(self):
-        return f"<\"{self.token}\" (word: {self.is_word}, eos: {self.is_end_of_sentence})>";
+        return f"<\"{self.token}\" (word: {self.is_word}, eos: {self.is_end_of_sentence})>"
 
 
 class AbstractParser(ABC):
@@ -36,10 +36,9 @@ class AbstractParser(ABC):
         """
         Get an array of ParsedTokens from the input text for the given language.
         """
-        pass
 
 
-    def get_reading(self, text: str):
+    def get_reading(self, text: str): # pylint: disable=unused-argument
         """
         Get the pronunciation for the given text.  For most
         languages, this can't be automated.
@@ -55,4 +54,3 @@ class AbstractParser(ABC):
         but some (like Turkish) need special handling.
         """
         return text.lower()
-

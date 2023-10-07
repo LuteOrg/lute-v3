@@ -10,6 +10,12 @@ good-names-rgxs=[a-z]
 # List of note tags to take in consideration, separated by a comma.
 notes=FIXME,XXX
 
+[MESSAGES CONTROL]
+
+# Disable the message, report, category or checker with the given id(s).
+disable=too-few-public-methods
+
+
 ### placeholder - available settings
 ###
 ###
