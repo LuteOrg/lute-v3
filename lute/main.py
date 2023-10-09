@@ -9,7 +9,7 @@ from lute.dbsetup.setup import BackupManager, Setup
 
 from lute.db import db
 
-from . import language
+from . import language, book
 
 
 def _setup_app_dirs(app_config):
@@ -84,6 +84,7 @@ def _create_app(app_config, extra_config):
     app.db = db
 
     app.register_blueprint(language.bp)
+    app.register_blueprint(book.bp)
 
     @app.route('/')
     def index():

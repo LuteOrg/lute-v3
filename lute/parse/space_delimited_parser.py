@@ -63,7 +63,7 @@ class SpaceDelimitedParser(AbstractParser):
 
     def parse_para(self, text: str, lang: Language, tokens: List[ParsedToken]):
         """
-        Parse a single paragraph, appending the tokens to the list of tokens.
+        Parse a string, appending the tokens to the list of tokens.
         """
         termchar = lang.word_characters
         split_sentence = re.escape(lang.regexp_split_sentences)
@@ -73,6 +73,11 @@ class SpaceDelimitedParser(AbstractParser):
         wordtoks = list(filter(lambda t: t[0] != "", m))
 
         def add_non_words(s):
+            """
+            Add non-word token s to the list of tokens.  If s
+            matches any of the split_sentence values, mark it as an
+            end-of-sentence.
+            """
             if not s:
                 return
             pattern = f"[{split_sentence}]"
@@ -80,7 +85,8 @@ class SpaceDelimitedParser(AbstractParser):
             has_eos = len(allmatches) > 0
             tokens.append(ParsedToken(s, False, has_eos))
 
-        # TODO comments: add notes about how this works, it's slightly opaque.
+        # For each wordtok, add all non-words before the wordtok, and
+        # then add the wordtok.
         pos = 0
         for wt in wordtoks:
             w = wt[0]
@@ -90,5 +96,6 @@ class SpaceDelimitedParser(AbstractParser):
             tokens.append(ParsedToken(w, True, False))
             pos = wp + len(w)
 
+        # Add anything left over.
         s = text[pos:]
         add_non_words(s)

@@ -20,7 +20,9 @@ import pytest
 @task
 def lint(c):
     "Run pylint on lute/ and tests/."
-    c.run("pylint lute/ tests/")
+    # Formats: https://pylint.pycqa.org/en/latest/user_guide/usage/output.html
+    msgfmt = "--msg-template='{path} ({line:03d}): {msg} ({msg_id} {symbol})'"
+    c.run(f"pylint {msgfmt} lute/ tests/")
 
 @task(help={'args': 'test arguments', 'print': 'include print statements'})
 def test(c, args=None, print=False):
