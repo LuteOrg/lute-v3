@@ -23,6 +23,7 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         return f"<Book {self.id} add_title>"
 
 
+    # TODO book listing: update to new code in lutev2
     @staticmethod
     def get_data_tables_list(parameters, is_archived):
         "Book json data for datatables."
