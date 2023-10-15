@@ -32,33 +32,30 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
         base_sql = f"""
         SELECT
-            b.BkID, LgName,
-            BkTitle || CASE
-                WHEN currtext.TxID IS NULL THEN ''
-                ELSE ' (' || currtext.TxOrder || '/' || pagecnt.c || ')'
-            END AS BkTitle,
-            pagecnt.c AS PageCount,
+            b.BkID As BkID,
+            LgName,
+            BkTitle,
+            case when currtext.TxID is null then 1 else currtext.TxOrder end as PageNum,
+            pagecnt.c as PageCount,
             BkArchived,
             tags.taglist AS TagList,
-            CASE
-                WHEN IFNULL(b.BkWordCount, 0) = 0 THEN 'n/a'
-                ELSE b.BkWordCount
-            END AS WordCount,
-            c.distinctterms AS DistinctCount,
-            c.distinctunknowns AS UnknownCount,
-            c.unknownpercent AS UnknownPercent
+            case when ifnull(b.BkWordCount, 0) = 0 then 'n/a' else b.BkWordCount end as WordCount,
+            c.distinctterms as DistinctCount,
+            c.distinctunknowns as UnknownCount,
+            c.unknownpercent as UnknownPercent
+
         FROM books b
         INNER JOIN languages ON LgID = b.BkLgID
         LEFT OUTER JOIN texts currtext ON currtext.TxID = BkCurrentTxID
         INNER JOIN (
-            SELECT TxBkID, COUNT(TxID) AS c
-            FROM texts
+            SELECT TxBkID, COUNT(TxID) AS c FROM texts
             GROUP BY TxBkID
-        ) pagecnt ON pagecnt.TxBkID = b.BkID
-        LEFT OUTER JOIN bookstats c ON c.BkID = b.BkID
+        ) pagecnt on pagecnt.TxBkID = b.BkID
+        LEFT OUTER JOIN bookstats c on c.BkID = b.BkID
         LEFT OUTER JOIN (
-            SELECT BtBkID AS BkID, GROUP_CONCAT(T2Text, ', ') AS taglist
-            FROM (
+            SELECT BtBkID as BkID, GROUP_CONCAT(T2Text, ', ') AS taglist
+            FROM
+            (
                 SELECT BtBkID, T2Text
                 FROM booktags bt
                 INNER JOIN tags2 t2 ON t2.T2ID = bt.BtT2ID
@@ -66,6 +63,7 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
             ) tagssrc
             GROUP BY BtBkID
         ) AS tags ON tags.BkID = b.BkID
+
         WHERE b.BkArchived = {archived}
         """
 

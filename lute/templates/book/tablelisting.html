@@ -33,7 +33,14 @@
         {
           "name": "BkTitle", "targets": 0,
           "render": function ( data, type, row, meta ) {
-            return `<a href="/book/read/${row[3]}">${row[0]}</a>`;
+            const bkid = parseInt(row[3]);
+            const pgnum = parseInt(row[10]);
+            const pgcount = parseInt(row[8]);
+            let pgfraction = '';
+            if (pgnum > 1) {
+              pgfraction = ` (${pgnum}/${pgcount})`;
+            }
+            return `<a href="/read/${bkid}/page/${pgnum}">${row[0]}${pgfraction}</a>`;
           }
         },
         { "name": "LgName", "targets": 1 },
@@ -61,14 +68,12 @@
           "searchable": false,
           "orderable": false,
           "render": function ( data, type, row, meta ) {
-            // TODO book listing actions: security - add CSRF token
-            // TODO book listing actions: implement edit, reparse, archive, delete
+            // TODO:security - add CSRF token
             const ret = [];
             const bkid = row[3];
             if (row[4] == 0) {
               // not archived
               ret.push(`<img src="/icn/document--pencil.png" title="Edit" onclick="edit_book(${bkid})" />`);
-              ret.push(`<img src="/icn/lightning.png" title="Reparse" onclick="confirm_reparse(${bkid})" />`);
               ret.push(`<img src="/icn/inbox-download.png" title="Archive" onclick="confirm_archive(${bkid})" />`);
             }
             else {
@@ -87,7 +92,8 @@
         { "name": "UnknownCount", "targets": 8, "data": null, "visible": false },
         { "name": "UnknownPercent", "targets": 9, "data": null, "visible": false },
         { "name": "PageCount", "targets": 10, "data": null, "visible": false },
-        { "name": "DistinctCount", "targets": 11, "data": null, "visible": false }
+        { "name": "DistinctCount", "targets": 11, "data": null, "visible": false },
+        { "name": "PageNum", "targets": 12, "data": null, "visible": false },
       ],
 
       // Ajax call
