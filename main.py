@@ -12,5 +12,6 @@ configfile = os.path.join(thisdir, 'config', 'config.yml')
 app_config = AppConfig(configfile)
 app = init_db_and_app(app_config)
 
-print('running at localhost:5000')
-serve(app, host="0.0.0.0", port=5000)
+port = app_config.port
+print(f'running at localhost:{port}')
+serve(app, host="0.0.0.0", port=port)

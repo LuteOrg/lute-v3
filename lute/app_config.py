@@ -47,6 +47,8 @@ class AppConfig:
         if self._data_path is None:
             self._data_path = self._get_appdata_dir()
 
+        self._port = config.get('PORT', 5000)
+
         return config
 
 
@@ -86,3 +88,8 @@ class AppConfig:
     def sqliteconnstring(self):
         "Full sqlite connection string."
         return f'sqlite:///{self.dbfilename}'
+
+    @property
+    def port(self):
+        "Port served on."
+        return self._port

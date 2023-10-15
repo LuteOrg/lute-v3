@@ -14,3 +14,9 @@ DBNAME: lute.db
 # (ref https://pypi.org/project/platformdirs/).
 # OPTIONAL (but REQUIRED for developer tests)
 # DATAPATH: yourpathhere
+
+# Port to serve on.
+# If not set, defaults to 5000.
+# This is only used in main.py, not in dev.py.
+# OPTIONAL
+# PORT: 5000
