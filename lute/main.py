@@ -9,7 +9,6 @@ from lute.dbsetup.setup import BackupManager, Setup
 
 from lute.db import db
 
-from . import read
 from lute.book import bp as book_bp
 from lute.language import bp as language_bp
 from lute.read import bp as read_bp
