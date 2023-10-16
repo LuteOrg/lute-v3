@@ -9,8 +9,9 @@ from lute.dbsetup.setup import BackupManager, Setup
 
 from lute.db import db
 
-from . import language, read
+from . import read
 from lute.book import bp as book_bp
+from lute.language import bp as language_bp
 
 def _setup_app_dirs(app_config):
     """
@@ -83,7 +84,7 @@ def _create_app(app_config, extra_config):
 
     app.db = db
 
-    app.register_blueprint(language.bp)
+    app.register_blueprint(language_bp)
     app.register_blueprint(book_bp)
     app.register_blueprint(read.bp)
 

@@ -8,8 +8,7 @@ from lute.models.language import Language
 from lute.forms import LanguageForm
 from lute.db import db
 
-bp = Blueprint('language', __name__, url_prefix='/language')
-
+from . import bp
 
 @bp.route('/index')
 def index():
