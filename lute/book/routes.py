@@ -1,12 +1,12 @@
 """
-/book endpoints.
+/book routes.
 """
 
-from flask import Blueprint, request, jsonify
+from flask import request, jsonify
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.models.book import Book
 
-bp = Blueprint('book', __name__, url_prefix='/book')
+from . import bp
 
 def datatables_source(is_archived):
     "Get datatables json for books."
@@ -25,9 +25,3 @@ def datatables_active_source():
 def datatables_archived_source():
     "Datatables data for archived books."
     return datatables_source(True)
-
-
-@bp.route('/read/<int:bookid>', methods=['GET'])
-def read(bookid):
-    "Display reading pane for book with given id."
-    return f"TODO book: reading book {bookid}"
