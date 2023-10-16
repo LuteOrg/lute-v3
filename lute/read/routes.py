@@ -2,11 +2,11 @@
 /read endpoints.
 """
 
-from flask import Blueprint, request, jsonify
+from flask import request, jsonify
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.models.book import Book
 
-bp = Blueprint('read', __name__, url_prefix='/read')
+from . import bp
 
 @bp.route('/<int:bookid>/page/<int:pagenum>', methods=['GET'])
 def read(bookid, pagenum):
