@@ -2,11 +2,11 @@
 /book routes.
 """
 
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.models.book import Book
 
-from . import bp
+bp = Blueprint('book', __name__, url_prefix='/book')
 
 def datatables_source(is_archived):
     "Get datatables json for books."

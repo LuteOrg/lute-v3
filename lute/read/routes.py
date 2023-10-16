@@ -2,7 +2,9 @@
 /read endpoints.
 """
 
-from . import bp
+from flask import Blueprint
+
+bp = Blueprint('read', __name__, url_prefix='/read')
 
 @bp.route('/<int:bookid>/page/<int:pagenum>', methods=['GET'])
 def read(bookid, pagenum):

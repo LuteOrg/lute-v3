@@ -3,12 +3,12 @@
 """
 
 from sqlalchemy.exc import IntegrityError
-from flask import current_app, render_template, redirect, url_for, flash
+from flask import Blueprint, current_app, render_template, redirect, url_for, flash
 from lute.models.language import Language
 from lute.language.forms import LanguageForm
 from lute.db import db
 
-from . import bp
+bp = Blueprint('language', __name__, url_prefix='/language')
 
 @bp.route('/index')
 def index():
