@@ -14,6 +14,7 @@ wordparents = db.Table(
 
 
 class TermImage(db.Model):
+    "Term images."
     __tablename__ = 'wordimages'
 
     id = db.Column('WiID', db.Integer, primary_key=True)
@@ -23,6 +24,7 @@ class TermImage(db.Model):
 
 
 class TermFlashMessage(db.Model):
+    "Term flash messages."
     __tablename__ = 'wordflashmessages'
 
     id = db.Column('WfID', db.Integer, primary_key=True)
@@ -38,7 +40,9 @@ wordtags = db.Table(
     db.Column('WtWoID', db.Integer, db.ForeignKey('words.WoID'))
 )
 
+
 class TermTag(db.Model):
+    "Term tags."
     __tablename__ = 'tags'
 
     id = db.Column('TgID', db.Integer, primary_key=True)
@@ -49,6 +53,7 @@ class TermTag(db.Model):
 
     @property
     def comment(self):
+        "Comment getter."
         return self._comment
 
     # TODO tags schema fix: TgComment should be nullable
@@ -58,10 +63,12 @@ class TermTag(db.Model):
     # Minor change, a nice-to-have.
     @comment.setter
     def comment(self, c):
+        "Set cleaned comment."
         self._comment = c if c is not None else ''
-    
+
     @staticmethod
     def make_term_tag(text, comment=None):
+        "Create a TermTag."
         tt = TermTag()
         tt.set_text(text)
         if comment is not None:
@@ -117,18 +124,16 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     def __repr__(self):
         return f"<Term {self.id} '{self.text}'>"
 
-    # @property
-    # def id(self):
-    #    return self._id
-
     @property
     def text(self):
+        "Get the text."
         return self._text
 
     @text.setter
     def text(self, textstring):
+        "Set the text, textlc, and token count."
         if self.language is None:
-            raise Exception("Must set term language before setting text")
+            raise RuntimeError("Must set term language before setting text")
 
         # Clean up encoding cruft.
         t = textstring.strip()
@@ -151,13 +156,14 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         text_changed = old_text_lc is not None and new_text_lc != old_text_lc
         if self.id is not None and text_changed:
             msg = f"Cannot change text of term '{self.text}' (id = {self.id}) once saved."
-            raise Exception(msg)
+            raise RuntimeError(msg)
 
         self._text = t
         self._text_lc = new_text_lc
         self._calc_token_count()
 
     def _calc_token_count(self):
+        "Tokens are separated by zero-width space."
         token_count = 0
         if self._text is not None:
             zws = '\u200B'  # zero-width space
@@ -168,6 +174,7 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     @property
     def text_lc(self):
         return self._text_lc
+
 
     @text_lc.setter
     def text_lc(self, s):
@@ -187,19 +194,23 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         self.parents = []
 
     def add_parent(self, parent):
-        # Can't add self as own parent.
+        """
+        Add valid parent, term cannot be its own parent.
+        """
         if self == parent:
-            return self
+            return
         if parent not in self.parents:
             self.parents.append(parent)
             parent.children.append(self)
 
     def remove_parent(self, parent):
+        "Remove the given parent."
         if parent in self.parents:
             self.parents.remove(parent)
             parent.children.remove(self)
 
     def get_current_image(self, strip_jpeg=True):
+        "Get the current (first) image for the term."
         if len(self.images) == 0:
             return None
         i = self.images[0]
@@ -214,6 +225,7 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         return src.replace('.jpeg', '')
 
     def set_current_image(self, s):
+        "Set the current image for this term."
         if self.images:
             self.images.pop(0)
         if s is not None:
@@ -251,11 +263,13 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     #     return dto
 
     def get_flash_message(self):
+        "Get the flash message."
         if not self.term_flash_message:
             return None
         return self.term_flash_message.get_message()
 
     def set_flash_message(self, m):
+        "Set a flash message to be shown at some point in the future."
         tfm = self.term_flash_message
         if not tfm:
             tfm = TermFlashMessage()
@@ -264,6 +278,7 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         tfm.set_message(m)
 
     def pop_flash_message(self):
+        "Get the flash message, and remove it from this term."
         if not self.term_flash_message:
             return None
         m = self.term_flash_message.get_message()

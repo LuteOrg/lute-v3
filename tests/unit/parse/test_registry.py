@@ -14,7 +14,7 @@ def test_get_parser_by_name():
 
 def test_get_parser_throws_if_not_found():
     with pytest.raises(ValueError):
-        p = get_parser('trash')
+        get_parser('trash')
 
 
 def test_list_all_parsers():

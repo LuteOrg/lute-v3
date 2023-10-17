@@ -5,6 +5,10 @@
 good-names=ex,_
 good-names-rgxs=[a-z]
 
+# Minimum line length for functions/classes that require docstrings, shorter
+# ones are exempt.
+docstring-min-length=3
+
 [MISCELLANEOUS]
 
 # List of note tags to take in consideration, separated by a comma.

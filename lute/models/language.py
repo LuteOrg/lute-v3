@@ -125,4 +125,3 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
 
     def get_lowercase(self, s) -> str:
         return self.parser.get_lowercase(s)
-
