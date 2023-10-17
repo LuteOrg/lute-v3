@@ -7,7 +7,6 @@ perform the actual parsing.
 
 import re
 from typing import List
-from lute.models.language import Language
 from lute.parse.base import ParsedToken, AbstractParser
 
 
@@ -17,7 +16,11 @@ class SpaceDelimitedParser(AbstractParser):
     such as English, French, Spanish ... etc.
     """
 
-    def get_parsed_tokens(self, text: str, language: Language) -> List[ParsedToken]:
+    @property
+    def name(self):
+        return "Space Delimited"
+
+    def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
         "Return parsed tokens."
         return self.parse_to_tokens(text, language)
 
@@ -34,7 +37,7 @@ class SpaceDelimitedParser(AbstractParser):
         return result
 
 
-    def parse_to_tokens(self, text: str, lang: Language):
+    def parse_to_tokens(self, text: str, lang):
         """
         Returns ParsedToken array for given language.
         """
@@ -61,7 +64,7 @@ class SpaceDelimitedParser(AbstractParser):
         return tokens
 
 
-    def parse_para(self, text: str, lang: Language, tokens: List[ParsedToken]):
+    def parse_para(self, text: str, lang, tokens: List[ParsedToken]):
         """
         Parse a string, appending the tokens to the list of tokens.
         """

@@ -5,9 +5,6 @@ Common classes use for all parsing.
 from abc import ABC, abstractmethod
 from typing import List
 
-from lute.models.language import Language
-
-
 class ParsedToken:
     """
     A single parsed token from an input text.
@@ -31,8 +28,15 @@ class AbstractParser(ABC):
     Abstract parser, inherited from by all parsers.
     """
 
+    @property
     @abstractmethod
-    def get_parsed_tokens(self, text: str, language: Language) -> List:
+    def name(self):
+        """
+        Parser name, for displaying in UI.
+        """
+
+    @abstractmethod
+    def get_parsed_tokens(self, text: str, language) -> List:
         """
         Get an array of ParsedTokens from the input text for the given language.
         """

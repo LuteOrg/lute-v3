@@ -6,6 +6,7 @@ import glob
 import os
 import yaml
 from lute.db import db
+from lute.parse.registry import get_parser
 
 
 class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-instance-attributes
@@ -110,6 +111,18 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
         return ret
 
 
-    # relationships.
+    # TODO language relationships: should deleting lang should delete books and terms
     # books = db.relationship('Book', backref='language', lazy='extra')
     # terms = db.relationship('Term', backref='language', lazy='extra')
+
+
+    @property
+    def parser(self):
+        return get_parser(self.parser_type)
+
+    def get_parsed_tokens(self, s):
+        return self.parser.get_parsed_tokens(s, self)
+
+    def get_lowercase(self, s) -> str:
+        return self.parser.get_lowercase(s)
+

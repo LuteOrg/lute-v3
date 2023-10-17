@@ -38,7 +38,7 @@ def test_language(_empty_db):
     assert retrieved.show_romanization is False, 'retrieved no roman'
 
 
-def test_term(_empty_db):
+def test_term(_empty_db, english):
     """
     Check term mappings.
     """
@@ -46,6 +46,7 @@ def test_term(_empty_db):
     assert_sql_result(sql, [], 'empty table')
 
     term = Term()
+    term.language = english
     term.text = 'abc'
     term.text_lc = 'abc'
     term.token_count = 1
@@ -53,3 +54,7 @@ def test_term(_empty_db):
     db.session.add(term)
     db.session.commit()
     assert_sql_result(sql, ['abc; abc; 1'], 'have term')
+
+
+# TODO db relationships: delete lang should delete everything related
+# TODO db relationships: delete book should delete everything related

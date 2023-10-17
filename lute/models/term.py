@@ -101,6 +101,9 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     term_flash_message = db.relationship('TermFlashMessage', uselist=False, back_populates='term')
 
     def __init__(self, language=None, text=None):
+        self.status = 1
+        self.translation = None
+        self.romanization = None
         self.term_tags = []
         self.parents = []
         self.children = []
@@ -134,7 +137,8 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         nbsp = '\u00A0'  # non-breaking space
         t = t.replace(nbsp, ' ')
 
-        tokens = self.language.get_parsed_tokens(t)
+        lang = self.language
+        tokens = lang.get_parsed_tokens(t)
 
         # Terms can't contain paragraph markers.
         tokens = [tok for tok in tokens if tok.token != "¶"]
@@ -154,13 +158,12 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         self._calc_token_count()
 
     def _calc_token_count(self):
-        zws = '\u200B'  # zero-width space
+        token_count = 0
         if self._text is not None:
+            zws = '\u200B'  # zero-width space
             parts = self._text.split(zws)
             token_count = len(parts)
-        else:
-            token_count = 0
-        self.set_token_count(token_count)
+        self.token_count = token_count
 
     @property
     def text_lc(self):
