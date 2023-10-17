@@ -116,13 +116,20 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         self.children = []
         self.images = []
         if language is not None:
-            self.set_language(language)
+            self.language = language
         if text is not None:
-            self.set_text(text)
+            self.text = text
 
 
     def __repr__(self):
         return f"<Term {self.id} '{self.text}'>"
+
+    def __eq__(self, other):
+        def eqrep(term):
+            return f"{term.language.name} {term.text}"
+        if isinstance(other, Term):
+            return eqrep(self) == eqrep(other)
+        return False
 
     @property
     def text(self):
