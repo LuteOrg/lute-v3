@@ -5,6 +5,7 @@ Low value but ensure that the db mapping is correct.
 """
 
 from lute.models.language import Language
+from lute.models.term import Term
 from lute.db import db
 from tests.dbasserts import assert_sql_result
 
@@ -35,3 +36,20 @@ def test_language(_empty_db):
     assert retrieved.name == 'abc'
     assert retrieved.right_to_left is True, 'retrieved is RTL'
     assert retrieved.show_romanization is False, 'retrieved no roman'
+
+
+def test_term(_empty_db):
+    """
+    Check term mappings.
+    """
+    sql = "select WoText, WoTextLC, WoTokenCount from words"
+    assert_sql_result(sql, [], 'empty table')
+
+    term = Term()
+    term.text = 'abc'
+    term.text_lc = 'abc'
+    term.token_count = 1
+
+    db.session.add(term)
+    db.session.commit()
+    assert_sql_result(sql, ['abc; abc; 1'], 'have term')
