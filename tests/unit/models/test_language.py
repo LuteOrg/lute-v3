@@ -12,7 +12,7 @@ from lute.db import db
 from tests.dbasserts import assert_sql_result
 
 
-def test_demo_has_preloaded_languages(_demo_db):
+def test_demo_has_preloaded_languages(app_context):
     """
     When users get the initial demo, it has English, French, etc,
     pre-defined.
@@ -42,13 +42,14 @@ def test_new_language_has_sane_defaults():
     assert lang.parser_type == 'spacedel'
 
 
-def test_save_new_language_smoke_test(_empty_db):
+def test_save_new_language_smoke_test(app_context):
     """
     Validating model save.
     When a new language is created and saved,
     the defaults are saved in the db.
     """
-    sql = "select LgName, LgRightToLeft, LgRegexpSplitSentences from languages"
+    sql = """select LgName, LgRightToLeft, LgRegexpSplitSentences
+    from languages where LgName = 'abc'"""
     assert_sql_result(sql, [], 'empty table')
 
     lang = Language()
