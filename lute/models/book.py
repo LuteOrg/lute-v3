@@ -117,7 +117,6 @@ class Text(db.Model):
     __tablename__ = 'texts'
 
     id = db.Column('TxID', db.Integer, primary_key=True)
-    lg_id = db.Column('TxLgID', db.Integer, db.ForeignKey('languages.LgID'), nullable=False)
     text = db.Column('TxText', db.String, nullable=False)
     order = db.Column('TxOrder', db.Integer)
     read_date = db.Column('TxReadDate', db.DateTime, nullable=True)
