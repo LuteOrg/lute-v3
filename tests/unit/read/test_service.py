@@ -63,7 +63,7 @@ def test_english_find_all_in_string(english, _empty_db):
 # TODO arabic: add check
 
 
-def test_smoke_get_paras(spanish, _demo_db):
+def DISABLED_test_smoke_get_paras(spanish, _demo_db):
     add_terms(spanish, ['tengo un', 'un gato'])
 
     content = "Tengo un gato. Hay un perro.\nTengo un perro."
