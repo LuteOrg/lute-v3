@@ -31,9 +31,11 @@ def test_token_locator_scenario(english):
         (["b", "b", "c", "d"], "x", []),  # No match
     ]
 
-
+    casenum = 0
     for tokens, word, expected in cases:
+        casenum += 1
         sentence = TokenLocator.make_string(tokens)
         tocloc = TokenLocator(english, sentence)
         actual = tocloc.locate_string(word)
-        assert actual == expected
+        msg = f"case {casenum} - tokens: {', '.join(tokens)}; word: {word}"
+        assert actual == expected, msg
