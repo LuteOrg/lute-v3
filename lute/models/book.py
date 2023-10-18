@@ -172,13 +172,14 @@ class Text(db.Model):
         Sentences are only needed once the text has been read.
         """
         for s in self.sentences:
-            self.removeSentence(s)
+            self.remove_sentence(s)
 
         if self.read_date is None:
             return
 
-        parser = self.language.parser
-        parsedtokens = parser.getParsedTokens(self.text, self.language)
+        lang = self.book.language
+        parser = lang.parser
+        parsedtokens = parser.get_parsed_tokens(self.text, lang)
 
         curr_sentence_tokens = []
         sentence_number = 1
