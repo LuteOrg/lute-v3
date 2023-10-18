@@ -25,7 +25,7 @@ class BookTag(db.Model):
     books = db.relationship('Book', secondary=booktags, back_populates='book_tags')
 
     @staticmethod
-    def make_book_tag(text, comment=None):
+    def make_book_tag(text, comment=''):
         "Create a TermTag."
         tt = BookTag()
         tt.text = text
@@ -119,7 +119,7 @@ class Text(db.Model):
     id = db.Column('TxID', db.Integer, primary_key=True)
     lg_id = db.Column('TxLgID', db.Integer, db.ForeignKey('languages.LgID'), nullable=False)
     text = db.Column('TxText', db.String, nullable=False)
-    order = db.Column('TxOrder', db.Integer, default=1)
+    order = db.Column('TxOrder', db.Integer)
     read_date = db.Column('TxReadDate', db.DateTime, nullable=True)
     bk_id = db.Column('TxBkID', db.Integer, db.ForeignKey('books.BkID'), nullable=False)
 

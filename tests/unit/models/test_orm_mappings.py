@@ -6,6 +6,7 @@ Low value but ensure that the db mapping is correct.
 
 from lute.models.language import Language
 from lute.models.term import Term
+from lute.models.book import Book, Text, BookTag, Sentence
 from lute.db import db
 from tests.dbasserts import assert_sql_result
 
@@ -55,6 +56,49 @@ def test_term(empty_db, english):
 
     db.session.add(term)
     db.session.commit()
+    assert_sql_result(sql, ['abc; abc; 1'], 'have term')
+
+
+def test_save_book(empty_db, english):
+    """
+    Check book mappings.
+    """
+
+    b = Book()
+    b.title = 'hi'
+    b.language = english
+
+    t = Text()
+    t.text = 'some text'
+    t.order = 1
+
+    s = Sentence()
+    s.text_content = 'some text'
+    s.order = 1
+
+    t.add_sentence(s)
+
+    b.texts.append(t)
+
+    bt = BookTag.make_book_tag('hola')
+    b.book_tags.append(bt)
+
+    db.session.add(b)
+    db.session.commit()
+
+    sql = "select BkID, BkTitle, BkLgID, BkWordCount from books"
+    assert_sql_result(sql, ['abc; abc; 1'], 'have term')
+
+    sql = "select TxID, TxBkID, TxText from texts"
+    assert_sql_result(sql, ['abc; abc; 1'], 'have term')
+
+    sql = "select * from sentences"
+    assert_sql_result(sql, ['abc; abc; 1'], 'have term')
+
+    sql = "select * from booktags"
+    assert_sql_result(sql, ['abc; abc; 1'], 'have term')
+
+    sql = "select * from tags2"
     assert_sql_result(sql, ['abc; abc; 1'], 'have term')
 
 
