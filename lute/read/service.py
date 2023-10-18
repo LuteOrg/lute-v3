@@ -37,7 +37,7 @@ def find_all_Terms_in_string(s, language):
     tok_strings = list(set(tok_strings))
     terms_matching_tokens = db.session.query(Term).filter(
         Term.language == language,
-        Term._text_lc.in_(tok_strings),
+        Term.text_lc.in_(tok_strings),
         Term.token_count == 1
     ).all()
 
@@ -49,7 +49,7 @@ def find_all_Terms_in_string(s, language):
     contained_term_query = db.session.query(Term).filter(
         Term.language == language,
         Term.token_count > 1,
-        func.instr(content, Term._text_lc) > 0
+        func.instr(content, Term.text_lc) > 0
     )
     contained_terms = contained_term_query.all()
 

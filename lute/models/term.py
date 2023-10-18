@@ -85,9 +85,14 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     id = db.Column('WoID', db.SmallInteger, primary_key=True)
     language_id = db.Column('WoLgID', db.Integer, db.ForeignKey('languages.LgID'))
 
-    # Text and TextLC need to be set through setters.
+    # Text should only be set through setters.
     _text = db.Column('WoText', db.String(250))
-    _text_lc = db.Column('WoTextLC', db.String(250))
+
+    # text_lc shouldn't be touched (it's changed when term.text is
+    # set), but it's public here to allow for its access during
+    # queries (eg in lute.read.service.  TODO fix access: text_lc is
+    # best kept private/protected.
+    text_lc = db.Column('WoTextLC', db.String(250))
 
     status = db.Column('WoStatus', db.Integer)
     translation = db.Column('WoTranslation', db.String(500))
@@ -157,7 +162,7 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         tok_strings = [tok.token for tok in tokens]
 
         t = zws.join(tok_strings)
-        old_text_lc = self._text_lc
+        old_text_lc = self.text_lc
         new_text_lc = lang.get_lowercase(t)
 
         text_changed = old_text_lc is not None and new_text_lc != old_text_lc
@@ -166,7 +171,7 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
             raise RuntimeError(msg)
 
         self._text = t
-        self._text_lc = new_text_lc
+        self.text_lc = new_text_lc
         self._calc_token_count()
 
     def _calc_token_count(self):
@@ -177,15 +182,6 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
             parts = self._text.split(zws)
             token_count = len(parts)
         self.token_count = token_count
-
-    @property
-    def text_lc(self):
-        return self._text_lc
-
-
-    @text_lc.setter
-    def text_lc(self, s):
-        self._text_lc = s
 
     def remove_all_term_tags(self):
         self.term_tags = []
