@@ -202,17 +202,12 @@ class TokenLocator:
         self.subject = subject
 
     def locate_string(self, s):
-        tlc = self.language.get_lowercase(s)
-        LCpatt = TokenLocator.make_string(tlc)
-
-        # "(?=())" is required because sometimes the search pattern can
-        # overlap -- e.g. _b_b_ has _b_ *twice*.
-        # Ref https://stackoverflow.com/questions/22454032/
-        #   preg-match-all-how-to-get-all-combinations-even-overlapping-ones
-        pattern = rf'(?=({re.escape(LCpatt)}))'
+        find_lc = self.language.get_lowercase(s)
+        find_lc = TokenLocator.make_string(find_lc)
 
         subjLC = self.language.get_lowercase(self.subject)
-        matches = self.preg_match_capture(pattern, subjLC)
+
+        matches = self.preg_match_capture(find_lc, subjLC)
 
         # The matches were performed with the lowercased subject,
         # because some languages (Turkish!) have funny cases.
@@ -225,6 +220,7 @@ class TokenLocator:
             matchlen = len(matchtext)
             matchpos = match[1]
 
+            # print(f"found match \"{matchtext}\" length = {matchlen} at pos = {matchpos}")
             original_subject_text = subj[matchpos: matchpos + matchlen]
             zws = '\u200B'
             t = original_subject_text.lstrip(zws).rstrip(zws)
@@ -241,15 +237,25 @@ class TokenLocator:
         n = beforesubstr.count(zws)
         return n
 
-    def preg_match_capture(self, pattern, subject):
+    def preg_match_capture(self, find_lc, subject):
         """
         Return the matched text and their start positions in the subject.
 
         E.g. search for r'cat' in "there is a CAT and a Cat" returns:
         [['CAT', 11], ['Cat', 21]]
         """
+
+        # "(?=())" is required because sometimes the search pattern can
+        # overlap -- e.g. _b_b_ has _b_ *twice*.
+        # https://stackoverflow.com/questions/5616822/
+        #   how-to-use-regex-to-find-all-overlapping-matches
+        pattern = rf'(?=({re.escape(find_lc)}))'
+
         matches = re.finditer(pattern, subject, flags=re.IGNORECASE)
-        result = [[match.group(), match.start()] for match in matches]
+
+        # Use group(1) to get the match text, because group(0) is a
+        # zero-length string.
+        result = [[match.group(1), match.start()] for match in matches]
         return result
 
     @staticmethod
