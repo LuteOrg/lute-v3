@@ -3,6 +3,7 @@ ORM mapping smoke tests
 
 Low value but ensure that the db mapping is correct.
 """
+import pytest
 
 from lute.models.language import Language
 from lute.models.term import Term
@@ -60,15 +61,10 @@ def test_term(empty_db, english):
     assert_sql_result(sql, ['abc; abc; 1'], 'have term')
 
 
-def test_save_book(empty_db, english):
-    """
-    Check book mappings.
-    """
-
-    b = Book()
-    b.title = 'hi'
-    b.language = english
-
+@pytest.fixture(name="simple_book")
+def fixture_simple_book(english):
+    "Single page book with some associated objects."
+    b = Book('hi', english)
     t = Text(b, 'some text', 1)
 
     s = Sentence()
@@ -82,6 +78,14 @@ def test_save_book(empty_db, english):
     bt = BookTag.make_book_tag('hola')
     b.book_tags.append(bt)
 
+    return b
+
+
+def test_save_book(empty_db, simple_book):
+    """
+    Check book mappings.
+    """
+    b = simple_book
     db.session.add(b)
     db.session.commit()
 
@@ -100,6 +104,24 @@ def test_save_book(empty_db, english):
 
     sql = "select * from tags2"
     assert_sql_result(sql, ['1; hola; '], 'tags2')
+
+
+def test_delete_book(empty_db, simple_book):
+    """
+    Most tables should clear out after delete.
+    """
+    b = simple_book
+    db.session.add(b)
+    db.session.commit()
+
+    db.session.delete(b)
+    db.session.commit()
+
+    for t in [ 'books', 'texts', 'sentences', 'booktags' ]:
+        assert_record_count_equals(t, 0, f'{t} deleted')
+
+    sql = "select * from tags2"
+    assert_sql_result(sql, ['1; hola; '], 'tags2 remain')
 
 
 def test_save_text_sentences_replaced_in_db(empty_db, english):
