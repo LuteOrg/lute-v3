@@ -1,8 +1,11 @@
+"""
+Calculating what items should be rendered in the browser.
+"""
+
 import re
 import functools
 from lute.models.language import Language
 from lute.models.term import Term, Status
-from lute.read.render.text_token import TextToken
 
 class RenderableCalculator:
     """
@@ -40,7 +43,7 @@ class RenderableCalculator:
             if prevtok is not None and prevtok.order != (tok.order - 1):
                 mparts = [prevtok.tok_text, prevtok.order, tok.tok_text, tok.order]
                 msg = '; '.join(map(str, mparts))
-                raise Exception(f"bad token ordering: {msg}")
+                raise RuntimeError(f"bad token ordering: {msg}")
             prevtok = tok
 
 
@@ -123,38 +126,32 @@ class RenderableCalculator:
             candidateID += 1
             rc.id = candidateID
             rc.term = None
-            rc.displaytext = tok.tok_text
+            rc.display_text = tok.tok_text
             rc.text = tok.tok_text
             rc.pos = tok.order
             rc.length = 1
-            rc.isword = tok.is_word
+            rc.is_word = tok.is_word
             candidates[candidateID] = rc
             rendered[rc.pos] = candidateID
 
         # 3.  Create candidates for all the terms.
         termcandidates = []
-        firstorder = texttokens[0].order
-        toktext = [tok.tok_text for tok in texttokens]
-        subject = TokenLocator.make_string(toktext)
+        subject = TokenLocator.make_string([t.tok_text for t in texttokens])
         tocloc = TokenLocator(language, subject)
 
         for term in terms:
-            tlc = term.text_lc
-            wtokencount = term.token_count
-            locations = tocloc.locate_string(tlc)
-
-            for loc in locations:
+            for loc in tocloc.locate_string(term.text_lc):
                 rc = RenderableCandidate()
                 candidateID += 1
                 rc.id = candidateID
 
                 matchtext, index = loc
                 rc.term = term
-                rc.displaytext = matchtext
+                rc.display_text = matchtext
                 rc.text = matchtext
-                rc.pos = firstorder + index
-                rc.length = wtokencount
-                rc.isword = 1
+                rc.pos = texttokens[0].order + index
+                rc.length = term.token_count
+                rc.is_word = 1
 
                 termcandidates.append(rc)
                 candidates[candidateID] = rc
@@ -178,10 +175,8 @@ class RenderableCalculator:
             for i in range(tc.length):
                 rendered[tc.pos + i] = tc.id
 
-        rendered_candidate_ids = rendered.values()
-        rcids = list(set(rendered_candidate_ids))
-        ret = [candidates[rcid] for rcid in rcids]
-        return ret
+        rcids = list(set(rendered.values()))
+        return [candidates[rcid] for rcid in rcids]
 
 
     def _sort_by_order_and_tokencount(self, items):
@@ -200,11 +195,17 @@ class RenderableCalculator:
                 zws = chr(0x200B)
                 curr_tokens = curr.text.split(zws)
                 show = curr_tokens[overlap:]
-                curr.displaytext = zws.join(show)
+                curr.display_text = zws.join(show)
 
         return items
 
     def main(self, language, words, texttokens):
+        """
+        Main entrypoint.
+
+        Given a language and some terms and texttokens,
+        return the RenderableCandidates to be rendered.
+        """
         renderable = self._get_renderable(language, words, texttokens)
         items = self._sort_by_order_and_tokencount(renderable)
         items = self._calc_overlaps(items)
@@ -212,11 +213,23 @@ class RenderableCalculator:
 
     @staticmethod
     def get_renderable(lang, words, texttokens):
+        "Calls main, useless method?"  # TODO unused code: check?
         rc = RenderableCalculator()
         return rc.main(lang, words, texttokens)
 
 
-class RenderableCandidate:
+class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
+    """
+    An item that may or may not be rendered on the browser.
+
+    Given some Terms contained in a text, the RenderableCalculator
+    creates RenderableCandidates for each Term in the text, as well as
+    the original text tokens.
+
+    When the final set of actually rendered RenderableCandidates is
+    found (with self.render is True), these are convered into TextItems
+    for the final render.
+    """
     def __init__(self):
         self.id: int
         self.term: Term = None
@@ -229,24 +242,26 @@ class RenderableCandidate:
         self.render: bool = True
 
     def __repr__(self):
-        return f"<RenderableCandidate \"{self.text}\" at pos {self.pos} (id={self.id})>";
+        parts = [
+            f"pos {self.pos}",
+            f"render {self.render}"
+            f"(id {self.id})"
+        ]
+        parts = ' '.join(parts)
+        return f"<RenderableCandidate \"{self.text}\", {parts}>"
 
     @property
     def term_id(self) -> int:
-        if self.term is None:
-            return None
-        return self.term.id
+        return self.term.id if self.term else None
 
     @property
     def order_end(self) -> int:
         return self.pos + self.length - 1
 
-    def to_string(self) -> str:
-        render_str = 'true' if self.render else 'false'
-        term_id = self.term.id if self.term is not None else '-'
-        return f"{term_id}; {self.text}; {self.pos}; {self.length}; render = {render_str}"
-
     def make_text_item(self, p_num: int, se_id: int, text_id: int, lang: Language):
+        """
+        Create a TextItem for final rendering.
+        """
         t = TextItem()
         t.order = self.pos
         t.text_id = text_id
@@ -260,27 +275,7 @@ class RenderableCandidate:
         t.is_word = self.is_word
         t.text_length = len(self.text)
 
-        if self.term is None:
-            return t
-
-        t.wo_id = self.term.get_id()
-        t.wo_status = self.term.get_status()
-        t.flash_message = self.term.get_flash_message()
-
-        def has_extra(cterm):
-            if cterm is None:
-                return False
-            no_extra = (
-                cterm.get_translation() is None and
-                cterm.get_romanization() is None and
-                cterm.get_current_image() is None
-            )
-            return not no_extra
-
-        show_tooltip = has_extra(self.term)
-        for p in self.term.get_parents():
-            show_tooltip = show_tooltip or has_extra(p)
-        t.show_tooltip = show_tooltip
+        t.load_term_data(self.term)
 
         return t
 
@@ -315,6 +310,9 @@ class TokenLocator:
         self.subject = subject
 
     def locate_string(self, s):
+        """
+        Find the string s in the subject self.subject.
+        """
         find_lc = self.language.get_lowercase(s)
         find_lc = TokenLocator.make_string(find_lc)
 
@@ -345,6 +343,9 @@ class TokenLocator:
         return termmatches
 
     def get_count_before(self, string, pos):
+        """
+        Count of tokens found in string before position pos.
+        """
         zws = '\u200B'
         beforesubstr = string[:pos]
         n = beforesubstr.count(zws)
@@ -373,13 +374,22 @@ class TokenLocator:
 
     @staticmethod
     def make_string(t):
+        """
+        Append zero-width string to string to simplify/standardize searches.
+        """
         zws = '\u200B'
         if isinstance(t, list):
             t = zws.join(t)
         return zws + t + zws
 
 
-class TextItem:
+class TextItem: # pylint: disable=too-many-instance-attributes
+    """
+    Unit to be rendered.
+
+    Data structure for template read/textitem.html (TODO confirm template name)
+    """
+
     def __init__(self):
         self.text_id: int
         self.lang_id: int
@@ -404,11 +414,48 @@ class TextItem:
         self.wo_status: int = None
         self.flash_message: str = None
 
-    def get_html_display_text(self) -> str:
+    def load_term_data(self, term):
+        """
+        Load extra term data, if any.
+        """
+        if term is None:
+            return
+
+        self.wo_id = term.id
+        self.wo_status = term.status
+        self.flash_message = term.get_flash_message()
+
+        def has_extra(cterm):
+            if cterm is None:
+                return False
+            no_extra = (
+                cterm.translation is None and
+                cterm.romanization is None and
+                cterm.get_current_image() is None
+            )
+            return not no_extra
+
+        show_tooltip = has_extra(term)
+        for p in term.parents:
+            show_tooltip = show_tooltip or has_extra(p)
+        self.show_tooltip = show_tooltip
+
+    @property
+    def html_display_text(self):
+        """
+        Content to be rendered to browser.
+        """
         zws = chr(0x200B)
         return self.display_text.replace(zws, '').replace(' ', '&nbsp;')
 
-    def get_span_id(self) -> str:
+    @property
+    def span_id(self):
+        """
+        Each span gets a unique id.
+        Arbitrary format: ID-{order}-{tokencount}.
+
+        This *might* not be necessary ... I don't think IDs are used anywhere.
+        """
         parts = [
             'ID',
             str(self.order),
@@ -416,7 +463,11 @@ class TextItem:
         ]
         return '-'.join(parts)
 
-    def get_html_class_string(self) -> str:
+    @property
+    def html_class_string(self):
+        """
+        Create class string for TextItem.
+        """
         if self.is_word == 0:
             return "textitem"
 
@@ -431,7 +482,7 @@ class TextItem:
         ]
 
         tooltip = (
-            st != Status.WELLKNOWN and st != Status.IGNORED or
+            st not in (Status.WELLKNOWN, Status.IGNORED) or
             self.show_tooltip or
             self.flash_message is not None
         )

@@ -5,11 +5,15 @@ Read service tests.
 from lute.models.term import Term
 from lute.read.service import find_all_Terms_in_string
 from lute.db import db
-from tests.dbasserts import assert_sql_result
 
 
-def _run_scenario(spanish, content, expected_found):
-    found_terms = find_all_Terms_in_string(content, spanish)
+def _run_scenario(language, content, expected_found):
+    """
+    Given some pre-saved terms in language,
+    find_all method returns the expected_found terms that
+    exist in the content string.
+    """
+    found_terms = find_all_Terms_in_string(content, language)
     assert len(found_terms) == len(expected_found), 'found count'
     zws = '\u200B'  # zero-width space
     found_terms = [ t.text.replace(zws, '') for t in found_terms ]
@@ -17,6 +21,7 @@ def _run_scenario(spanish, content, expected_found):
 
 
 def test_spanish_find_all_in_string(spanish, _empty_db):
+    "Given various pre-saved terms, find_all returns those in the string."
     terms = [ 'perro', 'gato', 'un gato' ]
     for term in terms:
         t = Term(spanish, term)
@@ -40,6 +45,7 @@ def test_spanish_find_all_in_string(spanish, _empty_db):
 
 
 def test_english_find_all_in_string(english, _empty_db):
+    "Can find a term with an apostrophe in string."
     terms = [ "the cat's pyjamas" ]
     for term in terms:
         t = Term(english, term)

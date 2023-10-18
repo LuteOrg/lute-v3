@@ -294,6 +294,9 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
 
 class Status:
+    """
+    Term statuses.
+    """
     UNKNOWN = 0
     WELLKNOWN = 99
     IGNORED = 98

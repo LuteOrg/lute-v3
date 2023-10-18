@@ -3,12 +3,11 @@ Reading helpers.
 """
 
 import re
+from sqlalchemy import func
+
 from lute.models.term import Term
 from lute.db import db
 
-
-from sqlalchemy import func
-from sqlalchemy.orm import aliased
 
 def find_all_Terms_in_string(s, language):
     """

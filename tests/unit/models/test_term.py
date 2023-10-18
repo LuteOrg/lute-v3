@@ -2,11 +2,11 @@
 Term tests.
 """
 
-import pytest
 from lute.models.term import Term
 
 
 def test_cruft_stripped_on_set_word(spanish):
+    "Extra spaces are stripped, because they cause parsing/matching problems."
     cases = [
         ('hola', 'hola', 'hola'),
         ('    hola    ', 'hola', 'hola'),
@@ -22,6 +22,7 @@ def test_cruft_stripped_on_set_word(spanish):
 
 
 def test_token_count(english):
+    "Various scenarios."
     cases = [
         ("hola", 1),
         ("    hola    ", 1),
@@ -42,6 +43,7 @@ def test_token_count(english):
 
 
 def test_term_left_as_is_if_its_an_exception(spanish):
+    "Ensure regex match works, upper and lowercase."
     spanish.exceptions_split_sentences = 'EE.UU.'
 
     term = Term(spanish, 'EE.UU.')
@@ -54,6 +56,7 @@ def test_term_left_as_is_if_its_an_exception(spanish):
 
 
 def test_cannot_add_self_as_own_parent(spanish):
+    "Avoid circular references."
     t = Term(spanish, 'gato')
     t.add_parent(t)
     assert len(t.parents) == 0
