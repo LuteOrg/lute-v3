@@ -1,9 +1,38 @@
 import re
+import functools
 from lute.models.language import Language
 from lute.models.term import Term, Status
 from lute.read.render.text_token import TextToken
 
 class RenderableCalculator:
+    """
+    Calculating what TextTokens and Terms should be rendered.
+
+    Suppose we had the following TextTokens A-I, with spaces between:
+
+     A B C D E F G H I
+
+    Then suppose we had the following Terms:
+      "B C"       (term J)
+      "E F G H I" (K)
+      "F G"       (L)
+      "C D E"     (M)
+
+    Stacking these:
+
+     A B C D E F G H I
+
+      "B C"              (term J)
+            "E F G H I"  (term K)
+              "F G"      (term L)
+        "C D E"          (term M)
+
+    We can say:
+
+    - term J "contains" TextTokens B and C, so B and C should not be rendered.
+    - K contains tokens E-I, and also L, so none of those should be rendered.
+    - M is _not_ contained by anything else, so it should be rendered.
+    """
 
     def _assert_texttokens_are_contiguous(self, texttokens):
         prevtok = None
@@ -16,14 +45,79 @@ class RenderableCalculator:
 
 
     def _get_renderable(self, language, terms, texttokens):
+        """
+        Method to determine what should be rendered:
+
+        1. Create a "rendered array".  On completion of this algorithm,
+        each position in the array will be filled with the ID of the
+        RenderableCandidate that should actually appear there (and
+        which might hide other candidates).
+
+        2. Start by saying that all the original texttokens will be
+        rendered by writing each candidate ID in the rendered array.
+
+        3. Create candidates for all the terms.
+
+        4. Starting with the shortest terms first (fewest text tokens),
+        and starting _at the end_ of the string, "write" the candidate
+        ID to the output "rendered array", for each token in the candidate.
+
+        At the end of this process, each position in the "rendered array"
+        should be filled with the ID of the corresponding candidate
+        that will actually appear in that position.  By getting the
+        unique IDs and returning just their candidates, we should have
+        the list of candidates that would be "visible" on render.
+
+        Applying the above algorithm to the example given in the class
+        header:
+
+        We have the following TextTokens A-I, with spaces between:
+
+         a b c d e f g h i
+
+        And the following terms, arranged from shortest to longest:
+          "B C"
+          "F G"
+          "C D E"
+          "E F G H I"
+
+        First, terms are created for each individual token in the
+        original string:
+
+        A B C D E F G H I
+
+        Then the positions for each of the terms are calculated:
+
+        [A B C D E F G H I]
+
+          "B C"
+                  "F G"
+            "C D E"
+                "E F G H I"
+
+        Then, "writing" terms order by their length, and then by their
+        distance from the *end* of the string:
+
+        - "F G" is written first, because it's short, and is nearest
+          the end:
+          => "A B C D E [F-G] H I"
+        - "B C" is next:
+          => "A [B-C] D E [F-G] H I"
+        - then "C D E":
+          => "A [B-C][C-D-E] [F-G] H I"
+        then "E F G H I":
+          => "A [B-C][C-D-E][E-F-G-H-I]"
+        """
         texttokens.sort(key=lambda x: x.order)
         self._assert_texttokens_are_contiguous(texttokens)
 
         candidateID = 0
         candidates = {}
 
+        # Step 1.
         rendered = {}
 
+        # Step 2 - fill with the original texttokens.
         for tok in texttokens:
             rc = RenderableCandidate()
             candidateID += 1
@@ -37,6 +131,7 @@ class RenderableCalculator:
             candidates[candidateID] = rc
             rendered[rc.pos] = candidateID
 
+        # 3.  Create candidates for all the terms.
         termcandidates = []
         firstorder = texttokens[0].order
         toktext = [tok.tok_text for tok in texttokens]
@@ -64,8 +159,21 @@ class RenderableCalculator:
                 termcandidates.append(rc)
                 candidates[candidateID] = rc
 
-        termcandidates.sort(key=lambda x: (-x.length, x.pos))
+        # 4a.  Sort the term candidates: first by length, then by position.
+        def compare(a, b):
+            # Longest sorts first.
+            if a.length != b.length:
+                return -1 if (a.length > b.length) else 1
+            # Lowest position (closest to front of string) sorts first.
+            return -1 if (a.pos < b.pos) else 1
+        termcandidates.sort(key=functools.cmp_to_key(compare))
 
+        # The termcandidates should now be sorted such that longest
+        # are first, with items of equal length being sorted by
+        # position.  By traversing this in reverse and "writing"
+        # their IDs to the "rendered" array, we should end up with
+        # the final IDs in each position.
+        termcandidates.reverse()
         for tc in termcandidates:
             for i in range(tc.length):
                 rendered[tc.pos + i] = tc.id
@@ -225,7 +333,7 @@ class TokenLocator:
             matchlen = len(matchtext)
             matchpos = match[1]
 
-            # print(f"found match \"{matchtext}\" length = {matchlen} at pos = {matchpos}")
+            # print(f"found match \"{matchtext}\" len={matchlen} pos={matchpos}")
             original_subject_text = subj[matchpos: matchpos + matchlen]
             zws = '\u200B'
             t = original_subject_text.lstrip(zws).rstrip(zws)
