@@ -20,6 +20,14 @@ notes=FIXME,XXX
 disable=too-few-public-methods
 
 
+[VARIABLES]
+
+# Argument names that match this expression will be ignored.
+# This includes some pytest fixtures that are "setup" methods for functions:
+# app_context, empty_db, etc
+ignored-argument-names=app_context|empty_db|dummy|^ignored_|^unused_
+
+
 ### placeholder - available settings
 ###
 ###
