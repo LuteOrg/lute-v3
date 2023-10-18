@@ -47,7 +47,7 @@ class RenderableCalculator:
             prevtok = tok
 
 
-    def _get_renderable(self, language, terms, texttokens):
+    def _get_renderable(self, tokenlocator, terms, texttokens):
         """
         Method to determine what should be rendered:
 
@@ -111,8 +111,6 @@ class RenderableCalculator:
         then "E F G H I":
           => "A [B-C][C-D-E][E-F-G-H-I]"
         """
-        texttokens.sort(key=lambda x: x.order)
-        self._assert_texttokens_are_contiguous(texttokens)
 
         # All the candidates to be considered for rendering.
         candidates = {}
@@ -133,13 +131,11 @@ class RenderableCalculator:
 
         # 3.  Create candidates for all the terms.
         termcandidates = []
-        subject = TokenLocator.make_string([t.tok_text for t in texttokens])
-        tocloc = TokenLocator(language, subject)
 
         for term in terms:
-            for loc in tocloc.locate_string(term.text_lc):
-                rc = RenderableCandidate()
+            for loc in tokenlocator.locate_string(term.text_lc):
                 matchtext, index = loc
+                rc = RenderableCandidate()
                 rc.term = term
                 rc.display_text = matchtext
                 rc.text = matchtext
@@ -177,6 +173,7 @@ class RenderableCalculator:
         items.sort(key=lambda x: (x.pos, -x.length))
         return items
 
+
     def _calc_overlaps(self, items):
         for i in range(1, len(items)):
             prev = items[i - 1]
@@ -193,6 +190,7 @@ class RenderableCalculator:
 
         return items
 
+
     def main(self, language, words, texttokens):
         """
         Main entrypoint.
@@ -200,16 +198,24 @@ class RenderableCalculator:
         Given a language and some terms and texttokens,
         return the RenderableCandidates to be rendered.
         """
-        renderable = self._get_renderable(language, words, texttokens)
+        texttokens.sort(key=lambda x: x.order)
+        self._assert_texttokens_are_contiguous(texttokens)
+
+        subject = TokenLocator.make_string([t.tok_text for t in texttokens])
+        tocloc = TokenLocator(language, subject)
+
+        renderable = self._get_renderable(tocloc, words, texttokens)
         items = self._sort_by_order_and_tokencount(renderable)
         items = self._calc_overlaps(items)
         return items
+
 
     @staticmethod
     def get_renderable(lang, words, texttokens):
         "Calls main, useless method?"  # TODO unused code: check?
         rc = RenderableCalculator()
         return rc.main(lang, words, texttokens)
+
 
 
 class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
