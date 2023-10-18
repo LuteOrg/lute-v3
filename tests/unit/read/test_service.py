@@ -6,6 +6,8 @@ from lute.models.term import Term
 from lute.read.service import find_all_Terms_in_string
 from lute.db import db
 
+from tests.utils import add_terms
+
 
 def _run_scenario(language, content, expected_found):
     """
@@ -59,3 +61,36 @@ def test_english_find_all_in_string(english, _empty_db):
 # TODO japanese: add check
 # TODO chinese: add check
 # TODO arabic: add check
+
+
+def test_smoke_get_paras(spanish, _demo_db):
+    add_terms(db, spanish, ['tengo un', 'un gato'])
+
+    content = "Tengo un gato. Hay un perro.\nTengo un perro."
+    t = make_text("Hola", content, spanish)
+
+    paras = RenderableSentence.get_paragraphs(t, term_service)
+    assert len(paras) == 2
+
+    def stringize(t):
+        zws = chr(0x200B)
+        parts = [
+            '[',
+            f"'{t.display_text.replace(zws, '|')}'",
+            f'p{t.para_id}',
+            f's{t.se_id}',
+            ']'
+        ]
+        return ' '.join(parts)
+
+    sentences = [item for sublist in paras for item in sublist]
+    actual = []
+    for sent in sentences:
+        actual.append(', '.join(map(stringize, sent.renderable())))
+
+    expected = [
+        "[ 'Tengo| |un' p0 s0 ], [ ' |gato' p0 s0 ], [ '. ' p0 s0 ]",
+        "[ 'Hay' p0 s1 ], [ ' ' p0 s1 ], [ 'un' p0 s1 ], [ ' ' p0 s1 ], [ 'perro' p0 s1 ], [ '.' p0 s1 ]",
+        "[ 'Tengo| |un' p1 s3 ], [ ' ' p1 s3 ], [ 'perro' p1 s3 ], [ '.' p1 s3 ]"
+    ]
+    assert actual == expected
