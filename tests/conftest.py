@@ -54,10 +54,13 @@ def fixture_config():
 def fixture_demo_db(testconfig):
     """
     A clean instance of the demo database.
+    Yields the app context so that tests using the db will work.
     """
     if os.path.exists(testconfig.dbfilename):
         os.unlink(testconfig.dbfilename)
-    init_db_and_app(testconfig, { 'TESTING': True })
+    app = init_db_and_app(testconfig, { 'TESTING': True })
+    with app.app_context():
+        yield
 
 
 def _delete_all_from_database(app):

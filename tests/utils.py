@@ -3,9 +3,9 @@ Utility methods for tests.
 """
 
 from lute.models.term import Term
+from lute.db import db
 
-
-def add_terms(db, language, term_array):
+def add_terms(language, term_array):
     """
     Make and save terms.
     """
