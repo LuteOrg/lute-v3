@@ -15,13 +15,12 @@ def make_tokens(token_data):
     return [make_token(t) for t in token_data]
 
 
-def assert_renderable_equals(english, token_data, term_data, expected, expected_displayed=None):
+def assert_renderable_equals(language, token_data, term_data, expected, expected_displayed=None):
     tokens = make_tokens(token_data)
-    terms = [Term(english, t) for t in term_data]
+    terms = [Term(language, t) for t in term_data]
 
     rc = RenderableCalculator()
-    en = english
-    rcs = rc.main(en, terms, tokens)
+    rcs = rc.main(language, terms, tokens)
     res = ''
     for rc in rcs:
         if rc.render:
@@ -141,3 +140,8 @@ def test_crazy_case(english):
     expected = '[A-1][ -1][B C-3][C D E-5][E F G H I-9]'
     expected_displayed = '[A-1][ -1][B C-3][ D E-5][ F G H I-9]'
     assert_renderable_equals(english, data, words, expected, expected_displayed)
+
+
+# TODO turkish: add turkish check
+# TODO japanese: add turkish check
+# TODO other languages: add other lang/parser checks
