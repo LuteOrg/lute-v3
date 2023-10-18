@@ -109,30 +109,22 @@ def fixture_empty_db(app_context):
     _delete_all_from_database()
 
 
-@pytest.fixture(name="app_with_demo")
-def fixture_demo_app(app):
-    """
-    App with database loaded with demo data.
-    """
-    yield app
-
-
 @pytest.fixture(name = "demo_client")
-def fixture_demo_client(app_with_demo):
+def fixture_demo_client(app):
     """
     Client using demo-data-loaded application.
     """
-    return app_with_demo.test_client()
+    return app.test_client()
 
 
 @pytest.fixture(name = "empty_client")
-def fixture_empty_client(app_with_demo):
+def fixture_empty_client(app):
     """
     Client using empty database application.
     """
-    with app_with_demo.app_context():
+    with app.app_context():
         _delete_all_from_database()
-    return app_with_demo.test_client()
+    return app.test_client()
 
 
 @pytest.fixture(name="demo_yaml_folder")
