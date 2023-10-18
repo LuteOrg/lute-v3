@@ -10,7 +10,7 @@ from lute.db import db
 from tests.dbasserts import assert_sql_result
 
 
-def test_language(_empty_db):
+def test_language(empty_db):
     """
     Check language mappings.
     """
@@ -38,7 +38,7 @@ def test_language(_empty_db):
     assert retrieved.show_romanization is False, 'retrieved no roman'
 
 
-def test_term(_empty_db, english):
+def test_term(empty_db, english):
     """
     Check term mappings.
     """

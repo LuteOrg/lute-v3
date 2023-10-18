@@ -101,7 +101,7 @@ def _delete_all_from_database():
             conn.execute(text(f"delete from {t}"))
 
 
-@pytest.fixture(name="_empty_db")
+@pytest.fixture(name="empty_db")
 def fixture_empty_db(app_context):
     """
     An empty db!
