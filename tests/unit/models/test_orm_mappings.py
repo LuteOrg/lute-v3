@@ -148,4 +148,3 @@ def test_save_text_sentences_replaced_in_db(empty_db, english):
 
 
 # TODO db relationships: delete lang should delete everything related
-# TODO db relationships: delete book should delete everything related
