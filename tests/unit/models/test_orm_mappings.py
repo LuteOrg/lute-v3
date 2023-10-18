@@ -68,9 +68,7 @@ def test_save_book(empty_db, english):
     b.title = 'hi'
     b.language = english
 
-    t = Text()
-    t.text = 'some text'
-    t.order = 1
+    t = Text(b, 'some text', 1)
 
     s = Sentence()
     s.text_content = 'some text'

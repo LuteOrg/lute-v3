@@ -52,10 +52,10 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     texts = db.relationship('Text', back_populates='book', order_by='Text.order')
     book_tags = db.relationship('BookTag', secondary='booktags', back_populates='books')
 
-    def __init__(self, Title=None, Language=None, BkSourceURI=None):
-        self.title = Title
-        self.language = Language
-        self.source_uri = BkSourceURI
+    def __init__(self, title=None, language=None, source_uri=None):
+        self.title = title
+        self.language = language
+        self.source_uri = source_uri
         self.texts = []
         self.book_tags = []
 
@@ -114,36 +114,67 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
 
 class Text(db.Model):
+    """
+    Each page in a Book.
+
+    This class should really be named "Page" ...
+    todo for the future.
+    """
     __tablename__ = 'texts'
 
     id = db.Column('TxID', db.Integer, primary_key=True)
-    text = db.Column('TxText', db.String, nullable=False)
+    _text = db.Column('TxText', db.String, nullable=False)
     order = db.Column('TxOrder', db.Integer)
-    read_date = db.Column('TxReadDate', db.DateTime, nullable=True)
+    _read_date = db.Column('TxReadDate', db.DateTime, nullable=True)
     bk_id = db.Column('TxBkID', db.Integer, db.ForeignKey('books.BkID'), nullable=False)
 
     book = db.relationship('Book', back_populates='texts')
     sentences = db.relationship('Sentence', back_populates='text', order_by='Sentence.order')
 
-    def __init__(self, text='', language=None, order=1):
+    def __init__(self, book, text, order=1):
+        self.book = book
         self.text = text
-        self.language = language
         self.order = order
         self.sentences = []
 
     @property
     def title(self):
+        """
+        Text title is the book title + page fraction.
+        """
         b = self.book
         s = f"({self.order}/{self.book.page_count})"
         t = f"{b.title} {s}"
         return t
 
+    @property
+    def text(self):
+        return self._text
 
-    def load_sentences(self):
+    @text.setter
+    def text(self, s):
+        self._text = s
+        self._load_sentences()
+
+    @property
+    def read_date(self):
+        return self._read_date
+
+    @read_date.setter
+    def read_date(self, s):
+        self._read_date = s
+        self._load_sentences()
+
+
+    def _load_sentences(self):
+        """
+        Parse the current text and create Sentence objects.
+        Sentences are only needed once the text has been read.
+        """
         for s in self.sentences:
             self.removeSentence(s)
 
-        if self.TxReadDate is None:
+        if self.read_date is None:
             return
 
         parser = self.language.parser
@@ -155,7 +186,7 @@ class Text(db.Model):
         for pt in parsedtokens:
             curr_sentence_tokens.append(pt)
             if pt.is_end_of_sentence:
-                se = self.make_sentence_from_tokens(curr_sentence_tokens, sentence_number)
+                se = Sentence.from_tokens(curr_sentence_tokens, sentence_number)
                 self.add_sentence(se)
 
                 # Reset for the next sentence.
@@ -164,10 +195,51 @@ class Text(db.Model):
 
         # Add any stragglers.
         if len(curr_sentence_tokens) > 0:
-            se = self.make_sentence_from_tokens(curr_sentence_tokens, sentence_number)
+            se = Sentence.from_tokens(curr_sentence_tokens, sentence_number)
             self.add_sentence(se)
 
-    def make_sentence_from_tokens(self, tokens, senumber):
+    def add_sentence(self, sentence):
+        "Add a sentence to the Text."
+        if sentence not in self.sentences:
+            self.sentences.append(sentence)
+            sentence.text = self
+        return self
+
+    def remove_sentence(self, sentence):
+        "Remove the given sentence from the Text."
+        if sentence in self.sentences:
+            self.sentences.remove(sentence)
+            sentence.text = None
+        return self
+
+
+class Sentence(db.Model):
+    """
+    Parsed sentences for a given Text.
+
+    The Sentence contains the parsed tokens, joined by the zero-width string.
+    """
+
+    __tablename__ = 'sentences'
+
+    id = db.Column('SeID', db.Integer, primary_key=True)
+    tx_id = db.Column('SeTxID', db.Integer, db.ForeignKey('texts.TxID'), nullable=False)
+    order = db.Column('SeOrder', db.Integer, default=1)
+    text_content = db.Column('SeText', db.Text, default='')
+
+    text = db.relationship('Text', back_populates='sentences')
+
+    def __init__(self, text_content='', text=None, order=1):
+        self.text_content = text_content
+        self.text = text
+        self.order = order
+
+    @staticmethod
+    def from_tokens(tokens, senumber):
+        """
+        Create a new Sentence from ParsedTokens.
+        """
+
         ptstrings = [t.token for t in tokens]
 
         zws = chr(0x200B)  # Zero-width space.
@@ -183,31 +255,3 @@ class Text(db.Model):
         sentence.order = senumber
         sentence.text_content = s
         return sentence
-
-    def add_sentence(self, sentence):
-        if sentence not in self.sentences:
-            self.sentences.append(sentence)
-            sentence.text = self
-        return self
-
-    def remove_sentence(self, sentence):
-        if sentence in self.sentences:
-            self.sentences.remove(sentence)
-            sentence.text = None
-        return self
-
-
-class Sentence(db.Model):
-    __tablename__ = 'sentences'
-
-    id = db.Column('SeID', db.Integer, primary_key=True)
-    tx_id = db.Column('SeTxID', db.Integer, db.ForeignKey('texts.TxID'), nullable=False)
-    order = db.Column('SeOrder', db.Integer, default=1)
-    text_content = db.Column('SeText', db.Text, default='')
-
-    text = db.relationship('Text', back_populates='sentences')
-
-    def __init__(self, text_content='', text=None, order=1):
-        self.text_content = text_content
-        self.text = text
-        self.order = order
