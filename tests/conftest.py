@@ -74,39 +74,28 @@ def fixture_app_context(app):
         yield
 
 
-def _delete_all_from_database():
-    "Clean out all db tables.  Requires an app_context to be active."
-        # Clearing everything out in ref-integrity order.
+@pytest.fixture(name="empty_db")
+def fixture_empty_db(app_context):
+    """
+    Empty the db in ref. integrity order.
+    """
     tables = [
-        "sentences",
         "settings",
 
-        "booktags",
-        "bookstats",
+        "booktags", "wordtags",
+        "tags", "tags2",
 
-        "wordtags",
-        "wordparents",
-        "wordimages",
-        "wordflashmessages",
-
-        "tags",
-        "tags2",
-        "texts",
+        "sentences", "texts", "bookstats",
         "books",
+
+        "wordparents", "wordimages", "wordflashmessages",
         "words",
+
         "languages"
     ]
     with db.engine.begin() as conn:
         for t in tables:
             conn.execute(text(f"delete from {t}"))
-
-
-@pytest.fixture(name="empty_db")
-def fixture_empty_db(app_context):
-    """
-    An empty db!
-    """
-    _delete_all_from_database()
 
 
 @pytest.fixture(name = "client")
