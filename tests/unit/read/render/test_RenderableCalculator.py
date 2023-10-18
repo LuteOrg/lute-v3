@@ -15,18 +15,13 @@ def make_tokens(token_data):
     return [make_token(t) for t in token_data]
 
 
-def assert_renderable_equals(english, token_data, word_data, expected, expected_displayed=None):
+def assert_renderable_equals(english, token_data, term_data, expected, expected_displayed=None):
     tokens = make_tokens(token_data)
-
-    def make_term(arr):
-        eng = Language.make_english()
-        w = Term(eng, arr[0])
-        return w
-    words = [make_term(t) for t in word_data]
+    terms = [Term(english, t) for t in term_data]
 
     rc = RenderableCalculator()
     en = english
-    rcs = rc.main(en, words, tokens)
+    rcs = rc.main(en, terms, tokens)
     res = ''
     for rc in rcs:
         if rc.render:
@@ -99,7 +94,7 @@ def test_multiword_items_cover_other_items(english):
         [6, '.'],
     ]
     words = [
-        ['data here'],
+        'data here',
     ]
     expected = '[some-1][ -1][data here-3][.-1]'
     assert_renderable_equals(english, data, words, expected)
@@ -115,8 +110,8 @@ def test_overlapping_multiwords(english):
         [6, '.'],
     ]
     words = [
-        ['some data'],
-        ['data here'],
+        'some data',
+        'data here',
     ]
     expected = '[some data-3][data here-3][.-1]'
     expected_displayed = '[some data-3][ here-3][.-1]'
@@ -127,8 +122,8 @@ def test_multiwords_starting_at_same_location(english):
     chars = list('A B C D')
     data = [[i + 1, c] for i, c in enumerate(chars)]
     words = [
-        ['A B'],
-        ['A B C'],
+        'A B',
+        'A B C',
     ]
     expected = '[A B C-5][ -1][D-1]'
     assert_renderable_equals(english, data, words, expected)
@@ -138,10 +133,10 @@ def test_crazy_case(english):
     chars = list('A B C D E F G H I')
     data = [[i + 1, c] for i, c in enumerate(chars)]
     words = [
-        ['B C'],  # J
-        ['E F G H I'],  # K
-        ['F G'],  # L
-        ['C D E'],  # M
+        'B C',  # J
+        'E F G H I',  # K
+        'F G',  # L
+        'C D E',  # M
     ]
     expected = '[A-1][ -1][B C-3][C D E-5][E F G H I-9]'
     expected_displayed = '[A-1][ -1][B C-3][ D E-5][ F G H I-9]'

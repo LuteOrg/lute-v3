@@ -43,7 +43,7 @@ class RenderableCalculator:
         tocloc = TokenLocator(language, subject)
 
         for term in terms:
-            tlc = term.getTextLC()
+            tlc = term.text_lc
             wtokencount = term.token_count
             locations = tocloc.locate_string(tlc)
 
@@ -70,7 +70,6 @@ class RenderableCalculator:
                 rendered[tc.pos + i] = tc.id
 
         rcids = list(set(rendered))
-        print('rcids = ')
         ret = [candidates[rcid] for rcid in rcids]
         return ret
 
