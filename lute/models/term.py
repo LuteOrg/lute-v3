@@ -291,3 +291,9 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         m = self.term_flash_message.get_message()
         self.term_flash_message = None
         return m
+
+
+class Status:
+    UNKNOWN = 0
+    WELLKNOWN = 99
+    IGNORED = 98
