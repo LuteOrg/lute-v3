@@ -114,25 +114,22 @@ class RenderableCalculator:
         texttokens.sort(key=lambda x: x.order)
         self._assert_texttokens_are_contiguous(texttokens)
 
-        candidateID = 0
+        # All the candidates to be considered for rendering.
         candidates = {}
 
-        # Step 1.
+        # Step 1.  Map of the token position to the id of the
+        # candidate that should be rendered there.
         rendered = {}
 
         # Step 2 - fill with the original texttokens.
         for tok in texttokens:
             rc = RenderableCandidate()
-            candidateID += 1
-            rc.id = candidateID
-            rc.term = None
             rc.display_text = tok.tok_text
             rc.text = tok.tok_text
             rc.pos = tok.order
-            rc.length = 1
             rc.is_word = tok.is_word
-            candidates[candidateID] = rc
-            rendered[rc.pos] = candidateID
+            candidates[rc.id] = rc
+            rendered[rc.pos] = rc.id
 
         # 3.  Create candidates for all the terms.
         termcandidates = []
@@ -142,9 +139,6 @@ class RenderableCalculator:
         for term in terms:
             for loc in tocloc.locate_string(term.text_lc):
                 rc = RenderableCandidate()
-                candidateID += 1
-                rc.id = candidateID
-
                 matchtext, index = loc
                 rc.term = term
                 rc.display_text = matchtext
@@ -154,7 +148,7 @@ class RenderableCalculator:
                 rc.is_word = 1
 
                 termcandidates.append(rc)
-                candidates[candidateID] = rc
+                candidates[rc.id] = rc
 
         # 4a.  Sort the term candidates: first by length, then by position.
         def compare(a, b):
@@ -230,15 +224,20 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
     found (with self.render is True), these are convered into TextItems
     for the final render.
     """
+
+    # ID incremented for each instance.
+    class_id = 0
+
     def __init__(self):
-        self.id: int
+        RenderableCandidate.class_id += 1
+
+        self.id: int = RenderableCandidate.class_id
         self.term: Term = None
         self.display_text: str  # Text to show, if there is any overlap
         self.text: str  # Actual text of the term
         self.pos: int
-        self.length: int
+        self.length: int = 1
         self.is_word: int
-        self.hides: list = []
         self.render: bool = True
 
     def __repr__(self):
