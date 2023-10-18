@@ -78,20 +78,20 @@ def disabled_test_smoke_get_paras(spanish, app_context):
     def stringize(t):
         zws = chr(0x200B)
         parts = [
-            f"'{t.display_text.replace(zws, '|')}'",
-            f'p{t.para_id}',
-            f's{t.se_id}'
+            f"[{t.display_text.replace(zws, '/')}(",
+            f'{t.para_id}.{t.se_id}',
+            ')]'
         ]
         return ''.join(parts)
 
     sentences = [item for sublist in paras for item in sublist]
     actual = []
     for sent in sentences:
-        actual.append('/'.join(map(stringize, sent.renderable())))
+        actual.append(''.join(map(stringize, sent.renderable())))
 
     expected = [
-        "'Tengo| |un'p0s0/' |gato'p0s0/'. 'p0s0",
-        "'Hay'p0s1/' 'p0s1/'un'p0s1/' 'p0s1/'perro'p0s1/'.'p0s1/",
-        "'Tengo| |un'p1s3/' 'p1s3/'perro'p1s3/'.'p1s3"
+        "[Tengo/ /un(0.0)][ /gato(0.0)][. (0.0)]",
+        "[Hay(0.1)][ (0.1)][un(0.1)][ (0.1)][perro(0.1)][.(0.1)]",
+        "[Tengo/ /un(1.3)][ (1.3)][perro(1.3)][.(1.3)]"
     ]
     assert actual == expected
