@@ -5,6 +5,15 @@ Book entity.
 from lute.db import db
 from lute.utils.data_tables import DataTablesSqliteQuery
 
+
+book_tags_association = db.Table(
+    'booktags',
+    db.Model.metadata,
+    db.Column('BtBkID', db.Integer, db.ForeignKey('books.BkID')),
+    db.Column('BtT2ID', db.Integer, db.ForeignKey('texttags.T2ID'))
+)
+
+
 class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instance-attributes
     """
     Book entity.
@@ -13,14 +22,26 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     __tablename__ = 'books'
 
     id = db.Column('BkID', db.SmallInteger, primary_key=True)
+    title = db.Column('BkTitle', db.String(length=200))
+    lg_id = db.Column('BkLgID', db.Integer, ForeignKey('languages.LgID'), nullable=False)
+    word_count = db.Column('BkWordCount', db.Integer)
+    source_uri = db.Column('BkSourceURI', db.String(length=1000))
+    current_tx_id = db.Column('BkCurrentTxID', db.Integer, default=0)
+    archived = db.Column('BkArchived', db.Boolean, default=False)
 
+    language = db.relationship('Language', back_populates='books')
+    texts = db.relationship('Text', back_populates='book', order_by='Text.TxOrder')
+    tags = db.relationship('TextTag', secondary=book_tags_association)
 
-    def __init__(self):
-        pass
-
+    def __init__(self, Title=None, Language=None, BkSourceURI=None):
+        self.title = Title
+        self.language = Language
+        self.source_uri = BkSourceURI
+        self.texts = []
+        self.tags = []
 
     def __repr__(self):
-        return f"<Book {self.id} add_title>"
+        return f"<Book {self.id} {self.title}>"
 
 
     # TODO book listing: update to new code in lutev2
@@ -71,3 +92,105 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         connection = session.connection()
 
         return DataTablesSqliteQuery.get_data(base_sql, parameters, connection)
+
+
+class Text(Base):
+    __tablename__ = 'texts'
+
+    id = db.Column('TxID', db.Integer, primary_key=True)
+    lg_id = db.Column('TxLgID', db.Integer, db.ForeignKey('languages.LgID'), nullable=False)
+    text = db.Column('TxText', db.String, nullable=False)
+    order = db.Column('TxOrder', db.Integer, default=1)
+    read_date = db.Column('TxReadDate', db.DateTime, nullable=True)
+    bk_id = db.Column('TxBkID', db.Integer, db.ForeignKey('books.BkID'), nullable=False)
+
+    language = db.relationship('Language', back_populates='texts')
+    book = db.relationship('Book', back_populates='Texts')
+    sentences = db.relationship('Sentence', back_populates='text', order_by='Sentence.SeOrder')
+
+    def __init__(self, text='', language=None, order=1):
+        self.text = text
+        self.language = language
+        self.order = order
+        self.Sentences = []
+
+    @property
+    def title(self):
+        b = self.book
+        s = f"({self.order}/{self.book.page_count})"
+        t = f"{b.title} {s}"
+        return t
+
+
+    def load_sentences(self):
+        for s in self.sentences:
+            self.removeSentence(s)
+
+        if self.TxReadDate is None:
+            return
+
+        parser = self.language.parser
+        parsedtokens = parser.getParsedTokens(self.text, self.language)
+
+        curr_sentence_tokens = []
+        sentence_number = 1
+
+        for pt in parsedtokens:
+            curr_sentence_tokens.append(pt)
+            if pt.is_end_of_sentence:
+                se = self.make_sentence_from_tokens(curr_sentence_tokens, sentence_number)
+                self.add_sentence(se)
+
+                # Reset for the next sentence.
+                curr_sentence_tokens = []
+                sentence_number += 1
+
+        # Add any stragglers.
+        if len(curr_sentence_tokens) > 0:
+            se = self.make_sentence_from_tokens(curr_sentence_tokens, sentence_number)
+            self.add_sentence(se)
+
+    def make_sentence_from_tokens(self, tokens, senumber):
+        ptstrings = [t.token for t in tokens]
+
+        zws = chr(0x200B)  # Zero-width space.
+        s = zws.join(ptstrings)
+        s = s.strip(' ')
+
+        # The zws is added at the start and end of each
+        # sentence, to standardize the string search when
+        # looking for terms.
+        s = zws + s + zws
+
+        sentence = Sentence()
+        sentence.order = senumber
+        sentence.text_content = s
+        return sentence
+
+    def add_sentence(self, sentence):
+        if sentence not in self.sentences:
+            self.sentences.append(sentence)
+            sentence.text = self
+        return self
+
+    def remove_sentence(self, sentence):
+        if sentence in self.sentences:
+            self.sentences.remove(sentence)
+            sentence.text = None
+        return self
+
+
+class Sentence(Base):
+    __tablename__ = 'sentences'
+
+    id = db.Column('SeID', db.Integer, primary_key=True)
+    tx_id = db.Column('SeTxID', db.Integer, db.ForeignKey('texts.TxID'), nullable=False)
+    order = db.Column('SeOrder', db.Integer, default=1)
+    text_content = db.Column('SeText', db.Text, default='')
+
+    text = db.relationship('Text', back_populates='Sentences')
+
+    def __init__(self, text_content='', text=None, order=1):
+        self.text_content = text_content
+        self.text = text
+        self.order = order
