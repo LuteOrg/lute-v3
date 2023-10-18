@@ -117,16 +117,6 @@ def fixture_demo_client(app):
     return app.test_client()
 
 
-@pytest.fixture(name = "empty_client")
-def fixture_empty_client(app):
-    """
-    Client using empty database application.
-    """
-    with app.app_context():
-        _delete_all_from_database()
-    return app.test_client()
-
-
 @pytest.fixture(name="demo_yaml_folder")
 def fixture_yaml_folder():
     "Path to the demo files."

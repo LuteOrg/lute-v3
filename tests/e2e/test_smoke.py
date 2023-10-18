@@ -25,10 +25,10 @@ def test_smoke_pages(demo_client):
     _run_checks(demo_client, pagechecks)
 
 
-def test_smoke_empty_db_pages(empty_client):
+def test_smoke_empty_db_pages(demo_client, empty_db):
     "Some pages have special content blocks when no data is defined."
     pagechecks = {
         '/': [ 'Lute' ],  # TODO smoke: add_no_books_check
         '/language/index': [ 'No languages defined' ],
     }
-    _run_checks(empty_client, pagechecks)
+    _run_checks(demo_client, pagechecks)
