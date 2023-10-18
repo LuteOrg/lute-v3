@@ -86,20 +86,21 @@ def test_save_book(empty_db, english):
     db.session.add(b)
     db.session.commit()
 
+    # TODO book: update word count
     sql = "select BkID, BkTitle, BkLgID, BkWordCount from books"
-    assert_sql_result(sql, ['abc; abc; 1'], 'have term')
+    assert_sql_result(sql, ['1; hi; 1; None'], 'book')
 
     sql = "select TxID, TxBkID, TxText from texts"
-    assert_sql_result(sql, ['abc; abc; 1'], 'have term')
+    assert_sql_result(sql, ['1; 1; some text'], 'texts')
 
     sql = "select * from sentences"
-    assert_sql_result(sql, ['abc; abc; 1'], 'have term')
+    assert_sql_result(sql, ['1; 1; 1; some text'], 'sentences')
 
     sql = "select * from booktags"
-    assert_sql_result(sql, ['abc; abc; 1'], 'have term')
+    assert_sql_result(sql, ['1; 1'], 'booktags')
 
     sql = "select * from tags2"
-    assert_sql_result(sql, ['abc; abc; 1'], 'have term')
+    assert_sql_result(sql, ['1; hola; '], 'tags2')
 
 
 # TODO db relationships: delete lang should delete everything related
