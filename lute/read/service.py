@@ -2,9 +2,9 @@
 Reading helpers.
 """
 
+import re
 from lute.models.term import Term
 from lute.db import db
-# from sqlalchemy import or_
 
 
 from sqlalchemy import func
@@ -27,7 +27,8 @@ def find_all_Terms_in_string(s, language):
     """
 
     # Extract word tokens from the input string
-    tokens = language.get_parsed_tokens(s)
+    cleaned = re.sub(r'\s+', ' ', s)
+    tokens = language.get_parsed_tokens(cleaned)
 
     parser = language.parser
 
