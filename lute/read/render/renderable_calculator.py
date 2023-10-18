@@ -134,12 +134,11 @@ class RenderableCalculator:
 
         for term in terms:
             for loc in tokenlocator.locate_string(term.text_lc):
-                matchtext, index = loc
                 rc = RenderableCandidate()
                 rc.term = term
-                rc.display_text = matchtext
-                rc.text = matchtext
-                rc.pos = texttokens[0].order + index
+                rc.display_text = loc['text']
+                rc.text = loc['text']
+                rc.pos = texttokens[0].order + loc['index']
                 rc.length = term.token_count
                 rc.is_word = 1
 
@@ -300,7 +299,7 @@ class TokenLocator:
 
     (where "/" is the zero-width space to indicate word boundaries)
 
-    this method would return [ "CAT", 2 ]
+    this method would return [ { 'term': "CAT", 'index': 2 } ]
       - the token "cat" is actually "CAT" (uppercase) in the sentence
       - it's at index = 2
 
@@ -341,7 +340,7 @@ class TokenLocator:
             zws = '\u200B'
             t = original_subject_text.lstrip(zws).rstrip(zws)
             index = self.get_count_before(subj, matchpos)
-            return [t, index]
+            return { 'text': t, 'index': index }
 
         termmatches = list(map(make_text_index_pair, matches))
 

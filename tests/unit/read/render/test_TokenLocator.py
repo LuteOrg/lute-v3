@@ -20,48 +20,56 @@ def test_token_locator_scenario(english):
         # Finds b
         (["a", "b", "c", "d"],
          "b",
-         [["b", 1]]),
+         [{'text': "b", 'index': 1}]),
 
         # Case doesn't matter
+        # The original case is returned
         (["A", "B", "C", "D"],
          "b",
-         [["B", 1]]),  # The original case is returned
+         [{'text': "B", 'index': 1}]),
 
+        # Original case returned
         (["a", "b", "c", "d"],
          "B",
-         [["b", 1]]),  # Original case returned
+         [{'text': "b", 'index': 1}]),
 
+        # No match
         (["a", "bb", "c", "d"],
          "B",
-         []),  # No match
+         []),
 
+        # Found in multiple places
         (["b", "b", "c", "d"],
          "b",
-         [["b", 0], ["b", 1]]),  # Found in multiple places
+         [{'text': "b", 'index': 0}, {'text': "b", 'index': 1}]),
 
+        # Multiword, found in multiple
         (["b", "B", "b", "d"],
          f"b{zws}b",
-         [[f"b{zws}B", 0], [f"B{zws}b", 1]]),  # Multiword, found in multiple
+         [{'text': f"b{zws}B", 'index': 0}, {'text': f"B{zws}b", 'index': 1}]),
 
+        # Multiword, found in multiple
         (["b", "B", "c", "b", "b", "x", "b"],
          f"b{zws}b",
-         [[f"b{zws}B", 0], [f"b{zws}b", 3]]),  # Multiword, found in multiple
+         [{'text': f"b{zws}B", 'index': 0}, {'text': f"b{zws}b", 'index': 3}]),
 
         (["a", " ", "cat", " ", "here"],
          "cat",
-         [["cat", 2]]),
+         [{'text': "cat", 'index': 2}]),
 
         (["a", " ", "CAT", " ", "here"],
          "cat",
-         [["CAT", 2]]),
+         [{'text': "CAT", 'index': 2}]),
 
+        # No match
         (["a", " ", "CAT", " ", "here"],
          "ca",
-         []),  # No match
+         []),
 
+        # No match
         (["b", "b", "c", "d"],
          "x",
-         []),  # No match
+         [])
     ]
 
     casenum = 0
