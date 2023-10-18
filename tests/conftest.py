@@ -109,7 +109,7 @@ def fixture_empty_db(app_context):
     _delete_all_from_database()
 
 
-@pytest.fixture(name = "demo_client")
+@pytest.fixture(name = "client")
 def fixture_demo_client(app):
     """
     Client using demo-data-loaded application.

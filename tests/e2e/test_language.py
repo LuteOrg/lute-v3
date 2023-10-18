@@ -27,9 +27,9 @@ def fixture_dummy_lang():
     }
 
 
-def test_edit_language(demo_client, dummy_lang):
+def test_edit_language(client, dummy_lang):
     "Edit one of the demo languages."
-    response = demo_client.post(
+    response = client.post(
         "language/edit/1",
         data=dummy_lang,
         follow_redirects=True
@@ -41,9 +41,9 @@ def test_edit_language(demo_client, dummy_lang):
     assert b'updated_name' in response.data, "name content"
 
 
-def test_new_language(demo_client, dummy_lang):
+def test_new_language(client, dummy_lang):
     "Post a new language returns to the index."
-    response = demo_client.post(
+    response = client.post(
         "language/new",
         data=dummy_lang,
         follow_redirects=True

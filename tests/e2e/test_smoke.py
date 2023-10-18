@@ -13,7 +13,7 @@ def _run_checks(client, pagechecks):
             assert bytes(c, 'utf-8') in resp.data, f"{p} content"
 
 
-def test_smoke_pages(demo_client):
+def test_smoke_pages(client):
     "Hit pages, ensure 200 status, and expected content is present."
     pagechecks = {
         '/': [ 'Lute' ],  # TODO smoke: add_Tutorial_check
@@ -22,13 +22,13 @@ def test_smoke_pages(demo_client):
         '/language/new/English': [ 'Create new Language', 'https://en.thefreedictionary.com/###' ],
         '/language/edit/1': [ 'Edit Language' ],
     }
-    _run_checks(demo_client, pagechecks)
+    _run_checks(client, pagechecks)
 
 
-def test_smoke_empty_db_pages(demo_client, empty_db):
+def test_smoke_empty_db_pages(client, empty_db):
     "Some pages have special content blocks when no data is defined."
     pagechecks = {
         '/': [ 'Lute' ],  # TODO smoke: add_no_books_check
         '/language/index': [ 'No languages defined' ],
     }
-    _run_checks(demo_client, pagechecks)
+    _run_checks(client, pagechecks)
