@@ -50,11 +50,10 @@ def fixture_config():
     yield ac
 
 
-@pytest.fixture(name="app_context")
-def fixture_app_context(testconfig):
+@pytest.fixture(name="app")
+def fixture_app(testconfig):
     """
     A clean instance of the demo database.
-    Yields the app context so that tests using the db will work.
     """
     if os.path.exists(testconfig.dbfilename):
         os.unlink(testconfig.dbfilename)
@@ -63,12 +62,20 @@ def fixture_app_context(testconfig):
         'TESTING': True
     }
     app = init_db_and_app(testconfig, { 'TESTING': True })
+    yield app
+
+
+@pytest.fixture(name="app_context")
+def fixture_app_context(app):
+    """
+    Yields the app context so that tests using the db will work.
+    """
     with app.app_context():
         yield
 
 
-def _delete_all_from_database(app):
-    "Clean out all db tables."
+def _delete_all_from_database():
+    "Clean out all db tables.  Requires an app_context to be active."
         # Clearing everything out in ref-integrity order.
     tables = [
         "sentences",
@@ -89,23 +96,17 @@ def _delete_all_from_database(app):
         "words",
         "languages"
     ]
-    with app.app_context():
-        with db.engine.begin() as conn:
-            for t in tables:
-                conn.execute(text(f"delete from {t}"))
+    with db.engine.begin() as conn:
+        for t in tables:
+            conn.execute(text(f"delete from {t}"))
 
 
 @pytest.fixture(name="_empty_db")
-def fixture_empty_db(testconfig):
+def fixture_empty_db(app_context):
     """
     An empty db!
     """
-    if os.path.exists(testconfig.dbfilename):
-        os.unlink(testconfig.dbfilename)
-    app = init_db_and_app(testconfig, { 'TESTING': True })
-    _delete_all_from_database(app)
-    with app.app_context():
-        yield
+    _delete_all_from_database()
 
 
 @pytest.fixture(name="app_with_demo")
@@ -136,7 +137,8 @@ def fixture_empty_client(app_with_demo):
     """
     Client using empty database application.
     """
-    _delete_all_from_database(app_with_demo)
+    with app_with_demo.app_context():
+        _delete_all_from_database()
     return app_with_demo.test_client()
 
 
