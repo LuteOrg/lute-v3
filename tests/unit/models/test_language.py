@@ -8,7 +8,6 @@ import os
 import pytest
 
 from lute.models.language import Language
-from lute.db import db
 from tests.dbasserts import assert_sql_result
 
 
@@ -40,32 +39,6 @@ def test_new_language_has_sane_defaults():
     assert lang.right_to_left is False
     assert lang.show_romanization is False
     assert lang.parser_type == 'spacedel'
-
-
-def test_save_new_language_smoke_test(app_context):
-    """
-    Validating model save.
-    When a new language is created and saved,
-    the defaults are saved in the db.
-    """
-    sql = """select LgName, LgRightToLeft, LgRegexpSplitSentences
-    from languages where LgName = 'abc'"""
-    assert_sql_result(sql, [], 'empty table')
-
-    lang = Language()
-    lang.name = 'abc'
-    lang.dict_1_uri = 'something'
-
-    db.session.add(lang)
-    db.session.commit()
-
-    assert_sql_result(sql, ['abc; 0; .!?'], 'have language, default saved')
-
-    lang.right_to_left = True
-
-    db.session.add(lang)
-    db.session.commit()
-    assert_sql_result(sql, ['abc; 1; .!?'], 'rtl is True')
 
 
 @pytest.fixture(name="yaml_folder")

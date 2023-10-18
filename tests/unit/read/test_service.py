@@ -63,7 +63,10 @@ def test_english_find_all_in_string(english, empty_db):
 # TODO arabic: add check
 
 
-def DISABLED_test_smoke_get_paras(spanish, _demo_db):
+def disabled_test_smoke_get_paras(spanish, app_context):
+    """
+    Smoke test to get paragraph information.
+    """
     add_terms(spanish, ['tengo un', 'un gato'])
 
     content = "Tengo un gato. Hay un perro.\nTengo un perro."
@@ -75,22 +78,20 @@ def DISABLED_test_smoke_get_paras(spanish, _demo_db):
     def stringize(t):
         zws = chr(0x200B)
         parts = [
-            '[',
             f"'{t.display_text.replace(zws, '|')}'",
             f'p{t.para_id}',
-            f's{t.se_id}',
-            ']'
+            f's{t.se_id}'
         ]
-        return ' '.join(parts)
+        return ''.join(parts)
 
     sentences = [item for sublist in paras for item in sublist]
     actual = []
     for sent in sentences:
-        actual.append(', '.join(map(stringize, sent.renderable())))
+        actual.append('/'.join(map(stringize, sent.renderable())))
 
     expected = [
-        "[ 'Tengo| |un' p0 s0 ], [ ' |gato' p0 s0 ], [ '. ' p0 s0 ]",
-        "[ 'Hay' p0 s1 ], [ ' ' p0 s1 ], [ 'un' p0 s1 ], [ ' ' p0 s1 ], [ 'perro' p0 s1 ], [ '.' p0 s1 ]",
-        "[ 'Tengo| |un' p1 s3 ], [ ' ' p1 s3 ], [ 'perro' p1 s3 ], [ '.' p1 s3 ]"
+        "'Tengo| |un'p0s0/' |gato'p0s0/'. 'p0s0",
+        "'Hay'p0s1/' 'p0s1/'un'p0s1/' 'p0s1/'perro'p0s1/'.'p0s1/",
+        "'Tengo| |un'p1s3/' 'p1s3/'perro'p1s3/'.'p1s3"
     ]
     assert actual == expected

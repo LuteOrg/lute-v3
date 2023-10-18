@@ -10,11 +10,13 @@ from lute.db import db
 from tests.dbasserts import assert_sql_result
 
 
-def test_language(empty_db):
+def test_save_new_language(empty_db):
     """
-    Check language mappings.
+    Check language mappings and defaults.
     """
-    sql = "select LgName, LgRightToLeft, LgShowRomanization from languages"
+    sql = """select LgName, LgRightToLeft,
+    LgShowRomanization, LgRegexpSplitSentences
+    from languages"""
     assert_sql_result(sql, [], 'empty table')
 
     lang = Language()
@@ -23,13 +25,13 @@ def test_language(empty_db):
 
     db.session.add(lang)
     db.session.commit()
-    assert_sql_result(sql, ['abc; 0; 0'], 'have language, default rtl = 0, show rom = 0')
+    assert_sql_result(sql, ['abc; 0; 0; .!?'], 'have language, defaults as expected')
 
     lang.right_to_left = True
 
     db.session.add(lang)
     db.session.commit()
-    assert_sql_result(sql, ['abc; 1; 0'], 'rtl is True')
+    assert_sql_result(sql, ['abc; 1; 0; .!?'], 'rtl is True')
 
     retrieved = db.session.query(Language).filter(Language.name == "abc").first()
     # print(retrieved)
