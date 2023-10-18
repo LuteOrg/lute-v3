@@ -129,7 +129,7 @@ class Text(db.Model):
     bk_id = db.Column('TxBkID', db.Integer, db.ForeignKey('books.BkID'), nullable=False)
 
     book = db.relationship('Book', back_populates='texts')
-    sentences = db.relationship('Sentence', back_populates='text', order_by='Sentence.order')
+    sentences = db.relationship('Sentence', back_populates='text', order_by='Sentence.order', cascade='all, delete-orphan')
 
     def __init__(self, book, text, order=1):
         self.book = book
