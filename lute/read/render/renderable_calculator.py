@@ -1,3 +1,4 @@
+import re
 from lute.models.language import Language
 from lute.models.term import Term, Status
 from lute.read.render.text_token import TextToken
@@ -172,12 +173,91 @@ class RenderableCandidate:
 
 
 class TokenLocator:
-    @staticmethod
-    def make_string(text):
-        return "".join(text)
+    """
+    Helper class for finding tokens and positions in a subject string.
+
+    Finds a given token (word) in a sentence, ignoring case, returning
+    the actual word in the sentence (its original case), and its index
+    or indices.
+
+    For example, given:
+
+      - $subject "/this/ /CAT/ /is/ /big/"
+      - $find_patt = "/cat/"
+
+    (where "/" is the zero-width space to indicate word boundaries)
+
+    this method would return [ "CAT", 2 ]
+      - the token "cat" is actually "CAT" (uppercase) in the sentence
+      - it's at index = 2
+
+    Note that the language of the string must also be provided, because
+    some languages (Turkish!) have unusual case requirements.
+    
+    See the test cases for more examples.
+    """
 
     def __init__(self, language, subject):
-        pass
+        self.language = language
+        self.subject = subject
+
+    def locate_string(self, s):
+        tlc = self.language.get_lowercase(s)
+        LCpatt = TokenLocator.make_string(tlc)
+
+        # "(?=())" is required because sometimes the search pattern can
+        # overlap -- e.g. _b_b_ has _b_ *twice*.
+        # Ref https://stackoverflow.com/questions/22454032/
+        #   preg-match-all-how-to-get-all-combinations-even-overlapping-ones
+        pattern = rf'(?=({re.escape(LCpatt)}))'
+
+        subjLC = self.language.get_lowercase(self.subject)
+        matches = self.preg_match_capture(pattern, subjLC)
+
+        # The matches were performed with the lowercased subject,
+        # because some languages (Turkish!) have funny cases.
+        # We need to convert the matched text back to the _original_
+        # subject string cases.
+        subj = self.subject
+
+        def make_text_index_pair(match):
+            matchtext = match[0]  # includes zws at start and end.
+            matchlen = len(matchtext)
+            matchpos = match[1]
+
+            original_subject_text = subj[matchpos: matchpos + matchlen]
+            zws = '\u200B'
+            t = original_subject_text.lstrip(zws).rstrip(zws)
+            index = self.get_count_before(subj, matchpos)
+            return [t, index]
+
+        termmatches = list(map(make_text_index_pair, matches))
+
+        return termmatches
+
+    def get_count_before(self, string, pos):
+        zws = '\u200B'
+        beforesubstr = string[:pos]
+        n = beforesubstr.count(zws)
+        return n
+
+    def preg_match_capture(self, pattern, subject):
+        """
+        Return the matched text and their start positions in the subject.
+
+        E.g. search for r'cat' in "there is a CAT and a Cat" returns:
+        [['CAT', 11], ['Cat', 21]]
+        """
+        matches = re.finditer(pattern, subject, flags=re.IGNORECASE)
+        result = [[match.group(), match.start()] for match in matches]
+        return result
+
+    @staticmethod
+    def make_string(t):
+        zws = '\u200B'
+        if isinstance(t, list):
+            t = zws.join(t)
+        return zws + t + zws
 
 
 class TextItem:
