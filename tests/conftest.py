@@ -50,6 +50,22 @@ def fixture_config():
     yield ac
 
 
+@pytest.fixture(name="app_context")
+def fixture_app_context(testconfig):
+    """
+    A clean instance of the demo database.
+    Yields the app context so that tests using the db will work.
+    """
+    if os.path.exists(testconfig.dbfilename):
+        os.unlink(testconfig.dbfilename)
+    extra_config = {
+        'WTF_CSRF_ENABLED': False,
+        'TESTING': True
+    }
+    app = init_db_and_app(testconfig, { 'TESTING': True })
+    with app.app_context():
+        yield
+
 @pytest.fixture(name="_demo_db")
 def fixture_demo_db(testconfig):
     """
