@@ -61,7 +61,7 @@ def fixture_app(testconfig):
         'WTF_CSRF_ENABLED': False,
         'TESTING': True
     }
-    app = init_db_and_app(testconfig, { 'TESTING': True })
+    app = init_db_and_app(testconfig, extra_config)
     yield app
 
 
@@ -110,17 +110,10 @@ def fixture_empty_db(app_context):
 
 
 @pytest.fixture(name="app_with_demo")
-def fixture_demo_app(testconfig):
+def fixture_demo_app(app):
     """
     App with database loaded with demo data.
     """
-    if os.path.exists(testconfig.dbfilename):
-        os.unlink(testconfig.dbfilename)
-    extra_config = {
-        'WTF_CSRF_ENABLED': False,
-        'TESTING': True
-    }
-    app = init_db_and_app(testconfig, extra_config)
     yield app
 
 
