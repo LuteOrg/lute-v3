@@ -70,9 +70,11 @@ class RenderableCalculator:
             for i in range(tc.length):
                 rendered[tc.pos + i] = tc.id
 
-        rcids = list(set(rendered))
+        rendered_candidate_ids = rendered.values()
+        rcids = list(set(rendered_candidate_ids))
         ret = [candidates[rcid] for rcid in rcids]
         return ret
+
 
     def _sort_by_order_and_tokencount(self, items):
         items.sort(key=lambda x: (x.pos, -x.length))
@@ -117,6 +119,9 @@ class RenderableCandidate:
         self.is_word: int
         self.hides: list = []
         self.render: bool = True
+
+    def __repr__(self):
+        return f"<RenderableCandidate \"{self.text}\" at pos {self.pos} (id={self.id})>";
 
     @property
     def term_id(self) -> int:
