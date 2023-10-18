@@ -70,7 +70,7 @@ class TermTag(db.Model):
     def make_term_tag(text, comment=None):
         "Create a TermTag."
         tt = TermTag()
-        tt.set_text(text)
+        tt.text = text
         if comment is not None:
             tt.comment(comment)
         return tt

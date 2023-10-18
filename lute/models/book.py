@@ -6,12 +6,31 @@ from lute.db import db
 from lute.utils.data_tables import DataTablesSqliteQuery
 
 
-book_tags_association = db.Table(
+booktags = db.Table(
     'booktags',
     db.Model.metadata,
-    db.Column('BtBkID', db.Integer, db.ForeignKey('books.BkID')),
-    db.Column('BtT2ID', db.Integer, db.ForeignKey('texttags.T2ID'))
+    db.Column('BtT2ID', db.Integer, db.ForeignKey('tags2.T2ID')),
+    db.Column('BtBkID', db.Integer, db.ForeignKey('books.BkID'))
 )
+
+
+class BookTag(db.Model):
+    "Term tags."
+    __tablename__ = 'tags2'
+
+    id = db.Column('T2ID', db.Integer, primary_key=True)
+    text = db.Column('T2Text', db.String(20))
+    comment = db.Column('T2Comment', db.String(200))
+
+    books = db.relationship('Book', secondary=booktags, back_populates='book_tags')
+
+    @staticmethod
+    def make_book_tag(text, comment=None):
+        "Create a TermTag."
+        tt = BookTag()
+        tt.text = text
+        tt.comment = comment
+        return tt
 
 
 class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instance-attributes
@@ -23,22 +42,22 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
     id = db.Column('BkID', db.SmallInteger, primary_key=True)
     title = db.Column('BkTitle', db.String(length=200))
-    lg_id = db.Column('BkLgID', db.Integer, ForeignKey('languages.LgID'), nullable=False)
+    lg_id = db.Column('BkLgID', db.Integer, db.ForeignKey('languages.LgID'), nullable=False)
     word_count = db.Column('BkWordCount', db.Integer)
     source_uri = db.Column('BkSourceURI', db.String(length=1000))
     current_tx_id = db.Column('BkCurrentTxID', db.Integer, default=0)
     archived = db.Column('BkArchived', db.Boolean, default=False)
 
-    language = db.relationship('Language', back_populates='books')
-    texts = db.relationship('Text', back_populates='book', order_by='Text.TxOrder')
-    tags = db.relationship('TextTag', secondary=book_tags_association)
+    language = db.relationship('Language')
+    texts = db.relationship('Text', back_populates='book', order_by='Text.order')
+    book_tags = db.relationship('BookTag', secondary='booktags', back_populates='books')
 
     def __init__(self, Title=None, Language=None, BkSourceURI=None):
         self.title = Title
         self.language = Language
         self.source_uri = BkSourceURI
         self.texts = []
-        self.tags = []
+        self.book_tags = []
 
     def __repr__(self):
         return f"<Book {self.id} {self.title}>"
@@ -94,7 +113,7 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         return DataTablesSqliteQuery.get_data(base_sql, parameters, connection)
 
 
-class Text(Base):
+class Text(db.Model):
     __tablename__ = 'texts'
 
     id = db.Column('TxID', db.Integer, primary_key=True)
@@ -104,15 +123,14 @@ class Text(Base):
     read_date = db.Column('TxReadDate', db.DateTime, nullable=True)
     bk_id = db.Column('TxBkID', db.Integer, db.ForeignKey('books.BkID'), nullable=False)
 
-    language = db.relationship('Language', back_populates='texts')
-    book = db.relationship('Book', back_populates='Texts')
-    sentences = db.relationship('Sentence', back_populates='text', order_by='Sentence.SeOrder')
+    book = db.relationship('Book', back_populates='texts')
+    sentences = db.relationship('Sentence', back_populates='text', order_by='Sentence.order')
 
     def __init__(self, text='', language=None, order=1):
         self.text = text
         self.language = language
         self.order = order
-        self.Sentences = []
+        self.sentences = []
 
     @property
     def title(self):
@@ -180,7 +198,7 @@ class Text(Base):
         return self
 
 
-class Sentence(Base):
+class Sentence(db.Model):
     __tablename__ = 'sentences'
 
     id = db.Column('SeID', db.Integer, primary_key=True)
@@ -188,7 +206,7 @@ class Sentence(Base):
     order = db.Column('SeOrder', db.Integer, default=1)
     text_content = db.Column('SeText', db.Text, default='')
 
-    text = db.relationship('Text', back_populates='Sentences')
+    text = db.relationship('Text', back_populates='sentences')
 
     def __init__(self, text_content='', text=None, order=1):
         self.text_content = text_content
