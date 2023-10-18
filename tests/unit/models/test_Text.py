@@ -1,5 +1,8 @@
+"""
+Text tests.
+"""
+
 from datetime import datetime
-from lute.models.language import Language
 from lute.models.book import Book, Text
 
 
@@ -26,6 +29,5 @@ def test_sentence_lifecycle(english):
 
     t.text = "Tengo un coche."
     assert len(t.sentences) == 1, 'changed'
-    # Note how SQLAlchemy handles the collection, elements 0 and 1
-    # are still "in" the array.
-    assert transform_sentence(t.sentences[2]) == '/Tengo/ /un/ /coche/./', 'changed'
+
+    assert transform_sentence(t.sentences[0]) == '/Tengo/ /un/ /coche/./', 'changed'

@@ -171,8 +171,7 @@ class Text(db.Model):
         Parse the current text and create Sentence objects.
         Sentences are only needed once the text has been read.
         """
-        for s in self.sentences:
-            self.remove_sentence(s)
+        self.remove_sentences()
 
         if self.read_date is None:
             return
@@ -199,19 +198,18 @@ class Text(db.Model):
             se = Sentence.from_tokens(curr_sentence_tokens, sentence_number)
             self.add_sentence(se)
 
+
     def add_sentence(self, sentence):
         "Add a sentence to the Text."
         if sentence not in self.sentences:
             self.sentences.append(sentence)
             sentence.text = self
-        return self
 
-    def remove_sentence(self, sentence):
-        "Remove the given sentence from the Text."
-        if sentence in self.sentences:
-            self.sentences.remove(sentence)
+    def remove_sentences(self):
+        "Remove all sentence from the Text."
+        for sentence in self.sentences:
             sentence.text = None
-        return self
+        self.sentences = []
 
 
 class Sentence(db.Model):
