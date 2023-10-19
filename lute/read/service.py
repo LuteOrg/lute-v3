@@ -54,3 +54,53 @@ def find_all_Terms_in_string(s, language):
     contained_terms = contained_term_query.all()
 
     return terms_matching_tokens + contained_terms
+
+
+class RenderableSentence:
+    """
+    A collection of TextItems to be rendered.
+    """
+    def __init__(self, sentence_id, textitems):
+        self.SeID = sentence_id
+        self.textitems = textitems
+
+
+def get_paragraphs(text, svc):
+    if text.getID() is None:
+        return []
+
+    tokens = getTextTokens(text)
+    tokens = [t for t in tokens if t.TokText != '¶']
+
+    language = text.getBook().getLanguage()
+    terms = svc.findAllInString(text.text, language)
+
+    def makeRenderableSentence(pnum, sentence_num, tokens, terms, text, language):
+        setokens = [t for t in tokens if t.TokSentenceNumber == sentence_num]
+        renderable = RenderableCalculator.getRenderable(language, terms, setokens)
+        textitems = [
+            i.makeTextItem(pnum, sentence_num, text.getID(), language)
+            for i in renderable
+        ]
+        return RenderableSentence(sentence_num, textitems)
+
+    paranums = [t.TokParagraphNumber for t in tokens]
+    paranums = list(set(paranums))
+    renderableParas = []
+
+    for pnum in paranums:
+        paratokens = [t for t in tokens if t.TokParagraphNumber == pnum]
+        senums = [t.TokSentenceNumber for t in paratokens]
+        senums = list(set(senums))
+        renderableParas.append(
+            [makeRenderableSentence(pnum, senum, paratokens, terms, text, language) for senum in senums]
+        )
+
+    return renderableParas
+
+def getTextTokens(t):
+    text_id = t.getID()
+    if text_id is None:
+        return []
+    pts = t.getBook().getLanguage().getParsedTokens(t.text)
+    return ParsedToken.createTextTokens(pts)

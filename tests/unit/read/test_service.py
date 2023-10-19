@@ -3,7 +3,7 @@ Read service tests.
 """
 
 from lute.models.term import Term
-from lute.read.service import find_all_Terms_in_string
+from lute.read.service import find_all_Terms_in_string, get_paragraphs
 from lute.db import db
 
 from tests.utils import add_terms
@@ -63,7 +63,7 @@ def test_english_find_all_in_string(english, empty_db):
 # TODO arabic: add check
 
 
-def disabled_test_smoke_get_paras(spanish, app_context):
+def test_smoke_get_paragraphs(spanish, app_context):
     """
     Smoke test to get paragraph information.
     """
@@ -72,7 +72,7 @@ def disabled_test_smoke_get_paras(spanish, app_context):
     content = "Tengo un gato. Hay un perro.\nTengo un perro."
     t = make_text("Hola", content, spanish)
 
-    paras = RenderableSentence.get_paragraphs(t, term_service)
+    paras = get_paragraphs(t)
     assert len(paras) == 2
 
     def stringize(t):
@@ -87,7 +87,7 @@ def disabled_test_smoke_get_paras(spanish, app_context):
     sentences = [item for sublist in paras for item in sublist]
     actual = []
     for sent in sentences:
-        actual.append(''.join(map(stringize, sent.renderable())))
+        actual.append(''.join(map(stringize, sent.textitems)))
 
     expected = [
         "[Tengo/ /un(0.0)][ /gato(0.0)][. (0.0)]",
