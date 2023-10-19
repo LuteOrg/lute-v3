@@ -3,6 +3,8 @@ ORM mapping smoke tests
 
 Low value but ensure that the db mapping is correct.
 """
+
+from datetime import datetime
 import pytest
 
 from lute.models.language import Language
@@ -10,7 +12,6 @@ from lute.models.term import Term
 from lute.models.book import Book, Text, BookTag, Sentence
 from lute.db import db
 from tests.dbasserts import assert_sql_result, assert_record_count_equals
-from datetime import datetime
 
 
 def test_save_new_language(empty_db):

@@ -49,7 +49,9 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     archived = db.Column('BkArchived', db.Boolean, default=False)
 
     language = db.relationship('Language')
-    texts = db.relationship('Text', back_populates='book', order_by='Text.order', cascade='all, delete-orphan')
+    texts = db.relationship(
+        'Text', back_populates='book',
+        order_by='Text.order', cascade='all, delete-orphan')
     book_tags = db.relationship('BookTag', secondary='booktags', back_populates='books')
 
     def __init__(self, title=None, language=None, source_uri=None):
@@ -129,7 +131,9 @@ class Text(db.Model):
     bk_id = db.Column('TxBkID', db.Integer, db.ForeignKey('books.BkID'), nullable=False)
 
     book = db.relationship('Book', back_populates='texts')
-    sentences = db.relationship('Sentence', back_populates='text', order_by='Sentence.order', cascade='all, delete-orphan')
+    sentences = db.relationship(
+        'Sentence', back_populates='text',
+        order_by='Sentence.order', cascade='all, delete-orphan')
 
     def __init__(self, book, text, order=1):
         self.book = book

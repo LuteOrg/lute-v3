@@ -5,10 +5,6 @@ For this to provide useful assertion outputs, this module needs to be
 
     import pytest
     pytest.register_assert_rewrite("tests.dbasserts")
-
-Functions:
-
-    assert_sql_result
 """
 
 import os
@@ -42,6 +38,12 @@ def assert_sql_result(sql, expected, msg = ''):
 
 
 def assert_record_count_equals(sql, expected, message=''):
+    """
+    Checks count of records of sql results (stringized) against expected.
+
+    e.g. with sql = "select 1, 2", expected would be 1
+    """
+
     uri = __sqlite_uri()
     engine = create_engine(uri)
     conn = engine.connect()
