@@ -126,6 +126,9 @@ def test_delete_book(empty_db, simple_book):
 
 
 def test_save_and_delete_created_book(english):
+    """
+    Verify book orm mappings.
+    """
     content = "Some text here. Some more text"
     b = Book.create_book('test', english, content, 3)
     db.session.add(b)
