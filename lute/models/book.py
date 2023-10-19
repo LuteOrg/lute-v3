@@ -4,7 +4,7 @@ Book entity.
 
 from lute.db import db
 from lute.utils.data_tables import DataTablesSqliteQuery
-
+from lute.parse.base import SentenceGroupIterator
 
 booktags = db.Table(
     'booktags',
@@ -63,6 +63,34 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
     def __repr__(self):
         return f"<Book {self.id} {self.title}>"
+
+    @staticmethod
+    def create_book(title, language, fulltext, max_word_tokens_per_text = 250):
+        """
+        Create a book with given fulltext content,
+        splitting the content into separate Text objects with max
+        token count.
+        """
+        tokens = language.parser.get_parsed_tokens(fulltext, language)
+
+        def token_string(toks):
+            a = [t.token for t in toks]
+            ret = ''.join(a)
+            ret = ret.replace("\r", '')
+            ret = ret.replace("¶", "\n")
+            return ret.strip()
+
+        b = Book(title, language)
+        b.word_count = len([t for t in tokens if t.is_word])
+
+        page_number = 0
+        it = SentenceGroupIterator(tokens, max_word_tokens_per_text)
+        while toks := it.next():
+            page_number += 1
+            # Note the text is automatically added to b.texts!
+            t = Text(b, token_string(toks), page_number)
+
+        return b
 
 
     # TODO book listing: update to new code in lutev2

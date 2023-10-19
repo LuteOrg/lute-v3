@@ -125,6 +125,23 @@ def test_delete_book(empty_db, simple_book):
     assert_sql_result(sql, ['1; hola; '], 'tags2 remain')
 
 
+def test_save_and_delete_created_book(english):
+    content = "Some text here. Some more text"
+    b = Book.create_book('test', english, content, 3)
+    db.session.add(b)
+    db.session.commit()
+    sql = f"select TxOrder, TxText from texts where TxBkID = {b.id}"
+    expected = [
+        '1; Some text here.',
+        '2; Some more text'
+    ]
+    assert_sql_result(sql, expected, 'texts')
+
+    db.session.delete(b)
+    db.session.commit()
+    assert_sql_result(sql, [], 'texts deleted')
+
+
 def test_save_text_sentences_replaced_in_db(empty_db, english):
     """
     Sentences should only be generated when a Text is saved with the ReadDate saved.
