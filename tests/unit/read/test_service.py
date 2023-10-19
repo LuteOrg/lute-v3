@@ -22,7 +22,7 @@ def _run_scenario(language, content, expected_found):
     assert found_terms == expected_found
 
 
-def test_spanish_find_all_in_string(spanish, empty_db):
+def test_spanish_find_all_in_string(spanish, app_context):
     "Given various pre-saved terms, find_all returns those in the string."
     terms = [ 'perro', 'gato', 'un gato' ]
     for term in terms:
@@ -46,7 +46,7 @@ def test_spanish_find_all_in_string(spanish, empty_db):
     _run_scenario(spanish, 'gato ábrela Ábrela', [ 'gato', 'ábrela' ])
 
 
-def test_english_find_all_in_string(english, empty_db):
+def test_english_find_all_in_string(english, app_context):
     "Can find a term with an apostrophe in string."
     terms = [ "the cat's pyjamas" ]
     for term in terms:
