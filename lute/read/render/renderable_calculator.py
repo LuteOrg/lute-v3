@@ -49,6 +49,8 @@ class RenderableCalculator:
 
     def _get_renderable(self, tokenlocator, terms, texttokens):
         """
+        Return RenderableCandidates that will **actually be rendered**.
+        
         Method to determine what should be rendered:
 
         1. Create a "rendered array".  On completion of this algorithm,

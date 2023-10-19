@@ -81,27 +81,35 @@ def get_paragraphs(text):
 
     terms = find_all_Terms_in_string(text.text, language)
 
-    def makeRenderableSentence(pnum, sentence_num, tokens, terms, text, language):
-        setokens = [t for t in tokens if t.sentence_number == sentence_num]
-        renderable = RenderableCalculator.get_renderable(language, terms, setokens)
+    def make_RenderableSentence(pnum, sentence_num, tokens, terms):
+        """
+        Make a RenderableSentences using the tokens present in
+        that sentence.  The current text and language are pulled
+        into the function from the closure.
+        """
+        sentence_tokens = [t for t in tokens if t.sentence_number == sentence_num]
+        renderable = RenderableCalculator.get_renderable(language, terms, sentence_tokens)
         textitems = [
             i.make_text_item(pnum, sentence_num, text.id, language)
             for i in renderable
         ]
         return RenderableSentence(sentence_num, textitems)
 
-    paranums = [t.paragraph_number for t in tokens]
-    paranums = list(set(paranums))
-    renderableParas = []
+    def unique(arr):
+        return list(set(arr))
 
+    renderable_paragraphs = []
+    paranums = unique([t.paragraph_number for t in tokens])
     for pnum in paranums:
         paratokens = [t for t in tokens if t.paragraph_number == pnum]
-        senums = [t.sentence_number for t in paratokens]
-        senums = list(set(senums))
+        senums = unique([t.sentence_number for t in paratokens])
+
+        # A renderable paragraph is a collection of
+        # RenderableSentences.
         renderable_sentences = [
-            makeRenderableSentence(pnum, senum, paratokens, terms, text, language)
+            make_RenderableSentence(pnum, senum, paratokens, terms)
             for senum in senums
         ]
-        renderableParas.append(renderable_sentences)
+        renderable_paragraphs.append(renderable_sentences)
 
-    return renderableParas
+    return renderable_paragraphs
