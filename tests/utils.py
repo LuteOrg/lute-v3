@@ -17,6 +17,9 @@ def add_terms(language, term_array):
 
 
 def make_text(title, content, language):
+    """
+    Make a single-page book, return the text.
+    """
     b = Book(title, language)
     t = Text(b, content)
     b.texts.append(t)

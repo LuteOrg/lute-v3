@@ -16,6 +16,9 @@ class TextToken:
 
     @staticmethod
     def create_from(parsed_tokens):
+        """
+        Create array of TextTokens from the array of ParsedTokens.
+        """
         ret = []
 
         sentence_number = 0

@@ -63,11 +63,14 @@ class RenderableSentence:
     A collection of TextItems to be rendered.
     """
     def __init__(self, sentence_id, textitems):
-        self.SeID = sentence_id
+        self.sentence_id = sentence_id
         self.textitems = textitems
 
 
 def get_paragraphs(text):
+    """
+    Get array of arrays of RenderableSentences for the given Text.
+    """
     if text.id is None:
         return []
 
@@ -95,8 +98,10 @@ def get_paragraphs(text):
         paratokens = [t for t in tokens if t.paragraph_number == pnum]
         senums = [t.sentence_number for t in paratokens]
         senums = list(set(senums))
-        renderableParas.append(
-            [makeRenderableSentence(pnum, senum, paratokens, terms, text, language) for senum in senums]
-        )
+        renderable_sentences = [
+            makeRenderableSentence(pnum, senum, paratokens, terms, text, language)
+            for senum in senums
+        ]
+        renderableParas.append(renderable_sentences)
 
     return renderableParas
