@@ -114,15 +114,27 @@ def fixture_yaml_folder():
     return absolute_path
 
 
+def _get_language(f):
+    """
+    Return language from the db if it already exists,
+    or create it from the file.
+    """
+    lang = Language.from_yaml(f)
+    db_language = db.session.query(Language).filter(Language.name == lang.name).first()
+    if db_language is None:
+        return lang
+    return db_language
+
+
 @pytest.fixture(name="spanish")
-def fixture_spanish(demo_yaml_folder):
+def fixture_spanish(app_context, demo_yaml_folder):
     "Make spanish from demo file."
     f = os.path.join(demo_yaml_folder, 'spanish.yaml')
-    return Language.from_yaml(f)
+    return _get_language(f)
 
 
 @pytest.fixture(name="english")
-def fixture_english(demo_yaml_folder):
+def fixture_english(app_context, demo_yaml_folder):
     "Make spanish from demo file."
     f = os.path.join(demo_yaml_folder, 'english.yaml')
-    return Language.from_yaml(f)
+    return _get_language(f)

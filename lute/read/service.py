@@ -6,6 +6,8 @@ import re
 from sqlalchemy import func
 
 from lute.models.term import Term
+from lute.read.render.text_token import TextToken
+from lute.read.render.renderable_calculator import RenderableCalculator
 from lute.db import db
 
 
@@ -65,42 +67,36 @@ class RenderableSentence:
         self.textitems = textitems
 
 
-def get_paragraphs(text, svc):
-    if text.getID() is None:
+def get_paragraphs(text):
+    if text.id is None:
         return []
 
-    tokens = getTextTokens(text)
-    tokens = [t for t in tokens if t.TokText != '¶']
+    language = text.book.language
+    parsed_tokens = language.get_parsed_tokens(text.text)
+    tokens = TextToken.create_from(parsed_tokens)
+    tokens = [t for t in tokens if t.tok_text != '¶']
 
-    language = text.getBook().getLanguage()
-    terms = svc.findAllInString(text.text, language)
+    terms = find_all_Terms_in_string(text.text, language)
 
     def makeRenderableSentence(pnum, sentence_num, tokens, terms, text, language):
-        setokens = [t for t in tokens if t.TokSentenceNumber == sentence_num]
-        renderable = RenderableCalculator.getRenderable(language, terms, setokens)
+        setokens = [t for t in tokens if t.sentence_number == sentence_num]
+        renderable = RenderableCalculator.get_renderable(language, terms, setokens)
         textitems = [
-            i.makeTextItem(pnum, sentence_num, text.getID(), language)
+            i.make_text_item(pnum, sentence_num, text.id, language)
             for i in renderable
         ]
         return RenderableSentence(sentence_num, textitems)
 
-    paranums = [t.TokParagraphNumber for t in tokens]
+    paranums = [t.paragraph_number for t in tokens]
     paranums = list(set(paranums))
     renderableParas = []
 
     for pnum in paranums:
-        paratokens = [t for t in tokens if t.TokParagraphNumber == pnum]
-        senums = [t.TokSentenceNumber for t in paratokens]
+        paratokens = [t for t in tokens if t.paragraph_number == pnum]
+        senums = [t.sentence_number for t in paratokens]
         senums = list(set(senums))
         renderableParas.append(
             [makeRenderableSentence(pnum, senum, paratokens, terms, text, language) for senum in senums]
         )
 
     return renderableParas
-
-def getTextTokens(t):
-    text_id = t.getID()
-    if text_id is None:
-        return []
-    pts = t.getBook().getLanguage().getParsedTokens(t.text)
-    return ParsedToken.createTextTokens(pts)

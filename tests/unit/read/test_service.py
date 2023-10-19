@@ -6,7 +6,7 @@ from lute.models.term import Term
 from lute.read.service import find_all_Terms_in_string, get_paragraphs
 from lute.db import db
 
-from tests.utils import add_terms
+from tests.utils import add_terms, make_text
 
 
 def _run_scenario(language, content, expected_found):
@@ -71,6 +71,8 @@ def test_smoke_get_paragraphs(spanish, app_context):
 
     content = "Tengo un gato. Hay un perro.\nTengo un perro."
     t = make_text("Hola", content, spanish)
+    db.session.add(t)
+    db.session.commit()
 
     paras = get_paragraphs(t)
     assert len(paras) == 2
