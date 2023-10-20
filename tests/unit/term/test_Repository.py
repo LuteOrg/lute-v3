@@ -5,12 +5,12 @@ Tests lute.term.model.Term *domain* objects being saved
 and retrieved from DB.
 """
 
-from lute.models.term import Term as DbTerm, TermTag
+from lute.models.term import Term as DBTerm, TermTag
 from lute.db import db
 from tests.dbasserts import assert_sql_result
 from lute.term.model import Term, Repository
 
-def test_save(spanish, app_context):
+def test_save_new(english, app_context):
     """
     Saving a simple Term object loads the database.
     """
@@ -19,15 +19,39 @@ def test_save(spanish, app_context):
     assert_sql_result(sql, [], 'empty table')
 
     t = Term()
-    t.language_id = spanish.id
-    t.text = 'HOLA'
+    t.language_id = english.id
+    t.text = 'HELLO'
 
     r = Repository(db)
     r.add(t)
     assert_sql_result(sql, [], 'Still empty')
 
     r.commit()
-    assert_sql_result(sql, [ "HOLA; hola; 1" ], 'Saved')
+    assert_sql_result(sql, [ "HELLO; hello; 1" ], 'Saved')
+
+
+def test_save_updates_existing(english, app_context):
+    """
+    Saving Term updates an existing term if the text and lang
+    matches.
+    """
+
+    term = DBTerm(english, 'HELLO')
+    db.session.add(term)
+    db.session.commit()
+    sql = "select WoText, WoStatus from words"
+    assert_sql_result(sql, ['HELLO; 1'], 'have term')
+
+    t = Term()
+    t.language_id = english.id
+    t.text = 'hello'
+    t.status = 5
+
+    r = Repository(db)
+    r.add(t)
+    r.commit()
+    assert_sql_result(sql, ['HELLO; 5'], 'have term, status changed')
+
 
 
 # def test_save_and_remove(empty_db, english):

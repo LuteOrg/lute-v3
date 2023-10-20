@@ -12,9 +12,7 @@ def test_save_and_remove(empty_db, english):
     sql = "select WoText, WoTextLC, WoTokenCount from words"
     assert_sql_result(sql, [], 'empty table')
 
-    term = Term()
-    term.language = english
-    term.text = 'ABC'
+    term = Term(english, 'ABC')
 
     db.session.add(term)
     db.session.commit()
