@@ -11,34 +11,33 @@
     <table style="width: 100%">
       <tr>
         <td align="left">
-    <h2 style="margin: 0px;">
-      {% if prev10page != pagenum %}
-      <a id="navPrev10" href="/read/{{ book.id }}/page/{{ prev10page }}" title="page {{ prev10page }}" tabindex="-1">&#171;</a>
-      {% else %}
-      <span style="color: lightgrey;">&#171;</span>
-      {% endif %}
+          <h2 style="margin: 0px;">
+            {% if prev10page != pagenum %}
+            <a id="navPrev10" href="/read/{{ book.id }}/page/{{ prev10page }}" title="page {{ prev10page }}" tabindex="-1">&#171;</a>
+            {% else %}
+            <span style="color: lightgrey;">&#171;</span>
+            {% endif %}
 
-      {% if prevpage != pagenum %}
-      <a id="navPrev" href="/read/{{ book.id }}/page/{{ prevpage }}" title="page {{ prevpage }}" tabindex="-1">&#8249;</a>
-      {% else %}
-      <span style="color: lightgrey;">&#8249;</span>
-      {% endif %}
+            {% if prevpage != pagenum %}
+            <a id="navPrev" href="/read/{{ book.id }}/page/{{ prevpage }}" title="page {{ prevpage }}" tabindex="-1">&#8249;</a>
+            {% else %}
+            <span style="color: lightgrey;">&#8249;</span>
+            {% endif %}
 
-      {{ pagenum }}/{{ pagecount }}
+            {{ pagenum }}/{{ pagecount }}
 
-      {% if pagenum != pagecount %}
-      <a id="navNext" href="/read/{{ book.id }}/page/{{ nextpage }}" title="page {{ nextpage }}" tabindex="-1">&#8250;</a>
-      {% else %}
-      <span style="color: lightgrey;">&#8250;</span>
-      {% endif %}
+            {% if pagenum != pagecount %}
+            <a id="navNext" href="/read/{{ book.id }}/page/{{ nextpage }}" title="page {{ nextpage }}" tabindex="-1">&#8250;</a>
+            {% else %}
+            <span style="color: lightgrey;">&#8250;</span>
+            {% endif %}
 
-      {% if next10page != pagecount %}
-      <a id="navNext10" href="/read/{{ book.id }}/page/{{ next10page }}" title="page {{ next10page }}" tabindex="-1">&#187;</a>
-      {% else %}
-      <span style="color: lightgrey;">&#187;</span>
-      {% endif %}
-
-    </h2>
+            {% if next10page != pagecount %}
+            <a id="navNext10" href="/read/{{ book.id }}/page/{{ next10page }}" title="page {{ next10page }}" tabindex="-1">&#187;</a>
+            {% else %}
+            <span style="color: lightgrey;">&#187;</span>
+            {% endif %}
+          </h2>
         </td>
         <td align="right">
           {% if book.source_uri %}
