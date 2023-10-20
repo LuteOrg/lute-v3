@@ -2,11 +2,11 @@
 /read endpoints.
 """
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template
 
 from lute.read.service import get_paragraphs
 from lute.models.book import Book, Text
-
+from lute.db import db
 
 bp = Blueprint('read', __name__, url_prefix='/read')
 
@@ -55,6 +55,7 @@ def read(bookid, pagenum):
         paragraphs=paragraphs)
 
 
+# TODO unused code: this may not be used.
 @bp.route('/text/<int:textid>', methods=['GET'])
 def read_text(textid):
     "Display a text."
@@ -65,16 +66,16 @@ def read_text(textid):
 
     return render_template(
         'read/text.html',
-        textid=text_id,
+        textid=textid,
         is_rtl=is_rtl,
-        dictionary_url = language.sentence_translate_uri,
+        dictionary_url = lang.sentence_translate_uri,
         paragraphs=paragraphs)
 
 
 @bp.route('/sentences/<int:textid>', methods=['GET'])
 def sentences(textid):
     "Display sentences for the given text."
-    text = session.query(Text).filter(Text.id == textid).first()
+    text = db.session.query(Text).filter(Text.id == textid).first()
     paragraphs = get_paragraphs(text)
     return render_template(
         'read/sentences.html',

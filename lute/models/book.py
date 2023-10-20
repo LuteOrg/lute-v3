@@ -97,9 +97,9 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         return b
 
     @staticmethod
-    def find(id):
+    def find(book_id):
         "Get by ID."
-        return db.session.query(Book).filter(Book.id == id).first()
+        return db.session.query(Book).filter(Book.id == book_id).first()
 
     # TODO book listing: update to new code in lutev2
     @staticmethod
@@ -253,9 +253,9 @@ class Text(db.Model):
 
 
     @staticmethod
-    def find(id):
+    def find(text_id):
         "Get by ID."
-        return db.session.query(Text).filter(Text.id == id).first()
+        return db.session.query(Text).filter(Text.id == text_id).first()
 
 
 class Sentence(db.Model):
