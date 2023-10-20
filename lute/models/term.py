@@ -51,6 +51,10 @@ class TermTag(db.Model):
 
     terms = db.relationship('Term', secondary=wordtags, back_populates='term_tags')
 
+    def __init__(self, text, comment=None):
+        self.text=text
+        self.comment=comment
+
     @property
     def comment(self):
         "Comment getter."
@@ -65,15 +69,6 @@ class TermTag(db.Model):
     def comment(self, c):
         "Set cleaned comment."
         self._comment = c if c is not None else ''
-
-    @staticmethod
-    def make_term_tag(text, comment=None):
-        "Create a TermTag."
-        tt = TermTag()
-        tt.text = text
-        if comment is not None:
-            tt.comment(comment)
-        return tt
 
 
 class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instance-attributes
@@ -100,17 +95,26 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     token_count = db.Column('WoTokenCount', db.Integer)
 
     language = db.relationship('Language')
-    term_tags = db.relationship('TermTag', secondary='wordtags', back_populates='terms')
-    parents = db.relationship('Term', secondary='wordparents',
-                           primaryjoin='Term.id == wordparents.c.WpWoID',
-                           secondaryjoin='Term.id == wordparents.c.WpParentWoID',
-                           back_populates='children')
-    children = db.relationship('Term', secondary='wordparents',
-                            primaryjoin='Term.id == wordparents.c.WpParentWoID',
-                            secondaryjoin='Term.id == wordparents.c.WpWoID',
-                            back_populates='parents')
-    images = db.relationship('TermImage', back_populates='term', lazy='subquery')
-    term_flash_message = db.relationship('TermFlashMessage', uselist=False, back_populates='term')
+    term_tags = db.relationship(
+        'TermTag', secondary='wordtags', back_populates='terms')
+    parents = db.relationship(
+        'Term', secondary='wordparents',
+        primaryjoin='Term.id == wordparents.c.WpWoID',
+        secondaryjoin='Term.id == wordparents.c.WpParentWoID',
+        back_populates='children')
+    children = db.relationship(
+        'Term', secondary='wordparents',
+        primaryjoin='Term.id == wordparents.c.WpParentWoID',
+        secondaryjoin='Term.id == wordparents.c.WpWoID',
+        back_populates='parents')
+    images = db.relationship(
+        'TermImage', back_populates='term',
+        lazy='subquery',
+        cascade='all, delete-orphan')
+    term_flash_message = db.relationship(
+        'TermFlashMessage',
+        uselist=False, back_populates='term',
+        cascade='all, delete-orphan')
 
     def __init__(self, language=None, text=None):
         self.status = 1
@@ -204,13 +208,6 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
             return
         if parent not in self.parents:
             self.parents.append(parent)
-            parent.children.append(self)
-
-    def remove_parent(self, parent):
-        "Remove the given parent."
-        if parent in self.parents:
-            self.parents.remove(parent)
-            parent.children.remove(self)
 
     def get_current_image(self, strip_jpeg=True):
         "Get the current (first) image for the term."
@@ -233,8 +230,8 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
             self.images.pop(0)
         if s is not None:
             ti = TermImage()
-            ti.set_term(self)
-            ti.set_source(s)
+            ti.term = self
+            ti.source = s
             self.images.append(ti)
 
     # TODO: term dto: where to put dto and conversion methods?
@@ -269,24 +266,29 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         "Get the flash message."
         if not self.term_flash_message:
             return None
-        return self.term_flash_message.get_message()
+        return self.term_flash_message.message
 
     def set_flash_message(self, m):
         "Set a flash message to be shown at some point in the future."
         tfm = self.term_flash_message
         if not tfm:
             tfm = TermFlashMessage()
-            tfm.set_term(self)
             self.term_flash_message = tfm
-        tfm.set_message(m)
+        tfm.message = m
 
     def pop_flash_message(self):
         "Get the flash message, and remove it from this term."
         if not self.term_flash_message:
             return None
-        m = self.term_flash_message.get_message()
+        m = self.term_flash_message.message
         self.term_flash_message = None
         return m
+
+
+    @staticmethod
+    def find(term_id):
+        "Get by ID."
+        return db.session.query(Term).filter(Term.id == term_id).first()
 
 
 class Status:

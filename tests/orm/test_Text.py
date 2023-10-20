@@ -3,7 +3,7 @@ Text mapping checks.
 """
 
 from datetime import datetime
-from lute.models.book import Book, Text, Sentence
+from lute.models.book import Book, Text
 from lute.db import db
 from tests.dbasserts import assert_record_count_equals
 
