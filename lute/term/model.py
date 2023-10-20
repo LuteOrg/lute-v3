@@ -5,6 +5,7 @@ Terms are converted to and from lute.models.term.Term objects to save
 them in the database.
 """
 
+from lute.db import db
 from lute.models.term import Term as DBTerm, TermTag, TermFlashMessage, TermImage
 from lute.models.language import Language
 
@@ -60,8 +61,7 @@ class Repository:
         if term.text is None:
             raise Exception('Text not set for term')
 
-        t = None
-        # TODO - add lookup - term_service.find(dto.text, dto.language)
+        t = self._find_by_langid_and_text(lang.id, term.text)
         if t is None:
             t = DBTerm()
 
@@ -91,6 +91,19 @@ class Repository:
             t.add_parent(tp)
 
         return t
+
+
+    def _find_by_langid_and_text(self, langid, text):
+        lang = Language.find(langid)
+        text_lc = lang.get_lowercase(text)
+        query = db.session.query(DBTerm).filter(
+            DBTerm.language_id == langid,
+            DBTerm.text_lc == text_lc
+        )
+        terms = query.all()
+        if not terms:
+            return None
+        return terms[0]
 
 
     def _find_or_create_parent(self, pt, language, term, termtags) -> Term:

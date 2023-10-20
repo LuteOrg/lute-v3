@@ -39,8 +39,8 @@ def test_save_updates_existing(english, app_context):
     term = DBTerm(english, 'HELLO')
     db.session.add(term)
     db.session.commit()
-    sql = "select WoText, WoStatus from words"
-    assert_sql_result(sql, ['HELLO; 1'], 'have term')
+    sql = "select WoID, WoText, WoStatus from words"
+    assert_sql_result(sql, [f'{term.id}; HELLO; 1'], 'have term')
 
     t = Term()
     t.language_id = english.id
@@ -50,7 +50,7 @@ def test_save_updates_existing(english, app_context):
     r = Repository(db)
     r.add(t)
     r.commit()
-    assert_sql_result(sql, ['HELLO; 5'], 'have term, status changed')
+    assert_sql_result(sql, [f'{term.id}; hello; 5'], 'have term, status changed')
 
 
 
