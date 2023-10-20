@@ -3,7 +3,7 @@ BackupManager tests.
 """
 
 import os
-from lute.dbsetup.setup import BackupManager
+from lute.db.setup.main import BackupManager
 
 
 def test_do_backup(tmp_path):

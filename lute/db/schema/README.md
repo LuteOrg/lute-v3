@@ -26,8 +26,8 @@ git checkout develop      # should be develop!
 composer dev:data:load    # set to baseline!
 popd
 
-sqlite3 ../lute_dev/data/test_lute.db .dump > lute/schema/baseline.sql
-git add lute/schema/baseline.sql
+sqlite3 ../lute_dev/data/test_lute.db .dump > lute/db/schema/baseline.sql
+git add lute/db/schema/baseline.sql
 git diff --cached         # verify
 git commit -m "Update db baseline.sql"
 ```
@@ -39,10 +39,8 @@ On a Mac, at least!
 
 ```
 # Copy the folders over
-for f in migrations migrations_repeatable; do cp -r ../lute_dev/db/$f lute/schema/; done
-
-git add lute/schema/migrations/
-git add lute/schema/migrations_repeatable/
+for f in migrations migrations_repeatable; do cp -r ../lute_dev/db/$f lute/db/schema/; done
+git add lute/db/schema/
 git diff --cached          # verify
 git commit -m "Copy migrations from lute v2."
 ```

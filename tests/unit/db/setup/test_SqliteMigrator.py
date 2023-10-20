@@ -6,7 +6,7 @@ import sqlite3
 from contextlib import closing
 import pytest
 
-from lute.dbsetup.migrator import SqliteMigrator
+from lute.db.setup.migrator import SqliteMigrator
 
 
 @pytest.fixture(name="db")

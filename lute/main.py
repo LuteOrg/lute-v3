@@ -4,8 +4,8 @@ Main entry point.
 
 import os
 from flask import Flask, render_template
-from lute.dbsetup.migrator import SqliteMigrator
-from lute.dbsetup.setup import BackupManager, Setup
+from lute.db.setup.migrator import SqliteMigrator
+from lute.db.setup.main import BackupManager, Setup
 
 from lute.db import db
 
@@ -27,13 +27,19 @@ def _setup_app_dirs(app_config):
         os.makedirs(d)
 
 
+def _schema_dir():
+    "Where schema files are found."
+    thisdir = os.path.dirname(os.path.realpath(__file__))
+    return os.path.join(thisdir, 'db', 'schema')
+
+
 def _create_migrator():
     """
     Create SqliteMigrator with prod migration folders.
     """
-    thisdir = os.path.dirname(os.path.realpath(__file__))
-    migdir = os.path.join(thisdir, 'schema', 'migrations')
-    repeatable = os.path.join(thisdir, 'schema', 'migrations_repeatable')
+    schema_dir = _schema_dir()
+    migdir = os.path.join(schema_dir, 'migrations')
+    repeatable = os.path.join(schema_dir, 'migrations_repeatable')
     return SqliteMigrator(migdir, repeatable)
 
 
@@ -46,8 +52,8 @@ def _setup_db(app_config):
     backup_count = 20  # Arbitrary
     bm = BackupManager(dbfile, backup_dir, backup_count)
 
-    thisdir = os.path.dirname(os.path.realpath(__file__))
-    baseline = os.path.join(thisdir, 'schema', 'baseline.sql')
+    schema_dir = _schema_dir()
+    baseline = os.path.join(schema_dir, 'baseline.sql')
 
     migrator = _create_migrator()
 
