@@ -71,6 +71,19 @@ class TermTag(db.Model):
         self._comment = c if c is not None else ''
 
 
+    @staticmethod
+    def find_by_text(text):
+        "Find a tag by text, or None if not found."
+        return db.session.query(TermTag).filter(TermTag.text == text).first()
+
+    @staticmethod
+    def find_or_create_by_text(text):
+        "Return tag or create one."
+        ret = TermTag.find_by_text(text)
+        if ret is not None:
+            return ret
+        return TermTag(text)
+
 class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instance-attributes
     """
     Term entity.
