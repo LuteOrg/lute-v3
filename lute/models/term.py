@@ -247,34 +247,6 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
             ti.source = s
             self.images.append(ti)
 
-    # TODO: term dto: where to put dto and conversion methods?
-    # def create_term_dto(self):
-    #     dto = TermDTO()
-    #     dto.id = self.get_id()
-    #     dto.language = self.get_language()
-
-    #     t = self.get_text()
-    #     zws = '\u200B'  # zero-width space
-    #     t = t.replace(zws, '')
-    #     dto.OriginalText = t
-    #     dto.Text = t
-
-    #     dto.Status = self.get_status()
-    #     dto.Translation = self.get_translation()
-    #     dto.Romanization = self.get_romanization()
-    #     dto.TokenCount = self.get_token_count()
-    #     dto.CurrentImage = self.get_current_image()
-    #     dto.FlashMessage = self.get_flash_message()
-
-    #     dto.termParents = [p.get_text() for p in self.get_parents()]
-
-    #     if not dto.Romanization:
-    #         dto.Romanization = dto.language.get_parser().get_reading(dto.Text)
-
-    #     dto.termTags = [tt.get_text() for tt in self.get_term_tags()]
-
-    #     return dto
-
     def get_flash_message(self):
         "Get the flash message."
         if not self.term_flash_message:

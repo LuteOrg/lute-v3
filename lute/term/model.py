@@ -38,6 +38,14 @@ class Repository:
         self.db = db
 
 
+    def find_by_id(self, term_id):
+        "Return a Term business object for the DBTerm with the id."
+        t = DBTerm.find(term_id)
+        if t is None:
+            raise ValueError(f'No term with id {term_id} found')
+        return self._build_business_term(t)
+
+
     def add(self, term):
         """
         Add a term to be saved to the db session.
@@ -57,7 +65,7 @@ class Repository:
         "Convert a term business object to a DBTerm."
         lang = Language.find(term.language_id)
         if lang is None:
-            raise Exception('Unknown language {term.language_id} for Language not set for term dto')
+            raise Exception(f'Unknown language {term.language_id} for term')
         if term.text is None:
             raise Exception('Text not set for term')
 
@@ -85,7 +93,7 @@ class Repository:
             if p is not None and p != '' and
             lang.get_lowercase(term.text) != lang.get_lowercase(p)]
         for p in create_parents:
-            termparents.append(self._find_or_create_parent(p, dto, termtags))
+            termparents.append(self._find_or_create_parent(p, term, termtags))
         t.remove_all_parents()
         for tp in termparents:
             t.add_parent(tp)
@@ -124,3 +132,29 @@ class Repository:
             p.add_term_tag(tt)
 
         return p
+
+
+    def _build_business_term(self, dbterm):
+        "Create a Term bus. object from a lute.model.term.Term."
+        term = Term()
+        term.id = dbterm.id
+        term.language_id = dbterm.language.id
+
+        # Remove zero-width spaces (zws) from strings for user forms.
+        text = dbterm.text
+        zws = '\u200B'  # zero-width space
+        text = text.replace(zws, '')
+        term.original_text = text
+        term.text = text
+
+        term.status = dbterm.status
+        term.translation = dbterm.translation
+        term.romanization = dbterm.romanization
+        term.token_count = dbterm.token_count
+        term.current_image = dbterm.get_current_image()
+        term.flash_message = dbterm.get_flash_message()
+        term.term_parents = [p.text for p in dbterm.parents]
+        term.romanization = dbterm.romanization
+        term.term_tags = [tt.text for tt in dbterm.term_tags]
+
+        return term
