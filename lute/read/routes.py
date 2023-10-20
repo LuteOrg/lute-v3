@@ -15,6 +15,7 @@ def read(bookid, pagenum):
     "Display reading pane for book page."
 
     book = Book.find(bookid)
+    lang = book.language
 
     def page_in_range(n):
         "Force n in range 1 to book.page_count."
@@ -24,6 +25,7 @@ def read(bookid, pagenum):
 
     pagenum = page_in_range(pagenum)
     text = book.texts[pagenum - 1]
+    paragraphs = get_paragraphs(text)
 
     prevpage = page_in_range(pagenum - 1)
     nextpage = page_in_range(pagenum + 1)
@@ -39,14 +41,18 @@ def read(bookid, pagenum):
     return render_template(
         'read/index.html',
         text=text,
+        textid=text.id,
+        is_rtl = lang.right_to_left,
         html_title=text.title,
         book=book,
+        dictionary_url = lang.sentence_translate_uri,
         pagenum=pagenum,
         pagecount=book.page_count,
         prevpage=prevpage,
         prev10page=prev10,
         nextpage=nextpage,
-        next10page=next10)
+        next10page=next10,
+        paragraphs=paragraphs)
 
 
 @bp.route('/text/<int:textid>', methods=['GET'])
@@ -54,7 +60,7 @@ def read_text(textid):
     "Display a text."
     text = Text.find(textid)
     lang = text.book.language
-    is_rtl = lang.isLgRightToLeft()
+    is_rtl = lang.right_to_left
     paragraphs = get_paragraphs(text)
 
     return render_template(

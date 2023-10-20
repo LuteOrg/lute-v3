@@ -66,6 +66,10 @@ class RenderableSentence:
         self.sentence_id = sentence_id
         self.textitems = textitems
 
+    def __repr__(self):
+        s = ''.join([t.display_text for t in self.textitems])
+        return f"<RendSent {self.sentence_id}, {len(self.textitems)} items, \"{s}\">"
+
 
 def get_paragraphs(text):
     """

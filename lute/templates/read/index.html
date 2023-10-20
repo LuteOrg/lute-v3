@@ -63,6 +63,19 @@
 
   <h1>TODO: render(url('app_read_text', { 'textid': text.id }))</h1>
 
+  <span id="textid" style="display:none">{{ textid }}</span>
+
+  {# Hack for js translation keyboard shortcut. #}
+  <span id="translateURL" style="display:none">{{ dictionary_url }}</span>
+
+  <div id="thetext" {% if isRTL %}dir="rtl"{% endif %}>
+    {% include 'read/sentences.html' %}
+  </div>
+
+  <script>
+    $(document).ready(prepareTextInteractions);
+  </script>
+
   <div id="reading-footer"  style="text-align: center;">
     <h2>
       <form style="display:none"

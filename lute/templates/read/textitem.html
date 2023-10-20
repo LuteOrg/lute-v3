@@ -1,0 +1,12 @@
+{# Render a read.render.renderable_calculator.TextItem #}
+<span id="{{ item.span_id }}"
+      class="{{ item.html_class_string }}"
+      tid="{{ item.text_id }}"
+      lid="{{ item.lang_id }}"
+      paraid="{{ item.para_id }}"
+      seid="{{ item.se_id }}"
+      data_text="{{ item.text }}"
+      data_order="{{ item.order }}"
+{% if item.wo_id is not none %}
+      data_wid="{{ item.wo_id }}"
+{% endif %}>{{ item.html_display_text | safe }}</span>
