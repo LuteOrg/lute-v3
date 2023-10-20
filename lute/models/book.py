@@ -64,6 +64,10 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     def __repr__(self):
         return f"<Book {self.id} {self.title}>"
 
+    @property
+    def page_count(self):
+        return len(self.texts)
+
     @staticmethod
     def create_book(title, language, fulltext, max_word_tokens_per_text = 250):
         """
@@ -92,6 +96,10 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
         return b
 
+    @staticmethod
+    def find(id):
+        "Get by ID."
+        return db.session.query(Book).filter(Book.id == id).first()
 
     # TODO book listing: update to new code in lutev2
     @staticmethod
@@ -242,6 +250,12 @@ class Text(db.Model):
         for sentence in self.sentences:
             sentence.text = None
         self.sentences = []
+
+
+    @staticmethod
+    def find(id):
+        "Get by ID."
+        return db.session.query(Text).filter(Text.id == id).first()
 
 
 class Sentence(db.Model):

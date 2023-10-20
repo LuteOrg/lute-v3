@@ -4,26 +4,27 @@
 
 from flask import Blueprint, render_template, request
 
+from lute.read.service import get_paragraphs
+from lute.models.book import Book, Text
+
+
 bp = Blueprint('read', __name__, url_prefix='/read')
 
 @bp.route('/<int:bookid>/page/<int:pagenum>', methods=['GET'])
 def read(bookid, pagenum):
     "Display reading pane for book page."
-    # Simulate data retrieval for Book and TextRepository
-    book = get_book_by_id(BkID)  # Implement a function to retrieve the book
-    text = get_text_at_page_number(book, pagenum)  # Implement a function to retrieve the text
-    text_title = text.getTitle()  # Implement the getTitle method
 
-    pc = book.getPageCount()
-    
+    book = Book.find(bookid)
+
     def page_in_range(n):
-        if n < 1:
-            n = 1
-        if n > pc:
-            n = pc
+        "Force n in range 1 to book.page_count."
+        n = max(n, 1)
+        n = min(n, book.page_count)
         return n
 
     pagenum = page_in_range(pagenum)
+    text = book.texts[pagenum - 1]
+
     prevpage = page_in_range(pagenum - 1)
     nextpage = page_in_range(pagenum + 1)
     prev10 = page_in_range(pagenum - 10)
@@ -35,24 +36,40 @@ def read(bookid, pagenum):
     # TODO book stats: mark stale for recalc later
     # BookStats.markStale(book)
 
-    return render_template('read/index.html', text=text, htmltitle=text_title, book=book,
-                           pagenum=pagenum, pagecount=pc, prevpage=prevpage, prev10page=prev10,
-                           nextpage=nextpage, next10page=next10)
+    return render_template(
+        'read/index.html',
+        text=text,
+        html_title=text.title,
+        book=book,
+        pagenum=pagenum,
+        pagecount=book.page_count,
+        prevpage=prevpage,
+        prev10page=prev10,
+        nextpage=nextpage,
+        next10page=next10)
 
-@app.route('/text/<int:TxID>', methods=['GET'])
-def read_text(TxID):
+
+@bp.route('/text/<int:textid>', methods=['GET'])
+def read_text(textid):
     "Display a text."
-    # Simulate data retrieval for Text and ReadingFacade
-    text = get_text_by_id(TxID)  # Implement a function to retrieve the text
+    text = Text.find(textid)
+    lang = text.book.language
+    is_rtl = lang.isLgRightToLeft()
+    paragraphs = get_paragraphs(text)
 
-    # Simulate data retrieval for Book and Language
-    book = text.getBook()
-    lang = book.getLanguage()
-    isRTL = lang.isLgRightToLeft() if lang else False
+    return render_template(
+        'read/text.html',
+        textid=text_id,
+        is_rtl=is_rtl,
+        dictionary_url = language.sentence_translate_uri,
+        paragraphs=paragraphs)
 
-    facade = ReadingFacade()
-    paragraphs = facade.getParagraphs(text)
 
-    return render_template('read/text.html', textid=TxID, isRTL=isRTL,
-                           dictionary_url=lang.getLgGoogleTranslateURI() if lang else None,
-                           paragraphs=paragraphs)
+@bp.route('/sentences/<int:textid>', methods=['GET'])
+def sentences(textid):
+    "Display sentences for the given text."
+    text = session.query(Text).filter(Text.id == textid).first()
+    paragraphs = get_paragraphs(text)
+    return render_template(
+        'read/sentences.html',
+        paragraphs=paragraphs)

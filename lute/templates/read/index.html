@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Reading &quot;{{ htmltitle }}&quot;{% endblock %}
+
+{% block body %}
+
+<div id="reading-frames-left" style="width: 50%;">
+  <div id="reading-header">
+
+    <!-- Lacking css skills, so table layout to the rescue. -->
+    <table style="width: 100%">
+      <tr>
+        <td align="left">
+    <h2 style="margin: 0px;">
+      {% if prev10page != pagenum %}
+      <a id="navPrev10" href="/read/{{ book.id }}/page/{{ prev10page }}" title="page {{ prev10page }}" tabindex="-1">&#171;</a>
+      {% else %}
+      <span style="color: lightgrey;">&#171;</span>
+      {% endif %}
+
+      {% if prevpage != pagenum %}
+      <a id="navPrev" href="/read/{{ book.id }}/page/{{ prevpage }}" title="page {{ prevpage }}" tabindex="-1">&#8249;</a>
+      {% else %}
+      <span style="color: lightgrey;">&#8249;</span>
+      {% endif %}
+
+      {{ pagenum }}/{{ pagecount }}
+
+      {% if pagenum != pagecount %}
+      <a id="navNext" href="/read/{{ book.id }}/page/{{ nextpage }}" title="page {{ nextpage }}" tabindex="-1">&#8250;</a>
+      {% else %}
+      <span style="color: lightgrey;">&#8250;</span>
+      {% endif %}
+
+      {% if next10page != pagecount %}
+      <a id="navNext10" href="/read/{{ book.id }}/page/{{ next10page }}" title="page {{ next10page }}" tabindex="-1">&#187;</a>
+      {% else %}
+      <span style="color: lightgrey;">&#187;</span>
+      {% endif %}
+
+    </h2>
+        </td>
+        <td align="right">
+          {% if book.source_uri %}
+          <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
+            <img src="/icn/external.png" title="Show source URL" />
+          </a>
+          {% endif %}
+          <a id="editText" href="/text/{{ text.id }}/edit" tabindex="-1">
+            <img src="/icn/document--pencil.png" title="Edit" alt="Edit" />
+          </a>
+          <img style="margin-right:10px;" src="/icn/question-balloon.png" onclick="show_help(); return false;" title="Keyboard shortcuts" />
+        </td>
+      </tr>
+    </table>
+
+    <hr />
+
+  </div>
+
+  {% if pagenum == 1 %}
+    <h2>{{ book.Title }}</h2>
+  {% endif %}
+
+  <h1>TODO: render(url('app_read_text', { 'textid': text.id }))</h1>
+
+  <div id="reading-footer"  style="text-align: center;">
+    <h2>
+      <form style="display:none"
+            id="setknown"
+            action="/read/{{ book.id }}/page/{{ pagenum }}/allknown"
+            method="post">
+      </form>
+      <a id="footerMarkRestAsKnown"
+         style="text-decoration: none;"
+         onclick="document.getElementById('setknown').submit(); return false;"
+         title="Mark rest as known, mark page as read" tabindex="-1">
+        <img src="/icn/tick.png" />
+      </a>
+
+      {% if pagenum != pagecount %}
+      &nbsp;
+      <form style="display:none"
+            id="knowntonext"
+            action="/read/{{ book.id }}/page/{{ pagenum }}/allknown/{{ pagenum + 1 }}"
+            method="post">
+      </form>
+      <a id="footerMarkRestAsKnownNextPage"
+         style="text-decoration: none;"
+         onclick="document.getElementById('knowntonext').submit(); return false;"
+         title="Mark rest as known, mark page as read, then go to next page"
+         tabindex="-1">
+        <img src="/icn/tick.png" />&#8250;
+      </a>
+      &nbsp;
+
+      <form style="display:none"
+            id="gotonext"
+            action="/read/{{ book.id }}/page/{{ pagenum }}/markread/{{ pagenum + 1 }}"
+            method="post">
+      </form>
+      <a id="footerNextPage"
+         style="text-decoration: none;"
+         onclick="document.getElementById('gotonext').submit(); return false;"
+         title="Mark page as read, then go to next page"
+         tabindex="-1">&#8250;</a>
+      {% endif %}
+    </h2>
+
+    {% if pagenum == pagecount %}
+    <h2>&#127881;</h2>
+    <p>
+      <a href="" onclick="$('#actionposter').submit(); return false;">Archive book</a> |
+      <a href="/">Home</a>
+    </p>
+
+    <form id="actionposter" method="post" action="/book/{{ book.id }}/archive"></form>
+    {% endif %}
+
+  </div>
+  
+</div>
+
+
+<div id="reading-frames-right" style="position: fixed; top: 0; right: 0; height: 95%; 
+width: 50%;">
+    <iframe name="wordframe" id="wordframeid" class="rightreadingframe" src="about:blank" scrolling="auto"
+            style="height: 35%; width: 100%;" frameBorder="0">
+      Frame support required.
+    </iframe>
+
+    <iframe name="dictframe" id="dictframeid" class="rightreadingframe" src="about:blank" scrolling="auto"
+            style="height: 65%; width: 100%;" frameBorder="0">
+      Frame support required.
+    </iframe>
+</div>
+
+{% endblock %}
