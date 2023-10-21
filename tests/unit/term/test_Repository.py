@@ -63,7 +63,7 @@ def test_save_new_multiword(app_context, hello_term, repo):
 
     repo.commit()
     zws = "\u200B"
-    assert_sql_result(sql, [ f"HELLO{zws} {zws}THERE; hello{zws} {zws}there; 1" ], 'Saved')
+    assert_sql_result(sql, [ f"HELLO{zws} {zws}THERE; hello{zws} {zws}there; 3" ], 'Saved')
 
 
 def test_save_updates_existing(english, app_context, hello_term, repo):
@@ -268,16 +268,16 @@ def test_find_only_looks_in_specified_language(spanish, english, repo):
 
 
 def test_find_existing_multi_word(spanish, repo):
-    "Spaces etc handled correctly."
+    "Domain objects don't have zero-width strings in them."
     add_terms(spanish, ['una bebida'])
     zws = "\u200B"
     t = repo.find(spanish.id, f"una{zws} {zws}bebida")
     assert t.id > 0
-    assert t.text == f"una{zws} {zws}bebida"
+    assert t.text == "una bebida"
 
-    t = repo.find(spanish.id, f"una bebida")
+    t = repo.find(spanish.id, "una bebida")
     assert t.id > 0
-    assert t.text == f"una{zws} {zws}bebida"
+    assert t.text == "una bebida"
 
 
 ## Find or new tests.
@@ -293,7 +293,7 @@ def test_find_or_new_existing_word(spanish, repo):
 def test_find_or_new_non_existing(spanish, repo):
     "Returns new term."
     t = repo.find_or_new(spanish.id, 'TENGO')
-    assert t.id == 0
+    assert t.id is None
     assert t.text == "TENGO"
 
 
@@ -303,23 +303,23 @@ def test_find_or_new_existing_multi_word(spanish, repo):
     zws = "\u200B"
     t = repo.find_or_new(spanish.id, f"una{zws} {zws}bebida")
     assert t.id > 0
-    assert t.text == f"una{zws} {zws}bebida"
+    assert t.text == "una bebida"
 
-    t = repo.find_or_new(spanish.id, f"una bebida")
+    t = repo.find_or_new(spanish.id, "una bebida")
     assert t.id > 0
-    assert t.text == f"una{zws} {zws}bebida"
+    assert t.text == "una bebida"
 
 
 def test_find_or_new_new_multi_word(spanish, repo):
     "ZWS added correctly."
     zws = "\u200B"
     t = repo.find_or_new(spanish.id, f"una{zws} {zws}bebida")
-    assert t.id == 0
+    assert t.id is None
     assert t.text == f"una{zws} {zws}bebida"
 
-    t = repo.find_or_new(spanish.id, f"una bebida")
-    assert t.id == 0
-    assert t.text == f"una{zws} {zws}bebida"
+    t = repo.find_or_new(spanish.id, "una bebida")
+    assert t.id is None
+    assert t.text == "una bebida"
 
 
 ## Matches tests.

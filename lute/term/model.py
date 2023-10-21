@@ -54,7 +54,8 @@ class Repository:
         Return a Term business object for the DBTerm with the langid and text.
         If no match, return None.
         """
-        dbt = self._find_db_term_by_langid_and_text(langid, text)
+        spec = self._search_spec_term(langid, text)
+        dbt = self._find_db_term_by_spec(spec)
         if dbt is None:
             return None
         return self._build_business_term(dbt)
@@ -65,10 +66,13 @@ class Repository:
         Return a Term business object for the DBTerm with the langid and text.
         If no match, return a new term with the text and language.
         """
-        dbt = self._find_db_term_by_langid_and_text(langid, text)
-        if dbt is None:
-            return None
-        return self._build_business_term(dbt)
+        t = self.find(langid, text)
+        if t is not None:
+            return t
+        t = Term()
+        t.language_id = langid
+        t.text = text
+        return t
 
 
     def find_matches(self, langid, text, max_results=50):
@@ -77,9 +81,8 @@ class Repository:
         with the same langid, matching the text.
         If no match, return [].
         """
-
-        lang = Language.find(langid)
-        text_lc = lang.get_lowercase(text)
+        spec = self._search_spec_term(langid, text)
+        text_lc = spec.text_lc
         search = text_lc.strip() if text_lc else ''
         if search == '':
             return []
@@ -133,10 +136,22 @@ class Repository:
         self.db.session.commit()
 
 
-    def _find_db_term_by_langid_and_text(self, langid, text):
-        "Find by the given language ID and text."
+    def _search_spec_term(self, langid, text):
+        """
+        Make a term to get the correct text_lc to search for.
+
+        Creating a term does parsing and correct downcasing,
+        so term.language.id and term.text_lc match what the
+        db would contain.
+        """
         lang = Language.find(langid)
-        text_lc = lang.get_lowercase(text)
+        return DBTerm(lang, text)
+
+
+    def _find_db_term_by_spec(self, spec):
+        "Find by the given spec term's language ID and text."
+        langid = spec.language.id
+        text_lc = spec.text_lc
         query = db.session.query(DBTerm).filter(
             DBTerm.language_id == langid,
             DBTerm.text_lc == text_lc
@@ -149,17 +164,15 @@ class Repository:
 
     def _build_db_term(self, term):
         "Convert a term business object to a DBTerm."
-        lang = Language.find(term.language_id)
-        if lang is None:
-            raise ValueError(f'Unknown language {term.language_id} for term')
         if term.text is None:
             raise ValueError('Text not set for term')
 
-        t = self._find_db_term_by_langid_and_text(lang.id, term.text)
+        spec = self._search_spec_term(term.language_id, term.text)
+        t = self._find_db_term_by_spec(spec)
         if t is None:
             t = DBTerm()
 
-        t.language = lang
+        t.language = spec.language
         t.text = term.text
         t.original_text = term.text
         t.status = term.status
@@ -175,6 +188,7 @@ class Repository:
             t.add_term_tag(tt)
 
         termparents = []
+        lang = spec.language
         create_parents = [
             p for p in term.parents
             if p is not None and p != '' and
@@ -191,7 +205,8 @@ class Repository:
 
 
     def _find_or_create_parent(self, pt, language, term, termtags) -> DBTerm:
-        p = self._find_db_term_by_langid_and_text(language.id, pt)
+        spec = self._search_spec_term(language.id, pt)
+        p = self._find_db_term_by_spec(spec)
 
         if p is not None:
             if (p.translation or '') == '':
