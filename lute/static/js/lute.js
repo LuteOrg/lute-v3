@@ -90,7 +90,7 @@ function prepareTextInteractions(textid) {
 let tooltip_textitem_hover_content = function (el, setContent) {
   elid = parseInt(el.attr('data_wid'));
   $.ajax({
-    url: `/termpopup/${elid}`,
+    url: `/read/termpopup/${elid}`,
     type: 'get',
     success: function(response) {
       setContent(response);

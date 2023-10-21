@@ -10,6 +10,7 @@ from lute.read.service import get_paragraphs
 from lute.term.model import Repository
 from lute.term.forms import TermForm
 from lute.models.book import Book, Text
+from lute.models.term import Term as DBTerm
 from lute.db import db
 
 bp = Blueprint('read', __name__, url_prefix='/read')
@@ -151,3 +152,50 @@ def term_form(langid, text):
         tags=[ "apple", "bear", "cat" ],
         parent_link_to_frame=True
     )
+
+
+@bp.route('/termpopup/<int:id>', methods=['GET'])
+def term_popup(id):
+    """
+    Show a term popup for the given DBTerm.
+    """
+    term = DBTerm.query.get(id)
+
+    term_tags = [tt.text for tt in term.term_tags]
+
+    def make_array(t):
+        ret = {
+            'term': t.text,
+            'roman': t.romanization,
+            'trans': t.translation if t.translation else '-',
+            'tags': [tt.text for tt in t.term_tags],
+        }
+        return ret
+
+    print(term.parents)
+    parent_terms = [p.text for p in term.parents]
+    parent_terms = ', '.join(parent_terms)
+
+    parent_data = []
+    if len(term.parents) == 1:
+        parent = term.parents[0]
+        if parent.translation != term.translation:
+            parent_data.append(make_array(parent))
+    else:
+        parent_data = [make_array(p) for p in term.parents]
+
+    images = [term.get_current_image()] if term.get_current_image() else []
+    for p in term.parents:
+        if p.get_current_image():
+            images.append(p.get_current_image())
+
+    images = list(set(images))
+
+    return render_template(
+        'read/termpopup.html',
+        term=term,
+        flashmsg=term.get_flash_message(),
+        term_tags=term_tags,
+        term_images=images,
+        parentdata=parent_data,
+        parentterms=parent_terms)
