@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Form</title>
+    
+    <link rel="stylesheet" type="text/css" href="/css/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="/css/jquery.tagit.css" />
+    <link rel="stylesheet" type="text/css" href="/css/styles.css" />
+
+    <!-- override most of the elements in styles with more compact css. -->
+    <link rel="stylesheet" type="text/css" href="/css/styles-compact.css" />
+    
+    <script type="text/javascript" src="/js/jquery.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/js/jquery-ui.min.js"  charset="utf-8"></script>
+    <script type="text/javascript" src="/js/jquery.jeditable.mini.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/js/tag-it.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/js/jquery.hoverIntent.js" charset="utf-8"></script>
+
+    <script type="text/javascript">
+      // TODO term tags: ensure works with tag containing " and '
+      // ref https://vjayc.medium.com/convert-jinja2-array-into-js-array-python-cca6a70f17e
+      var temp_tags = "{{ tags }}";
+      var TAGS = Array.from(JSON.parse(temp_tags));
+    </script>
+
+  </head>
+
+  <body>
+    {# TODO term flash: verify that a flash message shows. #}
+    {% if term.flash_message %}
+    <p class='small-flash-notice'>{{ term.flash_message }}</p>
+    {% endif %}
+    {% include 'term/_form.html' %}
+  </body>
+
+</html>

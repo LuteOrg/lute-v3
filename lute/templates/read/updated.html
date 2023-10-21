@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <script type="text/javascript" src="/js/jquery.js" charset="utf-8"></script>
+    <style>
+      .flash {
+          margin-top: 20px;
+          padding: 20px;
+          background-color: #fff3cd;
+          border-color: #ffeeba;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div id="flash" class="flash">
+      <p>&quot;{{ term_text }}&quot; updated.</p>
+    </div>
+
+    <script>
+      let reload_text_div = function() {
+        const context = window.parent.document;
+        const textid = $('#textid', context).text();
+        const repel = $('#thetext', context);
+
+        // Force remove the old popup.
+        // ref https://stackoverflow.com/questions/19266886/
+        //   tooltip-not-disappearing
+        $('div.ui-tooltip', context).remove();
+
+        repel.load(`/read/sentences/${textid}`);
+      };
+
+      $(document).ready(function() {
+        top.frames.dictframe.location.href = '/read/empty';
+        reload_text_div();
+        $('#flash').delay(1000).fadeOut();
+      });
+    </script>
+
+  </body>
+
+</html>

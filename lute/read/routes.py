@@ -2,10 +2,11 @@
 /read endpoints.
 """
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect, url_for
 
 from lute.read.service import get_paragraphs
 from lute.term.model import Repository
+from lute.term.forms import TermForm
 from lute.models.book import Book, Text
 from lute.db import db
 
@@ -83,13 +84,19 @@ def sentences(textid):
         paragraphs=paragraphs)
 
 
+@bp.route('/empty', methods=['GET'])
+def empty():
+    "Show an empty/blank page."
+    return ''
+
+
 def _handle_form(term, form, text) -> bool:
     """
     Handle the read term form processing.
     Returns True if validated and saved.
     """
     if not form.validate_on_submit():
-        return True
+        return False
 
     form.populate_obj(term)
     if term.text_has_changed():
@@ -113,7 +120,7 @@ def _handle_form(term, form, text) -> bool:
     return ret
 
 
-# TODO: term form: ensure reading pane can create form with .
+# TODO: term form: ensure reading pane can create form with "." character
 @bp.route('/termform/<int:langid>/<text>', methods=['GET', 'POST'])
 def term_form(langid, text):
     """
@@ -124,12 +131,15 @@ def term_form(langid, text):
 
     form = TermForm(obj=term)
     if _handle_form(term, form, text):
-        return redirect(url_for('read.updated', term_text=term.text))
+        return render_template('/read/updated.html', term_text=term.text)
 
     return render_template(
-        '/read/frameform.html.twig',
+        '/read/frameform.html',
         form=form,
         term=term,
         showlanguageselector=False,
+
+        # TODO term tags: pass dynamic list.
+        tags=['apple', 'bear', 'cat'],
         parent_link_to_frame=True
     )
