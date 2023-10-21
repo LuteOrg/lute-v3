@@ -24,12 +24,10 @@ class TermForm(FlaskForm):
     # TODO term form: hide this, change to HiddenField
     original_text = StringField('OriginalText')
     text = StringField('Text', validators=[DataRequired()], render_kw={"placeholder": "Term"})
-
     parents = FieldList(StringField('parent'))
-
     translation = StringField('Translation', render_kw={"placeholder": "Translation"})
     romanization = StringField('Romanization', render_kw={"placeholder": "Pronunciation"})
     status = StringField('Status', render_kw={"placeholder": "Status"})
-    termtags = FieldList(StringField('termtag'))
+    term_tags = FieldList(StringField('termtag'))
     # TODO term form: hide this, change to HiddenField
     current_image = StringField('OriginalText')
