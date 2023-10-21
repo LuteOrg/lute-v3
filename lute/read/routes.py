@@ -5,6 +5,7 @@
 from flask import Blueprint, render_template
 
 from lute.read.service import get_paragraphs
+from lute.term.model import Repository
 from lute.models.book import Book, Text
 from lute.db import db
 
@@ -80,3 +81,55 @@ def sentences(textid):
     return render_template(
         'read/sentences.html',
         paragraphs=paragraphs)
+
+
+def _handle_form(term, form, text) -> bool:
+    """
+    Handle the read term form processing.
+    Returns True if validated and saved.
+    """
+    if not form.validate_on_submit():
+        return True
+
+    form.populate_obj(term)
+    if term.text_has_changed():
+        flash('Can only change term case.', 'error')
+        term.text = term.original_text
+        form = TermForm(obj=term)
+        return False
+
+    ret = False
+    try:
+        repo = Repository(current_app.db)
+        repo.add(term)
+        repo.commit()
+        flash(f'Term {term.text} updated', 'success')
+        ret = True
+    except IntegrityError as e:
+        # TODO term: better integrity error message - currently shows raw message.
+        # TODO check if used: not sure if this will ever occur
+        flash(e.orig.args, 'error')
+
+    return ret
+
+
+# TODO: term form: ensure reading pane can create form with .
+@bp.route('/termform/<int:langid>/<text>', methods=['GET', 'POST'])
+def term_form(langid, text):
+    """
+    Create or edit a term.
+    """
+    repo = Repository(db)
+    term = repo.find_or_new(langid, text)
+
+    form = TermForm(obj=term)
+    if _handle_form(term, form, text):
+        return redirect(url_for('read.updated', term_text=term.text))
+
+    return render_template(
+        '/read/frameform.html.twig',
+        form=form,
+        term=term,
+        showlanguageselector=False,
+        parent_link_to_frame=True
+    )
