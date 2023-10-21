@@ -60,6 +60,17 @@ class Repository:
         return self._build_business_term(dbt)
 
 
+    def find_or_new(self, langid, text):
+        """
+        Return a Term business object for the DBTerm with the langid and text.
+        If no match, return a new term with the text and language.
+        """
+        dbt = self._find_db_term_by_langid_and_text(langid, text)
+        if dbt is None:
+            return None
+        return self._build_business_term(dbt)
+
+
     def find_matches(self, langid, text, max_results=50):
         """
         Return array of Term business objects for the DBTerms

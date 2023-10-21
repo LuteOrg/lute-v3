@@ -37,7 +37,6 @@ def test_save_new(app_context, hello_term, repo):
     """
     Saving a simple Term object loads the database.
     """
-
     sql = "select WoText, WoTextLC, WoTokenCount from words"
     assert_sql_result(sql, [], 'empty table')
 
@@ -49,6 +48,22 @@ def test_save_new(app_context, hello_term, repo):
 
     term = repo.find(hello_term.language_id, hello_term.text)
     assert term.text == hello_term.text
+
+
+def test_save_new_multiword(app_context, hello_term, repo):
+    """
+    Zero-width strings are added between parsed tokens.
+    """
+    sql = "select WoText, WoTextLC, WoTokenCount from words"
+    assert_sql_result(sql, [], 'empty table')
+
+    hello_term.text = 'HELLO THERE'
+    repo.add(hello_term)
+    assert_sql_result(sql, [], 'Still empty')
+
+    repo.commit()
+    zws = "\u200B"
+    assert_sql_result(sql, [ f"HELLO{zws} {zws}THERE; hello{zws} {zws}there; 1" ], 'Saved')
 
 
 def test_save_updates_existing(english, app_context, hello_term, repo):
@@ -252,13 +267,68 @@ def test_find_only_looks_in_specified_language(spanish, english, repo):
     assert p is None, 'english terms not checked'
 
 
+def test_find_existing_multi_word(spanish, repo):
+    "Spaces etc handled correctly."
+    add_terms(spanish, ['una bebida'])
+    zws = "\u200B"
+    t = repo.find(spanish.id, f"una{zws} {zws}bebida")
+    assert t.id > 0
+    assert t.text == f"una{zws} {zws}bebida"
+
+    t = repo.find(spanish.id, f"una bebida")
+    assert t.id > 0
+    assert t.text == f"una{zws} {zws}bebida"
+
+
+## Find or new tests.
+
+def test_find_or_new_existing_word(spanish, repo):
+    "Existing term is found."
+    add_terms(spanish, ['BEBIDA'])
+    t = repo.find_or_new(spanish.id, 'bebida')
+    assert t.id > 0, 'exists'
+    assert t.text == "BEBIDA"
+
+
+def test_find_or_new_non_existing(spanish, repo):
+    "Returns new term."
+    t = repo.find_or_new(spanish.id, 'TENGO')
+    assert t.id == 0
+    assert t.text == "TENGO"
+
+
+def test_find_or_new_existing_multi_word(spanish, repo):
+    "Spaces etc handled correctly."
+    add_terms(spanish, ['una bebida'])
+    zws = "\u200B"
+    t = repo.find_or_new(spanish.id, f"una{zws} {zws}bebida")
+    assert t.id > 0
+    assert t.text == f"una{zws} {zws}bebida"
+
+    t = repo.find_or_new(spanish.id, f"una bebida")
+    assert t.id > 0
+    assert t.text == f"una{zws} {zws}bebida"
+
+
+def test_find_or_new_new_multi_word(spanish, repo):
+    "ZWS added correctly."
+    zws = "\u200B"
+    t = repo.find_or_new(spanish.id, f"una{zws} {zws}bebida")
+    assert t.id == 0
+    assert t.text == f"una{zws} {zws}bebida"
+
+    t = repo.find_or_new(spanish.id, f"una bebida")
+    assert t.id == 0
+    assert t.text == f"una{zws} {zws}bebida"
+
+
 ## Matches tests.
 
 @pytest.fixture(name="_multiple_terms")
 def fixture_multiple(english, spanish, app_context):
     "Create multiple terms for find_matches tests."
     add_terms(english, ['parent'])
-    add_terms(spanish, ['parent', 'pare', 'gato'])
+    add_terms(spanish, ['parent', 'pare', 'gato', 'tengo uno'])
 
 
 def test_find_matches_only_returns_language_matches(spanish, repo, _multiple_terms):
@@ -274,6 +344,15 @@ def test_find_matches_returns_empty_if_no_match_or_empty_string(spanish, repo, _
     for c in [ '', 'x' ]:
         matches = repo.find_matches(spanish.id, c)
         assert len(matches) == 0, c
+
+
+def test_find_matches_multiword_respects_zws(spanish, repo, _multiple_terms):
+    "zws are removed from the business objects."
+    zws = "\u200B"
+    for c in [ f"tengo{zws} {zws}uno", 'tengo uno', 'tengo' ]:
+        matches = repo.find_matches(spanish.id, c)
+        assert len(matches) == 1, f'have match for case "{c}"'
+        assert matches[0].text == 'tengo uno'
 
 
 # TOOD find_matches: exact sorts to top
