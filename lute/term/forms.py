@@ -3,7 +3,7 @@ Flask-wtf forms.
 """
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, SelectField, HiddenField, FieldList
+from wtforms import StringField, SelectField, FieldList  #, HiddenField
 from wtforms.validators import DataRequired
 
 

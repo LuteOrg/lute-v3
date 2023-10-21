@@ -4,7 +4,7 @@
 
 from flask import Blueprint, request, jsonify
 from lute.utils.data_tables import DataTablesFlaskParamParser
-from lute.models.book import Book
+# from lute.models.book import Book
 from lute.book.datatables import get_data_tables_list
 
 bp = Blueprint('book', __name__, url_prefix='/book')

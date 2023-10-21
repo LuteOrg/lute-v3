@@ -90,7 +90,6 @@ class TermTextChangedException(Exception):
     Terms cannot change their text once saved,
     except for the text case.
     """
-    pass
 
 
 class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instance-attributes
@@ -192,7 +191,6 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         new_text_lc = lang.get_lowercase(t)
 
         text_changed = old_text_lc is not None and new_text_lc != old_text_lc
-        print(f'check text_changed: old = {old_text_lc}, new = {new_text_lc}; equal? {new_text_lc == old_text_lc}; self.id = {self.id}')
         if self.id is not None and text_changed:
             msg = f"Cannot change text of term '{self.text}' (id = {self.id}) once saved."
             raise TermTextChangedException(msg)

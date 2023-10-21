@@ -259,4 +259,3 @@ def test_changing_text_of_non_saved_Term_is_ok(english):
     "Changing text should throw."
     term = Term(english, 'ABC')
     term.text = 'DEF'
-

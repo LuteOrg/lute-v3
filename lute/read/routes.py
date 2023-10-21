@@ -3,7 +3,8 @@
 """
 
 from sqlalchemy.exc import IntegrityError
-from flask import Blueprint, render_template, redirect, url_for, flash
+
+from flask import Blueprint, render_template, flash
 
 from lute.read.service import get_paragraphs
 from lute.term.model import Repository
@@ -91,7 +92,7 @@ def empty():
     return ''
 
 
-def _handle_form(term, form, text) -> bool:
+def _handle_form(term, form) -> bool:
     """
     Handle the read term form processing.
     Returns True if validated and saved.
@@ -111,8 +112,14 @@ def _handle_form(term, form, text) -> bool:
         repo = Repository(db)
         repo.add(term)
         repo.commit()
-        flash(f'Term {term.text} updated', 'success')
+
+        # Don't add a flash message here.  When the reading term is
+        # updated, it shows the read/updated.html template, which has
+        # its own "flash" message.  Adding a flash here would send the
+        # message to the base.html template.
+        # flash(f'Term {term.text} updated', 'success')
         ret = True
+
     except IntegrityError as e:
         # TODO term: better integrity error message - currently shows raw message.
         # TODO check if used: not sure if this will ever occur
@@ -131,7 +138,7 @@ def term_form(langid, text):
     term = repo.find_or_new(langid, text)
 
     form = TermForm(obj=term)
-    if _handle_form(term, form, text):
+    if _handle_form(term, form):
         return render_template('/read/updated.html', term_text=term.text)
 
     return render_template(
