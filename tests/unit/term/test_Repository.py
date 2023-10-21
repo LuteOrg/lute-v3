@@ -17,8 +17,21 @@ from lute.term.model import Term, Repository
 def fixture_repo():
     return Repository(db)
 
+@pytest.fixture(name='hello_term')
+def fixture_hello_term(english):
+    """
+    Term business object with some defaults,
+    no tags or parents.
+    """
+    t = Term()
+    t.language_id = english.id
+    t.text = 'HELLO'
+    t.current_image = 'hello.png'
+    t.flash_message = 'hello flash'
+    return t
 
-def test_save_new(english, app_context, repo):
+
+def test_save_new(english, app_context, hello_term, repo):
     """
     Saving a simple Term object loads the database.
     """
@@ -26,18 +39,14 @@ def test_save_new(english, app_context, repo):
     sql = "select WoText, WoTextLC, WoTokenCount from words"
     assert_sql_result(sql, [], 'empty table')
 
-    t = Term()
-    t.language_id = english.id
-    t.text = 'HELLO'
-
-    repo.add(t)
+    repo.add(hello_term)
     assert_sql_result(sql, [], 'Still empty')
 
     repo.commit()
     assert_sql_result(sql, [ "HELLO; hello; 1" ], 'Saved')
 
 
-def test_save_updates_existing(english, app_context, repo):
+def test_save_updates_existing(english, app_context, hello_term, repo):
     """
     Saving Term updates an existing term if the text and lang
     matches.
@@ -49,12 +58,11 @@ def test_save_updates_existing(english, app_context, repo):
     sql = "select WoID, WoText, WoStatus from words"
     assert_sql_result(sql, [f'{term.id}; HELLO; 1'], 'have term')
 
-    t = Term()
-    t.language_id = english.id
-    t.text = 'hello'
-    t.status = 5
+    hello_term.language_id = english.id
+    hello_term.text = 'hello'
+    hello_term.status = 5
 
-    repo.add(t)
+    repo.add(hello_term)
     repo.commit()
     assert_sql_result(sql, [f'{term.id}; hello; 5'], 'have term, status changed')
 
@@ -91,7 +99,7 @@ def test_save_existing_replaces_tags(english, app_context, repo):
     assert_sql_result(sql, [ 'a', 'b', 'c' ], 'Source tags still exist')
 
 
-def test_save_uses_existing_TermTags(english, app_context, repo):
+def test_save_uses_existing_TermTags(english, app_context, repo, hello_term):
     "Don't create new TermTag records if they already exist."
     db.session.add(TermTag('a'))
     db.session.commit()
@@ -103,13 +111,33 @@ def test_save_uses_existing_TermTags(english, app_context, repo):
     order by TgText"""
     assert_sql_result(sql, [ '1; a; None' ], 'a tag exists')
 
-    t = Term()
-    t.language_id = english.id
-    t.text = 'hello'
-    t.term_tags = [ 'a', 'b' ]
-    repo.add(t)
+    hello_term.term_tags = [ 'a', 'b' ]
+    repo.add(hello_term)
     repo.commit()
-    assert_sql_result(sql, [ '1; a; hello', '2; b; hello' ], 'a used, b created')
+    assert_sql_result(sql, [ '1; a; HELLO', '2; b; HELLO' ], 'a used, b created')
+
+
+## Saving and parents.
+
+def test_save_with_new_parent(app_context, repo, hello_term):
+    """
+    Given a Term with parents = [ 'newparent' ],
+    new parent DBTerm is created, and is assigned translation and image and tag.
+    """
+    hello_term.parents = [ 'parent' ]
+    hello_term.term_tags = [ 'a', 'b' ]
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result('select WoText from words', [ 'HELLO', 'parent' ], 'parent created')
+
+    parent = repo.find_by_langid_and_text(hello_term.language_id, 'parent')
+    assert isinstance(parent, Term), 'is a Term bus. object'
+    assert parent.text == 'parent'
+    assert parent.term_tags == hello_term.term_tags
+    assert parent.term_tags == [ 'a', 'b' ]  # just spelling it out.
+    assert parent.translation == hello_term.translation
+    assert parent.current_image == hello_term.current_image
+    assert parent.parents == []
 
 
 ## Find tests.
