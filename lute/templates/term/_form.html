@@ -1,6 +1,12 @@
 {# TODO term tags: pass dynamic list #}
 {# TODO term form: all the things #}
 
+{% with messages = get_flashed_messages('error') %}
+{% for message in messages %}
+<div class="flash-notice-narrow">{{ message[1] }}</div>
+{% endfor %}
+{% endwith %}
+
 {% for field_name, field_errors in form.errors.items() %}
 <p>{{ field_name }}
   <ul>

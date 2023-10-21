@@ -4,23 +4,23 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>Form</title>
     
-    <link rel="stylesheet" type="text/css" href="/css/jquery-ui.css" />
-    <link rel="stylesheet" type="text/css" href="/css/jquery.tagit.css" />
-    <link rel="stylesheet" type="text/css" href="/css/styles.css" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-ui.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery.tagit.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
 
     <!-- override most of the elements in styles with more compact css. -->
-    <link rel="stylesheet" type="text/css" href="/css/styles-compact.css" />
-    
-    <script type="text/javascript" src="/js/jquery.js" charset="utf-8"></script>
-    <script type="text/javascript" src="/js/jquery-ui.min.js"  charset="utf-8"></script>
-    <script type="text/javascript" src="/js/jquery.jeditable.mini.js" charset="utf-8"></script>
-    <script type="text/javascript" src="/js/tag-it.js" charset="utf-8"></script>
-    <script type="text/javascript" src="/js/jquery.hoverIntent.js" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles-compact.css') }}" />
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.scrollTo.min.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"  charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.jeditable.mini.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/tag-it.js') }}" charset="utf-8"></script>
 
     <script type="text/javascript">
       // TODO term tags: ensure works with tag containing " and '
       // ref https://vjayc.medium.com/convert-jinja2-array-into-js-array-python-cca6a70f17e
-      var temp_tags = "{{ tags | safe }}";
+      var temp_tags = '{{ tags | tojson }}';
       var TAGS = Array.from(JSON.parse(temp_tags));
     </script>
 

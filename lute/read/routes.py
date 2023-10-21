@@ -140,6 +140,6 @@ def term_form(langid, text):
         showlanguageselector=False,
 
         # TODO term tags: pass dynamic list.
-        tags=[ 'apple', 'bear', 'cat' ],
+        tags=[ "apple", "bear", "cat" ],
         parent_link_to_frame=True
     )

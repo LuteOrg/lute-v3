@@ -35,6 +35,13 @@
      border-color: #ffeeba;
  }
 
+ .flash-notice-narrow {
+     margin-top: 2px;
+     padding: 2px;
+     background-color: #fff3cd;
+     border-color: #ffeeba;
+ }
+
  .small-flash-notice {
      margin-top: 3px;
      padding: 3px;
