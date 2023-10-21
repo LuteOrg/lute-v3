@@ -274,6 +274,9 @@ def test_find_matches_returns_empty_if_no_match_or_empty_string(spanish, repo, _
         assert len(matches) == 0, c
 
 
+# TOOD find_matches: exact sorts to top
+# TOOD find_matches: parents sort to top
+
 # TODO test coverage: implement more tests
 # def test_save_and_remove(empty_db, english):
 # def test_add_and_remove_parents(spanish):
