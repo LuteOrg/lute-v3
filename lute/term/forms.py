@@ -11,4 +11,6 @@ class TermForm(FlaskForm):
     """
     Term.
     """
-    text = StringField('Text', validators=[DataRequired()])
+
+    # TODO term form: add fields
+    text = StringField('Text', validators=[DataRequired()], render_kw={"placeholder": "Term"})
