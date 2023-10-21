@@ -5,8 +5,8 @@ Terms are converted to and from lute.models.term.Term objects to save
 them in the database.
 """
 
-from sqlalchemy import and_, func
 import functools
+from sqlalchemy import and_
 
 from lute.db import db
 from lute.models.term import Term as DBTerm, TermTag

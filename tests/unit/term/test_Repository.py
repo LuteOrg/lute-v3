@@ -246,6 +246,7 @@ def test_find_not_found_returns_none(spanish, repo):
 
 
 def test_find_only_looks_in_specified_language(spanish, english, repo):
+    "Only search language."
     add_terms(english, ['hola'])
     p = repo.find(spanish.id, 'hola')
     assert p is None, 'english terms not checked'
@@ -255,6 +256,7 @@ def test_find_only_looks_in_specified_language(spanish, english, repo):
 
 @pytest.fixture(name="_multiple_terms")
 def fixture_multiple(english, spanish, app_context):
+    "Create multiple terms for find_matches tests."
     add_terms(english, ['parent'])
     add_terms(spanish, ['parent', 'pare', 'gato'])
 
