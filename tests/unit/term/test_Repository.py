@@ -26,6 +26,7 @@ def fixture_hello_term(english):
     t = Term()
     t.language_id = english.id
     t.text = 'HELLO'
+    t.translation = 'greeting'
     t.current_image = 'hello.png'
     t.flash_message = 'hello flash'
     return t
@@ -140,6 +141,59 @@ def test_save_with_new_parent(app_context, repo, hello_term):
     assert parent.parents == []
 
 
+def test_cant_set_term_as_its_own_parent(app_context, repo, hello_term):
+    """
+    Would create obvious circular ref
+    """
+    hello_term.parents = [ hello_term.text ]
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result('select WoText from words', [ 'HELLO' ], 'term entered')
+    assert_sql_result('select * from wordparents', [], 'no records')
+
+
+@pytest.fixture(name="existing_parent")
+def fixture_existing_parent(app_context, english):
+    term = DBTerm(english, 'parent')
+    db.session.add(term)
+    db.session.commit()
+    return term
+
+
+def test_save_with_existing_parent_creates_link(app_context, repo, hello_term, existing_parent):
+    """
+    new parent link is created, and is assigned translation and image and tag.
+    """
+
+    sql = "select WoID, WoText from words"
+    assert_sql_result(sql, [ '1; parent' ], 'initial state')
+
+    hello_term.parents = [ 'parent' ]
+    hello_term.term_tags = [ 'a', 'b' ]
+    dbterm = repo.add(hello_term)
+    repo.commit()
+
+    assert_sql_result(sql, [ '1; parent', '2; HELLO' ], 'new record added')
+    assert len(dbterm.parents) == 1
+    assert dbterm.parents[0].text == 'parent'
+
+
+def test_save_existing_parent_gets_translation_if_missing(app_context, repo, hello_term, existing_parent):
+    """
+    Translation and image applied if missing.
+    """
+
+    sql = "select WoID, WoText, WoTranslation from words"
+    assert_sql_result(sql, [ '1; parent; None' ], 'initial state')
+
+    hello_term.parents = [ 'parent' ]
+    hello_term.term_tags = [ 'a', 'b' ]
+    dbterm = repo.add(hello_term)
+    repo.commit()
+
+    assert_sql_result(sql, [ '1; parent; greeting', '2; HELLO; greeting' ], 'transl saved')
+
+
 ## Find tests.
 
 def test_find_by_id(empty_db, english, repo):
@@ -162,10 +216,17 @@ def test_find_by_id(empty_db, english, repo):
     assert term.term_tags == [ 'a', 'b' ]
 
 
-def test_find_by_id_throws_if_bad_id(empty_db, english, repo):
+def test_find_by_id_throws_if_bad_id(app_context, english, repo):
     "If app says term id = 7 exists, and it doesn't, that's a problem."
     with pytest.raises(ValueError):
         repo.find_by_id(9876)
+
+
+def test_find_by_langid_and_text_returns_new_if_no_match(app_context, english, repo):
+    term = repo.find_by_langid_and_text(english.id, 'newone')
+    assert term.id == None, 'new entry'
+    assert term.language_id == english.id
+    assert term.text == 'newone'
 
 
 # def test_save_and_remove(empty_db, english):

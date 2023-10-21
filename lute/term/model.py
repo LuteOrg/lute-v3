@@ -60,9 +60,12 @@ class Repository:
     def add(self, term):
         """
         Add a term to be saved to the db session.
+        Returns DB Term for tests and verification only,
+        clients should not change it.
         """
         dbterm = self._build_db_term(term)
         self.db.session.add(dbterm)
+        return dbterm
 
 
     def commit(self):
@@ -119,6 +122,7 @@ class Repository:
             if p is not None and p != '' and
             lang.get_lowercase(term.text) != lang.get_lowercase(p)
         ]
+        print('creating parents: ' + ', '.join(create_parents))
         for p in create_parents:
             termparents.append(self._find_or_create_parent(p, lang, term, termtags))
         t.remove_all_parents()
