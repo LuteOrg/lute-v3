@@ -2,7 +2,7 @@
 /read endpoints.
 """
 
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, flash
 
 from lute.read.service import get_paragraphs
 from lute.term.model import Repository
@@ -140,6 +140,6 @@ def term_form(langid, text):
         showlanguageselector=False,
 
         # TODO term tags: pass dynamic list.
-        tags=['apple', 'bear', 'cat'],
+        tags=[ 'apple', 'bear', 'cat' ],
         parent_link_to_frame=True
     )

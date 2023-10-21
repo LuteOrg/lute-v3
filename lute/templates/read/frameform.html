@@ -20,7 +20,7 @@
     <script type="text/javascript">
       // TODO term tags: ensure works with tag containing " and '
       // ref https://vjayc.medium.com/convert-jinja2-array-into-js-array-python-cca6a70f17e
-      var temp_tags = "{{ tags }}";
+      var temp_tags = "{{ tags | safe }}";
       var TAGS = Array.from(JSON.parse(temp_tags));
     </script>
 

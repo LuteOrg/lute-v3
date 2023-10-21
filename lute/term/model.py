@@ -21,7 +21,8 @@ class Term: # pylint: disable=too-many-instance-attributes
     def __init__(self):
         self.id = None
         self.language_id = None
-        self.original_text = None  # The original text given to the DTO, to track changes.
+        # The original text given to the DTO, to track changes.
+        self.original_text = None
         self.text = None
         self.status = 1
         self.translation = None
@@ -31,6 +32,9 @@ class Term: # pylint: disable=too-many-instance-attributes
         self.parents = []
         self.current_image = None
 
+    # TODO term form: case change allowed
+    def text_has_changed(self):
+        return self.original_text != self.text
 
 class Repository:
     """

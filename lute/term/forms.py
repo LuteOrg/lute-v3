@@ -18,7 +18,7 @@ class TermForm(FlaskForm):
     language = SelectField(
         'Language',
         choices=[
-            (1, 'English'),
+            (3, 'English'),
         ])
 
     # TODO term form: hide this, change to HiddenField
