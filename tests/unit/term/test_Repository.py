@@ -47,6 +47,9 @@ def test_save_new(app_context, hello_term, repo):
     repo.commit()
     assert_sql_result(sql, [ "HELLO; hello; 1" ], 'Saved')
 
+    term = repo.find(hello_term.language_id, hello_term.text)
+    assert term.text == hello_term.text
+
 
 def test_save_updates_existing(english, app_context, hello_term, repo):
     """
@@ -240,6 +243,35 @@ def test_find_not_found_returns_none(spanish, repo):
     "No match = none."
     p = repo.find(spanish.id, 'unknown_term')
     assert p is None, 'nothing found'
+
+
+def test_find_only_looks_in_specified_language(spanish, english, repo):
+    add_terms(english, ['hola'])
+    p = repo.find(spanish.id, 'hola')
+    assert p is None, 'english terms not checked'
+
+
+## Matches tests.
+
+@pytest.fixture(name="_multiple_terms")
+def fixture_multiple(english, spanish, app_context):
+    add_terms(english, ['parent'])
+    add_terms(spanish, ['parent', 'pare', 'gato'])
+
+
+def test_find_matches_only_returns_language_matches(spanish, repo, _multiple_terms):
+    "Searches match the start of string."
+    for c in [ 'PARE', 'pare', 'PAR' ]:
+        matches = repo.find_matches(spanish.id, c)
+        assert len(matches) == 2, c
+        assert matches[0].text == 'parent'
+
+
+def test_find_matches_returns_empty_if_no_match_or_empty_string(spanish, repo, _multiple_terms):
+    "Empty if no match."
+    for c in [ '', 'x' ]:
+        matches = repo.find_matches(spanish.id, c)
+        assert len(matches) == 0, c
 
 
 # TODO test coverage: implement more tests

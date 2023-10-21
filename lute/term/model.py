@@ -5,6 +5,9 @@ Terms are converted to and from lute.models.term.Term objects to save
 them in the database.
 """
 
+from sqlalchemy import and_, func
+import functools
+
 from lute.db import db
 from lute.models.term import Term as DBTerm, TermTag
 from lute.models.language import Language
@@ -55,6 +58,50 @@ class Repository:
         if dbt is None:
             return None
         return self._build_business_term(dbt)
+
+
+    def find_matches(self, langid, text, max_results=50):
+        """
+        Return array of Term business objects for the DBTerms
+        with the same langid, matching the text.
+        If no match, return [].
+        """
+
+        lang = Language.find(langid)
+        text_lc = lang.get_lowercase(text)
+        search = text_lc.strip() if text_lc else ''
+        if search == '':
+            return []
+
+        matches = self.db.session.query(DBTerm).filter(
+            and_(
+                DBTerm.language_id == langid,
+                DBTerm.text_lc.like(search + '%')
+            )
+        ).all()
+
+        exact = [t for t in matches if t.text_lc == text_lc]
+
+        def compare(item1, item2):
+            c1 = len(item1.children)
+            c2 = len(item2.children)
+            if c1 < c2:
+                return -1
+            if c2 > c1:
+                return 1
+            t1 = item1.text_lc
+            t2 = item2.text_lc
+            if t1 < t2:
+                return -1
+            if t1 > t2:
+                return 1
+            return 0
+
+        remaining = [t for t in matches if t.text_lc != text_lc]
+        remaining.sort(key=functools.cmp_to_key(compare))
+        ret = exact + matches
+        ret = ret[:max_results]
+        return [self._build_business_term(t) for t in matches]
 
 
     def add(self, term):
