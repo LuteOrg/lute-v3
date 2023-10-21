@@ -6,11 +6,11 @@ them in the database.
 """
 
 from lute.db import db
-from lute.models.term import Term as DBTerm, TermTag, TermFlashMessage, TermImage
+from lute.models.term import Term as DBTerm, TermTag
 from lute.models.language import Language
 
 
-class Term:
+class Term: # pylint: disable=too-many-instance-attributes
     """
     Term business object.  All class members are primitives.
     """
@@ -34,8 +34,8 @@ class Repository:
     Maps Term BO to and from lute.model.Term.
     """
 
-    def __init__(self, db):
-        self.db = db
+    def __init__(self, _db):
+        self.db = _db
 
 
     def find_by_id(self, term_id):
@@ -93,9 +93,9 @@ class Repository:
         "Convert a term business object to a DBTerm."
         lang = Language.find(term.language_id)
         if lang is None:
-            raise Exception(f'Unknown language {term.language_id} for term')
+            raise ValueError(f'Unknown language {term.language_id} for term')
         if term.text is None:
-            raise Exception('Text not set for term')
+            raise ValueError('Text not set for term')
 
         t = self._find_db_term_by_langid_and_text(lang.id, term.text)
         if t is None:
@@ -168,10 +168,9 @@ class Repository:
         term.status = dbterm.status
         term.translation = dbterm.translation
         term.romanization = dbterm.romanization
-        term.token_count = dbterm.token_count
         term.current_image = dbterm.get_current_image()
         term.flash_message = dbterm.get_flash_message()
-        term.term_parents = [p.text for p in dbterm.parents]
+        term.parents = [p.text for p in dbterm.parents]
         term.romanization = dbterm.romanization
         term.term_tags = [tt.text for tt in dbterm.term_tags]
 

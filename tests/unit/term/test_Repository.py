@@ -9,8 +9,8 @@ import pytest
 
 from lute.models.term import Term as DBTerm, TermTag
 from lute.db import db
-from tests.dbasserts import assert_sql_result
 from lute.term.model import Term, Repository
+from tests.dbasserts import assert_sql_result
 
 
 @pytest.fixture(name='repo')
@@ -32,7 +32,7 @@ def fixture_hello_term(english):
     return t
 
 
-def test_save_new(english, app_context, hello_term, repo):
+def test_save_new(app_context, hello_term, repo):
     """
     Saving a simple Term object loads the database.
     """
@@ -100,7 +100,7 @@ def test_save_existing_replaces_tags(english, app_context, repo):
     assert_sql_result(sql, [ 'a', 'b', 'c' ], 'Source tags still exist')
 
 
-def test_save_uses_existing_TermTags(english, app_context, repo, hello_term):
+def test_save_uses_existing_TermTags(app_context, repo, hello_term):
     "Don't create new TermTag records if they already exist."
     db.session.add(TermTag('a'))
     db.session.commit()
@@ -152,15 +152,16 @@ def test_cant_set_term_as_its_own_parent(app_context, repo, hello_term):
     assert_sql_result('select * from wordparents', [], 'no records')
 
 
-@pytest.fixture(name="existing_parent")
+@pytest.fixture(name="_existing_parent")
 def fixture_existing_parent(app_context, english):
+    "Create an existing parent."
     term = DBTerm(english, 'parent')
     db.session.add(term)
     db.session.commit()
     return term
 
 
-def test_save_with_existing_parent_creates_link(app_context, repo, hello_term, existing_parent):
+def test_save_with_existing_parent_creates_link(app_context, repo, hello_term, _existing_parent):
     """
     new parent link is created, and is assigned translation and image and tag.
     """
@@ -178,7 +179,9 @@ def test_save_with_existing_parent_creates_link(app_context, repo, hello_term, e
     assert dbterm.parents[0].text == 'parent'
 
 
-def test_save_existing_parent_gets_translation_if_missing(app_context, repo, hello_term, existing_parent):
+def test_save_existing_parent_gets_translation_if_missing(
+        app_context, repo, hello_term, _existing_parent
+):
     """
     Translation and image applied if missing.
     """
@@ -188,7 +191,7 @@ def test_save_existing_parent_gets_translation_if_missing(app_context, repo, hel
 
     hello_term.parents = [ 'parent' ]
     hello_term.term_tags = [ 'a', 'b' ]
-    dbterm = repo.add(hello_term)
+    repo.add(hello_term)
     repo.commit()
 
     assert_sql_result(sql, [ '1; parent; greeting', '2; HELLO; greeting' ], 'transl saved')
@@ -216,241 +219,26 @@ def test_find_by_id(empty_db, english, repo):
     assert term.term_tags == [ 'a', 'b' ]
 
 
-def test_find_by_id_throws_if_bad_id(app_context, english, repo):
+def test_find_by_id_throws_if_bad_id(app_context, repo):
     "If app says term id = 7 exists, and it doesn't, that's a problem."
     with pytest.raises(ValueError):
         repo.find_by_id(9876)
 
 
 def test_find_by_langid_and_text_returns_new_if_no_match(app_context, english, repo):
+    "If no lang/text match, return a new one, as user will want to fill it in."
     term = repo.find_by_langid_and_text(english.id, 'newone')
-    assert term.id == None, 'new entry'
+    assert term.id is None, 'new entry'
     assert term.language_id == english.id
     assert term.text == 'newone'
 
 
+# TODO test coverage: implement more tests
 # def test_save_and_remove(empty_db, english):
-#     "Smoke test of mappings and db records."
-#     sql = "select WoText, WoTextLC, WoTokenCount from words"
-#     assert_sql_result(sql, [], 'empty table')
-# 
-#     term = Term()
-#     term.language = english
-#     term.text = 'ABC'
-# 
-#     db.session.add(term)
-#     db.session.commit()
-#     assert_sql_result(sql, ['ABC; abc; 1'], 'have term')
-# 
-#     db.session.delete(term)
-#     db.session.commit()
-#     assert_sql_result(sql, [], 'no terms')
-# 
-# 
-# def test_term_with_parent_and_tags(empty_db, spanish):
-#     "Misc data check - parent and tags are saved."
-#     term = Term(spanish, "HOLA")
-#     parent = Term(spanish, "PARENT")
-#     term.add_parent(parent)
-# 
-#     tg = TermTag('tag')
-#     term.add_term_tag(tg)
-# 
-#     db.session.add(term)
-#     db.session.commit()
-# 
-#     sql = "select WoID, WoText, WoTextLC from words"
-#     expected = [ "1; HOLA; hola", "2; PARENT; parent" ]
-#     assert_sql_result(sql, expected, "sanity check on save")
-# 
-#     assert_sql_result("select WpWoID, WpParentWoID from wordparents", [ '1; 2' ], 'wp')
-# 
-#     # Hacky sql check.
-#     sql = """select w.WoText, p.WoText as ptext, tags.TgText
-#         FROM words w
-#         INNER JOIN wordparents on WpWoID = w.WoID
-#         INNER JOIN words p on p.WoID = wordparents.WpParentWoID
-#         INNER JOIN wordtags on WtWoID = w.WoID
-#         INNER JOIN tags on TgID = WtTgID"""
-#     exp = [ "HOLA; PARENT; tag" ]
-#     assert_sql_result(sql, exp, "parents, tags")
-# 
-# 
-# def test_term_parent_with_two_children(spanish):
-#     "Both children get saved in the db."
-#     term = Term(spanish, "HOLA")
-#     gato = Term(spanish, "gato")
-#     parent = Term(spanish, "PARENT")
-#     gato.add_parent(parent)
-#     term.add_parent(parent)
-# 
-#     db.session.add(term)
-#     db.session.add(gato)
-#     db.session.commit()
-# 
-#     parent_get = Term.find(parent.id)
-#     assert parent_get.text == "PARENT"
-#     assert len(parent_get.children) == 2
-# 
-#     expected = [
-#         f"{term.id}; {parent.id}",
-#         f"{gato.id}; {parent.id}"
-#     ]
-#     expected.sort()
-#     sql = """select WpWoID, WpParentWoID
-#     from wordparents order by WpWoID"""
-#     assert_sql_result(sql, expected, 'wp')
-# 
-# 
 # def test_add_and_remove_parents(spanish):
-#     "Parent mappings."
-#     term = Term(spanish, "HOLA")
-#     p1 = Term(spanish, "parent")
-#     p2 = Term(spanish, "otro")
-#     term.add_parent(p1)
-#     term.add_parent(p2)
-# 
-#     db.session.add(term)
-#     db.session.commit()
-# 
-#     sql = """select WpWoID, WpParentWoID
-#     from wordparents order by WpWoID, WpParentWoID"""
-# 
-#     expected = [
-#         f"{term.id}; {p1.id}",
-#         f"{term.id}; {p2.id}",
-#     ]
-#     expected.sort()
-#     assert_sql_result(sql, expected, 'after change')
-# 
-#     term.remove_all_parents()
-#     db.session.add(term)
-#     db.session.commit()
-#     assert_sql_result(sql, [], 'all removed')
-# 
-# 
 # def test_remove_parent_leaves_children_in_db(spanish):
-#     "Child deletion doesn't delete the parent."
-#     term = Term(spanish, "HOLA")
-#     parent = Term(spanish, "PARENT")
-#     term.add_parent(parent)
-# 
-#     db.session.add(term)
-#     db.session.commit()
-#     sql_list = "select WoText from words order by WoText"
-#     sql = f"""select w.WoText, p.WoText as ptext from words w
-#     left join wordparents on WpWoID = w.WoID
-#     left join words p on p.WoID = wordparents.WpParentWoID
-#     where w.WoID = {term.id}"""
-#     assert_sql_result(sql_list, [ "HOLA", "PARENT" ], "both exist")
-#     assert_sql_result(sql, [ "HOLA; PARENT" ], "parent set")
-# 
-#     db.session.delete(parent)
-#     db.session.commit()
-#     assert_sql_result(sql_list, [ "HOLA" ], "parent removed")
-#     assert_sql_result(sql, [ "HOLA; None" ], "parent not set")
-# 
-# 
 # def test_removing_term_with_parent_and_tag(empty_db, spanish):
-#     """
-#     Both the parent and the tag are left.
-#     """
-#     term = Term(spanish, "HOLA")
-#     parent = Term(spanish, "PARENT")
-#     term.add_parent(parent)
-#     tg = TermTag('tag')
-#     term.add_term_tag(tg)
-# 
-#     db.session.add(term)
-#     db.session.commit()
-#     sqllist = "select WoText from words order by WoText"
-#     sqltags = "select TgText from tags"
-#     assert_sql_result(sqllist, [ "HOLA", "PARENT" ], "both exist")
-#     assert_sql_result(sqltags, [ "tag" ], "tag exists")
-# 
-#     db.session.delete(term)
-#     db.session.commit()
-#     assert_sql_result(sqllist, [ "PARENT" ], "parent left")
-#     assert_sql_result(sqltags, [ "tag" ], "tag left")
-# 
-# 
 # def test_save_replace_remove_image(spanish):
-#     "Save saves the associated image."
-#     t = Term(spanish, "HOLA")
-#     t.set_current_image('hello.png')
-#     assert t.get_current_image() == 'hello.png'
-# 
-#     db.session.add(t)
-#     db.session.commit()
-#     sql = "select WiWoID, WiSource from wordimages"
-#     expected = ["1; hello.png"]
-#     assert_sql_result(sql, expected, "hello")
-# 
-#     t.set_current_image('there.png')
-#     assert t.get_current_image() == 'there.png'
-# 
-#     db.session.add(t)
-#     db.session.commit()
-#     expected = ["1; there.png"]
-#     assert_sql_result(sql, expected, "there")
-# 
-#     t.set_current_image(None)
-#     assert t.get_current_image() is None
-# 
-#     db.session.add(t)
-#     db.session.commit()
-#     expected = []
-#     assert_sql_result(sql, expected, "removed")
-# 
-# 
 # def test_delete_term_deletes_image(spanish):
-#     "Check cascade delete."
-#     t = Term(spanish, "HOLA")
-#     t.set_current_image('hello.png')
-#     assert t.get_current_image() == 'hello.png'
-# 
-#     db.session.add(t)
-#     db.session.commit()
-#     sql = "select WiWoID, WiSource from wordimages"
-#     expected = ["1; hello.png"]
-#     assert_sql_result(sql, expected, "hello")
-# 
-#     db.session.delete(t)
-#     db.session.commit()
-#     assert_sql_result(sql, [], "removed")
-# 
-# 
 # def test_save_remove_flash_message(spanish):
-#     "Flash message is associated with term, can be popped."
-#     t = Term(spanish, "HOLA")
-#     t.set_flash_message('hello')
-#     assert t.get_flash_message() == 'hello'
-# 
-#     db.session.add(t)
-#     db.session.commit()
-#     sql = "select WfWoID, WfMessage from wordflashmessages"
-#     expected = ["1; hello"]
-#     assert_sql_result(sql, expected, "hello")
-# 
-#     assert t.pop_flash_message() == 'hello', 'popped'
-#     assert t.get_flash_message() is None, 'no message now'
-# 
-#     db.session.add(t)
-#     db.session.commit()
-#     assert_sql_result(sql, [], "popped")
-# 
-# 
 # def test_delete_term_deletes_flash_message(spanish):
-#     "Check cascade delete."
-#     t = Term(spanish, "HOLA")
-#     t.set_flash_message('hello')
-# 
-#     db.session.add(t)
-#     db.session.commit()
-#     sql = "select WfWoID, WfMessage from wordflashmessages"
-#     expected = ["1; hello"]
-#     assert_sql_result(sql, expected, "hello")
-# 
-#     db.session.delete(t)
-#     db.session.commit()
-#     assert_sql_result(sql, [], "popped")
