@@ -2,7 +2,8 @@
 Term mapping tests.
 """
 
-from lute.models.term import Term, TermTag
+import pytest
+from lute.models.term import Term, TermTag, TermTextChangedException
 from lute.db import db
 from tests.dbasserts import assert_sql_result
 
@@ -230,3 +231,32 @@ def test_delete_term_deletes_flash_message(spanish):
     db.session.delete(t)
     db.session.commit()
     assert_sql_result(sql, [], "popped")
+
+
+## Changing term text isn't allowed -- changing case is ok.
+
+@pytest.mark.term_case
+def test_changing_text_of_saved_Term_throws(english):
+    "Changing text should throw."
+    term = Term(english, 'ABC')
+    db.session.add(term)
+    db.session.commit()
+
+    with pytest.raises(TermTextChangedException):
+        term.text = 'DEF'
+
+@pytest.mark.term_case
+def test_changing_case_only_of_text_of_saved_Term_is_ok(english):
+    "Changing text should throw."
+    term = Term(english, 'ABC')
+    db.session.add(term)
+    db.session.commit()
+
+    term.text = 'abc'
+
+@pytest.mark.term_case
+def test_changing_text_of_non_saved_Term_is_ok(english):
+    "Changing text should throw."
+    term = Term(english, 'ABC')
+    term.text = 'DEF'
+

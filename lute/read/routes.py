@@ -2,6 +2,7 @@
 /read endpoints.
 """
 
+from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, render_template, redirect, url_for, flash
 
 from lute.read.service import get_paragraphs
@@ -107,7 +108,7 @@ def _handle_form(term, form, text) -> bool:
 
     ret = False
     try:
-        repo = Repository(current_app.db)
+        repo = Repository(db)
         repo.add(term)
         repo.commit()
         flash(f'Term {term.text} updated', 'success')
