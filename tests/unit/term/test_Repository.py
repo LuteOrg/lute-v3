@@ -11,6 +11,7 @@ from lute.models.term import Term as DBTerm, TermTag
 from lute.db import db
 from lute.term.model import Term, Repository
 from tests.dbasserts import assert_sql_result
+from tests.utils import add_terms
 
 
 @pytest.fixture(name='repo')
@@ -83,7 +84,7 @@ def test_save_existing_replaces_tags(english, app_context, repo):
     where WtWoID = {dbterm.id}"""
     assert_sql_result(sql, [ 'a', 'b' ], 'have term tags')
 
-    term = repo.find_by_id(dbterm.id)
+    term = repo.load(dbterm.id)
     assert term.term_tags == [ 'a', 'b' ]
 
     term.term_tags = [ 'a', 'c' ]
@@ -131,7 +132,7 @@ def test_save_with_new_parent(app_context, repo, hello_term):
     repo.commit()
     assert_sql_result('select WoText from words', [ 'HELLO', 'parent' ], 'parent created')
 
-    parent = repo.find_by_langid_and_text(hello_term.language_id, 'parent')
+    parent = repo.find(hello_term.language_id, 'parent')
     assert isinstance(parent, Term), 'is a Term bus. object'
     assert parent.text == 'parent'
     assert parent.term_tags == hello_term.term_tags
@@ -199,7 +200,7 @@ def test_save_existing_parent_gets_translation_if_missing(
 
 ## Find tests.
 
-def test_find_by_id(empty_db, english, repo):
+def test_load(empty_db, english, repo):
     "Smoke test."
     t = DBTerm(english, 'Hello')
     t.set_current_image('hello.png')
@@ -209,7 +210,7 @@ def test_find_by_id(empty_db, english, repo):
     db.session.commit()
     assert t.id is not None, 'ID assigned'
 
-    term = repo.find_by_id(t.id)
+    term = repo.load(t.id)
     assert term.id == t.id
     assert term.language_id == english.id
     assert term.text == 'Hello'
@@ -219,18 +220,26 @@ def test_find_by_id(empty_db, english, repo):
     assert term.term_tags == [ 'a', 'b' ]
 
 
-def test_find_by_id_throws_if_bad_id(app_context, repo):
+def test_load_throws_if_bad_id(app_context, repo):
     "If app says term id = 7 exists, and it doesn't, that's a problem."
     with pytest.raises(ValueError):
-        repo.find_by_id(9876)
+        repo.load(9876)
 
 
-def test_find_by_langid_and_text_returns_new_if_no_match(app_context, english, repo):
-    "If no lang/text match, return a new one, as user will want to fill it in."
-    term = repo.find_by_langid_and_text(english.id, 'newone')
-    assert term.id is None, 'new entry'
-    assert term.language_id == english.id
-    assert term.text == 'newone'
+def test_find_is_found(spanish, app_context, repo):
+    "Find by text finds regardless of case."
+    add_terms(spanish, ['PARENT'])
+    cases = ['PARENT', 'parent', 'pAReNt']
+    for c in cases:
+        p = repo.find(spanish.id, c)
+        assert p is not None, f'parent found for case {c}'
+        assert p.text == 'PARENT', f'parent found for case {c}'
+
+
+def test_find_not_found_returns_none(spanish, repo):
+    "No match = none."
+    p = repo.find(spanish.id, 'unknown_term')
+    assert p is None, 'nothing found'
 
 
 # TODO test coverage: implement more tests

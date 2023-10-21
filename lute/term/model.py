@@ -38,23 +38,23 @@ class Repository:
         self.db = _db
 
 
-    def find_by_id(self, term_id):
-        "Return a Term business object for the DBTerm with the id."
+    def load(self, term_id):
+        "Loads a Term business object for the DBTerm with the id."
         dbt = DBTerm.find(term_id)
         if dbt is None:
             raise ValueError(f'No term with id {term_id} found')
         return self._build_business_term(dbt)
 
 
-    def find_by_langid_and_text(self, langid, text):
-        "Return a Term business object for the DBTerm with the langid and text."
+    def find(self, langid, text):
+        """
+        Return a Term business object for the DBTerm with the langid and text.
+        If no match, return None.
+        """
         dbt = self._find_db_term_by_langid_and_text(langid, text)
-        if dbt is not None:
-            return self._build_business_term(dbt)
-        term = Term()
-        term.language_id = langid
-        term.text = text
-        return term
+        if dbt is None:
+            return None
+        return self._build_business_term(dbt)
 
 
     def add(self, term):
