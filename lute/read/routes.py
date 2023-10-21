@@ -154,12 +154,12 @@ def term_form(langid, text):
     )
 
 
-@bp.route('/termpopup/<int:id>', methods=['GET'])
-def term_popup(id):
+@bp.route('/termpopup/<int:termid>', methods=['GET'])
+def term_popup(termid):
     """
     Show a term popup for the given DBTerm.
     """
-    term = DBTerm.query.get(id)
+    term = DBTerm.query.get(termid)
 
     term_tags = [tt.text for tt in term.term_tags]
 
