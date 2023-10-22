@@ -230,6 +230,7 @@ def test_load(empty_db, english, repo):
 
     term = repo.load(t.id)
     assert term.id == t.id
+    assert term.language.id == t.language.id, "lang object set"
     assert term.language_id == english.id
     assert term.text == 'Hello'
     assert term.original_text == 'Hello'
@@ -288,6 +289,7 @@ def test_find_or_new_existing_word(spanish, repo):
     t = repo.find_or_new(spanish.id, 'bebida')
     assert t.id > 0, 'exists'
     assert t.text == "BEBIDA"
+    assert t.language.id == spanish.id, "lang object set"
 
 
 def test_find_or_new_non_existing(spanish, repo):
@@ -295,6 +297,7 @@ def test_find_or_new_non_existing(spanish, repo):
     t = repo.find_or_new(spanish.id, 'TENGO')
     assert t.id is None
     assert t.text == "TENGO"
+    assert t.language.id == spanish.id, "lang object set"
 
 
 def test_find_or_new_existing_multi_word(spanish, repo):
@@ -337,7 +340,7 @@ def test_find_matches_only_returns_language_matches(spanish, repo, _multiple_ter
         matches = repo.find_matches(spanish.id, c)
         assert len(matches) == 2, c
         assert matches[0].text == 'parent'
-
+        assert matches[0].language.id == spanish.id, "lang object set"
 
 def test_find_matches_returns_empty_if_no_match_or_empty_string(spanish, repo, _multiple_terms):
     "Empty if no match."

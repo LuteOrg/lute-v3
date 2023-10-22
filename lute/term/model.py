@@ -19,11 +19,24 @@ class Term: # pylint: disable=too-many-instance-attributes
     """
 
     def __init__(self):
+        # The ID of the DBTerm.
         self.id = None
+
+        # A language object is required as the Term bus. object
+        # must downcase the text and the original_text to see
+        # if anything has changed.
+        self._language = None
+
+        # Ideally this wouldn't be needed, but the term form
+        # populates this field with the (primitive) language id.
         self.language_id = None
+
+        # The text.
+        self.text = None
+
         # The original text given to the DTO, to track changes.
         self.original_text = None
-        self.text = None
+
         self.status = 1
         self.translation = None
         self.romanization = None
@@ -32,9 +45,22 @@ class Term: # pylint: disable=too-many-instance-attributes
         self.parents = []
         self.current_image = None
 
-    # TODO term form: case change allowed
+    @property
+    def language(self):
+        return self._language
+
+    @language.setter
+    def language(self, lang):
+        if not isinstance(lang, Language):
+            raise ValueError('not a language')
+        self._language = lang
+
     def text_has_changed(self):
-        return self.original_text != self.text
+        "Check the downcased original text with the current text."
+        def get_lc(s):
+            return self.language.get_lowercase(s)
+        return get_lc(self.original_text) != get_lc(self.text)
+
 
 class Repository:
     """
@@ -78,6 +104,8 @@ class Repository:
         # TODO term change case: spec term may not be necessary.
         spec = self._search_spec_term(langid, text)
         t = Term()
+        print('TODO remove: 1')
+        t.language = spec.language
         t.language_id = langid
         t.text = text
         t.original_text = spec.text_lc
@@ -238,6 +266,7 @@ class Repository:
         "Create a Term bus. object from a lute.model.term.Term."
         term = Term()
         term.id = dbterm.id
+        term.language = dbterm.language
         term.language_id = dbterm.language.id
 
         # Remove zero-width spaces (zws) from strings for user forms.

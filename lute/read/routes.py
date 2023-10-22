@@ -122,7 +122,8 @@ def _handle_form(term, form) -> bool:
         ret = True
 
     except IntegrityError as e:
-        # TODO term: better integrity error message - currently shows raw message.
+        # TODO term: better integrity error message - currently
+        # shows raw message.
         # TODO check if used: not sure if this will ever occur
         flash(e.orig.args, 'error')
 

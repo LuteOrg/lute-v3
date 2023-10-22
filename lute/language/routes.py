@@ -83,7 +83,11 @@ def new(langname):
 
 @bp.route('/jsonlist', methods=['GET'], endpoint='app_language_jsonlist')
 def jsonlist():
-    languages = Language.query.all()  # Assuming Language is your SQLAlchemy model
+    """
+    Json data of languages for javascript actions,
+    such as cycling through dictionaries for term lookups.
+    """
+    languages = Language.query.all()
 
     language_data = {}
     for language in languages:

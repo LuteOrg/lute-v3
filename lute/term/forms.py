@@ -15,7 +15,7 @@ class TermForm(FlaskForm):
     # TODO term form: add fields
 
     # TODO term form: language - use predefined
-    language = SelectField(
+    language_id = SelectField(
         'Language',
         choices=[
             (3, 'English'),

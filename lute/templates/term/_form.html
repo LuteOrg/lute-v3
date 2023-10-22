@@ -110,7 +110,7 @@
         },
         onTagClicked: function (evt, ui) {
           // Exit early if language not set - can't handle, too complicated.
-          if ("{{ form.language.value }}" == "") {
+          if ("{{ form.language_id.value }}" == "") {
             return;
           }
 
@@ -137,7 +137,7 @@
 
           // alert("You clicked me: " + clickedtagtext);
           // We should never reach this point if the lang is not set.
-          const langid = {{ form.language.value | default(-1) }};
+          const langid = {{ form.language_id.value | default(-1) }};
           let url = '';
           {% if parent_link_to_frame %}
           url = `/read/termform/${langid}/${clickedtagtext}`;
