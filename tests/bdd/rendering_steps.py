@@ -1,4 +1,4 @@
-from pytest_bdd import given, when, then, scenario, parsers
+from pytest_bdd import given, when, then, scenarios, parsers
 
 from lute.db import db
 from lute.models.language import Language
@@ -10,10 +10,8 @@ language = None
 # The Text object
 text = None
 
-@scenario('../features/rendering.feature', 'Smoke test')
-def test_smoke_test():
-    "Smoke test."
-    pass
+scenarios('../features/rendering.feature')
+
 
 @given('demo data')
 def given_demo_data(app_context):
