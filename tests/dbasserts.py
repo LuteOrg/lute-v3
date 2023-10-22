@@ -36,7 +36,7 @@ def assert_sql_result(sql, expected, msg = ''):
     conn = engine.connect()
     result = conn.execute(text(sql))
     zws = '\u200B'  # zero-width space
-    actual = [ '; '.join([f"{s.replace(zws, '/')}" for s in row]) for row in result ]
+    actual = [ '; '.join([f"{s}".replace(zws, '/') for s in row]) for row in result ]
     assert actual == expected, msg
 
 

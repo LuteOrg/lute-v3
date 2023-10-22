@@ -62,8 +62,8 @@ def test_save_new_multiword(app_context, hello_term, repo):
     assert_sql_result(sql, [], 'Still empty')
 
     repo.commit()
-    zws = "\u200B"
-    assert_sql_result(sql, [ f"HELLO{zws} {zws}THERE; hello{zws} {zws}there; 3" ], 'Saved')
+    # Assert replaces zws with '/'
+    assert_sql_result(sql, [ f"HELLO/ /THERE; hello/ /there; 3" ], 'Saved')
 
 
 def test_save_updates_existing(english, app_context, hello_term, repo):
