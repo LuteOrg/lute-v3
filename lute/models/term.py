@@ -283,6 +283,23 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         "Get by ID."
         return db.session.query(Term).filter(Term.id == term_id).first()
 
+    @staticmethod
+    def find_by_spec(spec):
+        """
+        Find by the given spec term's language ID and text.
+        Returns None if not found.
+        """
+        langid = spec.language.id
+        text_lc = spec.text_lc
+        query = db.session.query(Term).filter(
+            Term.language_id == langid,
+            Term.text_lc == text_lc
+        )
+        terms = query.all()
+        if not terms:
+            return None
+        return terms[0]
+
 
 class Status:
     """

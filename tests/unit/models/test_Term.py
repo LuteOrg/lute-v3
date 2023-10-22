@@ -3,7 +3,7 @@ Term tests.
 """
 
 from lute.models.term import Term
-
+from lute.db import db
 
 def test_cruft_stripped_on_set_word(spanish):
     "Extra spaces are stripped, because they cause parsing/matching problems."
@@ -69,3 +69,21 @@ def test_cannot_add_self_as_own_parent(spanish):
 # TODO term tests: add/remove image
 # TODO term tests: add/remove tags
 # TODO term tests: add/remove parents
+
+
+def test_find_by_spec(app_context, spanish, english):
+    t = Term(spanish, 'gato')
+    db.session.add(t)
+    db.session.commit()
+
+    spec = Term(spanish, 'GATO')
+    found = Term.find_by_spec(spec)
+    assert found.id == t.id, 'term found by matching spec'
+
+    spec = Term(english, 'GATO')
+    found = Term.find_by_spec(spec)
+    assert found is None, 'not found in different language'
+
+    spec = Term(spanish, 'gatito')
+    found = Term.find_by_spec(spec)
+    assert found is None, 'not found with different text'

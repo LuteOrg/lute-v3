@@ -85,7 +85,7 @@ class Repository:
         If no match, return None.
         """
         spec = self._search_spec_term(langid, text)
-        dbt = self._find_db_term_by_spec(spec)
+        dbt = DBTerm.find_by_spec(spec)
         if dbt is None:
             return None
         return self._build_business_term(dbt)
@@ -104,7 +104,6 @@ class Repository:
         # TODO term change case: spec term may not be necessary.
         spec = self._search_spec_term(langid, text)
         t = Term()
-        print('TODO remove: 1')
         t.language = spec.language
         t.language_id = langid
         t.text = text
@@ -185,27 +184,13 @@ class Repository:
         return DBTerm(lang, text)
 
 
-    def _find_db_term_by_spec(self, spec):
-        "Find by the given spec term's language ID and text."
-        langid = spec.language.id
-        text_lc = spec.text_lc
-        query = db.session.query(DBTerm).filter(
-            DBTerm.language_id == langid,
-            DBTerm.text_lc == text_lc
-        )
-        terms = query.all()
-        if not terms:
-            return None
-        return terms[0]
-
-
     def _build_db_term(self, term):
         "Convert a term business object to a DBTerm."
         if term.text is None:
             raise ValueError('Text not set for term')
 
         spec = self._search_spec_term(term.language_id, term.text)
-        t = self._find_db_term_by_spec(spec)
+        t = DBTerm.find_by_spec(spec)
         if t is None:
             t = DBTerm()
 
@@ -231,7 +216,7 @@ class Repository:
             if p is not None and p != '' and
             lang.get_lowercase(term.text) != lang.get_lowercase(p)
         ]
-        print('creating parents: ' + ', '.join(create_parents))
+        # print('creating parents: ' + ', '.join(create_parents))
         for p in create_parents:
             termparents.append(self._find_or_create_parent(p, lang, term, termtags))
         t.remove_all_parents()
@@ -243,7 +228,7 @@ class Repository:
 
     def _find_or_create_parent(self, pt, language, term, termtags) -> DBTerm:
         spec = self._search_spec_term(language.id, pt)
-        p = self._find_db_term_by_spec(spec)
+        p = DBTerm.find_by_spec(spec)
 
         if p is not None:
             if (p.translation or '') == '':
