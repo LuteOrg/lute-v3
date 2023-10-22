@@ -14,3 +14,86 @@
     Several/ /lines(1)/ /of/ /text/,
     and(1)/ /also/ /a/ /blank/ /line/.
     And(1)/ /some/ /more/.
+
+- case: No content
+  language: Spanish
+  terms: []
+  text: |-
+  expected: |-
+
+- case: No terms
+  language: Spanish
+  terms: []
+  text: |-
+    Hola tengo un gato.
+  expected: |-
+    Hola/ /tengo/ /un/ /gato/.
+
+- case: Single terms
+  language: Spanish
+  terms:
+    - tengo
+  text: |-
+    Hola tengo un gato.
+  expected: |-
+    Hola/ /tengo(1)/ /un/ /gato/.
+
+- case: Overlapping terms
+  language: Spanish
+  terms:
+    - tengo un
+    - un gato
+  text: |-
+    Tengo un gato.
+  expected: |-
+    Tengo un(1)/ gato(1)/.
+
+- case: Non overlapping terms
+  language: Spanish
+  terms:
+    - tengo un
+    - un gato
+  text: |-
+    Tengo un un gato.
+  expected: |-
+    Tengo un(1)/ /un gato(1)/.
+
+- case: Chain of overlapping terms
+  language: Spanish
+  terms:
+    - tengo un
+    - un gato
+    - gato bueno
+  text: |-
+    Tengo un gato bueno.
+  expected: |-
+    Tengo un(1)/ gato(1)/ bueno(1)/.
+
+- case: Chain of overlapping terms and one hidden
+  language: Spanish
+  terms:
+    - tengo un gato
+    - gato bueno
+    - un gato bueno y gordo
+  text: |-
+    Tengo un gato bueno y gordo.
+  expected: |-
+    Tengo un gato(1)/ bueno y gordo(1)/.
+
+- case: Text with numbers and quotes
+  language: Spanish
+  terms:
+    - tiene una bebida
+  text: |-
+    121 111 123 "Ella tiene una bebida".
+  expected: |-
+    121 111 123 "/Ella/ /tiene una bebida(1)/".
+
+- case: Term with numbers in the middle
+  language: Spanish
+  terms:
+    - tiene 1234 una bebida
+  text: |-
+    Ella tiene 1234 una bebida.
+  expected: |-
+    Ella/ /tiene 1234 una bebida(1)/.

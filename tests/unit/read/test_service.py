@@ -133,6 +133,9 @@ def test_render_cases(app_context):
     # print(d)
 
     for testcase in d:
+        db.session.query(Term).delete()
+        db.session.commit()
+
         print(testcase['case'])
         lang = db.session.query(Language).filter(Language.name == testcase['language']).first()
         assert lang.name == testcase['language'], 'sanity check'
