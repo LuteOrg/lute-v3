@@ -2,7 +2,10 @@ from pytest_bdd import given, when, then, scenarios, parsers
 
 from lute.db import db
 from lute.models.language import Language
-from tests.utils import add_terms, make_text, assert_rendered_text_equals
+from lute.read.service import get_paragraphs
+
+from tests.utils import add_terms, make_text
+
 
 # The current language being used.
 language = None
@@ -32,7 +35,7 @@ def given_terms(content):
 
 
 @given(parsers.parse('text:\n{content}'))
-def when_text(content):
+def given_text(content):
     global text
     text = make_text('test', content, language)
     db.session.add(text)
@@ -41,5 +44,21 @@ def when_text(content):
 
 @then(parsers.parse('rendered should be:\n{content}'))
 def then_rendered_should_be(content):
+    def stringize(ti):
+        zws = '\u200B'
+        status = ''
+        if ti.wo_status not in [ None, 0 ]:
+            status = f'({ti.wo_status})'
+        return ti.display_text.replace(zws, '') + status
+
+    global text
+    paras = get_paragraphs(text)
+    ret = []
+    for p in paras:
+        tis = [t for s in p for t in s.textitems]
+        ss = [stringize(ti) for ti in tis]
+        ret.append('/'.join(ss))
+    actual = '/<PARA>/'.join(ret)
+
     expected = content.split("\n")
-    assert_rendered_text_equals(text, expected)
+    assert actual == "/<PARA>/".join(expected)
