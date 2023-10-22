@@ -1,0 +1,16 @@
+# Test cases.
+
+- case: Smoke test
+  language: English
+  terms:
+    - lines
+    - and
+  text: |-
+    Several lines of text,
+    and also a blank line.
+
+    And some more.
+  expected: |-
+    Several/ /lines(1)/ /of/ /text/,
+    and(1)/ /also/ /a/ /blank/ /line/.
+    And(1)/ /some/ /more/.
