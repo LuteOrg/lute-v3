@@ -2,17 +2,11 @@
 Read service tests.
 """
 
-import os
-import yaml
-
 from lute.models.term import Term
-from lute.models.language import Language
 from lute.read.service import find_all_Terms_in_string, get_paragraphs
 from lute.db import db
 
 from tests.utils import add_terms, make_text, assert_rendered_text_equals
-from tests.dbasserts import assert_record_count_equals
-
 
 def _run_scenario(language, content, expected_found):
     """
