@@ -162,6 +162,34 @@ Feature: Rendering
             Á(1)/ /la/ /una/. /A/ /la/ /una/, /ábrelo/ /á(1)/.
 
 
+    Scenario: Marking words as known
+        Given language Spanish
+        And terms:
+            lista
+        And text:
+            Tengo un GATO. Una lista.
+            Ella.
+        Then rendered should be:
+            Tengo/ /un/ /GATO/. /Una/ /lista(1)/.
+            Ella/.
+        Given terms:
+            TENGO
+        Then rendered should be:
+            Tengo(1)/ /un/ /GATO/. /Una/ /lista(1)/.
+            Ella/.
+        Given all unknowns are set to known
+        Then rendered should be:
+            Tengo(1)/ /un(99)/ /GATO(99)/. /Una(99)/ /lista(1)/.
+            Ella(99)/.
+        And words table should contain:
+            ella
+            gato
+            lista
+            tengo
+            un
+            una
+
+
 # Template
     # Scenario: x
     #     Given language x

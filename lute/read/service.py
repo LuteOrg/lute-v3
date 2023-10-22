@@ -5,9 +5,11 @@ Reading helpers.
 import re
 from sqlalchemy import func
 
-from lute.models.term import Term
+from lute.models.term import Term, Status
+from lute.models.book import Text
 from lute.read.render.text_token import TextToken
 from lute.read.render.renderable_calculator import RenderableCalculator
+
 from lute.db import db
 
 
@@ -117,3 +119,45 @@ def get_paragraphs(text):
         renderable_paragraphs.append(renderable_sentences)
 
     return renderable_paragraphs
+
+
+def set_unknowns_to_known(text: Text):
+    """
+    Given a text, create new Terms with status Well-Known
+    for any new Terms.
+    """
+    language = text.book.language
+
+    sentences = sum(get_paragraphs(text), [])
+
+    tis = []
+    for sentence in sentences:
+        for ti in sentence.textitems:
+            tis.append(ti)
+
+    def is_unknown(ti):
+        return ti.is_word == 1 and (ti.wo_id == 0 or ti.wo_id is None) and ti.token_count == 1
+
+    unknowns = list(filter(is_unknown, tis))
+    words_lc = [ti.text_lc for ti in unknowns]
+    uniques = list(set(words_lc))
+    uniques.sort()
+
+    batch_size = 100
+    i = 0
+
+    # There is likely a better way to write this using generators and
+    # yield.
+    for u in uniques:
+        candidate = Term(language, u)
+        t = Term.find_by_spec(candidate)
+        if t is None:
+            candidate.status = Status.WELLKNOWN
+            db.session.add(candidate)
+            i += 1
+
+        if i % batch_size == 0:
+            db.session.commit()
+
+    # Commit any remaining.
+    db.session.commit()

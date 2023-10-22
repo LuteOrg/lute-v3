@@ -2,9 +2,10 @@ from pytest_bdd import given, when, then, scenarios, parsers
 
 from lute.db import db
 from lute.models.language import Language
-from lute.read.service import get_paragraphs
+from lute.read.service import get_paragraphs, set_unknowns_to_known
 
 from tests.utils import add_terms, make_text
+from tests.dbasserts import assert_sql_result
 
 
 # The current language being used.
@@ -42,6 +43,12 @@ def given_text(content):
     db.session.commit()
 
 
+@given('all unknowns are set to known')
+def set_to_known():
+    global text
+    set_unknowns_to_known(text)
+
+
 @then(parsers.parse('rendered should be:\n{content}'))
 def then_rendered_should_be(content):
     def stringize(ti):
@@ -62,3 +69,10 @@ def then_rendered_should_be(content):
 
     expected = content.split("\n")
     assert actual == "/<PARA>/".join(expected)
+
+
+@then(parsers.parse('words table should contain:\n{text_lc_content}'))
+def then_words_table_contains_WoTextLC(text_lc_content):
+    expected = text_lc_content.split("\n")
+    sql = "select WoTextLC from words order by WoTextLC"
+    assert_sql_result(sql, expected)
