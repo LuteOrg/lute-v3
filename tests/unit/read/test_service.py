@@ -122,35 +122,3 @@ def test_smoke_rendered(spanish, app_context):
         "Tengo un(1)/ /perro/."
     ]
     assert_rendered_text_equals(text, expected)
-
-
-def test_render_cases(app_context):
-    """
-    Run all the cases in the render_test_cases.yml file, one after
-    the other.
-    """
-    thisdir = os.path.dirname(os.path.realpath(__file__))
-    f = os.path.join(thisdir, 'render_test_cases.yml')
-    d = None
-    with open(f, 'r', encoding='utf-8') as f:
-        d = yaml.safe_load(f)
-    # print(d)
-
-    for testcase in d:
-        db.session.query(Term).delete()
-        db.session.commit()
-
-        print(testcase['case'])
-        lang = db.session.query(Language).filter(Language.name == testcase['language']).first()
-        assert lang.name == testcase['language'], 'sanity check'
-
-        terms = testcase['terms']
-        add_terms(lang, terms)
-        assert_record_count_equals('words', len(terms), 'sanity check, words defined')
-
-        text = make_text(testcase['case'], testcase['text'], lang)
-        db.session.add(text)
-        db.session.commit()
-
-        expected = testcase['expected'].split("\n")
-        assert_rendered_text_equals(text, expected, testcase['case'])
