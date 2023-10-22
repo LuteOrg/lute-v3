@@ -265,6 +265,18 @@ Feature: Rendering
             Hola/ /tengo(3)/ /un gato(3)/.
 
 
+    Scenario: Fixed bug: change status of multiword term
+        Given language Spanish
+        And text:
+            Hola tengo un gato.
+        And term "un gato" with status 1
+        Then rendered should be:
+            Hola/ /tengo/ /un gato(1)/.
+        Given term "un gato" with status 5
+        Then rendered should be:
+            Hola/ /tengo/ /un gato(5)/.
+
+
     Scenario: Fixed bug: doe with parent
         Given language Spanish
         And text:
@@ -275,6 +287,33 @@ Feature: Rendering
         And words table should contain:
             tener/ /uno
             tiene
+
+
+    # While using Lute v1, I ran into problems with specific sentences,
+    # and fixed them.  Ported to v2, and now to v3.
+    # Mis-spell of "to-do" is intentional :-P
+    Scenario: Fixed bugs: production Spanish bugs
+        Given language Spanish
+        And text:
+            ¿Qué me dice si nos acercamos al bar de la plaza de Sarriá y nos marcamos dos bocadillos de tortilla con muchísima cebolla?
+            Un doctor de Cáceres le dijo una vez a mi madre que los Romero de Torres éramos el eslabón perdido entre el hombre y el pez martillo, porque el noventa por ciento de nuestro organismo es cartílago, mayormente concentrado en la nariz y en el pabellón auditivo.
+            En la mesa contigua, un hombre observaba a Fermín de refilón por encima del periódico, probablemente pensando lo mismo que yo.
+            Pese a toddo lo que pasó luego y a que nos distanciamos con el tiempo, fuimos buenos amigos:
+            Tanto daba si había pasado el día trabajando en los campos o llevaba encima los mismos harapos de toda la semana.
+        And terms:
+            Un gato
+            de refilón
+            con el tiempo
+            pabellón auditivo
+            nos marcamos
+            Tanto daba
+        Then known-only rendered should be:
+            ¿Qué me dice si nos acercamos al bar de la plaza de Sarriá y [[nos marcamos]] dos bocadillos de tortilla con muchísima cebolla?
+            Un doctor de Cáceres le dijo una vez a mi madre que los Romero de Torres éramos el eslabón perdido entre el hombre y el pez martillo, porque el noventa por ciento de nuestro organismo es cartílago, mayormente concentrado en la nariz y en el [[pabellón auditivo]].
+            En la mesa contigua, un hombre observaba a Fermín [[de refilón]] por encima del periódico, probablemente pensando lo mismo que yo.
+            Pese a toddo lo que pasó luego y a que nos distanciamos [[con el tiempo]], fuimos buenos amigos:
+            [[Tanto daba]] si había pasado el día trabajando en los campos o llevaba encima los mismos harapos de toda la semana.
+
 
 
     Scenario: Fixed bug: capitalized words are marked as known

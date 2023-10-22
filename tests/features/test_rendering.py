@@ -99,6 +99,28 @@ def then_rendered_should_be(content):
     assert actual == "/<PARA>/".join(expected)
 
 
+@then(parsers.parse('known-only rendered should be:\n{content}'))
+def known_only_rendered_should_be(content):
+    def stringize(ti):
+        s = ti.display_text
+        if ti.wo_status not in [ None, 0 ]:
+            s = f'[[{s}]]'
+        zws = '\u200B'
+        return s.replace(zws, '')
+
+    global text
+    paras = get_paragraphs(text)
+    ret = []
+    for p in paras:
+        tis = [t for s in p for t in s.textitems]
+        ss = [stringize(ti) for ti in tis]
+        ret.append(''.join(ss))
+    actual = '/<PARA>/'.join(ret)
+
+    expected = content.split("\n")
+    assert actual == "/<PARA>/".join(expected)
+
+
 @then(parsers.parse('words table should contain:\n{text_lc_content}'))
 def then_words_table_contains_WoTextLC(text_lc_content):
     expected = text_lc_content.split("\n")
