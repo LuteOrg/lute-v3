@@ -2,6 +2,8 @@ from pytest_bdd import given, when, then, scenarios, parsers
 
 from lute.db import db
 from lute.models.language import Language
+from lute.models.term import Term
+from lute.term.model import Repository
 from lute.read.service import get_paragraphs, set_unknowns_to_known
 
 from tests.utils import add_terms, make_text
@@ -33,6 +35,15 @@ def given_lang(langname):
 def given_terms(content):
     terms = content.split("\n")
     add_terms(language, terms)
+
+
+@given(parsers.parse('term "{content}" with status {status}'))
+def given_terms(content, status):
+    r = Repository(db)
+    t = r.find_or_new(language.id, content)
+    t.status = int(status)
+    r.add(t)
+    r.commit()
 
 
 @given(parsers.parse('text:\n{content}'))

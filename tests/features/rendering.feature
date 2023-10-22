@@ -190,6 +190,49 @@ Feature: Rendering
             una
 
 
+    Scenario: Creating new multiword term when all are known
+        Given language Spanish
+        And text:
+            Ella tiene una bebida.
+        And all unknowns are set to known
+        Then rendered should be:
+            Ella(99)/ /tiene(99)/ /una(99)/ /bebida(99)/.
+        Given terms:
+            tiene UNA BEBIDA
+        Then rendered should be:
+            Ella(99)/ /tiene una bebida(1)/.
+
+
+    # Prod bug: setting all to known in one Text wasn't updating another!
+    Scenario: Marking words as known carries through to other texts
+        Given language Spanish
+        And text:
+            Ella tiene una bebida.
+        And all unknowns are set to known
+        Then rendered should be:
+            Ella(99)/ /tiene(99)/ /una(99)/ /bebida(99)/.
+        Given text:
+            Ella tiene un gato.
+        Then rendered should be:
+            Ella(99)/ /tiene(99)/ /un/ /gato/.
+
+
+    # "Hasta cuando no juega, pero bueno." was getting rendered as
+    # "Hasta cuando nono juega, pero bueno.", when all terms were
+    # known, but "cuando no" was a mword term.
+    Scenario: Fixed bug: "no" rendered correctly
+        Given language Spanish
+        And text:
+            Hasta cuando no juega, pero bueno.
+        And all unknowns are set to known
+        Then rendered should be:
+            Hasta(99)/ /cuando(99)/ /no(99)/ /juega(99)/, /pero(99)/ /bueno(99)/.
+        Given term "hasta" with status 1
+        And term "cuando no" with status 2
+        Then rendered should be:
+            Hasta(1)/ /cuando no(2)/ /juega(99)/, /pero(99)/ /bueno(99)/.
+
+
 # Template
     # Scenario: x
     #     Given language x
