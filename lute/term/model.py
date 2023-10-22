@@ -8,7 +8,6 @@ them in the database.
 import functools
 from sqlalchemy import and_
 
-from lute.db import db
 from lute.models.term import Term as DBTerm, TermTag
 from lute.models.language import Language
 

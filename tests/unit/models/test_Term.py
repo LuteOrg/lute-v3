@@ -72,6 +72,9 @@ def test_cannot_add_self_as_own_parent(spanish):
 
 
 def test_find_by_spec(app_context, spanish, english):
+    """
+    Can find by spec, matches on language and text.
+    """
     t = Term(spanish, 'gato')
     db.session.add(t)
     db.session.commit()
