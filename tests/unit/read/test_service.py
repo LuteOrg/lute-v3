@@ -6,7 +6,7 @@ from lute.models.term import Term
 from lute.read.service import find_all_Terms_in_string, get_paragraphs
 from lute.db import db
 
-from tests.utils import add_terms, make_text
+from tests.utils import add_terms, make_text, assert_rendered_text_equals
 
 
 def _run_scenario(language, content, expected_found):
@@ -97,3 +97,23 @@ def test_smoke_get_paragraphs(spanish, app_context):
         "[Tengo/ /un(1.3)][ (1.3)][perro(1.3)][.(1.3)]"
     ]
     assert actual == expected
+
+
+def test_smoke_rendered(spanish, app_context):
+    """
+    Smoke test to get paragraph information.
+    """
+    add_terms(spanish, ['tengo un', 'un gato'])
+    content = [
+        "Tengo un gato. Hay un perro.",
+        "Tengo un perro."
+    ]
+    text = make_text("Hola", "\n".join(content), spanish)
+    db.session.add(text)
+    db.session.commit()
+
+    expected = [
+        "Tengo un(1)/ gato(1)/. /Hay/ /un/ /perro/.",
+        "Tengo un(1)/ /perro/."
+    ]
+    assert_rendered_text_equals(text, expected)
