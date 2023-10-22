@@ -21,8 +21,8 @@ class SpaceDelimitedParser(AbstractParser):
     such as English, French, Spanish ... etc.
     """
 
-    @property
-    def name(self):
+    @classmethod
+    def name(cls):
         return "Space Delimited"
 
     def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
@@ -112,6 +112,10 @@ class SpaceDelimitedParser(AbstractParser):
 
 class TurkishParser(SpaceDelimitedParser):
     "Parser to handle Turkish parsing fun."
+
+    @classmethod
+    def name(cls):
+        return "Turkish"
 
     def get_lowercase(self, text):
         "Handle the funny turkish i variants."

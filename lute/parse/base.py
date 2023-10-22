@@ -79,9 +79,20 @@ class AbstractParser(ABC):
     Abstract parser, inherited from by all parsers.
     """
 
-    @property
+    @classmethod
+    def is_supported(cls):
+        """
+        True if the parser will work on the current system.
+
+        Some parsers, such as Japanese, require external
+        components to be present and configured.  If missing,
+        this should return False.
+        """
+        return True
+
+    @classmethod
     @abstractmethod
-    def name(self):
+    def name(cls):
         """
         Parser name, for displaying in UI.
         """

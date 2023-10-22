@@ -14,16 +14,31 @@ parsers = {
 }
 
 
+def _supported_parsers():
+    "Get the supported parsers."
+    ret = {}
+    for k, v in parsers.items():
+        if v.is_supported():
+            ret[k] = v
+    return ret
+
+
 def get_parser(parser_name) -> AbstractParser:
-    "Return the parser with the given name."
-    if parser_name in parsers:
-        return parsers[parser_name]()
+    "Return the supported parser with the given name."
+    if parser_name in _supported_parsers():
+        pclass = parsers[parser_name]
+        return pclass()
     raise ValueError(f"Unknown parser type '{parser_name}'")
 
 
-def available_parsers():
-    "Dictionary of parser strings and class names, for UI."
-    ret = {}
-    for key, cls in parsers.items():
-        ret[key] = cls().name
-    return ret
+def is_supported(parser_name) -> bool:
+    "Return True if the specified parser is supported, false otherwise or if not found."
+    if parser_name not in parsers:
+        return False
+    p = parsers[parser_name]
+    return p.is_supported()
+
+
+def supported_parsers():
+    "Dictionary of supported parser strings and class names, for UI."
+    return _supported_parsers()

@@ -4,8 +4,9 @@ Parser registry tests.
 
 import pytest
 
-from lute.parse.registry import get_parser, available_parsers
+from lute.parse.registry import parsers, get_parser, supported_parsers, is_supported
 from lute.parse.space_delimited_parser import SpaceDelimitedParser
+
 
 def test_get_parser_by_name():
     p = get_parser('spacedel')
@@ -19,6 +20,32 @@ def test_get_parser_throws_if_not_found():
 
 def test_list_all_parsers():
     "Sanity check only."
-    d = available_parsers()
+    d = supported_parsers()
     assert isinstance(d, dict), "returns a dict"
-    assert d['spacedel'] == 'Space Delimited', 'sanity check'
+
+    p = d['spacedel']
+    print(p)
+    assert p.name() == 'Space Delimited', 'sanity check'
+
+
+class DummyParser(SpaceDelimitedParser):
+    "Dummy unsupported parser."
+    @classmethod
+    def is_supported(cls):
+        return False
+    @property
+    def name(self):
+        return "DUMMY"
+
+
+def test_unavailable_parser_not_included():
+    "An unsupported parser shouldn't be available."
+    parsers['dummy'] = DummyParser
+
+    d = supported_parsers()
+    assert 'dummy' not in d, 'not present'
+
+    assert is_supported('dummy') is False, 'no'
+
+    with pytest.raises(ValueError):
+        get_parser('dummy')
