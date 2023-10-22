@@ -22,7 +22,8 @@ class SpaceDelimitedParser(AbstractParser):
 
     def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
         "Return parsed tokens."
-        return self.parse_to_tokens(text, language)
+        remove_multi_space = re.sub(r' +', ' ', text)
+        return self._parse_to_tokens(remove_multi_space, language)
 
 
     def preg_match_capture(self, pattern, subject):
@@ -37,7 +38,7 @@ class SpaceDelimitedParser(AbstractParser):
         return result
 
 
-    def parse_to_tokens(self, text: str, lang):
+    def _parse_to_tokens(self, text: str, lang):
         """
         Returns ParsedToken array for given language.
         """
