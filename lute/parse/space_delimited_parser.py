@@ -115,8 +115,6 @@ class TurkishParser(SpaceDelimitedParser):
 
     def get_lowercase(self, text):
         "Handle the funny turkish i variants."
-        find = ['İ', 'I']
-        replace = ['i', 'ı']
-        for i in range(len(find)):
-            text = text.replace(find[i], replace[i])
+        for caps, lower in { 'İ': 'i', 'I': 'ı' }.items():
+            text = text.replace(caps, lower)
         return text.lower()

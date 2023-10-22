@@ -77,48 +77,46 @@ def update_status(newstatus, terms):
     bulk_status_update(text, terms.split("\n"), int(newstatus))
 
 
-@then(parsers.parse('rendered should be:\n{content}'))
-def then_rendered_should_be(content):
+def _assert_stringized_equals(stringizer, joiner, expected):
+    """
+    Get paragraphs and stringize all textitems,
+    join and assert equals expected.
+    """
+    paras = get_paragraphs(text)
+    ret = []
+    for p in paras:
+        tis = [t for s in p for t in s.textitems]
+        ss = [stringizer(ti) for ti in tis]
+        ret.append(joiner.join(ss))
+    actual = '/<PARA>/'.join(ret)
+
+    expected = expected.split("\n")
+    assert actual == "/<PARA>/".join(expected)
+
+
+@then(parsers.parse('rendered should be:\n{expected}'))
+def then_rendered_should_be(expected):
+    """
+    Renders /term(status)/ /term/ /term/, compares with expected.
+    """
     def stringize(ti):
         zws = '\u200B'
         status = ''
         if ti.wo_status not in [ None, 0 ]:
             status = f'({ti.wo_status})'
         return ti.display_text.replace(zws, '') + status
-
-    global text
-    paras = get_paragraphs(text)
-    ret = []
-    for p in paras:
-        tis = [t for s in p for t in s.textitems]
-        ss = [stringize(ti) for ti in tis]
-        ret.append('/'.join(ss))
-    actual = '/<PARA>/'.join(ret)
-
-    expected = content.split("\n")
-    assert actual == "/<PARA>/".join(expected)
+    _assert_stringized_equals(stringize, '/', expected)
 
 
-@then(parsers.parse('known-only rendered should be:\n{content}'))
-def known_only_rendered_should_be(content):
+@then(parsers.parse('known-only rendered should be:\n{expected}'))
+def known_only_rendered_should_be(expected):
     def stringize(ti):
         s = ti.display_text
         if ti.wo_status not in [ None, 0 ]:
             s = f'[[{s}]]'
         zws = '\u200B'
         return s.replace(zws, '')
-
-    global text
-    paras = get_paragraphs(text)
-    ret = []
-    for p in paras:
-        tis = [t for s in p for t in s.textitems]
-        ss = [stringize(ti) for ti in tis]
-        ret.append(''.join(ss))
-    actual = '/<PARA>/'.join(ret)
-
-    expected = content.split("\n")
-    assert actual == "/<PARA>/".join(expected)
+    _assert_stringized_equals(stringize, '', expected)
 
 
 @then(parsers.parse('words table should contain:\n{text_lc_content}'))
