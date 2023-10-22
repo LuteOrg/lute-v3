@@ -5,11 +5,12 @@ List of available parsers.
 """
 
 from lute.parse.base import AbstractParser
-from lute.parse.space_delimited_parser import SpaceDelimitedParser
+from lute.parse.space_delimited_parser import SpaceDelimitedParser, TurkishParser
 
 
 parsers = {
-    'spacedel': SpaceDelimitedParser
+    'spacedel': SpaceDelimitedParser,
+    'turkish': TurkishParser
 }
 
 

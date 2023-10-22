@@ -340,6 +340,20 @@ Feature: Rendering
             Ella/ /tiene una(1)/ /bebida/.
 
 
+    Scenario: Turkish text
+        Given language Turkish
+        And text:
+            ışık için Işık İçin.
+        Then rendered should be:
+            ışık/ /için/ /Işık/ /İçin/.
+        Given term "ışık" with status 1
+        Then rendered should be:
+            ışık(1)/ /için/ /Işık(1)/ /İçin/.
+        Given term "İçin" with status 3
+        Then rendered should be:
+            ışık(1)/ /için(3)/ /Işık(1)/ /İçin(3)/.
+
+
 # Template
     # Scenario: x
     #     Given language x

@@ -3,6 +3,11 @@ Parsing for space-delimited languages.
 
 The parser uses some Language settings (e.g., word characters) to
 perform the actual parsing.
+
+Includes classes:
+
+- SpaceDelimitedParser
+- Turkish
 """
 
 import re
@@ -103,3 +108,15 @@ class SpaceDelimitedParser(AbstractParser):
         # Add anything left over.
         s = text[pos:]
         add_non_words(s)
+
+
+class TurkishParser(SpaceDelimitedParser):
+    "Parser to handle Turkish parsing fun."
+
+    def get_lowercase(self, text):
+        "Handle the funny turkish i variants."
+        find = ['İ', 'I']
+        replace = ['i', 'ı']
+        for i in range(len(find)):
+            text = text.replace(find[i], replace[i])
+        return text.lower()
