@@ -9,6 +9,7 @@ from lute.models.term import Term, Status
 from lute.models.book import Text
 from lute.read.render.text_token import TextToken
 from lute.read.render.renderable_calculator import RenderableCalculator
+from lute.term.model import Repository
 
 from lute.db import db
 
@@ -161,3 +162,17 @@ def set_unknowns_to_known(text: Text):
 
     # Commit any remaining.
     db.session.commit()
+
+
+def bulk_status_update(text: Text, terms_text_array, new_status):
+    """
+    Given a text and list of terms, update or create new terms
+    and set the status.
+    """
+    language = text.book.language
+    repo = Repository(db)
+    for term_text in terms_text_array:
+        t = repo.find_or_new(language.id, term_text)
+        t.status = new_status
+        repo.add(t)
+    repo.commit()

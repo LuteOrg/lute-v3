@@ -4,7 +4,7 @@ from lute.db import db
 from lute.models.language import Language
 from lute.models.term import Term
 from lute.term.model import Repository
-from lute.read.service import get_paragraphs, set_unknowns_to_known
+from lute.read.service import get_paragraphs, set_unknowns_to_known, bulk_status_update
 
 from tests.utils import add_terms, make_text
 from tests.dbasserts import assert_sql_result
@@ -37,13 +37,25 @@ def given_terms(content):
     add_terms(language, terms)
 
 
+@given(parsers.parse('term "{content}" with status {status} and parent "{parenttext}"'))
+def given_term_with_status_and_parent(content, status, parenttext):
+    r = Repository(db)
+    t = r.find_or_new(language.id, content)
+    t.status = int(status)
+    t.parents.append(parenttext)
+    r.add(t)
+    r.commit()
+
+
 @given(parsers.parse('term "{content}" with status {status}'))
-def given_terms(content, status):
+def given_term_with_status(content, status):
     r = Repository(db)
     t = r.find_or_new(language.id, content)
     t.status = int(status)
     r.add(t)
     r.commit()
+
+
 
 
 @given(parsers.parse('text:\n{content}'))
@@ -58,6 +70,11 @@ def given_text(content):
 def set_to_known():
     global text
     set_unknowns_to_known(text)
+
+
+@given(parsers.parse('bulk status {newstatus} update for terms:\n{terms}'))
+def update_status(newstatus, terms):
+    bulk_status_update(text, terms.split("\n"), int(newstatus))
 
 
 @then(parsers.parse('rendered should be:\n{content}'))

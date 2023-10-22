@@ -233,6 +233,113 @@ Feature: Rendering
             Hasta(1)/ /cuando no(2)/ /juega(99)/, /pero(99)/ /bueno(99)/.
 
 
+    Scenario: New term with new parent
+        Given language Spanish
+        And text:
+            tiene y tener.
+        And term "tiene" with status 1 and parent "tener"
+        Then rendered should be:
+            tiene(1)/ /y/ /tener(1)/.
+        And words table should contain:
+            tener
+            tiene
+
+
+    Scenario: New term with new parent, accented parent not updated
+        Given language Spanish
+        And text:
+            Tengo que y qué.
+        Then rendered should be:
+            Tengo/ /que/ /y/ /qué/.
+        Given term "tengo" with status 1 and parent "que"
+        Then rendered should be:
+            Tengo(1)/ /que(1)/ /y/ /qué/.
+
+
+    Scenario: Fixed bug: doe with parent
+        Given language Spanish
+        And text:
+            tiene y tener uno.
+        And term "tiene" with status 1 and parent "tener uno"
+        Then rendered should be:
+            tiene(1)/ /y/ /tener uno(1)/.
+        And words table should contain:
+            tener/ /uno
+            tiene
+
+
+    Scenario: Fixed bug: capitalized words are marked as known
+        Given language Spanish
+        And text:
+            Á la una. Éste fué hallado. A la una.
+        And all unknowns are set to known
+        And all unknowns are set to known
+        Then rendered should be:
+            Á(99)/ /la(99)/ /una(99)/. /Éste(99)/ /fué(99)/ /hallado(99)/. /A(99)/ /la(99)/ /una(99)/.
+        And words table should contain:
+            a
+            fué
+            hallado
+            la
+            una
+            á
+            éste
+
+
+    Scenario: Fixed bug: issue 10 multiwords are rendered in new texts
+        Given language Spanish
+        And terms:
+            un gato
+        And text:
+            Tienes un gato.
+        Then rendered should be:
+            Tienes/ /un gato(1)/.
+        Given text:
+            Tengo un gato.
+        Then rendered should be:
+            Tengo/ /un gato(1)/.
+
+
+    Scenario: Fixed bug: issue 10 multiwords with known in new text
+        Given language English
+        And terms:
+            Associated Press
+        And text:
+            Abc wrote to the Associated Press about it.
+        And all unknowns are set to known
+        Then rendered should be:
+            Abc(99)/ /wrote(99)/ /to(99)/ /the(99)/ /Associated Press(1)/ /about(99)/ /it(99)/.
+        Given text:
+            Def wrote to the Associated Press about it.
+        Then rendered should be:
+            Def/ /wrote(99)/ /to(99)/ /the(99)/ /Associated Press(1)/ /about(99)/ /it(99)/.
+        Given text:
+            Ghi wrote to the Associated Press about it.
+        Then rendered should be:
+            Ghi/ /wrote(99)/ /to(99)/ /the(99)/ /Associated Press(1)/ /about(99)/ /it(99)/.
+
+
+    Scenario: Bulk updating terms
+        Given language Spanish
+        And terms:
+            un gato
+            lista
+            tiene una
+        And text:
+            Hola tengo un gato.  No tengo una lista.
+            Ella tiene una bebida.
+        Then rendered should be:
+            Hola/ /tengo/ /un gato(1)/. /No/ /tengo/ /una/ /lista(1)/.
+            Ella/ /tiene una(1)/ /bebida/.
+        Given bulk status 5 update for terms:
+            tengo
+            lista
+            perro
+        Then rendered should be:
+            Hola/ /tengo(5)/ /un gato(1)/. /No/ /tengo(5)/ /una/ /lista(5)/.
+            Ella/ /tiene una(1)/ /bebida/.
+
+
 # Template
     # Scenario: x
     #     Given language x

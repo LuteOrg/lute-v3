@@ -28,12 +28,15 @@ def assert_sql_result(sql, expected, msg = ''):
     Checks sql results (stringized) against expected.
 
     e.g. with sql = "select 1, 2", expected would be [ "1; 2" ]
+
+    This replaces all zero-width strings with '/'
     """
     uri = __sqlite_uri()
     engine = create_engine(uri)
     conn = engine.connect()
     result = conn.execute(text(sql))
-    actual = [ '; '.join([f'{s}' for s in row]) for row in result ]
+    zws = '\u200B'  # zero-width space
+    actual = [ '; '.join([f"{s.replace(zws, '/')}" for s in row]) for row in result ]
     assert actual == expected, msg
 
 
