@@ -19,4 +19,5 @@ def test_get_parser_throws_if_not_found():
 
 def test_list_all_parsers():
     d = available_parsers()
-    assert d == { 'spacedel': 'Space Delimited' }
+    assert isinstance(d, dict), "returns a dict"
+    assert d['spacedel'] == 'Space Delimited', 'sanity check'

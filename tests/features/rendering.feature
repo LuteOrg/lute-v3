@@ -256,6 +256,15 @@ Feature: Rendering
             Tengo(1)/ /que(1)/ /y/ /qué/.
 
 
+    Scenario: Multiword parent
+        Given language Spanish
+        And text:
+            Hola tengo un gato.
+        And term "tengo" with status 3 and parent "un gato"
+        Then rendered should be:
+            Hola/ /tengo(3)/ /un gato(3)/.
+
+
     Scenario: Fixed bug: doe with parent
         Given language Spanish
         And text:
