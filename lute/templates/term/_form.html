@@ -38,7 +38,7 @@
       <td>
         <ul id="parentslist" class="tags nomarginblock shorttaglist">
           {% for p in form.parents %}
-          <li>{{ p }}</li>
+          <li>{{ p.object_data }}</li>
           {% endfor %}
         </ul>
       </td>
@@ -50,7 +50,7 @@
       <td>
         <ul id="termtagslist" class="tags nomarginblock shorttaglist">
           {% for t in form.term_tags %}
-          <li>{{ t }}</li>
+          <li>{{ t.object_data }}</li>
           {% endfor %}
         </ul>
       </td>
@@ -86,7 +86,9 @@
 
 
   let setup_parent_Tagit = function() {
-    var prototypeFieldName = 'term_form[parents-0][__name__]';
+    // Note that Flask_WTF uses <fieldname>-{index}
+    // for mapping to and from FieldLists!
+    var prototypeFieldName = 'parents-__name__';
     var fieldIndex = 0;
 
     $('#parentslist').tagit(
@@ -182,8 +184,9 @@
 
 
   let setup_term_tags_Tagit = function() {
-    // term_form is the name of the form.
-    var prototypeFieldName = 'term_form[term_tags-0][__name__]';
+    // Note that Flask_WTF uses <fieldname>-{index}
+    // for mapping to and from FieldLists!
+    var prototypeFieldName = 'term_tags-__name__';
     var fieldIndex = 0;
     
     let invalidChar = function(s) { return /[\uD800-\uDFFF]/.test(s); };

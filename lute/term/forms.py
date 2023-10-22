@@ -28,6 +28,6 @@ class TermForm(FlaskForm):
     translation = StringField('Translation', render_kw={"placeholder": "Translation"})
     romanization = StringField('Romanization', render_kw={"placeholder": "Pronunciation"})
     status = StringField('Status', render_kw={"placeholder": "Status"})
-    term_tags = FieldList(StringField('termtag'))
+    term_tags = FieldList(StringField('term_tags'))
     # TODO term form: hide this, change to HiddenField
     current_image = StringField('OriginalText')
