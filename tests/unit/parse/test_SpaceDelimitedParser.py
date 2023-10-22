@@ -139,7 +139,7 @@ def test_quick_checks(english):
     assert_string_equals('"test."', english, '"[test]."')
     assert_string_equals('"test".', english, '"[test]".')
     assert_string_equals('Hi there.', english, '[Hi] [there].')
-    assert_string_equals('Hi there.  Goodbye.', english, '[Hi] [there].  [Goodbye].')
+    assert_string_equals('Hi there.  Goodbye.', english, '[Hi] [there]. [Goodbye].')
     assert_string_equals("Hi.\nGoodbye.", english, '[Hi].¶[Goodbye].')
     assert_string_equals('He123llo.', english, '[He]123[llo].')
     assert_string_equals('1234', english, '1234')

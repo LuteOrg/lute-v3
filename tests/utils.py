@@ -28,6 +28,7 @@ def make_text(title, content, language):
 
 
 def get_rendered_string(text, imploder='/', overridestringize=None):
+    "Get the stringized rendered content after parsing."
     def stringize(ti):
         zws = '\u200B'
         status = ''
@@ -46,6 +47,7 @@ def get_rendered_string(text, imploder='/', overridestringize=None):
 
 
 def assert_rendered_text_equals(text, expected, msg=''):
+    "Check that the rendered string matches the expected."
     actual = get_rendered_string(text)
     # This assertion gives details because the module
     # is registered in tests/__init__.py.

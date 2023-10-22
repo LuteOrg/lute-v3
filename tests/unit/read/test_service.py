@@ -125,6 +125,10 @@ def test_smoke_rendered(spanish, app_context):
 
 
 def test_render_cases(app_context):
+    """
+    Run all the cases in the render_test_cases.yml file, one after
+    the other.
+    """
     thisdir = os.path.dirname(os.path.realpath(__file__))
     f = os.path.join(thisdir, 'render_test_cases.yml')
     d = None
