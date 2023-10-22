@@ -389,7 +389,7 @@
 
     const termdicts = LANGUAGES[langid].term;
     const usedict = termdicts[termdictindex];
-    show_lookup_page(usedict, $('#term_dto_Text').val(), langid, allow_open_new_web_page);
+    show_lookup_page(usedict, $('#text').val(), langid, allow_open_new_web_page);
 
     termdictindex++;
     if (termdictindex >= termdicts.length)
