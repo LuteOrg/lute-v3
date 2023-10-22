@@ -654,4 +654,31 @@ a:active {
      font-size: 85%;
  }
 
- /* */
+ /* Term form, status elements */
+
+ ul.form-control {
+  list-style: none; /* Remove the marker */
+  padding: 0; /* Remove default padding */
+  display: flex; /* Display items in a row */
+
+  /* Adjust spacing between items as needed */
+  margin: 0;
+}
+
+ul.form-control li {
+  margin-right: 8px; /* Adjust the spacing between items */
+}
+
+/* Style radio buttons */
+ul.form-control input[type="radio"] {
+  margin: 0;
+  padding: 0;
+  width: auto; /* Allow the content to determine the width */
+}
+
+/* Style labels */
+ul.form-control label {
+  margin: 0;
+  padding: 0;
+  cursor: pointer; /* Add pointer cursor for better UX */
+}
