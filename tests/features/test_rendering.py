@@ -10,7 +10,7 @@ language = None
 # The Text object
 text = None
 
-scenarios('../features/rendering.feature')
+scenarios('rendering.feature')
 
 
 @given('demo data')
