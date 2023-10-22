@@ -23,18 +23,24 @@
   <table id="term">
   <tbody>
 
-    {% for field in form %}
-    {% if field.name not in ('csrf_token', 'term_tags', 'parents') %}
-    <tr>
-      <td>{{ field.name }}</td> <!-- TODO term form: remove this -->
-      <td>{{ field(class="form-control") }}</td>
+    <tr id="languageSel" {% if not showlanguageselector %}style="display:none;"{% endif %}>
+      <td>{{ form.language_id(class="form-control") }}</td>
     </tr>
-    {% endif %}
-    {% endfor %}
 
-    {# manually write list so it can be managed by tagit. #}
+    {{ form.original_text }}
+
     <tr>
-      <td>parents</td>
+      <td>
+        {{ form.text(class="form-control") }}
+      </td>
+      <td style="white-space: nowrap;">
+        <img src="/icn/external.png" title="Lookup" onclick="do_term_lookup()" />
+        <img src="/icn/eye.png" title="Images" onclick="do_image_lookup()" />
+      </td>
+    </tr>
+
+    {# Parents.  During setup this is replaced by tag-it. #}
+    <tr>
       <td>
         <ul id="parentslist" class="tags nomarginblock shorttaglist">
           {% for p in form.parents %}
@@ -44,9 +50,31 @@
       </td>
     </tr>
 
-    {# manually write list so it can be managed by tagit. #}
     <tr>
-      <td>tags</td>
+      <td>
+        {{ form.romanization(class="form-control") }}
+      </td>
+    </tr>
+
+    <tr>
+      <td>{{ form.translation }}</td>
+      <td><img class="zoomableTermImage" id="term_image" src="{{ form.current_image.object_data }}" width="50px"/></td>
+    </tr>
+
+    <tr>
+      <td>
+        {{ form.status(class="form-control") }}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        {{ form.current_image(class="form-control") }}
+      </td>
+    </tr>
+
+    {# Tags li entries are managed by tagit. #}
+    <tr>
       <td>
         <ul id="termtagslist" class="tags nomarginblock shorttaglist">
           {% for t in form.term_tags %}
@@ -56,10 +84,16 @@
       </td>
     </tr>
 
+    <tr>
+      <td align="right">
+        <a href="" onclick="show_term_sentences(); return false;">Sentences</a>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </td>
+    </tr>
+
   </tbody>
   </table>
 
-  <button type="submit" class="btn btn-primary">Save</button>
 </form>
 
 
@@ -153,7 +187,7 @@
         autocomplete: {
           source: function(request, response) {
             const s = encodeURIComponent(request.term);
-            const langid = parseInt($('#term_dto_language').val());
+            const langid = parseInt($('#language_id').val());
             $.ajax({
               url: `/term/search/${s}/${langid}`,
               type: 'GET',
@@ -207,9 +241,11 @@
 
   };
 
+  // TODO term form autofocus - check if used.
+  // lute.js should send an "autofocus" flag, I believe.
   let handleAutofocus = function() {
-    const wordfield = $('#wordfield');
-    const transfield = $('#translationfield');
+    const wordfield = $('#text');
+    const transfield = $('#translation');
 
     if ($('#autofocus').val() != 'false') {
       if (wordfield.val()) {
@@ -226,12 +262,12 @@
     setup_term_tags_Tagit();
 
     // Approx good size for the text area:
-    $('#term_dto_Translation').css({'width': '500px', 'height': '43px'});
+    $('#translation').css({'width': '500px', 'height': '43px'});
 
     // Setup complete, can now start monitoring form.
     monitor_form = true;
 
-    if (($('#term_dto_Text').val() ?? '') != '') {
+    if (($('#text').val() ?? '') != '') {
       do_term_lookup(false);
     }
   });
@@ -271,8 +307,8 @@
 
 
   let do_image_lookup = function() {
-    const langid = $('#term_dto_language').val();
-    const text = $('#term_dto_Text').val();
+    const langid = $('#language_id').val();
+    const text = $('#text').val();
 
     if (langid == null || langid == '' || parseInt(langid) == 0 || text == null || text == '') {
       alert('Please select a language and enter the term.');
@@ -289,7 +325,9 @@
       function(index) {
         var input = $(this);
         let n = input.attr('name');
-        if (typeof n !== "undefined" && n != null && n.startsWith('term_dto[termParents]')) {
+        // The parent tag inputs are created in setup_parent_Tagit,
+        // with name parents-{index}
+        if (typeof n !== "undefined" && n != null && n.startsWith('parents-')) {
            parentTags.push(input.val());
         }
     });
@@ -343,7 +381,7 @@
 
 
   function do_term_lookup(allow_open_new_web_page = true) {
-    const langid = $('#term_dto_language').val();
+    const langid = $('#language_id').val();
     if (langid == null || langid == '' || parseInt(langid) == 0) {
       alert('Please select a language.');
       return;
@@ -359,8 +397,8 @@
   }
 
   function show_term_sentences() {
-    const langid = $('#term_dto_language').val();
-    const txt = $('#term_dto_Text').val();
+    const langid = $('#language_id').val();
+    const txt = $('#text').val();
     // %E2%80%8B is the zero-width string.  The term is reparsed
     // on the server, so this doesn't need to be sent.
     const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');

@@ -3,7 +3,7 @@ Flask-wtf forms.
 """
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, FieldList, RadioField  #, HiddenField
+from wtforms import StringField, SelectField, FieldList, RadioField, TextAreaField, HiddenField
 from wtforms.validators import DataRequired
 
 
@@ -12,8 +12,6 @@ class TermForm(FlaskForm):
     Term.
     """
 
-    # TODO term form: add fields
-
     # TODO term form: language - use predefined
     language_id = SelectField(
         'Language',
@@ -21,11 +19,10 @@ class TermForm(FlaskForm):
             (3, 'English'),
         ])
 
-    # TODO term form: hide this, change to HiddenField
-    original_text = StringField('OriginalText')
+    original_text = HiddenField('OriginalText')
     text = StringField('Text', validators=[DataRequired()], render_kw={"placeholder": "Term"})
     parents = FieldList(StringField('parent'))
-    translation = StringField('Translation', render_kw={"placeholder": "Translation"})
+    translation = TextAreaField('Translation', render_kw={"placeholder": "Translation"})
     romanization = StringField('Romanization', render_kw={"placeholder": "Pronunciation"})
 
     status_choices = [
@@ -39,5 +36,6 @@ class TermForm(FlaskForm):
     status = RadioField('Status', choices=status_choices)
 
     term_tags = FieldList(StringField('term_tags'))
-    # TODO term form: hide this, change to HiddenField
-    current_image = StringField('OriginalText')
+
+    # TODO term form images: hide this, change to HiddenField
+    current_image = StringField('current_image')
