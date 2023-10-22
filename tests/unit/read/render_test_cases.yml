@@ -97,3 +97,20 @@
     Ella tiene 1234 una bebida.
   expected: |-
     Ella/ /tiene 1234 una bebida(1)/.
+
+- case: Double spaces removed
+  language: Spanish
+  terms: []
+  text: |-
+    Hola  tengo     un gato.
+  expected: |-
+    Hola/ /tengo/ /un/ /gato/.
+
+- case: Text contains same term many times.
+  language: Spanish
+  terms:
+    - UN GATO
+  text: |-
+    Un gato es bueno. No hay un gato.  Veo a un gato.
+  expected: |-
+    Un gato(1)/ /es/ /bueno/. /No/ /hay/ /un gato(1)/. /Veo/ /a/ /un gato(1)/.
