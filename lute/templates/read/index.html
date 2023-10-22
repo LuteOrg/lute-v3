@@ -46,9 +46,12 @@
           </a>
           {% endif %}
           <a id="editText" href="/text/{{ text.id }}/edit" tabindex="-1">
-            <img src="{{ url_for('static', filename='/icn/document--pencil.png') }}" title="Edit" alt="Edit" />
+            <img src="{{ url_for('static', filename='/icn/document--pencil.png') }}"
+                 title="Edit" alt="Edit" />
           </a>
-          <img style="margin-right:10px;" src="{{ url_for('static', filename='/icn/question-balloon.png') }}" onclick="show_help(); return false;" title="Keyboard shortcuts" />
+          <img id="keyboard_shortcuts" style="margin-right:10px;"
+               src="{{ url_for('static', filename='/icn/question-balloon.png') }}"
+               title="Keyboard shortcuts" />
         </td>
       </tr>
     </table>
@@ -72,6 +75,22 @@
 
   <script>
     $(document).ready(prepareTextInteractions);
+
+    let tooltip_help_hover_content = function (setContent) {
+      $.ajax({
+        url: `/read/keyboard_shortcuts`,
+        type: 'get',
+        success: function(response) {
+          setContent(response);
+        }
+      });
+    }
+
+    $("#keyboard_shortcuts").tooltip({
+      position: { my: 'left top+10', at: 'left bottom', collision: 'flipfit flip' },
+      show: { easing: 'easeOutCirc' },
+      content: function (setContent) { tooltip_help_hover_content(setContent); }
+    });
   </script>
 
   <div id="reading-footer"  style="text-align: center;">

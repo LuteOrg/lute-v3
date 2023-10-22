@@ -200,3 +200,8 @@ def term_popup(termid):
         term_images=images,
         parentdata=parent_data,
         parentterms=parent_terms)
+
+
+@bp.route('/keyboard_shortcuts', methods=['GET'])
+def keyboard_shortcuts():
+    return render_template('read/keyboard_shortcuts.html')

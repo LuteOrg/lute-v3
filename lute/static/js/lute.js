@@ -125,12 +125,6 @@ function showEditFrame(el, extra_args = {}) {
 }
 
 
-function show_help() {
-  const url = `/read/shortcuts`;
-  top.frames.wordframe.location.href = url;
-}
-
-
 let save_curr_data_order = function(el) {
   LUTE_CURR_TERM_DATA_ORDER = parseInt(el.attr('data_order'));
 }
