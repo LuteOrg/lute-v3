@@ -114,3 +114,39 @@
     Un gato es bueno. No hay un gato.  Veo a un gato.
   expected: |-
     Un gato(1)/ /es/ /bueno/. /No/ /hay/ /un gato(1)/. /Veo/ /a/ /un gato(1)/.
+
+- case: Text same sentence contains same term many times.
+  language: Spanish
+  terms:
+    - UN GATO
+  text: |-
+    Un gato es bueno, no hay un gato, veo a un gato.
+  expected: |-
+    Un gato(1)/ /es/ /bueno/, /no/ /hay/ /un gato(1)/, /veo/ /a/ /un gato(1)/.
+
+- case: Apostrophes
+  language: English
+  terms:
+    - the cat's pyjamas
+  text: |-
+    This is the cat's pyjamas.
+  expected: |-
+    This/ /is/ /the cat's pyjamas(1)/.
+
+- case: Last word is a word
+  language: English
+  terms:
+    - word
+  text: |-
+    Here is a word
+  expected: |-
+    Here/ /is/ /a/ /word(1)
+
+- case: Capitals with accents
+  language: Spanish
+  terms:
+    - Á
+  text: |-
+    Á la una. A la una, ábrelo á.
+  expected: |-
+    Á(1)/ /la/ /una/. /A/ /la/ /una/, /ábrelo/ /á(1)/.
