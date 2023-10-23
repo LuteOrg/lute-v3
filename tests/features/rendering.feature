@@ -463,6 +463,18 @@ Feature: Rendering
             している(1)
 
 
+    Scenario: Bug fix: classical chinese first character
+        Given language Classical Chinese
+        And text:
+            關關。
+        Then rendered should be:
+            關/關/。
+        Given terms:
+            關
+        Then rendered should be:
+            關(1)/關(1)/。
+
+
 # Template
     # Scenario: x
     #     Given language x
