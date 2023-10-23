@@ -33,19 +33,24 @@ class DummyParser(SpaceDelimitedParser):
     @classmethod
     def is_supported(cls):
         return False
+
     @property
     def name(self):
         return "DUMMY"
 
 
-def test_unavailable_parser_not_included():
-    "An unsupported parser shouldn't be available."
+@pytest.fixture(name='load_dummy_parser')
+def fixture_load_dummy():
+    "Add the dummy parser for the test."
     parsers['dummy'] = DummyParser
+    yield
+    del parsers['dummy']
 
+
+def test_unavailable_parser_not_included_in_lists(load_dummy_parser):
+    "An unsupported parser shouldn't be available."
     d = supported_parsers()
     assert 'dummy' not in d, 'not present'
-
     assert is_supported('dummy') is False, 'no'
-
     with pytest.raises(ValueError):
         get_parser('dummy')
