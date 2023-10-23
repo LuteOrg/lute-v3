@@ -402,6 +402,21 @@ Feature: Rendering
             ışık(1)/ /için(3)/ /Işık(1)/ /İçin(3)/.
 
 
+
+    Scenario: Japanese text.
+        Given language Japanese
+        And text:
+            私は元気です.
+        Then rendered should be:
+            私/は/元気/です/.
+        Given terms:
+            私
+            元気
+            です
+        Then rendered should be:
+            私(1)/は/元気(1)/です(1)/.
+
+
     Scenario: Japanese multiword at end of sentence.
         Given language Japanese
         And text:

@@ -54,24 +54,33 @@ class JapaneseParser(AbstractParser):
         text = re.sub(r'[ \t]+', ' ', text).strip()
 
         lines = []
-        flags = r'-F %m\t%t\t%h\n -U %m\t%t\t%h\n -E EOP\t3\t7\n'
-        with MeCab(flags) as nm:
-            for n in nm.parse(text, as_nodes=True):
-                lines.append(n.feature)
 
-        lines = [n for n in lines if n is not None]
-        lines = [n.strip() for n in lines if n.strip() != '']
+        # If the string contains a "\n", MeCab appears to silently
+        # remove it.  Splitting it works (ref test_JapaneseParser).
+        # Flags: ref https://github.com/buruzaemon/natto-py:
+        #    -F = node format
+        #    -U = unknown format
+        #    -E = EOP format
+        with MeCab(r'-F %m\t%t\t%h\n -U %m\t%t\t%h\n -E EOP\t3\t7\n') as nm:
+            for para in text.split("\n"):
+                for n in nm.parse(para, as_nodes=True):
+                    lines.append(n.feature)
 
-        tokens = []
-        for lin in lines:
+        lines = [
+            n.strip() for n in lines
+            if n is not None and n.strip() != ''
+        ]
+
+        def line_to_token(lin):
+            "Convert parsed line to a ParsedToken."
             term, node_type, third = lin.split("\t")
             is_eos = term in language.regexp_split_sentences
             if term == 'EOP' and third == '7':
                 term = '¶'
             is_word = node_type in '2678'
-            p = ParsedToken(term, is_word, is_eos or term == '¶')
-            tokens.append(p)
+            return ParsedToken(term, is_word, is_eos or term == '¶')
 
+        tokens = [line_to_token(lin) for lin in lines]
         return tokens
 
 
@@ -86,17 +95,27 @@ class JapaneseParser(AbstractParser):
         return all(self._char_is_hiragana(c) for c in s)
 
 
-    def get_reading(self, text: str): # pylint: disable=unused-argument
+    def get_reading(self, text: str):
         """
-        Get the pronunciation for the given text.  For most
-        languages, this can't be automated.
+        Get the pronunciation for the given text.
+
+        Returns None if the text is all hiragana, or the pronunciation
+        doesn't add value (same as text).
         """
         if self._string_is_hiragana(text):
             return None
 
-        reading = None
         flags = r'-O yomi'
+        readings = []
         with MeCab(flags) as nm:
-            for n in nm.parse('必ず', as_nodes=True):
-                reading = n.feature
-        return reading
+            for n in nm.parse(text, as_nodes=True):
+                readings.append(n.feature)
+        readings = [
+            r.strip() for r in readings
+            if r is not None and r.strip() != ''
+        ]
+
+        ret = ''.join(readings).strip()
+        if ret in ('', text):
+            return None
+        return ret
