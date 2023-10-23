@@ -6,11 +6,13 @@ List of available parsers.
 
 from lute.parse.base import AbstractParser
 from lute.parse.space_delimited_parser import SpaceDelimitedParser, TurkishParser
+from lute.parse.mecab_parser import JapaneseParser
 
 
 parsers = {
     'spacedel': SpaceDelimitedParser,
-    'turkish': TurkishParser
+    'turkish': TurkishParser,
+    'japanese': JapaneseParser
 }
 
 

@@ -402,6 +402,52 @@ Feature: Rendering
             ışık(1)/ /için(3)/ /Işık(1)/ /İçin(3)/.
 
 
+    Scenario: Japanese multiword at end of sentence.
+        Given language Japanese
+        And text:
+            2後ヲウメニ能問アラ費理セイ北多国び持困寿ながち。
+        Then rendered should be:
+            2/後/ヲ/ウメニ/能/問/アラ/費/理/セイ/北/多国/び/持/困/寿/な/がち/。
+        Given terms:
+            ながち
+        Then rendered should be:
+            2/後/ヲ/ウメニ/能/問/アラ/費/理/セイ/北/多国/び/持/困/寿/ながち(1)/。
+
+
+    Scenario: Japanese multiword
+        Given language Japanese
+        And text:
+            私は元気です.
+        Then rendered should be:
+            私/は/元気/です/.
+        Given terms:
+            元気です
+        Then rendered should be:
+            私/は/元気です(1)/.
+
+
+    Scenario: Japanese multiword with numbers
+        Given language Japanese
+        And text:
+            1234おれの方が強い。
+        Then rendered should be:
+            1234/おれ/の/方/が/強い/。
+        Given terms:
+            おれの方
+        Then rendered should be:
+            1234/おれの方(1)/が/強い/。
+
+
+    Scenario: Bug fix: ru at end of sentence
+        Given language Japanese
+        And text:
+            している
+        And terms:
+            している
+        Then rendered should be:
+            している(1)
+
+
 # Template
     # Scenario: x
     #     Given language x
