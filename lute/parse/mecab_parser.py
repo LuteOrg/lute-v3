@@ -11,8 +11,8 @@ Includes classes:
 """
 
 import re
-from natto import MeCab
 from typing import List
+from natto import MeCab
 from lute.parse.base import ParsedToken, AbstractParser
 
 
@@ -32,18 +32,18 @@ class JapaneseParser(AbstractParser):
         otherwise false.  The value is cached _just in case_,
         thought that's probably premature optimization.
         """
-        if (JapaneseParser._is_supported is not None):
+        if JapaneseParser._is_supported is not None:
             return JapaneseParser._is_supported
         b = False
         try:
-            nm = MeCab()
+            MeCab()
             b = True
-        except:
+        except:  # pylint: disable=bare-except
             b = False
         JapaneseParser._is_supported = b
         return b
 
-        
+
     @classmethod
     def name(cls):
         return "Japanese"
@@ -65,24 +65,21 @@ class JapaneseParser(AbstractParser):
         tokens = []
         for lin in lines:
             term, node_type, third = lin.split("\t")
-
             is_eos = term in language.regexp_split_sentences
-            is_paragraph = (term == 'EOP' and third == '7')
-            if is_paragraph:
-                term = "¶"
+            if term == 'EOP' and third == '7':
+                term = '¶'
+            is_word = node_type in '2678'
+            p = ParsedToken(term, is_word, is_eos or term == '¶')
+            tokens.append(p)
 
-            count = 0
-            if node_type in '2678':
-                count = 1
-
-            pt = ParsedToken(term, count > 0, is_eos or is_paragraph)
-            tokens.append(pt)
-
-        return tokens;
+        return tokens
 
 
+    # Hiragana is Unicode code block U+3040 - U+309F
+    # ref https://stackoverflow.com/questions/72016049/
+    #   how-to-check-if-text-is-japanese-hiragana-in-python
     def _char_is_hiragana(self, c) -> bool:
-        return u'\u3040' <= c <= u'\u309F'
+        return '\u3040' <= c <= '\u309F'
 
 
     def _string_is_hiragana(self, s: str) -> bool:
@@ -94,7 +91,7 @@ class JapaneseParser(AbstractParser):
         Get the pronunciation for the given text.  For most
         languages, this can't be automated.
         """
-        if self._string_is_hiragana(s):
+        if self._string_is_hiragana(text):
             return None
 
         reading = None
