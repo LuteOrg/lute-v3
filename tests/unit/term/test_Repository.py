@@ -10,7 +10,7 @@ import pytest
 from lute.models.term import Term as DBTerm, TermTag
 from lute.db import db
 from lute.term.model import Term, Repository
-from tests.dbasserts import assert_sql_result
+from tests.dbasserts import assert_sql_result, assert_record_count_equals
 from tests.utils import add_terms
 
 
@@ -151,6 +151,19 @@ def test_delete(app_context, repo, hello_term):
     assert_sql_result(sql, [], 'deleted')
 
 
+def test_delete_leaves_parent(app_context, repo, hello_term):
+    "Parent is left."
+    hello_term.parents.append('parent')
+    repo.add(hello_term)
+    repo.commit()
+    sql = "select WoTextLC from words"
+    assert_sql_result(sql, ['hello', 'parent'], 'records exists')
+
+    repo.delete(hello_term)
+    repo.commit()
+    assert_sql_result(sql, ['parent'], 'parent stays')
+
+
 ## Saving and parents.
 
 def test_save_with_new_parent(app_context, repo, hello_term):
@@ -172,6 +185,46 @@ def test_save_with_new_parent(app_context, repo, hello_term):
     assert parent.translation == hello_term.translation
     assert parent.current_image == hello_term.current_image
     assert parent.parents == []
+
+
+def test_save_remove_parent_breaks_link(app_context, repo, hello_term):
+    "Parent is left."
+    hello_term.parents.append('parent')
+    repo.add(hello_term)
+    repo.commit()
+    sql = "select WoTextLC from words"
+    assert_sql_result(sql, ['hello', 'parent'], 'records exists')
+    assert_record_count_equals('wordparents', 1, 'linked')
+
+    hello_term.parents.remove('parent')
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result(sql, ['hello', 'parent'], 'both stay')
+    assert_record_count_equals('wordparents', 0, 'link broken')
+
+
+def test_save_change_parent_breaks_old_link(app_context, repo, hello_term):
+    "Parent is left."
+    hello_term.parents.append('parent')
+    repo.add(hello_term)
+    repo.commit()
+    sql = "select WoTextLC from words order by WoTextLC"
+    assert_sql_result(sql, ['hello', 'parent'], 'records exists')
+
+    sqlparent = """
+    select c.WoTextLC, p.WoTextLC
+    from wordparents
+    inner join words as c on WpWoID = c.WoID
+    inner join words as p on WpParentWoID = p.WoID
+    """
+    assert_sql_result(sqlparent, ['hello; parent'], 'records exists')
+
+    hello_term.parents.remove('parent')
+    hello_term.parents.append('new')
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result(sql, ['hello', 'new', 'parent'], 'all stay')
+    assert_sql_result(sqlparent, ['hello; new'], 'changed')
 
 
 def test_cant_set_term_as_its_own_parent(app_context, repo, hello_term):
