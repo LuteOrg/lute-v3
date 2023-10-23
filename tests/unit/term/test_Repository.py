@@ -137,6 +137,20 @@ def test_save_uses_existing_TermTags(app_context, repo, hello_term):
     assert_sql_result(sql, [ '1; a; HELLO', '2; b; HELLO' ], 'a used, b created')
 
 
+## Deletes.
+
+def test_delete(app_context, repo, hello_term):
+    "Removes record from db."
+    repo.add(hello_term)
+    repo.commit()
+    sql = "select WoTextLC, WoStatus from words"
+    assert_sql_result(sql, ['hello; 1'], 'record exists')
+
+    repo.delete(hello_term)
+    repo.commit()
+    assert_sql_result(sql, [], 'deleted')
+
+
 ## Saving and parents.
 
 def test_save_with_new_parent(app_context, repo, hello_term):
