@@ -8,6 +8,7 @@ from lute.parse.base import ParsedToken
 
 
 def test_token_count(japanese):
+    "token_count checks."
     cases = [
         ("私", 1),
         ("元気", 1),
@@ -15,7 +16,6 @@ def test_token_count(japanese):
         ( "元気です", 2 ),
         ( "元気です私", 3 )
     ]
-    p = japanese.parser
     for text, expected_count in cases:
         t = Term(japanese, text)
         assert t.token_count == expected_count, text
