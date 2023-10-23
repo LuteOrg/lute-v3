@@ -173,7 +173,7 @@ class Repository:
         if dbt is None:
             return
         self.db.session.delete(dbt)
-        
+
 
     def commit(self):
         """

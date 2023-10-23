@@ -2,8 +2,11 @@
 Term tests.
 """
 
+import pytest
+from sqlalchemy import text
 from lute.models.term import Term
 from lute.db import db
+from tests.dbasserts import assert_record_count_equals
 
 def test_cruft_stripped_on_set_word(spanish):
     "Extra spaces are stripped, because they cause parsing/matching problems."
@@ -15,8 +18,8 @@ def test_cruft_stripped_on_set_word(spanish):
         # ('   hola\tGATO\nok', 'hola GATO ok', 'hola gato ok'),
     ]
 
-    for text, expected_text, expected_text_lc in cases:
-        term = Term(spanish, text)
+    for s, expected_text, expected_text_lc in cases:
+        term = Term(spanish, s)
         assert term.text == expected_text
         assert term.text_lc == expected_text_lc
 
@@ -36,8 +39,8 @@ def test_token_count(english):
         ("...", 1),  # should never happen :-)
     ]
 
-    for text, expected_token_count in cases:
-        term = Term(english, text)
+    for s, expected_token_count in cases:
+        term = Term(english, s)
         assert term.token_count == expected_token_count
 
 
@@ -90,3 +93,92 @@ def test_find_by_spec(app_context, spanish, english):
     spec = Term(spanish, 'gatito')
     found = Term.find_by_spec(spec)
     assert found is None, 'not found with different text'
+
+
+# WoStatusChanged checks.
+#
+# Saving a term changes WoStatusChanged date, via a db trigger.
+
+@pytest.fixture(name="_saved_term")
+def fixture_saved_term(app_context, english):
+    "Saved term."
+    t = Term(english, 'hello')
+    db.session.add(t)
+    db.session.commit()
+    return t
+
+
+def _get_field_value(_saved_term):
+    "Get the updated date, and the timestamp."
+    sql = text("""
+        SELECT
+          WoStatusChanged,
+          ROUND((JULIANDAY(datetime('now')) - JULIANDAY(WoStatusChanged)) * 86400) as diffsecs
+        FROM words
+        WHERE WoID = :term_id
+    """)
+
+    result = db.session.execute(sql, {"term_id": _saved_term.id}).fetchone()
+    diff = int(result[1])
+    return [result[0], diff]
+
+
+def _assert_updated(_saved_term):
+    "Assert the status field was updated."
+    val, diff = _get_field_value(_saved_term)
+    msg = f'Was updated (set to {val})'
+    assert diff <= 100, msg
+
+
+@pytest.mark.term_status_change
+def test_set_on_save_new(app_context, _saved_term):
+    "On save of new Term, status changed is creation date."
+    _assert_updated(_saved_term)
+
+    sql = "select * from words where WoCreated != WoStatusChanged"
+    assert_record_count_equals(sql, 0, 'status changed matches created date')
+
+
+@pytest.mark.term_status_change
+def test_update_status_updates_date(app_context, _saved_term):
+    "On update, if status has changed, change date."
+    db.session.execute(text('update words set WoStatusChanged = "2000-01-01 12:00:00"'))
+    db.session.commit()
+    sql = 'select * from words where WoStatusChanged = "2000-01-01 12:00:00"'
+    assert_record_count_equals(sql, 1, 'WoStatusChanged set to test value')
+
+    _saved_term.status = 2
+    db.session.add(_saved_term)
+    db.session.commit()
+    _assert_updated(_saved_term)
+
+    assert_record_count_equals(sql, 0, 'updated')
+
+
+@pytest.mark.term_status_change
+def test_saving_with_unchanged_status_leaves_date(app_context, _saved_term):
+    "On update, if status has not changed, don't change date."
+    db.session.execute(text('update words set WoStatusChanged = "2000-01-01 12:00:00"'))
+    db.session.commit()
+    _saved_term.status = _saved_term.status
+    db.session.add(_saved_term)
+    db.session.commit()
+    sql = 'select * from words where WoStatusChanged = "2000-01-01 12:00:00"'
+    assert_record_count_equals(sql, 1, 'WoStatusChanged not updated')
+
+
+@pytest.mark.term_status_change
+def test_update_status_via_sql_updates_date(app_context, _saved_term):
+    "On update, if status has changed, change date."
+    db.session.execute(text('update words set WoStatusChanged = "2000-01-01 12:00:00"'))
+    db.session.commit()
+    sql = 'select * from words where WoStatusChanged = "2000-01-01 12:00:00"'
+    assert_record_count_equals(sql, 1, 'WoStatusChanged set to test value')
+
+    db.session.execute(text('update words set WoStatus = 1'))
+    db.session.commit()
+    assert_record_count_equals(sql, 1, 'same status = same WoStatusChanged')
+
+    db.session.execute(text('update words set WoStatus = 2'))
+    db.session.commit()
+    assert_record_count_equals(sql, 0, 'updated WoStatusChanged')
