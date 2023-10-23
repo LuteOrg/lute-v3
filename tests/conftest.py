@@ -126,22 +126,30 @@ def _get_language(f):
     return db_language
 
 
-@pytest.fixture(name="spanish")
-def fixture_spanish(app_context, demo_yaml_folder):
-    "Make spanish from demo file."
-    f = os.path.join(demo_yaml_folder, 'spanish.yaml')
-    return _get_language(f)
+@pytest.fixture(name="test_languages")
+def fixture_test_languages(app_context, demo_yaml_folder):
+    "Dict of available languages for tests."
+    # Hardcoded = good enough.
+    langs = [ 'spanish', 'english', 'japanese', 'turkish' ]
+    ret = {}
+    for lang in langs:
+        f = os.path.join(demo_yaml_folder, f'{lang}.yaml')
+        ret[lang] = _get_language(f)
+    yield ret
 
+
+@pytest.fixture(name="spanish")
+def fixture_spanish(test_languages):
+    return test_languages['spanish']
 
 @pytest.fixture(name="english")
-def fixture_english(app_context, demo_yaml_folder):
-    "Make jp from demo file."
-    f = os.path.join(demo_yaml_folder, 'english.yaml')
-    return _get_language(f)
-
+def fixture_english(test_languages):
+    return test_languages['english']
 
 @pytest.fixture(name="japanese")
-def fixture_japanese(app_context, demo_yaml_folder):
-    "Make jp from demo file."
-    f = os.path.join(demo_yaml_folder, 'japanese.yaml')
-    return _get_language(f)
+def fixture_japanese(test_languages):
+    return test_languages['japanese']
+
+@pytest.fixture(name="turkish")
+def fixture_turkish(test_languages):
+    return test_languages['turkish']

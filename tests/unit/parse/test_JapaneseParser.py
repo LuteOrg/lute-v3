@@ -3,7 +3,23 @@ JapaneseParser tests.
 """
 
 from lute.parse.mecab_parser import JapaneseParser
+from lute.models.term import Term
 from lute.parse.base import ParsedToken
+
+
+def test_token_count(japanese):
+    cases = [
+        ("私", 1),
+        ("元気", 1),
+        ("です", 1),
+        ( "元気です", 2 ),
+        ( "元気です私", 3 )
+    ]
+    p = japanese.parser
+    for text, expected_count in cases:
+        t = Term(japanese, text)
+        assert t.token_count == expected_count, text
+        assert t.text_lc == t.text, 'case'
 
 
 def assert_tokens_equals(text, lang, expected):
