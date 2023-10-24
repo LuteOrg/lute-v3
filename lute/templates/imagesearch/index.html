@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Images</title>
+    <script type="text/javascript" src="/js/jquery.js" charset="utf-8"></script>
+    <style>
+      .initial {
+          border: solid 2px transparent;
+      }
+
+      .highlight {
+          border: solid 2px red !important;
+      }
+
+      .saved {
+          border: solid 2px green !important;
+      }
+
+      span > img {
+          display:inline;
+      }
+    </style>
+  </head>
+
+  <script>
+
+    let update_term_form = function(filename) {
+      // Well, this took **far** too long to figure out ...
+      let fr = window.parent.frames['wordframe'];
+      if (fr == null) {
+        // This feels clumsy.  Summary of bad code: this imagesearch
+        // file is used on the reading pane, where it is presented as a
+        // child iframe inside _another_ iframe.  It is _also_ used on
+        // the term index page, where it is an iframe, but _not_ inside
+        // another iframe.  In this latter case, there is no
+        // window.parent.frames['wordframe'].
+        //
+        // There is probably a much better way of doing this,
+        // but I don't know what it is, and can't be bothered to spend
+        // the time to make this code more "pure."  Suggestions welcome!
+        fr = window.parent;
+      }
+      var el = fr.document.getElementById('term_dto_CurrentImage');
+      el.value = filename;
+      const img = fr.document.getElementById('term_image');
+
+      // Ugly hack: we have to remove the .jpeg at the end, because
+      // Symfony doesn't handle params with periods.
+      // Ref https://github.com/symfony/symfony/issues/25541.
+      // The src/ImageController adds the .jpeg at the end again to
+      // find the actual file.
+      img.src = filename.replace('.jpeg', '');
+    }
+
+    function save_image_locally(src, langid, text) {
+      $.ajax({
+        url: '/bing/save',
+        data: {
+          src: src,
+          langid: langid,
+          text: text
+        },
+        type: 'POST',
+        dataType: 'json',
+        success: function(data) {
+          // console.log("Saved: " + data + "\nStatus: " + status);
+          update_term_form(data.filename);
+          $('.saved').removeClass('saved');
+          $('.highlight').addClass('saved').removeClass('highlight');
+        }
+      });
+    }
+
+    function highlight_image(el) {
+      $(el).addClass('highlight');
+    }
+
+    function un_highlight_image(el) {
+      $(el).removeClass('highlight');
+    }
+
+  </script>
+
+  <body>
+    <p>Clicking an image will save it in your userimages/{{ langid }}/{{ text }}.jpeg</p>
+
+    {% for image in images %}
+    <span class="initial"
+          style="margin: 2px; display:inline-block;"
+          onmouseover="highlight_image(this);"
+          onmouseout="un_highlight_image(this);"
+          onclick='save_image_locally("{{ image['src'] }}", {{ langid }}, "{{ text }}")'
+          >
+      {{ image['html']|raw }}
+    </span>
+    {% endfor %}
+  </body>
+
+</html>

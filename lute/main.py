@@ -12,6 +12,7 @@ from lute.db import db
 from lute.book.routes import bp as book_bp
 from lute.language.routes import bp as language_bp
 from lute.read.routes import bp as read_bp
+from lute.bing.routes import bp as bing_bp
 
 def _setup_app_dirs(app_config):
     """
@@ -93,6 +94,7 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(language_bp)
     app.register_blueprint(book_bp)
     app.register_blueprint(read_bp)
+    app.register_blueprint(bing_bp)
 
     @app.route('/')
     def index():
