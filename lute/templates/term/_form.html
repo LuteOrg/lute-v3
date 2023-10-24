@@ -58,7 +58,7 @@
 
     <tr>
       <td>{{ form.translation }}</td>
-      <td><img class="zoomableTermImage" id="term_image" src="{{ form.current_image.object_data }}" width="50px"/></td>
+      <td><img class="zoomableTermImage" id="term_image" src="{{ form.current_image.object_data or '' }}" width="50px"/></td>
     </tr>
 
     <tr>

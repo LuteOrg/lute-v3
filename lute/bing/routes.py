@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, jsonify
+from flask import Blueprint, request, render_template, jsonify, current_app
 import os
 import urllib.request
 import re
@@ -60,12 +60,15 @@ def bing_save():
     text = request.form['text']
     langid = request.form['langid']
 
-    publicdir = '/userimages/' + str(langid) + '/'
-    realdir = os.path.join(os.path.dirname(__file__), '..', 'data', publicdir)
-    if not os.path.exists(realdir):
-        os.makedirs(realdir)
+    datapath = current_app.config['DATAPATH']
+    imgdir = os.path.join(datapath, 'userimages', langid)
+    if not os.path.exists(imgdir):
+        os.makedirs(imgdir)
     filename = make_filename(text)
-    with urllib.request.urlopen(src) as response, open(os.path.join(realdir, filename), 'wb') as out_file:
+    destfile = os.path.join(imgdir, filename)
+    with urllib.request.urlopen(src) as response, open(destfile, 'wb') as out_file:
         out_file.write(response.read())
 
-    return jsonify({'filename': publicdir + filename})
+    # This is the format of legacy Lute v2 data.
+    image_url = f'/userimages/{langid}/{filename}'
+    return jsonify({ 'filename': image_url })

@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>Images</title>
-    <script type="text/javascript" src="/js/jquery.js" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}" charset="utf-8"></script>
     <style>
       .initial {
           border: solid 2px transparent;
@@ -41,7 +41,7 @@
         // the time to make this code more "pure."  Suggestions welcome!
         fr = window.parent;
       }
-      var el = fr.document.getElementById('term_dto_CurrentImage');
+      var el = fr.document.getElementById('current_image');
       el.value = filename;
       const img = fr.document.getElementById('term_image');
 
@@ -92,7 +92,7 @@
           onmouseout="un_highlight_image(this);"
           onclick='save_image_locally("{{ image['src'] }}", {{ langid }}, "{{ text }}")'
           >
-      {{ image['html']|raw }}
+      {{ image['html'] | safe }}
     </span>
     {% endfor %}
   </body>
