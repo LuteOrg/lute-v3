@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 from flask import Blueprint, render_template, flash, redirect
 from lute.read.service import get_paragraphs, set_unknowns_to_known
+from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.forms import TermForm
 from lute.models.book import Book, Text
@@ -223,3 +224,20 @@ def term_popup(termid):
 @bp.route('/keyboard_shortcuts', methods=['GET'])
 def keyboard_shortcuts():
     return render_template('read/keyboard_shortcuts.html')
+
+
+@bp.route('/editpage/<int:textid>', methods=['GET', 'POST'])
+def edit_page(textid):
+    "Edit the text on a page."
+    text = db.session.get(Text, textid)
+    if text is None:
+        return redirect('/', 302)
+    form = TextForm(obj=text)
+
+    if form.validate_on_submit():
+        form.populate_obj(text)
+        db.session.add(text)
+        db.session.commit()
+        return redirect(f'/read/{text.book.id}/page/{text.order}', 302)
+
+    return render_template('read/page_edit_form.html', form=form)

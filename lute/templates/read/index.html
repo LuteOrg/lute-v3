@@ -45,7 +45,7 @@
             <img src="{{ url_for('static', filename='/icn/external.png') }}" title="Show source URL" />
           </a>
           {% endif %}
-          <a id="editText" href="/text/{{ text.id }}/edit" tabindex="-1">
+          <a id="editText" href="/read/editpage/{{ text.id }}" tabindex="-1">
             <img src="{{ url_for('static', filename='/icn/document--pencil.png') }}"
                  title="Edit" alt="Edit" />
           </a>
