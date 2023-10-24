@@ -144,7 +144,7 @@
         },
         onTagClicked: function (evt, ui) {
           // Exit early if language not set - can't handle, too complicated.
-          if ("{{ form.language_id.value }}" == "") {
+          if ($("#language_id").val() == "") {
             return;
           }
 
@@ -171,13 +171,14 @@
 
           // alert("You clicked me: " + clickedtagtext);
           // We should never reach this point if the lang is not set.
-          const langid = {{ form.language_id.value | default(-1) }};
+          const langid = {{ form.language_id.object_data }};
           let url = '';
           {% if parent_link_to_frame %}
           url = `/read/termform/${langid}/${clickedtagtext}`;
           {% else %}
           url = `/term/editbytext/${langid}/${clickedtagtext}`;
           {% endif %}
+          // alert('go to url ' + url);
 
           window.location = url;
         },
