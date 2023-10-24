@@ -111,6 +111,29 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
         return ret
 
 
+    @classmethod
+    def all_dictionaries(cls):
+        """
+        All dictionaries for all languages.
+        """
+        languages = Language.query.all()
+        language_data = {}
+        for language in languages:
+            term_dicts = [
+                language.dict_1_uri,
+                language.dict_2_uri
+            ]
+            term_dicts = [uri for uri in term_dicts if uri is not None]
+
+            data = {
+                'term': term_dicts,
+                'sentence': language.sentence_translate_uri
+            }
+
+            language_data[language.id] = data
+        return language_data
+
+
     # TODO language relationships: should deleting lang should delete books and terms
     # books = db.relationship('Book', backref='language', lazy='extra')
     # terms = db.relationship('Term', backref='language', lazy='extra')

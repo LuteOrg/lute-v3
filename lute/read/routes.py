@@ -2,17 +2,18 @@
 /read endpoints.
 """
 
-from sqlalchemy.exc import IntegrityError
 from datetime import datetime
+from sqlalchemy.exc import IntegrityError
 
 from flask import Blueprint, render_template, flash, redirect
-
 from lute.read.service import get_paragraphs, set_unknowns_to_known
 from lute.term.model import Repository
 from lute.term.forms import TermForm
 from lute.models.book import Book, Text
+from lute.models.language import Language
 from lute.models.term import Term as DBTerm
 from lute.db import db
+
 
 bp = Blueprint('read', __name__, url_prefix='/read')
 
@@ -180,6 +181,7 @@ def term_form(langid, text):
         '/read/frameform.html',
         form=form,
         term=term,
+        language_dicts=Language.all_dictionaries(),
         showlanguageselector=False,
 
         # TODO term tags: pass dynamic list.

@@ -274,8 +274,7 @@
 
   /** LOOKUPS */
 
-  var LANGUAGES = {};
-  $.get('/language/jsonlist', function(data) { LANGUAGES = data; })
+  var LANGUAGES = {{ language_dicts | safe }};
 
   // Term lookups cycle through the available dictionaries in the language.
   var termdictindex = 0;
