@@ -3,10 +3,11 @@
 """
 
 from sqlalchemy.exc import IntegrityError
+from datetime import datetime
 
-from flask import Blueprint, render_template, flash
+from flask import Blueprint, render_template, flash, redirect
 
-from lute.read.service import get_paragraphs
+from lute.read.service import get_paragraphs, set_unknowns_to_known
 from lute.term.model import Repository
 from lute.term.forms import TermForm
 from lute.models.book import Book, Text
@@ -15,6 +16,14 @@ from lute.db import db
 
 bp = Blueprint('read', __name__, url_prefix='/read')
 
+
+def _page_in_range(book, n):
+    "Return the page number respecting the page range."
+    ret = max(n, 1)
+    ret = min(ret, book.page_count)
+    return ret
+
+
 @bp.route('/<int:bookid>/page/<int:pagenum>', methods=['GET'])
 def read(bookid, pagenum):
     "Display reading pane for book page."
@@ -22,13 +31,7 @@ def read(bookid, pagenum):
     book = Book.find(bookid)
     lang = book.language
 
-    def page_in_range(n):
-        "Force n in range 1 to book.page_count."
-        n = max(n, 1)
-        n = min(n, book.page_count)
-        return n
-
-    pagenum = page_in_range(pagenum)
+    pagenum = _page_in_range(book, pagenum)
     text = book.texts[pagenum - 1]
     book.current_tx_id = text.id
     db.session.add(book)
@@ -36,10 +39,10 @@ def read(bookid, pagenum):
 
     paragraphs = get_paragraphs(text)
 
-    prevpage = page_in_range(pagenum - 1)
-    nextpage = page_in_range(pagenum + 1)
-    prev10 = page_in_range(pagenum - 10)
-    next10 = page_in_range(pagenum + 10)
+    prevpage = _page_in_range(book, pagenum - 1)
+    nextpage = _page_in_range(book, pagenum + 1)
+    prev10 = _page_in_range(book, pagenum - 10)
+    next10 = _page_in_range(book, pagenum + 10)
 
     # TODO book stats: mark stale for recalc later
     # BookStats.markStale(book)
@@ -59,6 +62,35 @@ def read(bookid, pagenum):
         nextpage=nextpage,
         next10page=next10,
         paragraphs=paragraphs)
+
+
+def _process_footer_action(bookid, pagenum, nextpage, set_to_known = True):
+    """"
+    Mark as read,
+    optionally mark all terms as known on the current page,
+    and go to the next page.
+    """
+    book = Book.find(bookid)
+    pagenum = _page_in_range(book, pagenum)
+    text = book.texts[pagenum - 1]
+    text.read_date = datetime.now()
+    db.session.add(text)
+    db.session.commit()
+    if set_to_known:
+        set_unknowns_to_known(text)
+    return redirect(f'/read/{bookid}/page/{nextpage}', code=302)
+
+
+@bp.route('/<int:bookid>/page/<int:pagenum>/allknown/<int:nextpage>', methods=['post'])
+def allknown(bookid, pagenum, nextpage):
+    "Mark all as known, go to next page."
+    return _process_footer_action(bookid, pagenum, nextpage, True)
+
+
+@bp.route('/<int:bookid>/page/<int:pagenum>/markread/<int:nextpage>', methods=['post'])
+def mark_read(bookid, pagenum, nextpage):
+    "Mark page as read, go to the next page."
+    return _process_footer_action(bookid, pagenum, nextpage, False)
 
 
 # TODO unused code: this may not be used.
