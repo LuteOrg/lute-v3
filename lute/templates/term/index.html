@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+
+{% block title %}Term index{% endblock %}
+
+{% block body %}
+
+<p><img id="showHideFilters" src="/icn/plus-button.png" style="cursor: pointer"> Filters</p>
+<div id="filterControls" style="display: none; margin-left: 20px;">
+  <table>
+    <tr>
+      <td>Parent terms only</td>
+      <td>
+        <input id="filtParentsOnly" type="checkbox" />
+      </td>
+    </tr>
+    <tr>
+      <td>Age (days since created)</td>
+      <td>
+        <input id="filtAgeMin" style="width: 50px;" type="text" placeholder="min" />
+        to
+        <input id="filtAgeMax" style="width: 50px;" type="text" placeholder="max" />
+      </td>
+    </tr>
+    <tr>
+      <td>Status range</td>
+      <td>
+        <select id="filtStatusMin">
+          <option value=0></option>
+          <option value=1>New (1)</option>
+          <option value=2>New (2)</option>
+          <option value=3>Learn (3)</option>
+          <option value=4>Learn (4)</option>
+          <option value=5>Learned</option>
+          <option value=99>Well Known</option>
+        </select>
+        to
+        <select id="filtStatusMax">
+          <option value=0></option>
+          <option value=1>New (1)</option>
+          <option value=2>New (2)</option>
+          <option value=3>Learn (3)</option>
+          <option value=4>Learn (4)</option>
+          <option value=5>Learned</option>
+          <option value=99>Well Known</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Include Ignored</td>
+      <td>
+        <input id="filtIncludeIgnored" type="checkbox" />
+      </td>
+    </tr>
+  </table>
+  <button id="clearFilters">Clear all</button>
+  <br />
+</div>
+
+<div style="margin-top: 10px; margin-bottom: 10px;">
+  <a href="#">Create new - TODO</a>
+  &nbsp;|&nbsp;
+  Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" disabled >go</button>
+</div>
+
+<table id="termtable" class="table dataTable stripe" style="table-layout:fixed;" >
+  <thead>
+    <tr>
+      <th style="width: 20px;"><input type="checkbox" id="chkAll" onclick="handleChkAll()"></th>
+      <th>Term</th>
+      <th>Parent</th>
+      <th>Translation</th>
+      <th>Language</th>
+      <th>Tags</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+</table>
+
+<script>
+
+  let setup_term_datatable = function(initial_search) {
+    var table = $('#termtable').DataTable({
+      responsive: true,
+      select: true,
+      lengthMenu: [ 25, 50, 100 ],
+      paging: true,
+      info: true,
+      searching: true,
+      processing: true,
+      serverSide: true,
+      stateSave: true,
+      search: { search: initial_search },
+      columnDefs: [
+        {
+          // "chk" is included in the underlying SQL query.
+          // Without it, datatables would place the values
+          // in the wrong table columns.  Ugly hack, but works.
+          "name": "chk",
+          "targets": 0,
+          "searchable": false, "orderable": false, "data": null,
+          "render": function (data, type, row, meta) {
+            return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row[7]}" langid="${row[8]}" onclick="handleChkClick()">`;
+          }
+        },
+
+        { "name": "WoText", "targets": 1,
+          "render": function ( data, type, row, meta ) {
+            return `<a href="/term/${row[7]}/edit">${row[1]}</a>`;
+          }
+        },
+        { "name": "ParentText", "targets": 2 },
+        { "name": "WoTranslation", "targets": 3, width: "40%",
+          "render": function ( data, type, row, meta ) {
+            let tx = row[3] ?? '';
+            let imgsrc = row[9] ?? '';
+            if (imgsrc != '')
+              imgsrc = `<img style="margin-top: 5px;" src="${imgsrc}" />`;
+            let ret = [ tx, imgsrc ].filter((s) => s != '');
+            return ret.join('<br />');
+          },
+          "searchable": false, "orderable": false,
+        },
+        { "name": "LgName", "targets": 4 },
+        { "name": "TagList", "targets": 5 },
+        { "name": "StText", "targets": 6 },
+        { "name": "WoID", "targets": 7, "data": null, "visible": false },
+        { "name": "LgID", "targets": 8, "data": null, "visible": false },
+        { "name": "WiSource", "targets": 9, "data": null, "visible": false },
+      ],
+
+      // Ajax call
+      ajax: {
+        url: '/term/datatables',
+        type: "POST",
+
+        // Additional filters.  func calls are required to get the
+        // current filter field values.  These are included in the
+        // data sent to the controller, and are used by the
+        // TermRepository.
+        data: {
+          filtParentsOnly: () => $('#filtParentsOnly').prop('checked'),
+          filtAgeMin: () => $('#filtAgeMin').val(),
+          filtAgeMax: () => $('#filtAgeMax').val(),
+          filtStatusMin: () => $('#filtStatusMin').val(),
+          filtStatusMax: () => $('#filtStatusMax').val(),
+          filtIncludeIgnored: () => $('#filtIncludeIgnored').prop('checked')
+        },
+
+        dataType: "json"
+      },
+
+    });
+  } // end setup_term_datatable
+
+
+  let handleChkAll = function() {
+    const v = $('#chkAll').prop('checked');
+    $('.chkWord').each(function(i) {
+      $(this).prop('checked', v);
+    });
+    handleChkClick(true);
+  }
+
+  let handleChkClick = function(leave_checkAll = false) {
+    if (! leave_checkAll)
+      $('#chkAll').prop('checked', false);
+    const n = $('.chkWord:checked').length;
+    const lang_id = get_lang_id();
+    const disabled = ((n == 0) || lang_id == null);
+    $("#txtSetParent").prop('disabled', disabled);
+    $("#btnSetParent").prop('disabled', disabled);
+  }
+
+
+  // Return the clicked checkboxes' language ID,
+  // or null if the lang id isn't the same for all.
+  let get_lang_id = function() {
+    let langids = [];
+    $('.chkWord:checked').each(function(i) {
+      langids.push($(this).attr('langid'));
+    });
+    const unique_langids = [...new Set(langids)];
+    if (unique_langids.length == 1) {
+      return unique_langids[0];
+    }
+    return null;
+  }
+
+  let handle_set_parent_click = function() {
+    const lang_id = get_lang_id();
+    if (lang_id == null) {
+      alert("All terms must be of the same language.");
+      return;
+    }
+    let wordids = [];
+    $('.chkWord:checked').each(function(i) {
+      wordids.push($(this).attr('wordid'));
+    });
+    const ptxt = $('#txtSetParent').val();
+
+    const resp = confirm(`Change parent for ${wordids.length} term(s) to "${ptxt}"?  Note this will *remove* any existing parents for these terms.`);
+    if (! resp)
+      return;
+
+    $.ajax({
+      url: '/term/bulk_set_parent',
+      data: {
+        wordids: wordids,
+        langid: lang_id,
+        parenttext: ptxt
+      },
+      type: 'POST',
+      dataType: 'json',
+      success: function(data) {
+        location.reload();
+      }
+    });
+  }
+
+
+  let set_up_parent_autocomplete = function() {
+    $("#txtSetParent").autocomplete({
+      source: function(request, response) {
+        const lang_id = get_lang_id();
+        if (lang_id == null) {
+          // This should never occur; the text
+          // box should be disabled if lang_id is null.
+          response([], null);
+        }
+
+        const s = encodeURIComponent(request.term);
+        $.ajax({
+          url: `/term/search/${s}/${lang_id}`,
+          type: 'GET',
+          dataType: 'json',
+          minLength: 2,
+          success: function(data) {
+            arr = data.map(function(word) {
+              let label = word.text;
+              if (word.translation != null && word.translation != '') {
+                label = `${label} (${word.translation})`;
+              }
+              const obj = {
+                label: label,
+                value: word.text,
+                word: word.text,
+                translation: word.translation
+              };
+              return obj;
+            });
+            response(arr, data);
+          }
+        })
+      }
+    });
+  };
+
+
+  let handle_filter_update = function() {
+    const store = {
+      filtDisplay: $('#filterControls').css('display'),
+      filtParentsOnly: $('#filtParentsOnly').prop('checked'),
+      filtAgeMin: $('#filtAgeMin').val(),
+      filtAgeMax: $('#filtAgeMax').val(),
+      filtStatusMin: $('#filtStatusMin').val(),
+      filtStatusMax: $('#filtStatusMax').val(),
+      filtIncludeIgnored: $('#filtIncludeIgnored').prop('checked')
+    };
+    // console.log('saving: ' + JSON.stringify(store));
+    sessionStorage.setItem('termtable_filters', JSON.stringify(store));
+    $('#termtable').DataTable().draw();
+  };
+
+
+  let load_filters_from_storage = function() {
+    fs = sessionStorage.getItem('termtable_filters');
+    console.log(fs);
+    if (fs == null)
+      return;
+    store = JSON.parse(fs);
+    $('#filterControls').css('display', store.filtDisplay);
+
+    if (store.filtDisplay == 'none')
+      return;
+
+    $('#showHideFilters').prop('src', '/icn/minus-button.png');
+    $('#filtParentsOnly').prop('checked', store.filtParentsOnly);
+    if (store.filtAgeMin != '')
+      $('#filtAgeMin').val(parseInt(store.filtAgeMin));
+    if (store.filtAgeMax != '')
+    $('#filtAgeMax').val(parseInt(store.filtAgeMax));
+    $('#filtStatusMin').val(parseInt(store.filtStatusMin));
+    $('#filtStatusMax').val(parseInt(store.filtStatusMax));
+    $('#filtIncludeIgnored').prop('checked', store.filtIncludeIgnored);
+
+    // Have to re-load the data table, now that the filters have changed.
+    $('#termtable').DataTable().draw();
+  };
+  
+  let handle_show_hide_filter_click = function() {
+    const fc = $('#filterControls');
+    const is_hidden = (fc.css('display') == 'none');
+    const new_src = is_hidden ? '/icn/minus-button.png' : '/icn/plus-button.png';
+    $('#showHideFilters').prop('src', new_src);
+    if (! is_hidden)
+      handle_clear_filters();
+    fc.css('display', is_hidden ? 'block' : 'none');
+    handle_filter_update();
+  };
+
+  let handle_clear_filters = function() {
+    $('#filtParentsOnly').prop('checked', false);
+    $('#filtAgeMin').val('');
+    $('#filtAgeMax').val('');
+    $('#filtStatusMin').val(0);
+    $('#filtStatusMax').val(0);
+    $('#filtIncludeIgnored').prop('checked', false);
+    handle_filter_update();
+  };
+
+  $(document).ready(function () {
+    setup_term_datatable("{{ initial_search or '' }}");
+    set_up_parent_autocomplete();
+    $('#btnSetParent').click(handle_set_parent_click);
+    $('#showHideFilters').click(handle_show_hide_filter_click);
+    
+    $('#filtParentsOnly').change(handle_filter_update);
+    $('#filtAgeMin').keyup(handle_filter_update);
+    $('#filtAgeMax').keyup(handle_filter_update);
+    $('#filtStatusMin').change(handle_filter_update);
+    $('#filtStatusMax').change(handle_filter_update);
+    $('#filtIncludeIgnored').change(handle_filter_update);
+    $('#clearFilters').click(handle_clear_filters);
+
+    load_filters_from_storage();
+  });
+
+
+</script>
+
+{% endblock %}
