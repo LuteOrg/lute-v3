@@ -94,23 +94,6 @@ def mark_read(bookid, pagenum, nextpage):
     return _process_footer_action(bookid, pagenum, nextpage, False)
 
 
-# TODO unused code: this may not be used.
-@bp.route('/text/<int:textid>', methods=['GET'])
-def read_text(textid):
-    "Display a text."
-    text = Text.find(textid)
-    lang = text.book.language
-    is_rtl = lang.right_to_left
-    paragraphs = get_paragraphs(text)
-
-    return render_template(
-        'read/text.html',
-        textid=textid,
-        is_rtl=is_rtl,
-        dictionary_url = lang.sentence_translate_uri,
-        paragraphs=paragraphs)
-
-
 @bp.route('/sentences/<int:textid>', methods=['GET'])
 def sentences(textid):
     "Display sentences for the given text."
