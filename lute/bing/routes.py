@@ -1,7 +1,12 @@
-from flask import Blueprint, request, render_template, jsonify, current_app
+"""
+Getting and saving bing image search results.
+"""
+
 import os
-import urllib.request
 import re
+import urllib.request
+from flask import Blueprint, request, render_template, jsonify, current_app
+
 
 bp = Blueprint('bing', __name__, url_prefix='/bing')
 
@@ -20,32 +25,40 @@ def bing_search(langid, text, searchstring):
     search = urllib.parse.quote(text)
     searchparams = searchstring.replace("###", search)
     url = "https://www.bing.com/images/search?" + searchparams
-    content = urllib.request.urlopen(url).read().decode('utf-8')
+    content = ''
+    with urllib.request.urlopen(url) as s:
+        content = s.read().decode('utf-8')
 
     # Samples
     # <img class="mimg vimgld" ... data-src="https:// ...">
     # or
     # <img class="mimg rms_img" ... src="https://tse4.mm.bing ..." >
-    
+
     pattern = r'(<img .*?>)'
     matches = re.findall(pattern, content, re.I)
-    
+
     images = list(matches)
 
-    is_search_img = lambda img: not ('src="/' in img) and ('rms_img' in img or 'vimgld' in img)
-    images = list(filter(is_search_img, images))
-
-    fix_data_src = lambda img: img.replace('data-src=', 'src=')
-    images = list(map(fix_data_src, images))
+    def is_search_img(img):
+        return not ('src="/' in img) and ('rms_img' in img or 'vimgld' in img)
+    def fix_data_src(img):
+        return img.replace('data-src=', 'src=')
+    images = [fix_data_src(i) for i in images if is_search_img(i)]
 
     # Reduce image load count so we don't kill subpage loading.
     images = images[:25]
 
-    build_struct = lambda image: {
-        'html': image,
-        'src': re.search(r'src="(.*?)"', image).group(1) if re.search(r'src="(.*?)"', image) else 'missing'
-    }
-    data = list(map(build_struct, images))
+    def build_struct(image):
+        src = 'missing'
+        m = re.search(r'src="(.*?)"', image)
+        if m:
+            src = m.group(1)
+        return {
+            'html': image,
+            'src': src
+        }
+
+    data = [build_struct(i) for i in images]
 
     return render_template('imagesearch/index.html', langid=langid, text=text, images=data)
 
@@ -56,6 +69,10 @@ def make_filename(text):
 
 @bp.route('/save', methods=['POST'])
 def bing_save():
+    """
+    Save the posted image data to DATAPATH/userimages,
+    returning the filename.
+    """
     src = request.form['src']
     text = request.form['text']
     langid = request.form['langid']
