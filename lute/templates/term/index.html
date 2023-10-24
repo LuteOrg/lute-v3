@@ -4,7 +4,10 @@
 
 {% block body %}
 
-<p><img id="showHideFilters" src="/icn/plus-button.png" style="cursor: pointer"> Filters</p>
+<p>
+  <img id="showHideFilters" src="{{ url_for('static', filename='icn/plus-button.png') }}" />
+  Filters
+</p>
 <div id="filterControls" style="display: none; margin-left: 20px;">
   <table>
     <tr>
@@ -284,7 +287,7 @@
     if (store.filtDisplay == 'none')
       return;
 
-    $('#showHideFilters').prop('src', '/icn/minus-button.png');
+    $('#showHideFilters').prop('src', "{{ url_for('static', filename='icn/minus-button.png') }}");
     $('#filtParentsOnly').prop('checked', store.filtParentsOnly);
     if (store.filtAgeMin != '')
       $('#filtAgeMin').val(parseInt(store.filtAgeMin));
@@ -301,7 +304,7 @@
   let handle_show_hide_filter_click = function() {
     const fc = $('#filterControls');
     const is_hidden = (fc.css('display') == 'none');
-    const new_src = is_hidden ? '/icn/minus-button.png' : '/icn/plus-button.png';
+    const new_src = is_hidden ? "{{ url_for('static', filename='icn/minus-button.png') }}" : "{{ url_for('static', filename='icn/plus-button.png') }}";
     $('#showHideFilters').prop('src', new_src);
     if (! is_hidden)
       handle_clear_filters();
