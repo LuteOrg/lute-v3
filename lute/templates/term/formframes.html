@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div id="form-frame-left" style="width: 50%;">
+  {% if newterm %}
+  <h1>New Term</h1>
+  {% else %}
+  <h1>Edit Term</h1>
+  {% endif %}
+
+  {% include('term/_form.html') %}
+
+  <a href="/term/index">back to list</a>
+
+  {% if not newterm %}
+  TODO term form: delete button
+  <p include('term/_delete_form.html') /p>
+  {% endif %}
+</div>
+
+
+<div id="reading-frames-right" style="position: fixed; top: 0; right: 0; height: 95%; 
+width: 50%;">
+  <iframe name="dictframe" class="rightreadingframe" src="/read/empty" scrolling="auto"
+          style="height: 100%; width: 100%;" frameBorder="1">
+    Frame support required.
+  </iframe>
+</div>
+
+{% endblock %}
