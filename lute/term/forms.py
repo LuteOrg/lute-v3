@@ -37,5 +37,4 @@ class TermForm(FlaskForm):
 
     term_tags = FieldList(StringField('term_tags'))
 
-    # TODO term form images: hide this, change to HiddenField
-    current_image = StringField('current_image')
+    current_image = HiddenField('current_image')
