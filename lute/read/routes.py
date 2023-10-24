@@ -30,6 +30,10 @@ def read(bookid, pagenum):
 
     pagenum = page_in_range(pagenum)
     text = book.texts[pagenum - 1]
+    book.current_tx_id = text.id
+    db.session.add(book)
+    db.session.commit()
+
     paragraphs = get_paragraphs(text)
 
     prevpage = page_in_range(pagenum - 1)
@@ -37,9 +41,6 @@ def read(bookid, pagenum):
     prev10 = page_in_range(pagenum - 10)
     next10 = page_in_range(pagenum + 10)
 
-    # TODO book: set the book.currentpage db
-    # facade = ReadingFacade()
-    # facade.set_current_book_text(text)
     # TODO book stats: mark stale for recalc later
     # BookStats.markStale(book)
 
