@@ -38,15 +38,15 @@ def fixture_config():
     if 'DATAPATH' not in config:
         failures.append("add DATAPATH")
 
-    dbname = config.get('DBNAME')
-    if not dbname.startswith('test_'):
+    ac = AppConfig(configfile)
+
+    if not ac.is_test_db:
         failures.append("DBNAME must start with test_")
 
     if len(failures) > 0:
         msg = f"Bad config.yml: {', '.join(failures)}"
         pytest.exit(msg)
 
-    ac = AppConfig(configfile)
     yield ac
 
 

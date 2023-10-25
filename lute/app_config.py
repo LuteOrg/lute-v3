@@ -77,6 +77,16 @@ class AppConfig:
         "Database name."
         return self._db_name
 
+    @property
+    def is_test_db(self):
+        """
+        True if the db name starts with test_.
+
+        This is useful because various invoke tasks
+        in /invoke.py check if the database is a test_
+        db prior to running some destructive action.
+        """
+        return self.dbname.startswith('test_')
 
     @property
     def dbfilename(self):
