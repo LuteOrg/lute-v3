@@ -104,14 +104,12 @@ class Repository:
         if t is not None:
             return t
 
-        # Use spec term to get proper downcasing for original text.
-        # TODO term change case: spec term may not be necessary.
         spec = self._search_spec_term(langid, text)
         t = Term()
         t.language = spec.language
         t.language_id = langid
         t.text = text
-        t.original_text = spec.text_lc
+        t.original_text = text
         return t
 
 
