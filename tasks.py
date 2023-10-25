@@ -14,8 +14,13 @@ invoke --list          # list all tasks
 invoke --help <cmd>    # See docstrings and help notes
 """
 
-from invoke import task, Collection
+import os
 import pytest
+from invoke import task, Collection
+
+from lute.app_config import AppConfig
+from lute.db.setup.main import setup_db
+
 
 @task
 def lint(c):
@@ -68,15 +73,86 @@ ns.add_task(lint)
 ns.add_task(test)
 ns.add_task(coverage)
 ns.add_task(todos)
-    
+
+
+##############################
+# Dev tasks
+
+@task
+def dev_start(c):
+    """
+    Start the dev server, using script dev.py.
+    """
+    thisdir = os.path.dirname(os.path.realpath(__file__))
+    devscript = os.path.join(thisdir, 'dev.py')
+    c.run(f'python {devscript}')
+
+devtasks = Collection('dev')
+devtasks.add_task(dev_start, 'start')
+ns.add_collection(devtasks)
+
+
+##############################
+# DB tasks
+
+@task
+def db_reset(c):
+    """
+    Reset the database to the demo data. Can only be run on a testing db.
+
+    It appears that doing this requires a restart of the dev server ...
+    some file handle issue, I suppose.
+    """
+    ac = AppConfig.create_from_config()
+    if ac.is_test_db is False:
+        raise ValueError('not a test db')
+    print(f'replacing {ac.dbfilename} with new demo db ...')
+    os.unlink(ac.dbfilename)
+    setup_db(ac)
+    assert os.path.exists(ac.dbfilename)
+    print('ok')
+
+
 @task
 def db_export_baseline(c):
     """
-    Create a new baseline db file from the current db.
-    
-    This assumes that the current db is in data/test_lute.db.
+    Reset the db, and create a new baseline db file from the current db.
     """
-    print('TODO: reset the db data.')
+
+    # Running the delete task before this one as a pre- step was
+    # causing problems (sqlite file not in correct state), so this
+    # asks the user to verify.
+    text = input(f'Have you reset the db?  (y/n): ')
+    if (text != 'y'):
+        print('quitting.')
+        return
+
+    thisdir = os.path.dirname(os.path.realpath(__file__))
+    destfile = os.path.join(thisdir, 'lute', 'db', 'schema', 'baseline.sql')
+    tempfile = f'{destfile}.temp'
+    commands = f"""
+    echo "-- ------------------------------------------" > {tempfile}
+    echo "-- Baseline db with migrations and demo data." >> {tempfile}
+    echo "-- Generated from 'inv db.export.baseline'" >> {tempfile}
+    echo "-- ------------------------------------------" >> {tempfile}
+    echo "" >> {tempfile}
+    sqlite3 data/test_lute.db .dump >> {tempfile}
+    """
+    c.run(commands)
+
+    print(f'Verifying {tempfile}')
+    with open(tempfile) as f:
+        checkstring = 'Tutorial follow-up'
+        if checkstring in f.read():
+            print(f'"{checkstring}" found, likely ok.')
+        else:
+            print(f'"{checkstring}" NOT found, something likely wrong.')
+            raise RuntimeError(f'Missing "{checkstring}" in exported file.')
+
+    os.rename(tempfile, destfile)
+    print(f'{destfile} updated:')
+    c.run(f'git diff -- {destfile}')
+    print()
 
 
 @task
@@ -86,7 +162,8 @@ def db_export_empty(c):
     
     This assumes that the current db is in data/test_lute.db.
     """
-    destfile = 'lute/db/schema/empty.sql'
+    thisdir = os.path.dirname(os.path.realpath(__file__))
+    destfile = os.path.join(thisdir, 'lute', 'db', 'schema', 'empty.sql')
     commands = f"""
     echo "-- ------------------------------------------" > {destfile}
     echo "-- Empty db schema, with _migrations tracked." >> {destfile}
@@ -103,6 +180,7 @@ def db_export_empty(c):
 
 
 dbtasks = Collection('db')
+dbtasks.add_task(db_reset, 'reset')
 dbexport = Collection('export')
 dbexport.add_task(db_export_baseline, 'baseline')
 dbexport.add_task(db_export_empty, 'empty')

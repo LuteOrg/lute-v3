@@ -1,3 +1,8 @@
+-- ------------------------------------------
+-- Baseline db with migrations and demo data.
+-- Generated from 'inv db.export.baseline'
+-- ------------------------------------------
+
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS "_migrations" (

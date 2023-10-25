@@ -11,6 +11,10 @@ Ref https://stackoverflow.com/questions/37650208/flask-cant-find-app-file
 This works on Mac:
 
 python `pwd`/dev.py
+
+Optionally, use the dev.start task:
+
+inv dev.start
 """
 
 from lute.main import init_db_and_app
