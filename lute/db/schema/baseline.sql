@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS "settings" (
 	"StValue" VARCHAR(40) NULL  ,
 	PRIMARY KEY ("StKey")
 );
+INSERT INTO settings VALUES('IsDemoData','1');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
