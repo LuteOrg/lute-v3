@@ -1,9 +1,13 @@
 """
-Database setup.
+Database setup:
 
-Creates database if necessary.
-Runs migrations.
-Manages backups pre-migration.a
+- Creates database if necessary.
+- Runs migrations.
+- Manages backups pre-migration.
+
+Methods:
+
+- setup_db(app_config): setup a db with the given config.
 """
 
 from contextlib import closing
@@ -125,3 +129,38 @@ class Setup: # pylint: disable=too-few-public-methods
             has_migs = self._migrator.has_migrations(conn)
             self._migrator.do_migration(conn)
         return has_migs
+
+
+
+def _schema_dir():
+    "Where schema files are found."
+    thisdir = os.path.dirname(os.path.realpath(__file__))
+    return os.path.join(thisdir, '..', 'schema')
+
+
+def _create_migrator():
+    """
+    Create SqliteMigrator with prod migration folders.
+    """
+    schema_dir = _schema_dir()
+    migdir = os.path.join(schema_dir, 'migrations')
+    repeatable = os.path.join(schema_dir, 'migrations_repeatable')
+    return SqliteMigrator(migdir, repeatable)
+
+
+def setup_db(app_config):
+    """
+    Main setup routine.
+    """
+    dbfile = app_config.dbfilename
+    backup_dir = os.path.join(app_config.datapath, 'backups')
+    backup_count = 20  # Arbitrary
+    bm = BackupManager(dbfile, backup_dir, backup_count)
+
+    schema_dir = _schema_dir()
+    baseline = os.path.join(schema_dir, 'baseline.sql')
+
+    migrator = _create_migrator()
+
+    setup = Setup(dbfile, baseline, bm, migrator)
+    setup.setup()
