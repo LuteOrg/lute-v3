@@ -1,0 +1,69 @@
+"""
+TermForm tests.
+
+Tests lute.term.model.Term *domain* objects being saved
+and retrieved from DB.
+"""
+
+import pytest
+
+from lute.models.term import Term as DBTerm, TermTag
+from lute.db import db
+from lute.term.model import Term, Repository
+from lute.term.forms import TermForm
+from tests.dbasserts import assert_sql_result, assert_record_count_equals
+from tests.utils import add_terms
+
+
+def test_validate(app_context, english):
+    "A new term is valid."
+    repo = Repository(db)
+    t = repo.find_or_new(english.id, 'CAT')
+    f = TermForm(obj = t)
+    assert f.validate() is True, 'no change = valid'
+
+
+def test_text_change_not_valid(app_context, english):
+    "Text change raises error."
+    dbt = DBTerm(english, 'CAT')
+    db.session.add(dbt)
+    db.session.commit()
+
+    repo = Repository(db)
+    t = repo.find_or_new(english.id, 'CAT')
+    t.text = 'dog'
+    f = TermForm(obj = t)
+    is_valid = f.validate()
+    assert is_valid is False, 'text change = not valid'
+    assert f.errors == {'text': ['Can only change term case']}
+
+
+def test_duplicate_text_not_valid(app_context, english):
+    "Duplicate term throws."
+    dbt = DBTerm(english, 'CAT')
+    db.session.add(dbt)
+    db.session.commit()
+
+    t = Term()
+    t.language_id = english.id
+    t.text = 'cat'
+    f = TermForm(obj = t)
+
+    is_valid = f.validate()
+    assert is_valid is False, 'dup term not valid'
+    assert f.errors == {'text': ['Term already exists']}
+
+
+def test_update_existing_term_is_valid(app_context, english):
+    "Can update an existing term."
+    dbt = DBTerm(english, 'CAT')
+    db.session.add(dbt)
+    db.session.commit()
+
+    repo = Repository(db)
+    t = repo.find_or_new(english.id, 'cat')
+    t.text = 'cat'
+    f = TermForm(obj = t)
+
+    is_valid = f.validate()
+    assert is_valid is True, 'updating existing term is ok'

@@ -44,15 +44,25 @@ class TermForm(FlaskForm):
 
 
     def validate_text(form, field):
-        "Throw if form text changes from the original."
-        if form.text.data == form.original_text.data:
-            return
-        if form.original_text.data in ('', None):
-            return
+        "Throw if form text changes from the original or is a dup."
         if form.language_id.data is None:
             return
         langid = int(form.language_id.data)
         lang = Language.find(langid)
+
+        if form.original_text.data in ('', None):
+            # New term.
+            spec = Term(lang, form.text.data)
+            checkdup = Term.find_by_spec(spec)
+            if checkdup is None:
+                # Not a dup.
+                return
+            # Is a dup.
+            raise ValidationError("Term already exists")
+
+        if form.text.data == form.original_text.data:
+            return
+        langid = int(form.language_id.data)
         newterm = Term(lang, form.text.data)
         origterm = Term(lang, form.original_text.data)
         if newterm.text_lc != origterm.text_lc:
