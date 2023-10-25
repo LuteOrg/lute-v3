@@ -13,3 +13,6 @@ def contains_demo_data():
 
 def remove_flag():
     pass
+
+def delete_all_data():
+    pass
