@@ -87,11 +87,19 @@ def db_export_empty(c):
     This assumes that the current db is in data/test_lute.db.
     """
     destfile = 'lute/db/schema/empty.sql'
-    c.run(f'sqlite3 data/test_lute.db .schema > {destfile}')
-    c.run(f'echo "" >> {destfile}')
-    c.run(f'echo "###########################################" >> {destfile}')
-    c.run(f'echo "# Migrations that have already been applied" >> {destfile}')
-    c.run(f'sqlite3 ../lute_dev/data/test_lute.db ".dump _migrations" >> {destfile}')
+    commands = f"""
+    echo "-- ------------------------------------------" > {destfile}
+    echo "-- Empty db schema, with _migrations tracked." >> {destfile}
+    echo "-- Generated from 'inv db.export.empty'" >> {destfile}
+    echo "-- ------------------------------------------" >> {destfile}
+    echo "" >> {destfile}
+    sqlite3 data/test_lute.db .schema >> {destfile}
+    echo "" >> {destfile}
+    echo "-- -------------------------------------------" >> {destfile}
+    echo "-- Migrations that have already been applied" >> {destfile}
+    sqlite3 ../lute_dev/data/test_lute.db ".dump _migrations" >> {destfile}
+    """
+    c.run(commands)
 
 
 dbtasks = Collection('db')
