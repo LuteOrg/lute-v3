@@ -5,14 +5,10 @@ Tests lute.term.model.Term *domain* objects being saved
 and retrieved from DB.
 """
 
-import pytest
-
-from lute.models.term import Term as DBTerm, TermTag
+from lute.models.term import Term as DBTerm
 from lute.db import db
 from lute.term.model import Term, Repository
 from lute.term.forms import TermForm
-from tests.dbasserts import assert_sql_result, assert_record_count_equals
-from tests.utils import add_terms
 
 
 def test_validate(app_context, english):

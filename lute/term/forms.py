@@ -9,7 +9,6 @@ from wtforms.validators import DataRequired
 
 from lute.models.language import Language
 from lute.models.term import Term
-from lute.db import db
 
 
 class TermForm(FlaskForm):
@@ -42,26 +41,25 @@ class TermForm(FlaskForm):
 
     current_image = HiddenField('current_image')
 
-
-    def validate_language_id(form, field):
+    def validate_language_id(self, field): # pylint: disable=unused-argument
         "Language must be set."
-        if form.language_id.data in (None, 0):
+        if self.language_id.data in (None, 0):
             raise ValidationError("Please select a language")
 
 
-    def validate_text(form, field):
+    def validate_text(self, field): # pylint: disable=unused-argument
         "Throw if form text changes from the original or is a dup."
         # Don't continue if the language isn't set.
-        if form.language_id.data in (None, 0):
+        if self.language_id.data in (None, 0):
             return
-        langid = int(form.language_id.data)
+        langid = int(self.language_id.data)
         lang = Language.find(langid)
         if lang is None:
             return
 
-        if form.original_text.data in ('', None):
+        if self.original_text.data in ('', None):
             # New term.
-            spec = Term(lang, form.text.data)
+            spec = Term(lang, self.text.data)
             checkdup = Term.find_by_spec(spec)
             if checkdup is None:
                 # Not a dup.
@@ -69,11 +67,10 @@ class TermForm(FlaskForm):
             # Is a dup.
             raise ValidationError("Term already exists")
 
-        if form.text.data == form.original_text.data:
+        if self.text.data == self.original_text.data:
             return
-        langid = int(form.language_id.data)
-        newterm = Term(lang, form.text.data)
-        origterm = Term(lang, form.original_text.data)
+        langid = int(self.language_id.data)
+        newterm = Term(lang, self.text.data)
+        origterm = Term(lang, self.original_text.data)
         if newterm.text_lc != origterm.text_lc:
             raise ValidationError("Can only change term case")
-

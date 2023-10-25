@@ -2,7 +2,7 @@
 /term routes.
 """
 
-from flask import Blueprint, request, jsonify, render_template, redirect, flash
+from flask import Blueprint, request, jsonify, render_template, redirect
 from lute.models.language import Language
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list

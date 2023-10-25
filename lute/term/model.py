@@ -46,6 +46,7 @@ class Term: # pylint: disable=too-many-instance-attributes
 
     @property
     def language(self):
+        "Use or get the language."
         if self._language is not None:
             return self._language
         return Language.find(self.language_id)

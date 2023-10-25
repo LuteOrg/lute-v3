@@ -3,9 +3,8 @@
 """
 
 from datetime import datetime
-from sqlalchemy.exc import IntegrityError
 
-from flask import Blueprint, render_template, flash, redirect
+from flask import Blueprint, render_template, redirect
 from lute.read.service import get_paragraphs, set_unknowns_to_known
 from lute.read.forms import TextForm
 from lute.term.model import Repository
