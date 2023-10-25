@@ -218,6 +218,8 @@
   }
 
 
+  var TAGS = {{ tags | safe }};
+
   let setup_term_tags_Tagit = function() {
     // Note that Flask_WTF uses <fieldname>-{index}
     // for mapping to and from FieldLists!

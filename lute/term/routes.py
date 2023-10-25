@@ -99,6 +99,10 @@ def edit(termid):
         form=form,
         term=term,
         newterm = False,
+
+        # TODO term tags: pass dynamic list.
+        tags=[ "apple", "bear", "cat" ],
+
         language_dicts=Language.all_dictionaries(),
     )
 
@@ -120,5 +124,9 @@ def new():
         form=form,
         term=term,
         newterm = True,
+
+        # TODO term tags: pass dynamic list.
+        tags=[ "apple", "bear", "cat" ],
+
         language_dicts=Language.all_dictionaries(),
     )
