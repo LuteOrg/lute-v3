@@ -44,43 +44,6 @@ def datatables_active_source():
     return jsonify(data)
 
 
-def _handle_form(term, form) -> bool:
-    """
-    Handle the read term form processing.
-    Returns True if validated and saved.
-    """
-    if not form.validate_on_submit():
-        return False
-
-    form.populate_obj(term)
-    if term.text_has_changed():
-        flash('Can only change term case.', 'error')
-        term.text = term.original_text
-        form = TermForm(obj=term)
-        return False
-
-    ret = False
-    try:
-        repo = Repository(db)
-        repo.add(term)
-        repo.commit()
-
-        # Don't add a flash message here.  When the reading term is
-        # updated, it shows the read/updated.html template, which has
-        # its own "flash" message.  Adding a flash here would send the
-        # message to the base.html template.
-        # flash(f'Term {term.text} updated', 'success')
-        ret = True
-
-    except IntegrityError as e:
-        # TODO term: better integrity error message - currently
-        # shows raw message.
-        # TODO check if used: not sure if this will ever occur
-        flash(e.orig.args, 'error')
-
-    return ret
-
-
 @bp.route('/edit/<int:termid>', methods=['GET', 'POST'])
 def edit(termid):
     """
@@ -88,22 +51,23 @@ def edit(termid):
     """
     repo = Repository(db)
     term = repo.load(termid)
-
     form = TermForm(obj=term)
-    resp = _handle_form(term, form)
-    if resp is True:
+    if form.validate_on_submit():
+        form.populate_obj(term)
+        repo.add(term)
+        repo.commit()
         return redirect('/term/index', 302)
 
     return render_template(
-        '/term/formframes.html',
+        '/read/frameform.html',
         form=form,
         term=term,
-        newterm = False,
+        language_dicts=Language.all_dictionaries(),
+        showlanguageselector=False,
 
         # TODO term tags: pass dynamic list.
         tags=[ "apple", "bear", "cat" ],
-
-        language_dicts=Language.all_dictionaries(),
+        parent_link_to_frame=True
     )
 
 
@@ -115,18 +79,20 @@ def new():
     repo = Repository(db)
     term = Term()
     form = TermForm(obj=term)
-    resp = _handle_form(term, form)
-    if resp is True:
+    if form.validate_on_submit():
+        form.populate_obj(term)
+        repo.add(term)
+        repo.commit()
         return redirect('/term/index', 302)
 
     return render_template(
-        '/term/formframes.html',
+        '/read/frameform.html',
         form=form,
         term=term,
-        newterm = True,
+        language_dicts=Language.all_dictionaries(),
+        showlanguageselector=False,
 
         # TODO term tags: pass dynamic list.
         tags=[ "apple", "bear", "cat" ],
-
-        language_dicts=Language.all_dictionaries(),
+        parent_link_to_frame=True
     )
