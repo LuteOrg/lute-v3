@@ -20,6 +20,8 @@ def test_validate(app_context, english):
     repo = Repository(db)
     t = repo.find_or_new(english.id, 'CAT')
     f = TermForm(obj = t)
+    f.language_id.choices = [(english.id, 'english')]
+
     assert f.validate() is True, 'no change = valid'
 
 
@@ -33,6 +35,8 @@ def test_text_change_not_valid(app_context, english):
     t = repo.find_or_new(english.id, 'CAT')
     t.text = 'dog'
     f = TermForm(obj = t)
+    f.language_id.choices = [(english.id, 'english')]
+
     is_valid = f.validate()
     assert is_valid is False, 'text change = not valid'
     assert f.errors == {'text': ['Can only change term case']}
@@ -48,6 +52,7 @@ def test_duplicate_text_not_valid(app_context, english):
     t.language_id = english.id
     t.text = 'cat'
     f = TermForm(obj = t)
+    f.language_id.choices = [(english.id, 'english')]
 
     is_valid = f.validate()
     assert is_valid is False, 'dup term not valid'
@@ -64,6 +69,7 @@ def test_update_existing_term_is_valid(app_context, english):
     t = repo.find_or_new(english.id, 'cat')
     t.text = 'cat'
     f = TermForm(obj = t)
+    f.language_id.choices = [(english.id, 'english')]
 
     is_valid = f.validate()
     assert is_valid is True, 'updating existing term is ok'

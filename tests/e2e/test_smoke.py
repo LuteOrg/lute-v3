@@ -21,7 +21,6 @@ def test_smoke_pages(client):
         '/language/new': [ 'Create new Language' ],
         '/language/new/English': [ 'Create new Language', 'https://en.thefreedictionary.com/###' ],
         '/language/edit/1': [ 'Edit Language' ],
-        '/language/jsonlist': [],
     }
     _run_checks(client, pagechecks)
 
