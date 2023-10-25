@@ -44,7 +44,7 @@ def datatables_active_source():
     return jsonify(data)
 
 
-def _handle_form(term, repo, showlanguageselector):
+def _handle_form(term, repo, show_language_selector):
     """
     Handle the form post.  Only show lang. selector
     for new terms.
@@ -67,11 +67,11 @@ def _handle_form(term, repo, showlanguageselector):
         form=form,
         term=term,
         language_dicts=Language.all_dictionaries(),
-        showlanguageselector=showlanguageselector,
+        show_language_selector=show_language_selector,
 
         # TODO term tags: pass dynamic list.
         tags=[ "apple", "bear", "cat" ],
-        parent_link_to_frame=True
+        embedded_in_reading_frame=False
     )
 
 
@@ -82,6 +82,16 @@ def edit(termid):
     """
     repo = Repository(db)
     term = repo.load(termid)
+    return _handle_form(term, repo, False)
+
+
+@bp.route('/editbytext/<int:langid>/<text>', methods=['GET', 'POST'])
+def edit_by_text(langid, text):
+    """
+    Edit a term.
+    """
+    repo = Repository(db)
+    term = repo.find(langid, text)
     return _handle_form(term, repo, False)
 
 

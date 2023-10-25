@@ -13,7 +13,7 @@
   <table id="term">
   <tbody>
 
-    <tr id="languageSel" {% if not showlanguageselector %}style="display:none;"{% endif %}>
+    <tr id="languageSel" {% if not show_language_selector %}style="display:none;"{% endif %}>
       <td>{{ form.language_id(class="form-control") }}</td>
     </tr>
 
@@ -163,7 +163,7 @@
           // We should never reach this point if the lang is not set.
           const langid = {{ form.language_id.object_data }};
           let url = '';
-          {% if parent_link_to_frame %}
+          {% if embedded_in_reading_frame %}
           url = `/read/termform/${langid}/${clickedtagtext}`;
           {% else %}
           url = `/term/editbytext/${langid}/${clickedtagtext}`;

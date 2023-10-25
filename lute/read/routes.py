@@ -135,11 +135,11 @@ def term_form(langid, text):
         form=form,
         term=term,
         language_dicts=Language.all_dictionaries(),
-        showlanguageselector=False,
+        show_language_selector=False,
 
         # TODO term tags: pass dynamic list.
         tags=[ "apple", "bear", "cat" ],
-        parent_link_to_frame=True
+        embedded_in_reading_frame=True
     )
 
 
