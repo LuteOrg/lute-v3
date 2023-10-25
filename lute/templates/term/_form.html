@@ -1,20 +1,10 @@
 {# TODO term tags: pass dynamic list #}
 {# TODO term form: all the things #}
 
-{% with messages = get_flashed_messages() %}
-{% for message in messages %}
-<div class="flash-notice-narrow">{{ message }}</div>
-{% endfor %}
-{% endwith %}
-
 {% for field_name, field_errors in form.errors.items() %}
-<p>{{ field_name }}
-  <ul>
-    {% for error in field_errors %}
-    <li>{{ error }}</li>
-    {% endfor %}
-  </ul>
-</p>
+{% for error in field_errors %}
+<div class="flash-notice-narrow">{{ error }}</div>
+{% endfor %}
 {% endfor %}
 
 <form name="term_form" method="POST">

@@ -4,8 +4,11 @@ Flask-wtf forms.
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, FieldList, RadioField, TextAreaField, HiddenField
+from wtforms import ValidationError
 from wtforms.validators import DataRequired
 
+from lute.models.language import Language
+from lute.models.term import Term
 
 class TermForm(FlaskForm):
     """
@@ -38,3 +41,20 @@ class TermForm(FlaskForm):
     term_tags = FieldList(StringField('term_tags'))
 
     current_image = HiddenField('current_image')
+
+
+    def validate_text(form, field):
+        "Throw if form text changes from the original."
+        if form.text.data == form.original_text.data:
+            return
+        if form.original_text.data in ('', None):
+            return
+        if form.language_id.data is None:
+            return
+        langid = int(form.language_id.data)
+        lang = Language.find(langid)
+        newterm = Term(lang, form.text.data)
+        origterm = Term(lang, form.original_text.data)
+        if newterm.text_lc != origterm.text_lc:
+            raise ValidationError("Can only change term case")
+
