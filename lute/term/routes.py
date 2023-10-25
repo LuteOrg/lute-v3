@@ -2,7 +2,7 @@
 /term routes.
 """
 
-from flask import Blueprint, request, jsonify, render_template, redirect
+from flask import Blueprint, request, jsonify, render_template, redirect, flash
 from lute.models.language import Language
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list
@@ -92,7 +92,7 @@ def edit(termid):
     form = TermForm(obj=term)
     resp = _handle_form(term, form)
     if resp is True:
-        return redirect('/', 302)
+        return redirect('/term/index', 302)
 
     return render_template(
         '/term/formframes.html',
@@ -117,7 +117,7 @@ def new():
     form = TermForm(obj=term)
     resp = _handle_form(term, form)
     if resp is True:
-        return redirect('/', 302)
+        return redirect('/term/index', 302)
 
     return render_template(
         '/term/formframes.html',

@@ -1,9 +1,9 @@
 {# TODO term tags: pass dynamic list #}
 {# TODO term form: all the things #}
 
-{% with messages = get_flashed_messages('error') %}
+{% with messages = get_flashed_messages() %}
 {% for message in messages %}
-<div class="flash-notice-narrow">{{ message[1] }}</div>
+<div class="flash-notice-narrow">{{ message }}</div>
 {% endfor %}
 {% endwith %}
 
