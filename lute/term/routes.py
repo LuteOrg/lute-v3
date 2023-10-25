@@ -44,13 +44,11 @@ def datatables_active_source():
     return jsonify(data)
 
 
-@bp.route('/edit/<int:termid>', methods=['GET', 'POST'])
-def edit(termid):
+def _handle_form(term, repo, showlanguageselector):
     """
-    Edit a term.
+    Handle the form post.  Only show lang. selector
+    for new terms.
     """
-    repo = Repository(db)
-    term = repo.load(termid)
     form = TermForm(obj=term)
     if form.validate_on_submit():
         form.populate_obj(term)
@@ -59,16 +57,26 @@ def edit(termid):
         return redirect('/term/index', 302)
 
     return render_template(
-        '/read/frameform.html',
+        '/term/formframes.html',
         form=form,
         term=term,
         language_dicts=Language.all_dictionaries(),
-        showlanguageselector=False,
+        showlanguageselector=showlanguageselector,
 
         # TODO term tags: pass dynamic list.
         tags=[ "apple", "bear", "cat" ],
         parent_link_to_frame=True
     )
+
+
+@bp.route('/edit/<int:termid>', methods=['GET', 'POST'])
+def edit(termid):
+    """
+    Edit a term.
+    """
+    repo = Repository(db)
+    term = repo.load(termid)
+    return _handle_form(term, repo, False)
 
 
 @bp.route('/new', methods=['GET', 'POST'])
@@ -78,21 +86,4 @@ def new():
     """
     repo = Repository(db)
     term = Term()
-    form = TermForm(obj=term)
-    if form.validate_on_submit():
-        form.populate_obj(term)
-        repo.add(term)
-        repo.commit()
-        return redirect('/term/index', 302)
-
-    return render_template(
-        '/read/frameform.html',
-        form=form,
-        term=term,
-        language_dicts=Language.all_dictionaries(),
-        showlanguageselector=False,
-
-        # TODO term tags: pass dynamic list.
-        tags=[ "apple", "bear", "cat" ],
-        parent_link_to_frame=True
-    )
+    return _handle_form(term, repo, True)
