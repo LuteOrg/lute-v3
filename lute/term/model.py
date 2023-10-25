@@ -20,22 +20,17 @@ class Term: # pylint: disable=too-many-instance-attributes
     def __init__(self):
         # The ID of the DBTerm.
         self.id = None
-
         # A language object is required as the Term bus. object
         # must downcase the text and the original_text to see
         # if anything has changed.
         self._language = None
-
         # Ideally this wouldn't be needed, but the term form
         # populates this field with the (primitive) language id.
         self.language_id = None
-
         # The text.
         self.text = None
-
         # The original text given to the DTO, to track changes.
         self.original_text = None
-
         self.status = 1
         self.translation = None
         self.romanization = None
@@ -43,6 +38,9 @@ class Term: # pylint: disable=too-many-instance-attributes
         self.flash_message = None
         self.parents = []
         self.current_image = None
+
+    def __repr__(self):
+        return f'<Term BO "{self.text}">'
 
     @property
     def language(self):

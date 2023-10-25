@@ -2,7 +2,7 @@
 /term routes.
 """
 
-from flask import Blueprint, request, jsonify, render_template, redirect
+from flask import Blueprint, request, jsonify, render_template, redirect, jsonify
 from lute.models.language import Language
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list
@@ -93,3 +93,20 @@ def new():
     repo = Repository(db)
     term = Term()
     return _handle_form(term, repo, True)
+
+
+@bp.route('/search/<text>/<int:langid>', methods=['GET'])
+def search_by_text_in_language(text, langid):
+    "JSON data for parent data."
+    repo = Repository(db)
+    matches = repo.find_matches(langid, text)
+    print('got matches for ' + text)
+    print(matches)
+    result = []
+    for t in matches:
+        result.append({
+            'id': t.id,
+            'text': t.text,
+            'translation': t.translation
+        })
+    return jsonify(result)
