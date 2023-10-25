@@ -31,7 +31,7 @@
 
     <tr>
       <td>
-        {{ form.text(class="form-control") }}
+        {{ form.text(class="form-control", value=form.original_text.data) }}
       </td>
       <td style="white-space: nowrap;">
         <img src="{{ url_for('static', filename='/icn/external.png') }}" title="Lookup" onclick="do_term_lookup()" />

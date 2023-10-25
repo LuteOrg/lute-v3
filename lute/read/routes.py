@@ -111,43 +111,6 @@ def empty():
     return ''
 
 
-def _handle_form(term, form) -> bool:
-    """
-    Handle the read term form processing.
-    Returns True if validated and saved.
-    """
-    if not form.validate_on_submit():
-        return False
-
-    form.populate_obj(term)
-    if term.text_has_changed():
-        flash('Can only change term case.', 'error')
-        term.text = term.original_text
-        form = TermForm(obj=term)
-        return False
-
-    ret = False
-    try:
-        repo = Repository(db)
-        repo.add(term)
-        repo.commit()
-
-        # Don't add a flash message here.  When the reading term is
-        # updated, it shows the read/updated.html template, which has
-        # its own "flash" message.  Adding a flash here would send the
-        # message to the base.html template.
-        # flash(f'Term {term.text} updated', 'success')
-        ret = True
-
-    except IntegrityError as e:
-        # TODO term: better integrity error message - currently
-        # shows raw message.
-        # TODO check if used: not sure if this will ever occur
-        flash(e.orig.args, 'error')
-
-    return ret
-
-
 # TODO: term form: ensure reading pane can create form with "." character
 @bp.route('/termform/<int:langid>/<text>', methods=['GET', 'POST'])
 def term_form(langid, text):
@@ -158,8 +121,25 @@ def term_form(langid, text):
     term = repo.find_or_new(langid, text)
 
     form = TermForm(obj=term)
-    if _handle_form(term, form):
-        return render_template('/read/updated.html', term_text=term.text)
+    if form.validate_on_submit():
+        form.populate_obj(term)
+        if term.text_has_changed():
+            flash(f'Can only change term case', 'error')
+            term.text = term.original_text
+        else:
+            try:
+                repo = Repository(db)
+                repo.add(term)
+                repo.commit()
+                # Don't add a flash message.  read/updated.html
+                # returned here has its own "flash" message; a regular
+                # flash message would appear on base.html.
+                return render_template('/read/updated.html', term_text=term.text)
+            except IntegrityError as e:
+                # TODO term: better integrity error message - currently
+                # shows raw message.
+                # TODO check if used: not sure if this will ever occur
+                flash(e.orig.args, 'error')
 
     return render_template(
         '/read/frameform.html',
