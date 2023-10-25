@@ -32,6 +32,18 @@ git diff --cached         # verify
 git commit -m "Update db baseline.sql"
 ```
 
+## Creating empty
+
+... same as above, in terms of setting up the db, then:
+
+```
+sqlite3 ../lute_dev/data/test_lute.db .schema > lute/db/schema/empty.sql
+echo "" >> lute/db/schema/empty.sql
+echo "###########################################" >> lute/db/schema/empty.sql
+echo "# Migrations that have already been applied" >> lute/db/schema/empty.sql
+sqlite3 ../lute_dev/data/test_lute.db ".dump _migrations" >> lute/db/schema/empty.sql
+```
+
 ## Copying over migrations from Lute v2
 
 On a Mac, at least!

@@ -14,7 +14,7 @@ invoke --list          # list all tasks
 invoke --help <cmd>    # See docstrings and help notes
 """
 
-from invoke import task
+from invoke import task, Collection
 import pytest
 
 @task
@@ -56,10 +56,48 @@ def coverage(c, html=False):
     else:
         c.run('coverage report --omit="*/test*"')
 
-
 @task
 def todos(c):
     """
     Print code TODOs.
     """
     c.run('python utils/todos.py')
+
+ns = Collection()
+ns.add_task(lint)
+ns.add_task(test)
+ns.add_task(coverage)
+ns.add_task(todos)
+    
+@task
+def db_export_baseline(c):
+    """
+    Create a new baseline db file from the current db.
+    
+    This assumes that the current db is in data/test_lute.db.
+    """
+    print('TODO: reset the db data.')
+
+
+@task
+def db_export_empty(c):
+    """
+    Create a new empty db file from the current db.
+    
+    This assumes that the current db is in data/test_lute.db.
+    """
+    destfile = 'lute/db/schema/empty.sql'
+    c.run(f'sqlite3 data/test_lute.db .schema > {destfile}')
+    c.run(f'echo "" >> {destfile}')
+    c.run(f'echo "###########################################" >> {destfile}')
+    c.run(f'echo "# Migrations that have already been applied" >> {destfile}')
+    c.run(f'sqlite3 ../lute_dev/data/test_lute.db ".dump _migrations" >> {destfile}')
+
+
+dbtasks = Collection('db')
+dbexport = Collection('export')
+dbexport.add_task(db_export_baseline, 'baseline')
+dbexport.add_task(db_export_empty, 'empty')
+dbtasks.add_collection(dbexport)
+
+ns.add_collection(dbtasks)
