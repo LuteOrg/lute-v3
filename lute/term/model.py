@@ -59,7 +59,7 @@ class Term: # pylint: disable=too-many-instance-attributes
 
     def text_has_changed(self):
         "Check the downcased original text with the current text."
-        print(f'checking if changed, original = "{self.original_text}", text = "{self.text}"')
+        # print(f'checking if changed, orig = "{self.original_text}", text = "{self.text}"')
         if self.original_text in ('', None):
             return False
         def get_lc(s):
@@ -138,9 +138,9 @@ class Repository:
         def compare(item1, item2):
             c1 = len(item1.children)
             c2 = len(item2.children)
-            if c1 < c2:
+            if c1 > c2:
                 return -1
-            if c2 > c1:
+            if c1 < c2:
                 return 1
             t1 = item1.text_lc
             t2 = item2.text_lc
@@ -151,10 +151,14 @@ class Repository:
             return 0
 
         remaining = [t for t in matches if t.text_lc != text_lc]
+        # for t in remaining:
+        #     print(f'term: {t.text}; child count = {len(t.children)}')
         remaining.sort(key=functools.cmp_to_key(compare))
-        ret = exact + matches
+        # print('remaining = ')
+        # print(remaining)
+        ret = exact + remaining
         ret = ret[:max_results]
-        return [self._build_business_term(t) for t in matches]
+        return [self._build_business_term(t) for t in ret]
 
 
     def add(self, term):

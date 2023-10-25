@@ -401,14 +401,16 @@ def fixture_multiple(english, spanish, app_context):
     add_terms(spanish, ['parent', 'pare', 'gato', 'tengo uno'])
 
 
+@pytest.mark.find_match
 def test_find_matches_only_returns_language_matches(spanish, repo, _multiple_terms):
     "Searches match the start of string."
     for c in [ 'PARE', 'pare', 'PAR' ]:
         matches = repo.find_matches(spanish.id, c)
         assert len(matches) == 2, c
-        assert matches[0].text == 'parent'
+        assert matches[0].text == 'pare'
         assert matches[0].language.id == spanish.id, "lang object set"
 
+@pytest.mark.find_match
 def test_find_matches_returns_empty_if_no_match_or_empty_string(spanish, repo, _multiple_terms):
     "Empty if no match."
     for c in [ '', 'x' ]:
@@ -416,6 +418,7 @@ def test_find_matches_returns_empty_if_no_match_or_empty_string(spanish, repo, _
         assert len(matches) == 0, c
 
 
+@pytest.mark.find_match
 def test_find_matches_multiword_respects_zws(spanish, repo, _multiple_terms):
     "zws are removed from the business objects."
     zws = "\u200B"
@@ -425,15 +428,43 @@ def test_find_matches_multiword_respects_zws(spanish, repo, _multiple_terms):
         assert matches[0].text == 'tengo uno'
 
 
-# TOOD find_matches: exact sorts to top
-# TOOD find_matches: parents sort to top
+def assert_find_matches_returns(term_repo, spanish, s, expected):
+    "Helper, assert returns expected content."
+    matches = term_repo.find_matches(spanish.id, s)
+    assert len(matches) == len(expected)
+    actual = ', '.join([t.text for t in matches])
+    assert ', '.join(expected) == actual
 
-# TODO test coverage: implement more tests
-# def test_save_and_remove(empty_db, english):
-# def test_add_and_remove_parents(spanish):
-# def test_remove_parent_leaves_children_in_db(spanish):
-# def test_removing_term_with_parent_and_tag(empty_db, spanish):
-# def test_save_replace_remove_image(spanish):
-# def test_delete_term_deletes_image(spanish):
-# def test_save_remove_flash_message(spanish):
-# def test_delete_term_deletes_flash_message(spanish):
+
+@pytest.mark.find_match
+def test_findLikeSpecification_initial_check(spanish, repo):
+    "Searches match the start of string."
+    add_terms(spanish, [ 'abc', 'abcd', 'bcd' ])
+
+    assert_find_matches_returns(repo, spanish, 'ab', ['abc', 'abcd'])
+    assert_find_matches_returns(repo, spanish, 'abcd', ['abcd'])
+    assert_find_matches_returns(repo, spanish, 'bc', ['bcd'])
+    assert_find_matches_returns(repo, spanish, 'yy', [])
+
+
+@pytest.mark.find_match
+def test_find_like_specification_terms_with_children_go_to_top(spanish, repo):
+    """
+    Parents go to the top, then the rest ... but exact matches trumps parent.
+    """
+    terms = [
+        ('abc', 'abcParent'),
+        ('axy', 'axyParent')
+    ]
+    for term, parent in terms:
+        t = Term()
+        t.language = spanish
+        t.language_id = spanish.id
+        t.text = term
+        t.parents.append(parent)
+        repo.add(t)
+    repo.commit()
+
+    assert_find_matches_returns(repo, spanish, 'a', ['abcParent', 'axyParent', 'abc', 'axy'])
+    assert_find_matches_returns(repo, spanish, 'ab', ['abcParent', 'abc'])
+    assert_find_matches_returns(repo, spanish, 'abc', ['abc', 'abcParent'])
