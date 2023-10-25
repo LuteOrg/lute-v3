@@ -46,7 +46,9 @@ class Term: # pylint: disable=too-many-instance-attributes
 
     @property
     def language(self):
-        return self._language
+        if self._language is not None:
+            return self._language
+        return Language.find(self.language_id)
 
     @language.setter
     def language(self, lang):
@@ -56,6 +58,9 @@ class Term: # pylint: disable=too-many-instance-attributes
 
     def text_has_changed(self):
         "Check the downcased original text with the current text."
+        print(f'checking if changed, original = "{self.original_text}", text = "{self.text}"')
+        if self.original_text in ('', None):
+            return False
         def get_lc(s):
             return self.language.get_lowercase(s)
         return get_lc(self.original_text) != get_lc(self.text)
