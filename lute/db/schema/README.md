@@ -14,19 +14,21 @@ The migration class `lute.dbsetup.migrator.SqliteMigrator` applies the migration
 
 ## Creating the baseline
 
-As of now (late 2023), the baseline.sql file is created from the latest `develop` branch in Lute v2, that is Lute running in PHP:
+The baseline.sql file is created the development database (data/test_lute.db).  This contains:
+
+* all non-repeatable migrations applied
+* demo data
 
 From this project's root dir:
 
 ```
-# Check the current branch, and reset the db:
-pushd ../lute_dev
-git st                    # should be clean!
-git checkout develop      # should be develop!
-composer dev:data:load    # set to baseline!
-popd
+# Reset the db to demo state
+inv db.reset
 
-sqlite3 ../lute_dev/data/test_lute.db .dump > lute/db/schema/baseline.sql
+# Export and follow the prompts:
+inv db.export.baseline
+
+# Double-verify if you want ... then
 git add lute/db/schema/baseline.sql
 git diff --cached         # verify
 git commit -m "Update db baseline.sql"
@@ -34,9 +36,8 @@ git commit -m "Update db baseline.sql"
 
 ## Creating empty
 
-... same as above, in terms of setting up the db, then:
-
 ```
+inv db.reset
 inv db.export.empty
 git add lute/db/schema/empty.sql
 git diff --cached    # verify

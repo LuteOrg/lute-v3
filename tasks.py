@@ -150,8 +150,10 @@ def db_export_baseline(c):
             raise RuntimeError(f'Missing "{checkstring}" in exported file.')
 
     os.rename(tempfile, destfile)
-    print(f'{destfile} updated:')
+    print(f'{destfile} updated (git diff follows):')
+    print('DIFF START ' + '-' * 38)
     c.run(f'git diff -- {destfile}')
+    print('DIFF END ' + '-' * 40)
     print()
 
 
