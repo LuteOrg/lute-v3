@@ -120,6 +120,7 @@ def term_form(langid, text):
     repo = Repository(db)
     term = repo.find_or_new(langid, text)
     form = TermForm(obj=term)
+    form.language_id.choices = [(langid, 'no_choice_allowed')]
     if form.validate_on_submit():
         form.populate_obj(term)
         repo = Repository(db)

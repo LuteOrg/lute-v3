@@ -9,18 +9,18 @@ from wtforms.validators import DataRequired
 
 from lute.models.language import Language
 from lute.models.term import Term
+from lute.db import db
+
 
 class TermForm(FlaskForm):
     """
     Term.
     """
 
-    # TODO term form: language - use predefined
     language_id = SelectField(
         'Language',
-        choices=[
-            (3, 'English'),
-        ])
+        coerce=int
+    )
 
     original_text = HiddenField('OriginalText')
     text = StringField('Text', validators=[DataRequired()], render_kw={"placeholder": "Term"})
@@ -43,12 +43,21 @@ class TermForm(FlaskForm):
     current_image = HiddenField('current_image')
 
 
+    def validate_language_id(form, field):
+        "Language must be set."
+        if form.language_id.data in (None, 0):
+            raise ValidationError("Please select a language")
+
+
     def validate_text(form, field):
         "Throw if form text changes from the original or is a dup."
-        if form.language_id.data is None:
+        # Don't continue if the language isn't set.
+        if form.language_id.data in (None, 0):
             return
         langid = int(form.language_id.data)
         lang = Language.find(langid)
+        if lang is None:
+            return
 
         if form.original_text.data in ('', None):
             # New term.

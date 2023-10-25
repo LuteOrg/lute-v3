@@ -50,6 +50,12 @@ def _handle_form(term, repo, showlanguageselector):
     for new terms.
     """
     form = TermForm(obj=term)
+
+    # All language ID - name pairs.
+    langs = db.session.query(Language).order_by(Language.name).all()
+    lang_choices = [ (0, '-') ] + [ (s.id, s.name) for s in langs ]
+    form.language_id.choices = lang_choices
+
     if form.validate_on_submit():
         form.populate_obj(term)
         repo.add(term)
