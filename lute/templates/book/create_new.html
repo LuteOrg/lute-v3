@@ -3,8 +3,95 @@
 {% block title %}New Book{% endblock %}
 
 {% block body %}
-    <h1>Create new Book</h1>
+<h1>Create new Book</h1>
 
+{% for field_name, field_errors in form.errors.items() %}
+{% for error in field_errors %}
+<div class="flash-notice-narrow">{{ error }}</div>
+{% endfor %}
+{% endfor %}
 
-    <a href="/">back to list</a>
+<form method="POST">
+  {{ form.hidden_tag() }}
+
+  <table id="book">
+  <tbody>
+
+    <tr id="languageSel" {% if not show_language_selector %}style="display:none;"{% endif %}>
+      <td>Language</td>
+      <td>{{ form.language_id(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.title.label }}</td>
+      <td>{{ form.title(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.text.label }}</td>
+      <td>{{ form.text(class="form-largetextarea") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.textfile.label }}</td>
+      <td>{{ form.textfile(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.source_uri.label }}</td>
+      <td>{{ form.source_uri(class="form-control") }}</td>
+    </tr>
+
+    {# Tags li entries are managed by tagit. #}
+    <tr>
+      <td>Tags</td>
+      <td>
+        <ul id="booktagslist" class="tags nomarginblock shorttaglist">
+          {% for t in form.book_tags %}
+          <li>{{ t.object_data }}</li>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+
+  </tbody>
+  </table>
+
+  <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<button onclick="window.location = '/'">Cancel</button>
+
+<script type="text/javascript">
+  var TAGS = {{ tags | safe }};
+
+  let setup_book_tags_Tagit = function() {
+    // Note that Flask_WTF uses <fieldname>-{index}
+    // for mapping to and from FieldLists!
+    var prototypeFieldName = 'book_tags-__name__';
+    var fieldIndex = 0;
+
+    let invalidChar = function(s) { return /[\uD800-\uDFFF]/.test(s); };
+
+    $('#booktagslist').tagit(
+      {
+        beforeTagAdded: function (_event, ui) {
+          if (invalidChar(ui.tag.text())) {
+            return;
+          }
+          fieldIndex++;
+          $(this).tagit({fieldName: prototypeFieldName.replace('__name__', fieldIndex)});
+        },
+        availableTags: TAGS,
+        fieldName: prototypeFieldName.replace('__name__', 0)
+      });
+
+  };
+
+  $(document).ready(function () {
+    setup_book_tags_Tagit();
+  });
+
+</script>
+
 {% endblock %}

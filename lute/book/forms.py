@@ -25,7 +25,7 @@ class NewBookForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired(), Length(max=255)])
     text = TextAreaField('Text', description='Use for short texts, e.g. up to a few thousand words. For longer texts, use the "Text File" below.')
     textfile = FileField('Text file', description='Max file size 2048K', validators=[FileAllowed(['txt'], 'Please upload a valid text document')])
-    sourceuri = StringField('Source URI', validators=[Length(max=255)])
+    source_uri = StringField('Source URI', validators=[Length(max=255)])
     book_tags = FieldList(StringField('book_tags'))
 
     def validate_language_id(self, field): # pylint: disable=unused-argument

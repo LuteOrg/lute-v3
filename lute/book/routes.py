@@ -47,4 +47,11 @@ def new():
         repo.commit()
         return redirect('/read/{book.id}/page/1')
 
-    return render_template('book/create_new.html', book=b, form=form, showlanguageselector=True)
+    return render_template(
+        'book/create_new.html',
+        book=b,
+        form=form,
+        # TODO book tags: render book tags
+        tags = [ 'applebook', 'bookbooktag', 'catbooktag' ],
+        showlanguageselector=True
+    )
