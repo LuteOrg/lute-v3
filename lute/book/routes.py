@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify, render_template
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm
+import lute.utils.formutils
 
 # Book domain object
 from lute.book.model import Book, Repository
@@ -36,9 +37,10 @@ def datatables_archived_source():
 def new():
     b = Book()
     form = NewBookForm()
+    form.language_id.choices = lute.utils.formutils.language_choices()
 
     if form.validate_on_submit():
-        text_file = request.files['TextFile']
+        text_file = request.files['textfile']
         if text_file:
             content = text_file.read()
             b.Text = content
@@ -53,5 +55,5 @@ def new():
         form=form,
         # TODO book tags: render book tags
         tags = [ 'applebook', 'bookbooktag', 'catbooktag' ],
-        showlanguageselector=True
+        show_language_selector=True
     )

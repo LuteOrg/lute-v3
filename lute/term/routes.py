@@ -9,6 +9,7 @@ from lute.term.datatables import get_data_tables_list
 from lute.term.model import Repository, Term
 from lute.db import db
 from lute.term.forms import TermForm
+import lute.utils.formutils
 
 bp = Blueprint('term', __name__, url_prefix='/term')
 
@@ -51,10 +52,7 @@ def _handle_form(term, repo, show_language_selector):
     """
     form = TermForm(obj=term)
 
-    # All language ID - name pairs.
-    langs = db.session.query(Language).order_by(Language.name).all()
-    lang_choices = [ (0, '-') ] + [ (s.id, s.name) for s in langs ]
-    form.language_id.choices = lang_choices
+    form.language_id.choices = lute.utils.formutils.language_choices()
 
     if form.validate_on_submit():
         form.populate_obj(term)
