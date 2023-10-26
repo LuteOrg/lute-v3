@@ -468,3 +468,99 @@ def test_find_like_specification_terms_with_children_go_to_top(spanish, repo):
     assert_find_matches_returns(repo, spanish, 'a', ['abcParent', 'axyParent', 'abc', 'axy'])
     assert_find_matches_returns(repo, spanish, 'ab', ['abcParent', 'abc'])
     assert_find_matches_returns(repo, spanish, 'abc', ['abc', 'abcParent'])
+
+
+## Sentences
+
+def full_refs_to_string(refs):
+    def to_string(r):
+        return f"{r['TxID']}, {r['Title']}, {r['Sentence'] if 'Sentence' in r else 'NULL'}"
+
+    def refs_to_string(refs_array):
+        ret = [to_string(r) for r in refs_array]
+        ret.sort()
+        return ret
+
+    def parent_refs_to_string(prefs):
+        ret = []
+        for p in prefs:
+            ret.append({
+                'term': p['term'],
+                'refs': refs_to_string(p['refs'])
+            })
+        return ret
+
+    return {
+        'term': refs_to_string(refs['term']),
+        'children': refs_to_string(refs['children']),
+        'parents': parent_refs_to_string(refs['parents'])
+    }
+
+
+@pytest.mark.sentences
+def test_get_all_references():
+    # Simulate your setup and data here
+    text = make_text('hola', 'Tengo un gato.  Ella tiene un perro.  No quiero tener nada.', spanish)
+    archtext = make_text('luego', 'Tengo un coche.', spanish)
+    b = archtext.getBook()
+    b.setArchived(True)
+    book_repo.save(b, True)
+
+    for t in [text, archtext]:
+        t.setReadDate(datetime.now())
+        text_repo.save(t, True)
+
+    tengo, tiene, tener = addTerms(spanish, ['tengo', 'tiene', 'tener'])
+    tengo.addParent(tener)
+    assert len(tengo.getParents()) == 1, 'has parent'
+    tiene.addParent(tener)
+    term_service.add(tengo, True)
+    term_service.add(tener, True)
+    term_service.add(tiene, True)
+
+    refs = term_service.findReferences(tengo)
+    assert full_refs_to_string(refs) == {
+        'term': [
+            "1, hola (1/1), <b>Tengo</b> un gato.",
+            "2, luego (1/1), <b>Tengo</b> un coche."
+        ],
+        'children': [],
+        'parents': [
+            {
+                'term': 'tener',
+                'refs': [
+                    "1, hola (1/1), Ella <b>tiene</b> un perro.",
+                    "1, hola (1/1), No quiero <b>tener</b> nada."
+                ]
+            }
+        ]
+    }, 'term tengo'
+
+    refs = term_service.findReferences(tener)
+    assert full_refs_to_string(refs) == {
+        'term': [
+            "1, hola (1/1), No quiero <b>tener</b> nada."
+        ],
+        'children': [
+            "1, hola (1/1), <b>Tengo</b> un gato.",
+            "1, hola (1/1), Ella <b>tiene</b> un perro.",
+            "2, luego (1/1), <b>Tengo</b> un coche."
+        ],
+        'parents': []
+    }, 'term tener'
+
+
+@pytest.mark.sentences
+def test_get_references_only_includes_read_texts():
+    text = make_text('hola', 'Tengo un gato.  No tengo un perro.', spanish)
+    tengo = addTerms(spanish, 'tengo')[0]
+
+    refs = term_service.findReferences(tengo)
+    keys = refs.keys()
+    for k in keys:
+        assert len(refs[k]) == 0, f'{k}, no matches for unread texts'
+
+    text.setReadDate(datetime.now())
+    text_repo.save(text, True)
+    refs = term_service.findReferences(tengo)
+    assert len(refs['term']) == 2, 'have refs once text is read'
