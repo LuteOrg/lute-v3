@@ -76,7 +76,7 @@
             const bkid = row[3];
             if (row[4] == 0) {
               // not archived
-              ret.push(`<img src="/icn/document--pencil.png" title="Edit" onclick="edit_book(${bkid})" />`);
+              ret.push(`<img src="{{ url_for('static', filename='/icn/document--pencil.png') }}" title="Edit" onclick="edit_book(${bkid})" />`);
               ret.push(`<img src="/icn/inbox-download.png" title="Archive" onclick="confirm_archive(${bkid})" />`);
             }
             else {
@@ -137,7 +137,7 @@
   }
 
   function edit_book(bookid) {
-    document.location = `/book/${bookid}/edit`;
+    document.location = `/book/edit/${bookid}`;
   }
 
   function confirm_delete(bookid) {

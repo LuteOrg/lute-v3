@@ -2,10 +2,10 @@
 /book routes.
 """
 
-from flask import Blueprint, request, jsonify, render_template, redirect
+from flask import Blueprint, request, jsonify, render_template, redirect, flash
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.book.datatables import get_data_tables_list
-from lute.book.forms import NewBookForm
+from lute.book.forms import NewBookForm, EditBookForm
 import lute.utils.formutils
 from lute.db import db
 
@@ -57,4 +57,26 @@ def new():
         form=form,
         tags = repo.get_book_tags(),
         show_language_selector=True
+    )
+
+
+@bp.route('/edit/<int:bookid>', methods=['GET', 'POST'])
+def edit(bookid):
+    "Edit a book - can only change a few fields."
+    repo = Repository(db)
+    b = repo.load(bookid)
+    form = EditBookForm(obj=b)
+
+    if form.validate_on_submit():
+        form.populate_obj(b)
+        repo.add(b)
+        repo.commit()
+        flash(f'{b.title} updated.')
+        return redirect('/', 302)
+
+    return render_template(
+        'book/edit.html',
+        book=b,
+        form=form,
+        tags = repo.get_book_tags()
     )

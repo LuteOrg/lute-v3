@@ -43,3 +43,12 @@ class NewBookForm(FlaskForm):
             raise ValidationError("Both Text and Text file are set, please only specify one")
         if have_text is False and have_textfile is False:
             raise ValidationError("Please specify either Text or Text file")
+
+
+class EditBookForm(FlaskForm):
+    """
+    Edit existing book.  Only a few fields can be changed.
+    """
+    title = StringField('Title', validators=[DataRequired(), Length(max=255)])
+    source_uri = StringField('Source URI', validators=[Length(max=255)])
+    book_tags = FieldList(StringField('book_tags'))

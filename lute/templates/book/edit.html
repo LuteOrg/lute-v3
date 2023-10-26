@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Book{% endblock %}
+
+{% block body %}
+<h1>Edit Book</h1>
+
+{% for field_name, field_errors in form.errors.items() %}
+{% for error in field_errors %}
+<div class="flash-notice-narrow">{{ error }}</div>
+{% endfor %}
+{% endfor %}
+
+<p style="width: 50%; margin-bottom: 20px;">Note: you can't change the language or text of a book after it has been created.  If you need to do that, please create a new book instead, and delete the old one.</p>
+
+<form method="POST">
+  {{ form.hidden_tag() }}
+
+  <table id="book">
+  <tbody>
+
+    <tr>
+      <td>{{ form.title.label }}</td>
+      <td>{{ form.title(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.source_uri.label }}</td>
+      <td>{{ form.source_uri(class="form-control") }}</td>
+    </tr>
+
+    {# Tags li entries are managed by tagit. #}
+    <tr>
+      <td>Tags</td>
+      <td>
+        <ul id="booktagslist" class="tags nomarginblock shorttaglist">
+          {% for t in form.book_tags %}
+          <li>{{ t.object_data }}</li>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+
+  </tbody>
+  </table>
+
+  <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<button onclick="window.location = '/'">Cancel</button>
+
+<script type="text/javascript">
+  var TAGS = {{ tags | safe }};
+
+  let setup_book_tags_Tagit = function() {
+    // Note that Flask_WTF uses <fieldname>-{index}
+    // for mapping to and from FieldLists!
+    var prototypeFieldName = 'book_tags-__name__';
+    var fieldIndex = 0;
+
+    let invalidChar = function(s) { return /[\uD800-\uDFFF]/.test(s); };
+
+    $('#booktagslist').tagit(
+      {
+        beforeTagAdded: function (_event, ui) {
+          if (invalidChar(ui.tag.text())) {
+            return;
+          }
+          fieldIndex++;
+          $(this).tagit({fieldName: prototypeFieldName.replace('__name__', fieldIndex)});
+        },
+        availableTags: TAGS,
+        fieldName: prototypeFieldName.replace('__name__', 0)
+      });
+
+  };
+
+  $(document).ready(function () {
+    setup_book_tags_Tagit();
+  });
+
+</script>
+
+{% endblock %}
