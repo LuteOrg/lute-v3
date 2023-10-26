@@ -50,7 +50,7 @@ def test_save_new(app_context, new_book, repo):
 def test_get_tags(app_context, new_book, repo):
     "Helper method test."
     assert repo.get_book_tags() == [], 'no tags yet'
-    b = repo.add(new_book)
+    repo.add(new_book)
     repo.commit()
     assert repo.get_book_tags() == [ 'tag1', 'tag2' ], 'no tags yet'
 

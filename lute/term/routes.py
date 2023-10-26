@@ -84,13 +84,11 @@ def _handle_form(term, repo):
     Handle the form post.  Only show lang. selector
     for new terms.
     """
-    form = TermForm(obj=term)
     return handle_term_form(
         term,
         repo,
         '/term/formframes.html',
-        redirect('/term/index', 302),
-        embedded_in_reading_frame = False
+        redirect('/term/index', 302)
     )
 
 
