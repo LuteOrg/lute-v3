@@ -8,6 +8,7 @@ from flask import Blueprint, render_template, redirect
 from lute.read.service import get_paragraphs, set_unknowns_to_known
 from lute.read.forms import TextForm
 from lute.term.model import Repository
+from lute.term.routes import handle_term_form
 from lute.term.forms import TermForm
 from lute.models.book import Book, Text
 from lute.models.language import Language
@@ -119,27 +120,14 @@ def term_form(langid, text):
     repo = Repository(db)
     term = repo.find_or_new(langid, text)
     form = TermForm(obj=term)
-    form.language_id.choices = [(langid, 'no_choice_allowed')]
-    if form.validate_on_submit():
-        form.populate_obj(term)
-        repo = Repository(db)
-        repo.add(term)
-        repo.commit()
-        # Don't add a flash message.  read/updated.html
-        # returned here has its own "flash" message; a regular
-        # flash message would appear on base.html.
-        return render_template('/read/updated.html', term_text=term.text)
 
-    return render_template(
+    return handle_term_form(
+        term,
+        repo,
         '/read/frameform.html',
-        form=form,
-        term=term,
-        language_dicts=Language.all_dictionaries(),
-        show_language_selector=False,
-
-        # TODO term tags: pass dynamic list.
-        tags=[ "apple", "bear", "cat" ],
-        embedded_in_reading_frame=True
+        render_template('/read/updated.html', term_text=term.text),
+        show_language_selector = False,
+        embedded_in_reading_frame = True
     )
 
 
