@@ -13,7 +13,16 @@
   <table id="term">
   <tbody>
 
-    <tr id="languageSel" {% if not show_language_selector %}style="display:none;"{% endif %}>
+    <p>{{ term }}</p>
+    <p>{{ term.language_id }}</p>
+    <p>{{ term.language }}</p>
+
+    <tr id="languageSel"
+        {% if term.language_id is none and term.language is none %}
+        {# show the language select box. #}
+        {% else %}
+        style="display:none;"
+        {% endif %}>
       <td>{{ form.language_id(class="form-control") }}</td>
     </tr>
 

@@ -40,7 +40,7 @@ class Term: # pylint: disable=too-many-instance-attributes
         self.current_image = None
 
     def __repr__(self):
-        return f'<Term BO "{self.text}">'
+        return f'<Term BO "{self.text}" lang_id={self.language_id} lang={self.language}>'
 
     @property
     def language(self):
