@@ -25,7 +25,7 @@ class BookTag(db.Model):
 
     @staticmethod
     def make_book_tag(text, comment=''):
-        "Create a TermTag."
+        "Create a BookTag."
         tt = BookTag()
         tt.text = text
         tt.comment = comment
@@ -42,7 +42,7 @@ class BookTag(db.Model):
         ret = BookTag.find_by_text(text)
         if ret is not None:
             return ret
-        return BookTag(text)
+        return BookTag.make_book_tag(text)
 
 
 class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instance-attributes

@@ -43,8 +43,8 @@ def new():
     if form.validate_on_submit():
         form.populate_obj(b)
         if form.textfile.data:
-            content = form.textfile.read()
-            b.Text = content
+            content = form.textfile.data.read()
+            b.text = str(content, 'utf-8')
 
         repo = Repository(db)
         book = repo.add(b)
