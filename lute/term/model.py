@@ -159,6 +159,12 @@ class Repository:
         return [self._build_business_term(t) for t in ret]
 
 
+    def get_term_tags(self):
+        "Get all available term tags, helper method."
+        tags = self.db.session.query(TermTag).all()
+        return [ t.text for t in tags ]
+
+
     def add(self, term):
         """
         Add a term to be saved to the db session.

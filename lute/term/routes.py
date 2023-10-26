@@ -74,9 +74,7 @@ def handle_term_form(
         form=form,
         term=term,
         language_dicts=Language.all_dictionaries(),
-
-        # TODO term tags: pass dynamic list.
-        tags=[ "apple", "bear", "cat" ],
+        tags=repo.get_term_tags(),
         embedded_in_reading_frame=embedded_in_reading_frame
     )
 
