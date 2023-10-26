@@ -45,10 +45,20 @@ def datatables_active_source():
     return jsonify(data)
 
 
-def _handle_form(term, repo, show_language_selector):
+def handle_term_form(
+        term,
+        repo,
+        form_template_name,
+        return_on_success,
+        show_language_selector = False,
+        embedded_in_reading_frame = False
+):
     """
-    Handle the form post.  Only show lang. selector
-    for new terms.
+    Handle a form post.
+
+    This is used here and in read.routes -- read.routes.term_form
+    lives in an iframe in the reading frames and returns a different
+    template on success.
     """
     form = TermForm(obj=term)
 
@@ -58,10 +68,10 @@ def _handle_form(term, repo, show_language_selector):
         form.populate_obj(term)
         repo.add(term)
         repo.commit()
-        return redirect('/term/index', 302)
+        return return_on_success
 
     return render_template(
-        '/term/formframes.html',
+        form_template_name,
         form=form,
         term=term,
         language_dicts=Language.all_dictionaries(),
@@ -69,7 +79,24 @@ def _handle_form(term, repo, show_language_selector):
 
         # TODO term tags: pass dynamic list.
         tags=[ "apple", "bear", "cat" ],
-        embedded_in_reading_frame=False
+        embedded_in_reading_frame=embedded_in_reading_frame
+    )
+
+
+def _handle_form(term, repo, show_language_selector):
+    """
+    Handle the form post.  Only show lang. selector
+    for new terms.
+    """
+    form = TermForm(obj=term)
+
+    return handle_term_form(
+        term,
+        repo,
+        '/term/formframes.html',
+        redirect('/term/index', 302),
+        show_language_selector = show_language_selector,
+        embedded_in_reading_frame = False
     )
 
 
