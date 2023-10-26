@@ -9,7 +9,6 @@ from lute.read.service import get_paragraphs, set_unknowns_to_known
 from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
-from lute.term.forms import TermForm
 from lute.models.book import Book, Text
 from lute.models.term import Term as DBTerm
 from lute.db import db
