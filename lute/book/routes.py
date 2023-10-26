@@ -36,6 +36,7 @@ def datatables_archived_source():
 
 @bp.route('/new', methods=['GET', 'POST'])
 def new():
+    "Create a new book, either from text or from a file."
     b = Book()
     form = NewBookForm(obj=b)
     form.language_id.choices = lute.utils.formutils.language_choices()

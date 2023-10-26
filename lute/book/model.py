@@ -10,7 +10,7 @@ class Book:
     """
     A book domain object, to create/edit lute.models.book.Books.
     """
-    
+
     def __init__(self):
         self.id = None
         self.language_id = None

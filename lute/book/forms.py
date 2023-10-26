@@ -8,10 +8,6 @@ from wtforms.validators import DataRequired, Length
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 
-from lute.models.language import Language
-from lute.models.book import Book
-
-
 class NewBookForm(FlaskForm):
     """
     New book.  All fields can be entered.
@@ -23,8 +19,14 @@ class NewBookForm(FlaskForm):
     )
 
     title = StringField('Title', validators=[DataRequired(), Length(max=255)])
-    text = TextAreaField('Text', description='Use for short texts, e.g. up to a few thousand words. For longer texts, use the "Text File" below.')
-    textfile = FileField('Text file', description='Max file size 2048K', validators=[FileAllowed(['txt'], 'Please upload a valid text document')])
+
+    desc = "Use for short texts, e.g. up to a few thousand words. " + \
+        "For longer texts, use the \"Text File\" below."
+    text = TextAreaField('Text', description=desc)
+    textfile = FileField(
+        'Text file',
+        description='Max file size 2048K',
+        validators=[FileAllowed(['txt'], 'Please upload a valid text document')])
     source_uri = StringField('Source URI', validators=[Length(max=255)])
     book_tags = FieldList(StringField('book_tags'))
 
