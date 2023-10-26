@@ -50,7 +50,6 @@ def handle_term_form(
         repo,
         form_template_name,
         return_on_success,
-        show_language_selector = False,
         embedded_in_reading_frame = False
 ):
     """
@@ -75,7 +74,6 @@ def handle_term_form(
         form=form,
         term=term,
         language_dicts=Language.all_dictionaries(),
-        show_language_selector=show_language_selector,
 
         # TODO term tags: pass dynamic list.
         tags=[ "apple", "bear", "cat" ],
@@ -83,19 +81,17 @@ def handle_term_form(
     )
 
 
-def _handle_form(term, repo, show_language_selector):
+def _handle_form(term, repo):
     """
     Handle the form post.  Only show lang. selector
     for new terms.
     """
     form = TermForm(obj=term)
-
     return handle_term_form(
         term,
         repo,
         '/term/formframes.html',
         redirect('/term/index', 302),
-        show_language_selector = show_language_selector,
         embedded_in_reading_frame = False
     )
 
@@ -107,7 +103,7 @@ def edit(termid):
     """
     repo = Repository(db)
     term = repo.load(termid)
-    return _handle_form(term, repo, False)
+    return _handle_form(term, repo)
 
 
 @bp.route('/editbytext/<int:langid>/<text>', methods=['GET', 'POST'])
@@ -117,7 +113,7 @@ def edit_by_text(langid, text):
     """
     repo = Repository(db)
     term = repo.find(langid, text)
-    return _handle_form(term, repo, False)
+    return _handle_form(term, repo)
 
 
 @bp.route('/new', methods=['GET', 'POST'])
@@ -127,7 +123,7 @@ def new():
     """
     repo = Repository(db)
     term = Term()
-    return _handle_form(term, repo, True)
+    return _handle_form(term, repo)
 
 
 @bp.route('/search/<text>/<int:langid>', methods=['GET'])

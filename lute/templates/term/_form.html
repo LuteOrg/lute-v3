@@ -13,10 +13,6 @@
   <table id="term">
   <tbody>
 
-    <p>{{ term }}</p>
-    <p>{{ term.language_id }}</p>
-    <p>{{ term.language }}</p>
-
     <tr id="languageSel"
         {% if term.language_id is none and term.language is none %}
         {# show the language select box. #}

@@ -126,7 +126,6 @@ def term_form(langid, text):
         repo,
         '/read/frameform.html',
         render_template('/read/updated.html', term_text=term.text),
-        show_language_selector = False,
         embedded_in_reading_frame = True
     )
 
