@@ -31,6 +31,19 @@ class BookTag(db.Model):
         tt.comment = comment
         return tt
 
+    @staticmethod
+    def find_by_text(text):
+        "Find a tag by text, or None if not found."
+        return db.session.query(BookTag).filter(BookTag.text == text).first()
+
+    @staticmethod
+    def find_or_create_by_text(text):
+        "Return tag or create one."
+        ret = BookTag.find_by_text(text)
+        if ret is not None:
+            return ret
+        return BookTag(text)
+
 
 class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instance-attributes
     """
@@ -62,6 +75,16 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
     def __repr__(self):
         return f"<Book {self.id} {self.title}>"
+
+    def remove_all_book_tags(self):
+        self.book_tags = []
+
+    def add_book_tag(self, book_tag):
+        if book_tag not in self.book_tags:
+            self.book_tags.append(book_tag)
+
+    def remove_book_tag(self, book_tag):
+        self.book_tags.remove(book_tag)
 
     @property
     def page_count(self):

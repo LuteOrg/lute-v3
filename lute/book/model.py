@@ -55,17 +55,14 @@ class Repository:
 
     def _build_db_book(self, book):
         "Convert a book business object to a DBBook."
-        b = DBBook()
 
         lang = Language.find(book.language_id)
-        b.language = lang
-        b.title = book.title
-        b.text = book.text
+        b = DBBook.create_book(book.title, lang, book.text)
         b.source_uri = book.source_uri
 
-        termtags = []
+        booktags = []
         for s in book.book_tags:
-            termtags.append(BookTag.find_or_create_by_text(s))
+            booktags.append(BookTag.find_or_create_by_text(s))
         b.remove_all_book_tags()
         for tt in booktags:
             b.add_book_tag(tt)

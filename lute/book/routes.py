@@ -2,11 +2,12 @@
 /book routes.
 """
 
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, redirect
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm
 import lute.utils.formutils
+from lute.db import db
 
 # Book domain object
 from lute.book.model import Book, Repository
@@ -36,18 +37,19 @@ def datatables_archived_source():
 @bp.route('/new', methods=['GET', 'POST'])
 def new():
     b = Book()
-    form = NewBookForm()
+    form = NewBookForm(obj=b)
     form.language_id.choices = lute.utils.formutils.language_choices()
 
     if form.validate_on_submit():
-        text_file = request.files['textfile']
-        if text_file:
-            content = text_file.read()
+        form.populate_obj(b)
+        if form.textfile.data:
+            content = form.textfile.read()
             b.Text = content
 
+        repo = Repository(db)
         book = repo.add(b)
         repo.commit()
-        return redirect('/read/{book.id}/page/1')
+        return redirect(f'/read/{book.id}/page/1', 302)
 
     return render_template(
         'book/create_new.html',

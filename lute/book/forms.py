@@ -2,11 +2,11 @@
 Book create/edit forms.
 """
 
-from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, FieldList, TextAreaField, FileField
+from wtforms import StringField, SelectField, FieldList, TextAreaField
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length
-from flask_wtf.file import FileRequired, FileAllowed
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 
 from lute.models.language import Language
 from lute.models.book import Book
