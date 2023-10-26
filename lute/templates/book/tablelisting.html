@@ -20,6 +20,9 @@
   
   let setup_text_datatable = function(initial_search) {
     var table = $('#booktable').DataTable({
+      "language": {
+            "emptyTable": "No books available."
+      },
       responsive: true,
       select: true,
       lengthMenu: [ 10, 25, 50 ],

@@ -54,7 +54,7 @@ def edit(langid):
 
     form = LanguageForm(obj=language)
     if _handle_form(language, form):
-        return redirect(url_for('language.index'))
+        return redirect('/')
     return render_template('language/edit.html', form=form, language=language)
 
 
@@ -73,7 +73,7 @@ def new(langname):
 
     form = LanguageForm(obj=language)
     if _handle_form(language, form):
-        return redirect(url_for('language.index'))
+        return redirect('/')
 
     return render_template('language/new.html', form=form, language=language, predefined=predefined)
 

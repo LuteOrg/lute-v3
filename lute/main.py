@@ -3,10 +3,14 @@ Main entry point.
 """
 
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, flash
 
 from lute.db import db
 from lute.db.setup.main import setup_db
+import lute.db.demo
+
+from lute.models.book import Book
+from lute.models.language import Language
 
 from lute.book.routes import bp as book_bp
 from lute.language.routes import bp as language_bp
@@ -72,12 +76,25 @@ def _create_app(app_config, extra_config):
 
     @app.route('/')
     def index():
+        tutorial_book_id = lute.db.demo.tutorial_book_id()
+        have_books = len(db.session.query(Book).all()) > 0
+        have_languages = len(db.session.query(Language).all()) > 0
         return render_template(
             'index.html',
             dbname = app_config.dbname,
             datapath = app_config.datapath,
+            tutorial_book_id = tutorial_book_id,
+            have_books = have_books,
+            have_languages = have_languages,
             hide_home_link = True
         )
+
+    @app.route('/wipe_database')
+    def wipe_db():
+        if lute.db.demo.contains_demo_data():
+            lute.db.demo.delete_all_data()
+            flash('The database has been wiped clean.  Have fun!')
+        return redirect('/', 302)
 
     return app
 

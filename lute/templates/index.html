@@ -19,15 +19,36 @@
 
 <br />
 
-{% include "book/tablelisting.html" %}
+{% if tutorial_book_id %}
+<div class="flash-notice">
+  <p>The Lute database has been loaded with a
+    <a href="/read/{{ tutorial_book_id }}/page/1" style="text-decoration: underline;">brief tutorial</a>,
+    and some languages and short texts for you to try out.
+  </p>
+  <p>When you're done trying out the demo, <a href="/wipe_database"
+  style="text-decoration: underline;">click here</a> to clear out the
+  database.  <i>Note: this removes everything in the db.</i></p>
+</div>
+{% endif %}
 
+{% if is_production_data %}
+<p><b>TODO backup: add warnings about backup keys here.</b></p>
+{% endif %}
+
+<br />
+
+{% if not have_languages %}
+<p>To get started using Lute, first <a href="/language/new">create your language.</a></p>
+{% else %}
+{% include "book/tablelisting.html" %}
 
 <div id="userlinks" style="margin-top: 10px;">
   <ul>
-    <li><a href="language/index">Languages</a></li>
-    <li><a href="term/index">Terms</a></li>
+    <li><a href="/language/index">Languages</a></li>
+    <li><a href="/term/index">Terms</a></li>
   </ul>
 </div>
+{% endif %}
 
 <footer id="myfooter">
   <p>DB = {{ dbname }}, Data path = {{ datapath }}</p>

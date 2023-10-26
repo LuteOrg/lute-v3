@@ -101,7 +101,7 @@
             method="post">
       </form>
       <a id="footerMarkRestAsKnown"
-         style="text-decoration: none;"
+         style="text-decoration: none; cursor: pointer;"
          onclick="document.getElementById('setknown').submit(); return false;"
          title="Mark rest as known, mark page as read" tabindex="-1">
         <img src="{{ url_for('static', filename='/icn/tick.png') }}" />
@@ -115,7 +115,7 @@
             method="post">
       </form>
       <a id="footerMarkRestAsKnownNextPage"
-         style="text-decoration: none;"
+         style="text-decoration: none; cursor: pointer;"
          onclick="document.getElementById('knowntonext').submit(); return false;"
          title="Mark rest as known, mark page as read, then go to next page"
          tabindex="-1">
@@ -129,7 +129,7 @@
             method="post">
       </form>
       <a id="footerNextPage"
-         style="text-decoration: none;"
+         style="text-decoration: none; cursor: pointer;"
          onclick="document.getElementById('gotonext').submit(); return false;"
          title="Mark page as read, then go to next page"
          tabindex="-1">&#8250;</a>

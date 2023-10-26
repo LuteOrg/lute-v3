@@ -3,14 +3,13 @@ DB setup tests using fake baseline, migration files.
 """
 
 import os
+import gzip
+import sqlite3
+from contextlib import closing
 import pytest
 
 from lute.db.setup.main import Setup, BackupManager
 from lute.db.setup.migrator import SqliteMigrator
-
-import gzip
-import sqlite3
-from contextlib import closing
 
 
 class MockBackupManager: # pylint: disable=too-few-public-methods
