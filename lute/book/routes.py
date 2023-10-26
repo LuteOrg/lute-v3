@@ -40,14 +40,13 @@ def new():
     b = Book()
     form = NewBookForm(obj=b)
     form.language_id.choices = lute.utils.formutils.language_choices()
+    repo = Repository(db)
 
     if form.validate_on_submit():
         form.populate_obj(b)
         if form.textfile.data:
             content = form.textfile.data.read()
             b.text = str(content, 'utf-8')
-
-        repo = Repository(db)
         book = repo.add(b)
         repo.commit()
         return redirect(f'/read/{book.id}/page/1', 302)
@@ -56,7 +55,6 @@ def new():
         'book/create_new.html',
         book=b,
         form=form,
-        # TODO book tags: render book tags
-        tags = [ 'applebook', 'bookbooktag', 'catbooktag' ],
+        tags = repo.get_book_tags(),
         show_language_selector=True
     )
