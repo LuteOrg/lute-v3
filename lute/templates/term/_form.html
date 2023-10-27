@@ -399,6 +399,8 @@
     // %E2%80%8B is the zero-width string.  The term is reparsed
     // on the server, so this doesn't need to be sent.
     const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
+    if (langid == '0' || t == '')
+      return;
     const url = `/term/sentences/${langid}/${t}`;
     top.frames.dictframe.location.href = url;
   }
