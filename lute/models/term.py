@@ -49,8 +49,6 @@ class TermTag(db.Model):
     text = db.Column('TgText', db.String(20))
     _comment = db.Column('TgComment', db.String(200))
 
-    terms = db.relationship('Term', secondary=wordtags, back_populates='term_tags')
-
     def __init__(self, text, comment=None):
         self.text=text
         self.comment=comment
@@ -116,8 +114,7 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     token_count = db.Column('WoTokenCount', db.Integer)
 
     language = db.relationship('Language')
-    term_tags = db.relationship(
-        'TermTag', secondary='wordtags', back_populates='terms')
+    term_tags = db.relationship('TermTag', secondary='wordtags')
     parents = db.relationship(
         'Term', secondary='wordparents',
         primaryjoin='Term.id == wordparents.c.WpWoID',

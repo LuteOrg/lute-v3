@@ -21,8 +21,6 @@ class BookTag(db.Model):
     text = db.Column('T2Text', db.String(20))
     comment = db.Column('T2Comment', db.String(200))
 
-    books = db.relationship('Book', secondary=booktags, back_populates='book_tags')
-
     @staticmethod
     def make_book_tag(text, comment=''):
         "Create a BookTag."
@@ -64,7 +62,7 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     texts = db.relationship(
         'Text', back_populates='book',
         order_by='Text.order', cascade='all, delete-orphan')
-    book_tags = db.relationship('BookTag', secondary='booktags', back_populates='books')
+    book_tags = db.relationship('BookTag', secondary='booktags')
 
     def __init__(self, title=None, language=None, source_uri=None):
         self.title = title
