@@ -137,3 +137,15 @@ def search_by_text_in_language(text, langid):
             'translation': t.translation
         })
     return jsonify(result)
+
+
+@bp.route('/sentences/<int:langid>/<text>', methods=['GET'])
+def sentences(langid, text):
+    "Get sentences for terms."
+    repo = Repository(db)
+    t = repo.find_or_new(langid, text)
+    references = repo.find_references(t)
+    return render_template(
+        '/term/sentences.html',
+        references = references
+    )

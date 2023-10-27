@@ -68,8 +68,10 @@ class Term: # pylint: disable=too-many-instance-attributes
 
 class TermReference:
     "Where a Term has been used in books."
-    def __init__(self, txid, title, sentence=None):
+    def __init__(self, bookid, txid, pgnum, title, sentence=None): # pylint: disable=too-many-arguments
+        self.book_id = bookid
         self.text_id = txid
+        self.page_number = pgnum
         self.title = title
         self.sentence = sentence
 
@@ -324,17 +326,14 @@ class Repository:
     def _build_term_references(self, term_lc, rows):
         ret = []
         zws = chr(0x200B)  # zero-width space
-
         for row in rows:
-            sentence = row[2].strip()
+            sentence = row[4].strip()
             pattern = f"{zws}({term_lc}){zws}"
             def replace_match(m):
                 return f"{zws}<b>{m.group(0)}</b>{zws}"
             sentence = re.sub(pattern, replace_match, sentence, flags=re.IGNORECASE)
-
             sentence = sentence.replace(zws, '').replace('¶', '')
-            ret.append(TermReference(row[0], row[1], sentence))
-
+            ret.append(TermReference(row[0], row[1], row[2], row[3], sentence))
         return ret
 
 
@@ -345,7 +344,9 @@ class Repository:
         term_lc = term.text_lc
         query = sqlalchtext("""
             SELECT DISTINCT
+                texts.TxBkID,
                 TxID,
+                TxOrder,
                 BkTitle || ' (' || TxOrder || '/' || pc.c || ')' AS TxTitle,
                 SeText
             FROM sentences
