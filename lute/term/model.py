@@ -313,12 +313,14 @@ class Repository:
         Return references of term, children, and parents.
         """
         spec = self._search_spec_term(term.language_id, term.text)
-        p = DBTerm.find_by_spec(spec)
+        searchterm = DBTerm.find_by_spec(spec)
+        if searchterm is None:
+            searchterm = spec
 
         references = {
-            'term': self._get_references(p),
-            'children': self._get_child_references(p),
-            'parents': self._get_parent_references(p),
+            'term': self._get_references(searchterm),
+            'children': self._get_child_references(searchterm),
+            'parents': self._get_parent_references(searchterm),
         }
         return references
 
