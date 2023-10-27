@@ -5,8 +5,9 @@ Terms are converted to and from lute.models.term.Term objects to save
 them in the database.
 """
 
+import re
 import functools
-from sqlalchemy import and_
+from sqlalchemy import and_, text
 
 from lute.models.term import Term as DBTerm, TermTag
 from lute.models.language import Language
@@ -63,6 +64,14 @@ class Term: # pylint: disable=too-many-instance-attributes
         def get_lc(s):
             return self.language.get_lowercase(s)
         return get_lc(self.original_text) != get_lc(self.text)
+
+
+class TermReference:
+    "Where a Term has been used in books."
+    def __init__(self, txid, title, sentence=None):
+        self.text_id = txid
+        self.title = title
+        self.sentence = sentence
 
 
 class Repository:
@@ -293,3 +302,97 @@ class Repository:
         term.term_tags = [tt.text for tt in dbterm.term_tags]
 
         return term
+
+
+    ## References.
+
+    def find_references(self, term):
+        """
+        Return references of term, children, and parents.
+        """
+        spec = self._search_spec_term(term.language_id, term.text)
+        p = DBTerm.find_by_spec(spec)
+
+        references = {
+            'term': self._get_references(p),
+            'children': self._get_child_references(p),
+            'parents': self._get_parent_references(p),
+        }
+        return references
+
+
+    def _build_term_references(self, term_lc, rows):
+        ret = []
+        zws = chr(0x200B)  # zero-width space
+
+        for row in rows:
+            sentence = row[2].strip()
+            pattern = f"{zws}({term_lc}){zws}"
+            def replace_match(m):
+                return f"{zws}<b>{m.group(0)}</b>{zws}"
+            sentence = re.sub(pattern, replace_match, sentence, flags=re.IGNORECASE)
+
+            sentence = sentence.replace(zws, '').replace('¶', '')
+            ret.append(TermReference(row[0], row[1], sentence))
+
+        return ret
+
+
+    def _get_references(self, term):
+        if term is None:
+            return []
+
+        term_lc = term.text_lc
+        query = text("""
+            SELECT DISTINCT
+                TxID,
+                BkTitle || ' (' || TxOrder || '/' || pc.c || ')' AS TxTitle,
+                SeText
+            FROM sentences
+            INNER JOIN texts ON TxID = SeTxID
+            INNER JOIN books ON BkID = texts.TxBkID
+            INNER JOIN (
+                SELECT TxBkID, COUNT(*) AS c
+                FROM texts
+                GROUP BY TxBkID
+            ) pc ON pc.TxBkID = texts.TxBkID
+            WHERE TxReadDate IS NOT NULL
+            AND LOWER(SeText) LIKE :pattern
+            LIMIT 20
+        """)
+
+        pattern = f"%{chr(0x200B)}{term_lc}{chr(0x200B)}%"
+        params = {'pattern': pattern}
+        result = self.db.session.execute(query, params)
+        return self._build_term_references(term_lc, result)
+
+
+    def _get_all_refs(self, terms):
+        all_references = []
+        for term in terms:
+            references = self._get_references(term)
+            all_references.extend(references)
+        return all_references
+
+
+    def _get_parent_references(self, term):
+        parent_references = []
+        for parent in term.parents:
+            parent_term_lc = parent.text_lc
+            references = self._get_family_references(parent, term)
+            parent_references.append({'term': parent_term_lc, 'refs': references})
+        return parent_references
+
+
+    def _get_family_references(self, parent, term):
+        if term is None or parent is None:
+            return []
+        family = [parent] + parent.children
+        family = [t for t in family if t.id != term.id]
+        return self._get_all_refs(family)
+
+
+    def _get_child_references(self, term):
+        if term is None:
+            return []
+        return self._get_all_refs(term.children)

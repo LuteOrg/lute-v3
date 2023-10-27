@@ -5,13 +5,14 @@ Tests lute.term.model.Term *domain* objects being saved
 and retrieved from DB.
 """
 
+from datetime import datetime
 import pytest
 
 from lute.models.term import Term as DBTerm, TermTag
 from lute.db import db
 from lute.term.model import Term, Repository
 from tests.dbasserts import assert_sql_result, assert_record_count_equals
-from tests.utils import add_terms
+from tests.utils import add_terms, make_text
 
 
 @pytest.fixture(name='repo')
@@ -474,7 +475,7 @@ def test_find_like_specification_terms_with_children_go_to_top(spanish, repo):
 
 def full_refs_to_string(refs):
     def to_string(r):
-        return f"{r['TxID']}, {r['Title']}, {r['Sentence'] if 'Sentence' in r else 'NULL'}"
+        return f"{r.title}, {r.sentence}"
 
     def refs_to_string(refs_array):
         ret = [to_string(r) for r in refs_array]
@@ -498,69 +499,108 @@ def full_refs_to_string(refs):
 
 
 @pytest.mark.sentences
-def test_get_all_references():
+def test_get_all_references(spanish, repo):
     # Simulate your setup and data here
     text = make_text('hola', 'Tengo un gato.  Ella tiene un perro.  No quiero tener nada.', spanish)
     archtext = make_text('luego', 'Tengo un coche.', spanish)
-    b = archtext.getBook()
-    b.setArchived(True)
-    book_repo.save(b, True)
+    archtext.book.archived = True
+    db.session.add(archtext.book)
 
     for t in [text, archtext]:
-        t.setReadDate(datetime.now())
-        text_repo.save(t, True)
+        t.read_date = datetime.now()
+        db.session.add(t)
 
-    tengo, tiene, tener = addTerms(spanish, ['tengo', 'tiene', 'tener'])
-    tengo.addParent(tener)
-    assert len(tengo.getParents()) == 1, 'has parent'
-    tiene.addParent(tener)
-    term_service.add(tengo, True)
-    term_service.add(tener, True)
-    term_service.add(tiene, True)
+    db.session.commit()
 
-    refs = term_service.findReferences(tengo)
+    tengo = Term()
+    tengo.language_id = spanish.id
+    tengo.text = 'tengo'
+    tengo.parents = [ 'tener' ]
+    repo.add(tengo)
+
+    tiene = Term()
+    tiene.language_id = spanish.id
+    tiene.text = 'tiene'
+    tiene.parents = [ 'tener' ]
+    repo.add(tiene)
+
+    repo.commit()
+
+    refs = repo.find_references(tengo)
     assert full_refs_to_string(refs) == {
         'term': [
-            "1, hola (1/1), <b>Tengo</b> un gato.",
-            "2, luego (1/1), <b>Tengo</b> un coche."
+            "hola (1/1), <b>Tengo</b> un gato.",
+            "luego (1/1), <b>Tengo</b> un coche."
         ],
         'children': [],
         'parents': [
             {
                 'term': 'tener',
                 'refs': [
-                    "1, hola (1/1), Ella <b>tiene</b> un perro.",
-                    "1, hola (1/1), No quiero <b>tener</b> nada."
+                    "hola (1/1), Ella <b>tiene</b> un perro.",
+                    "hola (1/1), No quiero <b>tener</b> nada."
                 ]
             }
         ]
     }, 'term tengo'
 
-    refs = term_service.findReferences(tener)
+    tener = repo.find(spanish.id, 'tener')
+    refs = repo.find_references(tener)
     assert full_refs_to_string(refs) == {
         'term': [
-            "1, hola (1/1), No quiero <b>tener</b> nada."
+            "hola (1/1), No quiero <b>tener</b> nada."
         ],
         'children': [
-            "1, hola (1/1), <b>Tengo</b> un gato.",
-            "1, hola (1/1), Ella <b>tiene</b> un perro.",
-            "2, luego (1/1), <b>Tengo</b> un coche."
+            "hola (1/1), <b>Tengo</b> un gato.",
+            "hola (1/1), Ella <b>tiene</b> un perro.",
+            "luego (1/1), <b>Tengo</b> un coche."
         ],
         'parents': []
     }, 'term tener'
 
 
 @pytest.mark.sentences
-def test_get_references_only_includes_read_texts():
-    text = make_text('hola', 'Tengo un gato.  No tengo un perro.', spanish)
-    tengo = addTerms(spanish, 'tengo')[0]
+def test_multiword_reference(spanish, repo):
+    "Ensure zws-delimiters are respected."
+    text = make_text('hola', 'Yo tengo un gato.', spanish)
+    text.read_date = datetime.now()
+    db.session.add(text)
+    db.session.commit()
 
-    refs = term_service.findReferences(tengo)
+    t = Term()
+    t.language_id = spanish.id
+    t.text = 'TENGO UN'
+    repo.add(t)
+    repo.commit()
+
+    refs = repo.find_references(t)
+    assert full_refs_to_string(refs) == {
+        'term': [
+            "hola (1/1), Yo <b>tengo un</b> gato."
+        ],
+        'children': [],
+        'parents': []
+    }, 'term tengo'
+
+
+@pytest.mark.sentences
+def test_get_references_only_includes_read_texts(spanish, repo):
+    text = make_text('hola', 'Tengo un gato.  No tengo un perro.', spanish)
+
+    tengo = Term()
+    tengo.language_id = spanish.id
+    tengo.text = 'tengo'
+    repo.add(tengo)
+    repo.commit()
+
+    refs = repo.find_references(tengo)
     keys = refs.keys()
     for k in keys:
         assert len(refs[k]) == 0, f'{k}, no matches for unread texts'
 
-    text.setReadDate(datetime.now())
-    text_repo.save(text, True)
-    refs = term_service.findReferences(tengo)
+    text.read_date = datetime.now()
+    db.session.add(text)
+    db.session.commit()
+
+    refs = repo.find_references(tengo)
     assert len(refs['term']) == 2, 'have refs once text is read'
