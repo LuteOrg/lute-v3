@@ -474,6 +474,7 @@ def test_find_like_specification_terms_with_children_go_to_top(spanish, repo):
 ## Sentences
 
 def full_refs_to_string(refs):
+    "Convert refs to strings for simpler testing."
     def to_string(r):
         return f"{r.title}, {r.sentence}"
 
@@ -500,7 +501,7 @@ def full_refs_to_string(refs):
 
 @pytest.mark.sentences
 def test_get_all_references(spanish, repo):
-    # Simulate your setup and data here
+    "Check references with parents and children."
     text = make_text('hola', 'Tengo un gato.  Ella tiene un perro.  No quiero tener nada.', spanish)
     archtext = make_text('luego', 'Tengo un coche.', spanish)
     archtext.book.archived = True
@@ -585,6 +586,7 @@ def test_multiword_reference(spanish, repo):
 
 @pytest.mark.sentences
 def test_get_references_only_includes_read_texts(spanish, repo):
+    "Like it says above."
     text = make_text('hola', 'Tengo un gato.  No tengo un perro.', spanish)
 
     tengo = Term()

@@ -7,7 +7,7 @@ them in the database.
 
 import re
 import functools
-from sqlalchemy import and_, text
+from sqlalchemy import and_, text as sqlalchtext
 
 from lute.models.term import Term as DBTerm, TermTag
 from lute.models.language import Language
@@ -343,7 +343,7 @@ class Repository:
             return []
 
         term_lc = term.text_lc
-        query = text("""
+        query = sqlalchtext("""
             SELECT DISTINCT
                 TxID,
                 BkTitle || ' (' || TxOrder || '/' || pc.c || ')' AS TxTitle,
