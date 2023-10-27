@@ -109,7 +109,7 @@ def get_paragraphs(text):
     paranums = unique([t.paragraph_number for t in tokens])
     for pnum in paranums:
         paratokens = [t for t in tokens if t.paragraph_number == pnum]
-        senums = unique([t.sentence_number for t in paratokens])
+        senums = sorted(unique([t.sentence_number for t in paratokens]))
 
         # A renderable paragraph is a collection of
         # RenderableSentences.
