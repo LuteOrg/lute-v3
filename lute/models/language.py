@@ -5,6 +5,7 @@ Language entity.
 import glob
 import os
 import yaml
+from sqlalchemy import text, func
 from lute.db import db
 from lute.parse.registry import get_parser
 
@@ -133,10 +134,29 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
             language_data[language.id] = data
         return language_data
 
+    @staticmethod
+    def delete(language):
+        """
+        Hacky method to delete language and all terms and books
+        associated with it.
 
-    # TODO language relationships: should deleting lang should delete books and terms
-    # books = db.relationship('Book', backref='language', lazy='extra')
-    # terms = db.relationship('Term', backref='language', lazy='extra')
+        There is _certainly_ a better way to do this using
+        Sqlalchemy relationships and cascade deletes, but I
+        was running into problems with it (things not cascading,
+        or warnings ("SAWarning: Object of type <Term> not in
+        session, add operation along 'Language.terms' will not
+        proceed") during test runs.  It would be nice to have
+        a "correct" mapping, but this is good enough for now.
+
+        TODO future fix: fix Language-Book and -Term mappings.
+        """
+        sqls = [
+            'pragma foreign_keys = ON',
+            f'delete from languages where LgID = {language.id}'
+        ]
+        for s in sqls:
+            db.session.execute(text(s))
+        db.session.commit()
 
 
     @property
@@ -154,3 +174,11 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
     def find(language_id):
         "Get by ID."
         return db.session.query(Language).filter(Language.id == language_id).first()
+
+
+    @staticmethod
+    def find_by_name(name):
+        "Get by name."
+        return db.session.query(Language).filter(
+            func.lower(Language.name) == func.lower(name)
+        ).first()

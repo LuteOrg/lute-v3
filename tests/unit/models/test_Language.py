@@ -72,3 +72,17 @@ def test_get_predefined():
     langnames = [lang.name for lang in langs]
     for expected in [ 'English', 'French', 'Turkish' ]:
         assert expected in langnames, expected
+
+
+def test_can_find_lang_by_name(app_context):
+    """
+    Returns lang if found, or None
+    """
+    e = Language.find_by_name('English')
+    assert e.name == 'English', 'case match'
+
+    e_lc = Language.find_by_name('english')
+    assert e_lc.name == 'English', 'case-insensitive'
+
+    nf = Language.find_by_name('notfound')
+    assert nf is None, 'not found'

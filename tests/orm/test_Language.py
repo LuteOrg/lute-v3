@@ -5,7 +5,7 @@ Language mapping tests.
 from lute.models.language import Language
 from lute.db import db
 from tests.dbasserts import assert_sql_result
-
+from tests.utils import make_text, add_terms
 
 def test_save_new(empty_db):
     """
@@ -38,3 +38,30 @@ def test_save_new(empty_db):
 
 
 # TODO db relationships: delete lang should delete everything related
+
+def test_delete_language_removes_book_and_terms(app_context, spanish):
+    """
+    Test HACKY Language.delete() method to ensure deletes cascade.
+    """
+    add_terms(spanish, [ 'gato', 'perro' ])
+    t = make_text('hola', 'Hola amigo', spanish)
+    db.session.add(t)
+    db.session.commit()
+
+    sqlterms = 'select WoText from words order by WoText'
+    sqlbook = "select BkTitle from books where BkTitle = 'hola'"
+    assert_sql_result(
+        sqlterms,
+        [ 'gato', 'perro' ],
+        'initial terms'
+    )
+    assert_sql_result(
+        sqlbook,
+        [ 'hola' ],
+        'initial book'
+    )
+
+    Language.delete(spanish)
+
+    assert_sql_result(sqlbook, [], 'book deleted')
+    assert_sql_result(sqlterms, [], 'terms deleted')
