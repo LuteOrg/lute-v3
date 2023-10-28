@@ -12,7 +12,7 @@ from lute.book.forms import NewBookForm, EditBookForm
 import lute.utils.formutils
 from lute.db import db
 
-# Book domain object
+from lute.models.book import Book as DBBook
 from lute.book.model import Book, Repository
 
 
@@ -130,3 +130,13 @@ def edit(bookid):
 @bp.route('/import_webpage', methods = ['GET', 'POST'])
 def import_webpage():
     return render_template('book/import_webpage.html')
+
+
+@bp.route('/archive/<int:bookid>', methods=['POST'])
+def archive(bookid):
+    "Archive a book."
+    b = DBBook.find(bookid)
+    b.archived = True
+    db.session.add(b)
+    db.session.commit()
+    return redirect('/', 302)

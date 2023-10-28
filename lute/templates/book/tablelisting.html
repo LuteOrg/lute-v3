@@ -77,7 +77,7 @@
             if (row[4] == 0) {
               // not archived
               ret.push(`<img src="{{ url_for('static', filename='/icn/document--pencil.png') }}" title="Edit" onclick="edit_book(${bkid})" />`);
-              ret.push(`<img src="/icn/inbox-download.png" title="Archive" onclick="confirm_archive(${bkid})" />`);
+              ret.push(`<img src="{{ url_for('static', filename='/icn/inbox-download.png') }}" title="Archive" onclick="confirm_archive(${bkid})" />`);
             }
             else {
               ret.push(`<img src="/icn/inbox-upload.png" title="Unarchive" onclick="confirm_unarchive(${bkid})" />`);
@@ -117,7 +117,7 @@
 
   function do_action_post(action, bookid) {
     let f = $('#actionposter');
-    f.attr('action', `/book/${bookid}/${action}`);
+    f.attr('action', `/book/${action}/${bookid}`);
     f.submit();
   }
 
@@ -129,12 +129,12 @@
     do_action_post('unarchive', bookid);
   }
 
-  function confirm_reparse(bookid) {
-    if (!confirm(`Reparse the book using parsing rules defined for its language.  This will also reset you to the first page of the book.  Click OK to proceed, or Cancel.`)) {
-      return;
-    }
-    do_action_post('reparse', bookid);
-  }
+  //  function confirm_reparse(bookid) {
+  //    if (!confirm(`Reparse the book using parsing rules defined for its language.  This will also reset you to the first page of the book.  Click OK to proceed, or Cancel.`)) {
+  //      return;
+  //    }
+  //    do_action_post('reparse', bookid);
+  //  }
 
   function edit_book(bookid) {
     document.location = `/book/edit/${bookid}`;
