@@ -37,8 +37,6 @@ def test_save_new(empty_db):
     assert retrieved.show_romanization is False, 'retrieved no roman'
 
 
-# TODO db relationships: delete lang should delete everything related
-
 def test_delete_language_removes_book_and_terms(app_context, spanish):
     """
     Test HACKY Language.delete() method to ensure deletes cascade.

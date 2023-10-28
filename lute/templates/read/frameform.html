@@ -18,8 +18,6 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/tag-it.js') }}" charset="utf-8"></script>
 
     <script type="text/javascript">
-      // TODO term tags: ensure works with tag containing " and '
-      // ref https://vjayc.medium.com/convert-jinja2-array-into-js-array-python-cca6a70f17e
       var temp_tags = '{{ tags | tojson }}';
       var TAGS = Array.from(JSON.parse(temp_tags));
     </script>

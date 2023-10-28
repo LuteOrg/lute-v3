@@ -2,6 +2,7 @@
 Book mapping checks.
 """
 
+from datetime import datetime
 import pytest
 from lute.models.book import Book, Text, BookTag, Sentence
 from lute.db import db
@@ -12,20 +13,10 @@ from tests.dbasserts import assert_sql_result, assert_record_count_equals
 @pytest.fixture(name="simple_book")
 def fixture_simple_book(english):
     "Single page book with some associated objects."
-    b = Book('hi', english)
-    t = Text(b, 'some text', 1)
-
-    s = Sentence()
-    s.text_content = 'some text'
-    s.order = 1
-
-    t.add_sentence(s)
-
-    b.texts.append(t)
-
+    b = Book.create_book('hi', english, 'some text')
+    b.texts[0].read_date = datetime.now()
     bt = BookTag.make_book_tag('hola')
     b.book_tags.append(bt)
-
     return b
 
 
@@ -37,15 +28,14 @@ def test_save_book(empty_db, simple_book):
     db.session.add(b)
     db.session.commit()
 
-    # TODO book: update word count
     sql = "select BkID, BkTitle, BkLgID, BkWordCount from books"
-    assert_sql_result(sql, ['1; hi; 1; None'], 'book')
+    assert_sql_result(sql, ['1; hi; 1; 2'], 'book')
 
     sql = "select TxID, TxBkID, TxText from texts"
     assert_sql_result(sql, ['1; 1; some text'], 'texts')
 
     sql = "select * from sentences"
-    assert_sql_result(sql, ['1; 1; 1; some text'], 'sentences')
+    assert_sql_result(sql, ['1; 1; 1; /some/ /text/'], 'sentences')
 
     sql = "select * from booktags"
     assert_sql_result(sql, ['1; 1'], 'booktags')

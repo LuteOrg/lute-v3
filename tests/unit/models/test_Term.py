@@ -69,11 +69,6 @@ def test_cannot_add_self_as_own_parent(spanish):
     assert len(t.parents) == 0, 'different object still not added'
 
 
-# TODO term tests: add/remove image
-# TODO term tests: add/remove tags
-# TODO term tests: add/remove parents
-
-
 def test_find_by_spec(app_context, spanish, english):
     """
     Can find by spec, matches on language and text.

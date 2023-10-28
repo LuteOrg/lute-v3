@@ -41,7 +41,6 @@ def test_find_by_text(_hola_tag, app_context):
 
 def test_find_by_text_returns_null_if_not_exact_match(_hola_tag, app_context):
     "Find returns null if no match."
-    # TODO check if used: this method feels useless.
     assert TermTag.find_by_text("unknown") is None
     assert TermTag.find_by_text("hola") is None
 
