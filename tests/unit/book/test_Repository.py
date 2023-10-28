@@ -41,6 +41,7 @@ def test_save_new(app_context, new_book, repo):
     b = repo.add(new_book)
     repo.commit()
     assert_sql_result(sql, [ "HELLO" ], 'Saved')
+    assert b.texts[0].text == "greeting"
 
     book = repo.load(b.id)
     assert book.title == new_book.title, 'found book'
