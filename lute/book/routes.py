@@ -2,6 +2,9 @@
 /book routes.
 """
 
+import requests
+from bs4 import BeautifulSoup
+
 from flask import Blueprint, request, jsonify, render_template, redirect, flash
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.book.datatables import get_data_tables_list
@@ -51,6 +54,13 @@ def new():
         repo.commit()
         return redirect(f'/read/{book.id}/page/1', 302)
 
+    parameters = request.args
+    import_url = parameters.get('importurl', '').strip()
+    if import_url != '':
+        b = load_book(import_url)
+        form = NewBookForm(obj=b)
+        form.language_id.choices = lute.utils.formutils.language_choices()
+
     return render_template(
         'book/create_new.html',
         book=b,
@@ -58,6 +68,45 @@ def new():
         tags = repo.get_book_tags(),
         show_language_selector=True
     )
+
+
+def load_book(url):
+    try:
+        # Replace with the appropriate way to fetch content from the URL
+        s = fetch_content_from_url(url)
+    except requests.exceptions.RequestException as e:
+        msg = f"Could not parse {url} (error: {str(e)})"
+        flash(msg, 'notice')
+        return Book()
+
+    soup = BeautifulSoup(s, 'html.parser')
+
+    extracted_text = []
+
+    # Add elements in order found.
+    for element in soup.descendants:
+        if element.name in ('h1', 'h2', 'h3', 'h4', 'p'):
+            extracted_text.append(element.text)
+
+    title_node = soup.find('title')
+    orig_title = title_node.string if title_node else url
+
+    short_title = orig_title[:150]
+    if len(orig_title) > 150:
+        short_title += ' ...'
+
+    b = Book()
+    b.title = short_title
+    b.source_uri = url
+    b.text = "\n\n".join(extracted_text)
+    return b
+
+
+def fetch_content_from_url(url):
+    "Fetch using requests."
+    response = requests.get(url)
+    response.raise_for_status()
+    return response.text
 
 
 @bp.route('/edit/<int:bookid>', methods=['GET', 'POST'])
