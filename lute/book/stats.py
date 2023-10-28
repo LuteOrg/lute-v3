@@ -3,6 +3,10 @@ Book statistics.
 """
 
 from lute.read.service import get_paragraphs
+from lute.db import db
+from lute.models.book import Book
+from sqlalchemy import text
+
 
 def get_status_distribution(book):
     """
@@ -61,5 +65,66 @@ def get_status_distribution(book):
     return stats
 
 
+##################################################
+# Stats table refresh.
+
+class BookStats(db.Model):
+    "The stats table."
+    __tablename__ = 'bookstats'
+
+    id = db.Column(db.Integer, primary_key=True)
+    BkID = db.Column(db.Integer)
+    wordcount = db.Column(db.Integer)
+    distinctterms = db.Column(db.Integer)
+    distinctunknowns = db.Column(db.Integer)
+    unknownpercent = db.Column(db.Integer)
+
+
 def refresh_stats():
-    "Calc stats"
+    books = _books_to_update()
+
+    for book in books:
+        print(book)
+        stats = _get_stats(book)
+        _update_stats(book, stats)
+
+def mark_stale(book):
+    bk_id = book.id
+    db.session.query(BookStats).filter_by(BkID=bk_id).delete()
+    db.session.commit()
+
+def recalc_language(language):
+    lg_id = language.id
+    db.session.query(BookStats).filter(BookStats.BkID.in_(db.session.query(Book.id).filter_by(BkLgID=lg_id))).delete()
+    db.session.commit()
+
+def _books_to_update():
+    books = db.session.query(Book).filter(~Book.id.in_(db.session.query(BookStats.BkID))).all()
+    return books
+
+def _get_stats(book):
+    lgid = book.language.id
+    bkid = book.id
+
+    status_distribution = get_status_distribution(book)
+    unknowns = status_distribution[0]
+    allunique = sum(status_distribution.values())
+
+    percent = 0
+    if allunique > 0:  # In case not parsed.
+        percent = round(100.0 * unknowns / allunique)
+
+    # Any change in the below fields requires a change to
+    # update_stats as well, query insert doesn't check field order.
+    return [
+        book.word_count or 0,
+        allunique,
+        unknowns,
+        percent
+    ]
+
+
+def _update_stats(book, stats):
+    new_stats = BookStats(BkID=book.id, wordcount=stats[0], distinctterms=stats[1], distinctunknowns=stats[2], unknownpercent=stats[3])
+    db.session.add(new_stats)
+    db.session.commit()

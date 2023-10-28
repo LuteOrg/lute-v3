@@ -6,7 +6,7 @@ import pytest
 
 from lute.db import db
 from lute.term.model import Term, Repository
-from lute.book.stats import get_status_distribution, refresh_stats
+from lute.book.stats import get_status_distribution, refresh_stats, mark_stale
 
 from tests.utils import make_text, make_book
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
@@ -131,7 +131,7 @@ def do_refresh():
 
 
 @pytest.fixture(name='test_book')
-def fixture_make_book(spanish):
+def fixture_make_book(empty_db, spanish):
     b = make_book("Hola.", "Hola tengo un gato.", spanish)
     db.session.add(b)
     db.session.commit()
@@ -173,9 +173,10 @@ def test_stats_smoke_test(test_book, spanish):
 
 
 def test_stats_calculates_rendered_text(test_book, spanish):
+    # text is "Hola tengo un gato."
     add_terms(spanish, ["tengo un"])
     do_refresh()
-    assert_stats(["3; 2; 1; 50"])
+    assert_stats(["4; 3; 2; 67"])
 
 
 def test_stats_only_update_existing_books_if_specified(test_book, spanish):
@@ -187,6 +188,6 @@ def test_stats_only_update_existing_books_if_specified(test_book, spanish):
     do_refresh()
     assert_stats(["4; 4; 2; 50"])
 
-    mark_stale(b)
+    mark_stale(test_book)
     do_refresh()
     assert_stats(["4; 4; 1; 25"])
