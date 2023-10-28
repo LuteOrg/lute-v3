@@ -465,7 +465,7 @@ a:active {
      vertical-align: middle;
      line-height: normal;
      margin: 0;
-     position: fixed;
+     /* position: fixed; */
      bottom: 0px;
      width: 100%;
  }

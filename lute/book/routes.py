@@ -71,16 +71,19 @@ def new():
 
 
 def load_book(url):
+    "Parse the url and load a new Book."
+    s = None
     try:
-        # Replace with the appropriate way to fetch content from the URL
-        s = fetch_content_from_url(url)
+        timeout = 20  # seconds
+        response = requests.get(url, timeout=timeout)
+        response.raise_for_status()
+        s = response.text
     except requests.exceptions.RequestException as e:
         msg = f"Could not parse {url} (error: {str(e)})"
         flash(msg, 'notice')
         return Book()
 
     soup = BeautifulSoup(s, 'html.parser')
-
     extracted_text = []
 
     # Add elements in order found.
@@ -100,13 +103,6 @@ def load_book(url):
     b.source_uri = url
     b.text = "\n\n".join(extracted_text)
     return b
-
-
-def fetch_content_from_url(url):
-    "Fetch using requests."
-    response = requests.get(url)
-    response.raise_for_status()
-    return response.text
 
 
 @bp.route('/edit/<int:bookid>', methods=['GET', 'POST'])
