@@ -1,12 +1,15 @@
 """
-TokenCoverage tests.
+Book stats tests.
 """
+
+import pytest
 
 from lute.db import db
 from lute.term.model import Term, Repository
-from lute.book.stats import get_status_distribution
+from lute.book.stats import get_status_distribution, refresh_stats
 
-from tests.utils import make_text
+from tests.utils import make_text, make_book
+from tests.dbasserts import assert_record_count_equals, assert_sql_result
 
 
 def add_term(lang, s, status):
@@ -120,3 +123,70 @@ def test_chinese_with_terms(classical_chinese):
             98: 0,
             99: 0
         })
+
+
+
+def do_refresh():
+    refresh_stats()
+
+
+@pytest.fixture(name='test_book')
+def fixture_make_book(spanish):
+    b = make_book("Hola.", "Hola tengo un gato.", spanish)
+    db.session.add(b)
+    db.session.commit()
+    return b
+
+
+def add_terms(lang, terms):
+    "Create and add term."
+    repo = Repository(db)
+    for s in terms:
+        term = Term()
+        term.language = lang
+        term.language_id = lang.id
+        term.text = s
+        repo.add(term)
+    repo.commit()
+
+
+def assert_stats(expected):
+    sql = "select wordcount, distinctterms, distinctunknowns, unknownpercent from bookstats"
+    assert_sql_result(
+        sql,
+        expected
+    )
+
+
+def test_cache_loads_when_prompted(test_book):
+    assert_record_count_equals("bookstats", 0, "nothing loaded")
+    do_refresh()
+    assert_record_count_equals("bookstats", 1, "loaded")
+
+
+def test_stats_smoke_test(test_book, spanish):
+    add_terms(spanish, [
+        "gato", "TENGO"
+    ])
+    do_refresh()
+    assert_stats(["4; 4; 2; 50"])
+
+
+def test_stats_calculates_rendered_text(test_book, spanish):
+    add_terms(spanish, ["tengo un"])
+    do_refresh()
+    assert_stats(["3; 2; 1; 50"])
+
+
+def test_stats_only_update_existing_books_if_specified(test_book, spanish):
+    add_terms(spanish, ["gato", "TENGO"])
+    do_refresh()
+    assert_stats(["4; 4; 2; 50"])
+
+    add_terms(spanish, ["hola"])
+    do_refresh()
+    assert_stats(["4; 4; 2; 50"])
+
+    mark_stale(b)
+    do_refresh()
+    assert_stats(["4; 4; 1; 25"])

@@ -17,14 +17,20 @@ def add_terms(language, term_array):
     db.session.commit()
 
 
+def make_book(title, content, language):
+    """
+    Make a book.
+    """
+    b = Book.create_book(title, language, content)
+    return b
+
+
 def make_text(title, content, language):
     """
     Make a single-page book, return the text.
     """
-    b = Book(title, language)
-    t = Text(b, content)
-    b.texts.append(t)
-    return t
+    b = make_book(title, content, language)
+    return b.texts[0]
 
 
 def get_rendered_string(text, imploder='/', overridestringize=None):

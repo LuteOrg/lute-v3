@@ -59,3 +59,7 @@ def get_status_distribution(book):
         stats[statusval] = len(uniques)
 
     return stats
+
+
+def refresh_stats():
+    "Calc stats"
