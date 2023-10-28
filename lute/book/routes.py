@@ -140,3 +140,22 @@ def archive(bookid):
     db.session.add(b)
     db.session.commit()
     return redirect('/', 302)
+
+
+@bp.route('/unarchive/<int:bookid>', methods=['POST'])
+def unarchive(bookid):
+    "Archive a book."
+    b = DBBook.find(bookid)
+    b.archived = False
+    db.session.add(b)
+    db.session.commit()
+    return redirect('/', 302)
+
+
+@bp.route('/delete/<int:bookid>', methods=['POST'])
+def delete(bookid):
+    "Archive a book."
+    b = DBBook.find(bookid)
+    db.session.delete(b)
+    db.session.commit()
+    return redirect('/', 302)

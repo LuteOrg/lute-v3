@@ -80,9 +80,9 @@
               ret.push(`<img src="{{ url_for('static', filename='/icn/inbox-download.png') }}" title="Archive" onclick="confirm_archive(${bkid})" />`);
             }
             else {
-              ret.push(`<img src="/icn/inbox-upload.png" title="Unarchive" onclick="confirm_unarchive(${bkid})" />`);
+              ret.push(`<img src="{{ url_for('static', filename='/icn/inbox-upload.png') }}" title="Unarchive" onclick="confirm_unarchive(${bkid})" />`);
             }
-            ret.push(`<img src="/icn/minus-button.png" title="Delete" onclick="confirm_delete(${bkid})" />`);
+            ret.push(`<img src="{{ url_for('static', filename='/icn/minus-button.png') }}" title="Delete" onclick="confirm_delete(${bkid})" />`);
 
             return ret.join('&nbsp;');
           }
