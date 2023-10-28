@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Books{% endblock %}
+
+{% block body %}
+
+<h1>{{ status }} Book index</h1>
+
+{% include '/book/tablelisting.html' %}
+
+{% endblock %}

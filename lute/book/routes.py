@@ -18,6 +18,7 @@ from lute.book.model import Book, Repository
 
 bp = Blueprint('book', __name__, url_prefix='/book')
 
+
 def datatables_source(is_archived):
     "Get datatables json for books."
     parameters = DataTablesFlaskParamParser.parse_params(request.form)
@@ -31,7 +32,14 @@ def datatables_active_source():
     return datatables_source(False)
 
 
-@bp.route('/datatables/archived', methods=['POST'])
+@bp.route('/archived', methods=['GET'])
+def archived():
+    "List archived books."
+    return render_template('book/index.html', status = "Archived")
+
+
+# Archived must be capitalized, or the ajax call 404's.
+@bp.route('/datatables/Archived', methods=['POST'])
 def datatables_archived_source():
     "Datatables data for archived books."
     return datatables_source(True)
