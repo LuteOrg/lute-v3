@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Term Import{% endblock %}
+
+{% block body %}
+
+<h1>Import Terms from CSV</h1>
+
+<p>See <a href="https://github.com/jzohrab/lute/wiki/Bulk-Term-Import" target="_blank">"Bulk Term Import"</a> on the Lute wiki for notes about the CSV file format and data.</p>
+<br />
+
+{% for field_name, field_errors in form.errors.items() %}
+{% for error in field_errors %}
+<div class="flash-notice">{{ error }}</div>
+{% endfor %}
+<br />
+{% endfor %}
+
+<form method="post" enctype="multipart/form-data">
+  {{ form.hidden_tag() }}
+
+  <table id="termimport">
+    <tr>
+      <td>CSV file</td>
+      <td>{{ form.text_file }}</td>
+    </tr>
+  </table>
+
+  <button id="btnSubmit" class="btn">Import</button>
+</form>
+
+{% endblock %}
