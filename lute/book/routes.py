@@ -80,3 +80,8 @@ def edit(bookid):
         form=form,
         tags = repo.get_book_tags()
     )
+
+
+@bp.route('/import_webpage', methods = ['GET', 'POST'])
+def import_webpage():
+    return render_template('book/import_webpage.html')

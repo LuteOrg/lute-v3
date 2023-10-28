@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Import web page{% endblock %}
+
+{% block body %}
+<h1>Import web page as a new Book</h1>
+
+<p>This import is very primitive -- it grabs <i>all</i> the headings
+and text from an HTML page.<br/>  This likely includes stuff you don't
+want, so edit the textbox of the Book form when it is displayed!</p>
+
+<br />
+
+<form action="/book/new" method="get">
+  <label for="importurl">Import URL:</label>
+  <input type="text" id="importurl" name="importurl" class="form-text" style="width:75%;"><br><br>
+  <input type="submit" value="Import">
+</form>
+
+{% endblock %}
