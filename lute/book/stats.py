@@ -11,19 +11,19 @@ def get_status_distribution(book):
     Does a full render of the next 20 pages in a book
     to calculate the distribution.
     """
-    start_text_index = 0
+    txindex = 0
 
-    curr_tx_id = book.current_tx_id
-    if curr_tx_id != 0 and curr_tx_id is not None:
+    if (book.current_tx_id or 0) != 0:
         for t in book.texts:
-            if t.id == curr_tx_id:
+            if t.id == book.current_tx_id:
                 break
-            start_text_index += 1
+            txindex += 1
 
-    # Get the next 20 pages, a good enough sample.
-    end_ind = start_text_index + 20
-    texts = book.texts[start_text_index:end_ind]
-    paras = [ get_paragraphs(t) for t in texts ]
+    paras = [
+        get_paragraphs(t) for t in
+        # Next 20 pages, a good enough sample.
+        book.texts[txindex:txindex + 20]
+    ]
 
     def flatten_list(nested_list):
         result = []
@@ -33,11 +33,10 @@ def get_status_distribution(book):
             else:
                 result.append(item)
         return result
-    sentences = flatten_list(paras)
     text_items = []
-    for s in sentences:
-        sent_words = [ti for ti in s.textitems if ti.is_word]
-        text_items.extend(sent_words)
+    for s in flatten_list(paras):
+        text_items.extend(s.textitems)
+    text_items = [ti for ti in text_items if ti.is_word]
 
     statterms = {
         0: [],
@@ -54,8 +53,7 @@ def get_status_distribution(book):
         statterms[ti.wo_status or 0].append(ti.text_lc)
 
     stats = {}
-    for statusval in statterms.keys():
-        allterms = statterms[statusval]
+    for statusval, allterms in statterms.items():
         uniques = list(set(allterms))
         statterms[statusval] = uniques
         stats[statusval] = len(uniques)

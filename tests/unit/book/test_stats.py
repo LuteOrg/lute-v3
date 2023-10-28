@@ -2,7 +2,6 @@
 TokenCoverage tests.
 """
 
-import pytest
 from lute.db import db
 from lute.term.model import Term, Repository
 from lute.book.stats import get_status_distribution
