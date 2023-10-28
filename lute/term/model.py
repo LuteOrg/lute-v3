@@ -30,6 +30,7 @@ class Term: # pylint: disable=too-many-instance-attributes
         self.language_id = None
         # The text.
         self.text = None
+        self.text_lc = None
         # The original text given to the DTO, to track changes.
         self.original_text = None
         self.status = 1
@@ -84,31 +85,63 @@ class Repository:
     def __init__(self, _db):
         self.db = _db
 
+        # Identity map for business lookup.
+        # Note that the same term is stored
+        # a few times: by upper case or lower case text,
+        # plus language ID.
+        self.identity_map = {}
+
+
+    def _id_map_key(self, langid, text):
+        return f'key-{langid}-{text}'
+
+    def _add_to_identity_map(self, t):
+        "Add found term to identity map."
+        for txt in t.text, t.text_lc:
+            k = self._id_map_key(t.language_id, txt)
+            self.identity_map[k] = t
+
+    def _search_identity_map(self, langid, txt):
+        "Search the map w/ the given bus. key."
+        k = self._id_map_key(langid, txt)
+        if k in self.identity_map:
+            return self.identity_map[k]
+        return None
 
     def load(self, term_id):
         "Loads a Term business object for the DBTerm with the id."
         dbt = DBTerm.find(term_id)
         if dbt is None:
             raise ValueError(f'No term with id {term_id} found')
-        return self._build_business_term(dbt)
-
+        term = self._build_business_term(dbt)
+        self._add_to_identity_map(term)
+        return term
 
     def find(self, langid, text):
         """
         Return a Term business object for the DBTerm with the langid and text.
         If no match, return None.
         """
+        term = self._search_identity_map(langid, text)
+        if term is not None:
+            return term
+
         spec = self._search_spec_term(langid, text)
         dbt = DBTerm.find_by_spec(spec)
         if dbt is None:
             return None
-        return self._build_business_term(dbt)
+        term = self._build_business_term(dbt)
+        self._add_to_identity_map(term)
+        return term
 
 
     def find_or_new(self, langid, text):
         """
         Return a Term business object for the DBTerm with the langid and text.
         If no match, return a new term with the text and language.
+
+        If it's new, don't add to the identity map ... it's not saved yet,
+        and so if we search for it again we should hit the db again. 
         """
         t = self.find(langid, text)
         if t is not None:
@@ -119,7 +152,9 @@ class Repository:
         t.language = spec.language
         t.language_id = langid
         t.text = text
+        t.text_lc = spec.text_lc
         t.original_text = text
+
         return t
 
 
@@ -235,6 +270,9 @@ class Repository:
         t.romanization = term.romanization
         t.set_current_image(term.current_image)
 
+        if term.flash_message is not None:
+            t.set_flash_message(term.flash_message)
+
         termtags = []
         for s in term.term_tags:
             termtags.append(TermTag.find_or_create_by_text(s))
@@ -291,6 +329,7 @@ class Repository:
         text = dbterm.text
         zws = '\u200B'  # zero-width space
         text = text.replace(zws, '')
+        term.text_lc = dbterm.text_lc
         term.original_text = text
         term.text = text
 
