@@ -126,12 +126,9 @@ def test_chinese_with_terms(classical_chinese):
 
 
 
-def do_refresh():
-    refresh_stats()
-
-
-@pytest.fixture(name='test_book')
+@pytest.fixture(name='_test_book')
 def fixture_make_book(empty_db, spanish):
+    "Single page book."
     b = make_book("Hola.", "Hola tengo un gato.", spanish)
     db.session.add(b)
     db.session.commit()
@@ -150,44 +147,45 @@ def add_terms(lang, terms):
     repo.commit()
 
 
-def assert_stats(expected):
+def assert_stats(expected, msg = ''):
+    "helper."
     sql = "select wordcount, distinctterms, distinctunknowns, unknownpercent from bookstats"
-    assert_sql_result(
-        sql,
-        expected
-    )
+    assert_sql_result(sql, expected, msg)
 
 
-def test_cache_loads_when_prompted(test_book):
+def test_cache_loads_when_prompted(_test_book):
+    "Have to call refresh_stats() to load stats."
     assert_record_count_equals("bookstats", 0, "nothing loaded")
-    do_refresh()
+    refresh_stats()
     assert_record_count_equals("bookstats", 1, "loaded")
 
 
-def test_stats_smoke_test(test_book, spanish):
+def test_stats_smoke_test(_test_book, spanish):
+    "Terms are rendered to count stats."
     add_terms(spanish, [
         "gato", "TENGO"
     ])
-    do_refresh()
+    refresh_stats()
     assert_stats(["4; 4; 2; 50"])
 
 
-def test_stats_calculates_rendered_text(test_book, spanish):
-    # text is "Hola tengo un gato."
+def test_stats_calculates_rendered_text(_test_book, spanish):
+    "Multiword term counted as one term."
     add_terms(spanish, ["tengo un"])
-    do_refresh()
+    refresh_stats()
     assert_stats(["4; 3; 2; 67"])
 
 
-def test_stats_only_update_existing_books_if_specified(test_book, spanish):
+def test_stats_only_update_books_marked_stale(_test_book, spanish):
+    "Have to mark book as stale, too expensive otherwise."
     add_terms(spanish, ["gato", "TENGO"])
-    do_refresh()
+    refresh_stats()
     assert_stats(["4; 4; 2; 50"])
 
     add_terms(spanish, ["hola"])
-    do_refresh()
-    assert_stats(["4; 4; 2; 50"])
+    refresh_stats()
+    assert_stats(["4; 4; 2; 50"], 'not updated')
 
-    mark_stale(test_book)
-    do_refresh()
-    assert_stats(["4; 4; 1; 25"])
+    mark_stale(_test_book)
+    refresh_stats()
+    assert_stats(["4; 4; 1; 25"], 'updated')

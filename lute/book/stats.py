@@ -5,7 +5,7 @@ Book statistics.
 from lute.read.service import get_paragraphs
 from lute.db import db
 from lute.models.book import Book
-from sqlalchemy import text
+
 
 
 def get_status_distribution(book):
@@ -79,33 +79,23 @@ class BookStats(db.Model):
     distinctunknowns = db.Column(db.Integer)
     unknownpercent = db.Column(db.Integer)
 
-
 def refresh_stats():
-    books = _books_to_update()
+    "Refresh stats for all books requiring update."
+    books_to_update = db.session.query(Book). \
+        filter(~Book.id.in_(db.session.query(BookStats.BkID))).all()
 
-    for book in books:
-        print(book)
+    for book in books_to_update:
         stats = _get_stats(book)
         _update_stats(book, stats)
 
 def mark_stale(book):
+    "Mark a book's stats as stale to force refresh."
     bk_id = book.id
     db.session.query(BookStats).filter_by(BkID=bk_id).delete()
     db.session.commit()
 
-def recalc_language(language):
-    lg_id = language.id
-    db.session.query(BookStats).filter(BookStats.BkID.in_(db.session.query(Book.id).filter_by(BkLgID=lg_id))).delete()
-    db.session.commit()
-
-def _books_to_update():
-    books = db.session.query(Book).filter(~Book.id.in_(db.session.query(BookStats.BkID))).all()
-    return books
-
 def _get_stats(book):
-    lgid = book.language.id
-    bkid = book.id
-
+    "Calc stats for the book using the status distribution."
     status_distribution = get_status_distribution(book)
     unknowns = status_distribution[0]
     allunique = sum(status_distribution.values())
@@ -123,8 +113,11 @@ def _get_stats(book):
         percent
     ]
 
-
 def _update_stats(book, stats):
-    new_stats = BookStats(BkID=book.id, wordcount=stats[0], distinctterms=stats[1], distinctunknowns=stats[2], unknownpercent=stats[3])
+    "Update BookStats for the given book."
+    new_stats = BookStats(
+        BkID=book.id, wordcount=stats[0],
+        distinctterms=stats[1], distinctunknowns=stats[2],
+        unknownpercent=stats[3])
     db.session.add(new_stats)
     db.session.commit()
