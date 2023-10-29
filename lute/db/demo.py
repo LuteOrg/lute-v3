@@ -50,16 +50,16 @@ def tutorial_book_id():
 
 def delete_all_data():
     """
-    Deletes all the data, but throws if IsDemoData is not set.
+    Deletes all the data (except settings), but throws if IsDemoData is not set.
     """
     if not contains_demo_data():
         raise RuntimeError("Can't delete non-demo data.")
 
+    remove_flag()
     # Setting the pragma first ensures cascade delete.
     statements = [
         'pragma foreign_keys = ON',
         'delete from languages',
-        'delete from settings',
         'delete from tags',
         'delete from tags2',
     ]

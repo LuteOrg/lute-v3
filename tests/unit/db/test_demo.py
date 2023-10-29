@@ -21,7 +21,7 @@ def test_removing_flag_means_not_demo(app_context):
 
 
 def test_wiping_db_clears_out_all_tables(app_context):
-    "DB is wiped clean if requested."
+    "DB is wiped clean if requested ... settings are left!"
     delete_all_data()
     tables = [
         'books',
@@ -29,7 +29,6 @@ def test_wiping_db_clears_out_all_tables(app_context):
         'booktags',
         'languages',
         'sentences',
-        'settings',
         'tags',
         'tags2',
         'texts',
