@@ -58,7 +58,7 @@ class TermTag(db.Model):
         "Comment getter."
         return self._comment
 
-    # TODO tags schema fix: TgComment should be nullable
+    # TODO zzfuture fix: TgComment should be nullable
     # The current schema has the TgComment NOT NULL default '',
     # which was a legacy copy over from LWT. Really, this should
     # be a nullable column, and all blanks should be NULL.

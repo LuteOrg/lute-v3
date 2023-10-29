@@ -178,7 +178,7 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
         proceed") during test runs.  It would be nice to have
         a "correct" mapping, but this is good enough for now.
 
-        TODO future fix: fix Language-Book and -Term mappings.
+        TODO zzfuture fix: fix Language-Book and -Term mappings.
         """
         sqls = [
             'pragma foreign_keys = ON',
