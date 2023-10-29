@@ -34,6 +34,11 @@ class BackupSettingsForm(FlaskForm):
     backup_warn = BooleanField('Warn If Backup Hasn\'t Run in a Week')
     backup_count = IntegerField('Backup Count', validators=[InputRequired(), NumberRange(min=1)])
 
+    def validate_backup_enabled(self, field):
+        "User should acknowledge."
+        if field.data == '-':
+            raise ValidationError('Please change "Backup enabled" to either yes or no.')
+
     def validate_backup_dir(self, field):
         "Field must be set if enabled."
         if self.backup_enabled.data != 'y':
