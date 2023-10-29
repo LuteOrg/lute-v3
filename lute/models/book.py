@@ -52,7 +52,7 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
     id = db.Column('BkID', db.SmallInteger, primary_key=True)
     title = db.Column('BkTitle', db.String(length=200))
-    lg_id = db.Column('BkLgID', db.Integer, db.ForeignKey('languages.LgID'), nullable=False)
+    language_id = db.Column('BkLgID', db.Integer, db.ForeignKey('languages.LgID'), nullable=False)
     word_count = db.Column('BkWordCount', db.Integer)
     source_uri = db.Column('BkSourceURI', db.String(length=1000))
     current_tx_id = db.Column('BkCurrentTxID', db.Integer, default=0)

@@ -29,4 +29,10 @@
   <button type="submit" class="btn btn-primary">Save</button>
 </form>
 
+{% if language.id %}
+<form method="post" action="/language/delete/{{ language.id }}" onsubmit="return confirm('WARNING: deleting a language deletes all its books and defined terms.  Are you *absolutely* sure you want to delete this item?');">
+    <button class="btn">Delete</button>
+</form>
+{% endif %}
+
 <button onclick="window.location = '{{ url_for('language.index') }}'">Cancel</button>

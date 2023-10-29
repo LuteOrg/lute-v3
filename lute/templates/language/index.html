@@ -6,7 +6,7 @@
 
 {% block body %}
 
-{% if languages|length == 0 %}
+{% if language_data|length == 0 %}
   <p>No languages defined.</p>
 {% else %}
 
@@ -14,20 +14,20 @@
   <thead>
     <tr>
       <th>Language</th>
+      <th>Books</th>
+      <th>Terms</th>
     </tr>
   </thead>
   <tbody>
-    {% for language in languages %}
+    {% for language, book_count, term_count in language_data %}
     <tr>
       <td>
         <a href="/language/edit/{{ language.id }}">
           {{ language.name }}
         </a>
       </td>
-
-      <!-- TODO language: add active book count? -->
-      <!-- TODO language: add active term count? -->
-      <!-- TODO language delete: icon to delete, js, call delete -->
+      <td>{{ book_count or '-' }}</td>
+      <td>{{ term_count or '-' }}</td>
     </tr>
     {% endfor %}
   </tbody>

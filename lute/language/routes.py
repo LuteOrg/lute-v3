@@ -2,9 +2,12 @@
 /language endpoints.
 """
 
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
 from lute.models.language import Language
+from lute.models.book import Book
+from lute.models.term import Term
 from lute.language.forms import LanguageForm
 from lute.db import db
 
@@ -14,9 +17,38 @@ bp = Blueprint('language', __name__, url_prefix='/language')
 def index():
     """
     List all languages.
+
+    This includes the Book and Term count for each Language.  These
+    counts are pulled in by subqueries, because Language doesn't have
+    "books" and "terms" members ... I was having trouble with session
+    management when these were added, and they're only used here, so
+    this is good enough for now.
     """
-    languages = Language.query.all()
-    return render_template('language/index.html', languages=languages)
+
+    def create_count_subquery(class_, count_column):
+        return (
+            db.session.query(
+                class_.language_id,
+                func.count(class_.id).label(count_column)
+            )
+            .group_by(class_.language_id)
+            .subquery()
+        )
+
+    # Create subqueries for counting books and terms
+    book_subquery = create_count_subquery(Book, 'book_count')
+    term_subquery = create_count_subquery(Term, 'term_count')
+
+    # Query to join Language with book and term counts
+    query = db.session.query(
+        Language,
+        book_subquery.c.book_count,
+        term_subquery.c.term_count
+    ).outerjoin(book_subquery, Language.id == book_subquery.c.language_id).outerjoin(term_subquery, Language.id == term_subquery.c.language_id)
+
+    results = query.all()
+
+    return render_template('language/index.html', language_data=results)
 
 
 def _handle_form(language, form) -> bool:
@@ -35,8 +67,10 @@ def _handle_form(language, form) -> bool:
             flash(f'Language {language.name} updated', 'success')
             result = True
         except IntegrityError as e:
-            # TODO language: better integrity error message - currently shows raw message.
-            flash(e.orig.args, 'error')
+            msg = e.orig
+            if "languages.LgName" in f'{e.orig}':
+                msg = f'{language.name} already exists.'
+            flash(msg, 'error')
 
     return result
 
@@ -78,4 +112,13 @@ def new(langname):
     return render_template('language/new.html', form=form, language=language, predefined=predefined)
 
 
-# TODO language delete: method for posting
+@bp.route('/delete/<int:langid>', methods=['POST'])
+def delete(langid):
+    """
+    Delete a language.
+    """
+    language = db.session.get(Language, langid)
+    if not language:
+        flash(f'Language {langid} not found')
+    Language.delete(language)
+    return redirect(url_for('language.index'))

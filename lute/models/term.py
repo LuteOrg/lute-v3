@@ -104,8 +104,8 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
     # text_lc shouldn't be touched (it's changed when term.text is
     # set), but it's public here to allow for its access during
-    # queries (eg in lute.read.service.  TODO fix access: text_lc is
-    # best kept private/protected.
+    # queries (eg in lute.read.service.  This can probably be
+    # improved, not sure how at the moment.
     text_lc = db.Column('WoTextLC', db.String(250))
 
     status = db.Column('WoStatus', db.Integer)
