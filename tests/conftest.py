@@ -15,7 +15,7 @@ from lute.main import init_db_and_app
 from lute.models.language import Language
 
 
-def pytest_sessionstart(session):
+def pytest_sessionstart(session): # pylint: disable=unused-argument
     """
     Ensure test config defines a test environment.
 
@@ -49,11 +49,9 @@ def pytest_sessionstart(session):
 
 @pytest.fixture(name="testconfig")
 def fixture_config():
+    "Config using the app config."
     thisdir = os.path.dirname(os.path.realpath(__file__))
     configfile = os.path.join(thisdir, '..', 'config', 'config.yml')
-    config = None
-    with open(configfile, 'r', encoding='utf-8') as f:
-        config = yaml.safe_load(f)
     ac = AppConfig(configfile)
     yield ac
 

@@ -6,6 +6,19 @@ run twice.  Runs repeatable migrations always.
 """
 
 import os
+from contextlib import contextmanager
+
+
+@contextmanager
+def _change_directory(new_dir):
+    "Change directory, and return to the current dir when done."
+    old_dir = os.getcwd()
+    try:
+        os.chdir(new_dir)
+        yield
+    finally:
+        os.chdir(old_dir)
+
 
 class SqliteMigrator:
     """
@@ -31,10 +44,10 @@ class SqliteMigrator:
         Get all non-applied (one-time) migrations.
         """
         allfiles = []
-        os.chdir(self.location)
-        allfiles = [s for s in os.listdir() if s.endswith('.sql')]
-        allfiles.sort()
-        outstanding = [f for f in allfiles if self._should_apply(conn, f)]
+        with _change_directory(self.location):
+            allfiles = [os.path.join(self.location, s) for s in os.listdir() if s.endswith('.sql')]
+            allfiles.sort()
+            outstanding = [f for f in allfiles if self._should_apply(conn, f)]
         return outstanding
 
     def do_migration(self, conn):
@@ -63,9 +76,8 @@ class SqliteMigrator:
         """
         Run all repeatable migrations.
         """
-        folder = self.repeatable
-        os.chdir(folder)
-        files = [f for f in os.listdir() if f.endswith('.sql')]
+        with _change_directory(self.repeatable):
+            files = [os.path.join(self.repeatable, f) for f in os.listdir() if f.endswith('.sql')]
         for f in files:
             try:
                 self._process_file(conn, f)
@@ -77,8 +89,11 @@ class SqliteMigrator:
     def _should_apply(self, conn, filename):
         """
         True if a migration hasn't been run yet.
+
+        The file basename (no directory) is stored in the migration table.
         """
-        sql = f"select count(filename) from _migrations where filename = '{filename}'"
+        f = os.path.basename(filename)
+        sql = f"select count(filename) from _migrations where filename = '{f}'"
         res = conn.execute(sql).fetchone()
         return res[0] == 0
 
@@ -86,8 +101,9 @@ class SqliteMigrator:
         """
         Track the executed migration in _migrations.
         """
+        f = os.path.basename(filename)
         conn.execute('begin transaction')
-        conn.execute(f"INSERT INTO _migrations values ('{filename}')")
+        conn.execute(f"INSERT INTO _migrations values ('{f}')")
         conn.execute('commit transaction')
 
     def _process_file(self, conn, f):
