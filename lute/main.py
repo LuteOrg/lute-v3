@@ -30,14 +30,19 @@ def _setup_app_dirs(app_config):
     """
     dp = app_config.datapath
     required_dirs = [
-        dp,
-        os.path.join(dp, 'backups'),
-        os.path.join(dp, 'userimages'),
-        os.path.join(dp, 'custom_styles')
+        { 'd': dp, 'readme': "Lute data folder." },
+        { 'd': os.path.join(dp, 'backups'), 'readme': "Database backups created by Lute at app start." },
+        { 'd': app_config.userimagespath, 'readme': "User images.  Each subfolder is a language's ID." },
+        { 'd': os.path.join(dp, 'custom_styles'), 'readme': "User custom styles." }
     ]
-    make_dirs = [d for d in required_dirs if not os.path.exists(d)]
-    for d in make_dirs:
-        os.makedirs(d)
+    for rec in required_dirs:
+        d = rec['d']
+        if not os.path.exists(d):
+            os.makedirs(d)
+        readme = os.path.join(d, 'README.md')
+        if not os.path.exists(readme):
+            with open(readme, 'w') as f:
+                f.write(rec['readme'])
 
 
 def _create_app(app_config, extra_config):

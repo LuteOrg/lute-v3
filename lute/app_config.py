@@ -71,6 +71,10 @@ class AppConfig:
         """
         return self._data_path
 
+    @property
+    def userimagespath(self):
+        "Path to user images."
+        return os.path.join(self.datapath, 'userimages')
 
     @property
     def dbname(self):
