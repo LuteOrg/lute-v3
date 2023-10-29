@@ -26,10 +26,12 @@ def index():
     """
 
     def create_count_subquery(class_, count_column):
+        # Re the pylint disable, ref
+        # https://github.com/pylint-dev/pylint/issues/8138 ...
         return (
             db.session.query(
                 class_.language_id,
-                func.count(class_.id).label(count_column)
+                func.count(class_.id).label(count_column) # pylint: disable=not-callable
             )
             .group_by(class_.language_id)
             .subquery()
@@ -44,7 +46,11 @@ def index():
         Language,
         book_subquery.c.book_count,
         term_subquery.c.term_count
-    ).outerjoin(book_subquery, Language.id == book_subquery.c.language_id).outerjoin(term_subquery, Language.id == term_subquery.c.language_id)
+    ).outerjoin(
+        book_subquery, Language.id == book_subquery.c.language_id
+    ).outerjoin(
+        term_subquery, Language.id == term_subquery.c.language_id
+    )
 
     results = query.all()
 
