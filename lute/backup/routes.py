@@ -5,7 +5,7 @@ Backup settings form management, and running backups.
 """
 
 import os
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, flash
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, SelectField, IntegerField
 from wtforms.validators import InputRequired, NumberRange
@@ -36,15 +36,18 @@ class BackupSettingsForm(FlaskForm):
 
     def validate_backup_dir(self, field):
         "Field must be set if enabled."
-        if self.backup_enabled != 'y':
+        if self.backup_enabled.data != 'y':
             return
-        if (self.backup_dir, '').strip() == '':
+        v = field.data
+        if (v or '').strip() == '':
             raise ValidationError('Backup directory required')
-        if not os.path.exists(self.backup_dir):
-            raise ValidationError(f'{self.backup_dir} does not exist.')
-        if not os.path.isdir(self.backup_dir):
-            raise ValidationError(f'{self.backup_dir} is not a directory.')
-        
+        if (v != os.path.abspath(v)):
+            raise ValidationError(f'Backup dir must be absolute path.  Did you mean "{os.path.abspath(v)}"?')
+        if not os.path.exists(v):
+            raise ValidationError(f'Directory "{v}" does not exist.')
+        if not os.path.isdir(v):
+            raise ValidationError(f'"{v}" is not a directory.')
+
 
 bp = Blueprint('backup', __name__, url_prefix='/backup')
 
@@ -55,15 +58,15 @@ def backup_settings():
     if form.validate_on_submit():
         # Update the settings in the database
         for field in form:
-            if field.id != 'csrf_token' and field.id != 'submit':
+            if field.id not in ('csrf_token', 'submit'):
                 Setting.set_value(field.id, field.data)
         db.session.commit()
         flash('Backup settings updated', 'success')
         return redirect('/')
-    
+
     # Load current settings from the database
     for field in form:
         if field.id != 'csrf_token' and field.id != 'submit':
             field.data = Setting.get_value(field.id)
-    
+
     return render_template('backup/settings.html', form=form)
