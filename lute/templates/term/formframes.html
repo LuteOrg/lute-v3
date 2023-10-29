@@ -14,8 +14,14 @@
   <a href="/term/index">back to list</a>
 
   {% if not newterm %}
-  TODO term form: delete button
-  <p include('term/_delete_form.html') /p>
+
+  <form
+    method="post"
+    action="/term/delete/{{ term.id }}"
+    onsubmit="return confirm('Are you sure you want to delete this item?');">
+    <button class="btn">Delete</button>
+  </form>
+
   {% endif %}
 </div>
 

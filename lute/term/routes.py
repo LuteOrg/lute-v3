@@ -164,3 +164,15 @@ def bulk_update_status():
         repo.add(term)
     repo.commit()
     return jsonify('ok')
+
+
+@bp.route('/delete/<int:termid>', methods=['POST'])
+def delete(termid):
+    """
+    Delete a term.
+    """
+    repo = Repository(db)
+    term = repo.load(termid)
+    repo.delete(term)
+    repo.commit()
+    return redirect('/term/index', 302)
