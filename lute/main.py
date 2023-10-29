@@ -20,6 +20,7 @@ from lute.read.routes import bp as read_bp
 from lute.bing.routes import bp as bing_bp
 from lute.userimage.routes import bp as userimage_bp
 from lute.termimport.routes import bp as termimport_bp
+from lute.backup.routes import bp as backup_bp
 
 
 def _setup_app_dirs(app_config):
@@ -76,6 +77,7 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(bing_bp)
     app.register_blueprint(userimage_bp)
     app.register_blueprint(termimport_bp)
+    app.register_blueprint(backup_bp)
 
     @app.route('/')
     def index():

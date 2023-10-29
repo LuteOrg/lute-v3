@@ -11,19 +11,19 @@ def test_save_and_retrieve(app_context):
     "Smoke tests."
     sql = "select StValue from settings where StKey = 'zztrash'"
     assert_sql_result(sql, [], 'not set')
-    Setting.set_key('zztrash', 42)
+    Setting.set_value('zztrash', 42)
     assert_sql_result(sql, [], 'still not set')
 
     db.session.commit()
     assert_sql_result(sql, [ '42' ], 'now set')
 
-    v = Setting.get_key('zztrash')
+    v = Setting.get_value('zztrash')
     assert v == '42', 'is string'
 
 
-def test_missing_key_value_is_nullapp_context(app_context):
+def test_missing_value_value_is_nullapp_context(app_context):
     "Missing key = None."
-    assert Setting.get_key('missing') is None, 'missing key'
+    assert Setting.get_value('missing') is None, 'missing key'
 
 
 def test_smoke_last_backup(app_context):

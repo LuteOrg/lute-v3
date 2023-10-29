@@ -12,7 +12,7 @@ class Setting(db.Model):
 
 
     @staticmethod
-    def set_key(keyname, keyvalue):
+    def set_value(keyname, keyvalue):
         "Set, but don't save, a setting."
         s = db.session.query(Setting).filter(Setting.key == keyname).first()
         if s is None:
@@ -23,7 +23,7 @@ class Setting(db.Model):
 
 
     @staticmethod
-    def get_key(keyname):
+    def get_value(keyname):
         "Get the saved key, or None if it doesn't exist."
         s = db.session.query(Setting).filter(Setting.key == keyname).first()
         if s is None:
@@ -36,7 +36,7 @@ class Setting(db.Model):
     @classmethod
     def get_last_backup_datetime(cls):
         "Get the last_backup_datetime as int, or None."
-        v = Setting.get_key('lastbackup')
+        v = Setting.get_value('lastbackup')
         if v is None:
             return None
         return int(v)
@@ -44,5 +44,5 @@ class Setting(db.Model):
     @classmethod
     def set_last_backup_datetime(cls, v):
         "Set and save the last backup time."
-        Setting.set_key('lastbackup', v)
+        Setting.set_value('lastbackup', v)
         db.session.commit()
