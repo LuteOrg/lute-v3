@@ -70,13 +70,13 @@ def backup_warning(backup_settings):
     if not backup_settings.backup_warn:
         return ""
 
-    old_backup_msg = "Last backup was more than 1 week ago."
     last = backup_settings.last_backup_datetime
     if last is None:
-        return old_backup_msg
+        return "Never backup up (successfully)."
 
     curr = int(time.time())
     diff = curr - last
+    old_backup_msg = "Last backup was more than 1 week ago."
     if diff > 7 * 24 * 60 * 60:
         return old_backup_msg
 

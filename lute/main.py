@@ -7,6 +7,7 @@ from flask import Flask, render_template, redirect, flash
 
 from lute.db import db
 from lute.db.setup.main import setup_db
+import lute.backup.service as backupservice
 import lute.db.demo
 
 from lute.models.book import Book
@@ -99,9 +100,7 @@ def _create_app(app_config, extra_config):
         bkp_settings = Setting.get_backup_settings()
         backup_enabled = bkp_settings.backup_enabled
         backup_show_warning = bkp_settings.backup_warn
-
-        backup_show_warning = True  # TODO remove this
-        backup_warning_msg = "Some warning"  # TODO fix this
+        backup_warning_msg = backupservice.backup_warning(bkp_settings)
 
         return render_template(
             'index.html',

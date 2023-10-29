@@ -134,7 +134,7 @@ def test_warn_if_last_backup_never_happened_or_is_old(backup_settings):
 
     backup_settings.backup_warn = True
     backup_settings.last_backup_datetime = None
-    assert backup_warning(backup_settings) == 'Last backup was more than 1 week ago.'
+    assert backup_warning(backup_settings) == 'Never backup up (successfully).'
 
     backup_settings.last_backup_datetime = one_week_ago + 10
     assert backup_warning(backup_settings) == ''
