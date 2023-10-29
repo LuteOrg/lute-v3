@@ -11,6 +11,7 @@ from lute.term.model import Repository
 from lute.term.routes import handle_term_form
 from lute.models.book import Book, Text
 from lute.models.term import Term as DBTerm
+from lute.book.stats import mark_stale
 from lute.db import db
 
 
@@ -44,8 +45,7 @@ def read(bookid, pagenum):
     prev10 = _page_in_range(book, pagenum - 10)
     next10 = _page_in_range(book, pagenum + 10)
 
-    # TODO book stats: mark stale for recalc later
-    # BookStats.markStale(book)
+    mark_stale(book)
 
     return render_template(
         'read/index.html',

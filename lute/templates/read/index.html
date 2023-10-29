@@ -69,7 +69,7 @@
   {# Hack for js translation keyboard shortcut. #}
   <span id="translateURL" style="display:none">{{ dictionary_url }}</span>
 
-  <div id="thetext" {% if isRTL %}dir="rtl"{% endif %}>
+  <div id="thetext" {% if is_rtl %}dir="rtl"{% endif %}>
     {% include 'read/sentences.html' %}
   </div>
 

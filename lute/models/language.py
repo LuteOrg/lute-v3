@@ -4,6 +4,7 @@ Language entity.
 
 import glob
 import os
+import re
 import yaml
 from sqlalchemy import text, func
 from lute.db import db
@@ -25,7 +26,7 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
     character_substitutions = db.Column('LgCharacterSubstitutions', db.String(500))
     regexp_split_sentences = db.Column('LgRegexpSplitSentences', db.String(500))
     exceptions_split_sentences = db.Column('LgExceptionsSplitSentences', db.String(500))
-    word_characters = db.Column('LgRegexpWordCharacters', db.String(500))
+    _word_characters = db.Column('LgRegexpWordCharacters', db.String(500))
     remove_spaces = db.Column('LgRemoveSpaces', db.Boolean)
     split_each_char = db.Column('LgSplitEachChar', db.Boolean)
     right_to_left = db.Column('LgRightToLeft', db.Boolean)
@@ -47,6 +48,35 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
 
     def __repr__(self):
         return f"<Language {self.id} '{self.name}'>"
+
+
+    def _get_python_regex_pattern(self, s):
+        """
+        Old Lute v2 ran in php, so the language word chars regex
+        could look like this:
+
+        x{0600}-x{06FF}x{FE70}-x{FEFC}  (where x = backslash-x)
+
+        This needs to be converted to the python equivalent, e.g.
+
+        u0600-u06FFuFE70-uFEFC  (where u = backslash-u)
+        """
+        def convert_match(match):
+            # Convert backslash-x{XXXX} to backslash-uXXXX
+            hex_value = match.group(1)
+            return f"\\u{hex_value}"
+        ret = re.sub(r'\\x{([0-9A-Fa-f]+)}', convert_match, s)
+        return ret
+
+
+    @property
+    def word_characters(self):
+        return self._get_python_regex_pattern(self._word_characters)
+
+
+    @word_characters.setter
+    def word_characters(self, s):
+        self._word_characters = self._get_python_regex_pattern(s)
 
 
     @classmethod

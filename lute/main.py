@@ -11,6 +11,7 @@ import lute.db.demo
 
 from lute.models.book import Book
 from lute.models.language import Language
+from lute.book.stats import refresh_stats
 
 from lute.book.routes import bp as book_bp
 from lute.language.routes import bp as language_bp
@@ -78,6 +79,7 @@ def _create_app(app_config, extra_config):
 
     @app.route('/')
     def index():
+        refresh_stats()
         tutorial_book_id = lute.db.demo.tutorial_book_id()
         have_books = len(db.session.query(Book).all()) > 0
         have_languages = len(db.session.query(Language).all()) > 0
