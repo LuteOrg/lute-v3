@@ -21,7 +21,7 @@ def fixture_dummy_lang():
         "parser_type": "turkish",
         "character_substitutions": "",
 
-        "regexp_split_sentences": "",
+        "regexp_split_sentences": ".",
         "exceptions_split_sentences": "",
         "word_characters": "a-z",
     }

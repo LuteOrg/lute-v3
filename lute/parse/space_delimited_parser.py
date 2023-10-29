@@ -75,10 +75,16 @@ class SpaceDelimitedParser(AbstractParser):
         Parse a string, appending the tokens to the list of tokens.
         """
         termchar = lang.word_characters
+        if termchar.strip() == '':
+            raise RuntimeError(f"Language {lang.name} has invalid Word Characters specification.")
+
         split_sentence = re.escape(lang.regexp_split_sentences)
         splitex = lang.exceptions_split_sentences.replace('.', '\\.')
 
-        m = self.preg_match_capture(fr"({splitex}|[{termchar}]*)", text)
+        pattern = fr"({splitex}|[{termchar}]*)"
+        if splitex.strip() == '':
+            pattern = fr"([{termchar}]*)"
+        m = self.preg_match_capture(pattern, text)
         wordtoks = list(filter(lambda t: t[0] != "", m))
 
         def add_non_words(s):

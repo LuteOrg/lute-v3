@@ -29,6 +29,6 @@ class LanguageForm(FlaskForm):
         ])
     character_substitutions = StringField('Character substitutions')
 
-    regexp_split_sentences = StringField('Split sentences at')
+    regexp_split_sentences = StringField('Split sentences at', validators=[DataRequired()])
     exceptions_split_sentences = StringField('Split sentence exceptions')
-    word_characters = StringField('Word characters')
+    word_characters = StringField('Word characters', validators=[DataRequired()])
