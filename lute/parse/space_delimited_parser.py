@@ -90,8 +90,10 @@ class SpaceDelimitedParser(AbstractParser):
             if not s:
                 return
             pattern = f"[{split_sentence}]"
-            allmatches = self.preg_match_capture(pattern, s)
-            has_eos = len(allmatches) > 0
+            has_eos = False
+            if pattern != "[]":  # Should never happen, but ...
+                allmatches = self.preg_match_capture(pattern, s)
+                has_eos = len(allmatches) > 0
             tokens.append(ParsedToken(s, False, has_eos))
 
         # For each wordtok, add all non-words before the wordtok, and
