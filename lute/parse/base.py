@@ -8,7 +8,17 @@ from typing import List
 class ParsedToken:
     """
     A single parsed token from an input text.
+
+    As tokens are created, the class counters
+    (starting with cls_) are assigned to the ParsedToken
+    and then incremented appropriately.
     """
+
+    # Class counters.
+    cls_sentence_number = 0
+    cls_paragraph_number = 0
+    cls_order = 0
+
     def __init__(
             self,
             token: str,
@@ -18,6 +28,21 @@ class ParsedToken:
         self.token = token
         self.is_word = is_word
         self.is_end_of_sentence = is_end_of_sentence
+
+        ParsedToken.cls_order += 1
+        self.order = ParsedToken.cls_order
+
+        self.sentence_number = ParsedToken.cls_sentence_number
+        self.paragraph_number = ParsedToken.cls_paragraph_number
+
+        # Increment counters after the TextToken has been
+        # completed, so that it belongs to the correct
+        # sentence/paragraph.
+        if self.is_end_of_sentence:
+            ParsedToken.cls_sentence_number += 1
+        if self.token == '¶':
+            ParsedToken.cls_paragraph_number += 1
+
 
     def __repr__(self):
         return f"<\"{self.token}\" (word: {self.is_word}, eos: {self.is_end_of_sentence})>"
