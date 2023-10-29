@@ -178,6 +178,10 @@ def term_popup(termid):
 def keyboard_shortcuts():
     return render_template('read/keyboard_shortcuts.html')
 
+@bp.route('/flashcopied', methods=['GET'])
+def flashcopied():
+    return render_template('read/flashcopied.html')
+
 
 @bp.route('/editpage/<int:textid>', methods=['GET', 'POST'])
 def edit_page(textid):
