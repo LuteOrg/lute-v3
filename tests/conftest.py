@@ -14,10 +14,10 @@ from lute.main import init_db_and_app
 
 from lute.models.language import Language
 
-@pytest.fixture(name="testconfig")
-def fixture_config():
+
+def pytest_sessionstart(session):
     """
-    Build app config using config in config/config.yml.
+    Ensure test config defines a test environment.
 
     Special configuration for test runs required:
 
@@ -36,17 +36,25 @@ def fixture_config():
 
     failures = []
     if 'DATAPATH' not in config:
-        failures.append("add DATAPATH")
+        failures.append("DATAPATH not in config file")
 
     ac = AppConfig(configfile)
 
     if not ac.is_test_db:
-        failures.append("DBNAME must start with test_")
-
+        failures.append("DBNAME in config.yml must start with test_")
     if len(failures) > 0:
         msg = f"Bad config.yml: {', '.join(failures)}"
         pytest.exit(msg)
 
+
+@pytest.fixture(name="testconfig")
+def fixture_config():
+    thisdir = os.path.dirname(os.path.realpath(__file__))
+    configfile = os.path.join(thisdir, '..', 'config', 'config.yml')
+    config = None
+    with open(configfile, 'r', encoding='utf-8') as f:
+        config = yaml.safe_load(f)
+    ac = AppConfig(configfile)
     yield ac
 
 
