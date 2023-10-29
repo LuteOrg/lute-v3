@@ -68,18 +68,9 @@ def todos(c):
     """
     c.run('python utils/todos.py')
 
-ns = Collection()
-ns.add_task(lint)
-ns.add_task(test)
-ns.add_task(coverage)
-ns.add_task(todos)
-
-
-##############################
-# Dev tasks
 
 @task
-def dev_start(c):
+def start(c):
     """
     Start the dev server, using script dev.py.
     """
@@ -89,7 +80,7 @@ def dev_start(c):
 
 
 @task
-def dev_search(c, search_for):
+def search(c, search_for):
     """
     Search the code for a string.
     """
@@ -97,10 +88,17 @@ def dev_search(c, search_for):
     devscript = os.path.join(thisdir, 'utils', 'findstring.sh')
     c.run(f'{devscript} "{search_for}"')
 
-devtasks = Collection('dev')
-devtasks.add_task(dev_start, 'start')
-devtasks.add_task(dev_search, 'search')
-ns.add_collection(devtasks)
+
+ns = Collection()
+ns.add_task(lint)
+ns.add_task(test)
+ns.add_task(coverage)
+ns.add_task(todos)
+ns.add_task(start)
+ns.add_task(search)
+
+
+
 
 
 ##############################

@@ -12,9 +12,9 @@ This works on Mac:
 
 python `pwd`/dev.py
 
-Optionally, use the dev.start task:
+Optionally, use the start task:
 
-inv dev.start
+inv start
 """
 
 from lute.main import init_db_and_app
