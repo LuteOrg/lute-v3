@@ -69,7 +69,6 @@ def todos(c):
     """
     c.run('python utils/todos.py')
 
-
 @task
 def start(c):
     """
@@ -78,6 +77,13 @@ def start(c):
     thisdir = os.path.dirname(os.path.realpath(__file__))
     devscript = os.path.join(thisdir, 'dev.py')
     c.run(f'python {devscript}')
+
+
+@task
+def resetstart(c):
+    "Reset the db, and start the app."
+    db_reset(c)
+    start(c)
 
 
 @task
@@ -96,6 +102,7 @@ ns.add_task(test)
 ns.add_task(coverage)
 ns.add_task(todos)
 ns.add_task(start)
+ns.add_task(resetstart)
 ns.add_task(search)
 
 
