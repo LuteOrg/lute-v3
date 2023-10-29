@@ -28,14 +28,11 @@ def index():
     def create_count_subquery(class_, count_column):
         # Re the pylint disable, ref
         # https://github.com/pylint-dev/pylint/issues/8138 ...
-        return (
-            db.session.query(
-                class_.language_id,
-                func.count(class_.id).label(count_column) # pylint: disable=not-callable
-            )
-            .group_by(class_.language_id)
-            .subquery()
-        )
+        ret = db.session.query(
+            class_.language_id,
+            func.count(class_.id).label(count_column) # pylint: disable=not-callable
+        ).group_by(class_.language_id).subquery()
+        return ret
 
     # Create subqueries for counting books and terms
     book_subquery = create_count_subquery(Book, 'book_count')
