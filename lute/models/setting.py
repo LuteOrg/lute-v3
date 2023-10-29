@@ -46,3 +46,32 @@ class Setting(db.Model):
         "Set and save the last backup time."
         Setting.set_value('lastbackup', v)
         db.session.commit()
+
+
+    class BackupSettings:
+        """
+        Convenience wrapper for current backup settings.
+        Getter only.
+        """
+        def __init__(self):
+            # -, y, or n
+            self.backup_enabled = Setting.get_value('backup_enabled')
+            self.backup_dir = Setting.get_value('backup_dir')
+
+            def _bool(k):
+                v = Setting.get_value(k)
+                return v in (1, '1', 'y', True)
+            self.backup_auto = _bool('backup_auto')
+            self.backup_warn = _bool('backup_warn')
+            self.backup_count = int(Setting.get_value('backup_count'))
+            self.last_backup_datetime = Setting.get_last_backup_datetime()
+
+        def is_acknowledged(self):
+            return self.backup_enabled in ('y', 'n')
+
+
+    @staticmethod
+    def get_backup_settings():
+        "Get BackupSettings."
+        b = Setting.BackupSettings()
+        return b

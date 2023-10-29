@@ -34,3 +34,18 @@ def test_smoke_last_backup(app_context):
     Setting.set_last_backup_datetime(42)
     v = Setting.get_last_backup_datetime()
     assert v == 42, 'set _and_ saved'
+
+
+def test_get_backup_settings(app_context):
+    "Smoke test."
+    Setting.set_value('backup_dir', 'blah')
+    Setting.set_value('backup_count', 12)
+    Setting.set_value('backup_warn', 0)
+    db.session.commit()
+    b = Setting.get_backup_settings()
+    assert isinstance(b, Setting.BackupSettings)
+    assert b.backup_dir == 'blah'
+    assert b.backup_auto is True  # initial default
+    assert b.backup_warn is False
+    assert b.backup_count == 12
+    assert b.last_backup_datetime is None
