@@ -97,15 +97,8 @@ def write_report(data):
         
         heading = g if g != "" else "<None>"
         print("\nGroup: " + heading)
-        
-        for f in sorted(set(d['file'] for d in curr_group_data)):
-            print("  File: " + f)
-            for d in curr_group_data:
-                if d['file'] == f:
-                    outline = d['line']
-                    outline = outline.replace('<!-- ', '')
-                    outline = outline.replace(' -->', '')
-                    print("    " + outline)
+        for d in curr_group_data:
+            print(f"  {d['file'].ljust(50)}:  {d['line']}")
 
 t = Todout()
 t.verbose = False
