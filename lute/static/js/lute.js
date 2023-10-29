@@ -470,15 +470,21 @@ function update_status_for_marked_elements(new_status) {
   if (els.length == 0)
     return;
   const firstel = $(els[0]);
-  const textid = firstel.attr('tid');
-
+  const langid = firstel.attr('lid');
   els = els.map(el => $(el).text());
 
+  data = JSON.stringify({
+    langid: langid,
+    terms: els,
+    new_status: new_status
+  });
+
   $.ajax({
-    url: '/read/update_status',
+    url: '/term/bulk_update_status',
     type: 'post',
-    data: { textid: textid, terms: els, new_status: new_status },
+    data: data,
     dataType: 'JSON',
+    contentType: 'application/json',
     success: function(response) {
       update_selected_statuses(new_status);
     },

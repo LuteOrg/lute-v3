@@ -127,8 +127,6 @@ def search_by_text_in_language(text, langid):
     "JSON data for parent data."
     repo = Repository(db)
     matches = repo.find_matches(langid, text)
-    print('got matches for ' + text)
-    print(matches)
     result = []
     for t in matches:
         result.append({
@@ -149,3 +147,20 @@ def sentences(langid, text):
         '/term/sentences.html',
         references = references
     )
+
+
+@bp.route('/bulk_update_status', methods=['POST'])
+def bulk_update_status():
+    "Update the statuses."
+    data = request.get_json()
+    terms = data.get('terms')
+    language_id = int(data.get('langid'))
+    new_status = int(data.get('new_status'))
+
+    repo = Repository(db)
+    for t in terms:
+        term = repo.find_or_new(language_id, t)
+        term.status = new_status
+        repo.add(term)
+    repo.commit()
+    return jsonify('ok')
