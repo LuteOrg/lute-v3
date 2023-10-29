@@ -46,8 +46,11 @@ class BackupSettingsForm(FlaskForm):
         v = field.data
         if (v or '').strip() == '':
             raise ValidationError('Backup directory required')
-        if (v != os.path.abspath(v)):
-            raise ValidationError(f'Backup dir must be absolute path.  Did you mean "{os.path.abspath(v)}"?')
+
+        abspath = os.path.abspath(v)
+        if v != abspath:
+            msg = f'Backup dir must be absolute path.  Did you mean "{abspath}"?'
+            raise ValidationError(msg)
         if not os.path.exists(v):
             raise ValidationError(f'Directory "{v}" does not exist.')
         if not os.path.isdir(v):
@@ -71,7 +74,7 @@ def backup_settings():
 
     # Load current settings from the database
     for field in form:
-        if field.id != 'csrf_token' and field.id != 'submit':
+        if field.id != 'csrf_token':
             field.data = Setting.get_value(field.id)
     # Hack: set boolean settings to ints, otherwise they're always checked.
     form.backup_warn.data = int(form.backup_warn.data)

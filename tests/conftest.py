@@ -78,10 +78,9 @@ def fixture_app_context(app):
 def fixture_empty_db(app_context):
     """
     Empty the db in ref. integrity order.
+    Keep settings.
     """
     tables = [
-        "settings",
-
         "booktags", "wordtags",
         "tags", "tags2",
 
