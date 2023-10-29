@@ -73,5 +73,8 @@ def backup_settings():
     for field in form:
         if field.id != 'csrf_token' and field.id != 'submit':
             field.data = Setting.get_value(field.id)
+    # Hack: set boolean settings to ints, otherwise they're always checked.
+    form.backup_warn.data = int(form.backup_warn.data)
+    form.backup_auto.data = int(form.backup_auto.data)
 
     return render_template('backup/settings.html', form=form)

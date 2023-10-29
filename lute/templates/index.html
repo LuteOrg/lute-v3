@@ -32,7 +32,7 @@
 {% endif %}
 
 {% if is_production_data %}
-<p><b>TODO backup: add warnings about backup keys here.</b></p>
+  {% include '/index_backup_warning.html' %}
 {% endif %}
 
 <br />
@@ -57,7 +57,7 @@
 
 <div id="techlinks" style="margin-top: 30px;">
   <ul>
-    <li style="color: grey;">Create backup - TODO</li>
+    <li style="color: grey;">Create backup - TODO (<a href="/backup/settings">backup settings</a>)</li>
     <li style="color: grey;">Version and software info - TODO</li>
     <li><a href="https://github.com/jzohrab/lute/wiki/">Docs (on GitHub wiki)</a></li>
   </ul>

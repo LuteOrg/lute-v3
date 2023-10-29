@@ -1,0 +1,24 @@
+{# Warning included in index.html if this is production (non-demo) data. #}
+
+{% if backup_not_acknowledged and have_languages and have_books %}
+<div class="flash-notice">
+  <p><b>Before continuing, please consider your backup strategy!</b></p>
+
+  <p>
+    It would be <i>really bad</i> if lost all of your Lute data due to
+    a computer issue.  Things happen, so put together a backup plan.
+  </p>
+
+  <p>
+    Lute provides a simple backup tool that you can enable in the
+    <a href="/backup/settings">backup settings</a>.  Setting "Backup Enabled"
+    to "yes" or "no" hides this message.
+  </p>
+</div>
+{% endif %}
+
+{% if backup_enabled and backup_show_warning %}
+<div class="flash-notice">
+  <p>Warning: {{ backup_warning_message }}  <a href="/backup/create_backup">Create a backup.</a></p>
+</div>
+{% endif %}

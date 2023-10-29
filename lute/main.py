@@ -11,6 +11,7 @@ import lute.db.demo
 
 from lute.models.book import Book
 from lute.models.language import Language
+from lute.models.setting import Setting
 from lute.book.stats import refresh_stats
 
 from lute.book.routes import bp as book_bp
@@ -85,6 +86,12 @@ def _create_app(app_config, extra_config):
         tutorial_book_id = lute.db.demo.tutorial_book_id()
         have_books = len(db.session.query(Book).all()) > 0
         have_languages = len(db.session.query(Language).all()) > 0
+        backup_enabled = Setting.get_value('backup_enabled')
+        backup_show_warning = Setting.get_value('backup_warn') in ('y', '1', 1, True)
+
+        backup_show_warning = True  # TODO remove this
+        backup_warning_msg = "Some warning"  # TODO fix this
+
         return render_template(
             'index.html',
             dbname = app_config.dbname,
@@ -92,7 +99,13 @@ def _create_app(app_config, extra_config):
             tutorial_book_id = tutorial_book_id,
             have_books = have_books,
             have_languages = have_languages,
-            hide_home_link = True
+            hide_home_link = True,
+            is_production_data = not lute.db.demo.contains_demo_data(),
+
+            backup_not_acknowledged = (backup_enabled == '-'),
+            backup_enabled = (backup_enabled == 'y'),
+            backup_show_warning = backup_show_warning,
+            backup_warning_msg = backup_warning_msg
         )
 
     @app.route('/wipe_database')
