@@ -458,14 +458,11 @@ a:active {
      clear: both;
      font-size: 0.8em;
      font-style: italic;
+     margin-top: 40px;
      border-top: 1px groove #aaaaaa;
-     /* color: White; */
      padding: 0;
-     /* text-align: center; */
      vertical-align: middle;
      line-height: normal;
-     margin: 0;
-     /* position: fixed; */
      bottom: 0px;
      width: 100%;
  }
