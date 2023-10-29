@@ -15,6 +15,7 @@ invoke --help <cmd>    # See docstrings and help notes
 """
 
 import os
+from datetime import datetime
 import pytest
 from invoke import task, Collection
 
@@ -122,6 +123,12 @@ def db_reset(c):
     print('ok')
 
 
+def _schema_dir():
+    "Return full path to schema dir."
+    thisdir = os.path.dirname(os.path.realpath(__file__))
+    return os.path.join(thisdir, 'lute', 'db', 'schema')
+
+
 @task
 def db_export_baseline(c):
     """
@@ -136,8 +143,7 @@ def db_export_baseline(c):
         print('quitting.')
         return
 
-    thisdir = os.path.dirname(os.path.realpath(__file__))
-    destfile = os.path.join(thisdir, 'lute', 'db', 'schema', 'baseline.sql')
+    destfile = os.path.join(_schema_dir(), 'baseline.sql')
     tempfile = f'{destfile}.temp'
     commands = f"""
     echo "-- ------------------------------------------" > {tempfile}
@@ -173,8 +179,7 @@ def db_export_empty(c):
     
     This assumes that the current db is in data/test_lute.db.
     """
-    thisdir = os.path.dirname(os.path.realpath(__file__))
-    destfile = os.path.join(thisdir, 'lute', 'db', 'schema', 'empty.sql')
+    destfile = os.path.join(_schema_dir(), 'empty.sql')
     commands = f"""
     echo "-- ------------------------------------------" > {destfile}
     echo "-- Empty db schema, with _migrations tracked." >> {destfile}
@@ -190,8 +195,24 @@ def db_export_empty(c):
     c.run(commands)
 
 
+@task(help={'suffix': 'suffix to add to filename.'})
+def db_newscript(c, suffix):
+    """
+    Create a new migration, <datetime>_suffix.sql
+    """
+    now = datetime.now()
+    fnow = now.strftime('%Y%m%d_%H%M%S')
+    filename = f'{fnow}_{suffix}.sql'
+    destfile = os.path.join(_schema_dir(), 'migrations', filename)
+    with open(destfile, 'w') as f:
+        f.write('-- TODO - fill this in.')
+    print('migration created:')
+    print(destfile)
+
+
 dbtasks = Collection('db')
 dbtasks.add_task(db_reset, 'reset')
+dbtasks.add_task(db_newscript, 'newscript')
 dbexport = Collection('export')
 dbexport.add_task(db_export_baseline, 'baseline')
 dbexport.add_task(db_export_empty, 'empty')
