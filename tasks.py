@@ -87,8 +87,19 @@ def dev_start(c):
     devscript = os.path.join(thisdir, 'dev.py')
     c.run(f'python {devscript}')
 
+
+@task
+def dev_search(c, search_for):
+    """
+    Search the code for a string.
+    """
+    thisdir = os.path.dirname(os.path.realpath(__file__))
+    devscript = os.path.join(thisdir, 'utils', 'findstring.sh')
+    c.run(f'{devscript} "{search_for}"')
+
 devtasks = Collection('dev')
 devtasks.add_task(dev_start, 'start')
+devtasks.add_task(dev_search, 'search')
 ns.add_collection(devtasks)
 
 
