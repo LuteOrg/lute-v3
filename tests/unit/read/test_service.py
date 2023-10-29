@@ -3,6 +3,7 @@ Read service tests.
 """
 
 from lute.models.term import Term
+from lute.parse.base import ParsedToken
 from lute.read.service import find_all_Terms_in_string, get_paragraphs
 from lute.db import db
 
@@ -73,6 +74,7 @@ def test_smoke_get_paragraphs(spanish, app_context):
     db.session.add(t)
     db.session.commit()
 
+    ParsedToken.reset_counters()
     paras = get_paragraphs(t)
     assert len(paras) == 2
 

@@ -7,7 +7,7 @@ from sqlalchemy import func
 
 from lute.models.term import Term, Status
 from lute.models.book import Text
-from lute.read.render.text_token import TextToken
+from lute.parse.base import ParsedToken
 from lute.read.render.renderable_calculator import RenderableCalculator
 from lute.term.model import Repository
 
@@ -82,9 +82,12 @@ def get_paragraphs(text):
         return []
 
     language = text.book.language
-    parsed_tokens = language.get_parsed_tokens(text.text)
-    tokens = TextToken.create_from(parsed_tokens)
-    tokens = [t for t in tokens if t.tok_text != '¶']
+
+    # Hacky reset of state of ParsedToken state.
+    # _Shouldn't_ matter ... :-(
+    ParsedToken.reset_counters()
+    tokens = language.get_parsed_tokens(text.text)
+    tokens = [t for t in tokens if t.token != '¶']
 
     terms = find_all_Terms_in_string(text.text, language)
 

@@ -19,6 +19,16 @@ class ParsedToken:
     cls_paragraph_number = 0
     cls_order = 0
 
+    @classmethod
+    def reset_counters(cls):
+        """
+        Reset all the counters.
+        """
+        ParsedToken.cls_sentence_number = 0
+        ParsedToken.cls_paragraph_number = 0
+        ParsedToken.cls_order = 0
+
+
     def __init__(
             self,
             token: str,

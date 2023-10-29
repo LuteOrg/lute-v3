@@ -4,19 +4,13 @@ RenderableCalculator tests.
 
 import pytest
 from lute.models.term import Term
+from lute.parse.base import ParsedToken
 from lute.read.render.renderable_calculator import RenderableCalculator
-from lute.read.render.text_token import TextToken
 
 
 def make_tokens(token_data):
-    "Make TextTokens for the data."
-    def make_token(arr):
-        t = TextToken()
-        t.order = arr[0]
-        t.tok_text = arr[1]
-        t.is_word = 1
-        return t
-    return [make_token(t) for t in token_data]
+    "Make ParsedTokens for the data."
+    return [ParsedToken(t, 1) for t in token_data]
 
 
 def assert_renderable_equals(language, token_data, term_data, expected, expected_displayed=None):
@@ -54,48 +48,19 @@ def assert_renderable_equals(language, token_data, term_data, expected, expected
 
 def test_simple_render(english):
     "Tokens with no defined terms are rendered as-is."
-    data = [
-        [1, 'some'],
-        [2, ' '],
-        [3, 'data'],
-        [4, ' '],
-        [5, 'here'],
-        [6, '.'],
-    ]
+    data = ['some', ' ', 'data', ' ', 'here', '.']
     expected = '[some-1][ -1][data-1][ -1][here-1][.-1]'
     assert_renderable_equals(english, data, [], expected)
 
-
-def test_data_out_of_order_still_ok(english):
-    """
-    Tokens will be sorted during the run.
-    """
-    data = [
-        [1, 'some'],
-        [5, 'here'],
-        [4, ' '],
-        [3, 'data'],
-        [2, ' '],
-        [6, '.'],
-    ]
-    expected = '[some-1][ -1][data-1][ -1][here-1][.-1]'
-    assert_renderable_equals(english, data, [], expected)
 
 
 def test_tokens_must_be_contiguous(english):
     """
     If tokens aren't contiguous, the algorithm gets confused.
     """
-    data = [
-        [1, 'some'],
-        [5, 'here'],
-        [4, ' '],
-        [3, 'data'],
-        [2, ' '],
-        [7, '.'],
-    ]
+    data = ['some', ' ', 'data', ' ', 'here', '.']
     tokens = make_tokens(data)
-
+    tokens[1].order = 99
     rc = RenderableCalculator()
     with pytest.raises(Exception):
         rc.main(english, [], tokens)
@@ -105,14 +70,7 @@ def test_multiword_items_cover_other_items(english):
     """
     Given a multiword term, some of the other terms are hidden.
     """
-    data = [
-        [1, 'some'],
-        [5, 'here'],
-        [4, ' '],
-        [3, 'data'],
-        [2, ' '],
-        [6, '.'],
-    ]
+    data = ['some', ' ', 'data', ' ', 'here', '.']
     words = [
         'data here',
     ]
@@ -125,14 +83,7 @@ def test_overlapping_multiwords(english):
     Given two overlapping terms, they're both displayed,
     but some of the second is cut off.
     """
-    data = [
-        [1, 'some'],
-        [2, ' '],
-        [3, 'data'],
-        [4, ' '],
-        [5, 'here'],
-        [6, '.'],
-    ]
+    data = ['some', ' ', 'data', ' ', 'here', '.']
     words = [
         'some data',
         'data here',
@@ -148,8 +99,7 @@ def test_multiwords_starting_at_same_location(english):
     Given two terms that contain the same chars at the start,
     the longer term overwrites the shorter.
     """
-    chars = list('A B C D')
-    data = [[i + 1, c] for i, c in enumerate(chars)]
+    data = ['A', ' ', 'B', ' ', 'C', ' ', 'D']
     words = [
         'A B',
         'A B C',
@@ -162,8 +112,9 @@ def test_crazy_case(english):
     """
     Crazy test case covering the scenario in the class docstring.
     """
-    chars = list('A B C D E F G H I')
-    data = [[i + 1, c] for i, c in enumerate(chars)]
+    data = ['A', ' ', 'B', ' ', 'C', ' ', 'D', ' ',
+            'E', ' ', 'F', ' ', 'G', ' ', 'H', ' ',
+            'I']
     words = [
         'B C',  # J
         'E F G H I',  # K

@@ -41,7 +41,7 @@ class RenderableCalculator:
         prevtok = None
         for tok in texttokens:
             if prevtok is not None and prevtok.order != (tok.order - 1):
-                mparts = [prevtok.tok_text, prevtok.order, tok.tok_text, tok.order]
+                mparts = [prevtok.token, prevtok.order, tok.token, tok.order]
                 msg = '; '.join(map(str, mparts))
                 raise RuntimeError(f"bad token ordering: {msg}")
             prevtok = tok
@@ -124,8 +124,8 @@ class RenderableCalculator:
         # Step 2 - fill with the original texttokens.
         for tok in texttokens:
             rc = RenderableCandidate()
-            rc.display_text = tok.tok_text
-            rc.text = tok.tok_text
+            rc.display_text = tok.token
+            rc.text = tok.token
             rc.pos = tok.order
             rc.is_word = tok.is_word
             candidates[rc.id] = rc
@@ -202,7 +202,7 @@ class RenderableCalculator:
         texttokens.sort(key=lambda x: x.order)
         self._assert_texttokens_are_contiguous(texttokens)
 
-        subject = TokenLocator.make_string([t.tok_text for t in texttokens])
+        subject = TokenLocator.make_string([t.token for t in texttokens])
         tocloc = TokenLocator(language, subject)
 
         renderable = self._get_renderable(tocloc, words, texttokens)
