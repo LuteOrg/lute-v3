@@ -78,12 +78,11 @@ class SpaceDelimitedParser(AbstractParser):
         if termchar.strip() == '':
             raise RuntimeError(f"Language {lang.name} has invalid Word Characters specification.")
 
-        split_sentence = re.escape(lang.regexp_split_sentences)
         splitex = lang.exceptions_split_sentences.replace('.', '\\.')
-
         pattern = fr"({splitex}|[{termchar}]*)"
         if splitex.strip() == '':
             pattern = fr"([{termchar}]*)"
+
         m = self.preg_match_capture(pattern, text)
         wordtoks = list(filter(lambda t: t[0] != "", m))
 
@@ -95,7 +94,7 @@ class SpaceDelimitedParser(AbstractParser):
             """
             if not s:
                 return
-            pattern = f"[{split_sentence}]"
+            pattern = f"[{re.escape(lang.regexp_split_sentences)}]"
             has_eos = False
             if pattern != "[]":  # Should never happen, but ...
                 allmatches = self.preg_match_capture(pattern, s)
