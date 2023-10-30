@@ -272,6 +272,8 @@ class Repository:
 
         if term.flash_message is not None:
             t.set_flash_message(term.flash_message)
+        else:
+            t.pop_flash_message()
 
         termtags = []
         for s in term.term_tags:

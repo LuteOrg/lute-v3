@@ -61,6 +61,10 @@ def handle_term_form(
     """
     form = TermForm(obj=term)
 
+    # Flash messages get added on things like term imports.
+    # The user opening the form is treated as an acknowledgement.
+    term.flash_message = None
+
     form.language_id.choices = lute.utils.formutils.language_choices()
 
     if form.validate_on_submit():

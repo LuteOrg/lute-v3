@@ -138,6 +138,19 @@ def test_save_uses_existing_TermTags(app_context, repo, hello_term):
     assert_sql_result(sql, [ '1; a; HELLO', '2; b; HELLO' ], 'a used, b created')
 
 
+def test_save_with_no_flash_message(app_context, repo, hello_term):
+    "Saving with flash = None removes the flash record."
+    hello_term.flash_message = 'hi there'
+    repo.add(hello_term)
+    repo.commit()
+    sql = "select WfMessage from wordflashmessages"
+    assert_sql_result(sql, ['hi there'], 'record exists')
+
+    hello_term.flash_message = None
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result(sql, [], 'removed')
+
 ## Deletes.
 
 def test_delete(app_context, repo, hello_term):
