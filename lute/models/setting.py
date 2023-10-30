@@ -2,8 +2,8 @@
 Lute settings, in settings key-value table.
 """
 
-from lute.db import db
 import datetime
+from lute.db import db
 
 class Setting(db.Model):
     "Settings table."

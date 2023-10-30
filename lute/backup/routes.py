@@ -120,5 +120,5 @@ def do_backup():
     try:
         f = create_backup(c, settings, is_manual = is_manual)
         return jsonify(f)
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-exception-caught
         return jsonify({'errmsg': str(e)}), 500
