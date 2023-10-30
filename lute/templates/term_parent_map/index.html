@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Import Parent Terms{% endblock %}
+
+{% block body %}
+
+<div style="width: 70%; margin-bottom: 20px;">
+
+<p>You can semi-automatically create parent and child Terms, creating and importing an external "mapping" file that you create. See the wiki, <a href="https://github.com/jzohrab/lute/wiki/Bulk-Mapping-Parent-Terms">Bulk Mapping Parent Terms</a>, for information.</p>
+
+
+<h2>Export</h2>
+<p><i>Generate a file to help you make an import file.</i></p>
+
+<div style="display: flex;">
+  <div style="flex: 1; padding: 0;">
+    <p>Books (export unknown terms)</p>
+    <ul style="list-style: none; padding: 0;">
+      {% for book in books %}
+      <li><a href="/term_parent_map/export_book/{{ book.id }}">{{ book.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div style="flex: 1; padding: 0;">
+    <p>Language (all existing Terms without parents)</p>
+    <ul style="list-style: none; padding: 0;">
+      {% for language in languages %}
+      <li><a href="/term_parent_map/export_language/{{ language.id }}">{{ language.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<h2>Import</h2>
+<p><i>Import your prepared .csv mapping file.</i></p>
+
+{% for field_name, field_errors in form.errors.items() %}
+{% for error in field_errors %}
+<div class="flash-notice">{{ error }}</div>
+{% endfor %}
+<br />
+{% endfor %}
+
+<form method="POST" enctype="multipart/form-data">
+  {{ form.hidden_tag() }}
+  <table class="table no-footer" style="width: 50%; margin: 0;">
+    <tbody>
+      <tr>
+        <td>Language</td>
+        <td>{{ form.language_id }}</td>
+      </tr>
+      <tr>
+        <td>File</td>
+        <td>{{ form.text_file }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button id="btnSubmit" class="btn">Import</button>
+</form>
+
+</div>
+
+{% endblock %}
