@@ -3,6 +3,7 @@ Lute settings, in settings key-value table.
 """
 
 from lute.db import db
+import datetime
 
 class Setting(db.Model):
     "Settings table."
@@ -68,6 +69,13 @@ class Setting(db.Model):
 
         def is_acknowledged(self):
             return self.backup_enabled in ('y', 'n')
+
+        def last_backup_display_date(self):
+            "Return the last_backup_datetime as yyyy-mm etc., or None if not set."
+            t = self.last_backup_datetime
+            if t is None:
+                return None
+            return datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S')
 
 
     @staticmethod

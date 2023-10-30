@@ -101,6 +101,10 @@ def _create_app(app_config, extra_config):
         backup_enabled = bkp_settings.backup_enabled
         backup_show_warning = bkp_settings.backup_warn
         backup_warning_msg = backupservice.backup_warning(bkp_settings)
+        backup_last_display_date = bkp_settings.last_backup_display_date()
+
+        if backupservice.should_run_auto_backup(bkp_settings):
+            return redirect('/backup/backup', 302)
 
         return render_template(
             'index.html',
@@ -117,6 +121,7 @@ def _create_app(app_config, extra_config):
             backup_show_warning = backup_show_warning,
             backup_warning_msg = backup_warning_msg,
             backup_directory = bkp_settings.backup_dir,
+            backup_last_display_date = backup_last_display_date,
         )
 
     @app.route('/wipe_database')
