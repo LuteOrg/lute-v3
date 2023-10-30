@@ -114,7 +114,20 @@
      vertical-align: top;
      word-break: break-all;
  }
- 
+
+ table#backupsettings
+ {
+     width: 80%;
+ }
+
+ table#backupsettings thead, table#backupsettings tr, table#backupsettings th:first-child, table#backupsettings tbody, table#backupsettings tr, table#backupsettings td:first-child {
+     width: 40%;
+     min-width: 40%;
+     max-width: 40%;
+     vertical-align: top;
+     word-break: break-word;
+ }
+
  table#language
  {
      width: 80%;

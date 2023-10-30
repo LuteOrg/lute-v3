@@ -14,7 +14,7 @@
 <form method="POST">
   {{ form.hidden_tag() }}
   {{ form.csrf_token }}
-  <table>
+  <table id="backupsettings">
     {% for f in [
     form.backup_enabled,
     form.backup_dir,
@@ -24,7 +24,7 @@
     ]%}
     <tr>
       <td>{{ f.label }}</td>
-      <td>{{ f }}</td>
+      <td>{{ f(class="form-control") }}</td>
     </tr>
     
     {% endfor %}

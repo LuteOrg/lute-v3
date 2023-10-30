@@ -31,10 +31,10 @@ class BackupSettingsForm(FlaskForm):
             ('n', 'no')
         ]
     )
-    backup_dir = StringField('Backup Directory')
-    backup_auto = BooleanField('Run Backups Automatically (Daily)')
-    backup_warn = BooleanField('Warn If Backup Hasn\'t Run in a Week')
-    backup_count = IntegerField('Backup Count', validators=[InputRequired(), NumberRange(min=1)])
+    backup_dir = StringField('Backup directory')
+    backup_auto = BooleanField('Run backups automatically (daily)')
+    backup_warn = BooleanField('Warn if backup hasn\'t run in a week')
+    backup_count = IntegerField('Backup count', validators=[InputRequired(), NumberRange(min=1)])
 
     def validate_backup_enabled(self, field):
         "User should acknowledge."
