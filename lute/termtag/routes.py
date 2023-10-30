@@ -3,14 +3,11 @@
 """
 
 from flask import Blueprint, request, jsonify, render_template, redirect
-from lute.models.language import Language
 from lute.models.term import TermTag
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.termtag.datatables import get_data_tables_list
-from lute.term.model import Repository, Term
 from lute.db import db
 from lute.termtag.forms import TermTagForm
-import lute.utils.formutils
 
 bp = Blueprint('termtag', __name__, url_prefix='/termtag')
 
