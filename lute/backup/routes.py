@@ -5,13 +5,15 @@ Backup settings form management, and running backups.
 """
 
 import os
-from flask import Blueprint, render_template, redirect, flash
+from flask import Blueprint, render_template, request, redirect, flash, jsonify
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, SelectField, IntegerField
 from wtforms.validators import InputRequired, NumberRange
 from wtforms import ValidationError
 from lute.models.setting import Setting
 from lute.db import db
+from lute.backup.service import create_backup
+from lute.app_config import AppConfig
 
 
 class BackupSettingsForm(FlaskForm):
@@ -81,3 +83,42 @@ def backup_settings():
     form.backup_auto.data = int(form.backup_auto.data)
 
     return render_template('backup/settings.html', form=form)
+
+
+@bp.route('/backup', methods=['GET'])
+def backup():
+    """
+    Endpoint called from front page.
+
+    With extra arg 'type' for manual.
+    """
+    backuptype = 'automatic'
+    if 'type' in request.args:
+        backuptype = 'manual'
+
+    settings = Setting.get_backup_settings()
+    return render_template(
+        'backup/backup.html',
+        backup_folder=settings.backup_dir,
+        backuptype=backuptype
+    )
+
+
+@bp.route('/do_backup', methods=['POST'])
+def do_backup():
+    """
+    Ajax endpoint called from backup.html.
+    """
+    backuptype = 'automatic'
+    prms = request.form.to_dict()
+    if 'type' in prms:
+        backuptype = prms['type']
+
+    c = AppConfig.create_from_config()
+    settings = Setting.get_backup_settings()
+    is_manual = backuptype.lower() == 'manual'
+    try:
+        f = create_backup(c, settings, is_manual = is_manual)
+        return jsonify(f)
+    except Exception as e:
+        return jsonify({'errmsg': str(e)}), 500

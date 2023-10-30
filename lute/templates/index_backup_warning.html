@@ -1,6 +1,6 @@
 {# Warning included in index.html if this is production (non-demo) data. #}
 
-{% if backup_not_acknowledged and have_languages and have_books %}
+{% if not backup_acknowledged and have_languages and have_books %}
 <div class="flash-notice">
   <p><b>Before continuing, please consider your backup strategy!</b></p>
 

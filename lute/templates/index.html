@@ -57,7 +57,13 @@
 
 <div id="techlinks" style="margin-top: 30px;">
   <ul>
-    <li style="color: grey;">Create backup - TODO (<a href="/backup/settings">backup settings</a>)</li>
+    {% if backup_acknowledged %}
+      {% if backup_directory != '' %}
+      <li><a href="/backup/backup?type=manual">Create backup</a></li>
+      {% endif %}
+    <li><a href="/backup/settings">Backup settings</a></li>
+    {% endif %}
+
     <li style="color: grey;">Version and software info - TODO</li>
     <li><a href="https://github.com/jzohrab/lute/wiki/">Docs (on GitHub wiki)</a></li>
   </ul>

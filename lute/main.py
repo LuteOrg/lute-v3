@@ -112,10 +112,11 @@ def _create_app(app_config, extra_config):
             hide_home_link = True,
             is_production_data = not lute.db.demo.contains_demo_data(),
 
-            backup_not_acknowledged = not bkp_settings.is_acknowledged(),
+            backup_acknowledged = bkp_settings.is_acknowledged(),
             backup_enabled = (backup_enabled == 'y'),
             backup_show_warning = backup_show_warning,
-            backup_warning_msg = backup_warning_msg
+            backup_warning_msg = backup_warning_msg,
+            backup_directory = bkp_settings.backup_dir,
         )
 
     @app.route('/wipe_database')

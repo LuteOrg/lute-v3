@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h1>Backing up ...</h1>
+
+<p>
+  Creating {{ backuptype }} backup at {{ backup_folder }}.
+</p>
+<p>
+  <b>Don't refresh this page, or another backup process will be kicked off!</b>
+</p>
+
+<p id="backupResult" />
+
+<p id="returnHome" style="visibility:hidden;"><a href="/">Back to home.</a></p>
+
+<script>
+  $(document).ready(function() {
+    $.post('/backup/do_backup', { type: '{{ backuptype }}' })
+      .done( function(msg) {
+        $('#backupResult').text('Completed: ' + msg);
+        $('#returnHome').css({ visibility: 'visible' })
+      })
+      .fail( function(xhr, textStatus, errorThrown) {
+        const p = JSON.parse(xhr.responseText);
+        const msg = "BACKUP ERROR: " + p.errmsg;
+        $('#backupResult').html(msg.replace(/__BREAK__/g, '<br />'));
+        $('#returnHome').css({ visibility: 'visible' })
+      });
+  });
+</script>
+
+{% endblock %}
