@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Term Tags{% endblock %}
+
+{% block body %}
+
+<h1>Term Tag index</h1>
+
+<div style="margin-top: 10px; margin-bottom: 10px;">
+  <a href="/termtag/new">Create new</a>
+</div>
+
+<table id="termtagtable" class="table dataTable stripe" style="table-layout:fixed;" >
+  <thead>
+    <tr>
+      <th>Tag</th>
+      <th>Comment</th>
+      <th>Term Count</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+</table>
+
+{# Hidden form for archive, unarchive, delete. #}
+<form id="actionposter" method="post" action="">
+</form>
+
+<script>
+  
+  let setup_datatable = function() {
+    var table = $('#termtagtable').DataTable({
+      responsive: true,
+      select: true,
+      lengthMenu: [ 10, 25, 50 ],
+      paging: true,
+      info: true,
+      searching: true,
+      processing: true,
+      serverSide: true,
+      stateSave: true,
+      columnDefs: [
+        {
+          "name": "TgText", "targets": 0,
+          "render": function ( data, type, row, meta ) {
+            return `<a href="/termtag/edit/${row[3]}">${row[0]}</a>`;
+          }
+        },
+        { "name": "TgComment", "targets": 1 },
+        { "name": "TermCount", "targets": 2,
+          "render": function ( data, type, row, meta ) {
+            const count = parseInt(row[2]);
+            if (count == 0)
+              return '-';
+            return `<a href="/termtag/index/${row[0]}">${count}</a>`;
+          }
+        },
+        {
+          "targets": 3,
+          "data": null,
+          "searchable": false,
+          "orderable": false,
+          "render": function ( data, type, row, meta ) {
+            // TODO:security - add CSRF token
+            const tgid = row[3];
+            return `<span id="deltermtag${tgid}" onclick="confirm_delete(${tgid})"><img src="{{ url_for('static', filename='/icn/minus-button.png') }}" title="Delete" /></span>`;
+          }
+        },
+        /* Extra data that is returned in the row for rendering, but not shown. */
+        { "name": "TgID", "targets": 4, "data": null, "visible": false }
+      ],
+
+      // Ajax call
+      ajax: {
+        url: '/termtag/datatables',
+        type: "POST",
+        dataType: "json"
+      },
+
+    });
+
+  } // end setup datatable
+
+
+  $(document).ready(function () {
+    setup_datatable();
+  });
+
+  function do_action_post(action, termtagid) {
+    let f = $('#actionposter');
+    f.attr('action', `/termtag/${action}/${termtagid}`);
+    f.submit();
+  }
+
+  function confirm_delete(termtagid) {
+    if (!confirm(`Deleting tag.  Click OK to proceed, or Cancel.`)) {
+      return;
+    }
+    do_action_post('delete', termtagid);
+  }
+
+</script>
+
+{% endblock %}

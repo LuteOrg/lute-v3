@@ -70,6 +70,11 @@ class TermTag(db.Model):
 
 
     @staticmethod
+    def find(termtag_id):
+        "Get by ID."
+        return db.session.query(TermTag).filter(TermTag.id == termtag_id).first()
+    
+    @staticmethod
     def find_by_text(text):
         "Find a tag by text, or None if not found."
         return db.session.query(TermTag).filter(TermTag.text == text).first()

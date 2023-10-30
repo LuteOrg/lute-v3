@@ -1,0 +1,33 @@
+{% for field_name, field_errors in form.errors.items() %}
+<p>{{ field_name }}
+  <ul>
+    {% for error in field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+</p>
+{% endfor %}
+
+<form method="POST">
+  {{ form.hidden_tag() }}
+
+  <table id="termtag">
+  <tbody>
+
+    <tr>
+      <td>{{ form.text.label(class="form-control-label") }}</td>
+      <td>{{ form.text(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.comment.label(class="form-control-label") }}</td>
+      <td>{{ form.comment(class="form-largetextarea") }}</td>
+    </tr>
+
+  </tbody>
+  </table>
+
+  <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<button onclick="window.location = '{{ url_for('termtag.index') }}'">Cancel</button>
