@@ -8,8 +8,9 @@ import pytest
 from lute.db import db
 from lute.db.demo import contains_demo_data, remove_flag, \
     delete_demo_data, tutorial_book_id, \
-    demo_data_path, load_demo_data, \
+    demo_data_path, load_demo_data, delete_unsupported_demo_data, \
     predefined_languages, get_demo_language
+import lute.parse.registry
 from tests.dbasserts import assert_record_count_equals
 
 
@@ -97,7 +98,44 @@ def test_load_demo_loads_language_yaml_files(app_context):
         "select * from books where BkTitle = 'Tutorial'"
     ]
     for c in checks:
-        assert_record_count_equals(c, 1, 'got data')
+        assert_record_count_equals(c, 1, c + ' returned 1')
 
 
-# unsupported
+@pytest.fixture(name='_restore_japanese_parser')
+def fixture_restore_mecab_support():
+    """
+    "Teardown" method to restore jp parser if it was removed.
+    """
+    k = 'japanese'
+    assert k in lute.parse.registry.parsers, 'have jp parser, sanity check'
+    old_val = lute.parse.registry.parsers[k]
+
+    yield
+
+    if k not in lute.parse.registry.parsers:
+        lute.parse.registry.parsers[k] = old_val
+
+
+def test_clear_unsupported_removes_unsupported_data(
+        app_context,
+        _restore_japanese_parser):
+    "All data is loaded, spot check some."
+    delete_demo_data()
+    load_demo_data()
+
+    sql = "select LgID from languages where LgName = 'Japanese'"
+    checks = [
+        sql,
+        f"select * from books where BkLgID in ({sql})"
+    ]
+    for c in checks:
+        assert_record_count_equals(c, 1, c + ' returned 1')
+
+    delete_unsupported_demo_data()
+    for c in checks:
+        assert_record_count_equals(c, 1, c + ' still returned 1')
+
+    del lute.parse.registry.parsers['japanese']
+    delete_unsupported_demo_data()
+    for c in checks:
+        assert_record_count_equals(c, 0, c + ' jp not supported')

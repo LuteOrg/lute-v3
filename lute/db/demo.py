@@ -169,3 +169,16 @@ def load_demo_data():
     _load_demo_stories()
     Setting.set_value('IsDemoData', True)
     db.session.commit()
+
+
+def delete_unsupported_demo_data():
+    """
+    Remove any language using an unsupported parser.
+    """
+    languages = db.session.query(Language).all()
+    unsupported = [ lang for lang in languages
+        if not lang.is_supported
+    ]
+    for lang in unsupported:
+        db.session.delete(lang)
+    db.session.commit()

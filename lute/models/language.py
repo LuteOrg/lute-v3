@@ -5,7 +5,7 @@ Language entity.
 import re
 from sqlalchemy import text, func
 from lute.db import db
-from lute.parse.registry import get_parser
+from lute.parse.registry import get_parser, is_supported
 
 
 class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-instance-attributes
@@ -126,6 +126,11 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
     @property
     def parser(self):
         return get_parser(self.parser_type)
+
+    @property
+    def is_supported(self):
+        "True if the language's parser is supported."
+        return is_supported(self.parser_type)
 
     def get_parsed_tokens(self, s):
         return self.parser.get_parsed_tokens(s, self)

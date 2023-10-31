@@ -10,6 +10,8 @@ from lute.parse.mecab_parser import JapaneseParser
 from lute.parse.character_parser import ClassicalChineseParser
 
 
+# List of parsers available.
+# This design feels fishy, but it suffices for now.
 parsers = {
     'spacedel': SpaceDelimitedParser,
     'turkish': TurkishParser,
