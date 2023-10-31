@@ -85,8 +85,13 @@ def test_get_predefined():
 
 # Loading.
 
+@pytest.mark.dbdemoload
 def test_load_demo_loads_language_yaml_files(app_context):
-    "All data is loaded, spot check some."
+    """
+    All data is loaded, spot check some.
+
+    This test is also used from /tasks.py; see .pytest.ini.
+    """
     delete_demo_data()
     assert contains_demo_data() is False, 'not a demo.'
     assert_record_count_equals('languages', 0, 'wiped out')

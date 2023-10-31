@@ -90,21 +90,33 @@ ns.add_task(search)
 ##############################
 # DB tasks
 
-@task
-def db_reset(c):
-    """
-    Reset the database to the demo data. Can only be run on a testing db.
-
-    It appears that doing this requires a restart of the dev server ...
-    some file handle issue, I suppose.
-    """
+def _ensure_test_db():
+    "Throw if not a testing db."
     ac = AppConfig.create_from_config()
     if ac.is_test_db is False:
         raise ValueError('not a test db')
-    print(f'replacing {ac.dbfilename} with new demo db ...')
-    os.unlink(ac.dbfilename)
-    setup_db(ac)
-    assert os.path.exists(ac.dbfilename)
+    
+@task
+def db_wipe(c):
+    """
+    Wipe the data from the testing db; factory reset settings. :-)
+
+    Can only be run on a testing db.
+    """
+    _ensure_test_db()
+    c.run('pytest -m dbwipe')
+    print('ok')
+
+
+@task
+def db_reset(c):
+    """
+    Reset the database to the demo data.
+
+    Can only be run on a testing db.
+    """
+    _ensure_test_db()
+    c.run('pytest -m dbdemoload')
     print('ok')
 
 
@@ -197,6 +209,7 @@ def db_newscript(c, suffix):
 
 dbtasks = Collection('db')
 dbtasks.add_task(db_reset, 'reset')
+dbtasks.add_task(db_wipe, 'wipe')
 dbtasks.add_task(db_newscript, 'newscript')
 dbexport = Collection('export')
 dbexport.add_task(db_export_baseline, 'baseline')

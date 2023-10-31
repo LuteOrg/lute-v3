@@ -4,14 +4,20 @@ Testing management functions.
 "management" is for global actions like clearing out the db.
 """
 
+import pytest
 from lute.db import db
 from lute.models.setting import Setting
 from lute.db.management import delete_all_data
 from tests.dbasserts import assert_record_count_equals
 
 
+@pytest.mark.dbwipe
 def test_wiping_db_clears_out_all_tables(app_context):
-    "DB is wiped clean if requested ... settings are left!"
+    """
+    DB is wiped clean if requested ... settings are left!
+
+    This test is also used from /tasks.py; see .pytest.ini.
+    """
     old_settings = [
         s.key for s in db.session.query(Setting).all()
     ]
