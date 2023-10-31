@@ -1,17 +1,22 @@
-import requests
+"""
+Lute test client.
+
+Convenience wrapper around the browser, clears db.
+
+Adds the home url to visited urls,
+provides common functions like make_book.
+
+Also calls the dev_api to set state, etc.
+"""
+
 import time
-import pytest
+import requests
 from selenium.webdriver.common.keys import Keys
 
 
 class LuteTestClient:
     """
-    Convenience wrapper around the browser, clears db.
-
-    Adds the home url to visited urls,
-    provides common functions like make_book.
-
-    Also calls the dev_api to set state, etc.
+    The client!
     """
     def __init__(self, b, home):
         self.browser = b
@@ -60,10 +65,17 @@ class LuteTestClient:
         self.browser.select('language_id', int(self.language_ids[langname]))
         self.browser.find_by_css('#save').first.click()
 
+    @staticmethod
     def default_parsed_token_renderer(t):
         return t.text
 
+    @staticmethod
     def text_and_status_renderer(t):
+        """
+        Lambda, generate a string for a parsedtoken.
+
+        Used to compare rendered content with expected.
+        """
         ret = t.text
 
         classes = t['class'].split(' ')
@@ -84,11 +96,15 @@ class LuteTestClient:
         etext = [ token_renderer(e) for e in elements ]
         return '/'.join(etext)
 
-    def click_word_fill_form(self, word, updates = {}):
+    def click_word_fill_form(self, word, updates = None):
+        """
+        Click a word in the reading frame, fill in the term form iframe.
+        """
         elements = self.browser.find_by_xpath('//span[contains(@class, "textitem")]')
         es = [ e for e in elements if e.text == word ]
         assert len(es) > 0, f'match for {word}'
         es[0].click()
+        updates = updates or {}
         with self.browser.get_iframe('wordframe') as iframe:
             if 'translation' in updates:
                 iframe.find_by_css('#translation').fill(updates['translation'])

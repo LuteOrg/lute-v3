@@ -2,14 +2,11 @@
 Acceptance test fixtures.
 """
 
-import requests
-import time
 import pytest
-from selenium.webdriver.common.keys import Keys
-from splinter import Browser
 from selenium.webdriver.chrome.options import Options as ChromeOptions
-
+from splinter import Browser
 from tests.acceptance.lute_test_client import LuteTestClient
+
 
 def pytest_addoption(parser):
     """
