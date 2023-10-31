@@ -1,10 +1,7 @@
 """Database assertions.
 
-For this to provide useful assertion outputs, this module needs to be
-"registed" in the test module as follows:
-
-    import pytest
-    pytest.register_assert_rewrite("tests.dbasserts")
+This module is "registered" to pytest in ./__init__.py
+to get nicer assertion details.
 """
 
 import os

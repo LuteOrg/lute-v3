@@ -2,6 +2,7 @@
 Reading acceptance tests.
 """
 
+import yaml
 import requests
 from pytest_bdd import given, when, then, scenarios, parsers
 from tests.acceptance.lute_test_client import LuteTestClient
@@ -26,6 +27,12 @@ def given_demo_langs_loaded(luteclient):
 @when(parsers.parse('I create a {lang} book "{title}" with content:\n{c}'))
 def when_book(luteclient, lang, title, c):
     luteclient.make_book(title, c, lang)
+
+@when(parsers.parse('I click "{word}" and edit the form:\n{content}'))
+def when_click_word_edit_form(luteclient, word, content):
+    "The content is assumed to be yaml."
+    updates = yaml.safe_load(content)
+    luteclient.click_word_fill_form(word, updates)
 
 @then(parsers.parse('the page title is {title}'))
 def then_title(luteclient, title):

@@ -7,6 +7,9 @@ Adds the home url to visited urls,
 provides common functions like make_book.
 
 Also calls the dev_api to set state, etc.
+
+This module is "registered" to pytest in ./__init__.py
+to get nicer assertion details.
 """
 
 import time
@@ -106,6 +109,15 @@ class LuteTestClient:
         es[0].click()
         updates = updates or {}
         with self.browser.get_iframe('wordframe') as iframe:
+            if 'status' in updates:
+                # This line didn't work:
+                # iframe.choose('status', updates['status'])
+                s = updates['status']
+                xp = f"//input[@type='radio'][@name='status'][@value='{s}']"
+                radios = self.browser.find_by_xpath(xp)
+                assert len(radios) == 1, 'have matching radio button'
+                radio = radios[0]
+                radio.click()
             if 'translation' in updates:
                 iframe.find_by_css('#translation').fill(updates['translation'])
             if 'parents' in updates:
