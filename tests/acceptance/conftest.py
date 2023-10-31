@@ -1,9 +1,20 @@
+"""
+Acceptance test fixtures.
+"""
+
+import requests
+import time
 import pytest
+from selenium.webdriver.common.keys import Keys
 from splinter import Browser
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 
+from tests.acceptance.lute_test_client import LuteTestClient
 
 def pytest_addoption(parser):
+    """
+    Command-line args for pytest runs.
+    """
     parser.addoption("--port", action="store", type=int, help="Specify the port number")
     parser.addoption("--headless", action='store_true', help="Run the test as headless")
 
@@ -39,3 +50,19 @@ def session_chrome_browser(request):
     request.addfinalizer(fin)
 
     return browser
+
+
+
+@pytest.fixture(name='luteclient')
+def fixture_lute_client(request, chromebrowser):
+    """
+    Start the lute browser.
+    """
+    useport = request.config.getoption("--port")
+    if useport is None:
+        # Need to specify the port, e.g.
+        # pytest tests/acceptance --port=1234
+        # Acceptance tests run using 'inv accept' sort this out automatically.
+        pytest.exit("--port not set")
+    c = LuteTestClient(chromebrowser, f'http://localhost:{useport}/')
+    yield c
