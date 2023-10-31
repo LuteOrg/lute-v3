@@ -10,6 +10,7 @@ data is demo.
 
 from sqlalchemy import text
 from lute.db import db
+import lute.db.management
 
 
 def contains_demo_data():
@@ -56,13 +57,5 @@ def delete_all_data():
         raise RuntimeError("Can't delete non-demo data.")
 
     remove_flag()
-    # Setting the pragma first ensures cascade delete.
-    statements = [
-        'pragma foreign_keys = ON',
-        'delete from languages',
-        'delete from tags',
-        'delete from tags2',
-    ]
-    for s in statements:
-        db.session.execute(text(s))
-    db.session.commit()
+
+    lute.db.management.delete_all_data()

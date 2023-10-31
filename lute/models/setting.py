@@ -55,7 +55,6 @@ class Setting(db.Model):
         Getter only.
         """
         def __init__(self):
-            # -, y, or n
             self.backup_enabled = Setting.get_value('backup_enabled')
             self.backup_dir = Setting.get_value('backup_dir')
 
@@ -64,7 +63,7 @@ class Setting(db.Model):
                 return v in (1, '1', 'y', True)
             self.backup_auto = _bool('backup_auto')
             self.backup_warn = _bool('backup_warn')
-            self.backup_count = int(Setting.get_value('backup_count'))
+            self.backup_count = int(Setting.get_value('backup_count') or 5)
             self.last_backup_datetime = Setting.get_last_backup_datetime()
 
         def is_acknowledged(self):
