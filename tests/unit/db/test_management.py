@@ -4,7 +4,6 @@ Testing management functions.
 "management" is for global actions like clearing out the db.
 """
 
-import pytest
 from lute.db import db
 from lute.models.setting import Setting
 from lute.db.management import delete_all_data

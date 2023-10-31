@@ -2,10 +2,7 @@
 Language entity.
 """
 
-import glob
-import os
 import re
-import yaml
 from sqlalchemy import text, func
 from lute.db import db
 from lute.parse.registry import get_parser
@@ -77,69 +74,6 @@ class Language(db.Model): # pylint: disable=too-few-public-methods, too-many-ins
     @word_characters.setter
     def word_characters(self, s):
         self._word_characters = self._get_python_regex_pattern(s)
-
-
-    @classmethod
-    def from_yaml(cls, filename):
-        """
-        Create a new Language object from a yaml definition.
-        """
-        with open(filename, 'r', encoding='utf-8') as file:
-            d = yaml.safe_load(file)
-
-        lang = cls()
-
-        def load(key, method):
-            if key in d:
-                val = d[key]
-                # Handle boolean values
-                if isinstance(val, str):
-                    temp = val.lower()
-                    if temp == 'true':
-                        val = True
-                    elif temp == 'false':
-                        val = False
-                setattr(lang, method, val)
-
-        # Define mappings for fields
-        mappings = {
-            'name': 'name',
-            'dict_1': 'dict_1_uri',
-            'dict_2': 'dict_2_uri',
-            'sentence_translation': 'sentence_translate_uri',
-            'show_romanization': 'show_romanization',
-            'right_to_left': 'right_to_left',
-            'parser_type': 'parser_type',
-            'character_substitutions': 'character_substitutions',
-            'split_sentences': 'regexp_split_sentences',
-            'split_sentence_exceptions': 'exceptions_split_sentences',
-            'word_chars': 'word_characters',
-        }
-
-        for key in d.keys():
-            funcname = mappings.get(key, '')
-            if funcname:
-                load(key, funcname)
-
-        return lang
-
-
-    @classmethod
-    def get_predefined(cls):
-        """
-        Return languages that have yaml definitions in demo/languages.
-        """
-        current_dir = os.path.dirname(__file__)
-        demoglob = os.path.join(current_dir, '../../demo/languages/*.yaml')
-        ret = [Language.from_yaml(f) for f in glob.glob(demoglob)]
-
-        # TODO mecab: remove japanese if no mecab
-        # no_mecab = not JapaneseParser.mecab_installed()
-        # if no_mecab:
-        #    ret = [lang for lang in ret if lang.get_lg_parser_type() != 'japanese']
-
-        ret.sort(key=lambda x: x.name)
-        return ret
 
 
     @classmethod

@@ -2,12 +2,14 @@
 Tests for managing the demo data.
 """
 
+import os
 from sqlalchemy import text
 import pytest
 from lute.db import db
 from lute.db.demo import contains_demo_data, remove_flag, \
     delete_demo_data, tutorial_book_id, \
-    load_demo_data
+    demo_data_path, load_demo_data, \
+    predefined_languages, get_demo_language
 from tests.dbasserts import assert_record_count_equals
 
 
@@ -52,6 +54,35 @@ def test_tutorial_id_returned_if_present(app_context):
     delete_demo_data()
     assert tutorial_book_id() is None, 'no tutorial'
 
+
+# Getting languages from yaml files.
+
+def test_new_english_from_yaml_file():
+    """
+    Smoke test, can load a new language from yaml definition.
+    """
+    f = os.path.join(demo_data_path(), 'languages', 'english.yaml')
+    lang = get_demo_language(f)
+
+    # Replace the following assertions with your specific expectations
+    assert lang.name == "English"
+    assert lang.dict_1_uri == "https://en.thefreedictionary.com/###"
+    assert lang.sentence_translate_uri == "*https://www.deepl.com/translator#en/en/###"
+    assert lang.show_romanization is False, 'uses default'
+    assert lang.right_to_left is False, 'uses default'
+
+
+def test_get_predefined():
+    """
+    Returns all the languages using the files in the demo folder.
+    """
+    langs = predefined_languages()
+    langnames = [lang.name for lang in langs]
+    for expected in [ 'English', 'French', 'Turkish' ]:
+        assert expected in langnames, expected
+
+
+# Loading.
 
 def test_load_demo_loads_language_yaml_files(app_context):
     "All data is loaded, spot check some."

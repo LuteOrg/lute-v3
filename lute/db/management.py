@@ -2,8 +2,9 @@
 Db management.
 """
 
-from lute.db import db
 from sqlalchemy import text
+from lute.db import db
+
 
 def delete_all_data():
     """

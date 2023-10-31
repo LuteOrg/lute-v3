@@ -10,6 +10,7 @@ from sqlalchemy import text
 
 from lute.app_config import AppConfig
 from lute.db import db
+import lute.db.demo
 from lute.main import init_db_and_app
 
 from lute.models.language import Language
@@ -124,7 +125,7 @@ def _get_language(f):
     Return language from the db if it already exists,
     or create it from the file.
     """
-    lang = Language.from_yaml(f)
+    lang = lute.db.demo.get_demo_language(f)
     db_language = db.session.query(Language).filter(Language.name == lang.name).first()
     if db_language is None:
         return lang
