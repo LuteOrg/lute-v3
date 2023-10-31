@@ -126,6 +126,31 @@ def _schema_dir():
     return os.path.join(thisdir, 'lute', 'db', 'schema')
 
 
+def _do_schema_export(c, destfile, header_notes, taskname):
+    """
+    Generate the dumpfile at destfile.
+    """
+    destfile = os.path.join(_schema_dir(), destfile)
+    tempfile = f'{destfile}.temp'
+    commands = f"""
+    echo "-- ------------------------------------------" > {tempfile}
+    echo "-- {header_notes}" >> {tempfile}
+    echo "-- Migrations tracked in _migrations, settings reset." >> {tempfile}
+    echo "-- Generated from 'inv {taskname}'" >> {tempfile}
+    echo "-- ------------------------------------------" >> {tempfile}
+    echo "" >> {tempfile}
+    sqlite3 data/test_lute.db .dump >> {tempfile}
+    """
+    c.run(commands)
+
+    os.rename(tempfile, destfile)
+    print(f'{destfile} updated (git diff follows):')
+    print('DIFF START ' + '-' * 38)
+    c.run(f'git diff -- {destfile}')
+    print('DIFF END ' + '-' * 40)
+    print()
+
+
 @task
 def db_export_baseline(c):
     """
@@ -139,34 +164,17 @@ def db_export_baseline(c):
     if (text != 'y'):
         print('quitting.')
         return
+    _do_schema_export(c, 'baseline.sql', 'Baseline db with demo data.', 'db.export.baseline')
 
-    destfile = os.path.join(_schema_dir(), 'baseline.sql')
-    tempfile = f'{destfile}.temp'
-    commands = f"""
-    echo "-- ------------------------------------------" > {tempfile}
-    echo "-- Baseline db with migrations and demo data." >> {tempfile}
-    echo "-- Generated from 'inv db.export.baseline'" >> {tempfile}
-    echo "-- ------------------------------------------" >> {tempfile}
-    echo "" >> {tempfile}
-    sqlite3 data/test_lute.db .dump >> {tempfile}
-    """
-    c.run(commands)
-
-    print(f'Verifying {tempfile}')
-    with open(tempfile) as f:
+    fname = os.path.join(_schema_dir(), 'baseline.sql')
+    print(f'Verifying {fname}')
+    with open(fname) as f:
         checkstring = 'Tutorial follow-up'
         if checkstring in f.read():
             print(f'"{checkstring}" found, likely ok.')
         else:
-            print(f'"{checkstring}" NOT found, something likely wrong.')
+            print(f'"{checkstring}" NOT FOUND, SOMETHING LIKELY WRONG.')
             raise RuntimeError(f'Missing "{checkstring}" in exported file.')
-
-    os.rename(tempfile, destfile)
-    print(f'{destfile} updated (git diff follows):')
-    print('DIFF START ' + '-' * 38)
-    c.run(f'git diff -- {destfile}')
-    print('DIFF END ' + '-' * 40)
-    print()
 
 
 @task
@@ -176,20 +184,15 @@ def db_export_empty(c):
     
     This assumes that the current db is in data/test_lute.db.
     """
-    destfile = os.path.join(_schema_dir(), 'empty.sql')
-    commands = f"""
-    echo "-- ------------------------------------------" > {destfile}
-    echo "-- Empty db schema, with _migrations tracked." >> {destfile}
-    echo "-- Generated from 'inv db.export.empty'" >> {destfile}
-    echo "-- ------------------------------------------" >> {destfile}
-    echo "" >> {destfile}
-    sqlite3 data/test_lute.db .schema >> {destfile}
-    echo "" >> {destfile}
-    echo "-- -------------------------------------------" >> {destfile}
-    echo "-- Migrations that have already been applied" >> {destfile}
-    sqlite3 ../lute_dev/data/test_lute.db ".dump _migrations" >> {destfile}
-    """
-    c.run(commands)
+
+    # Running the delete task before this one as a pre- step was
+    # causing problems (sqlite file not in correct state), so this
+    # asks the user to verify.
+    text = input(f'Have you **WIPED** the db?  (y/n): ')
+    if (text != 'y'):
+        print('quitting.')
+        return
+    _do_schema_export(c, 'empty.sql', 'EMPTY DB.', 'db.export.empty')
 
 
 @task(help={'suffix': 'suffix to add to filename.'})
