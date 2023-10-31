@@ -6,8 +6,6 @@ import os
 import yaml
 import pytest
 
-from sqlalchemy import text
-
 from lute.app_config import AppConfig
 from lute.db import db
 import lute.db.demo

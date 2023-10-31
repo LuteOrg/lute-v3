@@ -13,12 +13,11 @@ invoke --help <cmd>    # See docstrings and help notes
 """
 
 import os
+import subprocess
 from datetime import datetime
 import pytest
 from invoke import task, Collection
-
 from lute.app_config import AppConfig
-from lute.db.setup.main import setup_db
 
 
 @task
@@ -75,14 +74,30 @@ def search(c, search_for):
     c.run(f'{devscript} "{search_for}"')
 
 
+@task
+def accept(c):
+    """
+    Start lute on 9876, run tests/acceptance tests, screenshot fails.
+    """
+    run_test = [
+        'pytest',
+        'tests/acceptance',
+        '--splinter-screenshot-dir=tests/acceptance/failure_screenshots'
+    ]
+
+    app_process = subprocess.Popen(['python', '-m', 'tests.acceptance.start_acceptance_app'])
+    subprocess.run(run_test)
+    app_process.terminate()
+
+
 ns = Collection()
 ns.add_task(lint)
+ns.add_task(accept)
 ns.add_task(coverage)
 ns.add_task(todos)
 ns.add_task(start)
 ns.add_task(resetstart)
 ns.add_task(search)
-
 
 
 
