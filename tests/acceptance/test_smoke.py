@@ -25,9 +25,27 @@ class LuteBrowser:
 
         response = requests.get(f'{base_url}/dev_api/language_ids', timeout=5)
         self.language_ids = response.json()
-        print('got ids:')
-        print(self.language_ids)
 
+        self.start = time.process_time()
+        self.last_step = self.start
+
+    def elapsed(self, step):
+        """
+        Helper method for sorting out slowness.
+
+        For the step, gives elapsed time since start of
+        the LuteBrowser, and since the last recorded step.
+
+        To see this data, have to run the acc. tests with '-s', eg:
+
+        pytest tests/acceptance/test_smoke.py --port=5000 -s
+        """
+        now = time.process_time()
+        since_start = now - self.start
+        print(step)
+        print(f'total elapsed: {since_start}')
+        print(f'since last:    {now - self.last_step}')
+        self.last_step = now
 
     def visit(self, suburl):
         "Visit a sub url under the base."
@@ -66,22 +84,31 @@ class LuteBrowser:
 
     def click_word_fill_form(self, word, updates = {}):
         elements = self.browser.find_by_xpath('//span[contains(@class, "textitem")]')
+        self.elapsed('get elements')
         es = [ e for e in elements if e.text == word ]
         assert len(es) > 0, f'match for {word}'
+        self.elapsed('got match')
         es[0].click()
+        self.elapsed('click')
         with self.browser.get_iframe('wordframe') as iframe:
+            self.elapsed('get iframe')
             if 'translation' in updates:
                 iframe.find_by_css('#translation').fill(updates['translation'])
+                self.elapsed('translation')
             if 'parents' in updates:
                 for p in updates['parents']:
                     xp = 'ul#parentslist li.tagit-new > input.ui-autocomplete-input'
                     tagitbox = iframe.find_by_css(xp)
                     assert len(tagitbox) == 1, 'have parent input'
                     box = tagitbox.first
-                    box.type(p)
+                    self.elapsed('found tagitbox')
+                    box.type(p, slowly=False)
                     box.type(Keys.RETURN)
+                    self.elapsed('sent typing')
                     time.sleep(0.1) # seconds
+            self.elapsed('done updates')
             iframe.find_by_css('#submit').first.click()
+            self.elapsed('clicked submit')
 
         # Have to refresh the content to query the dom ...
         # Unfortunately, I can't see how to refresh without reloading
@@ -120,11 +147,14 @@ def test_create_book(browser, luteclient):
     assert browser.is_text_present('Hola')
     assert 'Hola/. /Adios/ /amigo/.' == luteclient.displayed_text()
 
+    luteclient.elapsed('created book')
     updates = {
         'translation': 'hello',
         'parents': [ 'adios', 'amigo' ]
     }
     luteclient.click_word_fill_form('Hola', updates)
+    luteclient.elapsed('updated Hola')
+    luteclient.click_word_fill_form('Adios', { 'translation': 'goodbye' })
 
     displayed = luteclient.displayed_text(LuteBrowser.text_and_status_renderer)
     assert 'Hola (1)/. /Adios (1)/ /amigo (1)/.' == displayed
