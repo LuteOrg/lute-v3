@@ -61,6 +61,12 @@ def fixture_config():
 def fixture_app(testconfig):
     """
     A clean instance of the demo database.
+
+    I'm not a _huge_ fan of this because if the app
+    is open while tests are running, the app seems to hold
+    on to references to the old deleted db ...
+    that said, it's much faster to do this than to do a
+    "wipe and reload database" on every test run.
     """
     if os.path.exists(testconfig.dbfilename):
         os.unlink(testconfig.dbfilename)
@@ -84,24 +90,9 @@ def fixture_app_context(app):
 @pytest.fixture(name="empty_db")
 def fixture_empty_db(app_context):
     """
-    Empty the db in ref. integrity order.
-    Keep settings.
+    Wipe the db.
     """
-    tables = [
-        "booktags", "wordtags",
-        "tags", "tags2",
-
-        "sentences", "texts", "bookstats",
-        "books",
-
-        "wordparents", "wordimages", "wordflashmessages",
-        "words",
-
-        "languages"
-    ]
-    with db.engine.begin() as conn:
-        for t in tables:
-            conn.execute(text(f"delete from {t}"))
+    lute.db.management.delete_all_data()
 
 
 @pytest.fixture(name = "client")
