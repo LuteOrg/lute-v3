@@ -66,6 +66,15 @@ python `pwd`/dev.py
 
 ## Testing
 
+Testing is done with pytest and pytest-bdd.  Run them as usual:
+
+```
+pytest
+pytest -s
+pytest -k test_setup
+pytest -m somemark
+```
+
 ### Config
 
 For tests, the config/config.yml must have:
@@ -73,15 +82,14 @@ For tests, the config/config.yml must have:
 * `DBNAME` set to `test_<something>.db`
 * `DATAPATH` set to some existing folder
 
-### Commands
+## Commands
 
 ```
 inv lint
-inv test   # Run all
-inv test --print   # Run all and see any print statements
-inv test --args="-k test_setup"   # Run specific
 inv coverage   # Coverage
 ```
+
+See `inv --list` for commands.
 
 ## TODOs
 
@@ -98,25 +106,24 @@ Todos are in the code as comments, e.g.:
 lute
 
 Group: <None>
-  File: ./language.py
-    # TODO:better_integrity_error - currently shows raw message.
-  ...
-  
-Group: book
-  File: ./templates/index.html
-    <p>TODO book: book listing</p>
+  ./read/render/renderable_calculator.py            :  Data structure for template read/textitem.html (TODO confirm template name)
+  ./read/routes.py                                  :  # TODO: term form: ensure reading pane can create form with "." character
+  ./models/book.py                                  :  todo for the future.
+  ./templates/index.html                            :  <li style="color: grey;">Version and software info - TODO</li>
+  ./templates/term/_form.html                       :  // TODO acceptance tests; need to check interactions.  Painful.
+  ./templates/term/_form.html                       :  // TODO term form autofocus - check if used.
+  ./templates/term/_form.html                       :  // TODO:fix_language_dict_asterisk
+  ./templates/book/tablelisting.html                :  // TODO:security - add CSRF token
+  ./templates/termtag/index.html                    :  // TODO:security - add CSRF token
 
-Group: something
-  File: ./app_config.py
-    # TODO something: fix this
+Group: js data
+  ./templates/base.html                             :  <!-- TODO js data: STATUS TAGS TEXTTAGS -->
 
------------------
-tests
+Group: misc
+  ./templates/base.html                             :  <!-- TODO misc: custom styles: add link -->
 
-Group: <None>
-  File: ./e2e/test_smoke.py
-    '/': [ 'Lute' ],  # TODO:add_Tutorial_check
-    '/': [ 'Lute' ],  # TODO:add_no_books_check
+Group: parsers
+  ./language/forms.py                               :  # TODO parsers: use the parser registry to load the select.
 ```
 
 Keeping the TODOs standard simplifies the grepping, grouping, etc.

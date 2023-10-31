@@ -5,8 +5,6 @@ Ref https://docs.pyinvoke.org/en/stable/index.html
 
 Samples:
 
-invoke test
-invoke test --print --args="-k test_main"
 invoke lint
 invoke coverage --html
 
@@ -29,25 +27,6 @@ def lint(c):
     # Formats: https://pylint.pycqa.org/en/latest/user_guide/usage/output.html
     msgfmt = "--msg-template='{path} ({line:03d}): {msg} ({msg_id} {symbol})'"
     c.run(f"pylint {msgfmt} lute/ tests/")
-
-@task(help={'args': 'test arguments', 'print': 'include print statements'})
-def test(c, args=None, print=False):
-    """
-    Run pytest.
-    
-    Sample calls:
-
-    inv test
-    inv test --args="-k test_main"
-    inv test -a "-k test_main"
-    inv test --print
-    """
-    runargs = [ 'tests' ]
-    if args is not None:
-        runargs.append(args)
-    if print is True:
-        runargs.append('-s')
-    pytest.main(runargs)
 
 
 @task(help={'html': 'open html report'})
@@ -98,7 +77,6 @@ def search(c, search_for):
 
 ns = Collection()
 ns.add_task(lint)
-ns.add_task(test)
 ns.add_task(coverage)
 ns.add_task(todos)
 ns.add_task(start)
