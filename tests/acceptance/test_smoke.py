@@ -26,7 +26,7 @@ class LuteBrowser:
         response = requests.get(f'{base_url}/dev_api/language_ids', timeout=5)
         self.language_ids = response.json()
 
-        self.start = time.process_time()
+        self.start = time.perf_counter()
         self.last_step = self.start
 
     def elapsed(self, step):
@@ -40,7 +40,7 @@ class LuteBrowser:
 
         pytest tests/acceptance/test_smoke.py --port=5000 -s
         """
-        now = time.process_time()
+        now = time.perf_counter()
         since_start = now - self.start
         print(step)
         print(f'total elapsed: {since_start}')
@@ -84,31 +84,22 @@ class LuteBrowser:
 
     def click_word_fill_form(self, word, updates = {}):
         elements = self.browser.find_by_xpath('//span[contains(@class, "textitem")]')
-        self.elapsed('get elements')
         es = [ e for e in elements if e.text == word ]
         assert len(es) > 0, f'match for {word}'
-        self.elapsed('got match')
         es[0].click()
-        self.elapsed('click')
         with self.browser.get_iframe('wordframe') as iframe:
-            self.elapsed('get iframe')
             if 'translation' in updates:
                 iframe.find_by_css('#translation').fill(updates['translation'])
-                self.elapsed('translation')
             if 'parents' in updates:
                 for p in updates['parents']:
                     xp = 'ul#parentslist li.tagit-new > input.ui-autocomplete-input'
                     tagitbox = iframe.find_by_css(xp)
                     assert len(tagitbox) == 1, 'have parent input'
                     box = tagitbox.first
-                    self.elapsed('found tagitbox')
                     box.type(p, slowly=False)
                     box.type(Keys.RETURN)
-                    self.elapsed('sent typing')
                     time.sleep(0.1) # seconds
-            self.elapsed('done updates')
             iframe.find_by_css('#submit').first.click()
-            self.elapsed('clicked submit')
 
         # Have to refresh the content to query the dom ...
         # Unfortunately, I can't see how to refresh without reloading
@@ -116,7 +107,7 @@ class LuteBrowser:
 
 
 @pytest.fixture(name='luteclient')
-def fixture_lute_client(request, browser):
+def fixture_lute_client(request, chromebrowser):
     """
     Start the lute browser.
     """
@@ -126,34 +117,32 @@ def fixture_lute_client(request, browser):
         # pytest tests/acceptance --port=1234
         # Acceptance tests run using 'inv accept' sort this out automatically.
         pytest.exit("--port not set")
-    c = LuteBrowser(browser, f'http://localhost:{useport}/')
+    c = LuteBrowser(chromebrowser, f'http://localhost:{useport}/')
     yield c
 
 
-def test_hit_main_page(browser, request):
+def test_hit_main_page(chromebrowser, request):
     "Hit the main page, sanity check only."
     useport = request.config.getoption("--port")
     url = f"http://localhost:{useport}/"
-    browser.visit(url)
-    assert browser.is_text_present('Lute'), 'have main page.'
+    chromebrowser.visit(url)
+    assert chromebrowser.is_text_present('Lute'), 'have main page.'
 
 
-def test_create_book(browser, luteclient):
+def test_create_book(chromebrowser, luteclient):
     "Try creating a book."
     luteclient.visit('/')
-    assert browser.is_text_present('Lute'), 'have main page.'
+    assert chromebrowser.is_text_present('Lute'), 'have main page.'
     luteclient.make_book('Hola', 'Hola. Adios amigo.', 'Spanish')
-    assert browser.title == 'Reading "Hola (1/1)"', 'title'
-    assert browser.is_text_present('Hola')
+    assert chromebrowser.title == 'Reading "Hola (1/1)"', 'title'
+    assert chromebrowser.is_text_present('Hola')
     assert 'Hola/. /Adios/ /amigo/.' == luteclient.displayed_text()
 
-    luteclient.elapsed('created book')
     updates = {
         'translation': 'hello',
         'parents': [ 'adios', 'amigo' ]
     }
     luteclient.click_word_fill_form('Hola', updates)
-    luteclient.elapsed('updated Hola')
     luteclient.click_word_fill_form('Adios', { 'translation': 'goodbye' })
 
     displayed = luteclient.displayed_text(LuteBrowser.text_and_status_renderer)

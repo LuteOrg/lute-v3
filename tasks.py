@@ -75,8 +75,12 @@ def search(c, search_for):
     c.run(f'{devscript} "{search_for}"')
 
 
-@task(help={'port': 'optional port to run on; creates server if needed.'})
-def accept(c, port=None):
+@task(help={
+    'port': 'optional port to run on; creates server if needed.',
+    'show': 'print data',
+    'headless': 'run as headless'
+})
+def accept(c, port=None, show=False, headless=False):
     """
     Start lute on 9876, run tests/acceptance tests, screenshot fails.
 
@@ -111,8 +115,15 @@ def accept(c, port=None):
         'pytest',
         'tests/acceptance',
         '--splinter-screenshot-dir=tests/acceptance/failure_screenshots',
-        f'--port={useport}'
+        '--splinter-webdriver=chrome',
+        f'--port={useport}',
     ]
+
+    if show:
+        run_test.append('-s')
+    if headless:
+        run_test.append('--headless')
+
     if site_running:
         c.run(' '.join(run_test))
     else:
