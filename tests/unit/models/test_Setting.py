@@ -45,7 +45,7 @@ def test_get_backup_settings(app_context):
     b = Setting.get_backup_settings()
     assert isinstance(b, Setting.BackupSettings)
     assert b.backup_dir == 'blah'
-    assert b.backup_auto is True  # initial default
+    assert b.backup_auto is False  # initial defaults
     assert b.backup_warn is False
     assert b.backup_count == 12
     assert b.last_backup_datetime is None
