@@ -49,13 +49,11 @@ def tutorial_book_id():
     return int(r[0])
 
 
-def delete_all_data():
+def delete_demo_data():
     """
-    Deletes all the data (except settings), but throws if IsDemoData is not set.
+    If this is a demo, wipe everything.
     """
     if not contains_demo_data():
         raise RuntimeError("Can't delete non-demo data.")
-
     remove_flag()
-
     lute.db.management.delete_all_data()

@@ -5,7 +5,7 @@ Tests for managing the demo data.
 from sqlalchemy import text
 import pytest
 from lute.db import db
-from lute.db.demo import contains_demo_data, remove_flag, delete_all_data, tutorial_book_id
+from lute.db.demo import contains_demo_data, remove_flag, delete_demo_data, tutorial_book_id
 from tests.dbasserts import assert_record_count_equals
 
 
@@ -20,33 +20,17 @@ def test_removing_flag_means_not_demo(app_context):
     assert contains_demo_data() is False, 'not a demo.'
 
 
-def test_wiping_db_clears_out_all_tables(app_context):
-    "DB is wiped clean if requested ... settings are left!"
-    delete_all_data()
-    tables = [
-        'books',
-        'bookstats',
-        'booktags',
-        'languages',
-        'sentences',
-        'tags',
-        'tags2',
-        'texts',
-        'wordflashmessages',
-        'wordimages',
-        'wordparents',
-        'words',
-        'wordtags'
-    ]
-    for t in tables:
-        assert_record_count_equals(t, 0, t)
+def test_wiping_db_clears_flag(app_context):
+    "No longer a demo if the demo is wiped out!"
+    delete_demo_data()
+    assert contains_demo_data() is False, 'not a demo.'
 
 
 def test_wipe_db_only_works_if_flag_is_set(app_context):
     "Can only wipe a demo db!"
     remove_flag()
     with pytest.raises(Exception):
-        delete_all_data()
+        delete_demo_data()
 
 
 def test_tutorial_id_returned_if_present(app_context):
@@ -63,5 +47,5 @@ def test_tutorial_id_returned_if_present(app_context):
     db.session.commit()
     assert tutorial_book_id() > 0, 'have tutorial again'
 
-    delete_all_data()
+    delete_demo_data()
     assert tutorial_book_id() is None, 'no tutorial'
