@@ -15,7 +15,7 @@ safeguards, so they can only be run against a test_ db.
 """
 
 from sqlalchemy import text
-from flask import Blueprint, jsonify, redirect, flash
+from flask import Blueprint, request, Response, jsonify, redirect, flash
 from lute.app_config import AppConfig
 from lute.models.language import Language
 from lute.db import db
@@ -51,9 +51,14 @@ def load_demo():
 
 @bp.route('/load_demo_languages', methods=['GET'])
 def load_demo_languages():
-    "Clean out everything, and load the demo langs only."
+    "Clean out everything, and load the demo langs with dummy dictionaries."
     lute.db.management.delete_all_data()
     lute.db.demo.load_demo_languages()
+    langs = db.session.query(Language).all()
+    for lang in langs:
+        lang.dict_1_uri = f'/dev_api/dummy_dict/{lang.name}/###'
+        db.session.add(lang)
+    db.session.commit()
     return redirect('/', 302)
 
 @bp.route('/language_ids', methods=['GET'])
@@ -90,3 +95,8 @@ def sql_result(sql):
         content.append('; '.join(map(str, rowvals)))
 
     return jsonify(content)
+
+@bp.route('/dummy_dict/<string:langname>/<string:term>', methods=['GET'])
+def dummy_language_dict(langname, term):
+    "Fake language dictionary/term lookup."
+    return Response(f'dev_api/dummy_dict/{langname}/{term}')
