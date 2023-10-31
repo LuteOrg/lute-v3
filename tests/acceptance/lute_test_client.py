@@ -113,7 +113,8 @@ class LuteTestClient:
 
 
     def press_hotkey(self, hotkey):
-        "Send a hotkey on the element."
+        "Send a hotkey on the active element."
+        assert self.active_element is not None, 'have element'
         map_to_js_keycode = {
             '1': 49,
             '2': 50,
@@ -127,16 +128,16 @@ class LuteTestClient:
         }
         jscode = map_to_js_keycode[hotkey.lower()]
         shift_pressed = 'true' if hotkey in [ 'C', 'T' ] else 'false'
-        script = f"""
-        var element = arguments[0];
-        var event = new Event('keydown');
-        event.keyCode = {jscode};
-        event.shiftKey = {shift_pressed};
-        element.dispatchEvent(event);
-        """
-        print(script)
+
+        # This was the only way I could get this to work:
+        script = f"""jQuery.event.trigger({{
+          type: 'keydown',
+          which: {jscode},
+          shiftKey: '{shift_pressed}'
+        }});"""
         self.browser.execute_script(script, self.active_element._element)
-        time.sleep(5)
+        time.sleep(0.2)  # Or it's too fast.
+        # print(script)
         # Have to refresh the content to query the dom ...
         # Unfortunately, I can't see how to refresh without reloading
         self.browser.reload()

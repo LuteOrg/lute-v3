@@ -400,6 +400,9 @@ function handle_keydown (e) {
     return; // Nothing to do.
   }
 
+  console.log('keydown:');
+  console.log(e)
+
   // Map of key codes (e.which) to lambdas:
   let map = {};
 
