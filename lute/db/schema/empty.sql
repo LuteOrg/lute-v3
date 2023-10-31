@@ -1,12 +1,40 @@
 -- ------------------------------------------
--- Empty db schema, with _migrations tracked.
+-- EMPTY DB.
+-- Migrations tracked in _migrations, settings reset.
 -- Generated from 'inv db.export.empty'
 -- ------------------------------------------
 
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS "_migrations" (
 	"filename" VARCHAR(255) NOT NULL  ,
 	PRIMARY KEY ("filename")
 );
+INSERT INTO _migrations VALUES('20230409_224327_load_statuses.sql');
+INSERT INTO _migrations VALUES('20230414_225828_add_texttokens_TokTextLC.sql');
+INSERT INTO _migrations VALUES('20230428_224656_create_wordflashmessages_table.sql');
+INSERT INTO _migrations VALUES('20230518_190000_remove_old_words_fields.sql');
+INSERT INTO _migrations VALUES('20230519_194627_add_TxDateRead.sql');
+INSERT INTO _migrations VALUES('20230621_010000_drop_texttags_table.sql');
+INSERT INTO _migrations VALUES('20230621_224416_fk_01_booktags.sql');
+INSERT INTO _migrations VALUES('20230621_224416_fk_02_wordtags.sql');
+INSERT INTO _migrations VALUES('20230621_224416_fk_03_sentences.sql');
+INSERT INTO _migrations VALUES('20230621_224416_fk_04_texttokens.sql');
+INSERT INTO _migrations VALUES('20230621_224416_fk_05_texts.sql');
+INSERT INTO _migrations VALUES('20230621_224416_fk_06_bookstats.sql');
+INSERT INTO _migrations VALUES('20230621_224416_fk_07_termimages.sql');
+INSERT INTO _migrations VALUES('20230621_224416_fk_08_wordflashmessages.sql');
+INSERT INTO _migrations VALUES('20230621_224416_fk_09_wordparents.sql');
+INSERT INTO _migrations VALUES('20230621_224416_fk_10_words.sql');
+INSERT INTO _migrations VALUES('20230621_224416_fk_11_books.sql');
+INSERT INTO _migrations VALUES('20230623_234104_drop_TxTitle.sql');
+INSERT INTO _migrations VALUES('20230624_182104_drop_index_TxBkIDTxOrder.sql');
+INSERT INTO _migrations VALUES('20230818_201200_add_BkWordCount.sql');
+INSERT INTO _migrations VALUES('20230819_044107_drop_texttokens.sql');
+INSERT INTO _migrations VALUES('20230819_050036_vacuum.sql');
+INSERT INTO _migrations VALUES('20230827_052154_allow_multiple_word_parents.sql');
+INSERT INTO _migrations VALUES('20231018_211236_remove_excess_texts_fields.sql');
+INSERT INTO _migrations VALUES('20231029_092851_create_migration_settings.sql');
 CREATE TABLE IF NOT EXISTS "languages" (
 	"LgID" INTEGER NOT NULL  ,
 	"LgName" VARCHAR(40) NOT NULL  ,
@@ -29,12 +57,26 @@ CREATE TABLE IF NOT EXISTS "settings" (
 	"StValue" VARCHAR(40) NULL  ,
 	PRIMARY KEY ("StKey")
 );
+INSERT INTO settings VALUES('backup_enabled',NULL);
+INSERT INTO settings VALUES('backup_auto',NULL);
+INSERT INTO settings VALUES('backup_warn',NULL);
+INSERT INTO settings VALUES('backup_dir',NULL);
+INSERT INTO settings VALUES('backup_count',NULL);
+INSERT INTO settings VALUES('IsDemoData',NULL);
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
 	"StAbbreviation" VARCHAR(5) NOT NULL  ,
 	PRIMARY KEY ("StID")
 );
+INSERT INTO statuses VALUES(0,'Unknown','?');
+INSERT INTO statuses VALUES(1,'New (1)','1');
+INSERT INTO statuses VALUES(2,'New (2)','2');
+INSERT INTO statuses VALUES(3,'Learning (3)','3');
+INSERT INTO statuses VALUES(4,'Learning (4)','4');
+INSERT INTO statuses VALUES(5,'Learned','5');
+INSERT INTO statuses VALUES(98,'Ignored','Ign');
+INSERT INTO statuses VALUES(99,'Well Known','WKn');
 CREATE TABLE IF NOT EXISTS "tags" (
 	"TgID" INTEGER NOT NULL  ,
 	"TgText" VARCHAR(20) NOT NULL  ,
@@ -155,37 +197,4 @@ BEGIN
     SET WoStatusChanged = CURRENT_TIMESTAMP
     WHERE WoID = NEW.WoID;
 END;
-
--- -------------------------------------------
--- Migrations that have already been applied
-PRAGMA foreign_keys=OFF;
-BEGIN TRANSACTION;
-CREATE TABLE IF NOT EXISTS "_migrations" (
-	"filename" VARCHAR(255) NOT NULL  ,
-	PRIMARY KEY ("filename")
-);
-INSERT INTO _migrations VALUES('20230409_224327_load_statuses.sql');
-INSERT INTO _migrations VALUES('20230414_225828_add_texttokens_TokTextLC.sql');
-INSERT INTO _migrations VALUES('20230428_224656_create_wordflashmessages_table.sql');
-INSERT INTO _migrations VALUES('20230518_190000_remove_old_words_fields.sql');
-INSERT INTO _migrations VALUES('20230519_194627_add_TxDateRead.sql');
-INSERT INTO _migrations VALUES('20230621_010000_drop_texttags_table.sql');
-INSERT INTO _migrations VALUES('20230621_224416_fk_01_booktags.sql');
-INSERT INTO _migrations VALUES('20230621_224416_fk_02_wordtags.sql');
-INSERT INTO _migrations VALUES('20230621_224416_fk_03_sentences.sql');
-INSERT INTO _migrations VALUES('20230621_224416_fk_04_texttokens.sql');
-INSERT INTO _migrations VALUES('20230621_224416_fk_05_texts.sql');
-INSERT INTO _migrations VALUES('20230621_224416_fk_06_bookstats.sql');
-INSERT INTO _migrations VALUES('20230621_224416_fk_07_termimages.sql');
-INSERT INTO _migrations VALUES('20230621_224416_fk_08_wordflashmessages.sql');
-INSERT INTO _migrations VALUES('20230621_224416_fk_09_wordparents.sql');
-INSERT INTO _migrations VALUES('20230621_224416_fk_10_words.sql');
-INSERT INTO _migrations VALUES('20230621_224416_fk_11_books.sql');
-INSERT INTO _migrations VALUES('20230623_234104_drop_TxTitle.sql');
-INSERT INTO _migrations VALUES('20230624_182104_drop_index_TxBkIDTxOrder.sql');
-INSERT INTO _migrations VALUES('20230818_201200_add_BkWordCount.sql');
-INSERT INTO _migrations VALUES('20230819_044107_drop_texttokens.sql');
-INSERT INTO _migrations VALUES('20230819_050036_vacuum.sql');
-INSERT INTO _migrations VALUES('20230827_052154_allow_multiple_word_parents.sql');
-INSERT INTO _migrations VALUES('20231018_211236_remove_excess_texts_fields.sql');
 COMMIT;
