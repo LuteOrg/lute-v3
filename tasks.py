@@ -14,6 +14,7 @@ invoke --help <cmd>    # See docstrings and help notes
 
 import os
 import subprocess
+import requests
 from datetime import datetime
 import pytest
 from invoke import task, Collection
@@ -74,20 +75,50 @@ def search(c, search_for):
     c.run(f'{devscript} "{search_for}"')
 
 
-@task
-def accept(c):
+@task(help={'port': 'optional port to run on; creates server if needed.'})
+def accept(c, port=None):
     """
     Start lute on 9876, run tests/acceptance tests, screenshot fails.
+
+    If no port specified, use the port in the app config.
+
+    If port is specified, and Lute's not running on that port,
+    start a server.
     """
+    ac = AppConfig.create_from_config()
+    if ac.is_test_db is False:
+        raise ValueError('not a test db')
+
+    useport = port
+    if useport is None:
+        useport = ac.port
+
+    url = f'http://localhost:{useport}'
+    site_running = False
+    try:
+        print(f'checking for site at {url} ...')
+        resp = requests.get(url)
+        if resp.status_code != 200:
+            raise RuntimeError(f'Got code {resp.status_code} ... ???')
+        print('Site running, using that for tests.')
+        print()
+        site_running = True
+    except requests.exceptions.ConnectionError:
+        print(f"URL {url} not reachable, will start new server at that port.")
+        print()
+
     run_test = [
         'pytest',
         'tests/acceptance',
-        '--splinter-screenshot-dir=tests/acceptance/failure_screenshots'
+        '--splinter-screenshot-dir=tests/acceptance/failure_screenshots',
+        f'--port={useport}'
     ]
-
-    app_process = subprocess.Popen(['python', '-m', 'tests.acceptance.start_acceptance_app'])
-    subprocess.run(run_test)
-    app_process.terminate()
+    if site_running:
+        c.run(' '.join(run_test))
+    else:
+        app_process = subprocess.Popen(['python', '-m', 'tests.acceptance.start_acceptance_app', useport])
+        subprocess.run(run_test)
+        app_process.terminate()
 
 
 ns = Collection()

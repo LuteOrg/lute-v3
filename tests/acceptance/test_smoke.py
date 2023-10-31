@@ -89,17 +89,24 @@ class LuteBrowser:
 
 
 @pytest.fixture(name='luteclient')
-def fixture_lute_client(browser):
+def fixture_lute_client(request, browser):
     """
     Start the lute browser.
     """
-    c = LuteBrowser(browser, 'http://localhost:9876/')
+    useport = request.config.getoption("--port")
+    if useport is None:
+        # Need to specify the port, e.g.
+        # pytest tests/acceptance --port=1234
+        # Acceptance tests run using 'inv accept' sort this out automatically.
+        pytest.exit("--port not set")
+    c = LuteBrowser(browser, f'http://localhost:{useport}/')
     yield c
 
 
-def test_hit_main_page(browser):
+def test_hit_main_page(browser, request):
     "Hit the main page, sanity check only."
-    url = "http://localhost:9876/"
+    useport = request.config.getoption("--port")
+    url = f"http://localhost:{useport}/"
     browser.visit(url)
     assert browser.is_text_present('Lute'), 'have main page.'
 

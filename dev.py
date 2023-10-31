@@ -27,4 +27,4 @@ print()
 
 app = init_db_and_app(app_config)
 
-app.run(debug=True)
+app.run(debug=True, port=app_config.port)
