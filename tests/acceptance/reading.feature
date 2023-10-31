@@ -7,14 +7,14 @@ Feature: User can actually read and stuff.
         And demo languages
 
     Scenario: Book elements are rendered correctly
-        When I create a Spanish book "Hola" with content:
+        Given a Spanish book "Hola" with content:
             Hola. Adios amigo.
         Then the page title is Reading "Hola (1/1)"
         And the reading pane shows:
             Hola/. /Adios/ /amigo/.
 
     Scenario: Updating term status updates the reading frame
-        When I create a Spanish book "Hola" with content:
+        Given a Spanish book "Hola" with content:
             Hola. Adios amigo.
         Then the page title is Reading "Hola (1/1)"
         And the reading pane shows:
@@ -24,3 +24,10 @@ Feature: User can actually read and stuff.
             status: 2
         Then the reading pane shows:
             Hola (2)/. /Adios/ /amigo/.
+
+    Scenario: Pressing a hotkey updates a term's status
+        Given a Spanish book "Hola" with content:
+            Hola. Adios amigo.
+        When I click "Hola" and press hotkey 1
+        Then the reading pane shows:
+            Hola (1)/. /Adios/ /amigo/.

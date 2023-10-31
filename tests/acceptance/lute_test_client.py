@@ -33,6 +33,9 @@ class LuteTestClient:
         self.start = time.perf_counter()
         self.last_step = self.start
 
+        # click_word activates the element for hotkey sendkeys.
+        self.active_element = None
+
     def elapsed(self, step):
         """
         Helper method for sorting out slowness.
@@ -99,14 +102,50 @@ class LuteTestClient:
         etext = [ token_renderer(e) for e in elements ]
         return '/'.join(etext)
 
+    def click_word(self, word):
+        "Click a word in the reading frame."
+        elements = self.browser.find_by_xpath('//span[contains(@class, "textitem")]')
+        es = [ e for e in elements if e.text == word ]
+        assert len(es) > 0, f'match for {word}'
+        el = es[0]
+        self.active_element = el
+        el.click()
+
+
+    def press_hotkey(self, hotkey):
+        "Send a hotkey on the element."
+        map_to_js_keycode = {
+            '1': 49,
+            '2': 50,
+            '3': 51,
+            '4': 52,
+            '5': 53,
+            'i': 73,
+            'w': 87,
+            'c': 67,
+            't': 84
+        }
+        jscode = map_to_js_keycode[hotkey.lower()]
+        shift_pressed = 'true' if hotkey in [ 'C', 'T' ] else 'false'
+        script = f"""
+        var element = arguments[0];
+        var event = new Event('keydown');
+        event.keyCode = {jscode};
+        event.shiftKey = {shift_pressed};
+        element.dispatchEvent(event);
+        """
+        print(script)
+        self.browser.execute_script(script, self.active_element._element)
+        time.sleep(5)
+        # Have to refresh the content to query the dom ...
+        # Unfortunately, I can't see how to refresh without reloading
+        self.browser.reload()
+
     def click_word_fill_form(self, word, updates = None):
         """
         Click a word in the reading frame, fill in the term form iframe.
         """
-        elements = self.browser.find_by_xpath('//span[contains(@class, "textitem")]')
-        es = [ e for e in elements if e.text == word ]
-        assert len(es) > 0, f'match for {word}'
-        es[0].click()
+        self.click_word(word)
         updates = updates or {}
         with self.browser.get_iframe('wordframe') as iframe:
             if 'status' in updates:
