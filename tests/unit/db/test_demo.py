@@ -5,7 +5,9 @@ Tests for managing the demo data.
 from sqlalchemy import text
 import pytest
 from lute.db import db
-from lute.db.demo import contains_demo_data, remove_flag, delete_demo_data, tutorial_book_id
+from lute.db.demo import contains_demo_data, remove_flag, \
+    delete_demo_data, tutorial_book_id, \
+    load_demo_data
 from tests.dbasserts import assert_record_count_equals
 
 
@@ -49,3 +51,22 @@ def test_tutorial_id_returned_if_present(app_context):
 
     delete_demo_data()
     assert tutorial_book_id() is None, 'no tutorial'
+
+
+def test_load_demo_loads_language_yaml_files(app_context):
+    "All data is loaded, spot check some."
+    delete_demo_data()
+    assert contains_demo_data() is False, 'not a demo.'
+    assert_record_count_equals('languages', 0, 'wiped out')
+
+    load_demo_data()
+    assert contains_demo_data() is True, 'demo loaded'
+    checks = [
+        "select * from languages where LgName = 'English'",
+        "select * from books where BkTitle = 'Tutorial'"
+    ]
+    for c in checks:
+        assert_record_count_equals(c, 1, 'got data')
+
+
+# unsupported

@@ -57,3 +57,9 @@ def delete_demo_data():
         raise RuntimeError("Can't delete non-demo data.")
     remove_flag()
     lute.db.management.delete_all_data()
+
+
+def load_demo_data():
+    """
+    Load the data.
+    """
