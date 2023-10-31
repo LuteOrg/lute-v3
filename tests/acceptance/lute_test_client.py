@@ -64,13 +64,19 @@ class LuteTestClient:
         return t.text
 
     def text_and_status_renderer(t):
+        ret = t.text
+
         classes = t['class'].split(' ')
         status_class = [c for c in classes if c.startswith('status')]
         if len(status_class) == 0:
-            return t.text
+            return ret
         assert len(status_class) == 1, f'should only have 1 status on {t.text}'
+
         status = status_class[0].replace('status', '')
-        return f'{t.text} ({status})'
+        if status != '0':
+            ret = f'{ret} ({status})'
+        return ret
+
 
     def displayed_text(self, token_renderer = default_parsed_token_renderer):
         "Return the TextItems, with '/' at token boundaries."
