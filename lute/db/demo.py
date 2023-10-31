@@ -130,8 +130,12 @@ def predefined_languages():
     return langs
 
 
-def _load_demo_languages():
-    "Load predefined languages.  Assume everything is supported."
+def load_demo_languages():
+    """
+    Load predefined languages.  Assume everything is supported.
+
+    This method will also be called during acceptance tests, so it's "public".
+    """
     for lang in predefined_languages():
         db.session.add(lang)
     db.session.commit()
@@ -165,7 +169,7 @@ def load_demo_data():
     """
     Load the data.
     """
-    _load_demo_languages()
+    load_demo_languages()
     _load_demo_stories()
     Setting.set_value('IsDemoData', True)
     db.session.commit()

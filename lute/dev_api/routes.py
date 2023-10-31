@@ -1,0 +1,92 @@
+"""
+Development-only routes.
+
+These routes are accessed during acceptance tests.
+The acceptance tests don't have easy access to
+the db model ... at least, as far as I can tell ...
+so this is a quick-and-easy way to set some test
+data state.
+
+If there's a better way to manage this, I'll change
+this.
+
+These are dangerous methods that hack on the db data without
+safeguards, so they can only be run against a test_ db.
+"""
+
+from sqlalchemy import text
+from flask import Blueprint, jsonify, redirect, flash
+from lute.app_config import AppConfig
+from lute.models.language import Language
+from lute.db import db
+import lute.db.management
+import lute.db.demo
+
+
+bp = Blueprint('dev_api', __name__, url_prefix='/dev_api')
+
+
+@bp.before_request
+def _ensure_is_test_db():
+    "These methods should only be run on a test db!"
+    ac = AppConfig.create_from_config()
+    if not ac.is_test_db:
+        raise RuntimeError("Dangerous method, only possible on test_lute database.")
+
+
+@bp.route('/wipe_db', methods=['GET'])
+def wipe_db():
+    "Clean it all."
+    lute.db.management.delete_all_data()
+    flash('db wiped')
+    return redirect('/', 302)
+
+@bp.route('/load_demo', methods=['GET'])
+def load_demo():
+    "Clean out everything, and load the demo."
+    lute.db.management.delete_all_data()
+    lute.db.demo.load_demo_data()
+    flash('demo loaded')
+    return redirect('/', 302)
+
+@bp.route('/load_demo_languages', methods=['GET'])
+def load_demo_languages():
+    "Clean out everything, and load the demo langs only."
+    lute.db.management.delete_all_data()
+    lute.db.demo.load_demo_languages()
+    return redirect('/', 302)
+
+@bp.route('/language_ids', methods=['GET'])
+def get_lang_ids():
+    "Get ids of all langs."
+    langs = db.session.query(Language).all()
+    ret = {}
+    for lang in langs:
+        ret[lang.name] = lang.id
+    return jsonify(ret)
+
+@bp.route('/delete_all_terms', methods=['GET'])
+def delete_all_terms():
+    "Delete all the terms only."
+    db.session.query(text("DELETE FROM words"))
+    db.session.commit()
+    flash('terms deleted')
+    return redirect('/', 302)
+
+@bp.route('/sqlresult/<string:sql>', methods=['GET'])
+def sql_result(sql):
+    "Get the sql result as json."
+    def clean_val(v):
+        if v is None:
+            return 'NULL'
+        if isinstance(v, str) and '\u200b' in v:
+            return v.replace('\u200b', '/')
+        return v
+
+    content = []
+    result = db.session.execute(text(sql)).all()
+    for row in result:
+        rowvals = [clean_val(v) for v in row]
+        content.append('; '.join(map(str, rowvals)))
+
+    return jsonify(content)
