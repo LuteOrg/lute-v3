@@ -122,7 +122,6 @@ class LuteTestClient:
     def click_word(self, word):
         "Click a word in the reading frame."
         self._get_element_for_word(word).click()
-        el.click()
 
     def shift_click_words(self, words):
         "Shift-click words."
