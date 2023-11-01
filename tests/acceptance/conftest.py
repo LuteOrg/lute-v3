@@ -21,8 +21,28 @@ def pytest_addoption(parser):
     parser.addoption("--headless", action='store_true', help="Run the test as headless")
 
 
+@pytest.fixture(name='_environment_check', scope='session')
+def fixture_env_check(request):
+    """
+    Sanity check that the site is up, port is set.
+    """
+    useport = request.config.getoption("--port")
+    if useport is None:
+        # Need to specify the port, e.g.
+        # pytest tests/acceptance --port=1234
+        # Acceptance tests run using 'inv accept' sort this out automatically.
+        pytest.exit("--port not set")
+
+    url = f'http://localhost:{useport}/'
+    try:
+        resp = requests.get(url)
+    except requests.exceptions.ConnectionError:
+        pytest.exit(f"Unable to reach {url} ... is it running?  Use inv accept to auto-start it")
+        print()
+
+
 @pytest.fixture(name='chromebrowser', scope='session')
-def session_chrome_browser(request):
+def session_chrome_browser(request, _environment_check):
     """
     Create a chrome browser.
 
@@ -60,13 +80,8 @@ def fixture_lute_client(request, chromebrowser):
     """
     Start the lute browser.
     """
-    useport = request.config.getoption("--port")
-    if useport is None:
-        # Need to specify the port, e.g.
-        # pytest tests/acceptance --port=1234
-        # Acceptance tests run using 'inv accept' sort this out automatically.
-        pytest.exit("--port not set")
-    c = LuteTestClient(chromebrowser, f'http://localhost:{useport}/')
+    url = f'http://localhost:{useport}/'
+    c = LuteTestClient(chromebrowser, url)
     yield c
 
 
