@@ -213,7 +213,7 @@ class RenderableCalculator:
 
     @staticmethod
     def get_renderable(lang, words, texttokens):
-        "Calls main, useless method?"  # TODO unused code: check?
+        "Convenience method, calls main."
         rc = RenderableCalculator()
         return rc.main(lang, words, texttokens)
 
@@ -393,7 +393,7 @@ class TextItem: # pylint: disable=too-many-instance-attributes
     """
     Unit to be rendered.
 
-    Data structure for template read/textitem.html (TODO confirm template name)
+    Data structure for template read/textitem.html
     """
 
     def __init__(self):

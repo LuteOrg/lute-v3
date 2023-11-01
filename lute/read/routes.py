@@ -109,7 +109,6 @@ def empty():
     return ''
 
 
-# TODO: term form: ensure reading pane can create form with "." character
 @bp.route('/termform/<int:langid>/<text>', methods=['GET', 'POST'])
 def term_form(langid, text):
     """

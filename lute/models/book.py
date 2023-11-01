@@ -122,12 +122,10 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         return db.session.query(Book).filter(Book.id == book_id).first()
 
 
+# TODO zzfuture fix: rename class and table to Page/pages
 class Text(db.Model):
     """
     Each page in a Book.
-
-    This class should really be named "Page" ...
-    todo for the future.
     """
     __tablename__ = 'texts'
 

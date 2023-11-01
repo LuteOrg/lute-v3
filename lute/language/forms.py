@@ -18,7 +18,6 @@ class LanguageForm(FlaskForm):
     show_romanization = BooleanField('Show Romanization field')
     right_to_left = BooleanField('Right-to-left')
 
-    # TODO parsers: use the parser registry to load the select.
     parser_type = SelectField(
         'Parse as',
         choices=supported_parsers().items())

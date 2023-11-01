@@ -60,7 +60,7 @@
           "searchable": false,
           "orderable": false,
           "render": function ( data, type, row, meta ) {
-            // TODO:security - add CSRF token
+            // TODO zzfuture fix: security - add CSRF token
             const tgid = row[3];
             return `<span id="deltermtag${tgid}" onclick="confirm_delete(${tgid})"><img src="{{ url_for('static', filename='/icn/minus-button.png') }}" title="Delete" /></span>`;
           }

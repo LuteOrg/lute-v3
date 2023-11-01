@@ -93,7 +93,7 @@
 
   // Preventing user navigating away by clicking on form parent tags.
   // Done with monitor_form and form_changed vars.
-  // TODO acceptance tests; need to check interactions.  Painful.
+  // TODO zzfuture fix: acceptance tests for all interactions
 
   // Only start monitoring the form for changes after everything has
   // been initialized.  Tagit calls before/afterTagAdded etc during
@@ -226,7 +226,7 @@
 
   };
 
-  // TODO term form autofocus - check if used.
+  // TODO zzfuture fix: check term autofocus
   // lute.js should send an "autofocus" flag, I believe.
   let handleAutofocus = function() {
     const wordfield = $('#text');
@@ -341,7 +341,7 @@
       return;
     }
 
-    // TODO:fix_language_dict_asterisk
+    // TODO zzfuture fix: fix_language_dict_asterisk
     // The URL shouldn not be prepended with trash
     // (e.g. "*http://" means "open an external window", while
     // "http://" means "this can be opened in an iframe."
