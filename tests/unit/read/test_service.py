@@ -19,6 +19,10 @@ def _run_scenario(language, content, expected_found):
     assert len(found_terms) == len(expected_found), 'found count'
     zws = '\u200B'  # zero-width space
     found_terms = [ t.text.replace(zws, '') for t in found_terms ]
+    assert found_terms is not None
+    assert expected_found is not None
+    found_terms.sort()
+    expected_found.sort()
     assert found_terms == expected_found
 
 
@@ -57,10 +61,16 @@ def test_english_find_all_in_string(english, app_context):
     _run_scenario(english, "This is the cat's pyjamas.", [ "the cat's pyjamas" ])
 
 
-# TODO turkish: add check
-# TODO japanese: add check
-# TODO chinese: add check
-# TODO arabic: add check
+def test_turkish_find_all_in_string(turkish, app_context):
+    "Finds terms, handling case conversion."
+    terms = [ "ışık", "için" ]
+    for term in terms:
+        t = Term(turkish, term)
+        db.session.add(t)
+    db.session.commit()
+
+    content = "Işık İçin."
+    _run_scenario(turkish, content, [ "ışık", "için" ])
 
 
 def test_smoke_get_paragraphs(spanish, app_context):
