@@ -35,7 +35,7 @@ def fixture_env_check(request):
 
     url = f'http://localhost:{useport}/'
     try:
-        resp = requests.get(url)
+        requests.get(url, timeout = 10)
     except requests.exceptions.ConnectionError:
         pytest.exit(f"Unable to reach {url} ... is it running?  Use inv accept to auto-start it")
         print()
