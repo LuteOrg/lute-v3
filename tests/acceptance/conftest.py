@@ -86,6 +86,12 @@ def fixture_lute_client(request, chromebrowser):
     yield c
 
 
+################################
+## STEP DEFS
+
+
+# Setup
+
 @when(parsers.parse('sleep for {seconds}'))
 def _sleep(seconds):
     "Hack helper."
@@ -98,6 +104,27 @@ def given_running_site(luteclient):
     assert resp.status_code == 200, f'{luteclient.home} is up'
     luteclient.visit('/')
     assert luteclient.browser.is_text_present('Lute')
+
+# Browsing
+
+@given(parsers.parse('I visit "{p}"'))
+def given_visit(luteclient, p):
+    "Go to a page."
+    luteclient.visit(p)
+
+@when(parsers.parse('I click the "{linktext}" link'))
+def when_click_link_text(luteclient, linktext):
+    luteclient.browser.links.find_by_text(linktext).click()
+
+@then(parsers.parse('the page title is {title}'))
+def then_title(luteclient, title):
+    assert luteclient.browser.title == title
+
+@then(parsers.parse('the page contains "{text}"'))
+def then_page_contains(luteclient, text):
+    assert text in luteclient.browser.html
+
+# Language
 
 @given('demo languages')
 def given_demo_langs_loaded(luteclient):
@@ -115,20 +142,62 @@ def given_update_language(luteclient, lang, content):
     updates = yaml.safe_load(content)
     luteclient.edit_language(lang, updates)
 
+# Books
+
 @given(parsers.parse('a {lang} book "{title}" with content:\n{c}'))
 def given_book(luteclient, lang, title, c):
     luteclient.make_book(title, c, lang)
-
-@given(parsers.parse('I visit "{p}"'))
-def given_visit(luteclient, p):
-    "Go to a page."
-    luteclient.visit(p)
 
 @given(parsers.parse('the book table loads "{title}"'))
 def given_book_table_wait(luteclient, title):
     "The book table is loaded via ajax, so there's a delay."
     _sleep(0.25)  # Hack!
     assert title in luteclient.browser.html
+
+@when(parsers.parse('I set the book table filter to "{filt}"'))
+def when_set_book_table_filter(luteclient, filt):
+    "Set the filter, wait a sec."
+    b = luteclient.browser
+    b.find_by_tag('input').fill(filt)
+    _sleep(0.25)
+
+@then(parsers.parse('the book table contains:\n{content}'))
+def check_book_table(luteclient, content):
+    "Check the table, e.g. content like 'Hola; Spanish; ; 4 (0%);'"
+    assert content == luteclient.get_book_table_content()
+
+# Reading
+
+@then(parsers.parse('the reading pane shows:\n{content}'))
+def then_read_content(luteclient, content):
+    "Check rendered content."
+    displayed = luteclient.displayed_text(LuteTestClient.text_and_status_renderer)
+    assert content == displayed
+
+@when(parsers.parse('I change the current text content to:\n{content}'))
+def when_change_content(luteclient, content):
+    "Change the content."
+    assert 'Reading' in luteclient.browser.title, 'sanity check'
+    b = luteclient.browser
+    b.find_by_id('editText').click()
+    b.find_by_id('text').fill(content)
+    b.find_by_id('submit').click()
+
+# Reading, terms
+
+@when(parsers.parse('I click "{word}" and edit the form:\n{content}'))
+def when_click_word_edit_form(luteclient, word, content):
+    "The content is assumed to be yaml."
+    updates = yaml.safe_load(content)
+    luteclient.click_word_fill_form(word, updates)
+
+@then(parsers.parse('the reading page term form frame contains "{text}"'))
+def then_reading_page_term_form_iframe_contains(luteclient, text):
+    "Have to get and read the iframe content, it's not in the main browser page."
+    with luteclient.browser.get_iframe('wordframe') as iframe:
+        assert text in iframe.html
+
+# Reading, word actions
 
 @when(parsers.parse('I click "{word}"'))
 def when_click_word(luteclient, word):
@@ -140,66 +209,11 @@ def shift_click_terms(luteclient, words):
     words = words.split("\n")
     luteclient.shift_click_words(words)
 
-@when(parsers.parse('I click "{word}" and edit the form:\n{content}'))
-def when_click_word_edit_form(luteclient, word, content):
-    "The content is assumed to be yaml."
-    updates = yaml.safe_load(content)
-    luteclient.click_word_fill_form(word, updates)
-
 @when(parsers.parse('I click "{word}" and press hotkey "{hotkey}"'))
 def when_click_word_press_hotkey(luteclient, word, hotkey):
     "Click word and press hotkey."
     luteclient.click_word(word)
     luteclient.press_hotkey(hotkey)
-
-@when(parsers.parse('I click the "{linktext}" link'))
-def when_click_link_text(luteclient, linktext):
-    luteclient.browser.links.find_by_text(linktext).click()
-
-@when(parsers.parse('I click the footer green check'))
-def when_click_footer_check(luteclient):
-    luteclient.browser.find_by_id('footerMarkRestAsKnown').click()
-
-@when(parsers.parse('I click the footer next page'))
-def when_click_footer_next_page(luteclient):
-    luteclient.browser.find_by_id('footerNextPage').click()
-
-@then(parsers.parse('the page title is {title}'))
-def then_title(luteclient, title):
-    assert luteclient.browser.title == title
-
-@then(parsers.parse('the page contains "{text}"'))
-def then_page_contains(luteclient, text):
-    assert text in luteclient.browser.html
-
-@then(parsers.parse('the reading page term form frame contains "{text}"'))
-def then_reading_page_term_form_iframe_contains(luteclient, text):
-    "Have to get and read the iframe content, it's not in the main browser page."
-    with luteclient.browser.get_iframe('wordframe') as iframe:
-        assert text in iframe.html
-
-@then(parsers.parse('the reading pane shows:\n{content}'))
-def then_read_content(luteclient, content):
-    "Check rendered content."
-    displayed = luteclient.displayed_text(LuteTestClient.text_and_status_renderer)
-    assert content == displayed
-
-
-@when(parsers.parse('I change the current text content to:\n{content}'))
-def when_change_content(luteclient, content):
-    "Change the content."
-    assert 'Reading' in luteclient.browser.title, 'sanity check'
-    b = luteclient.browser
-    b.find_by_id('editText').click()
-    b.find_by_id('text').fill(content)
-    b.find_by_id('submit').click()
-
-@when(parsers.parse('I set the book table filter to "{filt}"'))
-def when_set_book_table_filter(luteclient, filt):
-    "Set the filter, wait a sec."
-    b = luteclient.browser
-    b.find_by_tag('input').fill(filt)
-    _sleep(0.25)
 
 @when(parsers.parse('I hover over "{word}"'))
 def when_hover(luteclient, word):
@@ -213,12 +227,12 @@ def when_press_hotkey(luteclient, hotkey):
     "Click word and press hotkey."
     luteclient.press_hotkey(hotkey)
 
-@then(parsers.parse('the book table contains:\n{content}'))
-def check_book_table(luteclient, content):
-    """
-    Check the table.
+# Reading, paging
 
-    e.g. should contain something like
-    Hola; Spanish; ; 4 (0%);
-    """
-    assert content == luteclient.get_book_table_content()
+@when(parsers.parse('I click the footer green check'))
+def when_click_footer_check(luteclient):
+    luteclient.browser.find_by_id('footerMarkRestAsKnown').click()
+
+@when(parsers.parse('I click the footer next page'))
+def when_click_footer_next_page(luteclient):
+    luteclient.browser.find_by_id('footerNextPage').click()

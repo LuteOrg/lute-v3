@@ -22,6 +22,10 @@ class LuteTestClient:
     """
     The client!
     """
+
+    ################################3
+    # Setup
+
     def __init__(self, b, home):
         self.browser = b
         self.home = home
@@ -34,30 +38,12 @@ class LuteTestClient:
         self.start = time.perf_counter()
         self.last_step = self.start
 
-    def _sleep(self, seconds):
-        time.sleep(seconds)
-
     def load_demo_stories(self):
         "Load the demo stories."
         self.visit('dev_api/load_demo_stories')
 
-    def elapsed(self, step):
-        """
-        Helper method for sorting out slowness.
-
-        For the step, gives elapsed time since start of
-        the LuteBrowser, and since the last recorded step.
-
-        To see this data, have to run the acc. tests with '-s', eg:
-
-        pytest tests/acceptance/test_smoke.py --port=5000 -s
-        """
-        now = time.perf_counter()
-        since_start = now - self.start
-        print(step)
-        print(f'total elapsed: {since_start}')
-        print(f'since last:    {now - self.last_step}')
-        self.last_step = now
+    ################################3
+    # Browsing
 
     def visit(self, suburl):
         "Visit a sub url under the base."
@@ -71,6 +57,32 @@ class LuteTestClient:
         "Go to home page."
         self.browser.visit('')
 
+
+    ################################3
+    # Languages
+
+    def edit_language(self, langname, updates = None):
+        """
+        Edit a language.
+        """
+        self.visit('/')
+        self.browser.links.find_by_text('Languages').click()
+        # WEIRD: find_by_text(langname) doesn't work ...
+        self.browser.links.find_by_partial_text(langname).click()
+        assert f'Edit {langname}' in self.browser.html
+        updates = updates or {}
+        for k, v in updates.items():
+            match k:
+                case 'exceptions_split_sentences':
+                    self.browser.find_by_css(f'#{k}').fill(v)
+                case _:
+                    raise RuntimeError(f'unhandled key {k}')
+        self.browser.find_by_css('#submit').first.click()
+
+
+    ################################3
+    # Books
+
     def make_book(self, title, text, langname):
         "Create a book with title, text, and languagename."
         self.visit('book/new')
@@ -78,6 +90,20 @@ class LuteTestClient:
         self.browser.find_by_css('#title').fill(title)
         self.browser.select('language_id', int(self.language_ids[langname]))
         self.browser.find_by_css('#save').first.click()
+
+    def get_book_table_content(self):
+        "Get book table content."
+        css = '#booktable tbody tr'
+        def _to_string(row):
+            tds = row.find_by_css('td')
+            rowtext = [td.text.strip() for td in tds]
+            return '; '.join(rowtext).strip()
+        rows = list(self.browser.find_by_css(css))
+        return "\n".join([ _to_string(row) for row in rows ])
+
+
+    ################################3
+    # Reading/rendering
 
     @staticmethod
     def default_parsed_token_renderer(t):
@@ -110,6 +136,8 @@ class LuteTestClient:
         etext = [ token_renderer(e) for e in elements ]
         return '/'.join(etext)
 
+    ################################3
+    # Reading, term actions
 
     def _get_element_for_word(self, word):
         "Helper, get the element."
@@ -119,9 +147,11 @@ class LuteTestClient:
         assert len(es) > 0, f'match for {word}'
         return es[0]
 
+
     def click_word(self, word):
         "Click a word in the reading frame."
         self._get_element_for_word(word).click()
+
 
     def shift_click_words(self, words):
         "Shift-click words."
@@ -133,6 +163,7 @@ class LuteTestClient:
             ac = ac.click(e)
         ac = ac.key_up(Keys.SHIFT)
         ac.perform()
+
 
     def press_hotkey(self, hotkey):
         "Send a hotkey."
@@ -164,25 +195,6 @@ class LuteTestClient:
         # Have to refresh the content to query the dom ...
         # Unfortunately, I can't see how to refresh without reloading
         self.browser.reload()
-
-
-    def edit_language(self, langname, updates = None):
-        """
-        Edit a language.
-        """
-        self.visit('/')
-        self.browser.links.find_by_text('Languages').click()
-        # WEIRD: find_by_text(langname) doesn't work ...
-        self.browser.links.find_by_partial_text(langname).click()
-        assert f'Edit {langname}' in self.browser.html
-        updates = updates or {}
-        for k, v in updates.items():
-            match k:
-                case 'exceptions_split_sentences':
-                    self.browser.find_by_css(f'#{k}').fill(v)
-                case _:
-                    raise RuntimeError(f'unhandled key {k}')
-        self.browser.find_by_css('#submit').first.click()
 
 
     def click_word_fill_form(self, word, updates = None):
@@ -232,12 +244,27 @@ class LuteTestClient:
             self.browser.reload()
 
 
-    def get_book_table_content(self):
-        "Get book table content."
-        css = '#booktable tbody tr'
-        def _to_string(row):
-            tds = row.find_by_css('td')
-            rowtext = [td.text.strip() for td in tds]
-            return '; '.join(rowtext).strip()
-        rows = list(self.browser.find_by_css(css))
-        return "\n".join([ _to_string(row) for row in rows ])
+    ################################3
+    # Misc.
+
+    def elapsed(self, step):
+        """
+        Helper method for sorting out slowness.
+
+        For the step, gives elapsed time since start of
+        the LuteBrowser, and since the last recorded step.
+
+        To see this data, run the acc. tests with '-s', eg:
+
+        pytest tests/acceptance/test_smoke.py --port=5000 -s
+        """
+        now = time.perf_counter()
+        since_start = now - self.start
+        print(step)
+        print(f'total elapsed: {since_start}')
+        print(f'since last:    {now - self.last_step}')
+        self.last_step = now
+
+    def _sleep(self, seconds):
+        "Nap."
+        time.sleep(seconds)
