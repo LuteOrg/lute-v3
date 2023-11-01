@@ -264,29 +264,7 @@ class LuteTestClient:
 
         should_refresh = False
         with self.browser.get_iframe('wordframe') as iframe:
-            for k, v in updates.items():
-                if k == 'status':
-                    # This line didn't work:
-                    # iframe.choose('status', updates['status'])
-                    s = updates['status']
-                    xp = f"//input[@type='radio'][@name='status'][@value='{s}']"
-                    radios = self.browser.find_by_xpath(xp)
-                    assert len(radios) == 1, 'have matching radio button'
-                    radio = radios[0]
-                    radio.click()
-                elif k in ('translation', 'text'):
-                    iframe.find_by_css(f'#{k}').fill(v)
-                elif k == 'parents':
-                    for p in updates['parents']:
-                        xp = 'ul#parentslist li.tagit-new > input.ui-autocomplete-input'
-                        tagitbox = iframe.find_by_css(xp)
-                        assert len(tagitbox) == 1, 'have parent input'
-                        box = tagitbox.first
-                        box.type(p, slowly=False)
-                        box.type(Keys.RETURN)
-                        time.sleep(0.1) # seconds
-                else:
-                    raise RuntimeError(f'unhandled key {k}')
+            self._fill_term_form(iframe, updates)
             iframe.find_by_css('#submit').first.click()
 
             # Only refresh the reading frame if everything was ok.
