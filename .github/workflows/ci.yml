@@ -35,4 +35,7 @@ jobs:
       run: inv lint
 
     - name: Test
-      run: inv test
+      run: pytest
+
+    - name: Acceptance testing
+      run: inv accept --headless -s
