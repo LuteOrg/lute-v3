@@ -109,16 +109,7 @@ function showEditFrame(el, extra_args = {}) {
       map((p) => `${p[0]}=${encodeURIComponent(p[1])}`).
       join('&');
 
-  // Annoying hack.  I wanted to send a period '.' in the term, but
-  // Symfony didn't handle that well (per issue
-  // https://github.com/jzohrab/lute/issues/28), and replacing the '.'
-  // with the encoded value ('\u2e' or '%2E') didn't work, as it kept
-  // getting changed back to '.' on send, or it said that it couldn't
-  // find the controller route.  There is probably something very
-  // simple I'm missing, but for now, replacing the '.' with a hacky
-  // string which I'll replace on server side as well.
-  const periodhack = '__LUTE_PERIOD__';
-  const url = `/read/termform/${lid}/${sendtext}?${extras}`.replaceAll('.', periodhack);
+  const url = `/read/termform/${lid}/${sendtext}?${extras}`;
   // console.log('go to url = ' + url);
 
   top.frames.wordframe.location.href = url;

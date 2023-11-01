@@ -80,14 +80,16 @@ def fixture_lute_client(request, chromebrowser):
     """
     Start the lute browser.
     """
-    url = f'http://localhost:{useport}/'
+    useport = request.config.getoption("--port")
+    url = f'http://localhost:{useport}'
     c = LuteTestClient(chromebrowser, url)
     yield c
 
 
+@when(parsers.parse('sleep for {seconds}'))
 def _sleep(seconds):
     "Hack helper."
-    time.sleep(seconds)
+    time.sleep(int(seconds))
 
 @given('a running site')
 def given_running_site(luteclient):
@@ -111,9 +113,6 @@ def given_demo_stories_loaded(luteclient):
 def given_update_language(luteclient, lang, content):
     "Content is assumed to be yaml."
     updates = yaml.safe_load(content)
-    print('<' * 30)
-    print(updates)
-    print('>' * 30)
     luteclient.edit_language(lang, updates)
 
 @given(parsers.parse('a {lang} book "{title}" with content:\n{c}'))

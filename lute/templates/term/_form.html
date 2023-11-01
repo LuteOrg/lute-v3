@@ -148,16 +148,6 @@
           }
 
           let clickedtagtext = $('#parentslist').tagit('tagLabel', ui.tag);
-          // Annoying hack.  I wanted to send a period '.' in the term, but
-          // Symfony did not handle that well (per issue
-          // https://github.com/jzohrab/lute/issues/28), and replacing the '.'
-          // with the encoded value ('\u2e' or '%2E') did not work, as it kept
-          // getting changed back to '.' on send, or it said that it could not
-          // find the controller route.  There is probably something very
-          // simple I am missing, but for now, replacing the '.' with a hacky
-          // string which is replaced on server side as well.
-          const periodhack = '__LUTE_PERIOD__';
-          clickedtagtext = clickedtagtext.replaceAll('.', periodhack);
           if (clickedtagtext == '')
             return;
 

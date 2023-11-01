@@ -36,6 +36,9 @@ class LuteTestClient:
         # click_word activates the element for hotkey sendkeys.
         self.active_element = None
 
+    def _sleep(self, seconds):
+        time.sleep(seconds)
+
     def load_demo_stories(self):
         "Load the demo stories."
         self.visit('dev_api/load_demo_stories')
@@ -60,6 +63,8 @@ class LuteTestClient:
 
     def visit(self, suburl):
         "Visit a sub url under the base."
+        if suburl.startswith('/'):
+            suburl = suburl[1:]
         url = f'{self.home}/{suburl}'
         print(f'visiting: {url}')
         self.browser.visit(url)
@@ -149,23 +154,24 @@ class LuteTestClient:
         # Unfortunately, I can't see how to refresh without reloading
         self.browser.reload()
 
-#    def edit_language(self, langname, updates = None):
-#        """
-#        Click a word in the reading frame, fill in the term form iframe.
-#        """
-#        self.visit('/')
-#        self.browser.links.find_by_text('Languages').click()
-#        self.browser.links.find_by_text(langname).click()
-#        assert f'Edit {langname}' in self.browser.text
-#        updates = updates or {}
-#
-#        for k, v in updates.items():
-#            match k:
-#                case 'exceptions_split_sentences':
-#                    self.browser.find_by_css(f'#{k}').fill(v)
-#                case _:
-#                    raise RuntimeError(f'unhandled key {k}')
-#        self.browser.find_by_css('#submit').first.click()
+
+    def edit_language(self, langname, updates = None):
+        """
+        Edit a language.
+        """
+        self.visit('/')
+        self.browser.links.find_by_text('Languages').click()
+        # WEIRD: find_by_text(langname) doesn't work ...
+        self.browser.links.find_by_partial_text(langname).click()
+        assert f'Edit {langname}' in self.browser.html
+        updates = updates or {}
+        for k, v in updates.items():
+            match k:
+                case 'exceptions_split_sentences':
+                    self.browser.find_by_css(f'#{k}').fill(v)
+                case _:
+                    raise RuntimeError(f'unhandled key {k}')
+        self.browser.find_by_css('#submit').first.click()
 
 
     def click_word_fill_form(self, word, updates = None):
