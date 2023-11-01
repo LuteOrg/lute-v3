@@ -33,8 +33,10 @@ jobs:
 
     - name: Setup config
       run: |
-        echo "ENV: dev" > config.yml
-        echo "DBNAME: test_lute.db" >> config.yml
+        mkdir ./data
+        echo "ENV: dev" > config/config.yml
+        echo "DATAPATH: ./data" >> config/config.yml
+        echo "DBNAME: test_lute.db" >> config/config.yml
 
     - name: Lint
       run: inv lint
