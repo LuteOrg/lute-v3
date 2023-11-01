@@ -61,6 +61,15 @@ def load_demo_languages():
     db.session.commit()
     return redirect('/', 302)
 
+
+@bp.route('/load_demo_stories', methods=['GET'])
+def load_demo_stories():
+    "Stories only.  No db wipe."
+    lute.db.demo.load_demo_stories()
+    flash('stories loaded')
+    return redirect('/', 302)
+
+
 @bp.route('/language_ids', methods=['GET'])
 def get_lang_ids():
     "Get ids of all langs."

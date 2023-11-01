@@ -36,6 +36,10 @@ class LuteTestClient:
         # click_word activates the element for hotkey sendkeys.
         self.active_element = None
 
+    def load_demo_stories(self):
+        "Load the demo stories."
+        self.visit('dev_api/load_demo_stories')
+
     def elapsed(self, step):
         """
         Helper method for sorting out slowness.
@@ -102,6 +106,7 @@ class LuteTestClient:
         etext = [ token_renderer(e) for e in elements ]
         return '/'.join(etext)
 
+
     def click_word(self, word):
         "Click a word in the reading frame."
         elements = self.browser.find_by_xpath('//span[contains(@class, "textitem")]')
@@ -135,6 +140,7 @@ class LuteTestClient:
           which: {jscode},
           shiftKey: '{shift_pressed}'
         }});"""
+        # pylint: disable=protected-access
         self.browser.execute_script(script, self.active_element._element)
         time.sleep(0.2)  # Or it's too fast.
         # print(script)
@@ -148,29 +154,42 @@ class LuteTestClient:
         """
         self.click_word(word)
         updates = updates or {}
+
+        should_refresh = False
         with self.browser.get_iframe('wordframe') as iframe:
-            if 'status' in updates:
-                # This line didn't work:
-                # iframe.choose('status', updates['status'])
-                s = updates['status']
-                xp = f"//input[@type='radio'][@name='status'][@value='{s}']"
-                radios = self.browser.find_by_xpath(xp)
-                assert len(radios) == 1, 'have matching radio button'
-                radio = radios[0]
-                radio.click()
-            if 'translation' in updates:
-                iframe.find_by_css('#translation').fill(updates['translation'])
-            if 'parents' in updates:
-                for p in updates['parents']:
-                    xp = 'ul#parentslist li.tagit-new > input.ui-autocomplete-input'
-                    tagitbox = iframe.find_by_css(xp)
-                    assert len(tagitbox) == 1, 'have parent input'
-                    box = tagitbox.first
-                    box.type(p, slowly=False)
-                    box.type(Keys.RETURN)
-                    time.sleep(0.1) # seconds
+            for k, v in updates.items():
+                match k:
+                    case 'status':
+                        # This line didn't work:
+                        # iframe.choose('status', updates['status'])
+                        s = updates['status']
+                        xp = f"//input[@type='radio'][@name='status'][@value='{s}']"
+                        radios = self.browser.find_by_xpath(xp)
+                        assert len(radios) == 1, 'have matching radio button'
+                        radio = radios[0]
+                        radio.click()
+                    case 'translation' | 'text':
+                        iframe.find_by_css(f'#{k}').fill(v)
+                    case 'parents':
+                        for p in updates['parents']:
+                            xp = 'ul#parentslist li.tagit-new > input.ui-autocomplete-input'
+                            tagitbox = iframe.find_by_css(xp)
+                            assert len(tagitbox) == 1, 'have parent input'
+                            box = tagitbox.first
+                            box.type(p, slowly=False)
+                            box.type(Keys.RETURN)
+                            time.sleep(0.1) # seconds
+                    case _:
+                        raise RuntimeError(f'unhandled key {k}')
             iframe.find_by_css('#submit').first.click()
+
+            # Only refresh the reading frame if everything was ok.
+            # Some submits will fail due to validation errors,
+            # and we want to look at them.
+            if 'updated' in iframe.html:
+                should_refresh = True
 
         # Have to refresh the content to query the dom ...
         # Unfortunately, I can't see how to refresh without reloading
-        self.browser.reload()
+        if should_refresh:
+            self.browser.reload()

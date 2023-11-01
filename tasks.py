@@ -127,7 +127,7 @@ def accept(c, port=None, show=False, headless=False):
     if site_running:
         c.run(' '.join(run_test))
     else:
-        app_process = subprocess.Popen(['python', '-m', 'tests.acceptance.start_acceptance_app', useport])
+        app_process = subprocess.Popen(['python', '-m', 'tests.acceptance.start_acceptance_app', f'{useport}'])
         subprocess.run(run_test)
         app_process.terminate()
 

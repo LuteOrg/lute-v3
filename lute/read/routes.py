@@ -145,7 +145,6 @@ def term_popup(termid):
         }
         return ret
 
-    print(term.parents)
     parent_terms = [p.text for p in term.parents]
     parent_terms = ', '.join(parent_terms)
 

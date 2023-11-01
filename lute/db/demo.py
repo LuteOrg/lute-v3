@@ -141,7 +141,7 @@ def load_demo_languages():
     db.session.commit()
 
 
-def _load_demo_stories():
+def load_demo_stories():
     "Load the stories."
     demo_glob = os.path.join(demo_data_path(), 'stories', '*.txt')
     for filename in glob(demo_glob):
@@ -170,7 +170,7 @@ def load_demo_data():
     Load the data.
     """
     load_demo_languages()
-    _load_demo_stories()
+    load_demo_stories()
     Setting.set_value('IsDemoData', True)
     db.session.commit()
 
