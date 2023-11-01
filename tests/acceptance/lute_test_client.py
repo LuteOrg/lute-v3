@@ -33,9 +33,6 @@ class LuteTestClient:
         self.start = time.perf_counter()
         self.last_step = self.start
 
-        # click_word activates the element for hotkey sendkeys.
-        self.active_element = None
-
     def _sleep(self, seconds):
         time.sleep(seconds)
 
@@ -119,13 +116,12 @@ class LuteTestClient:
         es = [ e for e in elements if e.text == word ]
         assert len(es) > 0, f'match for {word}'
         el = es[0]
-        self.active_element = el
         el.click()
 
 
     def press_hotkey(self, hotkey):
-        "Send a hotkey on the active element."
-        assert self.active_element is not None, 'have element'
+        "Send a hotkey."
+        el = self.browser.find_by_tag('body')
         map_to_js_keycode = {
             '1': 49,
             '2': 50,
@@ -147,7 +143,7 @@ class LuteTestClient:
           shiftKey: '{shift_pressed}'
         }});"""
         # pylint: disable=protected-access
-        self.browser.execute_script(script, self.active_element._element)
+        self.browser.execute_script(script, el._element)
         time.sleep(0.2)  # Or it's too fast.
         # print(script)
         # Have to refresh the content to query the dom ...
