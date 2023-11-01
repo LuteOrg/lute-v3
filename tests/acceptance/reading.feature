@@ -112,3 +112,14 @@ Feature: User can actually read and stuff.
             parents: [ 'cap.' ]
         Then the reading pane shows:
             He (1)/ /escrito/ /cap. (2)/ /uno/.
+
+
+    Scenario: User can update the text while reading.
+        Given a Spanish book "Hola" with content:
+            Hola. Adios amigo.
+        Then the reading pane shows:
+            Hola/. /Adios/ /amigo/.
+        When I change the current text content to:
+            Tengo otro amigo.
+        Then the reading pane shows:
+            Tengo/ /otro/ /amigo/.

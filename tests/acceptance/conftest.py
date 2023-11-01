@@ -173,3 +173,13 @@ def then_read_content(luteclient, content):
     "Check rendered content."
     displayed = luteclient.displayed_text(LuteTestClient.text_and_status_renderer)
     assert content == displayed
+
+
+@when(parsers.parse('I change the current text content to:\n{content}'))
+def when_change_content(luteclient, content):
+    "Change the content."
+    assert 'Reading' in luteclient.browser.title, 'sanity check'
+    b = luteclient.browser
+    b.find_by_id('editText').click()
+    b.find_by_id('text').fill(content)
+    b.find_by_id('submit').click()

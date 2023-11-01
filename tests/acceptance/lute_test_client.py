@@ -66,7 +66,7 @@ class LuteTestClient:
         if suburl.startswith('/'):
             suburl = suburl[1:]
         url = f'{self.home}/{suburl}'
-        print(f'visiting: {url}')
+        # print(f'visiting: {url}')
         self.browser.visit(url)
 
     def index(self):
