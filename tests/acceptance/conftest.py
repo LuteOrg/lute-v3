@@ -130,13 +130,18 @@ def given_book_table_wait(luteclient, title):
     _sleep(0.25)  # Hack!
     assert title in luteclient.browser.html
 
+@when(parsers.parse('I click "{word}"'))
+def when_click_word(luteclient, word):
+    "Click word."
+    luteclient.click_word(word)
+
 @when(parsers.parse('I click "{word}" and edit the form:\n{content}'))
 def when_click_word_edit_form(luteclient, word, content):
     "The content is assumed to be yaml."
     updates = yaml.safe_load(content)
     luteclient.click_word_fill_form(word, updates)
 
-@when(parsers.parse('I click "{word}" and press hotkey {hotkey}'))
+@when(parsers.parse('I click "{word}" and press hotkey "{hotkey}"'))
 def when_click_word_press_hotkey(luteclient, word, hotkey):
     "Click word and press hotkey."
     luteclient.click_word(word)
@@ -191,6 +196,17 @@ def when_set_book_table_filter(luteclient, filt):
     b.find_by_tag('input').fill(filt)
     _sleep(0.25)
 
+@when(parsers.parse('I hover over "{word}"'))
+def when_hover(luteclient, word):
+    "Hover over a term."
+    els = luteclient.browser.find_by_text(word)
+    assert len(els) == 1, f'have single "{word}"'
+    els[0].mouse_over()
+
+@when(parsers.parse('I press hotkey "{hotkey}"'))
+def when_press_hotkey(luteclient, hotkey):
+    "Click word and press hotkey."
+    luteclient.press_hotkey(hotkey)
 
 @then(parsers.parse('the book table contains:\n{content}'))
 def check_book_table(luteclient, content):

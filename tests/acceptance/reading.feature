@@ -48,16 +48,16 @@ Feature: User can actually read and stuff.
     Scenario: Pressing a hotkey updates a term's status
         Given a Spanish book "Hola" with content:
             Hola. Adios amigo.
-        When I click "Hola" and press hotkey 1
+        When I click "Hola" and press hotkey "1"
         Then the reading pane shows:
             Hola (1)/. /Adios/ /amigo/.
-        When I click "Hola" and press hotkey 5
+        When I click "Hola" and press hotkey "5"
         Then the reading pane shows:
             Hola (5)/. /Adios/ /amigo/.
-        When I click "Hola" and press hotkey i
+        When I click "Hola" and press hotkey "i"
         Then the reading pane shows:
             Hola (98)/. /Adios/ /amigo/.
-        When I click "Hola" and press hotkey w
+        When I click "Hola" and press hotkey "w"
         Then the reading pane shows:
             Hola (99)/. /Adios/ /amigo/.
 
@@ -65,7 +65,7 @@ Feature: User can actually read and stuff.
     Scenario: Click footer green checkmark ("mark rest as known") sets rest to 99.
         Given a Spanish book "Hola" with content:
             Hola. Adios amigo.
-        When I click "Hola" and press hotkey 1
+        When I click "Hola" and press hotkey "1"
         Then the reading pane shows:
             Hola (1)/. /Adios/ /amigo/.
         When I click the footer green check
@@ -76,7 +76,7 @@ Feature: User can actually read and stuff.
     Scenario: Learned terms are applied to new texts.
         Given a Spanish book "Hola" with content:
             Hola. Adios amigo.
-        When I click "Hola" and press hotkey 1
+        When I click "Hola" and press hotkey "1"
         And I click the footer green check
         Then the reading pane shows:
             Hola (1)/. /Adios (99)/ /amigo (99)/.
@@ -123,3 +123,33 @@ Feature: User can actually read and stuff.
             Tengo otro amigo.
         Then the reading pane shows:
             Tengo/ /otro/ /amigo/.
+
+
+    Scenario: Hotkey affects hovered element
+        Given a Spanish book "Hola" with content:
+            Tengo otro amigo.
+        When I hover over "otro"
+        And I press hotkey "1"
+        Then the reading pane shows:
+            Tengo/ /otro (1)/ /amigo/.
+
+
+    Scenario: Clicked word "keeps the focus"
+        Given a Spanish book "Hola" with content:
+            Tengo otro amigo.
+        When I click "amigo"
+        And I hover over "otro"
+        And I press hotkey "1"
+        Then the reading pane shows:
+            Tengo/ /otro/ /amigo (1)/.
+
+
+    Scenario: Clicking an already-clicked word releases the focus
+        Given a Spanish book "Hola" with content:
+            Tengo otro amigo.
+        When I click "amigo"
+        And I click "amigo"
+        And I hover over "otro"
+        And I press hotkey "1"
+        Then the reading pane shows:
+            Tengo/ /otro (1)/ /amigo/.
