@@ -153,7 +153,7 @@ def given_book(luteclient, lang, title, c):
 @given(parsers.parse('the book table loads "{title}"'))
 def given_book_table_wait(luteclient, title):
     "The book table is loaded via ajax, so there's a delay."
-    _sleep(0.25)  # Hack!
+    _sleep(0.2)  # Hack!
     assert title in luteclient.browser.html
 
 @when(parsers.parse('I set the book table filter to "{filt}"'))
@@ -161,7 +161,7 @@ def when_set_book_table_filter(luteclient, filt):
     "Set the filter, wait a sec."
     b = luteclient.browser
     b.find_by_tag('input').fill(filt)
-    _sleep(0.25)
+    _sleep(0.2)
 
 @then(parsers.parse('the book table contains:\n{content}'))
 def check_book_table(luteclient, content):
