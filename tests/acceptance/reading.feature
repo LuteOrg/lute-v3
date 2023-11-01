@@ -153,3 +153,14 @@ Feature: User can actually read and stuff.
         And I press hotkey "1"
         Then the reading pane shows:
             Tengo/ /otro (1)/ /amigo/.
+
+
+    Scenario: Shift-click selects multiple words
+        Given a Spanish book "Hola" with content:
+            Tengo otro amigo.
+        When I shift click:
+            amigo
+            Tengo
+        And I press hotkey "1"
+        Then the reading pane shows:
+            Tengo (1)/ /otro/ /amigo (1)/.

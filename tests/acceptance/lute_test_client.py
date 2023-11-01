@@ -15,6 +15,7 @@ to get nicer assertion details.
 import time
 import requests
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 class LuteTestClient:
@@ -110,14 +111,29 @@ class LuteTestClient:
         return '/'.join(etext)
 
 
-    def click_word(self, word):
-        "Click a word in the reading frame."
+    def _get_element_for_word(self, word):
+        "Helper, get the element."
+        # print('getting ' + word)
         elements = self.browser.find_by_xpath('//span[contains(@class, "textitem")]')
         es = [ e for e in elements if e.text == word ]
         assert len(es) > 0, f'match for {word}'
-        el = es[0]
+        return es[0]
+
+    def click_word(self, word):
+        "Click a word in the reading frame."
+        self._get_element_for_word(word).click()
         el.click()
 
+    def shift_click_words(self, words):
+        "Shift-click words."
+        # https://stackoverflow.com/questions/27775759/
+        #   send-keys-control-click-in-selenium-with-python-bindings
+        els = [ self._get_element_for_word(w)._element for w in words ]
+        ac = ActionChains(self.browser.driver).key_down(Keys.SHIFT)
+        for e in els:
+            ac = ac.click(e)
+        ac = ac.key_up(Keys.SHIFT)
+        ac.perform()
 
     def press_hotkey(self, hotkey):
         "Send a hotkey."

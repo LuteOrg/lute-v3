@@ -135,6 +135,11 @@ def when_click_word(luteclient, word):
     "Click word."
     luteclient.click_word(word)
 
+@when(parsers.parse('I shift click:\n{words}'))
+def shift_click_terms(luteclient, words):
+    words = words.split("\n")
+    luteclient.shift_click_words(words)
+
 @when(parsers.parse('I click "{word}" and edit the form:\n{content}'))
 def when_click_word_edit_form(luteclient, word, content):
     "The content is assumed to be yaml."
