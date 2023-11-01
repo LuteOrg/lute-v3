@@ -10,7 +10,7 @@ from lute.parse.mecab_parser import JapaneseParser
 from lute.parse.character_parser import ClassicalChineseParser
 
 
-# List of parsers available.
+# List of ALL parsers available, not necessarily all supported.
 # This design feels fishy, but it suffices for now.
 parsers = {
     'spacedel': SpaceDelimitedParser,
@@ -46,5 +46,12 @@ def is_supported(parser_name) -> bool:
 
 
 def supported_parsers():
-    "Dictionary of supported parser strings and class names, for UI."
-    return _supported_parsers()
+    """
+    Dictionary of supported parser strings and class names, for UI.
+
+    For select list entries, use supported_parsers().items().
+    """
+    ret = {}
+    for k, v in _supported_parsers().items():
+        ret[k] = v.name()
+    return ret

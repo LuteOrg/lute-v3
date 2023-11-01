@@ -98,36 +98,35 @@ def _create_app(app_config, extra_config):
 
     @app.route('/')
     def index():
-        refresh_stats()
-        tutorial_book_id = lute.db.demo.tutorial_book_id()
-        have_books = len(db.session.query(Book).all()) > 0
-        have_languages = len(db.session.query(Language).all()) > 0
-
+        # Stop all other calculations if need to backup.
         bkp_settings = Setting.get_backup_settings()
-        backup_enabled = bkp_settings.backup_enabled
-        backup_show_warning = bkp_settings.backup_warn
-        backup_warning_msg = backupservice.backup_warning(bkp_settings)
-        backup_last_display_date = bkp_settings.last_backup_display_date()
-
         if backupservice.should_run_auto_backup(bkp_settings):
             return redirect('/backup/backup', 302)
+
+        is_demo = lute.db.demo.contains_demo_data()
+        tutorial_book_id = None
+        if is_demo:
+            lute.db.demo.delete_unsupported_demo_data()
+            tutorial_book_id = lute.db.demo.tutorial_book_id()
+
+        refresh_stats()
 
         return render_template(
             'index.html',
             dbname = app_config.dbname,
             datapath = app_config.datapath,
             tutorial_book_id = tutorial_book_id,
-            have_books = have_books,
-            have_languages = have_languages,
+            have_books = len(db.session.query(Book).all()) > 0,
+            have_languages = len(db.session.query(Language).all()) > 0,
             hide_home_link = True,
-            is_production_data = not lute.db.demo.contains_demo_data(),
+            is_production_data = not is_demo,
 
             backup_acknowledged = bkp_settings.is_acknowledged(),
-            backup_enabled = (backup_enabled == 'y'),
-            backup_show_warning = backup_show_warning,
-            backup_warning_msg = backup_warning_msg,
+            backup_enabled = (bkp_settings.backup_enabled == 'y'),
+            backup_show_warning = bkp_settings.backup_warn,
+            backup_warning_msg = backupservice.backup_warning(bkp_settings),
             backup_directory = bkp_settings.backup_dir,
-            backup_last_display_date = backup_last_display_date,
+            backup_last_display_date = bkp_settings.last_backup_display_date(),
         )
 
     @app.route('/wipe_database')

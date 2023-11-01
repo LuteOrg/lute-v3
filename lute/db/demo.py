@@ -136,7 +136,8 @@ def load_demo_languages():
 
     This method will also be called during acceptance tests, so it's "public".
     """
-    for lang in predefined_languages():
+    supported = [lang for lang in predefined_languages() if lang.is_supported]
+    for lang in supported:
         db.session.add(lang)
     db.session.commit()
 

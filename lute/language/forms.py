@@ -5,7 +5,7 @@ Flask-wtf forms.
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, SelectField
 from wtforms.validators import DataRequired
-
+from lute.parse.registry import supported_parsers
 
 class LanguageForm(FlaskForm):
     """
@@ -21,12 +21,7 @@ class LanguageForm(FlaskForm):
     # TODO parsers: use the parser registry to load the select.
     parser_type = SelectField(
         'Parse as',
-        choices=[
-            ('spacedel', 'Space Delimited'),
-            ('japanese', 'Japanese (MeCab)'),
-            ('classicalchinese', 'Classical Chinese'),
-            ('turkish', 'Turkish'),
-        ])
+        choices=supported_parsers().items())
     character_substitutions = StringField('Character substitutions')
 
     regexp_split_sentences = StringField('Split sentences at', validators=[DataRequired()])

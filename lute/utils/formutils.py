@@ -13,7 +13,8 @@ def language_choices():
     otherwise add a '-' dummy entry at the top.
     """
     langs = db.session.query(Language).order_by(Language.name).all()
-    lang_choices = [ (s.id, s.name) for s in langs ]
+    supported = [ lang for lang in langs if lang.is_supported ]
+    lang_choices = [ (s.id, s.name) for s in supported ]
     if len(lang_choices) > 1:
         lang_choices = [ (0, '-') ] + lang_choices
     return lang_choices

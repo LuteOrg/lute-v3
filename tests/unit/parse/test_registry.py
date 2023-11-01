@@ -25,7 +25,7 @@ def test_list_all_parsers():
 
     p = d['spacedel']
     print(p)
-    assert p.name() == 'Space Delimited', 'sanity check'
+    assert p == 'Space Delimited', 'sanity check'
 
 
 class DummyParser(SpaceDelimitedParser):
