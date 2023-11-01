@@ -3,7 +3,7 @@
 {% block body %}
 
 <div id="form-frame-left" style="width: 50%;">
-  {% if showlanguageselector %}
+  {% if term.language_id is none %}
   <h1>New Term</h1>
   {% else %}
   <h1>Edit Term</h1>

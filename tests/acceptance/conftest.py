@@ -2,6 +2,8 @@
 Acceptance test fixtures.
 """
 
+import os
+import tempfile
 import time
 import yaml
 import requests
@@ -166,6 +168,35 @@ def check_book_table(luteclient, content):
     "Check the table, e.g. content like 'Hola; Spanish; ; 4 (0%);'"
     assert content == luteclient.get_book_table_content()
 
+# Terms
+
+@given(parsers.parse('a new {lang} term:\n{content}'))
+def given_new_term(luteclient, lang, content):
+    "The content is assumed to be yaml."
+    updates = yaml.safe_load(content)
+    luteclient.make_term(lang, updates)
+
+
+@given(parsers.parse('import term file:\n{content}'))
+def import_term_file(luteclient, content):
+    "Import the term file."
+    luteclient.visit('/')
+    luteclient.browser.links.find_by_text('Import Terms').click()
+    fd, path = tempfile.mkstemp()
+    with os.fdopen(fd, 'w') as tmp:
+        # do stuff with temp file
+        tmp.write(content)
+    luteclient.browser.attach_file('text_file', path)
+    luteclient.browser.find_by_id('btnSubmit').click()
+
+
+@then(parsers.parse('the term table contains:\n{content}'))
+def check_term_table(luteclient, content):
+    "Check the table."
+    if content == '-':
+        content = ''
+    assert content == luteclient.get_term_table_content()
+
 # Reading
 
 @then(parsers.parse('the reading pane shows:\n{content}'))
@@ -206,6 +237,7 @@ def when_click_word(luteclient, word):
 
 @when(parsers.parse('I shift click:\n{words}'))
 def shift_click_terms(luteclient, words):
+    "Shift-click"
     words = words.split("\n")
     luteclient.shift_click_words(words)
 

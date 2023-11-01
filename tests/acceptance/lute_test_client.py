@@ -57,6 +57,8 @@ class LuteTestClient:
         "Go to home page."
         self.browser.visit('')
 
+    def click_link(self, linktext):
+        self.browser.links.find_by_text(linktext).click()
 
     ################################3
     # Languages
@@ -94,6 +96,58 @@ class LuteTestClient:
     def get_book_table_content(self):
         "Get book table content."
         css = '#booktable tbody tr'
+        def _to_string(row):
+            tds = row.find_by_css('td')
+            rowtext = [td.text.strip() for td in tds]
+            return '; '.join(rowtext).strip()
+        rows = list(self.browser.find_by_css(css))
+        return "\n".join([ _to_string(row) for row in rows ])
+
+
+    ################################
+    # Terms
+
+    def make_term(self, lang, updates):
+        "Create a new term."
+        self.visit('/')
+        self.click_link('Terms')
+        self.click_link('Create new')
+        assert 'New Term' in self.browser.html
+
+        updates['language_id'] = self.language_ids[lang]
+        b = self.browser
+        for k, v in updates.items():
+            match k:
+                case 'language_id':
+                    b.select('language_id', v)
+                case 'status':
+                    # This line didn't work:
+                    # iframe.choose('status', updates['status'])
+                    s = updates['status']
+                    xp = f"//input[@type='radio'][@name='status'][@value='{s}']"
+                    radios = b.find_by_xpath(xp)
+                    assert len(radios) == 1, 'have matching radio button'
+                    radio = radios[0]
+                    radio.click()
+                case 'translation' | 'text':
+                    b.find_by_css(f'#{k}').fill(v)
+                case 'parents':
+                    for p in updates['parents']:
+                        xp = 'ul#parentslist li.tagit-new > input.ui-autocomplete-input'
+                        tagitbox = b.find_by_css(xp)
+                        assert len(tagitbox) == 1, 'have parent input'
+                        box = tagitbox.first
+                        box.type(p, slowly=False)
+                        box.type(Keys.RETURN)
+                        time.sleep(0.1) # seconds
+                case _:
+                    raise RuntimeError(f'unhandled key {k}')
+        b.find_by_css('#submit').first.click()
+
+
+    def get_term_table_content(self):
+        "Get term table content."
+        css = '#termtable tbody tr'
         def _to_string(row):
             tds = row.find_by_css('td')
             rowtext = [td.text.strip() for td in tds]
@@ -157,6 +211,7 @@ class LuteTestClient:
         "Shift-click words."
         # https://stackoverflow.com/questions/27775759/
         #   send-keys-control-click-in-selenium-with-python-bindings
+        # pylint: disable=protected-access
         els = [ self._get_element_for_word(w)._element for w in words ]
         ac = ActionChains(self.browser.driver).key_down(Keys.SHIFT)
         for e in els:
