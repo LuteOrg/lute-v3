@@ -224,11 +224,9 @@ class LuteTestClient:
     def get_book_table_content(self):
         "Get book table content."
         css = '#booktable tbody tr'
-        rows = list(self.browser.find_by_css(css))
-        ret = []
-        for row in rows:
-            # Find all table cells in the current row
+        def _to_string(row):
             tds = row.find_by_css('td')
             rowtext = [td.text.strip() for td in tds]
-            ret.append('; '.join(rowtext).strip())
-        return "\n".join(ret)
+            return '; '.join(rowtext).strip()
+        rows = list(self.browser.find_by_css(css))
+        return "\n".join([ _to_string(row) for row in rows ])
