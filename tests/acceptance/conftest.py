@@ -183,3 +183,21 @@ def when_change_content(luteclient, content):
     b.find_by_id('editText').click()
     b.find_by_id('text').fill(content)
     b.find_by_id('submit').click()
+
+@when(parsers.parse('I set the book table filter to "{filt}"'))
+def when_set_book_table_filter(luteclient, filt):
+    "Set the filter, wait a sec."
+    b = luteclient.browser
+    b.find_by_tag('input').fill(filt)
+    _sleep(0.25)
+
+
+@then(parsers.parse('the book table contains:\n{content}'))
+def check_book_table(luteclient, content):
+    """
+    Check the table.
+
+    e.g. should contain something like
+    Hola; Spanish; ; 4 (0%);
+    """
+    assert content == luteclient.get_book_table_content()

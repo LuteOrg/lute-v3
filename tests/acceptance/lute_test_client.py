@@ -219,3 +219,21 @@ class LuteTestClient:
         # Unfortunately, I can't see how to refresh without reloading
         if should_refresh:
             self.browser.reload()
+
+
+    def _get_book_table_rows(self):
+        self.browser.reload()
+        rows = self.browser.find_by_css('#booktable tbody tr')
+        tis = list(rows)
+        return tis
+
+    def get_book_table_content(self):
+        # Get the rows from the table
+        rows = self._get_book_table_rows()
+        ret = []
+        for row in rows:
+            # Find all table cells in the current row
+            tds = row.find_by_css('td')
+            rowtext = [td.text.strip() for td in tds]
+            ret.append('; '.join(rowtext).strip())
+        return "\n".join(ret)
