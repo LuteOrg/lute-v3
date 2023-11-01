@@ -106,15 +106,8 @@ class LuteTestClient:
     ################################
     # Terms
 
-    def make_term(self, lang, updates):
-        "Create a new term."
-        self.visit('/')
-        self.click_link('Terms')
-        self.click_link('Create new')
-        assert 'New Term' in self.browser.html
-
-        updates['language_id'] = self.language_ids[lang]
-        b = self.browser
+    def _fill_term_form(self, b, updates):
+        "Fill in the term form."
         for k, v in updates.items():
             if k == 'language_id':
                 b.select('language_id', v)
@@ -140,6 +133,18 @@ class LuteTestClient:
                     time.sleep(0.1) # seconds
             else:
                 raise RuntimeError(f'unhandled key {k}')
+
+
+    def make_term(self, lang, updates):
+        "Create a new term."
+        self.visit('/')
+        self.click_link('Terms')
+        self.click_link('Create new')
+        assert 'New Term' in self.browser.html
+
+        updates['language_id'] = self.language_ids[lang]
+        b = self.browser
+        self._fill_term_form(b, updates)
         b.find_by_css('#submit').first.click()
 
 
