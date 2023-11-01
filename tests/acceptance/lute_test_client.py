@@ -61,6 +61,7 @@ class LuteTestClient:
     def visit(self, suburl):
         "Visit a sub url under the base."
         url = f'{self.home}/{suburl}'
+        print(f'visiting: {url}')
         self.browser.visit(url)
 
     def index(self):
@@ -147,6 +148,25 @@ class LuteTestClient:
         # Have to refresh the content to query the dom ...
         # Unfortunately, I can't see how to refresh without reloading
         self.browser.reload()
+
+#    def edit_language(self, langname, updates = None):
+#        """
+#        Click a word in the reading frame, fill in the term form iframe.
+#        """
+#        self.visit('/')
+#        self.browser.links.find_by_text('Languages').click()
+#        self.browser.links.find_by_text(langname).click()
+#        assert f'Edit {langname}' in self.browser.text
+#        updates = updates or {}
+#
+#        for k, v in updates.items():
+#            match k:
+#                case 'exceptions_split_sentences':
+#                    self.browser.find_by_css(f'#{k}').fill(v)
+#                case _:
+#                    raise RuntimeError(f'unhandled key {k}')
+#        self.browser.find_by_css('#submit').first.click()
+
 
     def click_word_fill_form(self, word, updates = None):
         """

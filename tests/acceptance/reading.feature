@@ -95,3 +95,21 @@ Feature: User can actually read and stuff.
         Given I visit "/"
         And the book table loads "Tutorial"
         Then the page contains "Tutorial (2/"
+
+
+     Scenario: Language split sentence exceptions are respected
+        Given I update the Spanish language:
+            exceptions_split_sentences: cap.
+#        And a Spanish book "Hola" with content:
+#            He escrito cap. uno.
+#        Then the reading pane shows:
+#            He/ /escrito/ /cap./ /uno/.
+#        When I click "cap." and edit the form:
+#            status: 2
+#        Then the reading pane shows:
+#            He/ /escrito/ /cap. (2)/ /uno/.
+#        When I click "He" and edit the form:
+#            parents: [ 'cap.' ]
+#        Then the reading pane shows:
+#            He (1)/ /escrito/ /cap. (2)/ /uno/.
+#

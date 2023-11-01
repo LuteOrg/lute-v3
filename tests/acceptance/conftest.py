@@ -7,7 +7,7 @@ import yaml
 import requests
 
 import pytest
-from pytest_bdd import given, when, then, scenarios, parsers
+from pytest_bdd import given, when, then, parsers
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from splinter import Browser
 from tests.acceptance.lute_test_client import LuteTestClient
@@ -91,6 +91,15 @@ def given_demo_langs_loaded(luteclient):
 @given('the demo stories are loaded')
 def given_demo_stories_loaded(luteclient):
     luteclient.load_demo_stories()
+
+@given(parsers.parse('I update the {lang} language:\n{content}'))
+def given_update_language(luteclient, lang, content):
+    "Content is assumed to be yaml."
+    updates = yaml.safe_load(content)
+    print('<' * 30)
+    print(updates)
+    print('>' * 30)
+    luteclient.edit_language(lang, updates)
 
 @given(parsers.parse('a {lang} book "{title}" with content:\n{c}'))
 def given_book(luteclient, lang, title, c):
