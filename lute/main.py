@@ -12,7 +12,7 @@ import lute.db.demo
 
 from lute.models.book import Book
 from lute.models.language import Language
-from lute.models.setting import Setting
+from lute.models.setting import BackupSettings
 from lute.book.stats import refresh_stats
 
 from lute.book.routes import bp as book_bp
@@ -99,7 +99,7 @@ def _create_app(app_config, extra_config):
     @app.route('/')
     def index():
         # Stop all other calculations if need to backup.
-        bkp_settings = Setting.get_backup_settings()
+        bkp_settings = BackupSettings.get_backup_settings()
         if backupservice.should_run_auto_backup(bkp_settings):
             return redirect('/backup/backup', 302)
 

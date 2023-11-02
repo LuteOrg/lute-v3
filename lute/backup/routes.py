@@ -10,7 +10,7 @@ from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, SelectField, IntegerField
 from wtforms.validators import InputRequired, NumberRange
 from wtforms import ValidationError
-from lute.models.setting import Setting
+from lute.models.setting import BackupSettings, UserSetting
 from lute.db import db
 from lute.backup.service import create_backup
 from lute.app_config import AppConfig
@@ -69,7 +69,7 @@ def backup_settings():
         # Update the settings in the database
         for field in form:
             if field.id not in ('csrf_token', 'submit'):
-                Setting.set_value(field.id, field.data)
+                UserSetting.set_value(field.id, field.data)
         db.session.commit()
         flash('Backup settings updated', 'success')
         return redirect('/')
@@ -77,7 +77,7 @@ def backup_settings():
     # Load current settings from the database
     for field in form:
         if field.id != 'csrf_token':
-            field.data = Setting.get_value(field.id)
+            field.data = UserSetting.get_value(field.id)
     # Hack: set boolean settings to ints, otherwise they're always checked.
     form.backup_warn.data = int(form.backup_warn.data)
     form.backup_auto.data = int(form.backup_auto.data)
@@ -96,7 +96,7 @@ def backup():
     if 'type' in request.args:
         backuptype = 'manual'
 
-    settings = Setting.get_backup_settings()
+    settings = BackupSettings.get_backup_settings()
     return render_template(
         'backup/backup.html',
         backup_folder=settings.backup_dir,
@@ -115,7 +115,7 @@ def do_backup():
         backuptype = prms['type']
 
     c = AppConfig.create_from_config()
-    settings = Setting.get_backup_settings()
+    settings = BackupSettings.get_backup_settings()
     is_manual = backuptype.lower() == 'manual'
     try:
         f = create_backup(c, settings, is_manual = is_manual)

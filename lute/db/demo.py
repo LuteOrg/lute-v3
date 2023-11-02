@@ -16,7 +16,7 @@ from sqlalchemy import text
 
 from lute.models.language import Language
 from lute.models.book import Book
-from lute.models.setting import Setting
+from lute.models.setting import SystemSetting
 from lute.db import db
 import lute.db.management
 
@@ -25,9 +25,8 @@ def contains_demo_data():
     """
     True if IsDemoData setting is present.
     """
-    sql = "select StKey from settings where StKey = 'IsDemoData'"
-    result = db.session.execute(text(sql)).fetchone()
-    if result is None:
+    ss = SystemSetting.get_value('IsDemoData')
+    if ss is None:
         return False
     return True
 
@@ -36,8 +35,7 @@ def remove_flag():
     """
     Remove IsDemoData setting.
     """
-    sql = "delete from settings where StKey = 'IsDemoData'"
-    db.session.execute(text(sql))
+    SystemSetting.delete_key('IsDemoData')
     db.session.commit()
 
 
@@ -170,7 +168,7 @@ def load_demo_data():
     """
     load_demo_languages()
     load_demo_stories()
-    Setting.set_value('IsDemoData', True)
+    SystemSetting.set_value('IsDemoData', True)
     db.session.commit()
 
 

@@ -8,7 +8,7 @@ import gzip
 from datetime import datetime
 import time
 
-from lute.models.setting import Setting
+from lute.models.setting import SystemSetting
 
 
 class BackupException(Exception):
@@ -90,7 +90,7 @@ def _create_db_backup(dbfilename, backupfile):
     with open(backupfile, 'rb') as in_file, gzip.open(f, 'wb', compresslevel=9) as out_file:
         shutil.copyfileobj(in_file, out_file)
     os.remove(backupfile)
-    Setting.set_last_backup_datetime(int(time.time()))
+    SystemSetting.set_last_backup_datetime(int(time.time()))
     return f
 
 

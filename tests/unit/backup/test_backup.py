@@ -9,7 +9,7 @@ import pytest
 from lute.backup.service import create_backup, \
     BackupException, \
     should_run_auto_backup, backup_warning
-from lute.models.setting import Setting
+from lute.models.setting import BackupSettings
 
 # pylint: disable=missing-function-docstring
 # Test method names are pretty descriptive already.
@@ -44,7 +44,7 @@ def cleanup_directory(directory):
 @pytest.fixture(name='backup_settings')
 def fixture_backup_settings(app_context, bkp_dir):
     # app_context is passed so that the db session is available.
-    ret = Setting.get_backup_settings()
+    ret = BackupSettings.get_backup_settings()
     ret.backup_dir = bkp_dir
     ret.backup_enabled = 'y'
     yield ret
@@ -98,7 +98,7 @@ def test_all_manual_backups_are_kept(testconfig, bkp_dir, backup_settings):
 def test_last_import_setting_is_updated_on_successful_backup(testconfig, backup_settings):
     assert backup_settings.last_backup_datetime is None, 'no backup'
     create_backup(testconfig, backup_settings)
-    updated = Setting.get_backup_settings()
+    updated = BackupSettings.get_backup_settings()
     assert updated.last_backup_datetime is not None, 'set'
 
 
