@@ -39,7 +39,8 @@ def test_wiping_db_clears_out_all_tables(app_context):
     for t in tables:
         assert_record_count_equals(t, 0, t)
 
-    assert_record_count_equals('settings', len(old_user_settings), 'user settings remain')
+    sql = "select * from settings where stkeytype='user'"
+    assert_record_count_equals(sql, len(old_user_settings), 'user settings remain')
     sql = "select * from settings where StKeyType = 'user' and StValue is null"
     assert_record_count_equals(sql, len(old_user_settings), 'user settings are nulled')
     sql = "select * from settings where StKeyType = 'system'"
