@@ -3,8 +3,28 @@ Settings test.
 """
 
 from lute.db import db
-from lute.models.setting import Setting
+from lute.models.setting import Setting, UserSetting, SystemSetting
 from tests.dbasserts import assert_sql_result
+
+
+def test_user_and_system_settings_do_not_intersect(app_context):
+    "A UserSetting is not available as a system setting."
+    UserSetting.set_value('zztrash', 42)
+    db.session.commit()
+    sql = "select StValue, StKeyType from settings where StKey = 'zztrash'"
+    assert_sql_result(sql, [ '42; user' ], 'loaded')
+    u = UserSetting.get_value('zztrash')
+    assert u == '42', 'found user setting'
+    assert SystemSetting.get_value('zztrash') is None, 'not in system settings'
+
+    SystemSetting.set_value('systrash', 99)
+    db.session.commit()
+    sql = "select StValue, StKeyType from settings where StKey = 'systrash'"
+    assert_sql_result(sql, [ '99; system' ], 'loaded system key')
+    assert SystemSetting.get_value('systrash') == '99', 'found'
+    u = UserSetting.get_value('systrash')
+    assert u is None, 'not in user settings'
+
 
 
 def test_save_and_retrieve(app_context):

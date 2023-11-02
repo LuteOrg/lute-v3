@@ -9,24 +9,29 @@ class Setting(db.Model):
     "Settings table."
     __tablename__ = 'settings'
     key = db.Column('StKey', db.String(40), primary_key=True)
-    value = db.Column('StValue', db.String(40), nullable=False)
+    keytype = db.Column('StKeyType', db.String(10), nullable=False)
+    value = db.Column('StValue', db.String, nullable=False)
+    __mapper_args__ = {"polymorphic_on": keytype}
 
+    # Subclasses declare the keytype_value to be stored in the db??
+    keytype_value = None
 
-    @staticmethod
-    def set_value(keyname, keyvalue):
+    @classmethod
+    def set_value(cls, keyname, keyvalue):
         "Set, but don't save, a setting."
-        s = db.session.query(Setting).filter(Setting.key == keyname).first()
+        s = db.session.query(cls).filter(cls.key == keyname).first()
         if s is None:
             s = Setting()
             s.key = keyname
+            s.keytype = cls.keytype_value
         s.value = keyvalue
         db.session.add(s)
 
 
-    @staticmethod
-    def get_value(keyname):
+    @classmethod
+    def get_value(cls, keyname):
         "Get the saved key, or None if it doesn't exist."
-        s = db.session.query(Setting).filter(Setting.key == keyname).first()
+        s = db.session.query(cls).filter(cls.key == keyname).first()
         if s is None:
             return None
         return s.value
@@ -82,3 +87,17 @@ class Setting(db.Model):
         "Get BackupSettings."
         b = Setting.BackupSettings()
         return b
+
+
+class UserSetting(Setting):
+    "User setting."
+    __tablename__ = None
+    keytype_value = 'user'
+    __mapper_args__ = {"polymorphic_identity": 'user'}
+
+
+class SystemSetting(Setting):
+    "System setting."
+    __tablename__ = None
+    keytype_value = 'system'
+    __mapper_args__ = {"polymorphic_identity": 'system'}
