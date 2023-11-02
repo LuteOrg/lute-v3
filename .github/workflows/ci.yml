@@ -21,6 +21,13 @@ jobs:
       run: |
         sudo apt-get update -y
         sudo apt-get install -y mecab mecab-ipadic-utf8
+        # Helper checks to find the mecab library path,
+        # so it can be exported before running tests.
+        # Without the export, natto-py fails on github.
+        # echo FIND THE LIB:
+        # which mecab
+        # actual=`readlink -f /usr/bin/mecab`
+        # ldd $actual
 
     - uses: actions/checkout@v3
 
@@ -33,16 +40,26 @@ jobs:
 
     - name: Setup config
       run: |
-        mkdir ./data
-        echo "ENV: dev" > config/config.yml
-        echo "DATAPATH: ./data" >> config/config.yml
-        echo "DBNAME: test_lute.db" >> config/config.yml
+        mkdir ${{ github.workspace }}/data
+        echo "ENV: dev" > ${{ github.workspace }}/config/config.yml
+        echo "DATAPATH: ${{ github.workspace }}/data" >> ${{ github.workspace }}/config/config.yml
+        echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/config/config.yml
+        ls ${{ github.workspace }}
+        cat ${{ github.workspace }}/config/config.yml
 
     - name: Lint
       run: inv lint
 
     - name: Test
-      run: pytest
+      run: |
+        # Have to explicitly set MECAB_PATH for natto-py.
+        export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
+        pytest
 
+    # Note that these seem to *pass* even if an acceptance
+    # test fails in GitHub actions ... which is annoying,
+    # because everything passes/fails correctly locally.
     - name: Acceptance testing
-      run: inv accept --headless -s
+      run: |
+        export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
+        inv accept --headless -s

@@ -65,6 +65,24 @@ def session_chrome_browser(request, _environment_check):
     if headless:
         chrome_options.add_argument('--headless')  # Enable headless mode
 
+        # Set the window size and ensure no devtools, or errors happen:
+        #
+        # selenium.common.exceptions.ElementClickInterceptedException:
+        # Message: element click intercepted: Element <button id="submit" ... >
+        #   is not clickable at poi...
+        #
+        # Possibly running headless is opening devtools or using
+        # a smaller browser window, which affects the layout and
+        # hides some elements.  When run in non-headless, all is fine.
+
+        # https://stackoverflow.com/questions/54023497/
+        #   python-selenium-chrome-driver-disable-devtools
+        chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+
+        # https://stackoverflow.com/questions/43541925/
+        #   how-can-i-set-the-browser-window-size-when-using-google-chrome-headless
+        chrome_options.add_argument("window-size=1920,1080")
+
     # Initialize the browser with ChromeOptions
     browser = Browser('chrome', options=chrome_options)
 
@@ -202,7 +220,7 @@ def check_term_table(luteclient, content):
 @then(parsers.parse('the reading pane shows:\n{content}'))
 def then_read_content(luteclient, content):
     "Check rendered content."
-    displayed = luteclient.displayed_text(LuteTestClient.text_and_status_renderer)
+    displayed = luteclient.displayed_text()
     assert content == displayed
 
 @when(parsers.parse('I change the current text content to:\n{content}'))

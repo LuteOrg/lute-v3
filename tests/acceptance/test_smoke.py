@@ -2,9 +2,6 @@
 Smoke tests.
 """
 
-from tests.acceptance.lute_test_client import LuteTestClient
-
-
 def test_hit_main_page(chromebrowser, request):
     "Hit the main page, sanity check only."
     useport = request.config.getoption("--port")
@@ -29,5 +26,5 @@ def test_create_book(chromebrowser, luteclient):
     luteclient.click_word_fill_form('Hola', updates)
     luteclient.click_word_fill_form('Adios', { 'translation': 'goodbye' })
 
-    displayed = luteclient.displayed_text(LuteTestClient.text_and_status_renderer)
+    displayed = luteclient.displayed_text()
     assert 'Hola (1)/. /Adios (1)/ /amigo (1)/.' == displayed

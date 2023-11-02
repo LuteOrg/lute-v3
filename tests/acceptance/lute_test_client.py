@@ -162,35 +162,24 @@ class LuteTestClient:
     ################################3
     # Reading/rendering
 
-    @staticmethod
-    def default_parsed_token_renderer(t):
-        return t.text
-
-    @staticmethod
-    def text_and_status_renderer(t):
-        """
-        Lambda, generate a string for a parsedtoken.
-
-        Used to compare rendered content with expected.
-        """
-        ret = t.text
-
-        classes = t['class'].split(' ')
-        status_class = [c for c in classes if c.startswith('status')]
-        if len(status_class) == 0:
-            return ret
-        assert len(status_class) == 1, f'should only have 1 status on {t.text}'
-
-        status = status_class[0].replace('status', '')
-        if status != '0':
-            ret = f'{ret} ({status})'
-        return ret
-
-
-    def displayed_text(self, token_renderer = default_parsed_token_renderer):
+    def displayed_text(self):
         "Return the TextItems, with '/' at token boundaries."
         elements = self.browser.find_by_xpath('//span[contains(@class, "textitem")]')
-        etext = [ token_renderer(e) for e in elements ]
+
+        def _to_string(t):
+            "Create string for token, eg 'cat (2)'."
+            status = [
+                c.replace('status', '')
+                for c in
+                t['class'].split(' ')
+                if c.startswith('status') and c != 'status0' ]
+            if len(status) == 0:
+                return t.text
+            assert len(status) == 1, f'should only have 1 status on {t.text}'
+            status = status[0]
+            return f'{t.text} ({status})'
+
+        etext = [ _to_string(e) for e in elements ]
         return '/'.join(etext)
 
     ################################3
