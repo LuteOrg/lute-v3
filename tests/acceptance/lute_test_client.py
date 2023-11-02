@@ -42,6 +42,13 @@ class LuteTestClient:
         "Load the demo stories."
         self.visit('dev_api/load_demo_stories')
 
+    def change_parser_registry_key(self, key, replacement):
+        """
+        Change a parser registry key to a replacement,
+        effectively disabling that parser.
+        """
+        self.visit(f'dev_api/disable_parser/{key}/{replacement}')
+
     ################################3
     # Browsing
 

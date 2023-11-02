@@ -2,16 +2,11 @@
 Smoke tests.
 """
 
-def test_hit_main_page(chromebrowser, request):
-    "Hit the main page, sanity check only."
-    useport = request.config.getoption("--port")
-    url = f"http://localhost:{useport}/"
-    chromebrowser.visit(url)
-    assert chromebrowser.is_text_present('Lute'), 'have main page.'
+import pytest
 
 
-def test_create_book(chromebrowser, luteclient):
-    "Try creating a book."
+def test_smoke_test(chromebrowser, luteclient):
+    "Hit the main page, create a book, update a term."
     luteclient.visit('/')
     assert chromebrowser.is_text_present('Lute'), 'have main page.'
     luteclient.make_book('Hola', 'Hola. Adios amigo.', 'Spanish')
@@ -24,7 +19,26 @@ def test_create_book(chromebrowser, luteclient):
         'parents': [ 'adios', 'amigo' ]
     }
     luteclient.click_word_fill_form('Hola', updates)
-    luteclient.click_word_fill_form('Adios', { 'translation': 'goodbye' })
+    luteclient.click_word_fill_form('Adios', { 'status': '2', 'translation': 'goodbye' })
 
     displayed = luteclient.displayed_text()
-    assert 'Hola (1)/. /Adios (1)/ /amigo (1)/.' == displayed
+    assert 'Hola (1)/. /Adios (2)/ /amigo (1)/.' == displayed
+
+
+@pytest.fixture(name='_restore_jp_parser')
+def fixture_restore_jp_parser(luteclient):
+    "Hack for test: restore a parser using the dev api."
+    yield
+    luteclient.change_parser_registry_key('disabled_japanese', 'japanese')
+
+
+def test_unsupported_language_not_shown(chromebrowser, luteclient, _restore_jp_parser):
+    "Missing mecab means no Japanese."
+    luteclient.load_demo_stories()
+    # luteclient.visit('/')
+    # assert chromebrowser.is_text_present('Japanese'), 'have Japanese demo book.'
+
+    luteclient.change_parser_registry_key('japanese', 'disabled_japanese')
+    luteclient.visit('/')
+    assert not chromebrowser.is_text_present('Japanese'), 'no Japanese demo book.'
+    assert chromebrowser.is_text_present('Tutorial'), 'Tutorial is available though.'

@@ -2,7 +2,9 @@ name: ci
 
 on:
   push:
-    branches: [ "develop", "master" ]
+    # A branch github-ci-updates can be created and used for ci
+    # experiments and tweaks.
+    branches: [ "develop", "master", "github-ci-updates" ]
   pull_request:
     branches: [ "develop", "master" ]
 
@@ -63,3 +65,16 @@ jobs:
       run: |
         export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
         inv accept --headless -s
+
+    - name: Remove mecab for smoke test without mecab
+      run: |
+        sudo apt-get remove -y mecab mecab-ipadic-utf8
+
+    # Run one particular sanity check.
+    #
+    # Note this isn't _completely_ valid because the test loads
+    # only supported language stories, whereas a prod release
+    # comes with _all_ stories pre-loaded and the invalid ones
+    # are deleted ...
+    - name: Smoke test no mecab
+      run: inv accept --headless -s -k test_unsupported_language_not_shown

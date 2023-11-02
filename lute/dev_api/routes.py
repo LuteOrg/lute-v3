@@ -18,6 +18,7 @@ from sqlalchemy import text
 from flask import Blueprint, Response, jsonify, redirect, flash
 from lute.app_config import AppConfig
 from lute.models.language import Language
+import lute.parse.registry
 from lute.db import db
 import lute.db.management
 import lute.db.demo
@@ -109,3 +110,30 @@ def sql_result(sql):
 def dummy_language_dict(langname, term):
     "Fake language dictionary/term lookup."
     return Response(f'dev_api/dummy_dict/{langname}/{term}')
+
+@bp.route('/disable_parser/<string:parsername>/<string:renameto>', methods=['GET'])
+def disable_parser(parsername, renameto):
+    "Hack: rename a parser in the registry so that languages can't find it."
+    p = lute.parse.registry.parsers
+    if parsername in p:
+        p[renameto] = p.pop(parsername)
+    langs = db.session.query(Language).all()
+    unsupported = [
+        { 'parser_type': lang.parser_type,
+          'language': lang.name
+         }
+        for lang in langs
+        if not lang.is_supported
+    ]
+    allparsers = [
+        { 'parser_type': lang.parser_type,
+          'language': lang.name
+         }
+        for lang in langs
+    ]
+    available_types = list(p.keys())
+    return jsonify({
+        '_unsupported': unsupported,
+        'available_types': available_types,
+        'parsers': allparsers
+    })

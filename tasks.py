@@ -78,9 +78,10 @@ def search(c, search_for):
 @task(help={
     'port': 'optional port to run on; creates server if needed.',
     'show': 'print data',
-    'headless': 'run as headless'
+    'headless': 'run as headless',
+    'kflag': 'optional -k flag argument'
 })
-def accept(c, port=None, show=False, headless=False):
+def accept(c, port=None, show=False, headless=False, kflag=None):
     """
     Start lute on 9876, run tests/acceptance tests, screenshot fails.
 
@@ -123,6 +124,9 @@ def accept(c, port=None, show=False, headless=False):
         run_test.append('-s')
     if headless:
         run_test.append('--headless')
+    if kflag:
+        run_test.append('-k')
+        run_test.append(kflag)
 
     if site_running:
         c.run(' '.join(run_test))

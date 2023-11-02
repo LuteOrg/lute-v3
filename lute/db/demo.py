@@ -147,22 +147,20 @@ def load_demo_stories():
     demo_glob = os.path.join(demo_data_path(), 'stories', '*.txt')
     for filename in glob(demo_glob):
         with open(filename, 'r', encoding='utf-8') as f:
-            full_content = f.read()
-        content = re.sub(r'#.*\n', '', full_content)
+            content = f.read()
 
-        lang_match = re.search(r'language:\s*(.*)\n', full_content)
-        lang_name = lang_match.group(1).strip()
-        lang = Language.find_by_name(lang_name)
+        langpatt = r'language:\s*(.*)\n'
+        lang = re.search(langpatt, content).group(1).strip()
+        lang = Language.find_by_name(lang)
 
-        if lang is None:
-            # Language not loaded, skip this demo.
-            continue
-
-        title_match = re.search(r'title:\s*(.*)\n', full_content)
-        title = title_match.group(1).strip()
-
-        b = Book.create_book(title, lang, content)
-        db.session.add(b)
+        if lang is None or not lang.is_supported:
+            pass
+        else:
+            title_match = re.search(r'title:\s*(.*)\n', content)
+            title = title_match.group(1).strip()
+            content = re.sub(r'#.*\n', '', content)
+            b = Book.create_book(title, lang, content)
+            db.session.add(b)
     db.session.commit()
 
 
