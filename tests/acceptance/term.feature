@@ -4,7 +4,7 @@ Feature: Creating and managing terms
         Given a running site
         And demo languages
         Then the term table contains:
-            -
+            No data available in table
 
     Scenario: Create a single term from the term form
         Given a new Spanish term:

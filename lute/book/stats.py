@@ -83,13 +83,6 @@ def refresh_stats():
     books_to_update = db.session.query(Book). \
         filter(~Book.id.in_(db.session.query(BookStats.BkID))). \
         all()
-    print('<' * 50)
-    print(books_to_update)
-    for b in books_to_update:
-        print('-' * 50)
-        print(b.title)
-        # print(b.language.name)
-    print('<' * 50)
     books = [b for b in books_to_update if b.is_supported]
     for book in books:
         stats = _get_stats(book)

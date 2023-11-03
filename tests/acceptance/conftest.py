@@ -186,7 +186,7 @@ def given_book(luteclient, lang, title, c):
 @given(parsers.parse('the book table loads "{title}"'))
 def given_book_table_wait(luteclient, title):
     "The book table is loaded via ajax, so there's a delay."
-    _sleep(0.2)  # Hack!
+    _sleep(1)  # Hack!
     assert title in luteclient.browser.html
 
 @when(parsers.parse('I set the book table filter to "{filt}"'))
@@ -199,6 +199,7 @@ def when_set_book_table_filter(luteclient, filt):
 @then(parsers.parse('the book table contains:\n{content}'))
 def check_book_table(luteclient, content):
     "Check the table, e.g. content like 'Hola; Spanish; ; 4 (0%);'"
+    time.sleep(1)
     assert content == luteclient.get_book_table_content()
 
 # Terms
@@ -226,8 +227,11 @@ def import_term_file(luteclient, content):
 @then(parsers.parse('the term table contains:\n{content}'))
 def check_term_table(luteclient, content):
     "Check the table."
+    luteclient.visit('/')
+    luteclient.browser.links.find_by_text('Terms').click()
+    time.sleep(1)
     if content == '-':
-        content = ''
+        content = 'No data available in table'
     assert content == luteclient.get_term_table_content()
 
 # Reading
