@@ -2,9 +2,6 @@
 Smoke tests.
 """
 
-import pytest
-
-
 def test_smoke_test(chromebrowser, luteclient):
     "Hit the main page, create a book, update a term."
     luteclient.visit('/')

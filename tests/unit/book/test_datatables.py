@@ -11,6 +11,7 @@ from lute.db.demo import load_demo_stories
 
 @pytest.fixture(name='_dt_params')
 def fixture_dt_params():
+    "Sample query params."
     columns = [
         {
             "data": "0",
@@ -49,7 +50,7 @@ def test_smoke_book_datatables_query_runs(app_context, _dt_params):
     Smoke test only, ensure query runs.
     """
     load_demo_stories()
-    d = get_data_tables_list(_dt_params, False)
+    get_data_tables_list(_dt_params, False)
     # print(d['data'])
     a = 1
     assert a == 1, 'dummy check'
