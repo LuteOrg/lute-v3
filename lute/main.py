@@ -12,7 +12,7 @@ import lute.db.demo
 
 from lute.models.book import Book
 from lute.models.language import Language
-from lute.models.setting import BackupSettings
+from lute.models.setting import BackupSettings, UserSetting
 from lute.book.stats import refresh_stats
 
 from lute.book.routes import bp as book_bp
@@ -82,6 +82,7 @@ def _create_app(app_config, extra_config):
 
     with app.app_context():
         db.create_all()
+        UserSetting.load()
 
     app.db = db
 

@@ -2,6 +2,7 @@
 Settings test.
 """
 
+from sqlalchemy import text
 from lute.db import db
 from lute.models.setting import UserSetting, SystemSetting, BackupSettings
 from tests.dbasserts import assert_sql_result
@@ -75,3 +76,28 @@ def test_get_backup_settings(app_context):
     assert b.backup_warn is False
     assert b.backup_count == 12
     assert b.last_backup_datetime is None
+
+
+def test_user_settings_loaded_with_defaults(app_context):
+    "Called on load."
+    db.session.execute(text("delete from settings"))
+    db.session.commit()
+    assert UserSetting.key_exists('backup_dir') is False, 'key removed'
+    UserSetting.load()
+    assert UserSetting.key_exists('backup_dir') is True, 'key created'
+    b = BackupSettings.get_backup_settings()
+    assert b.backup_enabled is None  # initial defaults
+    assert b.backup_dir is None  # initial defaults
+    assert b.backup_auto is True  # initial defaults
+    assert b.backup_warn is True
+    assert b.backup_count == 5
+
+
+def test_user_settings_load_leaves_existing_values(app_context):
+    "Called on load."
+    UserSetting.set_value('backup_count', 17)
+    db.session.commit()
+    assert UserSetting.get_value('backup_count') == '17'
+    UserSetting.load()
+    b = BackupSettings.get_backup_settings()
+    assert b.backup_count == 17, 'still 17'

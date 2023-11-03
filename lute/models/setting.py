@@ -30,6 +30,14 @@ class SettingBase(db.Model):
 
 
     @classmethod
+    def key_exists(cls, keyname):
+        "True if exists."
+        s = db.session.query(cls).filter(cls.key == keyname).first()
+        no_key = s is None
+        return not no_key
+
+
+    @classmethod
     def get_value(cls, keyname):
         "Get the saved key, or None if it doesn't exist."
         s = db.session.query(cls).filter(cls.key == keyname).first()
@@ -49,6 +57,24 @@ class UserSetting(SettingBase):
     "User setting."
     __tablename__ = None
     __mapper_args__ = {"polymorphic_identity": 'user'}
+
+    @staticmethod
+    def load():
+        "Load missing user settings and default values."
+        keys_and_defaults = {
+            'backup_enabled': None,
+            'backup_auto': True,
+            'backup_warn': True,
+            'backup_dir': None,
+            'backup_count': 5
+        }
+        for k, v in keys_and_defaults.items():
+            if not UserSetting.key_exists(k):
+                s = UserSetting()
+                s.key = k
+                s.value = v
+                db.session.add(s)
+        db.session.commit()
 
 
 class SystemSetting(SettingBase):
