@@ -129,7 +129,7 @@ def _create_app(app_config, extra_config):
     @app.route('/wipe_database')
     def wipe_db():
         if lute.db.demo.contains_demo_data():
-            lute.db.demo.delete_all_data()
+            lute.db.demo.delete_demo_data()
             flash('The database has been wiped clean.  Have fun!')
         return redirect('/', 302)
 
