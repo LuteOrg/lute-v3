@@ -26,6 +26,7 @@ from lute.termimport.routes import bp as termimport_bp
 from lute.term_parent_map.routes import bp as term_parent_map_bp
 from lute.backup.routes import bp as backup_bp
 from lute.dev_api.routes import bp as dev_api_bp
+from lute.settings.routes import bp as settings_bp
 
 
 def _setup_app_dirs(app_config):
@@ -95,6 +96,7 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(term_parent_map_bp)
     app.register_blueprint(backup_bp)
     app.register_blueprint(dev_api_bp)
+    app.register_blueprint(settings_bp)
 
     @app.route('/')
     def index():

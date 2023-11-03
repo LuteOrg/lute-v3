@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Backup settings{% endblock %}
+
+{% block body %}
+<h1>Backup settings</h1>
+
+{% for field_name, field_errors in form.errors.items() %}
+{% for error in field_errors %}
+<div class="flash-notice">{{ error }}</div>
+{% endfor %}
+{% endfor %}
+
+<form method="POST">
+  {{ form.hidden_tag() }}
+  {{ form.csrf_token }}
+  <table id="backupsettings">
+    {% for f in [
+    form.backup_enabled,
+    form.backup_dir,
+    form.backup_auto,
+    form.backup_warn,
+    form.backup_count
+    ]%}
+    <tr>
+      <td>{{ f.label }}</td>
+      <td>{{ f(class="form-control") }}</td>
+    </tr>
+    
+    {% endfor %}
+
+  </table>
+
+  <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<button onclick="window.location = '/'">Cancel</button>
+
+{% endblock %}
