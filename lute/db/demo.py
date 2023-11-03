@@ -159,6 +159,7 @@ def load_demo_stories():
             content = re.sub(r'#.*\n', '', content)
             b = Book.create_book(title, lang, content)
             db.session.add(b)
+    SystemSetting.set_value('IsDemoData', True)
     db.session.commit()
 
 

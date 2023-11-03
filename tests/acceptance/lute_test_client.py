@@ -296,6 +296,6 @@ class LuteTestClient:
         print(f'since last:    {now - self.last_step}')
         self.last_step = now
 
-    def _sleep(self, seconds):
+    def sleep(self, seconds):
         "Nap."
         time.sleep(seconds)

@@ -35,10 +35,8 @@ def fixture_restore_jp_parser(luteclient):
 def test_unsupported_language_not_shown(chromebrowser, luteclient, _restore_jp_parser):
     "Missing mecab means no Japanese."
     luteclient.load_demo_stories()
-    # luteclient.visit('/')
-    # assert chromebrowser.is_text_present('Japanese'), 'have Japanese demo book.'
 
     luteclient.change_parser_registry_key('japanese', 'disabled_japanese')
     luteclient.visit('/')
-    assert not chromebrowser.is_text_present('Japanese'), 'no Japanese demo book.'
-    assert chromebrowser.is_text_present('Tutorial'), 'Tutorial is available though.'
+    assert not luteclient.browser.is_text_present('Japanese'), 'no Japanese demo book.'
+    assert luteclient.browser.is_text_present('Tutorial'), 'Tutorial is available though.'
