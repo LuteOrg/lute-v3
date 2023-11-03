@@ -104,10 +104,7 @@ def _create_app(app_config, extra_config):
             return redirect('/backup/backup', 302)
 
         is_demo = lute.db.demo.contains_demo_data()
-        tutorial_book_id = None
-        if is_demo:
-            lute.db.demo.delete_unsupported_demo_data()
-            tutorial_book_id = lute.db.demo.tutorial_book_id()
+        tutorial_book_id = lute.db.demo.tutorial_book_id()
 
         refresh_stats()
 
