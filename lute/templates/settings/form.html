@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}Backup settings{% endblock %}
+{% block title %}Settings{% endblock %}
 
 {% block body %}
-<h1>Backup settings</h1>
+<h1>Settings</h1>
 
 {% for field_name, field_errors in form.errors.items() %}
 {% for error in field_errors %}
@@ -14,6 +14,9 @@
 <form method="POST">
   {{ form.hidden_tag() }}
   {{ form.csrf_token }}
+
+  <h2>Backup</h2>
+
   <table id="backupsettings">
     {% for f in [
     form.backup_enabled,

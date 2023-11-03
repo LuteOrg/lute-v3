@@ -3,12 +3,12 @@ Settings routes.
 """
 
 import os
-from flask import Blueprint, render_template, request, redirect, flash, jsonify
+from flask import Blueprint, render_template, redirect, flash
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, SelectField, IntegerField
 from wtforms.validators import InputRequired, NumberRange
 from wtforms import ValidationError
-from lute.models.setting import BackupSettings, UserSetting
+from lute.models.setting import UserSetting
 from lute.db import db
 
 
