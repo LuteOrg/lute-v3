@@ -106,6 +106,13 @@ def fixture_lute_client(request, chromebrowser):
     yield c
 
 
+@pytest.fixture(name='_restore_jp_parser')
+def fixture_restore_jp_parser(luteclient):
+    "Hack for test: restore a parser using the dev api."
+    yield
+    luteclient.change_parser_registry_key('disabled_japanese', 'japanese')
+
+
 ################################
 ## STEP DEFS
 
@@ -124,6 +131,14 @@ def given_running_site(luteclient):
     assert resp.status_code == 200, f'{luteclient.home} is up'
     luteclient.visit('/')
     assert luteclient.browser.is_text_present('Lute')
+
+@given('I disable the "japanese" parser')
+def disable_japanese_parser(luteclient, _restore_jp_parser):
+    luteclient.change_parser_registry_key('japanese', 'disabled_japanese')
+
+@given('I enable the "japanese" parser')
+def enable_jp_parser(luteclient):
+    luteclient.change_parser_registry_key('disabled_japanese', 'japanese')
 
 # Browsing
 
@@ -179,7 +194,7 @@ def when_set_book_table_filter(luteclient, filt):
     "Set the filter, wait a sec."
     b = luteclient.browser
     b.find_by_tag('input').fill(filt)
-    _sleep(0.2)
+    time.sleep(1)
 
 @then(parsers.parse('the book table contains:\n{content}'))
 def check_book_table(luteclient, content):

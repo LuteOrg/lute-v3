@@ -3,7 +3,8 @@ Show terms in datatables.
 """
 
 from lute.db import db
-from lute.utils.data_tables import DataTablesSqliteQuery
+from lute.utils.data_tables import DataTablesSqliteQuery, \
+    supported_parser_type_criteria
 
 def get_data_tables_list(parameters):
     "Term json data for datatables."
@@ -50,7 +51,8 @@ def get_data_tables_list(parameters):
     filt_status_max = int(parameters['filtStatusMax'])
     filt_include_ignored = parameters['filtIncludeIgnored']
 
-    wheres = ["1 = 1"]
+    typecrit = supported_parser_type_criteria()
+    wheres = [ f"L.LgParserType in ({typecrit})" ]
     if filt_parents_only == 'true':
         wheres.append("parents.parentlist IS NULL")
     if filt_age_min:

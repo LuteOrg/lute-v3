@@ -157,6 +157,8 @@ class LuteTestClient:
 
     def get_term_table_content(self):
         "Get term table content."
+        self.visit('/')
+        self.click_link('Terms')
         css = '#termtable tbody tr'
         def _to_string(row):
             tds = row.find_by_css('td')

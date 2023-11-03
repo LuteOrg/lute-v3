@@ -25,13 +25,6 @@ def test_smoke_test(chromebrowser, luteclient):
     assert 'Hola (1)/. /Adios (2)/ /amigo (1)/.' == displayed
 
 
-@pytest.fixture(name='_restore_jp_parser')
-def fixture_restore_jp_parser(luteclient):
-    "Hack for test: restore a parser using the dev api."
-    yield
-    luteclient.change_parser_registry_key('disabled_japanese', 'japanese')
-
-
 def test_unsupported_language_not_shown(luteclient, _restore_jp_parser):
     "Missing mecab means no Japanese."
     luteclient.load_demo_stories()

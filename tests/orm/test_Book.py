@@ -5,6 +5,7 @@ Book mapping checks.
 from datetime import datetime
 import pytest
 from lute.models.book import Book, BookTag
+from lute.book.stats import BookStats
 from lute.db import db
 from tests.dbasserts import assert_sql_result, assert_record_count_equals
 
@@ -80,3 +81,25 @@ def test_save_and_delete_created_book(english):
     db.session.delete(b)
     db.session.commit()
     assert_sql_result(sql, [], 'texts deleted')
+
+
+def test_load_book_loads_lang(empty_db, simple_book):
+    """
+    Check book mappings.
+    """
+    b = simple_book
+    db.session.add(b)
+    db.session.commit()
+
+    findbook = db.session.query(Book).filter(Book.title == 'hi').first()
+    assert findbook.title == 'hi', 'title'
+    assert findbook.language.name == 'English', 'check lang'
+
+    for b in db.session.query(Book).all():
+        assert b.language is not None, 'have lang object'
+
+    books_to_update = db.session.query(Book). \
+        filter(~Book.id.in_(db.session.query(BookStats.BkID))). \
+        all()
+    for b in books_to_update:
+        assert b.language is not None, 'have lang object'

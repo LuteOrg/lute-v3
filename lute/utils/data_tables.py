@@ -5,6 +5,14 @@ Helper methods to get data for datatables display.
 from typing import Any
 import re
 from sqlalchemy.sql import text
+from lute.parse.registry import supported_parser_types
+
+
+def supported_parser_type_criteria():
+    "Helper to get all supported parser_types."
+    typecrit = [ f"'{p}'" for p in supported_parser_types() ]
+    typecrit.append("'zz_dummy_parser'")
+    return ','.join(typecrit)
 
 
 class DataTablesFlaskParamParser:

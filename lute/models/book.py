@@ -88,6 +88,11 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
     def page_count(self):
         return len(self.texts)
 
+    @property
+    def is_supported(self):
+        "True if the book's language's parser is supported."
+        return self.language.is_supported
+
     @staticmethod
     def create_book(title, language, fulltext, max_word_tokens_per_text = 250):
         """

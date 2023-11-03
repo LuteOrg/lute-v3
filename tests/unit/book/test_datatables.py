@@ -2,12 +2,15 @@
 Book tests.
 """
 
+import pytest
+from lute.models.language import Language
 from lute.book.datatables import get_data_tables_list
+from lute.db import db
+from lute.db.demo import load_demo_stories
 
-def test_smoke_datatables_query_runs(app_context):
-    """
-    Smoke test only, ensure query runs.
-    """
+
+@pytest.fixture(name='_dt_params')
+def fixture_dt_params():
     columns = [
         {
             "data": "0",
@@ -31,15 +34,35 @@ def test_smoke_datatables_query_runs(app_context):
                 "dir": "asc"
             }
         ],
-        "start": "10",
-        "length": "50",
+        "start": "1",
+        "length": "10",
         "search": {
             "value": "",
             "regex": False
         }
     }
+    return params
 
-    d = get_data_tables_list(params, False)
-    print(d)
+
+def test_smoke_book_datatables_query_runs(app_context, _dt_params):
+    """
+    Smoke test only, ensure query runs.
+    """
+    load_demo_stories()
+    d = get_data_tables_list(_dt_params, False)
+    # print(d['data'])
     a = 1
     assert a == 1, 'dummy check'
+
+
+def test_book_query_only_returns_supported_language_books(app_context, _dt_params):
+    """
+    Smoke test only, ensure query runs.
+    """
+    load_demo_stories()
+    for lang in db.session.query(Language).all():
+        lang.parser_type = 'unknown'
+        db.session.add(lang)
+    db.session.commit()
+    d = get_data_tables_list(_dt_params, False)
+    assert len(d['data']) == 0, 'no books should be active'

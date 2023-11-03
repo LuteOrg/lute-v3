@@ -7,7 +7,6 @@ from lute.db import db
 from lute.models.book import Book
 
 
-
 def get_status_distribution(book):
     """
     Return statuses and count of unique words per status.
@@ -82,9 +81,17 @@ class BookStats(db.Model):
 def refresh_stats():
     "Refresh stats for all books requiring update."
     books_to_update = db.session.query(Book). \
-        filter(~Book.id.in_(db.session.query(BookStats.BkID))).all()
-
-    for book in books_to_update:
+        filter(~Book.id.in_(db.session.query(BookStats.BkID))). \
+        all()
+    print('<' * 50)
+    print(books_to_update)
+    for b in books_to_update:
+        print('-' * 50)
+        print(b.title)
+        # print(b.language.name)
+    print('<' * 50)
+    books = [b for b in books_to_update if b.is_supported]
+    for book in books:
         stats = _get_stats(book)
         _update_stats(book, stats)
 
