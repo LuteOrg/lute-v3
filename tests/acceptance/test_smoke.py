@@ -32,7 +32,7 @@ def fixture_restore_jp_parser(luteclient):
     luteclient.change_parser_registry_key('disabled_japanese', 'japanese')
 
 
-def test_unsupported_language_not_shown(chromebrowser, luteclient, _restore_jp_parser):
+def test_unsupported_language_not_shown(luteclient, _restore_jp_parser):
     "Missing mecab means no Japanese."
     luteclient.load_demo_stories()
 
