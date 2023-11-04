@@ -53,15 +53,11 @@ Lute3 uses [Invoke](https://docs.pyinvoke.org/en/stable/index.html) to run tasks
 
 ## Running in dev mode
 
-The script `dev.py` runs the built-in Flask server in dev/debug mode.
-
-For some reason, you have to supply the full path when running that file.  See that file's comments for notes.
-
-e.g. for Mac:
+The script `devstart.py` runs the built-in Flask server in dev/debug mode.  Run it with either of these:
 
 ```
-# cd /path/to/lute3
-python `pwd`/dev.py
+inv start
+python -m devstart
 ```
 
 ## Testing

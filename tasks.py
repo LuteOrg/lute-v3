@@ -53,9 +53,7 @@ def start(c):
     """
     Start the dev server, using script dev.py.
     """
-    thisdir = os.path.dirname(os.path.realpath(__file__))
-    devscript = os.path.join(thisdir, 'dev.py')
-    c.run(f'python {devscript}')
+    c.run(f'python -m devstart')
 
 
 @task

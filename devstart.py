@@ -1,20 +1,19 @@
 """
-Developer entry point.
+Developer entry point.  Runs lute on a dev server.
 
-For some _extremely odd_ reason, you must run this with the full path
-to the file:
+You can run with:
 
-python /Users/jeff/Documents/Projects/lute_v3/dev.py
+inv devstart
+python -m devstart
 
+If you want to run this with "python", then for some _extremely odd_
+reason, you must run this with the full path to the file.
 Ref https://stackoverflow.com/questions/37650208/flask-cant-find-app-file
 
-This works on Mac:
+e.g.:
 
-python `pwd`/dev.py
-
-Optionally, use the start task:
-
-inv start
+python /Users/jeff/Documents/Projects/lute_v3/devstart.py
+python `pwd`/devstart.py
 """
 
 import logging
