@@ -8,9 +8,12 @@ charset-normalizer==3.3.1
 click==8.1.7
 coverage==7.3.1
 dill==0.3.7
+docutils==0.20.1
 Flask==2.3.3
 Flask-SQLAlchemy==3.1.1
 Flask-WTF==1.2.1
+flit==3.9.0
+flit_core==3.9.0
 h11==0.14.0
 idna==3.4
 iniconfig==2.0.0
@@ -44,6 +47,8 @@ sortedcontainers==2.4.0
 soupsieve==2.5
 splinter==0.19.0
 SQLAlchemy==2.0.21
+toml==0.10.2
+tomli_w==1.0.0
 tomlkit==0.12.1
 trio==0.22.2
 trio-websocket==0.11.1
