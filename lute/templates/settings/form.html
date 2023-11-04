@@ -36,33 +36,44 @@
 
   <p><i>Only applicable to learners of Japanese.</i></p>
 
-  <div style="width:60%">
-    <p>Lute uses MeCab to parse Japanese, so MeCab needs to be installed on your machine (see notes in <a href="https://github.com/jzohrab/lute/wiki/Install-Mecab" target="_blank">the wiki</a>).</p>
-    <p>Lute uses the Python
-    library <a href="https://github.com/buruzaemon/natto-py">natto-py</a>
-    (pre-installed with Lute) to interact with MeCab.  natto-py can
-    usually find MeCab automatically, but you <i>may</i> need to set a
-    MECAB_PATH environment variable if it can't, per the <a href="https://github.com/buruzaemon/natto-py#explicit-configuration-via-mecab_path-and-mecab_charset" target="_blank">natto-py README</a>.  Try different values for the MECAB_PATH entry below, including leaving the field blank, until clicking the &quot;test&quot; button returns a &quot;success&quot; message.</p>
-  </div>
-
   <table class="settingstable">
-    {% for f in [
-    form.mecab_path
-    ]%}
     <tr>
-      <td>{{ f.label }}</td>
-      <td>{{ f(class="form-control") }}</td>
-    </tr>
-    <tr>
-      <td>Test parsing</td>
       <td>
         <button onclick="test_mecab_setup(); return false;">
-          test
-        </button><br />
+          Test my MeCab configuration
+        </button>
+      </td>
+      <td>
         <div id="parse_result"></div>
       </td>
     </tr>
-    {% endfor %}
+    <tr>
+      <td>
+        {{ form.mecab_path.label }}
+        <img
+          id="about_mecab_path" style="margin-right:10px;"
+          src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+          title="Click for details"
+          onclick="$('#mecab_path_help').toggle();"
+          />
+
+          <blockquote id="mecab_path_help" style="width:60%; display: none;">
+    <p>Lute uses MeCab to parse Japanese, so MeCab needs to be installed on your machine (see notes in <a href="https://github.com/jzohrab/lute/wiki/Install-Mecab" target="_blank">the wiki</a>).</p>
+    <p>Lute includes the Python
+    library <a href="https://github.com/buruzaemon/natto-py">natto-py</a>
+    to interact with MeCab.  natto-py can usually find MeCab
+    automatically, but you <i>may</i> need to set a MECAB_PATH
+    environment variable if it can't, per
+    the <a href="https://github.com/buruzaemon/natto-py#explicit-configuration-via-mecab_path-and-mecab_charset"
+           target="_blank">natto-py README</a>.</p>
+    <p>Try different values for MECAB_PATH, including leaving the
+    field blank, until clicking the &quot;test&quot; button returns a
+    &quot;success&quot; message.</p>
+  </blockquote>
+
+      </td>
+      <td>{{ form.mecab_path(class="form-control") }}</td>
+    </tr>
   </table>
 
   <div style="margin-top:40px;">
@@ -73,7 +84,6 @@
 <button onclick="window.location = '/'">Cancel</button>
 
 <script>
-
   function test_mecab_setup() {
     let mecab_path = $('#mecab_path').val()
 
