@@ -17,8 +17,12 @@ Optionally, use the start task:
 inv start
 """
 
+import logging
 from lute.main import init_db_and_app
 from lute.app_config import AppConfig
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 app_config = AppConfig.create_from_config()
 print()
