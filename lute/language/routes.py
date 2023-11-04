@@ -52,6 +52,10 @@ def index():
 
     results = query.all()
 
+    results = [
+        rec for rec in results
+        if rec[0].is_supported is True ]
+
     return render_template('language/index.html', language_data=results)
 
 

@@ -17,7 +17,7 @@
 
   <h2>Backup</h2>
 
-  <table id="backupsettings">
+  <table class="settingstable">
     {% for f in [
     form.backup_enabled,
     form.backup_dir,
@@ -29,14 +29,80 @@
       <td>{{ f.label }}</td>
       <td>{{ f(class="form-control") }}</td>
     </tr>
-    
     {% endfor %}
-
   </table>
 
-  <button type="submit" class="btn btn-primary">Save</button>
+  <h2>Japanese</h2>
+
+  <p><i>Only applicable to learners of Japanese.</i></p>
+
+  <div style="width:60%">
+    <p>Lute uses MeCab to parse Japanese, so MeCab needs to be installed on your machine (see notes in <a href="https://github.com/jzohrab/lute/wiki/Install-Mecab" target="_blank">the wiki</a>).</p>
+    <p>Lute uses the Python
+    library <a href="https://github.com/buruzaemon/natto-py">natto-py</a>
+    (pre-installed with Lute) to interact with MeCab.  natto-py can
+    usually find MeCab automatically, but you <i>may</i> need to set a
+    MECAB_PATH environment variable if it can't, per the <a href="https://github.com/buruzaemon/natto-py#explicit-configuration-via-mecab_path-and-mecab_charset" target="_blank">natto-py README</a>.  Try different values for the MECAB_PATH entry below, including leaving the field blank, until clicking the &quot;test&quot; button returns a &quot;success&quot; message.</p>
+  </div>
+
+  <table class="settingstable">
+    {% for f in [
+    form.mecab_path
+    ]%}
+    <tr>
+      <td>{{ f.label }}</td>
+      <td>{{ f(class="form-control") }}</td>
+    </tr>
+    <tr>
+      <td>Test parsing</td>
+      <td>
+        <button onclick="test_mecab_setup(); return false;">
+          test
+        </button><br />
+        <div id="parse_result"></div>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <div style="margin-top:40px;">
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
 </form>
 
 <button onclick="window.location = '/'">Cancel</button>
+
+<script>
+
+  function test_mecab_setup() {
+    let mecab_path = $('#mecab_path').val()
+
+    $.ajax({
+      type: "GET",
+      url: '/settings/test_mecab',
+      data: { mecab_path: mecab_path },
+      dataType: "json",
+      success: function(data) {
+        const r = data['result'];
+        let msg = `${r}: ${data['message']}`
+        let color = 'red';
+        if (r == 'success') {
+          color = 'green';
+        }
+        else {
+          msg += "<br/><br/>Also, ensure you have MeCab installed and on your PATH.";
+        }
+
+        el = $('#parse_result');
+        el.html(msg);
+        el.css('border', `2px solid ${color}`);
+      },
+      error: function() {
+        alert('Error occured');
+      }
+    });
+  }
+
+</script>
 
 {% endblock %}

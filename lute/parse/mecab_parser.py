@@ -10,6 +10,7 @@ Includes classes:
 
 """
 
+import os
 import re
 from typing import List
 from natto import MeCab
@@ -21,9 +22,30 @@ class JapaneseParser(AbstractParser):
     Japanese parser.
 
     This is only supported if mecab is installed.
+
+    The parser uses natto-py library, and so should
+    be able to find mecab automatically; if it can't,
+    you may need to set the MECAB_PATH env variable,
+    managed here by the set_mecab_path_envkey() method.
     """
 
     _is_supported = None
+
+    @staticmethod
+    def set_mecab_path_envkey(v):
+        """
+        Sets the key MECAB_PATH key for natto-py.
+        Deletes if None or ''.
+        """
+        if 'MECAB_PATH' in os.environ:
+            del os.environ['MECAB_PATH']
+        if v is not None and v.strip() != '':
+            os.environ['MECAB_PATH'] = v.strip()
+        JapaneseParser._is_supported = None
+
+    @staticmethod
+    def get_mecab_path_envkey():
+        return os.getenv('MECAB_PATH')
 
     @classmethod
     def is_supported(cls):

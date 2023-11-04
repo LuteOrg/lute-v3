@@ -115,12 +115,12 @@
      word-break: break-all;
  }
 
- table#backupsettings
+ table.settingstable
  {
      width: 80%;
  }
 
- table#backupsettings thead, table#backupsettings tr, table#backupsettings th:first-child, table#backupsettings tbody, table#backupsettings tr, table#backupsettings td:first-child {
+ table.settingstable thead, table.settingstable tr, table.settingstable th:first-child, table.settingstable tbody, table.settingstable tr, table.settingstable td:first-child {
      width: 40%;
      min-width: 40%;
      max-width: 40%;

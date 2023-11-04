@@ -4,6 +4,8 @@ Lute settings, in settings key-value table.
 
 import datetime
 from lute.db import db
+from lute.parse.mecab_parser import JapaneseParser
+
 
 class SettingBase(db.Model):
     """
@@ -66,7 +68,8 @@ class UserSetting(SettingBase):
             'backup_auto': True,
             'backup_warn': True,
             'backup_dir': None,
-            'backup_count': 5
+            'backup_count': 5,
+            'mecab_path': None
         }
         for k, v in keys_and_defaults.items():
             if not UserSetting.key_exists(k):
@@ -75,6 +78,10 @@ class UserSetting(SettingBase):
                 s.value = v
                 db.session.add(s)
         db.session.commit()
+
+        # This feels wrong, somehow ... possibly could have an event
+        # bus that posts messages about the setting.
+        JapaneseParser.set_mecab_path_envkey(UserSetting.get_value('mecab_path'))
 
 
 class SystemSetting(SettingBase):

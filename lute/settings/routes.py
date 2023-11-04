@@ -3,13 +3,15 @@ Settings routes.
 """
 
 import os
-from flask import Blueprint, render_template, redirect, flash
+from flask import Blueprint, request, render_template, redirect, flash, jsonify
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, SelectField, IntegerField
 from wtforms.validators import InputRequired, NumberRange
 from wtforms import ValidationError
+from lute.models.language import Language
 from lute.models.setting import UserSetting
 from lute.db import db
+from lute.parse.mecab_parser import JapaneseParser
 
 
 class UserSettingsForm(FlaskForm):
@@ -30,7 +32,11 @@ class UserSettingsForm(FlaskForm):
     backup_dir = StringField('Backup directory')
     backup_auto = BooleanField('Run backups automatically (daily)')
     backup_warn = BooleanField('Warn if backup hasn\'t run in a week')
-    backup_count = IntegerField('Backup count', validators=[InputRequired(), NumberRange(min=1)])
+    backup_count = IntegerField(
+        'Backup count',
+        validators=[InputRequired(), NumberRange(min=1)])
+
+    mecab_path = StringField('MECAB_PATH environment variable')
 
     def validate_backup_enabled(self, field):
         "User should acknowledge."
@@ -58,7 +64,7 @@ class UserSettingsForm(FlaskForm):
 bp = Blueprint('settings', __name__, url_prefix='/settings')
 
 @bp.route('/index', methods=['GET', 'POST'])
-def backup_settings():
+def edit_settings():
     "Edit settings."
     form = UserSettingsForm()
     if form.validate_on_submit():
@@ -67,6 +73,9 @@ def backup_settings():
             if field.id not in ('csrf_token', 'submit'):
                 UserSetting.set_value(field.id, field.data)
         db.session.commit()
+
+        JapaneseParser.set_mecab_path_envkey(form.mecab_path.data)
+
         flash('Settings updated', 'success')
         return redirect('/')
 
@@ -79,3 +88,40 @@ def backup_settings():
     form.backup_auto.data = int(form.backup_auto.data or 0)
 
     return render_template('settings/form.html', form=form)
+
+
+@bp.route('/test_mecab', methods=['GET'])
+def test_parse():
+    """
+    Do a test parse for the JapaneseParser using the
+    given path string.
+
+    Returns { 'success': tokens }, or { 'error' msg }
+
+    """
+    mecab_path = request.args.get('mecab_path', None)
+    old_key = JapaneseParser.get_mecab_path_envkey()
+    result = { 'failure': 'tbd' }
+    try:
+        JapaneseParser.set_mecab_path_envkey(mecab_path)
+        # Parsing requires a language, even if it's a dummy.
+        lang = Language()
+        p = JapaneseParser()
+        src = '私は元気です'
+        toks = p.get_parsed_tokens(src, lang)
+        toks = [ tok.token for tok in toks if tok.token != '¶']
+        message = f"{src} parsed to [{ ', '.join(toks) }]"
+        result = {
+            'result': 'success',
+            'message': message
+        }
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        message = f'{type(e).__name__}: { str(e) }'
+        result = {
+            'result': 'failure',
+            'message': message
+        }
+    finally:
+        JapaneseParser.set_mecab_path_envkey(old_key)
+
+    return jsonify(result)
