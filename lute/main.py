@@ -54,6 +54,21 @@ def _setup_app_dirs(app_config):
                 f.write(rec['readme'])
 
 
+def _set_mecab_path_user_setting_from_environment():
+    """
+    Set MECAB_PATH if it's in the env.
+
+    The user can specify the MECAB_PATH in the settings,
+    but if it's already set in the environment, as is
+    done in CI on GitHub, then override it, as we can
+    assume that the user knows what they're doing.
+    """
+    mp = os.getenv('MECAB_PATH')
+    if mp is not None and mp != '':
+        UserSetting.set_value('mecab_path', mp)
+        db.session.commit()
+
+
 def _create_app(app_config, extra_config):
     """
     Create the app using the given configuration,
@@ -83,6 +98,7 @@ def _create_app(app_config, extra_config):
     with app.app_context():
         db.create_all()
         UserSetting.load()
+        _set_mecab_path_user_setting_from_environment()
 
     app.db = db
 
