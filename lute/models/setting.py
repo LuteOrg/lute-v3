@@ -5,6 +5,7 @@ Lute settings, in settings key-value table.
 import datetime
 from lute.db import db
 from lute.parse.mecab_parser import JapaneseParser
+from lute.app_config import AppConfig
 
 
 class SettingBase(db.Model):
@@ -60,6 +61,24 @@ class UserSetting(SettingBase):
     __tablename__ = None
     __mapper_args__ = {"polymorphic_identity": 'user'}
 
+
+    @staticmethod
+    def _set_mecab_path_from_config():
+        """
+        Set MECAB_PATH if it's in the config.
+
+        The user can specify the MECAB_PATH in the settings,
+        but if it's already set in the config file, as is
+        done in CI on GitHub, then override it, as we can
+        assume that the user knows what they're doing.
+        """
+        app_config = AppConfig.create_from_config()
+        mp = app_config.mecab_path
+        if mp is not None and mp != '':
+            UserSetting.set_value('mecab_path', mp)
+            db.session.commit()
+
+
     @staticmethod
     def load():
         "Load missing user settings and default values."
@@ -79,6 +98,7 @@ class UserSetting(SettingBase):
                 db.session.add(s)
         db.session.commit()
 
+        UserSetting._set_mecab_path_from_config()
         # This feels wrong, somehow ... possibly could have an event
         # bus that posts messages about the setting.
         JapaneseParser.set_mecab_path_envkey(UserSetting.get_value('mecab_path'))
