@@ -7,7 +7,7 @@ Backup settings form management, and running backups.
 from flask import Blueprint, render_template, request, jsonify
 from lute.models.setting import BackupSettings
 from lute.backup.service import create_backup
-from lute.app_config import AppConfig
+from lute.config.app_config import AppConfig
 
 
 bp = Blueprint('backup', __name__, url_prefix='/backup')

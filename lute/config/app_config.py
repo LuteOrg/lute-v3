@@ -122,5 +122,5 @@ class AppConfig:
     def create_from_config():
         "Create an AppConfig from the config file."
         thisdir = os.path.dirname(os.path.realpath(__file__))
-        configfile = os.path.join(thisdir, '..', 'config', 'config.yml')
+        configfile = os.path.join(thisdir, 'config.yml')
         return AppConfig(configfile)

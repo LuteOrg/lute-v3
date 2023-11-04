@@ -16,7 +16,7 @@ safeguards, so they can only be run against a test_ db.
 
 from sqlalchemy import text
 from flask import Blueprint, Response, jsonify, redirect, flash
-from lute.app_config import AppConfig
+from lute.config.app_config import AppConfig
 from lute.models.language import Language
 import lute.parse.registry
 from lute.db import db

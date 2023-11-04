@@ -5,7 +5,7 @@ App config tests
 import pytest
 import yaml
 
-from lute.app_config import AppConfig
+from lute.config.app_config import AppConfig
 
 
 def write_file(config_file, config_data):

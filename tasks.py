@@ -18,7 +18,7 @@ import requests
 from datetime import datetime
 import pytest
 from invoke import task, Collection
-from lute.app_config import AppConfig
+from lute.config.app_config import AppConfig
 
 
 @task

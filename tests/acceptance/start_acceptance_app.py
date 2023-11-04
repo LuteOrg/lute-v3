@@ -16,8 +16,8 @@ if len(sys.argv) != 2:
 #
 # pylint: disable=wrong-import-position
 sys.path.append("..")
-from lute.main import init_db_and_app
-from lute.app_config import AppConfig
+from lute.app_setup import init_db_and_app
+from lute.config.app_config import AppConfig
 
 logging.getLogger("waitress.queue").setLevel(logging.ERROR)
 

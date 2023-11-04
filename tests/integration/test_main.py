@@ -6,7 +6,7 @@ import os
 import sqlite3
 from contextlib import closing
 
-from lute.main import init_db_and_app
+from lute.app_setup import init_db_and_app
 
 
 def test_init_no_existing_database(testconfig):

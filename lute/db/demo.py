@@ -72,7 +72,7 @@ def demo_data_path():
     Path to the demo data yaml files.
     """
     thisdir = os.path.dirname(__file__)
-    demo_dir = os.path.join(thisdir, '..', '..', 'demo')
+    demo_dir = os.path.join(thisdir, 'demo')
     return os.path.abspath(demo_dir)
 
 

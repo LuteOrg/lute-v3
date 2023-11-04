@@ -5,7 +5,7 @@ Lute settings, in settings key-value table.
 import datetime
 from lute.db import db
 from lute.parse.mecab_parser import JapaneseParser
-from lute.app_config import AppConfig
+from lute.config.app_config import AppConfig
 
 
 class SettingBase(db.Model):

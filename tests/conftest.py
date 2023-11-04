@@ -6,10 +6,10 @@ import os
 import yaml
 import pytest
 
-from lute.app_config import AppConfig
+from lute.config.app_config import AppConfig
 from lute.db import db
 import lute.db.demo
-from lute.main import init_db_and_app
+from lute.app_setup import init_db_and_app
 
 from lute.models.language import Language
 
@@ -27,7 +27,7 @@ def pytest_sessionstart(session): # pylint: disable=unused-argument
     data/media etc)
     """
     thisdir = os.path.dirname(os.path.realpath(__file__))
-    configfile = os.path.join(thisdir, '..', 'config', 'config.yml')
+    configfile = os.path.join(thisdir, '..', 'lute', 'config', 'config.yml')
 
     config = None
     with open(configfile, 'r', encoding='utf-8') as f:
@@ -50,7 +50,7 @@ def pytest_sessionstart(session): # pylint: disable=unused-argument
 def fixture_config():
     "Config using the app config."
     thisdir = os.path.dirname(os.path.realpath(__file__))
-    configfile = os.path.join(thisdir, '..', 'config', 'config.yml')
+    configfile = os.path.join(thisdir, '..', 'lute', 'config', 'config.yml')
     ac = AppConfig(configfile)
     yield ac
 
@@ -104,9 +104,7 @@ def fixture_demo_client(app):
 @pytest.fixture(name="demo_yaml_folder")
 def fixture_yaml_folder():
     "Path to the demo files."
-    lang_path = "../demo/languages/"
-    absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__), lang_path))
-    return absolute_path
+    return os.path.join(lute.db.demo.demo_data_path(), 'languages')
 
 
 def _get_language(f):

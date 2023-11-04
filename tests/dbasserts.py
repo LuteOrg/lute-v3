@@ -8,14 +8,14 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 
-from lute.app_config import AppConfig
+from lute.config.app_config import AppConfig
 
 def __sqlite_uri():
     """
     Get the application Sqlite URL from the config file.
     """
     this_files_dir = os.path.dirname(os.path.realpath(__file__))
-    conf_file = os.path.normpath(os.path.join(this_files_dir, '..', 'config', 'config.yml'))
+    conf_file = os.path.normpath(os.path.join(this_files_dir, '..', 'lute', 'config', 'config.yml'))
     ac = AppConfig(conf_file)
     return ac.sqliteconnstring
 
