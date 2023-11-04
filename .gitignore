@@ -2,7 +2,7 @@
 # Ignores.
 
 # Configs
-config/config.yml
+lute/config/config.yml
 *.ini
 *.ini.bkp
 
