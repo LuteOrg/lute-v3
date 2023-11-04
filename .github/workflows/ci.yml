@@ -46,6 +46,7 @@ jobs:
         echo "ENV: dev" > ${{ github.workspace }}/config/config.yml
         echo "DATAPATH: ${{ github.workspace }}/data" >> ${{ github.workspace }}/config/config.yml
         echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/config/config.yml
+        echo "MECAB_PATH: /lib/x86_64-linux-gnu/libmecab.so.2" >> ${{ github.workspace }}/config/config.yml
         ls ${{ github.workspace }}
         cat ${{ github.workspace }}/config/config.yml
 

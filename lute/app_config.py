@@ -42,6 +42,10 @@ class AppConfig:
             raise ValueError(f"Invalid ENV {env}, can only be prod or dev.")
         self._env = env
 
+        self._mecab_path = None
+        if 'MECAB_PATH' in config:
+            self._mecab_path = config.get('MECAB_PATH')
+
         self._db_name = config.get('DBNAME')
         self._data_path = config.get('DATAPATH', None)
         if self._data_path is None:
@@ -62,6 +66,11 @@ class AppConfig:
     def env(self):
         "App environment (dev or prod)."
         return self._env
+
+    @property
+    def mecab_path(self):
+        "To be used for MECAB_PATH."
+        return self._mecab_path
 
     @property
     def datapath(self):
