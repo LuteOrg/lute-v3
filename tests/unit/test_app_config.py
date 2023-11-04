@@ -80,6 +80,7 @@ def test_env_can_only_be_prod_or_dev(tmp_path):
 
 
 def test_mecab_path_optional(tmp_path):
+    "Needed for CI."
     config_file = tmp_path / 'valid_config.yaml'
     config_data = {'DBNAME': 'my_db', 'DATAPATH': 'data_path'}
     write_file(config_file, config_data)
