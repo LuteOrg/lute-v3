@@ -26,3 +26,6 @@ DBNAME: lute.db
 # can't find it automatically.
 # This is used in github CI.
 # MECAB_PATH: xyz
+
+# Set IS_DOCKER: true if this is run in a container.
+# IS_DOCKER: true

@@ -46,6 +46,10 @@ class AppConfig:
         if 'MECAB_PATH' in config:
             self._mecab_path = config.get('MECAB_PATH')
 
+        self._is_docker = False
+        if 'IS_DOCKER' in config:
+            self._is_docker = True
+
         self._db_name = config.get('DBNAME')
         self._data_path = config.get('DATAPATH', None)
         if self._data_path is None:
@@ -66,6 +70,11 @@ class AppConfig:
     def env(self):
         "App environment (dev or prod)."
         return self._env
+
+    @property
+    def is_docker(self):
+        "True if the config file has IS_DOCKER."
+        return self._is_docker
 
     @property
     def mecab_path(self):
