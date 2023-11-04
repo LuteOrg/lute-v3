@@ -29,21 +29,20 @@ TODO:windows - get instructions from https://flask.palletsprojects.com/en/2.3.x/
 
 > TODO: notes about usage when installing from pre-packaged thing
 
-* Copy config/config.yml.example to config/config.yml, making changes as you see fit
+* Copy lute/config/config.yml.example to lute/config/config.yml, making changes as you see fit
 * Start the virtual environment, and run main:
 
 ```
 source .venv/bin/activate   # if necessary
-python main.py
-```
 
+python -m lute.main
+
+# Open web browser to http://localhost:5000
+# ... work work work ...
 # When done, Ctl-C then
-
-```
 deactivate
 ```
 
-* Open web browser to http://localhost:5000
 
 # Development
 
