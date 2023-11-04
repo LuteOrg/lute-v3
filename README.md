@@ -77,7 +77,7 @@ pytest -m somemark
 
 ### Config
 
-For tests, the config/config.yml must have:
+For tests, the lute/config/config.yml must have:
 
 * `DBNAME` set to `test_<something>.db`
 * `DATAPATH` set to some existing folder
