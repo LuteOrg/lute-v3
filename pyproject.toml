@@ -1,0 +1,37 @@
+[build-system]
+requires = ["python>=3.11", "flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "lute"
+version = "3.0.0"
+description = "Learning Using Texts"
+requires-python = ">=3.11"
+authors = [
+  {name = "Jeff Zohrab", email = "jzohrab@gmail.com"}
+]
+readme = "README.md"
+dependencies = [
+  "Flask-SQLAlchemy>=3.1.1,<4",
+  "Flask-WTF>=1.2.1,<2",
+  "natto-py==1.0.1,<2",
+  "beautifulsoup4>=4.12.2,<5",
+  "PyYAML>=6.0.1,<7",
+  "toml>=0.10.2,<1",
+  "waitress>=2.1.2,<3"
+]
+
+[project.optional-dependencies]
+dev = [
+  "coverage>=7.3.1,<8",
+  "invoke>=2.2.0,<3",
+  "pip>=23.0.1",
+  "pipdeptree>=2.13.0,<3",
+  "pylint>=2.17.5,<3",
+  "pytest-bdd>=7.0.0,<8",
+  "pytest-splinter>=3.3.2,<4"
+]
+
+[project.urls]
+Home = "https://github.com/resthere"
+

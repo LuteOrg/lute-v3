@@ -88,37 +88,44 @@ See `inv --list` for commands.
 
 ## TODOs
 
-Todos are in the code as comments, e.g.:
+Todos are in the code as comments, e.g. `# TODO [<group name>:] detail`, `<!-- TODO ... -->`.
+`inv todos` collects all of these in a simple report.
+
+# Versioning
+
+Lute uses semver, `<major>`.`<minor>`.`<patch>`.
+
+* `<major>` will likely stay at 3, as different modes (e.g. a thick
+  client) will only be extensions of the current code.
+* `<minor>` will increment on breaking DB schema changes, in case
+  anyone writes scripts that directly hit the DB, or breaking API
+  changes if and when an API is released!
+
+This package will start at 0.0.1 until it's complete, and then will
+jump to 3.0.0.  Lute v1 and v2 were PHP projects, and Lute v3 is this
+Python rewrite.
+
+
+# dependencies
+
+## pip and requirements.txt
+
+Full (dev) dependencies are managed with pip:
+
+`pip install <pkg>; pip freeze > requirements.txt`
+
+## `pyproject.toml`
+
+> **Note: I'm not experienced with pyproject.toml, so below is my current understanding.  In fact, I rather dislike the handling of dependencies in toml, as unpinned dependencies could create runtime issues.**
+
+Lute is an application, so it **appears** that the .toml file should only contain unpinned top-level dependencies.  I'm not sure about this!
+
+The full requirements are in requirements.txt, so use `pipdeptree` to pull out the requirements in a consumable fashion for the toml file:
 
 ```
-# TODO [<group name>:] detail
+pipdeptree --freeze
 ```
 
-`inv todos` collects all of these in a simple report, eg:
+and then *manually* determine what should go into the `[project][dependencies]` and `dev`.
 
-```
------------------
-lute
-
-Group: <None>
-  ./read/render/renderable_calculator.py            :  Data structure for template read/textitem.html (TODO confirm template name)
-  ./read/routes.py                                  :  # TODO: term form: ensure reading pane can create form with "." character
-  ./models/book.py                                  :  todo for the future.
-  ./templates/index.html                            :  <li style="color: grey;">Version and software info - TODO</li>
-  ./templates/term/_form.html                       :  // TODO acceptance tests; need to check interactions.  Painful.
-  ./templates/term/_form.html                       :  // TODO term form autofocus - check if used.
-  ./templates/term/_form.html                       :  // TODO:fix_language_dict_asterisk
-  ./templates/book/tablelisting.html                :  // TODO:security - add CSRF token
-  ./templates/termtag/index.html                    :  // TODO:security - add CSRF token
-
-Group: js data
-  ./templates/base.html                             :  <!-- TODO js data: STATUS TAGS TEXTTAGS -->
-
-Group: misc
-  ./templates/base.html                             :  <!-- TODO misc: custom styles: add link -->
-
-Group: parsers
-  ./language/forms.py                               :  # TODO parsers: use the parser registry to load the select.
-```
-
-Keeping the TODOs standard simplifies the grepping, grouping, etc.
+Note I take the requirements.txt `==` entries and change them to `>=x,<y`, assuming that future changes up until the next major release for that package are backwards-compatible.  E.g, the dependency for `Flask-SQLAlchemy==3.1.1` in requirements.txt becomes `Flask-SQLAlchemy>=3.1.1,<4`.
