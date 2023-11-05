@@ -1,4 +1,5 @@
 import os
+import glob
 import re
 import subprocess
 
@@ -18,7 +19,7 @@ class Todout:
         if self.verbose:
             print(msg)
 
-    def find_files(self, directory, exclude_dirs=None, exclude_files=None):
+    def find_files(self, directory, exclude_dirs=None, exclude_files=None, maxdepth=10):
         if not os.path.exists(directory) or not os.path.isdir(directory):
             raise Exception(f"Missing directory: {directory}")
 
@@ -29,25 +30,23 @@ class Todout:
         if exclude_files is None:
             exclude_files = []
 
-        exclude_files = [e if e.startswith("./") else f"./{e}" for e in exclude_files]
+        exclude_files = [e if (e.startswith("./") or e.startswith('/')) else f"./{e}" for e in exclude_files]
         files = []
 
         os.chdir(directory)
         self.debug_print(f"Searching {os.getcwd()}")
         self.debug_print(f"excluding dirs {exclude_dirs}")
 
-        find_command = 'find . -type f -print0 | xargs -0 grep -li todo 2>/dev/null'
+        find_command = f'find . -type f -maxdepth {maxdepth} -print0 | xargs -0 grep -li todo 2>/dev/null'
         result = subprocess.run(find_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         files = result.stdout.split("\n")
         # self.debug_print('initial files:')
         # self.debug_print(files)
 
-        files = [f for f in files if not any(df.startswith(e) or df.startswith(f"{e}/") for e in exclude_dirs)]
+        files = [f for f in files if not any(f.startswith(e) or f.startswith(f"{e}/") for e in exclude_dirs)]
 
-        globbed_excluded = [f for pattern in exclude_files for f in glob.glob(pattern)]
-        self.debug_print(f"excluding files: {globbed_excluded}")
-        files = [f for f in files if f not in globbed_excluded]
+        files = [f for f in files if f not in exclude_files]
 
         if self.verbose:
             print("Found files:\n" + "\n".join(files))
@@ -76,8 +75,8 @@ class Todout:
             return ""
         return tmp.split(":", 1)[0].strip()
 
-    def get_todo_data(self, directory, exclude_dirs=None, exclude_files=None):
-        files = self.find_files(directory, exclude_dirs, exclude_files)
+    def get_todo_data(self, directory, exclude_dirs=None, exclude_files=None, maxdepth=10):
+        files = self.find_files(directory, exclude_dirs, exclude_files, maxdepth)
         ret = []
         for file in files:
             results = self.grepfiles(directory, [file])
@@ -103,18 +102,12 @@ def write_report(data):
 t = Todout()
 t.verbose = False
 current_script_path = os.path.abspath(__file__)
-parent_directory = os.path.dirname(current_script_path)
-rootdir = os.path.join(parent_directory, '..', 'lute')
-testdir = os.path.join(parent_directory, '..', 'tests')
+rootdir = os.path.join(os.path.dirname(current_script_path), '..')
+rootdir = os.path.abspath(rootdir)
+venvdir = os.path.join(rootdir, '.venv')
+htmlcovdir = os.path.join(rootdir, 'htmlcov')
+lutedir = os.path.join(rootdir, 'lute')
+testdir = os.path.join(rootdir, 'tests')
 
-print()
-print('-----------------')
-print('lute')
-d = t.get_todo_data(rootdir, [], [])
-write_report(d)
-
-print()
-print('-----------------')
-print('tests')
-d = t.get_todo_data(testdir, [], [])
+d = t.get_todo_data(rootdir, [venvdir, lutedir, testdir, './htmlcov', './.git', './.venv'], [ './utils/todos.py', './.pylintrc', './tasks.py' ], 99)
 write_report(d)
