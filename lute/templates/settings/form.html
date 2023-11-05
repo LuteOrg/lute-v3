@@ -15,9 +15,15 @@
   {{ form.hidden_tag() }}
   {{ form.csrf_token }}
 
-  <h2>Backup</h2>
-
   <table class="settingstable">
+
+    <tr>
+      <td>
+        <h2>Backup</h2>
+      </td>
+      <td />
+    </tr>
+
     {% for f in [
     form.backup_enabled,
     form.backup_dir,
@@ -30,13 +36,14 @@
       <td>{{ f(class="form-control") }}</td>
     </tr>
     {% endfor %}
-  </table>
 
-  <h2>Japanese</h2>
+    <tr>
+      <td>
+        <h2>MeCab (Japanese only)</h2>
+      </td>
+      <td />
+    </tr>
 
-  <p><i>Only applicable to learners of Japanese.</i></p>
-
-  <table class="settingstable">
     <tr>
       <td>
         <button onclick="test_mecab_setup(); return false;">
@@ -74,6 +81,7 @@
       </td>
       <td>{{ form.mecab_path(class="form-control") }}</td>
     </tr>
+
   </table>
 
   <div style="margin-top:40px;">
