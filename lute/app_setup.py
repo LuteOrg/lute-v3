@@ -129,12 +129,20 @@ def _create_app(app_config, extra_config):
             backup_last_display_date = bkp_settings.last_backup_display_date(),
         )
 
+
     @app.route('/wipe_database')
     def wipe_db():
         if lute.db.demo.contains_demo_data():
             lute.db.demo.delete_demo_data()
             flash('The database has been wiped clean.  Have fun!')
         return redirect('/', 302)
+
+
+    @app.route('/version')
+    def show_version():
+        return render_template(
+            'version.html',
+        )
 
     return app
 
