@@ -2,19 +2,29 @@
 requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
-[project]
+# The project name "lute" is already taken on PyPi,
+# so project.name = lute3 for the publish, but the
+# code is in the "lute" folder.
+[tool.flit.module]
 name = "lute"
-version = "3.0.0"
+
+[project]
+# TODO release: fix project name
+name = "lute3"
+# TODO release: fix version number
+version = "0.0.1.post1"
 description = "Learning Using Texts"
 requires-python = ">=3.11"
 authors = [
   {name = "Jeff Zohrab", email = "jzohrab@gmail.com"}
 ]
-readme = "README.md"
+readme = "README_PyPi.md"
 dependencies = [
   "Flask-SQLAlchemy>=3.1.1,<4",
   "Flask-WTF>=1.2.1,<2",
-  "natto-py==1.0.1,<2",
+  "natto-py>=1.0.1,<2",
+  "platformdirs>=3.10.0,<4",
+  "requests>=2.31.0,<3",
   "beautifulsoup4>=4.12.2,<5",
   "PyYAML>=6.0.1,<7",
   "toml>=0.10.2,<1",
@@ -24,6 +34,8 @@ dependencies = [
 [project.scripts]
 lute = "lute.main:start"
 
+[package_data]
+lute.config = ["config/config.yml"]
 
 [project.optional-dependencies]
 dev = [
@@ -37,5 +49,5 @@ dev = [
 ]
 
 [project.urls]
-Home = "https://github.com/resthere"
-
+# TODO release: fix repo.
+Home = "https://github.com/jzohrab/lute_v3"
