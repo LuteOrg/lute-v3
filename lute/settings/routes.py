@@ -3,7 +3,7 @@ Settings routes.
 """
 
 import os
-from flask import Blueprint, request, render_template, redirect, flash, jsonify
+from flask import Blueprint, request, Response, render_template, redirect, flash, jsonify
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, SelectField, IntegerField, TextAreaField
 from wtforms.validators import InputRequired, NumberRange
@@ -127,3 +127,14 @@ def test_parse():
         JapaneseParser.set_mecab_path_envkey(old_key)
 
     return jsonify(result)
+
+
+@bp.route('/custom_styles', methods=['GET'])
+def custom_styles():
+    """
+    Return the custom settings for inclusion in the base.html.
+    """
+    css = UserSetting.get_value('custom_styles')
+    response = Response(css, 200)
+    response.content_type = "text/css; charset=utf-8"
+    return response

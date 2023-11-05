@@ -47,6 +47,20 @@
     <tr>
       <td>
         {{ form.custom_styles.label }}
+        <img
+          id="about_custom_styles" style="margin-right:10px;"
+          src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+          title="Click for details"
+          onclick="$('#custom_styles_help').toggle();"
+          />
+        <blockquote id="custom_styles_help" style="width:60%; display: none;">
+          <p>Use this field to define custom styles to be applied to
+          Lute.</p>
+          <p>See examples
+          in <a href="https://github.com/jzohrab/lute/wiki/Customizing-Styles"
+          target="_blank">the wiki</a>.</p>
+        </blockquote>
+      </td>
       </td>
       <td>
         {{ form.custom_styles(class="form-largetextarea") }}
@@ -79,21 +93,22 @@
           title="Click for details"
           onclick="$('#mecab_path_help').toggle();"
           />
-
-          <blockquote id="mecab_path_help" style="width:60%; display: none;">
-    <p>Lute uses MeCab to parse Japanese, so MeCab needs to be installed on your machine (see notes in <a href="https://github.com/jzohrab/lute/wiki/Install-Mecab" target="_blank">the wiki</a>).</p>
-    <p>Lute includes the Python
-    library <a href="https://github.com/buruzaemon/natto-py">natto-py</a>
-    to interact with MeCab.  natto-py can usually find MeCab
-    automatically, but you <i>may</i> need to set a MECAB_PATH
-    environment variable if it can't, per
-    the <a href="https://github.com/buruzaemon/natto-py#explicit-configuration-via-mecab_path-and-mecab_charset"
-           target="_blank">natto-py README</a>.</p>
-    <p>Try different values for MECAB_PATH, including leaving the
-    field blank, until clicking the &quot;test&quot; button returns a
-    &quot;success&quot; message.</p>
-  </blockquote>
-
+        <blockquote id="mecab_path_help" style="width:60%; display: none;">
+          <p>Lute uses MeCab to parse Japanese, so MeCab needs to be
+            installed on your machine (see notes
+            in <a href="https://github.com/jzohrab/lute/wiki/Install-Mecab"
+            target="_blank">the wiki</a>).</p>
+          <p>Lute includes the Python
+            library <a href="https://github.com/buruzaemon/natto-py">natto-py</a>
+            to interact with MeCab.  natto-py can usually find MeCab
+            automatically, but you <i>may</i> need to set a MECAB_PATH
+            environment variable if it can't, per
+            the <a href="https://github.com/buruzaemon/natto-py#explicit-configuration-via-mecab_path-and-mecab_charset"
+            target="_blank">natto-py README</a>.</p>
+          <p>Try different values for MECAB_PATH, including leaving
+            the field blank, until clicking the &quot;test&quot;
+            button returns a &quot;success&quot; message.</p>
+        </blockquote>
       </td>
       <td>{{ form.mecab_path(class="form-control") }}</td>
     </tr>
