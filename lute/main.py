@@ -11,6 +11,7 @@ logging.getLogger("waitress.queue").setLevel(logging.ERROR)
 
 
 def start():
+    "Get the config, init the app, and start."
     app_config = AppConfig.create_from_config()
     app = init_db_and_app(app_config)
 
