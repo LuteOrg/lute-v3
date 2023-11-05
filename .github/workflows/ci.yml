@@ -43,12 +43,12 @@ jobs:
     - name: Setup config
       run: |
         mkdir ${{ github.workspace }}/data
-        echo "ENV: dev" > ${{ github.workspace }}/config/config.yml
-        echo "DATAPATH: ${{ github.workspace }}/data" >> ${{ github.workspace }}/config/config.yml
-        echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/config/config.yml
-        echo "MECAB_PATH: /lib/x86_64-linux-gnu/libmecab.so.2" >> ${{ github.workspace }}/config/config.yml
+        echo "ENV: dev" > ${{ github.workspace }}/lute/config/config.yml
+        echo "DATAPATH: ${{ github.workspace }}/data" >> ${{ github.workspace }}/lute/config/config.yml
+        echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/lute/config/config.yml
+        echo "MECAB_PATH: /lib/x86_64-linux-gnu/libmecab.so.2" >> ${{ github.workspace }}/lute/config/config.yml
         ls ${{ github.workspace }}
-        cat ${{ github.workspace }}/config/config.yml
+        cat ${{ github.workspace }}/lute/config/config.yml
 
     - name: Lint
       run: inv lint
