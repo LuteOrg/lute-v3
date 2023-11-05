@@ -3,7 +3,8 @@ Main entry point.
 """
 
 import os
-from flask import Flask, render_template, redirect, flash, current_app
+from flask import Flask, render_template, redirect, flash, \
+    current_app, make_response, send_from_directory
 
 from lute.db import db
 from lute.db.setup.main import setup_db
@@ -149,6 +150,16 @@ def _create_app(app_config, extra_config):
             datapath = current_app.config['DATAPATH'],
             database = current_app.config['DATABASE'],
         )
+
+    @app.route('/static/js/never_cache/<path:filename>')
+    def custom_js(filename):
+        """
+        Some files should never be cached.
+        """
+        response = make_response(send_from_directory('static/js', filename))
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        return response
+
 
     return app
 

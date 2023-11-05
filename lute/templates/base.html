@@ -33,7 +33,8 @@
   <script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.hoverIntent.js') }}" charset="utf-8"></script>
 
-  <script type="text/javascript" src="{{ url_for('static', filename='js/lute.js') }}" charset="utf-8"></script>
+  <!-- this calls a route defined in app_setup.py to never cache this file -->
+  <script type="text/javascript" src="/static/js/never_cache/lute.js" charset="utf-8"></script>
 </head>
 <body>
 
