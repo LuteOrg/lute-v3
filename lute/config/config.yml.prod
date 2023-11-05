@@ -1,0 +1,13 @@
+# Generic production config.
+# Copied to config.yml if needed by lute.main
+
+ENV: prod
+DBNAME: lute.db
+
+# DATAPATH is not set: user data should be
+# stored in PlatformDirs.user_data_dir
+# (ref https://pypi.org/project/platformdirs/).
+
+# PORT: 5000
+
+# MECAB_PATH: not set, users set this in settings.
