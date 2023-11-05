@@ -4,7 +4,7 @@ Db management.
 
 from sqlalchemy import text
 from lute.db import db
-from lute.models.setting import UserSetting, SystemSetting
+from lute.models.setting import UserSetting
 
 
 def delete_all_data():

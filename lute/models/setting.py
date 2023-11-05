@@ -26,7 +26,6 @@ class SettingBase(db.Model):
         """
         Check key validity for certain actions.
         """
-        pass
 
     @classmethod
     def set_value(cls, keyname, keyvalue):
