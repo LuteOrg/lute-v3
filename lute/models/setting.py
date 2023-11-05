@@ -88,7 +88,8 @@ class UserSetting(SettingBase):
             'backup_warn': True,
             'backup_dir': None,
             'backup_count': 5,
-            'mecab_path': None
+            'mecab_path': None,
+            'custom_styles': "/* Custom css to modify Lute's appearance. */",
         }
         for k, v in keys_and_defaults.items():
             if not UserSetting.key_exists(k):

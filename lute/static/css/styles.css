@@ -121,9 +121,9 @@
  }
 
  table.settingstable thead, table.settingstable tr, table.settingstable th:first-child, table.settingstable tbody, table.settingstable tr, table.settingstable td:first-child {
-     width: 40%;
-     min-width: 40%;
-     max-width: 40%;
+     width: 30%;
+     min-width: 30%;
+     max-width: 30%;
      vertical-align: top;
      word-break: break-word;
  }

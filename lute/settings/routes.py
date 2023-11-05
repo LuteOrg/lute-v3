@@ -5,7 +5,7 @@ Settings routes.
 import os
 from flask import Blueprint, request, render_template, redirect, flash, jsonify
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, SelectField, IntegerField
+from wtforms import BooleanField, StringField, SelectField, IntegerField, TextAreaField
 from wtforms.validators import InputRequired, NumberRange
 from wtforms import ValidationError
 from lute.models.language import Language
@@ -35,6 +35,8 @@ class UserSettingsForm(FlaskForm):
     backup_count = IntegerField(
         'Backup count',
         validators=[InputRequired(), NumberRange(min=1)])
+
+    custom_styles = TextAreaField('Custom styles')
 
     mecab_path = StringField('MECAB_PATH environment variable')
 
