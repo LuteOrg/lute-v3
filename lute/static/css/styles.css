@@ -49,6 +49,34 @@
      border-color: #ffeeba;
  }
 
+ /* Screen layouts - two columns ************************/
+
+ div#term_form_left {
+     width: 50%;
+ }
+
+ div#term_form_right {
+     width: 50%;
+     position: fixed;
+     top: 0;
+     right: 0;
+     height: 95%;
+ }
+
+ div#read_pane_left {
+     width: 50%;
+ }
+
+ div#read_pane_right {
+     width: 50%;
+     position: fixed;
+     top: 0;
+     right: 0;
+     height: 95%;
+ }
+
+ /* End layouts *****************************************/
+
  input[type=text]
  {
    font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
