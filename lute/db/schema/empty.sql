@@ -35,6 +35,7 @@ INSERT INTO _migrations VALUES('20230819_050036_vacuum.sql');
 INSERT INTO _migrations VALUES('20230827_052154_allow_multiple_word_parents.sql');
 INSERT INTO _migrations VALUES('20231018_211236_remove_excess_texts_fields.sql');
 INSERT INTO _migrations VALUES('20231029_092851_create_migration_settings.sql');
+INSERT INTO _migrations VALUES('20231101_203811_modify_settings_schema.sql');
 CREATE TABLE IF NOT EXISTS "languages" (
 	"LgID" INTEGER NOT NULL  ,
 	"LgName" VARCHAR(40) NOT NULL  ,
@@ -52,17 +53,6 @@ CREATE TABLE IF NOT EXISTS "languages" (
 	"LgParserType" VARCHAR(20) NOT NULL DEFAULT 'spacedel' ,
 	PRIMARY KEY ("LgID")
 );
-CREATE TABLE IF NOT EXISTS "settings" (
-	"StKey" VARCHAR(40) NOT NULL  ,
-	"StValue" VARCHAR(40) NULL  ,
-	PRIMARY KEY ("StKey")
-);
-INSERT INTO settings VALUES('backup_enabled',NULL);
-INSERT INTO settings VALUES('backup_auto',NULL);
-INSERT INTO settings VALUES('backup_warn',NULL);
-INSERT INTO settings VALUES('backup_dir',NULL);
-INSERT INTO settings VALUES('backup_count',NULL);
-INSERT INTO settings VALUES('IsDemoData',NULL);
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
@@ -172,6 +162,19 @@ CREATE TABLE IF NOT EXISTS "texts" (
 	PRIMARY KEY ("TxID"),
 	FOREIGN KEY("TxBkID") REFERENCES "books" ("BkID") ON UPDATE NO ACTION ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS "settings" (
+	"StKey" VARCHAR(40) NOT NULL,
+        "StKeyType" TEXT NOT NULL,
+	"StValue" TEXT NULL,
+	PRIMARY KEY ("StKey")
+);
+INSERT INTO settings VALUES('backup_enabled','user',NULL);
+INSERT INTO settings VALUES('backup_auto','user','1');
+INSERT INTO settings VALUES('backup_warn','user','1');
+INSERT INTO settings VALUES('backup_dir','user',NULL);
+INSERT INTO settings VALUES('backup_count','user','5');
+INSERT INTO settings VALUES('mecab_path','user',NULL);
+INSERT INTO settings VALUES('custom_styles','user','/* Custom css to modify Lute''s appearance. */');
 CREATE UNIQUE INDEX "LgName" ON "languages" ("LgName");
 CREATE UNIQUE INDEX "TgText" ON "tags" ("TgText");
 CREATE UNIQUE INDEX "T2Text" ON "tags2" ("T2Text");

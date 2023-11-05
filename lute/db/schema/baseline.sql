@@ -35,6 +35,7 @@ INSERT INTO _migrations VALUES('20230819_050036_vacuum.sql');
 INSERT INTO _migrations VALUES('20230827_052154_allow_multiple_word_parents.sql');
 INSERT INTO _migrations VALUES('20231018_211236_remove_excess_texts_fields.sql');
 INSERT INTO _migrations VALUES('20231029_092851_create_migration_settings.sql');
+INSERT INTO _migrations VALUES('20231101_203811_modify_settings_schema.sql');
 CREATE TABLE IF NOT EXISTS "languages" (
 	"LgID" INTEGER NOT NULL  ,
 	"LgName" VARCHAR(40) NOT NULL  ,
@@ -61,17 +62,6 @@ INSERT INTO languages VALUES(6,'Greek','https://www.wordreference.com/gren/###',
 INSERT INTO languages VALUES(7,'Japanese','https://jisho.org/search/###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#jp/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。？！','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','\p{Han}\p{Katakana}\p{Hiragana}',0,0,0,1,'japanese');
 INSERT INTO languages VALUES(8,'Spanish','https://es.thefreedictionary.com/###','https://www.wordreference.com/es/en/translation.asp?spen=###','*https://www.deepl.com/translator#es/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
 INSERT INTO languages VALUES(9,'Turkish','https://www.wordreference.com/tren/###','https://tr.wiktionary.org/###','*https://www.deepl.com/translator#tr/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑğĞıİöÖüÜşŞçÇ',0,0,0,1,'turkish');
-CREATE TABLE IF NOT EXISTS "settings" (
-	"StKey" VARCHAR(40) NOT NULL  ,
-	"StValue" VARCHAR(40) NULL  ,
-	PRIMARY KEY ("StKey")
-);
-INSERT INTO settings VALUES('backup_enabled',NULL);
-INSERT INTO settings VALUES('backup_auto',NULL);
-INSERT INTO settings VALUES('backup_warn',NULL);
-INSERT INTO settings VALUES('backup_dir',NULL);
-INSERT INTO settings VALUES('backup_count',NULL);
-INSERT INTO settings VALUES('IsDemoData','1');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
@@ -217,6 +207,20 @@ INSERT INTO texts VALUES(13,7,1,replace('Büyük ağaç eskiden aşılanmış ve
 INSERT INTO texts VALUES(14,8,1,replace('Es hatte ein Mann einen Esel, der schon lange Jahre die Säcke unverdrossen zur Mühle getragen hatte, dessen Kräfte aber nun zu Ende gingen, so daß er zur Arbeit immer untauglicher ward. Da dachte der Herr daran, ihn aus dem Futter zu schaffen, aber der Esel merkte, daß kein guter Wind wehte, lief fort und machte sich auf den Weg nach Bremen; dort, meinte er, könnte er ja Stadtmusikant werden.\n\nAls er ein Weilchen fortgegangen war, fand er einen Jagdhund auf dem Wege liegen, der jappte wie einer, der sich müde gelaufen hat. "Nun, was jappst du so, Packan?" fragte der Esel. "Ach," sagte der Hund, "weil ich alt bin und jeden Tag schwächer werde, auch auf der Jagd nicht mehr fort kann, hat mich mein Herr wollen totschlagen, da hab ich Reißaus genommen; aber womit soll ich nun mein Brot verdienen?" - "Weißt du was?" sprach der Esel, "ich gehe nach Bremen und werde dort Stadtmusikant, geh mit und laß dich auch bei der Musik annehmen. Ich spiele die Laute und du schlägst die Pauken."','\n',char(10)),NULL);
 INSERT INTO texts VALUES(15,9,1,replace('Il était une fois trois ours: un papa ours, une maman ours et un bébé ours. Ils habitaient tous ensemble dans une maison jaune au milieu d''une grande forêt.\n\nUn jour, Maman Ours prépara une grande marmite de porridge délicieux et fumant pour le petit déjeuner. Il était trop chaud pour pouvoir être mangé, alors les ours décidèrent d''aller se promener en attendant que le porridge refroidisse.','\n',char(10)),NULL);
 INSERT INTO texts VALUES(16,10,1,replace('北風と太陽\n\n「おれの方が強い。」「いいや、ぼくの方が強い。」\n北風と太陽の声が聞こえます。二人はどちらの力が強いかでケンカをしているようです。\n「太陽が毎日元気だから、暑くてみんな困っているよ。おれが涼しい風を吹くと、みんな嬉しそうだ。」','\n',char(10)),NULL);
+CREATE TABLE IF NOT EXISTS "settings" (
+	"StKey" VARCHAR(40) NOT NULL,
+        "StKeyType" TEXT NOT NULL,
+	"StValue" TEXT NULL,
+	PRIMARY KEY ("StKey")
+);
+INSERT INTO settings VALUES('backup_enabled','user',NULL);
+INSERT INTO settings VALUES('backup_auto','user','1');
+INSERT INTO settings VALUES('backup_warn','user','1');
+INSERT INTO settings VALUES('backup_dir','user',NULL);
+INSERT INTO settings VALUES('backup_count','user','5');
+INSERT INTO settings VALUES('mecab_path','user',NULL);
+INSERT INTO settings VALUES('custom_styles','user','/* Custom css to modify Lute''s appearance. */');
+INSERT INTO settings VALUES('IsDemoData','system','1');
 CREATE UNIQUE INDEX "LgName" ON "languages" ("LgName");
 CREATE UNIQUE INDEX "TgText" ON "tags" ("TgText");
 CREATE UNIQUE INDEX "T2Text" ON "tags2" ("T2Text");

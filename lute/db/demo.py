@@ -16,6 +16,7 @@ from sqlalchemy import text
 
 from lute.models.language import Language
 from lute.models.book import Book
+from lute.book.stats import refresh_stats
 from lute.models.setting import SystemSetting
 from lute.db import db
 import lute.db.management
@@ -161,6 +162,7 @@ def load_demo_stories():
             db.session.add(b)
     SystemSetting.set_value('IsDemoData', True)
     db.session.commit()
+    refresh_stats()
 
 
 def load_demo_data():
