@@ -3,12 +3,13 @@ Main entry point.
 """
 
 import os
-from flask import Flask, render_template, redirect, flash
+from flask import Flask, render_template, redirect, flash, current_app
 
 from lute.db import db
 from lute.db.setup.main import setup_db
 import lute.backup.service as backupservice
 import lute.db.demo
+from lute.utils.manifest import read_manifest
 
 from lute.models.book import Book
 from lute.models.language import Language
@@ -140,8 +141,13 @@ def _create_app(app_config, extra_config):
 
     @app.route('/version')
     def show_version():
+        m = read_manifest()
         return render_template(
             'version.html',
+            version = m.get('version', '<unknown>'),
+            commit = m.get('commit', '<unknown'),
+            datapath = current_app.config['DATAPATH'],
+            database = current_app.config['DATABASE'],
         )
 
     return app
