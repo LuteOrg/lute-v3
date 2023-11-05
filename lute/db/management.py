@@ -9,7 +9,7 @@ from lute.models.setting import UserSetting, SystemSetting
 
 def delete_all_data():
     """
-    DANGEROUS!  Delete everything, null user settings, clear sys settings.
+    DANGEROUS!  Delete everything, restore user settings, clear sys settings.
 
     NO CHECKS ARE PERFORMED.
     """
@@ -19,15 +19,10 @@ def delete_all_data():
         'pragma foreign_keys = ON',
         'delete from languages',
         'delete from tags',
-        'delete from tags2'
+        'delete from tags2',
+        'delete from settings',
     ]
     for s in statements:
         db.session.execute(text(s))
     db.session.commit()
-
-    for u in db.session.query(UserSetting).all():
-        u.value = None
-        db.session.add(u)
-    for ss in db.session.query(SystemSetting).all():
-        db.session.delete(ss)
-    db.session.commit()
+    UserSetting.load()

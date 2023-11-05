@@ -2,56 +2,41 @@
 Settings test.
 """
 
+import pytest
 from sqlalchemy import text
 from lute.db import db
-from lute.models.setting import UserSetting, SystemSetting, BackupSettings
+from lute.models.setting import UserSetting, MissingUserSettingKeyException, \
+    SystemSetting, BackupSettings
 from tests.dbasserts import assert_sql_result
 
 
 def test_user_and_system_settings_do_not_intersect(app_context):
     "A UserSetting is not available as a system setting."
-    UserSetting.set_value('zztrash', 42)
+    UserSetting.set_value('backup_count', 42)
     db.session.commit()
-    sql = "select StValue, StKeyType from settings where StKey = 'zztrash'"
+    sql = "select StValue, StKeyType from settings where StKey = 'backup_count'"
     assert_sql_result(sql, [ '42; user' ], 'loaded')
-    u = UserSetting.get_value('zztrash')
+    u = UserSetting.get_value('backup_count')
     assert u == '42', 'found user setting'
-    assert SystemSetting.get_value('zztrash') is None, 'not in system settings'
-
-    SystemSetting.set_value('systrash', 99)
-    db.session.commit()
-    sql = "select StValue, StKeyType from settings where StKey = 'systrash'"
-    assert_sql_result(sql, [ '99; system' ], 'loaded system key')
-    assert SystemSetting.get_value('systrash') == '99', 'found'
-    u = UserSetting.get_value('systrash')
-    assert u is None, 'not in user settings'
-
-    UserSetting.delete_key('zztrash')
-    db.session.commit()
-    assert UserSetting.get_value('zztrash') is None, 'deleted'
-
-    UserSetting.delete_key('systrash')
-    db.session.commit()
-    assert SystemSetting.get_value('systrash') == '99', 'still found'
+    assert SystemSetting.get_value('backup_count') is None, 'not in system settings'
 
 
-def test_save_and_retrieve(app_context):
+def test_save_and_retrieve_user_setting(app_context):
     "Smoke tests."
-    sql = "select StValue from settings where StKey = 'zztrash'"
-    assert_sql_result(sql, [], 'not set')
-    UserSetting.set_value('zztrash', 42)
-    assert_sql_result(sql, [], 'still not set')
+    UserSetting.set_value('backup_count', 42)
+    sql = "select StValue from settings where StKey = 'backup_count'"
+    assert_sql_result(sql, [ '5' ], 'still default')
 
     db.session.commit()
     assert_sql_result(sql, [ '42' ], 'now set')
 
-    v = UserSetting.get_value('zztrash')
+    v = UserSetting.get_value('backup_count')
     assert v == '42', 'is string'
 
 
 def test_missing_value_value_is_nullapp_context(app_context):
     "Missing key = None."
-    assert UserSetting.get_value('missing') is None, 'missing key'
+    assert SystemSetting.get_value('missing') is None, 'missing key'
 
 
 def test_smoke_last_backup(app_context):
@@ -72,8 +57,8 @@ def test_get_backup_settings(app_context):
     db.session.commit()
     b = BackupSettings.get_backup_settings()
     assert b.backup_dir == 'blah'
-    assert b.backup_auto is False  # initial defaults
-    assert b.backup_warn is False
+    assert b.backup_auto is True  # initial defaults
+    assert b.backup_warn is False  # set to 0 above
     assert b.backup_count == 12
     assert b.last_backup_datetime is None
 
@@ -101,3 +86,11 @@ def test_user_settings_load_leaves_existing_values(app_context):
     UserSetting.load()
     b = BackupSettings.get_backup_settings()
     assert b.backup_count == 17, 'still 17'
+
+
+def test_get_or_set_user_setting_unknown_key_throws(app_context):
+    "Safety, ensure no typo for user settings."
+    with pytest.raises(MissingUserSettingKeyException):
+        UserSetting.get_value('bad_key')
+    with pytest.raises(MissingUserSettingKeyException):
+        UserSetting.set_value('bad_key', 17)

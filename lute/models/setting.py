@@ -22,8 +22,16 @@ class SettingBase(db.Model):
     __mapper_args__ = {"polymorphic_on": keytype}
 
     @classmethod
+    def key_exists_precheck(cls, keyname):
+        """
+        Check key validity for certain actions.
+        """
+        pass
+
+    @classmethod
     def set_value(cls, keyname, keyvalue):
         "Set, but don't save, a setting."
+        cls.key_exists_precheck(keyname)
         s = db.session.query(cls).filter(cls.key == keyname).first()
         if s is None:
             s = cls()
@@ -43,6 +51,7 @@ class SettingBase(db.Model):
     @classmethod
     def get_value(cls, keyname):
         "Get the saved key, or None if it doesn't exist."
+        cls.key_exists_precheck(keyname)
         s = db.session.query(cls).filter(cls.key == keyname).first()
         if s is None:
             return None
@@ -56,10 +65,25 @@ class SettingBase(db.Model):
             db.session.delete(s)
 
 
+
+class MissingUserSettingKeyException(Exception):
+    """
+    Cannot set or get unknown user keys.
+    """
+
+
 class UserSetting(SettingBase):
     "User setting."
     __tablename__ = None
     __mapper_args__ = {"polymorphic_identity": 'user'}
+
+    @classmethod
+    def key_exists_precheck(cls, keyname):
+        """
+        User keys must exist.
+        """
+        if not UserSetting.key_exists(keyname):
+            raise MissingUserSettingKeyException(keyname)
 
 
     @staticmethod
