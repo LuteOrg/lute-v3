@@ -1,0 +1,13 @@
+ENV: prod
+DBNAME: lute.db
+
+# The folder _inside_ the container.
+# This needs to be mounted to a volume on the host.
+DATAPATH: /lute/data
+
+# Value to set in environment MECAB_PATH.
+# _May_ be needed for docker, if natto-py
+# can't find it automatically in the base image.
+# MECAB_PATH: xyz
+
+IS_DOCKER: true
