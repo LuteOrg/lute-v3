@@ -98,8 +98,9 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(termimport_bp)
     app.register_blueprint(term_parent_map_bp)
     app.register_blueprint(backup_bp)
-    app.register_blueprint(dev_api_bp)
     app.register_blueprint(settings_bp)
+    if app_config.is_test_db:
+        app.register_blueprint(dev_api_bp)
 
     @app.route('/')
     def index():
