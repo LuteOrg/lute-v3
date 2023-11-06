@@ -165,7 +165,7 @@ def _create_app(app_config, extra_config):
     return app
 
 
-def init_db_and_app(app_config, extra_config = None):
+def init_db_and_app(app_config, extra_config = None, output_func = None):
     """
     Main entry point.  Calls dbsetup, and returns Flask app.
 
@@ -173,7 +173,7 @@ def init_db_and_app(app_config, extra_config = None):
     """
 
     _setup_app_dirs(app_config)
-    setup_db(app_config)
+    setup_db(app_config, output_func)
 
     if extra_config is None:
         extra_config = {}

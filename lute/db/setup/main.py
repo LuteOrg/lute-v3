@@ -72,17 +72,19 @@ class Setup: # pylint: disable=too-few-public-methods
     Main setup class, coordinates other classes.
     """
 
-    def __init__(
+    def __init__( # pylint: disable=too-many-arguments
             self,
             db_filename: str,
             baseline_schema_file: str,
             backup_manager: BackupManager,
-            migrator: SqliteMigrator
+            migrator: SqliteMigrator,
+            output_func = None
     ):
         self._db_filename = db_filename
         self._baseline_schema_file = baseline_schema_file
         self._backup_mgr = backup_manager
         self._migrator = migrator
+        self._output_func = output_func
 
 
     def setup(self):
@@ -90,12 +92,31 @@ class Setup: # pylint: disable=too-few-public-methods
         Do database setup, making backup if necessary, running migrations.
         """
         new_db = False
+        has_migrations = False
+
         if not os.path.exists(self._db_filename):
             new_db = True
-            self._create_baseline()
-        if not new_db:
+            # Note openin a connection creates a db file,
+            # so this has to be done after the existence
+            # check.
+            with closing(self._open_connection()) as conn:
+                self._create_baseline(conn)
+
+        with closing(self._open_connection()) as conn:
+            has_migrations = self._migrator.has_migrations(conn)
+
+        # Don't do a backup with an open connection ...
+        # I don't _think_ it matters, but better to be safe.
+        def null_print(s):  # pylint: disable=unused-argument
+            pass
+        outfunc = self._output_func or null_print
+        if not new_db and has_migrations:
+            outfunc('Creating backup before running migrations ...')
             self._backup_mgr.do_backup()
-        self._run_migrations()
+            outfunc('Done backup.')
+
+        with closing(self._open_connection()) as conn:
+            self._migrator.do_migration(conn)
 
 
     def _open_connection(self):
@@ -108,27 +129,15 @@ class Setup: # pylint: disable=too-few-public-methods
         )
 
 
-    def _create_baseline(self):
+    def _create_baseline(self, conn):
         """
         Create baseline database.
         """
         b = self._baseline_schema_file
         with open(b, 'r', encoding='utf8') as f:
             sql = f.read()
-        with closing(self._open_connection()) as conn:
-            conn.executescript(sql)
-
-
-    def _run_migrations(self):
-        """
-        Migrate the db.  Return true if migrations were applied.
-        Note this returns False if only non-repeatable migrations were applied!
-        """
-        has_migs = False
-        with closing(self._open_connection()) as conn:
-            has_migs = self._migrator.has_migrations(conn)
-            self._migrator.do_migration(conn)
-        return has_migs
+        print("CREATING BASELINE ...", flush=True)
+        conn.executescript(sql)
 
 
 
@@ -148,7 +157,7 @@ def _create_migrator():
     return SqliteMigrator(migdir, repeatable)
 
 
-def setup_db(app_config):
+def setup_db(app_config, output_func = None):
     """
     Main setup routine.
     """
@@ -162,5 +171,5 @@ def setup_db(app_config):
 
     migrator = _create_migrator()
 
-    setup = Setup(dbfile, baseline, bm, migrator)
+    setup = Setup(dbfile, baseline, bm, migrator, output_func)
     setup.setup()
