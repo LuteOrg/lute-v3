@@ -13,11 +13,9 @@ invoke --help <cmd>    # See docstrings and help notes
 """
 
 import os
-import toml
 import subprocess
-import requests
 from datetime import datetime
-import pytest
+import requests
 from invoke import task, Collection
 from lute.config.app_config import AppConfig
 
@@ -27,7 +25,7 @@ def lint(c):
     "Run pylint on lute/ and tests/."
     # Formats: https://pylint.pycqa.org/en/latest/user_guide/usage/output.html
     msgfmt = "--msg-template='{path} ({line:03d}): {msg} ({msg_id} {symbol})'"
-    c.run(f"pylint {msgfmt} lute/ tests/")
+    c.run(f"pylint {msgfmt} tasks.py lute/ tests/")
 
 
 @task(help={'html': 'open html report'})
@@ -54,7 +52,7 @@ def start(c):
     """
     Start the dev server, using script dev.py.
     """
-    c.run(f'python -m devstart')
+    c.run('python -m devstart')
 
 
 @task
@@ -81,8 +79,10 @@ def search(c, search_for):
     'kflag': 'optional -k flag argument',
     'exitfirst': 'exit on first failure'
 })
-
-def accept(c, port=None, show=False, headless=False, kflag=None, exitfirst=False):
+def accept(   # pylint: disable=too-many-arguments
+        c, port=None, show=False,
+        headless=False, kflag=None, exitfirst=False
+):
     """
     Start lute on 9876, run tests/acceptance tests, screenshot fails.
 
@@ -103,7 +103,7 @@ def accept(c, port=None, show=False, headless=False, kflag=None, exitfirst=False
     site_running = False
     try:
         print(f'checking for site at {url} ...')
-        resp = requests.get(url)
+        resp = requests.get(url, timeout=5)
         if resp.status_code != 200:
             raise RuntimeError(f'Got code {resp.status_code} ... ???')
         print('Site running, using that for tests.')
@@ -134,9 +134,10 @@ def accept(c, port=None, show=False, headless=False, kflag=None, exitfirst=False
     if site_running:
         c.run(' '.join(run_test))
     else:
-        app_process = subprocess.Popen(['python', '-m', 'tests.acceptance.start_acceptance_app', f'{useport}'])
-        subprocess.run(run_test)
-        app_process.terminate()
+        cmd = ['python', '-m', 'tests.acceptance.start_acceptance_app', f'{useport}']
+        with subprocess.Popen(cmd) as app_process:
+            subprocess.run(run_test, check = True)
+            app_process.terminate()
 
 
 ns = Collection()
@@ -159,7 +160,7 @@ def _ensure_test_db():
     ac = AppConfig.create_from_config()
     if ac.is_test_db is False:
         raise ValueError('not a test db')
-    
+
 @task
 def db_wipe(c):
     """
@@ -224,15 +225,15 @@ def db_export_baseline(c):
     # Running the delete task before this one as a pre- step was
     # causing problems (sqlite file not in correct state), so this
     # asks the user to verify.
-    text = input(f'Have you reset the db?  (y/n): ')
-    if (text != 'y'):
+    text = input('Have you reset the db?  (y/n): ')
+    if text != 'y':
         print('quitting.')
         return
     _do_schema_export(c, 'baseline.sql', 'Baseline db with demo data.', 'db.export.baseline')
 
     fname = os.path.join(_schema_dir(), 'baseline.sql')
     print(f'Verifying {fname}')
-    with open(fname) as f:
+    with open(fname, 'r', encoding='utf-8') as f:
         checkstring = 'Tutorial follow-up'
         if checkstring in f.read():
             print(f'"{checkstring}" found, likely ok.')
@@ -252,15 +253,15 @@ def db_export_empty(c):
     # Running the delete task before this one as a pre- step was
     # causing problems (sqlite file not in correct state), so this
     # asks the user to verify.
-    text = input(f'Have you **WIPED** the db?  (y/n): ')
-    if (text != 'y'):
+    text = input('Have you **WIPED** the db?  (y/n): ')
+    if text != 'y':
         print('quitting.')
         return
     _do_schema_export(c, 'empty.sql', 'EMPTY DB.', 'db.export.empty')
 
 
 @task(help={'suffix': 'suffix to add to filename.'})
-def db_newscript(c, suffix):
+def db_newscript(c, suffix):  # pylint: disable=unused-argument
     """
     Create a new migration, <datetime>_suffix.sql
     """
@@ -268,7 +269,7 @@ def db_newscript(c, suffix):
     fnow = now.strftime('%Y%m%d_%H%M%S')
     filename = f'{fnow}_{suffix}.sql'
     destfile = os.path.join(_schema_dir(), 'migrations', filename)
-    with open(destfile, 'w') as f:
+    with open(destfile, 'w', encoding='utf-8') as f:
         f.write('-- TODO - fill this in.')
     print('migration created:')
     print(destfile)
