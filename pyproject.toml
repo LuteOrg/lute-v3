@@ -11,8 +11,9 @@ name = "lute"
 [project]
 # TODO release: fix project name
 name = "lute3"
-# TODO release: fix version number
-version = "0.0.1.post3"
+
+dynamic = ['version']
+
 description = "Learning Using Texts"
 requires-python = ">=3.11"
 authors = [
