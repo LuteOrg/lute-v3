@@ -119,7 +119,7 @@ def test_existing_database_new_migrations(baseline, tmp_path, fakebackupmanager,
 
 def test_existing_db_no_migrations(baseline, tmp_path, fakebackupmanager, fakemigrator):
     """
-    DB should be left as-is, no migrations run, backup created.
+    DB should be left as-is, no migrations run, and *no* backup created.
     """
     dbfile = tmp_path / 'testdb.db'
     dbfile.write_text('content')
@@ -131,7 +131,7 @@ def test_existing_db_no_migrations(baseline, tmp_path, fakebackupmanager, fakemi
 
     assert os.path.exists(dbfile), 'db still there'
     assert fakemigrator.migrations_run, 'migrations were run'
-    assert fakebackupmanager.backup_called, 'backup was called'
+    assert fakebackupmanager.backup_called is False, 'NO backup was called'
 
 
 @pytest.fixture(name="migrator")
@@ -182,11 +182,11 @@ def test_happy_path_no_existing_database(tmp_path, migrator):
     assert len(backup_files) == 0, 'no backups'
 
 
-def test_existing_database(tmp_path, migrator):
+def test_existing_database_with_migrations(tmp_path, migrator):
     """
     If db exists, setup should:
     - run any migrations
-    - create a backup, with today's datetime
+    - create a backup with today's datetime
     """
 
     dbfile = tmp_path / 'testdb.db'
@@ -232,3 +232,43 @@ def test_existing_database(tmp_path, migrator):
         output_file.write(data)
 
     assert_tables([ 'A' ], 'back to initial state')
+
+
+def test_existing_database_no_outstanding_migrations(tmp_path, migrator):
+    """
+    If db exists and no migrations are outstand, setup should:
+    - not run any migrations
+    - NOT create a backup
+    """
+
+    dbfile = tmp_path / 'testdb.db'
+    assert os.path.exists(dbfile) is False, 'no db exists'
+
+    thisdir = os.path.dirname(os.path.realpath(__file__))
+    baseline = os.path.join(thisdir, 'schema', 'baseline', 'schema.sql')
+    with open(baseline, 'r', encoding='utf8') as f:
+        with closing(sqlite3.connect(dbfile)) as conn:
+            conn.executescript(f.read())
+    assert os.path.exists(dbfile) is True, 'db exists'
+
+    backup_dir = tmp_path / 'backups'
+    backup_dir.mkdir()
+    bm = BackupManager(dbfile, backup_dir, 3)
+
+    setup = Setup(dbfile, baseline, bm, migrator)
+    setup.setup()
+
+    assert os.path.exists(dbfile), 'db still exists'
+
+    backup_files = list(backup_dir.glob('*.gz'))
+    assert len(backup_files) == 1, 'backup created'
+
+    # Clean state before next run.
+    for f in backup_files:
+        os.unlink(f)
+    backup_files = list(backup_dir.glob('*.gz'))
+    assert len(backup_files) == 0, 'no backups'
+
+    setup.setup()
+    backup_files = list(backup_dir.glob('*.gz'))
+    assert len(backup_files) == 0, 'STILL no backups'

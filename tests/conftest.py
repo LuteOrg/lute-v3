@@ -72,7 +72,7 @@ def fixture_app(testconfig):
         'WTF_CSRF_ENABLED': False,
         'TESTING': True
     }
-    app = init_db_and_app(testconfig, extra_config)
+    app = init_db_and_app(testconfig, extra_config = extra_config)
     yield app
 
 
