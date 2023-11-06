@@ -10,6 +10,8 @@ Includes classes:
 
 """
 
+from io import StringIO
+import sys
 import os
 import re
 from typing import List
@@ -57,11 +59,19 @@ class JapaneseParser(AbstractParser):
         if JapaneseParser._is_supported is not None:
             return JapaneseParser._is_supported
         b = False
+
+        # Calling MeCab() prints to stderr even if the
+        # exception is caught.  Suppress that output noise.
+        temp_err = StringIO()
         try:
+            sys.stderr = temp_err
             MeCab()
             b = True
         except:  # pylint: disable=bare-except
             b = False
+        finally:
+            sys.stderr = sys.__stderr__
+
         JapaneseParser._is_supported = b
         return b
 

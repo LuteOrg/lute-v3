@@ -10,7 +10,7 @@ from lute.app_setup import init_db_and_app
 from lute.config.app_config import AppConfig
 
 logging.getLogger("waitress.queue").setLevel(logging.ERROR)
-
+logging.getLogger('natto').setLevel(logging.CRITICAL)
 
 def start():
     """
