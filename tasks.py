@@ -65,33 +65,6 @@ def resetstart(c):
 
 
 @task
-def manifest(c):
-    """
-    Generate manifest.yml.
-
-    The toml file isn't included in the distributed package,
-    and we want the commit, so hack together a small yml file.
-    """
-    with open("pyproject.toml", "r") as toml_file:
-        toml_data = toml.load(toml_file)
-    version = toml_data['project']['version']
-    commit = subprocess.check_output([
-        'git', 'rev-parse', '--short', 'HEAD'
-    ]).decode('ascii').strip()
-
-    content = "\n".join([
-        '# Generated from inv manifest',
-        f'version: {version}',
-        f'commit: {commit}'
-    ])
-    thisdir = os.path.dirname(os.path.realpath(__file__))
-    f = os.path.join(thisdir, 'lute', 'manifest.yml')
-    with open(f, 'w') as outfile:
-        outfile.write(content)
-    print('Generated manifest with content:')
-    print(content)
-
-@task
 def search(c, search_for):
     """
     Search the code for a string.
@@ -170,7 +143,6 @@ ns = Collection()
 ns.add_task(lint)
 ns.add_task(accept)
 ns.add_task(coverage)
-ns.add_task(manifest)
 ns.add_task(todos)
 ns.add_task(start)
 ns.add_task(resetstart)

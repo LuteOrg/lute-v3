@@ -6,9 +6,6 @@ lute/config/config.yml
 *.ini
 *.ini.bkp
 
-# Manifest from inv manifest
-lute/manifest.yml
-
 # user data
 data/
 
