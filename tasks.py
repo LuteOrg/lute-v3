@@ -72,6 +72,14 @@ def search(c, search_for):
     c.run(f'{devscript} "{search_for}"')
 
 
+@task
+def test(c):
+    """
+    Simple caller to pytest to allow for inv task chaining.
+    """
+    c.run('pytest')
+
+
 @task(help={
     'port': 'optional port to run on; creates server if needed.',
     'show': 'print data',
@@ -140,8 +148,18 @@ def accept(   # pylint: disable=too-many-arguments
             app_process.terminate()
 
 
+@task(pre=[test, accept, lint])
+def full(c):
+    """
+    Run full check and lint.
+    """
+    print("Done.")
+
+
 ns = Collection()
+ns.add_task(full)
 ns.add_task(lint)
+ns.add_task(test)
 ns.add_task(accept)
 ns.add_task(coverage)
 ns.add_task(todos)
