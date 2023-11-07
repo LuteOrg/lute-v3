@@ -149,7 +149,7 @@ def accept(   # pylint: disable=too-many-arguments
 
 
 @task(pre=[test, accept, lint])
-def full(c):
+def full(c): # pylint: disable=unused-argument
     """
     Run full check and lint.
     """
