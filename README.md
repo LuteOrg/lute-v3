@@ -129,3 +129,33 @@ pipdeptree --freeze
 and then *manually* determine what should go into the `[project][dependencies]` and `dev`.
 
 Note I take the requirements.txt `==` entries and change them to `>=x,<y`, assuming that future changes up until the next major release for that package are backwards-compatible.  E.g, the dependency for `Flask-SQLAlchemy==3.1.1` in requirements.txt becomes `Flask-SQLAlchemy>=3.1.1,<4`.
+
+# Misc dev notes
+
+## read-only db during tests
+
+It _appears_ that killing acceptance tests mid-run results in a zombie (?) python process that keeps a handle on the db, causing it to get locked in read-only mode.
+
+I couldn't find a better way to kill this process than do a full machine restart.  Sledgehammer approach that works.
+
+
+## Acceptance tests suddenly failing
+
+Worning during run of tests with `inv accept --exitfail`:
+
+```
+WARNING  selenium.webdriver.common.selenium_manager:selenium_manager.py:139 The chromedriver version (118.0.5993.70) detected in PATH at /opt/homebrew/bin/chromedriver might not be compatible with the detected chrome version (119.0.6045.105); currently, chromedriver 119.0.6045.105 is recommended for chrome 119.*, so it is advised to delete the driver in PATH and retry
+```
+
+
+```
+brew upgrade chromedriver`
+```
+
+Then, on a Mac, have to "allow" it:
+
+```
+/opt/homebrew/bin/chromedriver --version
+```
+
+Will show message: "“chromedriver” can’t be opened because Apple cannot check it for malicious software."  Click "Show in Finder", then in Finder, click "Open" and say "OK" when it can't be verified.  Yes, this is a security risk.
