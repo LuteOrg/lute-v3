@@ -49,6 +49,18 @@ deactivate
 
 # Development
 
+## Cloning and setup
+
+* Clone as usual
+* set up your virtual environment, install all dev dependencies from requirements.txt, activate it
+* Install the git pre-commit hooks: `pre-commit install`
+
+## Commit hooks
+
+Pre-commit hooks are installed with the `pre-commit install` step, and are run on every commit.
+
+Skipping a step: `SKIP=pylint git commit -m "Some non-lint-compliant commit."`
+
 ## Using invoke for tasks
 
 Lute3 uses [Invoke](https://docs.pyinvoke.org/en/stable/index.html) to run tasks.  Tasks are in `tasks.py`.
