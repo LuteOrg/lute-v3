@@ -1,6 +1,7 @@
 astroid==2.15.6
 attrs==23.1.0
 beautifulsoup4==4.12.2
+black==23.10.1
 blinker==1.6.2
 certifi==2023.7.22
 cffi==1.16.0
@@ -31,12 +32,14 @@ lazy-object-proxy==1.9.0
 Mako==1.2.4
 MarkupSafe==2.1.3
 mccabe==0.7.0
+mypy-extensions==1.0.0
 natto-py==1.0.1
 nodeenv==1.8.0
 outcome==1.3.0.post0
 packaging==23.1
 parse==1.19.1
 parse-type==0.6.2
+pathspec==0.11.2
 pipdeptree==2.13.0
 platformdirs==3.10.0
 pluggy==1.3.0

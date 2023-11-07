@@ -47,7 +47,8 @@ dev = [
   "pylint>=2.17.5,<3",
   "pytest-bdd>=7.0.0,<8",
   "pytest-splinter>=3.3.2,<4",
-  "pre-commit>=3.5.0,<4"
+  "pre-commit>=3.5.0,<4",
+  "black>=23.10.1,<24",
 ]
 
 [project.urls]
