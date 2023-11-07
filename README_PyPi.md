@@ -8,7 +8,7 @@ Lute v3 is a rewrite of the original Lute PHP application in Python and Flask.
 
 ## Requirements
 
-Python 3.11+
+Python 3.8+
 
 ## Install
 

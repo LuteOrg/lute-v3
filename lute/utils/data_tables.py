@@ -2,7 +2,6 @@
 Helper methods to get data for datatables display.
 """
 
-from typing import Any
 import re
 from sqlalchemy.sql import text
 from lute.parse.registry import supported_parser_types
@@ -51,7 +50,7 @@ class DataTablesFlaskParamParser:
     """
 
     @staticmethod
-    def _parse_order(request_params: dict[str, Any]) -> list:
+    def _parse_order(request_params):
         """Parse the order[index][*] parameters."""
         order = []
         order_re = re.compile(r'order\[(.*?)]\[column]')
@@ -66,7 +65,7 @@ class DataTablesFlaskParamParser:
         return order
 
     @staticmethod
-    def _parse_columns(request_params: dict[str, Any]) -> list:
+    def _parse_columns(request_params):
         """Parse the column[index][*] parameters."""
         columns = []
         # Extract only the keys of type columns[i][data] from the params

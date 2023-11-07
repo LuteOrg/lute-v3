@@ -15,7 +15,7 @@ name = "lute3"
 dynamic = ['version']
 
 description = "Learning Using Texts"
-requires-python = ">=3.11"
+requires-python = ">=3.8"
 authors = [
   {name = "Jeff Zohrab", email = "jzohrab@gmail.com"}
 ]
