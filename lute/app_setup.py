@@ -55,52 +55,10 @@ def _setup_app_dirs(app_config):
                 f.write(rec['readme'])
 
 
-def _create_app(app_config, extra_config):
+def _add_base_routes(app, app_config):
     """
-    Create the app using the given configuration,
-    and init the SqlAlchemy db.
+    Add some basic routes.
     """
-
-    app = Flask(__name__, instance_path=app_config.datapath)
-
-    config = {
-        'SECRET_KEY': 'some_secret',
-        'DATABASE': app_config.dbfilename,
-        'ENV': app_config.env,
-        'SQLALCHEMY_DATABASE_URI': f'sqlite:///{app_config.dbfilename}',
-
-        'DATAPATH': app_config.datapath,
-
-        # ref https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
-        # Don't track mods.
-        'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-    }
-
-    final_config = { **config, **extra_config }
-    app.config.from_mapping(final_config)
-
-    db.init_app(app)
-
-    with app.app_context():
-        db.create_all()
-        UserSetting.load()
-
-    app.db = db
-
-    app.register_blueprint(language_bp)
-    app.register_blueprint(book_bp)
-    app.register_blueprint(term_bp)
-    app.register_blueprint(termtag_bp)
-    app.register_blueprint(read_bp)
-    app.register_blueprint(bing_bp)
-    app.register_blueprint(userimage_bp)
-    app.register_blueprint(termimport_bp)
-    app.register_blueprint(term_parent_map_bp)
-    app.register_blueprint(backup_bp)
-    app.register_blueprint(settings_bp)
-    if app_config.is_test_db:
-        app.register_blueprint(dev_api_bp)
-
     @app.route('/')
     def index():
         # Stop all other calculations if need to backup.
@@ -158,6 +116,51 @@ def _create_app(app_config, extra_config):
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
         return response
 
+
+def _create_app(app_config, extra_config):
+    """
+    Create the app using the given configuration,
+    and init the SqlAlchemy db.
+    """
+
+    app = Flask(__name__, instance_path=app_config.datapath)
+
+    config = {
+        'SECRET_KEY': 'some_secret',
+        'DATABASE': app_config.dbfilename,
+        'ENV': app_config.env,
+        'SQLALCHEMY_DATABASE_URI': f'sqlite:///{app_config.dbfilename}',
+
+        'DATAPATH': app_config.datapath,
+
+        # ref https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
+        # Don't track mods.
+        'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+    }
+
+    final_config = { **config, **extra_config }
+    app.config.from_mapping(final_config)
+
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()
+        UserSetting.load()
+    app.db = db
+
+    _add_base_routes(app, app_config)
+    app.register_blueprint(language_bp)
+    app.register_blueprint(book_bp)
+    app.register_blueprint(term_bp)
+    app.register_blueprint(termtag_bp)
+    app.register_blueprint(read_bp)
+    app.register_blueprint(bing_bp)
+    app.register_blueprint(userimage_bp)
+    app.register_blueprint(termimport_bp)
+    app.register_blueprint(term_parent_map_bp)
+    app.register_blueprint(backup_bp)
+    app.register_blueprint(settings_bp)
+    if app_config.is_test_db:
+        app.register_blueprint(dev_api_bp)
 
     return app
 
