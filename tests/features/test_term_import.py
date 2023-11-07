@@ -30,13 +30,13 @@ def given_demo_data(app_context):
 
 @given(parsers.parse("import file:\n{newcontent}"))
 def given_file(newcontent):
-    global content # pylint: disable=global-statement
+    global content  # pylint: disable=global-statement
     content = newcontent
 
 
 @given("empty import file")
 def given_empty_file():
-    global content # pylint: disable=global-statement
+    global content  # pylint: disable=global-statement
     content = ""
 
 

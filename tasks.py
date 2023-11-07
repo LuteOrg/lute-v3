@@ -161,9 +161,8 @@ def full(c):  # pylint: disable=unused-argument
 
 @task(post=[lint])
 def black(c):
-    "black-format lute and tests, then check."
-    c.run("python -m black lute")
-    c.run("python -m black tests")
+    "black-format things."
+    c.run("python -m black .")
 
 
 ns = Collection()
