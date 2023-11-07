@@ -4,7 +4,8 @@ Main entry point.
 
 import os
 from flask import Flask, render_template, redirect, flash, \
-    current_app, make_response, send_from_directory
+    current_app, make_response, send_from_directory, \
+    jsonify
 
 from lute.db import db
 from lute.db.setup.main import setup_db
@@ -106,6 +107,23 @@ def _add_base_routes(app, app_config):
             datapath = current_app.config['DATAPATH'],
             database = current_app.config['DATABASE'],
         )
+
+    @app.route('/info')
+    def show_info():
+        """
+        Json return of some data.
+
+        Used in lute.verify module for tests.
+
+        This likely belongs in a different 'api' location,
+        but leaving it here for now.
+        """
+        ret = {
+            'version': lute.__version__,
+            'datapath': current_app.config['DATAPATH'],
+            'database': current_app.config['DATABASE'],
+        }
+        return jsonify(ret)
 
     @app.route('/static/js/never_cache/<path:filename>')
     def custom_js(filename):

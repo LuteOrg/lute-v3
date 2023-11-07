@@ -35,7 +35,7 @@ jobs:
 
     - uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.11'
         cache: 'pip' # caching pip dependencies
 
     - run: pip install -r requirements.txt
@@ -79,3 +79,20 @@ jobs:
     # are deleted ...
     - name: Smoke test no mecab
       run: inv accept --headless -s -k test_unsupported_language_not_shown
+
+    - name: Check flit package
+      run: |
+        mkdir ${{ github.workspace }}/../lute_flit
+        cd ${{ github.workspace }}/../lute_flit
+        flit -f ${{ github.workspace }}/pyproject.toml install
+
+        python -m lute.main &   # Start in background process
+        sleep 2
+
+        # Verify with utils script back in the workspace
+        # (verify.py is not included in flit install)
+        pushd ${{ github.workspace }}
+        python -m utils.verify
+        popd
+
+        pkill -f "python -m lute.main"   # Kill that process.
