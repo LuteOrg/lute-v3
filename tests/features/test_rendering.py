@@ -1,8 +1,12 @@
-from pytest_bdd import given, when, then, scenarios, parsers
+"""
+Step defs for term_rendering.feature.
+"""
+# pylint: disable=missing-function-docstring
+
+from pytest_bdd import given, then, scenarios, parsers
 
 from lute.db import db
 from lute.models.language import Language
-from lute.models.term import Term
 from lute.term.model import Repository
 from lute.read.service import get_paragraphs, set_unknowns_to_known, bulk_status_update
 
@@ -16,22 +20,23 @@ language = None
 # The Text object
 text = None
 
-scenarios('rendering.feature')
+scenarios("rendering.feature")
 
 
-@given('demo data')
+@given("demo data")
 def given_demo_data(app_context):
     "Calling app_context loads the demo data."
 
-@given(parsers.parse('language {langname}'))
+
+@given(parsers.parse("language {langname}"))
 def given_lang(langname):
-    global language
+    global language  # pylint: disable=global-statement
     lang = db.session.query(Language).filter(Language.name == langname).first()
-    assert lang.name == langname, 'sanity check'
+    assert lang.name == langname, "sanity check"
     language = lang
 
 
-@given(parsers.parse('terms:\n{content}'))
+@given(parsers.parse("terms:\n{content}"))
 def given_terms(content):
     terms = content.split("\n")
     add_terms(language, terms)
@@ -56,23 +61,20 @@ def given_term_with_status(content, status):
     r.commit()
 
 
-
-
-@given(parsers.parse('text:\n{content}'))
+@given(parsers.parse("text:\n{content}"))
 def given_text(content):
-    global text
-    text = make_text('test', content, language)
+    global text  # pylint: disable=global-statement
+    text = make_text("test", content, language)
     db.session.add(text)
     db.session.commit()
 
 
-@given('all unknowns are set to known')
+@given("all unknowns are set to known")
 def set_to_known():
-    global text
     set_unknowns_to_known(text)
 
 
-@given(parsers.parse('bulk status {newstatus} update for terms:\n{terms}'))
+@given(parsers.parse("bulk status {newstatus} update for terms:\n{terms}"))
 def update_status(newstatus, terms):
     bulk_status_update(text, terms.split("\n"), int(newstatus))
 
@@ -88,38 +90,41 @@ def _assert_stringized_equals(stringizer, joiner, expected):
         tis = [t for s in p for t in s.textitems]
         ss = [stringizer(ti) for ti in tis]
         ret.append(joiner.join(ss))
-    actual = '/<PARA>/'.join(ret)
+    actual = "/<PARA>/".join(ret)
 
     expected = expected.split("\n")
     assert actual == "/<PARA>/".join(expected)
 
 
-@then(parsers.parse('rendered should be:\n{expected}'))
+@then(parsers.parse("rendered should be:\n{expected}"))
 def then_rendered_should_be(expected):
     """
     Renders /term(status)/ /term/ /term/, compares with expected.
     """
+
     def stringize(ti):
-        zws = '\u200B'
-        status = ''
-        if ti.wo_status not in [ None, 0 ]:
-            status = f'({ti.wo_status})'
-        return ti.display_text.replace(zws, '') + status
-    _assert_stringized_equals(stringize, '/', expected)
+        zws = "\u200B"
+        status = ""
+        if ti.wo_status not in [None, 0]:
+            status = f"({ti.wo_status})"
+        return ti.display_text.replace(zws, "") + status
+
+    _assert_stringized_equals(stringize, "/", expected)
 
 
-@then(parsers.parse('known-only rendered should be:\n{expected}'))
+@then(parsers.parse("known-only rendered should be:\n{expected}"))
 def known_only_rendered_should_be(expected):
     def stringize(ti):
         s = ti.display_text
-        if ti.wo_status not in [ None, 0 ]:
-            s = f'[[{s}]]'
-        zws = '\u200B'
-        return s.replace(zws, '')
-    _assert_stringized_equals(stringize, '', expected)
+        if ti.wo_status not in [None, 0]:
+            s = f"[[{s}]]"
+        zws = "\u200B"
+        return s.replace(zws, "")
+
+    _assert_stringized_equals(stringize, "", expected)
 
 
-@then(parsers.parse('words table should contain:\n{text_lc_content}'))
+@then(parsers.parse("words table should contain:\n{text_lc_content}"))
 def then_words_table_contains_WoTextLC(text_lc_content):
     expected = text_lc_content.split("\n")
     sql = "select WoTextLC from words order by WoTextLC"

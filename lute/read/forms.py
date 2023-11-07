@@ -10,4 +10,5 @@ class TextForm(FlaskForm):
     """
     Text page - for editing a page.
     """
-    text = TextAreaField('Text')
+
+    text = TextAreaField("Text")

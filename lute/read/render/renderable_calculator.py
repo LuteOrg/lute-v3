@@ -7,6 +7,7 @@ import functools
 from lute.models.language import Language
 from lute.models.term import Term, Status
 
+
 class RenderableCalculator:
     """
     Calculating what TextTokens and Terms should be rendered.
@@ -42,15 +43,14 @@ class RenderableCalculator:
         for tok in texttokens:
             if prevtok is not None and prevtok.order != (tok.order - 1):
                 mparts = [prevtok.token, prevtok.order, tok.token, tok.order]
-                msg = '; '.join(map(str, mparts))
+                msg = "; ".join(map(str, mparts))
                 raise RuntimeError(f"bad token ordering: {msg}")
             prevtok = tok
-
 
     def _get_renderable(self, tokenlocator, terms, texttokens):
         """
         Return RenderableCandidates that will **actually be rendered**.
-        
+
         Method to determine what should be rendered:
 
         1. Create a "rendered array".  On completion of this algorithm,
@@ -138,9 +138,9 @@ class RenderableCalculator:
             for loc in tokenlocator.locate_string(term.text_lc):
                 rc = RenderableCandidate()
                 rc.term = term
-                rc.display_text = loc['text']
-                rc.text = loc['text']
-                rc.pos = texttokens[0].order + loc['index']
+                rc.display_text = loc["text"]
+                rc.text = loc["text"]
+                rc.pos = texttokens[0].order + loc["index"]
                 rc.length = term.token_count
                 rc.is_word = 1
 
@@ -154,6 +154,7 @@ class RenderableCalculator:
                 return -1 if (a.length > b.length) else 1
             # Lowest position (closest to front of string) sorts first.
             return -1 if (a.pos < b.pos) else 1
+
         termcandidates.sort(key=functools.cmp_to_key(compare))
 
         # The termcandidates should now be sorted such that longest
@@ -169,11 +170,9 @@ class RenderableCalculator:
         rcids = list(set(rendered.values()))
         return [candidates[rcid] for rcid in rcids]
 
-
     def _sort_by_order_and_tokencount(self, items):
         items.sort(key=lambda x: (x.pos, -x.length))
         return items
-
 
     def _calc_overlaps(self, items):
         for i in range(1, len(items)):
@@ -190,7 +189,6 @@ class RenderableCalculator:
                 curr.display_text = zws.join(show)
 
         return items
-
 
     def main(self, language, words, texttokens):
         """
@@ -210,13 +208,11 @@ class RenderableCalculator:
         items = self._calc_overlaps(items)
         return items
 
-
     @staticmethod
     def get_renderable(lang, words, texttokens):
         "Convenience method, calls main."
         rc = RenderableCalculator()
         return rc.main(lang, words, texttokens)
-
 
 
 class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
@@ -248,13 +244,9 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
         self.render: bool = True
 
     def __repr__(self):
-        parts = [
-            f"pos {self.pos}",
-            f"render {self.render}"
-            f"(id {self.id})"
-        ]
-        parts = ' '.join(parts)
-        return f"<RenderableCandidate \"{self.text}\", {parts}>"
+        parts = [f"pos {self.pos}", f"render {self.render}" f"(id {self.id})"]
+        parts = " ".join(parts)
+        return f'<RenderableCandidate "{self.text}", {parts}>'
 
     @property
     def term_id(self) -> int:
@@ -307,7 +299,7 @@ class TokenLocator:
 
     Note that the language of the string must also be provided, because
     some languages (Turkish!) have unusual case requirements.
-    
+
     See the test cases for more examples.
     """
 
@@ -338,11 +330,11 @@ class TokenLocator:
             matchpos = match[1]
 
             # print(f"found match \"{matchtext}\" len={matchlen} pos={matchpos}")
-            original_subject_text = subj[matchpos: matchpos + matchlen]
-            zws = '\u200B'
+            original_subject_text = subj[matchpos : matchpos + matchlen]
+            zws = "\u200B"
             t = original_subject_text.lstrip(zws).rstrip(zws)
             index = self.get_count_before(subj, matchpos)
-            return { 'text': t, 'index': index }
+            return {"text": t, "index": index}
 
         termmatches = list(map(make_text_index_pair, matches))
 
@@ -352,7 +344,7 @@ class TokenLocator:
         """
         Count of tokens found in string before position pos.
         """
-        zws = '\u200B'
+        zws = "\u200B"
         beforesubstr = string[:pos]
         n = beforesubstr.count(zws)
         return n
@@ -369,7 +361,7 @@ class TokenLocator:
         # overlap -- e.g. _b_b_ has _b_ *twice*.
         # https://stackoverflow.com/questions/5616822/
         #   how-to-use-regex-to-find-all-overlapping-matches
-        pattern = rf'(?=({re.escape(find_lc)}))'
+        pattern = rf"(?=({re.escape(find_lc)}))"
 
         matches = re.finditer(pattern, subject, flags=re.IGNORECASE)
 
@@ -383,13 +375,13 @@ class TokenLocator:
         """
         Append zero-width string to string to simplify/standardize searches.
         """
-        zws = '\u200B'
+        zws = "\u200B"
         if isinstance(t, list):
             t = zws.join(t)
         return zws + t + zws
 
 
-class TextItem: # pylint: disable=too-many-instance-attributes
+class TextItem:  # pylint: disable=too-many-instance-attributes
     """
     Unit to be rendered.
 
@@ -435,9 +427,9 @@ class TextItem: # pylint: disable=too-many-instance-attributes
             if cterm is None:
                 return False
             no_extra = (
-                cterm.translation is None and
-                cterm.romanization is None and
-                cterm.get_current_image() is None
+                cterm.translation is None
+                and cterm.romanization is None
+                and cterm.get_current_image() is None
             )
             return not no_extra
 
@@ -452,7 +444,7 @@ class TextItem: # pylint: disable=too-many-instance-attributes
         Content to be rendered to browser.
         """
         zws = chr(0x200B)
-        return self.display_text.replace(zws, '').replace(' ', '&nbsp;')
+        return self.display_text.replace(zws, "").replace(" ", "&nbsp;")
 
     @property
     def span_id(self):
@@ -462,12 +454,8 @@ class TextItem: # pylint: disable=too-many-instance-attributes
 
         This *might* not be necessary ... I don't think IDs are used anywhere.
         """
-        parts = [
-            'ID',
-            str(self.order),
-            str(max(1, self.token_count))
-        ]
-        return '-'.join(parts)
+        parts = ["ID", str(self.order), str(max(1, self.token_count))]
+        return "-".join(parts)
 
     @property
     def html_class_string(self):
@@ -478,27 +466,30 @@ class TextItem: # pylint: disable=too-many-instance-attributes
             return "textitem"
 
         if self.wo_id is None:
-            classes = ['textitem', 'click', 'word', 'status0']
-            return ' '.join(classes)
+            classes = ["textitem", "click", "word", "status0"]
+            return " ".join(classes)
 
         st = self.wo_status
         classes = [
-            'textitem', 'click', 'word',
-            'word' + str(self.wo_id), 'status' + str(st)
+            "textitem",
+            "click",
+            "word",
+            "word" + str(self.wo_id),
+            "status" + str(st),
         ]
 
         tooltip = (
-            st not in (Status.WELLKNOWN, Status.IGNORED) or
-            self.show_tooltip or
-            self.flash_message is not None
+            st not in (Status.WELLKNOWN, Status.IGNORED)
+            or self.show_tooltip
+            or self.flash_message is not None
         )
         if tooltip:
-            classes.append('showtooltip')
+            classes.append("showtooltip")
 
         if self.flash_message is not None:
-            classes.append('hasflash')
+            classes.append("hasflash")
 
         if self.display_text != self.text:
-            classes.append('overlapped')
+            classes.append("overlapped")
 
-        return ' '.join(classes)
+        return " ".join(classes)

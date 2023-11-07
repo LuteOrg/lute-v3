@@ -6,6 +6,7 @@ import os
 import yaml
 from platformdirs import PlatformDirs
 
+
 class AppConfig:
     """
     Configuration wrapper around yaml file.
@@ -17,7 +18,6 @@ class AppConfig:
         """
         self._load_config(config_file_path)
 
-
     def _load_config(self, config_file_path):
         """
         Load and validate the config file.
@@ -25,46 +25,44 @@ class AppConfig:
         if not os.path.exists(config_file_path):
             raise FileNotFoundError(f"Config file not found at {config_file_path}")
 
-        with open(config_file_path, 'r', encoding='utf-8') as file:
+        with open(config_file_path, "r", encoding="utf-8") as file:
             config = yaml.safe_load(file)
 
         if not isinstance(config, dict):
             raise ValueError("Invalid configuration format. Expected a dictionary.")
 
-        if 'DBNAME' not in config:
+        if "DBNAME" not in config:
             raise ValueError("Config file must have 'DBNAME'")
 
-        if 'ENV' not in config:
+        if "ENV" not in config:
             raise ValueError("Config file must have 'ENV'")
 
-        env = config.get('ENV')
-        if env not in [ 'prod', 'dev']:
+        env = config.get("ENV")
+        if env not in ["prod", "dev"]:
             raise ValueError(f"Invalid ENV {env}, can only be prod or dev.")
         self._env = env
 
         self._mecab_path = None
-        if 'MECAB_PATH' in config:
-            self._mecab_path = config.get('MECAB_PATH')
+        if "MECAB_PATH" in config:
+            self._mecab_path = config.get("MECAB_PATH")
 
         self._is_docker = False
-        if 'IS_DOCKER' in config:
+        if "IS_DOCKER" in config:
             self._is_docker = True
 
-        self._db_name = config.get('DBNAME')
-        self._data_path = config.get('DATAPATH', None)
+        self._db_name = config.get("DBNAME")
+        self._data_path = config.get("DATAPATH", None)
         if self._data_path is None:
             self._data_path = self._get_appdata_dir()
 
-        self._port = config.get('PORT', 5000)
+        self._port = config.get("PORT", 5000)
 
         return config
-
 
     def _get_appdata_dir(self):
         "Get user's appdata directory from platformdirs."
         dirs = PlatformDirs("Lute3", "Lute3")
         return dirs.user_data_dir
-
 
     @property
     def env(self):
@@ -92,7 +90,7 @@ class AppConfig:
     @property
     def userimagespath(self):
         "Path to user images."
-        return os.path.join(self.datapath, 'userimages')
+        return os.path.join(self.datapath, "userimages")
 
     @property
     def dbname(self):
@@ -108,30 +106,28 @@ class AppConfig:
         in /invoke.py check if the database is a test_
         db prior to running some destructive action.
         """
-        return self.dbname.startswith('test_')
+        return self.dbname.startswith("test_")
 
     @property
     def dbfilename(self):
         "Full database file name and path."
         return os.path.join(self.datapath, self.dbname)
 
-
     @property
     def sqliteconnstring(self):
         "Full sqlite connection string."
-        return f'sqlite:///{self.dbfilename}'
+        return f"sqlite:///{self.dbfilename}"
 
     @property
     def port(self):
         "Port served on."
         return self._port
 
-
     @staticmethod
     def create_from_config():
         "Create an AppConfig from the config file."
         thisdir = AppConfig.configdir()
-        configfile = os.path.join(thisdir, 'config.yml')
+        configfile = os.path.join(thisdir, "config.yml")
         return AppConfig(configfile)
 
     @staticmethod

@@ -16,7 +16,8 @@ class BackupException(Exception):
     Raised if export bombs for some reason.
     """
 
-def create_backup(app_config, settings, is_manual = False, suffix = None):
+
+def create_backup(app_config, settings, is_manual=False, suffix=None):
     """
     Create backup using current app config, settings.
 
@@ -34,11 +35,11 @@ def create_backup(app_config, settings, is_manual = False, suffix = None):
       - last_backup_datetime
     """
     if not os.path.exists(settings.backup_dir):
-        raise BackupException('Missing directory ' + settings.backup_dir)
+        raise BackupException("Missing directory " + settings.backup_dir)
 
     _mirror_images_dir(app_config.userimagespath, settings.backup_dir)
 
-    prefix = 'manual_' if is_manual else ''
+    prefix = "manual_" if is_manual else ""
     if suffix is None:
         suffix = datetime.now().strftime("%Y-%m-%d_%H%M%S")
     fname = f"{prefix}lute_backup_{suffix}.db"
@@ -53,7 +54,7 @@ def should_run_auto_backup(backup_settings):
     """
     True (if applicable) if last backup was old.
     """
-    if backup_settings.backup_enabled != 'y' or not backup_settings.backup_auto:
+    if backup_settings.backup_enabled != "y" or not backup_settings.backup_auto:
         return False
 
     last = backup_settings.last_backup_datetime
@@ -87,7 +88,9 @@ def _create_db_backup(dbfilename, backupfile):
     "Make a backup."
     shutil.copy(dbfilename, backupfile)
     f = f"{backupfile}.gz"
-    with open(backupfile, 'rb') as in_file, gzip.open(f, 'wb', compresslevel=9) as out_file:
+    with open(backupfile, "rb") as in_file, gzip.open(
+        f, "wb", compresslevel=9
+    ) as out_file:
         shutil.copyfileobj(in_file, out_file)
     os.remove(backupfile)
     SystemSetting.set_last_backup_datetime(int(time.time()))
@@ -105,7 +108,7 @@ def _remove_excess_backups(count, outdir):
 
 def _mirror_images_dir(userimagespath, outdir):
     "Copy the images to backup."
-    target_dir = os.path.join(outdir, 'userimages_backup')
+    target_dir = os.path.join(outdir, "userimages_backup")
     target_dir = os.path.abspath(target_dir)
     if not os.path.exists(target_dir):
         os.mkdir(target_dir)

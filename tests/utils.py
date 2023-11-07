@@ -7,6 +7,7 @@ from lute.models.book import Book
 from lute.read.service import get_paragraphs
 from lute.db import db
 
+
 def add_terms(language, term_array):
     """
     Make and save terms.
@@ -33,14 +34,15 @@ def make_text(title, content, language):
     return b.texts[0]
 
 
-def get_rendered_string(text, imploder='/', overridestringize=None):
+def get_rendered_string(text, imploder="/", overridestringize=None):
     "Get the stringized rendered content after parsing."
+
     def stringize(ti):
-        zws = '\u200B'
-        status = ''
-        if ti.wo_status not in [ None, 0 ]:
-            status = f'({ti.wo_status})'
-        return ti.display_text.replace(zws, '') + status
+        zws = "\u200B"
+        status = ""
+        if ti.wo_status not in [None, 0]:
+            status = f"({ti.wo_status})"
+        return ti.display_text.replace(zws, "") + status
 
     usestringize = overridestringize or stringize
     ret = []
@@ -49,10 +51,10 @@ def get_rendered_string(text, imploder='/', overridestringize=None):
         tis = [t for s in p for t in s.textitems]
         ss = [usestringize(ti) for ti in tis]
         ret.append(imploder.join(ss))
-    return '/<PARA>/'.join(ret)
+    return "/<PARA>/".join(ret)
 
 
-def assert_rendered_text_equals(text, expected, msg=''):
+def assert_rendered_text_equals(text, expected, msg=""):
     "Check that the rendered string matches the expected."
     actual = get_rendered_string(text)
     # This assertion gives details because the module

@@ -38,15 +38,13 @@ class Repository:
         "Loads a Book business object for the DBBook."
         dbb = DBBook.find(book_id)
         if dbb is None:
-            raise ValueError(f'No book with id {book_id} found')
+            raise ValueError(f"No book with id {book_id} found")
         return self._build_business_book(dbb)
-
 
     def get_book_tags(self):
         "Get all available book tags, helper method."
         bts = self.db.session.query(BookTag).all()
-        return [ t.text for t in bts ]
-
+        return [t.text for t in bts]
 
     def add(self, book):
         """
@@ -58,23 +56,20 @@ class Repository:
         self.db.session.add(dbbook)
         return dbbook
 
-
     def delete(self, book):
         """
         Delete.
         """
         if book.id is None:
-            raise ValueError(f'book {book.title} not saved')
+            raise ValueError(f"book {book.title} not saved")
         b = DBBook.find(book.id)
         self.db.session.delete(b)
-
 
     def commit(self):
         """
         Commit everything.
         """
         self.db.session.commit()
-
 
     def _build_db_book(self, book):
         "Convert a book business object to a DBBook."
@@ -98,7 +93,6 @@ class Repository:
 
         return b
 
-
     def _build_business_book(self, dbbook):
         "Convert db book to Book."
         b = Book()
@@ -107,5 +101,5 @@ class Repository:
         b.title = dbbook.title
         b.text = None  # Not returning this for now
         b.source_uri = dbbook.source_uri
-        b.book_tags = [ t.text for t in dbbook.book_tags ]
+        b.book_tags = [t.text for t in dbbook.book_tags]
         return b

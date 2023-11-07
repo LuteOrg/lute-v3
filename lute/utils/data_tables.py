@@ -9,9 +9,9 @@ from lute.parse.registry import supported_parser_types
 
 def supported_parser_type_criteria():
     "Helper to get all supported parser_types."
-    typecrit = [ f"'{p}'" for p in supported_parser_types() ]
+    typecrit = [f"'{p}'" for p in supported_parser_types()]
     typecrit.append("'zz_dummy_parser'")
-    return ','.join(typecrit)
+    return ",".join(typecrit)
 
 
 class DataTablesFlaskParamParser:
@@ -44,7 +44,7 @@ class DataTablesFlaskParamParser:
       columns: [
         { data: 0, name: BkTitle, ... }
     }
- 
+
     All code here adapted from https://github.com/coding-doc/
     sqlalchemy2-datatables/blob/main/src/datatables/datatable.py.
     """
@@ -53,13 +53,13 @@ class DataTablesFlaskParamParser:
     def _parse_order(request_params):
         """Parse the order[index][*] parameters."""
         order = []
-        order_re = re.compile(r'order\[(.*?)]\[column]')
+        order_re = re.compile(r"order\[(.*?)]\[column]")
         order_params = {k: v for k, v in request_params.items() if order_re.match(k)}
 
         for i in range(len(order_params)):
             dt_column_order = {
-                'column': int(request_params[f'order[{i}][column]']),
-                'dir': request_params[f'order[{i}][dir]']
+                "column": int(request_params[f"order[{i}][column]"]),
+                "dir": request_params[f"order[{i}][dir]"],
             }
             order.append(dt_column_order)
         return order
@@ -69,20 +69,21 @@ class DataTablesFlaskParamParser:
         """Parse the column[index][*] parameters."""
         columns = []
         # Extract only the keys of type columns[i][data] from the params
-        data_re = re.compile(r'columns\[(.*?)]\[data]')
+        data_re = re.compile(r"columns\[(.*?)]\[data]")
         data_param = {k: v for k, v in request_params.items() if data_re.match(k)}
 
         for i in range(len(data_param)):
             column = {
-                'index': i,
-                'data': data_param.get(f'columns[{i}][data]'),
-                'name': request_params.get(f'columns[{i}][name]'),
-                'searchable': request_params.get(f'columns[{i}][searchable]') == 'true',
-                'orderable': request_params.get(f'columns[{i}][orderable]') == 'true',
-                'search': {
-                    'value': request_params.get(f'columns[{i}][search][value]'),
-                    'regex': request_params.get(f'columns[{i}][search][regex]') == 'true'
-                }
+                "index": i,
+                "data": data_param.get(f"columns[{i}][data]"),
+                "name": request_params.get(f"columns[{i}][name]"),
+                "searchable": request_params.get(f"columns[{i}][searchable]") == "true",
+                "orderable": request_params.get(f"columns[{i}][orderable]") == "true",
+                "search": {
+                    "value": request_params.get(f"columns[{i}][search][value]"),
+                    "regex": request_params.get(f"columns[{i}][search][regex]")
+                    == "true",
+                },
             }
             columns.append(column)
         return columns
@@ -93,15 +94,15 @@ class DataTablesFlaskParamParser:
         request_params = requestform.to_dict(flat=True)
 
         return {
-            'draw': int(request_params.get('draw', 1)),
-            'start': int(request_params.get('start', 0)),
-            'length': int(request_params.get('length', -1)),
-            'search': {
-                'value': request_params.get('search[value]'),
-                'regex': request_params.get('search[regex]') == 'true'
+            "draw": int(request_params.get("draw", 1)),
+            "start": int(request_params.get("start", 0)),
+            "length": int(request_params.get("length", -1)),
+            "search": {
+                "value": request_params.get("search[value]"),
+                "regex": request_params.get("search[regex]") == "true",
             },
-            'columns': DataTablesFlaskParamParser._parse_columns(request_params),
-            'order': DataTablesFlaskParamParser._parse_order(request_params),
+            "columns": DataTablesFlaskParamParser._parse_columns(request_params),
+            "order": DataTablesFlaskParamParser._parse_order(request_params),
         }
 
 
@@ -112,8 +113,8 @@ class DataTablesSqliteQuery:
     def where_and_params(searchable_cols, parameters):
         "Build where string and get the 'where' parameters."
 
-        search = parameters['search']
-        search_string = search['value'] if search['value'] is not None else ''
+        search = parameters["search"]
+        search_string = search["value"] if search["value"] is not None else ""
         search_string = search_string.strip()
 
         search_parts = search_string.split()
@@ -121,56 +122,55 @@ class DataTablesSqliteQuery:
 
         # If no searchable columns or search params, stop.
         if len(searchable_cols) == 0 or len(search_parts) == 0:
-            return [ '', {} ]
+            return ["", {}]
 
         params = {}
         part_wheres = []
         for i, p in enumerate(search_parts):
-            lwild = '%' if not p.startswith('^') else ''
-            rwild = '%' if not p.endswith('$') else ''
-            p = p.lstrip('^').rstrip('$')
+            lwild = "%" if not p.startswith("^") else ""
+            rwild = "%" if not p.endswith("$") else ""
+            p = p.lstrip("^").rstrip("$")
             params[f"s{i}"] = p
 
             col_wheres = []
             for cname in searchable_cols:
                 col_wheres.append(f"{cname} LIKE '{lwild}' || :s{i} || '{rwild}'")
 
-            part_wheres.append('(' + ' OR '.join(col_wheres) + ')')
+            part_wheres.append("(" + " OR ".join(col_wheres) + ")")
 
-        return ["WHERE " + ' AND '.join(part_wheres), params]
-
+        return ["WHERE " + " AND ".join(part_wheres), params]
 
     @staticmethod
     def get_sql(base_sql, parameters):
         "Build sql used for datatables queries."
-        start = parameters['start']
-        length = parameters['length']
-        columns = parameters['columns']
+        start = parameters["start"]
+        length = parameters["length"]
+        columns = parameters["columns"]
 
         def cols_with(attr):
-            cols = [c['name'] for c in columns if c[attr] is True]
+            cols = [c["name"] for c in columns if c[attr] is True]
             return cols
 
         orderby = ", ".join(cols_with("orderable"))
 
-        for order in parameters['order']:
-            sort_field = columns[int(order['column'])]['name']
+        for order in parameters["order"]:
+            sort_field = columns[int(order["column"])]["name"]
             orderby = f"ORDER BY {sort_field} {order['dir']}, {orderby}"
 
-        searchable = [c['name'] for c in columns if c['searchable'] is True]
+        searchable = [c["name"] for c in columns if c["searchable"] is True]
         [where, params] = DataTablesSqliteQuery.where_and_params(searchable, parameters)
 
         realbase = f"({base_sql}) realbase"
-        select_field_list = ", ".join([c['name'] for c in columns if c['name'] != ""])
+        select_field_list = ", ".join([c["name"] for c in columns if c["name"] != ""])
         # pylint: disable=line-too-long
         data_sql = f"SELECT {select_field_list} FROM (select * from {realbase} {where} {orderby} LIMIT {start}, {length}) src {orderby}"
 
         return {
-            'recordsTotal': f"select count(*) from {realbase}",
-            'recordsFiltered': f"select count(*) from {realbase} {where}",
-            'data': data_sql,
-            'params': params,
-            'draw': int(parameters['draw'])
+            "recordsTotal": f"select count(*) from {realbase}",
+            "recordsFiltered": f"select count(*) from {realbase} {where}",
+            "data": data_sql,
+            "params": params,
+            "draw": int(parameters["draw"]),
         }
 
     @staticmethod
@@ -182,24 +182,24 @@ class DataTablesSqliteQuery:
         try:
             sqla = DataTablesSqliteQuery.get_sql(base_sql, parameters)
 
-            def runqry(name, use_params = True):
+            def runqry(name, use_params=True):
                 "Run the given query from the datatables list of queries."
                 prms = None
                 if use_params:
-                    prms = sqla['params']
+                    prms = sqla["params"]
                 sql = sqla[name].replace("\n", " ")
                 return conn.execute(text(sql), prms)
 
-            recordsTotal = runqry('recordsTotal', False).fetchone()[0]
-            recordsFiltered = runqry('recordsFiltered').fetchone()[0]
-            res = runqry('data')
+            recordsTotal = runqry("recordsTotal", False).fetchone()[0]
+            recordsFiltered = runqry("recordsFiltered").fetchone()[0]
+            res = runqry("data")
             ret = [list(row) for row in res.fetchall()]
         except Exception as e:
             raise e
 
         result = {
-            'recordsTotal': recordsTotal,
-            'recordsFiltered': recordsFiltered,
-            'data': ret
+            "recordsTotal": recordsTotal,
+            "recordsFiltered": recordsFiltered,
+            "data": ret,
         }
         return result

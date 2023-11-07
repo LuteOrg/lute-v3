@@ -14,7 +14,7 @@ from lute.app_setup import init_db_and_app
 from lute.models.language import Language
 
 
-def pytest_sessionstart(session): # pylint: disable=unused-argument
+def pytest_sessionstart(session):  # pylint: disable=unused-argument
     """
     Ensure test config defines a test environment.
 
@@ -27,14 +27,14 @@ def pytest_sessionstart(session): # pylint: disable=unused-argument
     data/media etc)
     """
     thisdir = os.path.dirname(os.path.realpath(__file__))
-    configfile = os.path.join(thisdir, '..', 'lute', 'config', 'config.yml')
+    configfile = os.path.join(thisdir, "..", "lute", "config", "config.yml")
 
     config = None
-    with open(configfile, 'r', encoding='utf-8') as f:
+    with open(configfile, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
 
     failures = []
-    if 'DATAPATH' not in config:
+    if "DATAPATH" not in config:
         failures.append("DATAPATH not in config file")
 
     ac = AppConfig(configfile)
@@ -50,7 +50,7 @@ def pytest_sessionstart(session): # pylint: disable=unused-argument
 def fixture_config():
     "Config using the app config."
     thisdir = os.path.dirname(os.path.realpath(__file__))
-    configfile = os.path.join(thisdir, '..', 'lute', 'config', 'config.yml')
+    configfile = os.path.join(thisdir, "..", "lute", "config", "config.yml")
     ac = AppConfig(configfile)
     yield ac
 
@@ -68,11 +68,8 @@ def fixture_app(testconfig):
     """
     if os.path.exists(testconfig.dbfilename):
         os.unlink(testconfig.dbfilename)
-    extra_config = {
-        'WTF_CSRF_ENABLED': False,
-        'TESTING': True
-    }
-    app = init_db_and_app(testconfig, extra_config = extra_config)
+    extra_config = {"WTF_CSRF_ENABLED": False, "TESTING": True}
+    app = init_db_and_app(testconfig, extra_config=extra_config)
     yield app
 
 
@@ -93,7 +90,7 @@ def fixture_empty_db(app_context):
     lute.db.management.delete_all_data()
 
 
-@pytest.fixture(name = "client")
+@pytest.fixture(name="client")
 def fixture_demo_client(app):
     """
     Client using demo-data-loaded application.
@@ -104,7 +101,7 @@ def fixture_demo_client(app):
 @pytest.fixture(name="demo_yaml_folder")
 def fixture_yaml_folder():
     "Path to the demo files."
-    return os.path.join(lute.db.demo.demo_data_path(), 'languages')
+    return os.path.join(lute.db.demo.demo_data_path(), "languages")
 
 
 def _get_language(f):
@@ -123,36 +120,34 @@ def _get_language(f):
 def fixture_test_languages(app_context, demo_yaml_folder):
     "Dict of available languages for tests."
     # Hardcoded = good enough.
-    langs = [
-        'spanish',
-        'english',
-        'japanese',
-        'turkish',
-        'classical_chinese'
-    ]
+    langs = ["spanish", "english", "japanese", "turkish", "classical_chinese"]
     ret = {}
     for lang in langs:
-        f = os.path.join(demo_yaml_folder, f'{lang}.yaml')
+        f = os.path.join(demo_yaml_folder, f"{lang}.yaml")
         ret[lang] = _get_language(f)
     yield ret
 
 
 @pytest.fixture(name="spanish")
 def fixture_spanish(test_languages):
-    return test_languages['spanish']
+    return test_languages["spanish"]
+
 
 @pytest.fixture(name="english")
 def fixture_english(test_languages):
-    return test_languages['english']
+    return test_languages["english"]
+
 
 @pytest.fixture(name="japanese")
 def fixture_japanese(test_languages):
-    return test_languages['japanese']
+    return test_languages["japanese"]
+
 
 @pytest.fixture(name="turkish")
 def fixture_turkish(test_languages):
-    return test_languages['turkish']
+    return test_languages["turkish"]
+
 
 @pytest.fixture(name="classical_chinese")
 def fixture_cl_chinese(test_languages):
-    return test_languages['classical_chinese']
+    return test_languages["classical_chinese"]

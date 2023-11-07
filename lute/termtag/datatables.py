@@ -5,6 +5,7 @@ Show terms in datatables.
 from lute.db import db
 from lute.utils.data_tables import DataTablesSqliteQuery
 
+
 def get_data_tables_list(parameters):
     "json data for datatables."
     base_sql = """SELECT

@@ -13,10 +13,10 @@ from lute.parse.character_parser import ClassicalChineseParser
 # List of ALL parsers available, not necessarily all supported.
 # This design feels fishy, but it suffices for now.
 parsers = {
-    'spacedel': SpaceDelimitedParser,
-    'turkish': TurkishParser,
-    'japanese': JapaneseParser,
-    'classicalchinese': ClassicalChineseParser
+    "spacedel": SpaceDelimitedParser,
+    "turkish": TurkishParser,
+    "japanese": JapaneseParser,
+    "classicalchinese": ClassicalChineseParser,
 }
 
 

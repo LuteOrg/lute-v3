@@ -22,31 +22,31 @@ def test_wiping_db_clears_out_all_tables(app_context):
 
     delete_all_data()
     tables = [
-        'books',
-        'bookstats',
-        'booktags',
-        'languages',
-        'sentences',
-        'tags',
-        'tags2',
-        'texts',
-        'wordflashmessages',
-        'wordimages',
-        'wordparents',
-        'words',
-        'wordtags'
+        "books",
+        "bookstats",
+        "booktags",
+        "languages",
+        "sentences",
+        "tags",
+        "tags2",
+        "texts",
+        "wordflashmessages",
+        "wordimages",
+        "wordparents",
+        "words",
+        "wordtags",
     ]
     for t in tables:
         assert_record_count_equals(t, 0, t)
 
     sql = "select * from settings where stkeytype='user'"
-    assert_record_count_equals(sql, len(old_user_settings), 'user settings remain')
+    assert_record_count_equals(sql, len(old_user_settings), "user settings remain")
     sql = "select * from settings where StKeyType = 'system'"
-    assert_record_count_equals(sql, 0, 'no system settings')
+    assert_record_count_equals(sql, 0, "no system settings")
 
 
 def test_can_get_backup_settings_when_db_is_wiped(app_context):
     "The backupsettings struct assumes certain things about the data."
     delete_all_data()
     bs = BackupSettings.get_backup_settings()
-    assert bs.is_acknowledged() is False, 'reset, so not acknowledged'
+    assert bs.is_acknowledged() is False, "reset, so not acknowledged"

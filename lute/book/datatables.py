@@ -3,13 +3,12 @@ Show books in datatables.
 """
 
 from lute.db import db
-from lute.utils.data_tables import DataTablesSqliteQuery, \
-    supported_parser_type_criteria
+from lute.utils.data_tables import DataTablesSqliteQuery, supported_parser_type_criteria
 
 
 def get_data_tables_list(parameters, is_archived):
     "Book json data for datatables."
-    archived = 'true' if is_archived else 'false'
+    archived = "true" if is_archived else "false"
 
     base_sql = f"""
     SELECT

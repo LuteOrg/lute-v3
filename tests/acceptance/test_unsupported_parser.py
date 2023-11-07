@@ -4,4 +4,4 @@ Unsupported parser tests.
 
 from pytest_bdd import scenarios
 
-scenarios('unsupported_parser.feature')
+scenarios("unsupported_parser.feature")

@@ -27,11 +27,10 @@ class SpaceDelimitedParser(AbstractParser):
 
     def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
         "Return parsed tokens."
-        clean_text = re.sub(r' +', ' ', text)
+        clean_text = re.sub(r" +", " ", text)
         zws = chr(0x200B)  # zero-width space
-        clean_text = clean_text.replace(zws, '')
+        clean_text = clean_text.replace(zws, "")
         return self._parse_to_tokens(clean_text, language)
-
 
     def preg_match_capture(self, pattern, subject):
         """
@@ -43,7 +42,6 @@ class SpaceDelimitedParser(AbstractParser):
         matches = re.finditer(pattern, subject, flags=re.IGNORECASE)
         result = [[match.group(), match.start()] for match in matches]
         return result
-
 
     def _parse_to_tokens(self, text: str, lang):
         """
@@ -58,8 +56,8 @@ class SpaceDelimitedParser(AbstractParser):
                 text = text.replace(rfrom, rto)
 
         text = text.replace("\r\n", "\n")
-        text = text.replace('{', '[')
-        text = text.replace('}', ']')
+        text = text.replace("{", "[")
+        text = text.replace("}", "]")
 
         tokens = []
         paras = text.split("\n")
@@ -67,23 +65,24 @@ class SpaceDelimitedParser(AbstractParser):
         for i, para in enumerate(paras):
             self.parse_para(para, lang, tokens)
             if i != (pcount - 1):
-                tokens.append(ParsedToken('¶', False, True))
+                tokens.append(ParsedToken("¶", False, True))
 
         return tokens
-
 
     def parse_para(self, text: str, lang, tokens: List[ParsedToken]):
         """
         Parse a string, appending the tokens to the list of tokens.
         """
         termchar = lang.word_characters
-        if termchar.strip() == '':
-            raise RuntimeError(f"Language {lang.name} has invalid Word Characters specification.")
+        if termchar.strip() == "":
+            raise RuntimeError(
+                f"Language {lang.name} has invalid Word Characters specification."
+            )
 
-        splitex = lang.exceptions_split_sentences.replace('.', '\\.')
-        pattern = fr"({splitex}|[{termchar}]*)"
-        if splitex.strip() == '':
-            pattern = fr"([{termchar}]*)"
+        splitex = lang.exceptions_split_sentences.replace(".", "\\.")
+        pattern = rf"({splitex}|[{termchar}]*)"
+        if splitex.strip() == "":
+            pattern = rf"([{termchar}]*)"
 
         m = self.preg_match_capture(pattern, text)
         wordtoks = list(filter(lambda t: t[0] != "", m))
@@ -128,6 +127,6 @@ class TurkishParser(SpaceDelimitedParser):
 
     def get_lowercase(self, text):
         "Handle the funny turkish i variants."
-        for caps, lower in { 'İ': 'i', 'I': 'ı' }.items():
+        for caps, lower in {"İ": "i", "I": "ı"}.items():
             text = text.replace(caps, lower)
         return text.lower()

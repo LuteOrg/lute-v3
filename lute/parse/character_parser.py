@@ -29,7 +29,7 @@ class ClassicalChineseParser(AbstractParser):
         """
         Returns ParsedToken array for given language.
         """
-        text = re.sub(r'[ \t]+', '', text)
+        text = re.sub(r"[ \t]+", "", text)
 
         replacements = language.character_substitutions.split("|")
         for replacement in replacements:
@@ -40,17 +40,17 @@ class ClassicalChineseParser(AbstractParser):
                 text = text.replace(rfrom, rto)
 
         text = text.replace("\r\n", "\n")
-        text = text.replace('{', '[')
-        text = text.replace('}', ']')
-        text = text.replace("\n", '¶')
+        text = text.replace("{", "[")
+        text = text.replace("}", "]")
+        text = text.replace("\n", "¶")
         text = text.strip()
 
         tokens = []
-        pattern = f'[{language.word_characters}]'
+        pattern = f"[{language.word_characters}]"
         for char in text:
             is_word_char = re.match(pattern, char) is not None
             is_end_of_sentence = char in language.regexp_split_sentences
-            if char == '¶':
+            if char == "¶":
                 is_end_of_sentence = True
             p = ParsedToken(char, is_word_char, is_end_of_sentence)
             tokens.append(p)

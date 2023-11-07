@@ -9,13 +9,13 @@ from lute.parse.space_delimited_parser import SpaceDelimitedParser
 
 
 def test_get_parser_by_name():
-    p = get_parser('spacedel')
+    p = get_parser("spacedel")
     assert isinstance(p, SpaceDelimitedParser)
 
 
 def test_get_parser_throws_if_not_found():
     with pytest.raises(ValueError):
-        get_parser('trash')
+        get_parser("trash")
 
 
 def test_list_all_parsers():
@@ -23,13 +23,14 @@ def test_list_all_parsers():
     d = supported_parsers()
     assert isinstance(d, dict), "returns a dict"
 
-    p = d['spacedel']
+    p = d["spacedel"]
     print(p)
-    assert p == 'Space Delimited', 'sanity check'
+    assert p == "Space Delimited", "sanity check"
 
 
 class DummyParser(SpaceDelimitedParser):
     "Dummy unsupported parser."
+
     @classmethod
     def is_supported(cls):
         return False
@@ -39,18 +40,18 @@ class DummyParser(SpaceDelimitedParser):
         return "DUMMY"
 
 
-@pytest.fixture(name='_load_dummy')
+@pytest.fixture(name="_load_dummy")
 def fixture_load_dummy():
     "Add the dummy parser for the test."
-    parsers['dummy'] = DummyParser
+    parsers["dummy"] = DummyParser
     yield
-    del parsers['dummy']
+    del parsers["dummy"]
 
 
 def test_unavailable_parser_not_included_in_lists(_load_dummy):
     "An unsupported parser shouldn't be available."
     d = supported_parsers()
-    assert 'dummy' not in d, 'not present'
-    assert is_supported('dummy') is False, 'no'
+    assert "dummy" not in d, "not present"
+    assert is_supported("dummy") is False, "no"
     with pytest.raises(ValueError):
-        get_parser('dummy')
+        get_parser("dummy")

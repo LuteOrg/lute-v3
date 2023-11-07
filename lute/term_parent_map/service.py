@@ -11,6 +11,7 @@ from lute.term.model import Repository
 
 ## Exports
 
+
 def export_terms_without_parents(language, outfile):
     "Export terms without parents in the language to filename outfile."
     # All existing terms that don't have parents.
@@ -26,7 +27,7 @@ def export_terms_without_parents(language, outfile):
     """
     data = db.session.execute(text(sql)).fetchall()
     terms = [term[0] for term in data]
-    with open(outfile, 'w', encoding='utf-8') as f:
+    with open(outfile, "w", encoding="utf-8") as f:
         f.write("\n".join(terms))
 
 
@@ -34,23 +35,25 @@ def export_unknown_terms(book, outfile):
     "Export unknown terms in the book to outfile."
     lang = book.language
     unique_tokens = {
-        t for txt in book.texts
-        for t in lang.get_parsed_tokens(txt.text)
-        if t.is_word
+        t for txt in book.texts for t in lang.get_parsed_tokens(txt.text) if t.is_word
     }
     unique_lcase_toks = {lang.get_lowercase(t.token) for t in unique_tokens}
 
     lgid = lang.id
-    known_terms_lc = db.session.query(Term.text_lc). \
-        filter(Term.language_id == lgid, Term.token_count == 1).all()
-    known_terms_lc = [ word[0] for word in known_terms_lc ]
+    known_terms_lc = (
+        db.session.query(Term.text_lc)
+        .filter(Term.language_id == lgid, Term.token_count == 1)
+        .all()
+    )
+    known_terms_lc = [word[0] for word in known_terms_lc]
 
     newtoks = [t for t in unique_lcase_toks if t not in known_terms_lc]
-    with open(outfile, 'w', encoding='utf-8') as f:
+    with open(outfile, "w", encoding="utf-8") as f:
         f.write("\n".join(newtoks))
 
 
 ## Imports
+
 
 class BadImportFileError(Exception):
     """
@@ -69,30 +72,29 @@ def import_file(language, filename):
     return _do_import(language, import_data)
 
 
-
-def _load_import_file(filename, encoding = 'utf-8-sig'):
+def _load_import_file(filename, encoding="utf-8-sig"):
     "Create array of hashes from file."
     importdata = []
-    with open(filename, 'r', encoding=encoding) as f:
+    with open(filename, "r", encoding=encoding) as f:
         reader = csv.DictReader(f)
 
         fieldnames = reader.fieldnames
         if fieldnames is None:
-            raise BadImportFileError('No mappings in file')
+            raise BadImportFileError("No mappings in file")
         _validate_data_fields(fieldnames)
 
         for line in reader:
             importdata.append(line)
 
     if len(importdata) == 0:
-        raise BadImportFileError('No mappings in file')
+        raise BadImportFileError("No mappings in file")
 
     return importdata
 
 
 def _validate_data_fields(field_list):
     "Check the keys in the file."
-    for k in ['parent', 'term']:
+    for k in ["parent", "term"]:
         if k not in field_list:
             msg = "File must contain headings 'parent' and 'term'"
             raise BadImportFileError(msg)
@@ -101,11 +103,12 @@ def _validate_data_fields(field_list):
 def _validate_data(import_data):
     "All records must have parent, term."
     blanks = [
-        hsh for hsh in import_data
-        if hsh['term'].strip() == '' or hsh['parent'].strip() == '']
+        hsh
+        for hsh in import_data
+        if hsh["term"].strip() == "" or hsh["parent"].strip() == ""
+    ]
     if len(blanks) > 0:
-        raise BadImportFileError('Term is required')
-
+        raise BadImportFileError("Term is required")
 
 
 class ImportRecord:
@@ -124,9 +127,9 @@ class ImportRecord:
         return ImportRecord.repo.find(ImportRecord.language.id, t)
 
     def __init__(self, hsh):
-        self.ptext = hsh['parent']
+        self.ptext = hsh["parent"]
         self.parent = self._find(self.ptext)
-        self.ctext = hsh['term']
+        self.ctext = hsh["term"]
         self.child = self._find(self.ctext)
 
     @staticmethod
@@ -137,10 +140,7 @@ class ImportRecord:
         This is called periodically during the import
         as each step updates the database.
         """
-        return [
-            ImportRecord(hsh)
-            for hsh in import_data
-        ]
+        return [ImportRecord(hsh) for hsh in import_data]
 
 
 def _do_import(language, import_data):
@@ -153,14 +153,17 @@ def _do_import(language, import_data):
     updated = 0
     created = 0
 
-    created, updated = _import_child_exists_parent_no(import_data, language, repo, created, updated)
-    created, updated = _import_parent_exists_child_no(import_data, language, repo, created, updated)
-    created, updated = _import_add_extra_parent_child_links(import_data, repo, created, updated)
+    created, updated = _import_child_exists_parent_no(
+        import_data, language, repo, created, updated
+    )
+    created, updated = _import_parent_exists_child_no(
+        import_data, language, repo, created, updated
+    )
+    created, updated = _import_add_extra_parent_child_links(
+        import_data, repo, created, updated
+    )
 
-    stats = {
-        'created': created,
-        'updated': updated
-    }
+    stats = {"created": created, "updated": updated}
 
     return stats
 
@@ -168,17 +171,18 @@ def _do_import(language, import_data):
 def _import_child_exists_parent_no(import_data, language, repo, created, updated):
     "Add parent and relationship."
     records = [
-        p for p in ImportRecord.records(import_data)
+        p
+        for p in ImportRecord.records(import_data)
         if p.parent is None and p.child is not None
     ]
 
     def _get_flash_msg(ptext):
         "Build a flash message for a new parent."
-        all_children = [ d.ctext for d in records if d.ptext == ptext ]
+        all_children = [d.ctext for d in records if d.ptext == ptext]
         msg = f'Auto-created parent for "{all_children[0]}"'
         remaining = len(all_children) - 1
         if remaining > 0:
-            msg += f' + {remaining} more'
+            msg += f" + {remaining} more"
         return msg
 
     # First add all the unique parents.
@@ -203,7 +207,8 @@ def _import_child_exists_parent_no(import_data, language, repo, created, updated
 def _import_parent_exists_child_no(import_data, language, repo, created, updated):
     "Add child and relationship."
     records = [
-        p for p in ImportRecord.records(import_data)
+        p
+        for p in ImportRecord.records(import_data)
         if p.parent is not None and p.child is None
     ]
     # Add all the children and relationships.
@@ -223,8 +228,10 @@ def _import_parent_exists_child_no(import_data, language, repo, created, updated
 def _import_add_extra_parent_child_links(import_data, repo, created, updated):
     "Add parent to child if needed."
     records = [
-        p for p in ImportRecord.records(import_data)
-        if p.parent is not None and p.child is not None
+        p
+        for p in ImportRecord.records(import_data)
+        if p.parent is not None
+        and p.child is not None
         and p.parent.id != p.child.id
         and p.parent.text not in p.child.parents
     ]

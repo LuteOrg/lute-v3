@@ -13,7 +13,7 @@ from lute.models.term import Term as DBTerm, TermTag
 from lute.models.language import Language
 
 
-class Term: # pylint: disable=too-many-instance-attributes
+class Term:  # pylint: disable=too-many-instance-attributes
     """
     Term business object.  All class members are primitives.
     """
@@ -42,7 +42,9 @@ class Term: # pylint: disable=too-many-instance-attributes
         self.current_image = None
 
     def __repr__(self):
-        return f'<Term BO "{self.text}" lang_id={self.language_id} lang={self.language}>'
+        return (
+            f'<Term BO "{self.text}" lang_id={self.language_id} lang={self.language}>'
+        )
 
     @property
     def language(self):
@@ -54,22 +56,27 @@ class Term: # pylint: disable=too-many-instance-attributes
     @language.setter
     def language(self, lang):
         if not isinstance(lang, Language):
-            raise ValueError('not a language')
+            raise ValueError("not a language")
         self._language = lang
 
     def text_has_changed(self):
         "Check the downcased original text with the current text."
         # print(f'checking if changed, orig = "{self.original_text}", text = "{self.text}"')
-        if self.original_text in ('', None):
+        if self.original_text in ("", None):
             return False
+
         def get_lc(s):
             return self.language.get_lowercase(s)
+
         return get_lc(self.original_text) != get_lc(self.text)
 
 
 class TermReference:
     "Where a Term has been used in books."
-    def __init__(self, bookid, txid, pgnum, title, sentence=None): # pylint: disable=too-many-arguments
+
+    def __init__(
+        self, bookid, txid, pgnum, title, sentence=None
+    ):  # pylint: disable=too-many-arguments
         self.book_id = bookid
         self.text_id = txid
         self.page_number = pgnum
@@ -91,9 +98,8 @@ class Repository:
         # plus language ID.
         self.identity_map = {}
 
-
     def _id_map_key(self, langid, text):
-        return f'key-{langid}-{text}'
+        return f"key-{langid}-{text}"
 
     def _add_to_identity_map(self, t):
         "Add found term to identity map."
@@ -112,7 +118,7 @@ class Repository:
         "Loads a Term business object for the DBTerm with the id."
         dbt = DBTerm.find(term_id)
         if dbt is None:
-            raise ValueError(f'No term with id {term_id} found')
+            raise ValueError(f"No term with id {term_id} found")
         term = self._build_business_term(dbt)
         self._add_to_identity_map(term)
         return term
@@ -134,14 +140,13 @@ class Repository:
         self._add_to_identity_map(term)
         return term
 
-
     def find_or_new(self, langid, text):
         """
         Return a Term business object for the DBTerm with the langid and text.
         If no match, return a new term with the text and language.
 
         If it's new, don't add to the identity map ... it's not saved yet,
-        and so if we search for it again we should hit the db again. 
+        and so if we search for it again we should hit the db again.
         """
         t = self.find(langid, text)
         if t is not None:
@@ -157,7 +162,6 @@ class Repository:
 
         return t
 
-
     def find_matches(self, langid, text, max_results=50):
         """
         Return array of Term business objects for the DBTerms
@@ -166,16 +170,17 @@ class Repository:
         """
         spec = self._search_spec_term(langid, text)
         text_lc = spec.text_lc
-        search = text_lc.strip() if text_lc else ''
-        if search == '':
+        search = text_lc.strip() if text_lc else ""
+        if search == "":
             return []
 
-        matches = self.db.session.query(DBTerm).filter(
-            and_(
-                DBTerm.language_id == langid,
-                DBTerm.text_lc.like(search + '%')
+        matches = (
+            self.db.session.query(DBTerm)
+            .filter(
+                and_(DBTerm.language_id == langid, DBTerm.text_lc.like(search + "%"))
             )
-        ).all()
+            .all()
+        )
 
         exact = [t for t in matches if t.text_lc == text_lc]
 
@@ -204,12 +209,10 @@ class Repository:
         ret = ret[:max_results]
         return [self._build_business_term(t) for t in ret]
 
-
     def get_term_tags(self):
         "Get all available term tags, helper method."
         tags = self.db.session.query(TermTag).all()
-        return [ t.text for t in tags ]
-
+        return [t.text for t in tags]
 
     def add(self, term):
         """
@@ -221,7 +224,6 @@ class Repository:
         self.db.session.add(dbterm)
         return dbterm
 
-
     def delete(self, term):
         """
         Add term to be deleted to session.
@@ -232,13 +234,11 @@ class Repository:
             return
         self.db.session.delete(dbt)
 
-
     def commit(self):
         """
         Commit everything.
         """
         self.db.session.commit()
-
 
     def _search_spec_term(self, langid, text):
         """
@@ -251,11 +251,10 @@ class Repository:
         lang = Language.find(langid)
         return DBTerm(lang, text)
 
-
     def _build_db_term(self, term):
         "Convert a term business object to a DBTerm."
         if term.text is None:
-            raise ValueError('Text not set for term')
+            raise ValueError("Text not set for term")
 
         spec = self._search_spec_term(term.language_id, term.text)
         t = DBTerm.find_by_spec(spec)
@@ -285,9 +284,11 @@ class Repository:
         termparents = []
         lang = spec.language
         create_parents = [
-            p for p in term.parents
-            if p is not None and p != '' and
-            lang.get_lowercase(term.text) != lang.get_lowercase(p)
+            p
+            for p in term.parents
+            if p is not None
+            and p != ""
+            and lang.get_lowercase(term.text) != lang.get_lowercase(p)
         ]
         # print('creating parents: ' + ', '.join(create_parents))
         for p in create_parents:
@@ -298,15 +299,14 @@ class Repository:
 
         return t
 
-
     def _find_or_create_parent(self, pt, language, term, termtags) -> DBTerm:
         spec = self._search_spec_term(language.id, pt)
         p = DBTerm.find_by_spec(spec)
 
         if p is not None:
-            if (p.translation or '') == '':
+            if (p.translation or "") == "":
                 p.translation = term.translation
-            if (p.get_current_image() or '') == '':
+            if (p.get_current_image() or "") == "":
                 p.set_current_image(term.current_image)
             return p
 
@@ -319,7 +319,6 @@ class Repository:
 
         return p
 
-
     def _build_business_term(self, dbterm):
         "Create a Term bus. object from a lute.model.term.Term."
         term = Term()
@@ -329,8 +328,8 @@ class Repository:
 
         # Remove zero-width spaces (zws) from strings for user forms.
         text = dbterm.text
-        zws = '\u200B'  # zero-width space
-        text = text.replace(zws, '')
+        zws = "\u200B"  # zero-width space
+        text = text.replace(zws, "")
         term.text_lc = dbterm.text_lc
         term.original_text = text
         term.text = text
@@ -346,7 +345,6 @@ class Repository:
 
         return term
 
-
     ## References.
 
     def find_references(self, term):
@@ -359,12 +357,11 @@ class Repository:
             searchterm = spec
 
         references = {
-            'term': self._get_references(searchterm),
-            'children': self._get_child_references(searchterm),
-            'parents': self._get_parent_references(searchterm),
+            "term": self._get_references(searchterm),
+            "children": self._get_child_references(searchterm),
+            "parents": self._get_parent_references(searchterm),
         }
         return references
-
 
     def _build_term_references(self, term_lc, rows):
         ret = []
@@ -372,20 +369,22 @@ class Repository:
         for row in rows:
             sentence = row[4].strip()
             pattern = f"{zws}({term_lc}){zws}"
+
             def replace_match(m):
                 return f"{zws}<b>{m.group(0)}</b>{zws}"
+
             sentence = re.sub(pattern, replace_match, sentence, flags=re.IGNORECASE)
-            sentence = sentence.replace(zws, '').replace('¶', '')
+            sentence = sentence.replace(zws, "").replace("¶", "")
             ret.append(TermReference(row[0], row[1], row[2], row[3], sentence))
         return ret
-
 
     def _get_references(self, term):
         if term is None:
             return []
 
         term_lc = term.text_lc
-        query = sqlalchtext("""
+        query = sqlalchtext(
+            """
             SELECT DISTINCT
                 texts.TxBkID,
                 TxID,
@@ -403,13 +402,13 @@ class Repository:
             WHERE TxReadDate IS NOT NULL
             AND LOWER(SeText) LIKE :pattern
             LIMIT 20
-        """)
+        """
+        )
 
         pattern = f"%{chr(0x200B)}{term_lc}{chr(0x200B)}%"
-        params = {'pattern': pattern}
+        params = {"pattern": pattern}
         result = self.db.session.execute(query, params)
         return self._build_term_references(term_lc, result)
-
 
     def _get_all_refs(self, terms):
         all_references = []
@@ -418,15 +417,13 @@ class Repository:
             all_references.extend(references)
         return all_references
 
-
     def _get_parent_references(self, term):
         parent_references = []
         for parent in term.parents:
             parent_term_lc = parent.text_lc
             references = self._get_family_references(parent, term)
-            parent_references.append({'term': parent_term_lc, 'refs': references})
+            parent_references.append({"term": parent_term_lc, "refs": references})
         return parent_references
-
 
     def _get_family_references(self, parent, term):
         if term is None or parent is None:
@@ -434,7 +431,6 @@ class Repository:
         family = [parent] + parent.children
         family = [t for t in family if t.id != term.id]
         return self._get_all_refs(family)
-
 
     def _get_child_references(self, term):
         if term is None:

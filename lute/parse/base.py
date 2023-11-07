@@ -5,6 +5,7 @@ Common classes use for all parsing.
 from abc import ABC, abstractmethod
 from typing import List
 
+
 class ParsedToken:
     """
     A single parsed token from an input text.
@@ -28,13 +29,7 @@ class ParsedToken:
         ParsedToken.cls_paragraph_number = 0
         ParsedToken.cls_order = 0
 
-
-    def __init__(
-            self,
-            token: str,
-            is_word: bool,
-            is_end_of_sentence: bool = False
-    ):
+    def __init__(self, token: str, is_word: bool, is_end_of_sentence: bool = False):
         self.token = token
         self.is_word = is_word
         self.is_end_of_sentence = is_end_of_sentence
@@ -50,12 +45,13 @@ class ParsedToken:
         # sentence/paragraph.
         if self.is_end_of_sentence:
             ParsedToken.cls_sentence_number += 1
-        if self.token == '¶':
+        if self.token == "¶":
             ParsedToken.cls_paragraph_number += 1
 
-
     def __repr__(self):
-        return f"<\"{self.token}\" (word: {self.is_word}, eos: {self.is_end_of_sentence})>"
+        return (
+            f'<"{self.token}" (word: {self.is_word}, eos: {self.is_end_of_sentence})>'
+        )
 
 
 class SentenceGroupIterator:
@@ -91,7 +87,9 @@ class SentenceGroupIterator:
         last_eos = -1
         i = self.currpos
 
-        while (curr_tok_count <= self.maxcount or last_eos == -1) and i < len(self.tokens):
+        while (curr_tok_count <= self.maxcount or last_eos == -1) and i < len(
+            self.tokens
+        ):
             tok = self.tokens[i]
             if tok.is_end_of_sentence == 1:
                 last_eos = i
@@ -100,10 +98,10 @@ class SentenceGroupIterator:
             i += 1
 
         if curr_tok_count <= self.maxcount or last_eos == -1:
-            ret = self.tokens[self.currpos:i]
+            ret = self.tokens[self.currpos : i]
             self.currpos = i + 1
         else:
-            ret = self.tokens[self.currpos:last_eos + 1]
+            ret = self.tokens[self.currpos : last_eos + 1]
             self.currpos = last_eos + 1
 
         return ret
@@ -138,14 +136,12 @@ class AbstractParser(ABC):
         Get an array of ParsedTokens from the input text for the given language.
         """
 
-
-    def get_reading(self, text: str): # pylint: disable=unused-argument
+    def get_reading(self, text: str):  # pylint: disable=unused-argument
         """
         Get the pronunciation for the given text.  For most
         languages, this can't be automated.
         """
         return None
-
 
     def get_lowercase(self, text: str):
         """

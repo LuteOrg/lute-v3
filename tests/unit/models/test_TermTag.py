@@ -49,4 +49,4 @@ def test_find_or_create_by_text_returns_new_if_no_match(_hola_tag, app_context):
     "Return new."
     assert TermTag.find_by_text("unknown") is None
     t = TermTag.find_or_create_by_text("unknown")
-    assert t.text == 'unknown', 'new tag created'
+    assert t.text == "unknown", "new tag created"

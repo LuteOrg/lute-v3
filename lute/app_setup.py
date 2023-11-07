@@ -3,9 +3,16 @@ Main entry point.
 """
 
 import os
-from flask import Flask, render_template, redirect, flash, \
-    current_app, make_response, send_from_directory, \
-    jsonify
+from flask import (
+    Flask,
+    render_template,
+    redirect,
+    flash,
+    current_app,
+    make_response,
+    send_from_directory,
+    jsonify,
+)
 
 from lute.db import db
 from lute.db.setup.main import setup_db
@@ -37,35 +44,38 @@ def _setup_app_dirs(app_config):
     """
     dp = app_config.datapath
     required_dirs = [
-        { 'd': dp,
-          'readme': "Lute data folder." },
-        { 'd': os.path.join(dp, 'backups'),
-          'readme': "Database backups created by Lute at app start." },
-        { 'd': app_config.userimagespath,
-          'readme': "User images.  Each subfolder is a language's ID." },
-        { 'd': os.path.join(dp, 'custom_styles'),
-          'readme': "User custom styles." }
+        {"d": dp, "readme": "Lute data folder."},
+        {
+            "d": os.path.join(dp, "backups"),
+            "readme": "Database backups created by Lute at app start.",
+        },
+        {
+            "d": app_config.userimagespath,
+            "readme": "User images.  Each subfolder is a language's ID.",
+        },
+        {"d": os.path.join(dp, "custom_styles"), "readme": "User custom styles."},
     ]
     for rec in required_dirs:
-        d = rec['d']
+        d = rec["d"]
         if not os.path.exists(d):
             os.makedirs(d)
-        readme = os.path.join(d, 'README.md')
+        readme = os.path.join(d, "README.md")
         if not os.path.exists(readme):
-            with open(readme, 'w', encoding='utf-8') as f:
-                f.write(rec['readme'])
+            with open(readme, "w", encoding="utf-8") as f:
+                f.write(rec["readme"])
 
 
 def _add_base_routes(app, app_config):
     """
     Add some basic routes.
     """
-    @app.route('/')
+
+    @app.route("/")
     def index():
         # Stop all other calculations if need to backup.
         bkp_settings = BackupSettings.get_backup_settings()
         if backupservice.should_run_auto_backup(bkp_settings):
-            return redirect('/backup/backup', 302)
+            return redirect("/backup/backup", 302)
 
         is_demo = lute.db.demo.contains_demo_data()
         tutorial_book_id = lute.db.demo.tutorial_book_id()
@@ -73,42 +83,39 @@ def _add_base_routes(app, app_config):
         refresh_stats()
 
         return render_template(
-            'index.html',
-            dbname = app_config.dbname,
-            datapath = app_config.datapath,
-            tutorial_book_id = tutorial_book_id,
-            have_books = len(db.session.query(Book).all()) > 0,
-            have_languages = len(db.session.query(Language).all()) > 0,
-            hide_home_link = True,
-            is_production_data = not is_demo,
-
-            backup_acknowledged = bkp_settings.is_acknowledged(),
-            backup_enabled = (bkp_settings.backup_enabled == 'y'),
-            backup_show_warning = bkp_settings.backup_warn,
-            backup_warning_msg = backupservice.backup_warning(bkp_settings),
-            backup_directory = bkp_settings.backup_dir,
-            backup_last_display_date = bkp_settings.last_backup_display_date(),
+            "index.html",
+            dbname=app_config.dbname,
+            datapath=app_config.datapath,
+            tutorial_book_id=tutorial_book_id,
+            have_books=len(db.session.query(Book).all()) > 0,
+            have_languages=len(db.session.query(Language).all()) > 0,
+            hide_home_link=True,
+            is_production_data=not is_demo,
+            backup_acknowledged=bkp_settings.is_acknowledged(),
+            backup_enabled=(bkp_settings.backup_enabled == "y"),
+            backup_show_warning=bkp_settings.backup_warn,
+            backup_warning_msg=backupservice.backup_warning(bkp_settings),
+            backup_directory=bkp_settings.backup_dir,
+            backup_last_display_date=bkp_settings.last_backup_display_date(),
         )
 
-
-    @app.route('/wipe_database')
+    @app.route("/wipe_database")
     def wipe_db():
         if lute.db.demo.contains_demo_data():
             lute.db.demo.delete_demo_data()
-            flash('The database has been wiped clean.  Have fun!')
-        return redirect('/', 302)
+            flash("The database has been wiped clean.  Have fun!")
+        return redirect("/", 302)
 
-
-    @app.route('/version')
+    @app.route("/version")
     def show_version():
         return render_template(
-            'version.html',
-            version = lute.__version__,
-            datapath = current_app.config['DATAPATH'],
-            database = current_app.config['DATABASE'],
+            "version.html",
+            version=lute.__version__,
+            datapath=current_app.config["DATAPATH"],
+            database=current_app.config["DATABASE"],
         )
 
-    @app.route('/info')
+    @app.route("/info")
     def show_info():
         """
         Json return of some data.
@@ -119,19 +126,21 @@ def _add_base_routes(app, app_config):
         but leaving it here for now.
         """
         ret = {
-            'version': lute.__version__,
-            'datapath': current_app.config['DATAPATH'],
-            'database': current_app.config['DATABASE'],
+            "version": lute.__version__,
+            "datapath": current_app.config["DATAPATH"],
+            "database": current_app.config["DATABASE"],
         }
         return jsonify(ret)
 
-    @app.route('/static/js/never_cache/<path:filename>')
+    @app.route("/static/js/never_cache/<path:filename>")
     def custom_js(filename):
         """
         Some files should never be cached.
         """
-        response = make_response(send_from_directory('static/js', filename))
-        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response = make_response(send_from_directory("static/js", filename))
+        response.headers[
+            "Cache-Control"
+        ] = "no-store, no-cache, must-revalidate, max-age=0"
         return response
 
 
@@ -144,19 +153,17 @@ def _create_app(app_config, extra_config):
     app = Flask(__name__, instance_path=app_config.datapath)
 
     config = {
-        'SECRET_KEY': 'some_secret',
-        'DATABASE': app_config.dbfilename,
-        'ENV': app_config.env,
-        'SQLALCHEMY_DATABASE_URI': f'sqlite:///{app_config.dbfilename}',
-
-        'DATAPATH': app_config.datapath,
-
+        "SECRET_KEY": "some_secret",
+        "DATABASE": app_config.dbfilename,
+        "ENV": app_config.env,
+        "SQLALCHEMY_DATABASE_URI": f"sqlite:///{app_config.dbfilename}",
+        "DATAPATH": app_config.datapath,
         # ref https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
         # Don't track mods.
-        'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+        "SQLALCHEMY_TRACK_MODIFICATIONS": False,
     }
 
-    final_config = { **config, **extra_config }
+    final_config = {**config, **extra_config}
     app.config.from_mapping(final_config)
 
     db.init_app(app)
@@ -183,7 +190,7 @@ def _create_app(app_config, extra_config):
     return app
 
 
-def init_db_and_app(app_config, extra_config = None, output_func = None):
+def init_db_and_app(app_config, extra_config=None, output_func=None):
     """
     Main entry point.  Calls dbsetup, and returns Flask app.
 

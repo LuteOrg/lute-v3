@@ -16,11 +16,11 @@ def delete_all_data():
 
     # Setting the pragma first ensures cascade delete.
     statements = [
-        'pragma foreign_keys = ON',
-        'delete from languages',
-        'delete from tags',
-        'delete from tags2',
-        'delete from settings',
+        "pragma foreign_keys = ON",
+        "delete from languages",
+        "delete from tags",
+        "delete from tags2",
+        "delete from settings",
     ]
     for s in statements:
         db.session.execute(text(s))

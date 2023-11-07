@@ -15,7 +15,7 @@ from lute.book.stats import mark_stale
 from lute.db import db
 
 
-bp = Blueprint('read', __name__, url_prefix='/read')
+bp = Blueprint("read", __name__, url_prefix="/read")
 
 
 def _page_in_range(book, n):
@@ -25,7 +25,7 @@ def _page_in_range(book, n):
     return ret
 
 
-@bp.route('/<int:bookid>/page/<int:pagenum>', methods=['GET'])
+@bp.route("/<int:bookid>/page/<int:pagenum>", methods=["GET"])
 def read(bookid, pagenum):
     "Display reading pane for book page."
 
@@ -48,24 +48,25 @@ def read(bookid, pagenum):
     mark_stale(book)
 
     return render_template(
-        'read/index.html',
+        "read/index.html",
         text=text,
         textid=text.id,
-        is_rtl = lang.right_to_left,
+        is_rtl=lang.right_to_left,
         html_title=text.title,
         book=book,
-        dictionary_url = lang.sentence_translate_uri,
+        dictionary_url=lang.sentence_translate_uri,
         pagenum=pagenum,
         pagecount=book.page_count,
         prevpage=prevpage,
         prev10page=prev10,
         nextpage=nextpage,
         next10page=next10,
-        paragraphs=paragraphs)
+        paragraphs=paragraphs,
+    )
 
 
-def _process_footer_action(bookid, pagenum, nextpage, set_to_known = True):
-    """"
+def _process_footer_action(bookid, pagenum, nextpage, set_to_known=True):
+    """ "
     Mark as read,
     optionally mark all terms as known on the current page,
     and go to the next page.
@@ -78,38 +79,36 @@ def _process_footer_action(bookid, pagenum, nextpage, set_to_known = True):
     db.session.commit()
     if set_to_known:
         set_unknowns_to_known(text)
-    return redirect(f'/read/{bookid}/page/{nextpage}', code=302)
+    return redirect(f"/read/{bookid}/page/{nextpage}", code=302)
 
 
-@bp.route('/<int:bookid>/page/<int:pagenum>/allknown/<int:nextpage>', methods=['post'])
+@bp.route("/<int:bookid>/page/<int:pagenum>/allknown/<int:nextpage>", methods=["post"])
 def allknown(bookid, pagenum, nextpage):
     "Mark all as known, go to next page."
     return _process_footer_action(bookid, pagenum, nextpage, True)
 
 
-@bp.route('/<int:bookid>/page/<int:pagenum>/markread/<int:nextpage>', methods=['post'])
+@bp.route("/<int:bookid>/page/<int:pagenum>/markread/<int:nextpage>", methods=["post"])
 def mark_read(bookid, pagenum, nextpage):
     "Mark page as read, go to the next page."
     return _process_footer_action(bookid, pagenum, nextpage, False)
 
 
-@bp.route('/sentences/<int:textid>', methods=['GET'])
+@bp.route("/sentences/<int:textid>", methods=["GET"])
 def sentences(textid):
     "Display sentences for the given text."
     text = db.session.query(Text).filter(Text.id == textid).first()
     paragraphs = get_paragraphs(text)
-    return render_template(
-        'read/sentences.html',
-        paragraphs=paragraphs)
+    return render_template("read/sentences.html", paragraphs=paragraphs)
 
 
-@bp.route('/empty', methods=['GET'])
+@bp.route("/empty", methods=["GET"])
 def empty():
     "Show an empty/blank page."
-    return ''
+    return ""
 
 
-@bp.route('/termform/<int:langid>/<text>', methods=['GET', 'POST'])
+@bp.route("/termform/<int:langid>/<text>", methods=["GET", "POST"])
 def term_form(langid, text):
     """
     Create or edit a term.
@@ -120,13 +119,13 @@ def term_form(langid, text):
     return handle_term_form(
         term,
         repo,
-        '/read/frameform.html',
-        render_template('/read/updated.html', term_text=term.text),
-        embedded_in_reading_frame = True
+        "/read/frameform.html",
+        render_template("/read/updated.html", term_text=term.text),
+        embedded_in_reading_frame=True,
     )
 
 
-@bp.route('/termpopup/<int:termid>', methods=['GET'])
+@bp.route("/termpopup/<int:termid>", methods=["GET"])
 def term_popup(termid):
     """
     Show a term popup for the given DBTerm.
@@ -137,15 +136,15 @@ def term_popup(termid):
 
     def make_array(t):
         ret = {
-            'term': t.text,
-            'roman': t.romanization,
-            'trans': t.translation if t.translation else '-',
-            'tags': [tt.text for tt in t.term_tags],
+            "term": t.text,
+            "roman": t.romanization,
+            "trans": t.translation if t.translation else "-",
+            "tags": [tt.text for tt in t.term_tags],
         }
         return ret
 
     parent_terms = [p.text for p in term.parents]
-    parent_terms = ', '.join(parent_terms)
+    parent_terms = ", ".join(parent_terms)
 
     parent_data = []
     if len(term.parents) == 1:
@@ -163,36 +162,38 @@ def term_popup(termid):
     images = list(set(images))
 
     return render_template(
-        'read/termpopup.html',
+        "read/termpopup.html",
         term=term,
         flashmsg=term.get_flash_message(),
         term_tags=term_tags,
         term_images=images,
         parentdata=parent_data,
-        parentterms=parent_terms)
+        parentterms=parent_terms,
+    )
 
 
-@bp.route('/keyboard_shortcuts', methods=['GET'])
+@bp.route("/keyboard_shortcuts", methods=["GET"])
 def keyboard_shortcuts():
-    return render_template('read/keyboard_shortcuts.html')
+    return render_template("read/keyboard_shortcuts.html")
 
-@bp.route('/flashcopied', methods=['GET'])
+
+@bp.route("/flashcopied", methods=["GET"])
 def flashcopied():
-    return render_template('read/flashcopied.html')
+    return render_template("read/flashcopied.html")
 
 
-@bp.route('/editpage/<int:textid>', methods=['GET', 'POST'])
+@bp.route("/editpage/<int:textid>", methods=["GET", "POST"])
 def edit_page(textid):
     "Edit the text on a page."
     text = db.session.get(Text, textid)
     if text is None:
-        return redirect('/', 302)
+        return redirect("/", 302)
     form = TextForm(obj=text)
 
     if form.validate_on_submit():
         form.populate_obj(text)
         db.session.add(text)
         db.session.commit()
-        return redirect(f'/read/{text.book.id}/page/{text.order}', 302)
+        return redirect(f"/read/{text.book.id}/page/{text.order}", 302)
 
-    return render_template('read/page_edit_form.html', form=form)
+    return render_template("read/page_edit_form.html", form=form)

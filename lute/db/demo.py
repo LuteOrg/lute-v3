@@ -26,7 +26,7 @@ def contains_demo_data():
     """
     True if IsDemoData setting is present.
     """
-    ss = SystemSetting.get_value('IsDemoData')
+    ss = SystemSetting.get_value("IsDemoData")
     if ss is None:
         return False
     return True
@@ -36,7 +36,7 @@ def remove_flag():
     """
     Remove IsDemoData setting.
     """
-    SystemSetting.delete_key('IsDemoData')
+    SystemSetting.delete_key("IsDemoData")
     db.session.commit()
 
 
@@ -68,12 +68,13 @@ def delete_demo_data():
 
 # Loading demo data.
 
+
 def demo_data_path():
     """
     Path to the demo data yaml files.
     """
     thisdir = os.path.dirname(__file__)
-    demo_dir = os.path.join(thisdir, 'demo')
+    demo_dir = os.path.join(thisdir, "demo")
     return os.path.abspath(demo_dir)
 
 
@@ -81,7 +82,7 @@ def get_demo_language(filename):
     """
     Create a new Language object from a yaml definition.
     """
-    with open(filename, 'r', encoding='utf-8') as file:
+    with open(filename, "r", encoding="utf-8") as file:
         d = yaml.safe_load(file)
 
     lang = Language()
@@ -92,29 +93,29 @@ def get_demo_language(filename):
             # Handle boolean values
             if isinstance(val, str):
                 temp = val.lower()
-                if temp == 'true':
+                if temp == "true":
                     val = True
-                elif temp == 'false':
+                elif temp == "false":
                     val = False
             setattr(lang, method, val)
 
     # Define mappings for fields
     mappings = {
-        'name': 'name',
-        'dict_1': 'dict_1_uri',
-        'dict_2': 'dict_2_uri',
-        'sentence_translation': 'sentence_translate_uri',
-        'show_romanization': 'show_romanization',
-        'right_to_left': 'right_to_left',
-        'parser_type': 'parser_type',
-        'character_substitutions': 'character_substitutions',
-        'split_sentences': 'regexp_split_sentences',
-        'split_sentence_exceptions': 'exceptions_split_sentences',
-        'word_chars': 'word_characters',
+        "name": "name",
+        "dict_1": "dict_1_uri",
+        "dict_2": "dict_2_uri",
+        "sentence_translation": "sentence_translate_uri",
+        "show_romanization": "show_romanization",
+        "right_to_left": "right_to_left",
+        "parser_type": "parser_type",
+        "character_substitutions": "character_substitutions",
+        "split_sentences": "regexp_split_sentences",
+        "split_sentence_exceptions": "exceptions_split_sentences",
+        "word_chars": "word_characters",
     }
 
     for key in d.keys():
-        funcname = mappings.get(key, '')
+        funcname = mappings.get(key, "")
         if funcname:
             load(key, funcname)
 
@@ -123,8 +124,8 @@ def get_demo_language(filename):
 
 def predefined_languages():
     "Languages that have yaml files."
-    demo_glob = os.path.join(demo_data_path(), 'languages', '*.yaml')
-    langs = [ get_demo_language(f) for f in glob(demo_glob) ]
+    demo_glob = os.path.join(demo_data_path(), "languages", "*.yaml")
+    langs = [get_demo_language(f) for f in glob(demo_glob)]
     langs.sort(key=lambda x: x.name)
     return langs
 
@@ -143,24 +144,24 @@ def load_demo_languages():
 
 def load_demo_stories():
     "Load the stories."
-    demo_glob = os.path.join(demo_data_path(), 'stories', '*.txt')
+    demo_glob = os.path.join(demo_data_path(), "stories", "*.txt")
     for filename in glob(demo_glob):
-        with open(filename, 'r', encoding='utf-8') as f:
+        with open(filename, "r", encoding="utf-8") as f:
             content = f.read()
 
-        langpatt = r'language:\s*(.*)\n'
+        langpatt = r"language:\s*(.*)\n"
         lang = re.search(langpatt, content).group(1).strip()
         lang = Language.find_by_name(lang)
 
         if lang is None or not lang.is_supported:
             pass
         else:
-            title_match = re.search(r'title:\s*(.*)\n', content)
+            title_match = re.search(r"title:\s*(.*)\n", content)
             title = title_match.group(1).strip()
-            content = re.sub(r'#.*\n', '', content)
+            content = re.sub(r"#.*\n", "", content)
             b = Book.create_book(title, lang, content)
             db.session.add(b)
-    SystemSetting.set_value('IsDemoData', True)
+    SystemSetting.set_value("IsDemoData", True)
     db.session.commit()
     refresh_stats()
 
@@ -171,7 +172,7 @@ def load_demo_data():
     """
     load_demo_languages()
     load_demo_stories()
-    SystemSetting.set_value('IsDemoData', True)
+    SystemSetting.set_value("IsDemoData", True)
     db.session.commit()
 
 
@@ -180,9 +181,7 @@ def delete_unsupported_demo_data():
     Remove any language using an unsupported parser.
     """
     languages = db.session.query(Language).all()
-    unsupported = [ lang for lang in languages
-        if not lang.is_supported
-    ]
+    unsupported = [lang for lang in languages if not lang.is_supported]
     for lang in unsupported:
         db.session.delete(lang)
     db.session.commit()

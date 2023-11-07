@@ -29,10 +29,10 @@ class LuteTestClient:
     def __init__(self, b, home):
         self.browser = b
         self.home = home
-        self.visit('dev_api/wipe_db')
-        self.visit('dev_api/load_demo_languages')
+        self.visit("dev_api/wipe_db")
+        self.visit("dev_api/load_demo_languages")
 
-        response = requests.get(f'{home}/dev_api/language_ids', timeout=5)
+        response = requests.get(f"{home}/dev_api/language_ids", timeout=5)
         self.language_ids = response.json()
 
         self.start = time.perf_counter()
@@ -40,29 +40,29 @@ class LuteTestClient:
 
     def load_demo_stories(self):
         "Load the demo stories."
-        self.visit('dev_api/load_demo_stories')
+        self.visit("dev_api/load_demo_stories")
 
     def change_parser_registry_key(self, key, replacement):
         """
         Change a parser registry key to a replacement,
         effectively disabling that parser.
         """
-        self.visit(f'dev_api/disable_parser/{key}/{replacement}')
+        self.visit(f"dev_api/disable_parser/{key}/{replacement}")
 
     ################################3
     # Browsing
 
     def visit(self, suburl):
         "Visit a sub url under the base."
-        if suburl.startswith('/'):
+        if suburl.startswith("/"):
             suburl = suburl[1:]
-        url = f'{self.home}/{suburl}'
+        url = f"{self.home}/{suburl}"
         # print(f'visiting: {url}')
         self.browser.visit(url)
 
     def index(self):
         "Go to home page."
-        self.browser.visit('')
+        self.browser.visit("")
 
     def click_link(self, linktext):
         self.browser.links.find_by_text(linktext).click()
@@ -70,45 +70,45 @@ class LuteTestClient:
     ################################3
     # Languages
 
-    def edit_language(self, langname, updates = None):
+    def edit_language(self, langname, updates=None):
         """
         Edit a language.
         """
-        self.visit('/')
-        self.browser.links.find_by_text('Languages').click()
+        self.visit("/")
+        self.browser.links.find_by_text("Languages").click()
         # WEIRD: find_by_text(langname) doesn't work ...
         self.browser.links.find_by_partial_text(langname).click()
-        assert f'Edit {langname}' in self.browser.html
+        assert f"Edit {langname}" in self.browser.html
         updates = updates or {}
         for k, v in updates.items():
-            if k == 'exceptions_split_sentences':
-                self.browser.find_by_css(f'#{k}').fill(v)
+            if k == "exceptions_split_sentences":
+                self.browser.find_by_css(f"#{k}").fill(v)
             else:
-                raise RuntimeError(f'unhandled key {k}')
-        self.browser.find_by_css('#submit').first.click()
-
+                raise RuntimeError(f"unhandled key {k}")
+        self.browser.find_by_css("#submit").first.click()
 
     ################################3
     # Books
 
     def make_book(self, title, text, langname):
         "Create a book with title, text, and languagename."
-        self.visit('book/new')
-        self.browser.fill('text', text)
-        self.browser.find_by_css('#title').fill(title)
-        self.browser.select('language_id', int(self.language_ids[langname]))
-        self.browser.find_by_css('#save').first.click()
+        self.visit("book/new")
+        self.browser.fill("text", text)
+        self.browser.find_by_css("#title").fill(title)
+        self.browser.select("language_id", int(self.language_ids[langname]))
+        self.browser.find_by_css("#save").first.click()
 
     def get_book_table_content(self):
         "Get book table content."
-        css = '#booktable tbody tr'
-        def _to_string(row):
-            tds = row.find_by_css('td')
-            rowtext = [td.text.strip() for td in tds]
-            return '; '.join(rowtext).strip()
-        rows = list(self.browser.find_by_css(css))
-        return "\n".join([ _to_string(row) for row in rows ])
+        css = "#booktable tbody tr"
 
+        def _to_string(row):
+            tds = row.find_by_css("td")
+            rowtext = [td.text.strip() for td in tds]
+            return "; ".join(rowtext).strip()
+
+        rows = list(self.browser.find_by_css(css))
+        return "\n".join([_to_string(row) for row in rows])
 
     ################################
     # Terms
@@ -116,57 +116,56 @@ class LuteTestClient:
     def _fill_term_form(self, b, updates):
         "Fill in the term form."
         for k, v in updates.items():
-            if k == 'language_id':
-                b.select('language_id', v)
-            elif k == 'status':
+            if k == "language_id":
+                b.select("language_id", v)
+            elif k == "status":
                 # This line didn't work:
                 # iframe.choose('status', updates['status'])
-                s = updates['status']
+                s = updates["status"]
                 xp = f"//input[@type='radio'][@name='status'][@value='{s}']"
                 radios = b.find_by_xpath(xp)
-                assert len(radios) == 1, 'have matching radio button'
+                assert len(radios) == 1, "have matching radio button"
                 radio = radios[0]
                 radio.click()
-            elif k in ('translation', 'text'):
-                b.find_by_css(f'#{k}').fill(v)
-            elif k == 'parents':
-                for p in updates['parents']:
-                    xp = 'ul#parentslist li.tagit-new > input.ui-autocomplete-input'
+            elif k in ("translation", "text"):
+                b.find_by_css(f"#{k}").fill(v)
+            elif k == "parents":
+                for p in updates["parents"]:
+                    xp = "ul#parentslist li.tagit-new > input.ui-autocomplete-input"
                     tagitbox = b.find_by_css(xp)
-                    assert len(tagitbox) == 1, 'have parent input'
+                    assert len(tagitbox) == 1, "have parent input"
                     box = tagitbox.first
                     box.type(p, slowly=False)
                     box.type(Keys.RETURN)
-                    time.sleep(0.1) # seconds
+                    time.sleep(0.1)  # seconds
             else:
-                raise RuntimeError(f'unhandled key {k}')
-
+                raise RuntimeError(f"unhandled key {k}")
 
     def make_term(self, lang, updates):
         "Create a new term."
-        self.visit('/')
-        self.click_link('Terms')
-        self.click_link('Create new')
-        assert 'New Term' in self.browser.html
+        self.visit("/")
+        self.click_link("Terms")
+        self.click_link("Create new")
+        assert "New Term" in self.browser.html
 
-        updates['language_id'] = self.language_ids[lang]
+        updates["language_id"] = self.language_ids[lang]
         b = self.browser
         self._fill_term_form(b, updates)
-        b.find_by_css('#submit').first.click()
-
+        b.find_by_css("#submit").first.click()
 
     def get_term_table_content(self):
         "Get term table content."
-        self.visit('/')
-        self.click_link('Terms')
-        css = '#termtable tbody tr'
-        def _to_string(row):
-            tds = row.find_by_css('td')
-            rowtext = [td.text.strip() for td in tds]
-            return '; '.join(rowtext).strip()
-        rows = list(self.browser.find_by_css(css))
-        return "\n".join([ _to_string(row) for row in rows ])
+        self.visit("/")
+        self.click_link("Terms")
+        css = "#termtable tbody tr"
 
+        def _to_string(row):
+            tds = row.find_by_css("td")
+            rowtext = [td.text.strip() for td in tds]
+            return "; ".join(rowtext).strip()
+
+        rows = list(self.browser.find_by_css(css))
+        return "\n".join([_to_string(row) for row in rows])
 
     ################################3
     # Reading/rendering
@@ -178,18 +177,18 @@ class LuteTestClient:
         def _to_string(t):
             "Create string for token, eg 'cat (2)'."
             status = [
-                c.replace('status', '')
-                for c in
-                t['class'].split(' ')
-                if c.startswith('status') and c != 'status0' ]
+                c.replace("status", "")
+                for c in t["class"].split(" ")
+                if c.startswith("status") and c != "status0"
+            ]
             if len(status) == 0:
                 return t.text
-            assert len(status) == 1, f'should only have 1 status on {t.text}'
+            assert len(status) == 1, f"should only have 1 status on {t.text}"
             status = status[0]
-            return f'{t.text} ({status})'
+            return f"{t.text} ({status})"
 
-        etext = [ _to_string(e) for e in elements ]
-        return '/'.join(etext)
+        etext = [_to_string(e) for e in elements]
+        return "/".join(etext)
 
     ################################3
     # Reading, term actions
@@ -198,45 +197,42 @@ class LuteTestClient:
         "Helper, get the element."
         # print('getting ' + word)
         elements = self.browser.find_by_xpath('//span[contains(@class, "textitem")]')
-        es = [ e for e in elements if e.text == word ]
-        assert len(es) > 0, f'match for {word}'
+        es = [e for e in elements if e.text == word]
+        assert len(es) > 0, f"match for {word}"
         return es[0]
-
 
     def click_word(self, word):
         "Click a word in the reading frame."
         self._get_element_for_word(word).click()
-
 
     def shift_click_words(self, words):
         "Shift-click words."
         # https://stackoverflow.com/questions/27775759/
         #   send-keys-control-click-in-selenium-with-python-bindings
         # pylint: disable=protected-access
-        els = [ self._get_element_for_word(w)._element for w in words ]
+        els = [self._get_element_for_word(w)._element for w in words]
         ac = ActionChains(self.browser.driver).key_down(Keys.SHIFT)
         for e in els:
             ac = ac.click(e)
         ac = ac.key_up(Keys.SHIFT)
         ac.perform()
 
-
     def press_hotkey(self, hotkey):
         "Send a hotkey."
-        el = self.browser.find_by_tag('body')
+        el = self.browser.find_by_tag("body")
         map_to_js_keycode = {
-            '1': 49,
-            '2': 50,
-            '3': 51,
-            '4': 52,
-            '5': 53,
-            'i': 73,
-            'w': 87,
-            'c': 67,
-            't': 84
+            "1": 49,
+            "2": 50,
+            "3": 51,
+            "4": 52,
+            "5": 53,
+            "i": 73,
+            "w": 87,
+            "c": 67,
+            "t": 84,
         }
         jscode = map_to_js_keycode[hotkey.lower()]
-        shift_pressed = 'true' if hotkey in [ 'C', 'T' ] else 'false'
+        shift_pressed = "true" if hotkey in ["C", "T"] else "false"
 
         # This was the only way I could get this to work:
         script = f"""jQuery.event.trigger({{
@@ -252,8 +248,7 @@ class LuteTestClient:
         # Unfortunately, I can't see how to refresh without reloading
         self.browser.reload()
 
-
-    def click_word_fill_form(self, word, updates = None):
+    def click_word_fill_form(self, word, updates=None):
         """
         Click a word in the reading frame, fill in the term form iframe.
         """
@@ -261,21 +256,20 @@ class LuteTestClient:
         updates = updates or {}
 
         should_refresh = False
-        with self.browser.get_iframe('wordframe') as iframe:
+        with self.browser.get_iframe("wordframe") as iframe:
             self._fill_term_form(iframe, updates)
-            iframe.find_by_css('#submit').first.click()
+            iframe.find_by_css("#submit").first.click()
 
             # Only refresh the reading frame if everything was ok.
             # Some submits will fail due to validation errors,
             # and we want to look at them.
-            if 'updated' in iframe.html:
+            if "updated" in iframe.html:
                 should_refresh = True
 
         # Have to refresh the content to query the dom ...
         # Unfortunately, I can't see how to refresh without reloading
         if should_refresh:
             self.browser.reload()
-
 
     ################################3
     # Misc.
@@ -294,8 +288,8 @@ class LuteTestClient:
         now = time.perf_counter()
         since_start = now - self.start
         print(step)
-        print(f'total elapsed: {since_start}')
-        print(f'since last:    {now - self.last_step}')
+        print(f"total elapsed: {since_start}")
+        print(f"since last:    {now - self.last_step}")
         self.last_step = now
 
     def sleep(self, seconds):

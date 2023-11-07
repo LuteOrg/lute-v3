@@ -6,23 +6,23 @@ from lute.db import db
 from lute.parse.base import SentenceGroupIterator
 
 booktags = db.Table(
-    'booktags',
+    "booktags",
     db.Model.metadata,
-    db.Column('BtT2ID', db.Integer, db.ForeignKey('tags2.T2ID')),
-    db.Column('BtBkID', db.Integer, db.ForeignKey('books.BkID'))
+    db.Column("BtT2ID", db.Integer, db.ForeignKey("tags2.T2ID")),
+    db.Column("BtBkID", db.Integer, db.ForeignKey("books.BkID")),
 )
 
 
 class BookTag(db.Model):
     "Term tags."
-    __tablename__ = 'tags2'
+    __tablename__ = "tags2"
 
-    id = db.Column('T2ID', db.Integer, primary_key=True)
-    text = db.Column('T2Text', db.String(20))
-    comment = db.Column('T2Comment', db.String(200))
+    id = db.Column("T2ID", db.Integer, primary_key=True)
+    text = db.Column("T2Text", db.String(20))
+    comment = db.Column("T2Comment", db.String(200))
 
     @staticmethod
-    def make_book_tag(text, comment=''):
+    def make_book_tag(text, comment=""):
         "Create a BookTag."
         tt = BookTag()
         tt.text = text
@@ -43,26 +43,33 @@ class BookTag(db.Model):
         return BookTag.make_book_tag(text)
 
 
-class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instance-attributes
+class Book(
+    db.Model
+):  # pylint: disable=too-few-public-methods, too-many-instance-attributes
     """
     Book entity.
     """
 
-    __tablename__ = 'books'
+    __tablename__ = "books"
 
-    id = db.Column('BkID', db.SmallInteger, primary_key=True)
-    title = db.Column('BkTitle', db.String(length=200))
-    language_id = db.Column('BkLgID', db.Integer, db.ForeignKey('languages.LgID'), nullable=False)
-    word_count = db.Column('BkWordCount', db.Integer)
-    source_uri = db.Column('BkSourceURI', db.String(length=1000))
-    current_tx_id = db.Column('BkCurrentTxID', db.Integer, default=0)
-    archived = db.Column('BkArchived', db.Boolean, default=False)
+    id = db.Column("BkID", db.SmallInteger, primary_key=True)
+    title = db.Column("BkTitle", db.String(length=200))
+    language_id = db.Column(
+        "BkLgID", db.Integer, db.ForeignKey("languages.LgID"), nullable=False
+    )
+    word_count = db.Column("BkWordCount", db.Integer)
+    source_uri = db.Column("BkSourceURI", db.String(length=1000))
+    current_tx_id = db.Column("BkCurrentTxID", db.Integer, default=0)
+    archived = db.Column("BkArchived", db.Boolean, default=False)
 
-    language = db.relationship('Language')
+    language = db.relationship("Language")
     texts = db.relationship(
-        'Text', back_populates='book',
-        order_by='Text.order', cascade='all, delete-orphan')
-    book_tags = db.relationship('BookTag', secondary='booktags')
+        "Text",
+        back_populates="book",
+        order_by="Text.order",
+        cascade="all, delete-orphan",
+    )
+    book_tags = db.relationship("BookTag", secondary="booktags")
 
     def __init__(self, title=None, language=None, source_uri=None):
         self.title = title
@@ -94,7 +101,7 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         return self.language.is_supported
 
     @staticmethod
-    def create_book(title, language, fulltext, max_word_tokens_per_text = 250):
+    def create_book(title, language, fulltext, max_word_tokens_per_text=250):
         """
         Create a book with given fulltext content,
         splitting the content into separate Text objects with max
@@ -104,8 +111,8 @@ class Book(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
         def token_string(toks):
             a = [t.token for t in toks]
-            ret = ''.join(a)
-            ret = ret.replace("\r", '')
+            ret = "".join(a)
+            ret = ret.replace("\r", "")
             ret = ret.replace("¶", "\n")
             return ret.strip()
 
@@ -132,18 +139,22 @@ class Text(db.Model):
     """
     Each page in a Book.
     """
-    __tablename__ = 'texts'
 
-    id = db.Column('TxID', db.Integer, primary_key=True)
-    _text = db.Column('TxText', db.String, nullable=False)
-    order = db.Column('TxOrder', db.Integer)
-    _read_date = db.Column('TxReadDate', db.DateTime, nullable=True)
-    bk_id = db.Column('TxBkID', db.Integer, db.ForeignKey('books.BkID'), nullable=False)
+    __tablename__ = "texts"
 
-    book = db.relationship('Book', back_populates='texts')
+    id = db.Column("TxID", db.Integer, primary_key=True)
+    _text = db.Column("TxText", db.String, nullable=False)
+    order = db.Column("TxOrder", db.Integer)
+    _read_date = db.Column("TxReadDate", db.DateTime, nullable=True)
+    bk_id = db.Column("TxBkID", db.Integer, db.ForeignKey("books.BkID"), nullable=False)
+
+    book = db.relationship("Book", back_populates="texts")
     sentences = db.relationship(
-        'Sentence', back_populates='text',
-        order_by='Sentence.order', cascade='all, delete-orphan')
+        "Sentence",
+        back_populates="text",
+        order_by="Sentence.order",
+        cascade="all, delete-orphan",
+    )
 
     def __init__(self, book, text, order=1):
         self.book = book
@@ -179,7 +190,6 @@ class Text(db.Model):
         self._read_date = s
         self._load_sentences()
 
-
     def _load_sentences(self):
         """
         Parse the current text and create Sentence objects.
@@ -212,7 +222,6 @@ class Text(db.Model):
             se = Sentence.from_tokens(curr_sentence_tokens, sentence_number)
             self.add_sentence(se)
 
-
     def add_sentence(self, sentence):
         "Add a sentence to the Text."
         if sentence not in self.sentences:
@@ -224,7 +233,6 @@ class Text(db.Model):
         for sentence in self.sentences:
             sentence.text = None
         self.sentences = []
-
 
     @staticmethod
     def find(text_id):
@@ -239,16 +247,16 @@ class Sentence(db.Model):
     The Sentence contains the parsed tokens, joined by the zero-width string.
     """
 
-    __tablename__ = 'sentences'
+    __tablename__ = "sentences"
 
-    id = db.Column('SeID', db.Integer, primary_key=True)
-    tx_id = db.Column('SeTxID', db.Integer, db.ForeignKey('texts.TxID'), nullable=False)
-    order = db.Column('SeOrder', db.Integer, default=1)
-    text_content = db.Column('SeText', db.Text, default='')
+    id = db.Column("SeID", db.Integer, primary_key=True)
+    tx_id = db.Column("SeTxID", db.Integer, db.ForeignKey("texts.TxID"), nullable=False)
+    order = db.Column("SeOrder", db.Integer, default=1)
+    text_content = db.Column("SeText", db.Text, default="")
 
-    text = db.relationship('Text', back_populates='sentences')
+    text = db.relationship("Text", back_populates="sentences")
 
-    def __init__(self, text_content='', text=None, order=1):
+    def __init__(self, text_content="", text=None, order=1):
         self.text_content = text_content
         self.text = text
         self.order = order
@@ -263,7 +271,7 @@ class Sentence(db.Model):
 
         zws = chr(0x200B)  # Zero-width space.
         s = zws.join(ptstrings)
-        s = s.strip(' ')
+        s = s.strip(" ")
 
         # The zws is added at the start and end of each
         # sentence, to standardize the string search when

@@ -6,52 +6,56 @@ from lute.db import db
 
 
 wordparents = db.Table(
-    'wordparents',
+    "wordparents",
     db.Model.metadata,
-    db.Column('WpWoID', db.Integer, db.ForeignKey('words.WoID')),
-    db.Column('WpParentWoID', db.Integer, db.ForeignKey('words.WoID'))
+    db.Column("WpWoID", db.Integer, db.ForeignKey("words.WoID")),
+    db.Column("WpParentWoID", db.Integer, db.ForeignKey("words.WoID")),
 )
 
 
 class TermImage(db.Model):
     "Term images."
-    __tablename__ = 'wordimages'
+    __tablename__ = "wordimages"
 
-    id = db.Column('WiID', db.Integer, primary_key=True)
-    term_id = db.Column('WiWoID', db.Integer, db.ForeignKey('words.WoID'), nullable=False)
-    term = db.relationship('Term', back_populates='images')
-    source = db.Column('WiSource', db.String(500))
+    id = db.Column("WiID", db.Integer, primary_key=True)
+    term_id = db.Column(
+        "WiWoID", db.Integer, db.ForeignKey("words.WoID"), nullable=False
+    )
+    term = db.relationship("Term", back_populates="images")
+    source = db.Column("WiSource", db.String(500))
 
 
 class TermFlashMessage(db.Model):
     "Term flash messages."
-    __tablename__ = 'wordflashmessages'
+    __tablename__ = "wordflashmessages"
 
-    id = db.Column('WfID', db.Integer, primary_key=True)
-    message = db.Column('WfMessage', db.String(200))
-    term_id = db.Column(db.Integer, db.ForeignKey('words.WoID'), name='WfWoID', nullable=False)
-    term = db.relationship('Term', back_populates='term_flash_message', uselist=False)
+    id = db.Column("WfID", db.Integer, primary_key=True)
+    message = db.Column("WfMessage", db.String(200))
+    term_id = db.Column(
+        db.Integer, db.ForeignKey("words.WoID"), name="WfWoID", nullable=False
+    )
+    term = db.relationship("Term", back_populates="term_flash_message", uselist=False)
 
 
 wordtags = db.Table(
-    'wordtags',
+    "wordtags",
     db.Model.metadata,
-    db.Column('WtTgID', db.Integer, db.ForeignKey('tags.TgID')),
-    db.Column('WtWoID', db.Integer, db.ForeignKey('words.WoID'))
+    db.Column("WtTgID", db.Integer, db.ForeignKey("tags.TgID")),
+    db.Column("WtWoID", db.Integer, db.ForeignKey("words.WoID")),
 )
 
 
 class TermTag(db.Model):
     "Term tags."
-    __tablename__ = 'tags'
+    __tablename__ = "tags"
 
-    id = db.Column('TgID', db.Integer, primary_key=True)
-    text = db.Column('TgText', db.String(20))
-    _comment = db.Column('TgComment', db.String(200))
+    id = db.Column("TgID", db.Integer, primary_key=True)
+    text = db.Column("TgText", db.String(20))
+    _comment = db.Column("TgComment", db.String(200))
 
     def __init__(self, text, comment=None):
-        self.text=text
-        self.comment=comment
+        self.text = text
+        self.comment = comment
 
     @property
     def comment(self):
@@ -66,8 +70,7 @@ class TermTag(db.Model):
     @comment.setter
     def comment(self, c):
         "Set cleaned comment."
-        self._comment = c if c is not None else ''
-
+        self._comment = c if c is not None else ""
 
     @staticmethod
     def find(termtag_id):
@@ -95,49 +98,60 @@ class TermTextChangedException(Exception):
     """
 
 
-class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instance-attributes
+class Term(
+    db.Model
+):  # pylint: disable=too-few-public-methods, too-many-instance-attributes
     """
     Term entity.
     """
-    __tablename__ = 'words'
 
-    id = db.Column('WoID', db.SmallInteger, primary_key=True)
-    language_id = db.Column('WoLgID', db.Integer, db.ForeignKey('languages.LgID'))
+    __tablename__ = "words"
+
+    id = db.Column("WoID", db.SmallInteger, primary_key=True)
+    language_id = db.Column("WoLgID", db.Integer, db.ForeignKey("languages.LgID"))
 
     # Text should only be set through setters.
-    _text = db.Column('WoText', db.String(250))
+    _text = db.Column("WoText", db.String(250))
 
     # text_lc shouldn't be touched (it's changed when term.text is
     # set), but it's public here to allow for its access during
     # queries (eg in lute.read.service.  This can probably be
     # improved, not sure how at the moment.
-    text_lc = db.Column('WoTextLC', db.String(250))
+    text_lc = db.Column("WoTextLC", db.String(250))
 
-    status = db.Column('WoStatus', db.Integer)
-    translation = db.Column('WoTranslation', db.String(500))
-    romanization = db.Column('WoRomanization', db.String(100))
-    token_count = db.Column('WoTokenCount', db.Integer)
+    status = db.Column("WoStatus", db.Integer)
+    translation = db.Column("WoTranslation", db.String(500))
+    romanization = db.Column("WoRomanization", db.String(100))
+    token_count = db.Column("WoTokenCount", db.Integer)
 
-    language = db.relationship('Language')
-    term_tags = db.relationship('TermTag', secondary='wordtags')
+    language = db.relationship("Language")
+    term_tags = db.relationship("TermTag", secondary="wordtags")
     parents = db.relationship(
-        'Term', secondary='wordparents',
-        primaryjoin='Term.id == wordparents.c.WpWoID',
-        secondaryjoin='Term.id == wordparents.c.WpParentWoID',
-        back_populates='children')
+        "Term",
+        secondary="wordparents",
+        primaryjoin="Term.id == wordparents.c.WpWoID",
+        secondaryjoin="Term.id == wordparents.c.WpParentWoID",
+        back_populates="children",
+    )
     children = db.relationship(
-        'Term', secondary='wordparents',
-        primaryjoin='Term.id == wordparents.c.WpParentWoID',
-        secondaryjoin='Term.id == wordparents.c.WpWoID',
-        back_populates='parents')
+        "Term",
+        secondary="wordparents",
+        primaryjoin="Term.id == wordparents.c.WpParentWoID",
+        secondaryjoin="Term.id == wordparents.c.WpWoID",
+        back_populates="parents",
+    )
     images = db.relationship(
-        'TermImage', back_populates='term',
-        lazy='subquery',
-        cascade='all, delete-orphan')
+        "TermImage",
+        back_populates="term",
+        lazy="subquery",
+        cascade="all, delete-orphan",
+    )
     term_flash_message = db.relationship(
-        'TermFlashMessage',
-        uselist=False, back_populates='term',
-        cascade='all, delete-orphan')
+        "TermFlashMessage",
+        uselist=False,
+        back_populates="term",
+        cascade="all, delete-orphan",
+    )
 
     def __init__(self, language=None, text=None):
         self.status = 1
@@ -152,13 +166,13 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         if text is not None:
             self.text = text
 
-
     def __repr__(self):
         return f"<Term {self.id} '{self.text}'>"
 
     def __eq__(self, other):
         def eqrep(term):
             return f"{term.language.name} {term.text}"
+
         if isinstance(other, Term):
             return eqrep(self) == eqrep(other)
         return False
@@ -176,10 +190,10 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
         # Clean up encoding cruft.
         t = textstring.strip()
-        zws = '\u200B'  # zero-width space
-        t = t.replace(zws, '')
-        nbsp = '\u00A0'  # non-breaking space
-        t = t.replace(nbsp, ' ')
+        zws = "\u200B"  # zero-width space
+        t = t.replace(zws, "")
+        nbsp = "\u00A0"  # non-breaking space
+        t = t.replace(nbsp, " ")
 
         lang = self.language
         tokens = lang.get_parsed_tokens(t)
@@ -194,7 +208,9 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
         text_changed = old_text_lc is not None and new_text_lc != old_text_lc
         if self.id is not None and text_changed:
-            msg = f"Cannot change text of term '{self.text}' (id = {self.id}) once saved."
+            msg = (
+                f"Cannot change text of term '{self.text}' (id = {self.id}) once saved."
+            )
             raise TermTextChangedException(msg)
 
         self._text = t
@@ -205,7 +221,7 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         "Tokens are separated by zero-width space."
         token_count = 0
         if self._text is not None:
-            zws = '\u200B'  # zero-width space
+            zws = "\u200B"  # zero-width space
             parts = self._text.split(zws)
             token_count = len(parts)
         self.token_count = token_count
@@ -245,7 +261,7 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
 
         # Ugly hack: we have to remove the .jpeg at the end because
         # Flask doesn't handle params with periods.
-        return src.replace('.jpeg', '')
+        return src.replace(".jpeg", "")
 
     def set_current_image(self, s):
         "Set the current image for this term."
@@ -279,7 +295,6 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         self.term_flash_message = None
         return m
 
-
     @staticmethod
     def find(term_id):
         "Get by ID."
@@ -294,8 +309,7 @@ class Term(db.Model): # pylint: disable=too-few-public-methods, too-many-instanc
         langid = spec.language.id
         text_lc = spec.text_lc
         query = db.session.query(Term).filter(
-            Term.language_id == langid,
-            Term.text_lc == text_lc
+            Term.language_id == langid, Term.text_lc == text_lc
         )
         terms = query.all()
         if not terms:
@@ -307,6 +321,7 @@ class Status:
     """
     Term statuses.
     """
+
     UNKNOWN = 0
     WELLKNOWN = 99
     IGNORED = 98

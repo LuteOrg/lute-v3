@@ -10,43 +10,41 @@ from lute.backup.service import create_backup
 from lute.config.app_config import AppConfig
 
 
-bp = Blueprint('backup', __name__, url_prefix='/backup')
+bp = Blueprint("backup", __name__, url_prefix="/backup")
 
 
-@bp.route('/backup', methods=['GET'])
+@bp.route("/backup", methods=["GET"])
 def backup():
     """
     Endpoint called from front page.
 
     With extra arg 'type' for manual.
     """
-    backuptype = 'automatic'
-    if 'type' in request.args:
-        backuptype = 'manual'
+    backuptype = "automatic"
+    if "type" in request.args:
+        backuptype = "manual"
 
     settings = BackupSettings.get_backup_settings()
     return render_template(
-        'backup/backup.html',
-        backup_folder=settings.backup_dir,
-        backuptype=backuptype
+        "backup/backup.html", backup_folder=settings.backup_dir, backuptype=backuptype
     )
 
 
-@bp.route('/do_backup', methods=['POST'])
+@bp.route("/do_backup", methods=["POST"])
 def do_backup():
     """
     Ajax endpoint called from backup.html.
     """
-    backuptype = 'automatic'
+    backuptype = "automatic"
     prms = request.form.to_dict()
-    if 'type' in prms:
-        backuptype = prms['type']
+    if "type" in prms:
+        backuptype = prms["type"]
 
     c = AppConfig.create_from_config()
     settings = BackupSettings.get_backup_settings()
-    is_manual = backuptype.lower() == 'manual'
+    is_manual = backuptype.lower() == "manual"
     try:
-        f = create_backup(c, settings, is_manual = is_manual)
+        f = create_backup(c, settings, is_manual=is_manual)
         return jsonify(f)
-    except Exception as e: # pylint: disable=broad-exception-caught
-        return jsonify({'errmsg': str(e)}), 500
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        return jsonify({"errmsg": str(e)}), 500

@@ -45,7 +45,11 @@ class SqliteMigrator:
         """
         allfiles = []
         with _change_directory(self.location):
-            allfiles = [os.path.join(self.location, s) for s in os.listdir() if s.endswith('.sql')]
+            allfiles = [
+                os.path.join(self.location, s)
+                for s in os.listdir()
+                if s.endswith(".sql")
+            ]
             allfiles.sort()
             outstanding = [f for f in allfiles if self._should_apply(conn, f)]
         return outstanding
@@ -77,7 +81,11 @@ class SqliteMigrator:
         Run all repeatable migrations.
         """
         with _change_directory(self.repeatable):
-            files = [os.path.join(self.repeatable, f) for f in os.listdir() if f.endswith('.sql')]
+            files = [
+                os.path.join(self.repeatable, f)
+                for f in os.listdir()
+                if f.endswith(".sql")
+            ]
         for f in files:
             try:
                 self._process_file(conn, f)
@@ -102,15 +110,15 @@ class SqliteMigrator:
         Track the executed migration in _migrations.
         """
         f = os.path.basename(filename)
-        conn.execute('begin transaction')
+        conn.execute("begin transaction")
         conn.execute(f"INSERT INTO _migrations values ('{f}')")
-        conn.execute('commit transaction')
+        conn.execute("commit transaction")
 
     def _process_file(self, conn, f):
         """
         Run the given file.
         """
-        with open(f, 'r', encoding='utf8') as sql_file:
+        with open(f, "r", encoding="utf8") as sql_file:
             commands = sql_file.read()
             self._exec_commands(conn, commands)
 

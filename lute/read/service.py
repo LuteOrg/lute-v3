@@ -31,7 +31,7 @@ def find_all_Terms_in_string(s, language):
     """
 
     # Extract word tokens from the input string
-    cleaned = re.sub(r'\s+', ' ', s)
+    cleaned = re.sub(r"\s+", " ", s)
     tokens = language.get_parsed_tokens(cleaned)
 
     parser = language.parser
@@ -40,21 +40,25 @@ def find_all_Terms_in_string(s, language):
     word_tokens = filter(lambda t: t.is_word, tokens)
     tok_strings = [parser.get_lowercase(t.token) for t in word_tokens]
     tok_strings = list(set(tok_strings))
-    terms_matching_tokens = db.session.query(Term).filter(
-        Term.language == language,
-        Term.text_lc.in_(tok_strings),
-        Term.token_count == 1
-    ).all()
+    terms_matching_tokens = (
+        db.session.query(Term)
+        .filter(
+            Term.language == language,
+            Term.text_lc.in_(tok_strings),
+            Term.token_count == 1,
+        )
+        .all()
+    )
 
     # Multiword terms have zws between all tokens.
     # Create content string with zws between all tokens for the match.
-    zws = '\u200B'  # zero-width space
+    zws = "\u200B"  # zero-width space
     lctokens = [parser.get_lowercase(t.token) for t in tokens]
     content = zws + zws.join(lctokens) + zws
     contained_term_query = db.session.query(Term).filter(
         Term.language == language,
         Term.token_count > 1,
-        func.instr(content, Term.text_lc) > 0
+        func.instr(content, Term.text_lc) > 0,
     )
     contained_terms = contained_term_query.all()
 
@@ -65,13 +69,14 @@ class RenderableSentence:
     """
     A collection of TextItems to be rendered.
     """
+
     def __init__(self, sentence_id, textitems):
         self.sentence_id = sentence_id
         self.textitems = textitems
 
     def __repr__(self):
-        s = ''.join([t.display_text for t in self.textitems])
-        return f"<RendSent {self.sentence_id}, {len(self.textitems)} items, \"{s}\">"
+        s = "".join([t.display_text for t in self.textitems])
+        return f'<RendSent {self.sentence_id}, {len(self.textitems)} items, "{s}">'
 
 
 def get_paragraphs(text):
@@ -87,7 +92,7 @@ def get_paragraphs(text):
     # _Shouldn't_ matter ... :-(
     ParsedToken.reset_counters()
     tokens = language.get_parsed_tokens(text.text)
-    tokens = [t for t in tokens if t.token != '¶']
+    tokens = [t for t in tokens if t.token != "¶"]
 
     terms = find_all_Terms_in_string(text.text, language)
 
@@ -98,10 +103,11 @@ def get_paragraphs(text):
         into the function from the closure.
         """
         sentence_tokens = [t for t in tokens if t.sentence_number == sentence_num]
-        renderable = RenderableCalculator.get_renderable(language, terms, sentence_tokens)
+        renderable = RenderableCalculator.get_renderable(
+            language, terms, sentence_tokens
+        )
         textitems = [
-            i.make_text_item(pnum, sentence_num, text.id, language)
-            for i in renderable
+            i.make_text_item(pnum, sentence_num, text.id, language) for i in renderable
         ]
         return RenderableSentence(sentence_num, textitems)
 
@@ -117,8 +123,7 @@ def get_paragraphs(text):
         # A renderable paragraph is a collection of
         # RenderableSentences.
         renderable_sentences = [
-            make_RenderableSentence(pnum, senum, paratokens, terms)
-            for senum in senums
+            make_RenderableSentence(pnum, senum, paratokens, terms) for senum in senums
         ]
         renderable_paragraphs.append(renderable_sentences)
 
@@ -140,7 +145,11 @@ def set_unknowns_to_known(text: Text):
             tis.append(ti)
 
     def is_unknown(ti):
-        return ti.is_word == 1 and (ti.wo_id == 0 or ti.wo_id is None) and ti.token_count == 1
+        return (
+            ti.is_word == 1
+            and (ti.wo_id == 0 or ti.wo_id is None)
+            and ti.token_count == 1
+        )
 
     unknowns = list(filter(is_unknown, tis))
     words_lc = [ti.text_lc for ti in unknowns]

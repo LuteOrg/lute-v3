@@ -23,9 +23,10 @@ def get_status_distribution(book):
             txindex += 1
 
     paras = [
-        get_paragraphs(t) for t in
+        get_paragraphs(t)
+        for t in
         # Next 20 pages, a good enough sample.
-        book.texts[txindex:txindex + 20]
+        book.texts[txindex : txindex + 20]
     ]
 
     def flatten_list(nested_list):
@@ -36,21 +37,13 @@ def get_status_distribution(book):
             else:
                 result.append(item)
         return result
+
     text_items = []
     for s in flatten_list(paras):
         text_items.extend(s.textitems)
     text_items = [ti for ti in text_items if ti.is_word]
 
-    statterms = {
-        0: [],
-        1: [],
-        2: [],
-        3: [],
-        4: [],
-        5: [],
-        98: [],
-        99: []
-    }
+    statterms = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 98: [], 99: []}
 
     for ti in text_items:
         statterms[ti.wo_status or 0].append(ti.text_lc)
@@ -67,9 +60,10 @@ def get_status_distribution(book):
 ##################################################
 # Stats table refresh.
 
+
 class BookStats(db.Model):
     "The stats table."
-    __tablename__ = 'bookstats'
+    __tablename__ = "bookstats"
 
     id = db.Column(db.Integer, primary_key=True)
     BkID = db.Column(db.Integer)
@@ -78,21 +72,26 @@ class BookStats(db.Model):
     distinctunknowns = db.Column(db.Integer)
     unknownpercent = db.Column(db.Integer)
 
+
 def refresh_stats():
     "Refresh stats for all books requiring update."
-    books_to_update = db.session.query(Book). \
-        filter(~Book.id.in_(db.session.query(BookStats.BkID))). \
-        all()
+    books_to_update = (
+        db.session.query(Book)
+        .filter(~Book.id.in_(db.session.query(BookStats.BkID)))
+        .all()
+    )
     books = [b for b in books_to_update if b.is_supported]
     for book in books:
         stats = _get_stats(book)
         _update_stats(book, stats)
+
 
 def mark_stale(book):
     "Mark a book's stats as stale to force refresh."
     bk_id = book.id
     db.session.query(BookStats).filter_by(BkID=bk_id).delete()
     db.session.commit()
+
 
 def _get_stats(book):
     "Calc stats for the book using the status distribution."
@@ -106,18 +105,17 @@ def _get_stats(book):
 
     # Any change in the below fields requires a change to
     # update_stats as well, query insert doesn't check field order.
-    return [
-        book.word_count or 0,
-        allunique,
-        unknowns,
-        percent
-    ]
+    return [book.word_count or 0, allunique, unknowns, percent]
+
 
 def _update_stats(book, stats):
     "Update BookStats for the given book."
     new_stats = BookStats(
-        BkID=book.id, wordcount=stats[0],
-        distinctterms=stats[1], distinctunknowns=stats[2],
-        unknownpercent=stats[3])
+        BkID=book.id,
+        wordcount=stats[0],
+        distinctterms=stats[1],
+        distinctunknowns=stats[2],
+        unknownpercent=stats[3],
+    )
     db.session.add(new_stats)
     db.session.commit()

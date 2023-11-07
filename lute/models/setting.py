@@ -15,10 +15,11 @@ class SettingBase(db.Model):
     This class should not be used, it's the polymorphic base
     for UserSettings and SystemSettings.
     """
-    __tablename__ = 'settings'
-    key = db.Column('StKey', db.String(40), primary_key=True)
-    keytype = db.Column('StKeyType', db.String(10), nullable=False)
-    value = db.Column('StValue', db.String, nullable=False)
+
+    __tablename__ = "settings"
+    key = db.Column("StKey", db.String(40), primary_key=True)
+    keytype = db.Column("StKeyType", db.String(10), nullable=False)
+    value = db.Column("StValue", db.String, nullable=False)
     __mapper_args__ = {"polymorphic_on": keytype}
 
     @classmethod
@@ -38,14 +39,12 @@ class SettingBase(db.Model):
         s.value = keyvalue
         db.session.add(s)
 
-
     @classmethod
     def key_exists(cls, keyname):
         "True if exists."
         s = db.session.query(cls).filter(cls.key == keyname).first()
         no_key = s is None
         return not no_key
-
 
     @classmethod
     def get_value(cls, keyname):
@@ -64,7 +63,6 @@ class SettingBase(db.Model):
             db.session.delete(s)
 
 
-
 class MissingUserSettingKeyException(Exception):
     """
     Cannot set or get unknown user keys.
@@ -74,7 +72,7 @@ class MissingUserSettingKeyException(Exception):
 class UserSetting(SettingBase):
     "User setting."
     __tablename__ = None
-    __mapper_args__ = {"polymorphic_identity": 'user'}
+    __mapper_args__ = {"polymorphic_identity": "user"}
 
     @classmethod
     def key_exists_precheck(cls, keyname):
@@ -83,7 +81,6 @@ class UserSetting(SettingBase):
         """
         if not UserSetting.key_exists(keyname):
             raise MissingUserSettingKeyException(keyname)
-
 
     @staticmethod
     def _set_mecab_path_from_config():
@@ -97,22 +94,21 @@ class UserSetting(SettingBase):
         """
         app_config = AppConfig.create_from_config()
         mp = app_config.mecab_path
-        if mp is not None and mp != '':
-            UserSetting.set_value('mecab_path', mp)
+        if mp is not None and mp != "":
+            UserSetting.set_value("mecab_path", mp)
             db.session.commit()
-
 
     @staticmethod
     def load():
         "Load missing user settings and default values."
         keys_and_defaults = {
-            'backup_enabled': None,
-            'backup_auto': True,
-            'backup_warn': True,
-            'backup_dir': None,
-            'backup_count': 5,
-            'mecab_path': None,
-            'custom_styles': "/* Custom css to modify Lute's appearance. */",
+            "backup_enabled": None,
+            "backup_auto": True,
+            "backup_warn": True,
+            "backup_dir": None,
+            "backup_count": 5,
+            "mecab_path": None,
+            "custom_styles": "/* Custom css to modify Lute's appearance. */",
         }
         for k, v in keys_and_defaults.items():
             if not UserSetting.key_exists(k):
@@ -125,20 +121,20 @@ class UserSetting(SettingBase):
         UserSetting._set_mecab_path_from_config()
         # This feels wrong, somehow ... possibly could have an event
         # bus that posts messages about the setting.
-        JapaneseParser.set_mecab_path_envkey(UserSetting.get_value('mecab_path'))
+        JapaneseParser.set_mecab_path_envkey(UserSetting.get_value("mecab_path"))
 
 
 class SystemSetting(SettingBase):
     "System setting."
     __tablename__ = None
-    __mapper_args__ = {"polymorphic_identity": 'system'}
+    __mapper_args__ = {"polymorphic_identity": "system"}
 
     # Helpers for certain sys settings.
 
     @classmethod
     def get_last_backup_datetime(cls):
         "Get the last_backup_datetime as int, or None."
-        v = cls.get_value('lastbackup')
+        v = cls.get_value("lastbackup")
         if v is None:
             return None
         return int(v)
@@ -146,7 +142,7 @@ class SystemSetting(SettingBase):
     @classmethod
     def set_last_backup_datetime(cls, v):
         "Set and save the last backup time."
-        cls.set_value('lastbackup', v)
+        cls.set_value("lastbackup", v)
         db.session.commit()
 
 
@@ -155,28 +151,29 @@ class BackupSettings:
     Convenience wrapper for current backup settings.
     Getter only.
     """
+
     def __init__(self):
-        self.backup_enabled = UserSetting.get_value('backup_enabled')
-        self.backup_dir = UserSetting.get_value('backup_dir')
+        self.backup_enabled = UserSetting.get_value("backup_enabled")
+        self.backup_dir = UserSetting.get_value("backup_dir")
 
         def _bool(k):
             v = UserSetting.get_value(k)
-            return v in (1, '1', 'y', True)
-        self.backup_auto = _bool('backup_auto')
-        self.backup_warn = _bool('backup_warn')
-        self.backup_count = int(UserSetting.get_value('backup_count') or 5)
+            return v in (1, "1", "y", True)
+
+        self.backup_auto = _bool("backup_auto")
+        self.backup_warn = _bool("backup_warn")
+        self.backup_count = int(UserSetting.get_value("backup_count") or 5)
         self.last_backup_datetime = SystemSetting.get_last_backup_datetime()
 
     def is_acknowledged(self):
-        return self.backup_enabled in ('y', 'n')
+        return self.backup_enabled in ("y", "n")
 
     def last_backup_display_date(self):
         "Return the last_backup_datetime as yyyy-mm etc., or None if not set."
         t = self.last_backup_datetime
         if t is None:
             return None
-        return datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S')
-
+        return datetime.datetime.fromtimestamp(t).strftime("%Y-%m-%d %H:%M:%S")
 
     @staticmethod
     def get_backup_settings():
