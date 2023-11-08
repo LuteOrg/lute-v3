@@ -53,7 +53,6 @@ def _setup_app_dirs(app_config):
             "d": app_config.userimagespath,
             "readme": "User images.  Each subfolder is a language's ID.",
         },
-        {"d": os.path.join(dp, "custom_styles"), "readme": "User custom styles."},
     ]
     for rec in required_dirs:
         d = rec["d"]
