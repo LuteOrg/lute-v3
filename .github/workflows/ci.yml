@@ -53,6 +53,10 @@ jobs:
     - name: Lint
       run: inv lint
 
+    - name: Coding style
+      run: |
+        black --check .
+
     - name: Test
       run: |
         # Have to explicitly set MECAB_PATH for natto-py.

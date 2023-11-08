@@ -1,13 +1,16 @@
 # Lute v3
 
-Using Python and Flask.
+[![CI master](https://github.com/jzohrab/lute_v3/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jzohrab/lute_v3/actions/workflows/ci.yml?query=branch%3Amaster)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
+[![Discord Server](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/CzFUQP5m8u)
 
-Work-in-progress.  TODO
+Using Python and Flask.
 
 
 # Requirements
 
-Python 3
+Python 3.8+
 
 # Install
 
