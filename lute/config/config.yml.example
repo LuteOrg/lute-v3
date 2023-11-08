@@ -12,8 +12,12 @@ DBNAME: lute.db
 # If not set, this returns the "app data" folder
 # as indicated by PlatformDirs.user_data_dir
 # (ref https://pypi.org/project/platformdirs/).
-# OPTIONAL (but REQUIRED for developer tests)
+# OPTIONAL (but REQUIRED for docker and developer tests)
 # DATAPATH: yourpathhere
+
+# Folder where backups should be stored.
+# OPTIONAL (but REQUIRED for docker)
+# BACKUP_PATH: yourpathhere
 
 # Port to serve on.
 # If not set, defaults to 5000.

@@ -46,6 +46,10 @@ class AppConfig:
         if "MECAB_PATH" in config:
             self._mecab_path = config.get("MECAB_PATH")
 
+        self._backup_path = None
+        if "BACKUP_PATH" in config:
+            self._backup_path = config.get("BACKUP_PATH")
+
         self._is_docker = False
         if "IS_DOCKER" in config:
             self._is_docker = True
@@ -78,6 +82,11 @@ class AppConfig:
     def mecab_path(self):
         "To be used for MECAB_PATH."
         return self._mecab_path
+
+    @property
+    def backup_path(self):
+        "To be used for BACKUP_PATH."
+        return self._backup_path
 
     @property
     def datapath(self):

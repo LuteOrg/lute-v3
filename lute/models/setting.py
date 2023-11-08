@@ -83,20 +83,24 @@ class UserSetting(SettingBase):
             raise MissingUserSettingKeyException(keyname)
 
     @staticmethod
-    def _set_mecab_path_from_config():
+    def _load_settings_from_config():
         """
-        Set MECAB_PATH if it's in the config.
+        Special settings hardcoded in the config file should
+        override any settings.
 
-        The user can specify the MECAB_PATH in the settings,
-        but if it's already set in the config file, as is
-        done in CI on GitHub, then override it, as we can
-        assume that the user knows what they're doing.
+        This is necessary for GitHub CI and Docker, where
+        the values should be hardcoded.
         """
-        app_config = AppConfig.create_from_config()
-        mp = app_config.mecab_path
-        if mp is not None and mp != "":
-            UserSetting.set_value("mecab_path", mp)
-            db.session.commit()
+
+        def _set_key(k, v):
+            "Set the UserSetting and save."
+            if v is not None and v != "":
+                UserSetting.set_value(k, v)
+
+        ac = AppConfig.create_from_config()
+        _set_key("mecab_path", ac.mecab_path)
+        _set_key("backup_dir", ac.backup_path)
+        db.session.commit()
 
     @staticmethod
     def load():
@@ -118,7 +122,8 @@ class UserSetting(SettingBase):
                 db.session.add(s)
         db.session.commit()
 
-        UserSetting._set_mecab_path_from_config()
+        UserSetting._load_settings_from_config()
+
         # This feels wrong, somehow ... possibly could have an event
         # bus that posts messages about the setting.
         JapaneseParser.set_mecab_path_envkey(UserSetting.get_value("mecab_path"))
