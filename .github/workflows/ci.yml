@@ -13,10 +13,14 @@ permissions:
 
 jobs:
 
-  # Basic linting and tests.
+  # Lint, format check, and all tests.
   base-ci:
-
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python_version: [ '3.8', '3.9', '3.10', '3.11' ]
+
     steps:
 
     - name: Install Dependencies
@@ -35,7 +39,7 @@ jobs:
 
     - uses: actions/setup-python@v4
       with:
-        python-version: '3.8'
+        python-version: ${{ matrix.python_version }}
         cache: 'pip' # caching pip dependencies
 
     - run: pip install -r requirements.txt
@@ -100,3 +104,68 @@ jobs:
         popd
 
         pkill -f "python -m lute.main"   # Kill that process.
+
+
+  # Ensure that basic things work correctly on Windows,
+  # particularly PlatformDirs package.
+  windows-ci:
+
+    needs: base-ci
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        python_version: [ '3.8', '3.9', '3.10', '3.11' ]
+
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python_version }}
+        cache: 'pip' # caching pip dependencies
+
+    - name: Setup config
+      run: |
+        mkdir ${{ github.workspace }}\data
+        echo ENV: dev > ${{ github.workspace }}\lute\config\config.yml
+        echo DATAPATH: ${{ github.workspace }}\data >> ${{ github.workspace }}\lute\config\config.yml
+        echo DBNAME: test_lute.db >> ${{ github.workspace }}\lute\config\config.yml
+      shell: cmd
+
+    - name: Replace config slashes.
+      run: |
+        $content = [System.IO.File]::ReadAllText("${{ github.workspace }}\lute\config\config.yml").Replace('\','/')
+        [System.IO.File]::WriteAllText("${{ github.workspace }}\lute\config\config.yml", $content)
+        Get-Content -Path "${{ github.workspace }}\lute\config\config.yml"
+
+    - run: pip install -r requirements.txt
+
+    # Run one particular sanity check.
+    - name: Smoke test no mecab
+      run: inv accept --headless -s -k test_unsupported_language_not_shown
+
+    - name: Remove config to force using prod config
+      run: del ${{ github.workspace }}\lute\config\config.yml
+      shell: cmd
+
+    - name: Install prod-like flit package
+      run: |
+        mkdir ${{ github.workspace }}\..\lute_flit
+        cd ${{ github.workspace }}\..\lute_flit
+        flit -f ${{ github.workspace }}\pyproject.toml install
+      shell: cmd
+
+    - name: Run Lute application
+      run: |
+        echo "python -m lute.main" > run-server.bat
+        cmd /c "START /b run-server.bat"
+
+    - name: Wait for application to start
+      run: Start-Sleep -Seconds 10
+
+    - name: Verify flit install
+      run: |
+        cd ${{ github.workspace }}
+        python -m utils.verify
