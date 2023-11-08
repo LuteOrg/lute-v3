@@ -16,6 +16,7 @@ from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, SelectField, IntegerField, TextAreaField
 from wtforms.validators import InputRequired, NumberRange
 from wtforms import ValidationError
+from lute.config.app_config import AppConfig
 from lute.models.language import Language
 from lute.models.setting import UserSetting
 from lute.db import db
@@ -73,6 +74,14 @@ bp = Blueprint("settings", __name__, url_prefix="/settings")
 def edit_settings():
     "Edit settings."
     form = UserSettingsForm()
+
+    ac = AppConfig.create_from_config()
+    if ac.is_docker:
+        # User shouldn't change some things with docker.
+        kw = {"readonly": True, "style": "background-color: LightGray"}
+        form.backup_dir.render_kw = kw
+        form.mecab_path.render_kw = kw
+
     if form.validate_on_submit():
         # Update the settings in the database
         for field in form:
