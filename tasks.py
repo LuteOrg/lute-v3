@@ -13,6 +13,7 @@ invoke --help <cmd>    # See docstrings and help notes
 """
 
 import os
+import sys
 import subprocess
 from datetime import datetime
 import requests
@@ -26,19 +27,6 @@ def lint(c):
     # Formats: https://pylint.pycqa.org/en/latest/user_guide/usage/output.html
     msgfmt = "--msg-template='{path} ({line:03d}): {msg} ({msg_id} {symbol})'"
     c.run(f"pylint {msgfmt} tasks.py lute/ tests/")
-
-
-@task(help={"html": "open html report"})
-def coverage(c, html=False):
-    """
-    Run coverage, open report if needed.
-    """
-    c.run("coverage run -m pytest tests/")
-    if html:
-        c.run('coverage html --omit="*/test*"')
-        c.run("open htmlcov/index.html")
-    else:
-        c.run('coverage report --omit="*/test*"')
 
 
 @task
@@ -58,13 +46,6 @@ def start(c):
 
 
 @task
-def resetstart(c):
-    "Reset the db, and start the app."
-    db_reset(c)
-    start(c)
-
-
-@task
 def search(c, search_for):
     """
     Search the code for a string.
@@ -75,21 +56,60 @@ def search(c, search_for):
 
 
 @task
+def _ensure_test_db(c):  # pylint: disable=unused-argument
+    "Quits if not a test db. (Hidden task)"
+    ac = AppConfig.create_from_config()
+    if ac.is_test_db is False:
+        print(
+            f"""
+        QUITTING TASK FOR NON-TEST DB.
+        Your database name must start with test_ to run this task.
+        Your config.yml file has dbname = {ac.dbname}.
+        """
+        )
+        sys.exit(1)
+
+
+@task(pre=[_ensure_test_db])
 def test(c):
     """
-    Simple caller to pytest to allow for inv task chaining.
+    Unit tests only.
     """
-    c.run("pytest")
+    c.run("pytest --ignore=./tests/acceptance")
+
+
+def _site_is_running(useport=None):
+    """
+    Return true if site is running on port, or configured port.
+    """
+    if useport is None:
+        ac = AppConfig.create_from_config()
+        useport = ac.port
+
+    url = f"http://localhost:{useport}"
+    try:
+        print(f"checking for site at {url} ...")
+        resp = requests.get(url, timeout=5)
+        if resp.status_code != 200:
+            raise RuntimeError(f"Got code {resp.status_code} ... ???")
+        print("Site running, using that for tests.")
+        print()
+        return True
+    except requests.exceptions.ConnectionError:
+        print(f"URL {url} not reachable, will start new server at that port.")
+        print()
+        return False
 
 
 @task(
+    pre=[_ensure_test_db],
     help={
         "port": "optional port to run on; creates server if needed.",
         "show": "print data",
         "headless": "run as headless",
         "kflag": "optional -k flag argument",
         "exitfirst": "exit on first failure",
-    }
+    },
 )
 def accept(  # pylint: disable=too-many-arguments
     c, port=None, show=False, headless=False, kflag=None, exitfirst=False
@@ -103,26 +123,9 @@ def accept(  # pylint: disable=too-many-arguments
     start a server.
     """
     ac = AppConfig.create_from_config()
-    if ac.is_test_db is False:
-        raise ValueError("not a test db")
-
     useport = port
     if useport is None:
         useport = ac.port
-
-    url = f"http://localhost:{useport}"
-    site_running = False
-    try:
-        print(f"checking for site at {url} ...")
-        resp = requests.get(url, timeout=5)
-        if resp.status_code != 200:
-            raise RuntimeError(f"Got code {resp.status_code} ... ???")
-        print("Site running, using that for tests.")
-        print()
-        site_running = True
-    except requests.exceptions.ConnectionError:
-        print(f"URL {url} not reachable, will start new server at that port.")
-        print()
 
     run_test = [
         "pytest",
@@ -142,13 +145,30 @@ def accept(  # pylint: disable=too-many-arguments
     if exitfirst:
         run_test.append("--exitfirst")
 
-    if site_running:
+    if _site_is_running(useport):
         c.run(" ".join(run_test))
     else:
         cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{useport}"]
         with subprocess.Popen(cmd) as app_process:
             subprocess.run(run_test, check=True)
             app_process.terminate()
+
+
+@task(pre=[_ensure_test_db], help={"html": "open html report"})
+def coverage(c, html=False):
+    """
+    Run coverage (using non-acceptance tests only), open report if needed.
+
+    Running tests including the acceptance tests is slow,
+    and doesn't affect the coverage stats enough to justify it.
+    """
+    c.run("coverage run -m pytest tests/")
+    if html:
+        c.run('coverage html --omit="tests/*"')
+        c.run("open htmlcov/index.html")
+    else:
+        cmd = 'coverage report --sort=cover --show-missing --omit="tests/*"'
+        c.run(cmd)
 
 
 @task(pre=[test, accept, lint])
@@ -173,7 +193,6 @@ ns.add_task(accept)
 ns.add_task(coverage)
 ns.add_task(todos)
 ns.add_task(start)
-ns.add_task(resetstart)
 ns.add_task(search)
 ns.add_task(black)
 
@@ -182,33 +201,24 @@ ns.add_task(black)
 # DB tasks
 
 
-def _ensure_test_db():
-    "Throw if not a testing db."
-    ac = AppConfig.create_from_config()
-    if ac.is_test_db is False:
-        raise ValueError("not a test db")
-
-
-@task
+@task(pre=[_ensure_test_db])
 def db_wipe(c):
     """
     Wipe the data from the testing db; factory reset settings. :-)
 
     Can only be run on a testing db.
     """
-    _ensure_test_db()
     c.run("pytest -m dbwipe")
     print("ok")
 
 
-@task
+@task(pre=[_ensure_test_db])
 def db_reset(c):
     """
     Reset the database to the demo data.
 
     Can only be run on a testing db.
     """
-    _ensure_test_db()
     c.run("pytest -m dbdemoload")
     print("ok")
 

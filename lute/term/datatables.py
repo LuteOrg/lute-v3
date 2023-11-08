@@ -9,6 +9,7 @@ from lute.utils.data_tables import DataTablesSqliteQuery, supported_parser_type_
 def get_data_tables_list(parameters):
     "Term json data for datatables."
 
+    print(parameters, flush=True)
     base_sql = """SELECT
     0 as chk, w.WoID as WoID, LgName, L.LgID as LgID, w.WoText as WoText, parents.parentlist as ParentText, w.WoTranslation,
     replace(wi.WiSource, '.jpeg', '') as WiSource,
