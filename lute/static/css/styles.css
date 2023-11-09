@@ -162,7 +162,7 @@ p.version {
  div#term_form_right {
      width: 50%;
      position: fixed;
-     top: 0;
+     top: 120px;
      right: 0;
      height: 95%;
  }
