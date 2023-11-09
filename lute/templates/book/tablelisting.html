@@ -19,9 +19,11 @@
   
   let setup_text_datatable = function(initial_search) {
     var table = $('#booktable').DataTable({
+      {% if status != 'Archived' %}
       "language": {
             "emptyTable": "No books available. <a href='/book/new'>Create one?</a>"
       },
+      {% endif %}
       responsive: true,
       select: true,
       lengthMenu: [ 10, 25, 50 ],
