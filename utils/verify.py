@@ -5,21 +5,19 @@ Used in github actions to verify running app.
 
 Usage:
 
-python -m utils.verify
+python -m utils.verify [port]
 """
 
+import sys
 import json
 import requests
-from lute.config.app_config import AppConfig
 
 
-def verify():
+def verify(port):
     """
     Check the /info page.
     """
 
-    app_config = AppConfig.create_from_config()
-    port = app_config.port
     url = f"http://localhost:{port}/info"
     resp = requests.get(url, timeout=5)
     c = resp.status_code
@@ -32,4 +30,10 @@ def verify():
 
 
 if __name__ == "__main__":
-    verify()
+    useport = None
+    if len(sys.argv) == 2:
+        useport = sys.argv[1]
+    else:
+        print("Must supply port as argument")
+        sys.exit(1)
+    verify(useport)

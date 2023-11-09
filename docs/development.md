@@ -99,6 +99,10 @@ Todos are in the code as comments, e.g. `# TODO [<group name>:] detail`, `<!-- T
 `inv todos` collects all of these in a simple report.
 
 
+# Docker
+
+Notes for building and running a Docker container are at ../docker/README.com.
+
 # Misc dev notes
 
 ## read-only db during tests

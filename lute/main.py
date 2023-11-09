@@ -58,11 +58,20 @@ def start():
     Running at:
 
     http://localhost:{port}
+    """
+    )
 
+    close_msg = """
     When you're finished reading, stop this process
     with Ctrl-C or your system equivalent.
     """
-    )
+    if app_config.is_docker:
+        close_msg = """
+        When you're finished reading, stop this container
+        with Ctrl-C, docker compose stop, or docker stop <containerid>
+        as appropriate.
+        """
+    _print(close_msg)
 
     serve(app, host="0.0.0.0", port=port)
 

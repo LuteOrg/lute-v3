@@ -100,10 +100,33 @@ jobs:
         # Verify with utils script back in the workspace
         # (verify.py is not included in flit install)
         pushd ${{ github.workspace }}
-        python -m utils.verify
+        python -m utils.verify 5000
         popd
 
         pkill -f "python -m lute.main"   # Kill that process.
+
+
+  # Test build docker container and try running.
+  # Slightly wasteful re-setup of node.
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: base-ci
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+        cache: 'pip' # caching pip dependencies
+    - run: pip install -r requirements.txt
+    - name: Test docker build
+      run: |
+        docker build -f docker/Dockerfile --build-arg INSTALL_MECAB=false -t lute3 .
+        # Run container in the background, and check.
+        docker run -d -p 5000:5000 -v ./my_data:/lute_data -v ./my_backups:/lute_backup --name my-lute lute3:latest
+        sleep 10  # Give it a moment to start.
+        python -m utils.verify 5000
+        docker stop my-lute
+        docker rm my-lute
 
 
   # Generate a coverage badge, don't worry if it fails.
@@ -235,4 +258,4 @@ jobs:
     - name: Verify flit install
       run: |
         cd ${{ github.workspace }}
-        python -m utils.verify
+        python -m utils.verify 5000

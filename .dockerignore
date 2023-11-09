@@ -1,0 +1,14 @@
+# Only include the lute/ folder.
+#
+# On mac, to find all directories and sizes:
+#   du -hd 1
+#
+.git/
+.pytest_cache/
+.venv/
+__pycache__/
+dist/
+htmlcov/
+tests/
+utils/
+data/

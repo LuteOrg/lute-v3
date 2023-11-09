@@ -6,6 +6,9 @@ lute/config/config.yml
 *.ini
 *.ini.bkp
 
+docker/docker-compose.yml
+docker-compose.yml
+
 # user data
 data/
 

@@ -10,8 +10,18 @@ DATAPATH: /lute_data
 BACKUP_PATH: /lute_backup
 
 # Value to set in environment MECAB_PATH.
-# _May_ be needed for docker, if natto-py
-# can't find it automatically in the base image.
-# MECAB_PATH: xyz
+# The current build of the container can't find mecab,
+# so we have to set it here.
+#
+# To find the correct path, first build and run the container,
+# then connect to it, and find libmecab.so.2 like this:
+#
+# $ docker exec -it lute_v3-lute-1 bash
+# root@cid/# which mecab
+# /usr/bin/mecab
+# root@cid:/# ldd /usr/bin/mecab
+#    ...
+#    libmecab.so.2 => /lib/aarch64-linux-gnu/libmecab.so.2 (0x0000ffff9b540000)
+MECAB_PATH: /lib/aarch64-linux-gnu/libmecab.so.2
 
 IS_DOCKER: true
