@@ -9,7 +9,7 @@ import pytest
 from lute.config.app_config import AppConfig
 from lute.db import db
 import lute.db.demo
-from lute.app_setup import init_db_and_app
+from lute.app_factory import create_app
 
 from lute.models.language import Language
 
@@ -69,7 +69,7 @@ def fixture_app(testconfig):
     if os.path.exists(testconfig.dbfilename):
         os.unlink(testconfig.dbfilename)
     extra_config = {"WTF_CSRF_ENABLED": False, "TESTING": True}
-    app = init_db_and_app(testconfig, extra_config=extra_config)
+    app = create_app(testconfig, extra_config=extra_config)
     yield app
 
 

@@ -1,5 +1,7 @@
 """
-Main entry point.
+Factory.
+
+Methods: create_app.
 """
 
 import os
@@ -189,9 +191,9 @@ def _create_app(app_config, extra_config):
     return app
 
 
-def init_db_and_app(app_config, extra_config=None, output_func=None):
+def create_app(app_config, extra_config=None, output_func=None):
     """
-    Main entry point.  Calls dbsetup, and returns Flask app.
+    App factory.  Calls dbsetup, and returns Flask app.
 
     Use extra_config to pass { 'TESTING': True } during unit tests.
     """

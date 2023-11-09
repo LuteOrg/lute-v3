@@ -16,13 +16,13 @@ if len(sys.argv) != 2:
 #
 # pylint: disable=wrong-import-position
 sys.path.append("..")
-from lute.app_setup import init_db_and_app
+from lute.app_factory import create_app
 from lute.config.app_config import AppConfig
 
 logging.getLogger("waitress.queue").setLevel(logging.ERROR)
 
 app_config = AppConfig.create_from_config()
-app = init_db_and_app(app_config)
+app = create_app(app_config)
 
 port = int(sys.argv[1])
 print(f"running at localhost:{port}")

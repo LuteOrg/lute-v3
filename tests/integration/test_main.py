@@ -6,7 +6,7 @@ import os
 import sqlite3
 from contextlib import closing
 
-from lute.app_setup import init_db_and_app
+from lute.app_factory import create_app
 
 
 def test_init_no_existing_database(testconfig):
@@ -18,7 +18,7 @@ def test_init_no_existing_database(testconfig):
     if os.path.exists(testconfig.dbfilename):
         os.unlink(testconfig.dbfilename)
 
-    app = init_db_and_app(testconfig)
+    app = create_app(testconfig)
 
     assert os.path.exists(testconfig.dbfilename) is True, "db exists"
     assert testconfig.dbname.startswith("test_")

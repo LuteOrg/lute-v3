@@ -6,7 +6,7 @@ import os
 import shutil
 import logging
 from waitress import serve
-from lute.app_setup import init_db_and_app
+from lute.app_factory import create_app
 from lute.config.app_config import AppConfig
 
 logging.getLogger("waitress.queue").setLevel(logging.ERROR)
@@ -48,7 +48,7 @@ def start():
     app_config = AppConfig.create_from_config()
 
     _print("Initializing app.")
-    app = init_db_and_app(app_config, output_func=_print)
+    app = create_app(app_config, output_func=_print)
     _print(f"data path: {app_config.datapath}")
     _print(f"database: {app_config.dbfilename}")
 

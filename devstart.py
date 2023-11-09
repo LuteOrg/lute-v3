@@ -18,7 +18,7 @@ python `pwd`/devstart.py
 
 import os
 import logging
-from lute.app_setup import init_db_and_app
+from lute.app_factory import create_app
 from lute.config.app_config import AppConfig
 
 log = logging.getLogger("werkzeug")
@@ -39,5 +39,5 @@ else:
     # Reloading.
     pass
 
-app = init_db_and_app(app_config, output_func=print)
+app = create_app(app_config, output_func=print)
 app.run(debug=True, port=app_config.port)
