@@ -49,6 +49,7 @@ def read(bookid, pagenum):
 
     return render_template(
         "read/index.html",
+        hide_top_menu=True,
         text=text,
         textid=text.id,
         is_rtl=lang.right_to_left,
@@ -196,4 +197,4 @@ def edit_page(textid):
         db.session.commit()
         return redirect(f"/read/{text.book.id}/page/{text.order}", 302)
 
-    return render_template("read/page_edit_form.html", form=form)
+    return render_template("read/page_edit_form.html", hide_top_menu=True, form=form)

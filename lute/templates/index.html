@@ -7,61 +7,6 @@
 
 {% block body %}
 
-<div class="menu-bar">
-  <div class="header">
-    <img src="{{ url_for('static', filename='img/lute.png') }}" class="lutelogo" alt="LUTE Logo">
-    <div class="title-container">
-        <h1 id="luteTitle">Learning Using Texts (Lute)</h1>
-    </div>
-  </div>
-  <div class="menu">
-    <div class="menu-item">
-      <span>Books</span>
-      <ul class="sub-menu">
-        <li><a id="book_new" href="/book/new">Create new Book</a></li>
-        <li><a href="/book/import_webpage">Import web page</a></li>
-        <li><a href="/book/archived">Book archive</a></li>
-      </ul>
-    </div>
-    <div class="menu-item">
-      <span id="menu_terms">Terms</span>
-      <ul class="sub-menu">
-        <li><a id="term_index" href="/term/index">Terms</a></li>
-        <li><a id="term_import_index" href="/termimport/index">Import Terms</a></li>
-        <li><a id="term_parent_index" href="/term_parent_map/index">Parent Term mapping</a></li>
-        <li><a href="/termtag/index">Term Tags</a></li>
-      </ul>
-    </div>
-    <div class="menu-item">
-      <span id="menu_settings">Settings</span>
-      <ul class="sub-menu">
-        <li><a id="lang_index" href="/language/index">Languages</a></li>
-        <li><a href="/settings/index">Settings</a></li>
-      </ul>
-    </div>
-    {% if backup_acknowledged and backup_directory != '' %}
-    <div class="menu-item">
-      <span>Backup</span>
-      <ul class="sub-menu last-sub-menu">
-        {% if backup_last_display_date is not none %}
-        <li>last backup: {{ backup_last_display_date }}</li>
-        {% endif %}
-        <li><a href="/backup/backup?type=manual">Create backup</a></li>
-      </ul>
-    </div>
-    {% endif %}
-    <div class="menu-item">
-      <span>About</span>
-      <ul class="sub-menu last-sub-menu">
-        <li><a href="/version">Version and software info</a></li>
-        <li><a href="https://github.com/jzohrab/lute/wiki/">Docs</a></li>
-        <li><a href="https://discord.gg/CzFUQP5m8u">Discord</a></li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-
 {% if tutorial_book_id %}
 <div class="flash-notice">
   <p>The Lute database has been loaded with a

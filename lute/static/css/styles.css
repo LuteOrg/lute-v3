@@ -26,6 +26,16 @@
     align-items: center; /* Vertically center the items */
 }
 
+a.home-link {
+    text-decoration: none;
+    color: black !important;
+    display: flex; /* Keep the link as a block element for layout purposes */
+}
+
+a.home-link:hover {
+    text-decoration: none !important; /* Remove underline on hover */
+}
+
 /* Style for the logo image */
 .lutelogo {
     width: auto; /* Reset the width to auto */
@@ -40,7 +50,9 @@
 
 /* Style for the title text */
 #luteTitle {
-/*    font-size: 1em; /* Set the font size as needed */
+    /*    font-size: 1em; /* Set the font size as needed */
+/*    margin-block-start: 0px;
+    margin-block-end: 0px; */
 }
 
 p.version {
@@ -121,7 +133,7 @@ p.version {
 /* end menu bar. */
 
  .flash-notice {
-     margin-top: 20px;
+     margin: 20px;
      padding: 20px;
      background-color: #fff3cd;
      border-color: #ffeeba;

@@ -4,6 +4,20 @@
 
 {% block body %}
 
+<table style="table-layout: fixed; border-spacing: 0; ">
+  <tr>
+    <td width="2px">
+      <img src="{{ url_for('static', filename='img/lute.png') }}" class="lutelogo_small" />
+    </td>
+    <td>
+      <a href="/" tabindex="-1">Home</a>
+      {% if config.ENV == 'dev' %}
+      <span style="background-color: blue; color: white; margin: 2px; padding: 2px;">Dev environment</span>
+      {% endif %}
+    </td>
+  </tr>
+</table>
+
 <div id="read_pane_left">
   <div id="reading-header">
 
@@ -139,8 +153,8 @@
     {% if pagenum == pagecount %}
     <h2>&#127881;</h2>
     <p>
-      <a href="" onclick="$('#actionposter').submit(); return false;">Archive book</a> |
-      <a href="/">Home</a>
+      <a href="" tabindex="-1" onclick="$('#actionposter').submit(); return false;">Archive book</a> |
+      <a href="/" tabindex="-1">Home</a>
     </p>
 
     <form id="actionposter" method="post" action="/book/{{ book.id }}/archive"></form>

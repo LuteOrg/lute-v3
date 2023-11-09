@@ -49,4 +49,4 @@ def test_can_get_backup_settings_when_db_is_wiped(app_context):
     "The backupsettings struct assumes certain things about the data."
     delete_all_data()
     bs = BackupSettings.get_backup_settings()
-    assert bs.is_acknowledged() is False, "reset, so not acknowledged"
+    assert bs.is_acknowledged is False, "reset, so not acknowledged"

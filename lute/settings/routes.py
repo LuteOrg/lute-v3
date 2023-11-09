@@ -37,7 +37,11 @@ class UserSettingsForm(FlaskForm):
     backup_auto = BooleanField("Run backups automatically (daily)")
     backup_warn = BooleanField("Warn if backup hasn't run in a week")
     backup_count = IntegerField(
-        "Backup count", validators=[InputRequired(), NumberRange(min=1)]
+        "Retain backup count",
+        validators=[InputRequired(), NumberRange(min=1)],
+        render_kw={
+            "title": "Count of zipfiles to retain, oldest files are deleted first"
+        },
     )
 
     custom_styles = TextAreaField("Custom styles")

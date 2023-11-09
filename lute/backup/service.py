@@ -73,7 +73,7 @@ def backup_warning(backup_settings):
 
     last = backup_settings.last_backup_datetime
     if last is None:
-        return "Never backup up (successfully)."
+        return "Never backed up."
 
     curr = int(time.time())
     diff = curr - last

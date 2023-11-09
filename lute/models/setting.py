@@ -170,12 +170,15 @@ class BackupSettings:
         self.backup_count = int(UserSetting.get_value("backup_count") or 5)
         self.last_backup_datetime = SystemSetting.get_last_backup_datetime()
 
+    @property
     def is_acknowledged(self):
         return self.backup_enabled in ("y", "n")
 
+    @property
     def is_enabled(self):
         return self.backup_enabled == "y"
 
+    @property
     def last_backup_display_date(self):
         "Return the last_backup_datetime as yyyy-mm etc., or None if not set."
         t = self.last_backup_datetime

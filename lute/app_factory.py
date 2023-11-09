@@ -72,6 +72,19 @@ def _add_base_routes(app, app_config):
     Add some basic routes.
     """
 
+    @app.context_processor
+    def inject_menu_bar_vars():
+        """
+        Inject backup settings into the all templates for the menu bar.
+        """
+        bs = BackupSettings.get_backup_settings()
+        ret = {
+            "backup_acknowledged": bs.is_acknowledged,
+            "backup_directory": bs.backup_dir,
+            "backup_last_display_date": bs.last_backup_display_date,
+        }
+        return ret
+
     @app.route("/")
     def index():
         # Stop all other calculations if need to backup.
@@ -96,13 +109,11 @@ def _add_base_routes(app, app_config):
             tutorial_book_id=tutorial_book_id,
             have_books=len(db.session.query(Book).all()) > 0,
             have_languages=len(db.session.query(Language).all()) > 0,
-            hide_home_link=True,
             is_production_data=not is_demo,
-            backup_acknowledged=bkp_settings.is_acknowledged(),
+            # Backup stats
+            backup_acknowledged=bkp_settings.is_acknowledged,
             backup_show_warning=backup_show_warning,
             backup_warning_msg=warning_msg,
-            backup_directory=bkp_settings.backup_dir,
-            backup_last_display_date=bkp_settings.last_backup_display_date(),
         )
 
     @app.route("/wipe_database")

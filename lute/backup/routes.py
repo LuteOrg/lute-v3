@@ -4,6 +4,7 @@ Backup routes.
 Backup settings form management, and running backups.
 """
 
+import traceback
 from flask import Blueprint, render_template, request, jsonify
 from lute.models.setting import BackupSettings
 from lute.backup.service import create_backup
@@ -47,4 +48,5 @@ def do_backup():
         f = create_backup(c, settings, is_manual=is_manual)
         return jsonify(f)
     except Exception as e:  # pylint: disable=broad-exception-caught
-        return jsonify({"errmsg": str(e)}), 500
+        tb = traceback.format_exc()
+        return jsonify({"errmsg": str(e) + " -- " + tb}), 500

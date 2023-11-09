@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
 {% block title %}Settings{% endblock %}
+{% block header %}Settings{% endblock %}
 
 {% block body %}
-<h1>Settings</h1>
 
 {% for field_name, field_errors in form.errors.items() %}
 {% for error in field_errors %}

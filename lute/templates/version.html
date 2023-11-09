@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 
 {% block title %}Lute info{% endblock %}
+{% block header %}About Lute{% endblock %}
 
 {% block body %}
 
-<h1>About Lute</h1>
+<p>LUTE: Learning Using Texts v3</p>
 
-<div>
+<div style="margin-top:20px;">
   <p>Version: {{ version }}</p>
   <p>Data path: {{ datapath }}</p>
   <p>Database: {{ database }}</p>
@@ -15,7 +16,7 @@
   {% endif %}
 </div>
 
-<div style="margin-top:50px;">
+<div style="margin-top:20px;">
   <p>Repository: <a href="https://github.com/jzohrab/lute-v3">lute-v3</a></p>
   <p>Lute is released under the MIT License.</p>
 </div>

@@ -1,27 +1,21 @@
 {% extends 'base.html' %}
 
+{% block header %}
+{% if term.language_id is none %}New Term{% else %}Edit Term{% endif %}
+{% endblock %}
+
 {% block body %}
-
 <div id="term_form_left">
-  {% if term.language_id is none %}
-  <h1>New Term</h1>
-  {% else %}
-  <h1>Edit Term</h1>
-  {% endif %}
-
   {% include('term/_form.html') %}
-
   <a href="/term/index">back to list</a>
 
   {% if term.id %}
-
   <form
     method="post"
     action="/term/delete/{{ term.id }}"
     onsubmit="return confirm('Are you sure you want to delete this item?');">
     <button class="btn">Delete</button>
   </form>
-
   {% endif %}
 </div>
 
