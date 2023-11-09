@@ -132,7 +132,6 @@ class Setup:  # pylint: disable=too-few-public-methods
         b = self._baseline_schema_file
         with open(b, "r", encoding="utf8") as f:
             sql = f.read()
-        print("CREATING BASELINE ...", flush=True)
         conn.executescript(sql)
 
 

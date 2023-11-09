@@ -99,7 +99,8 @@ def test_load_demo_loads_language_yaml_files(app_context):
     """
     All data is loaded, spot check some.
 
-    This test is also used from /tasks.py; see .pytest.ini.
+    This test is also used from "inv db.reset" in tasks.py
+    (see .pytest.ini).
     """
     delete_demo_data()
     assert contains_demo_data() is False, "not a demo."
