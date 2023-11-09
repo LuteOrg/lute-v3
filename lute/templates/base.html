@@ -69,7 +69,12 @@
   {% endfor %}
   {% endwith %}
 
-  <h1>{% block header %}{% endblock %}</h1>
+  {% if self.header() | trim %}
+    <h1>{% block header %}{% endblock %}</h1>
+  {% else %}
+    {# do nothing, no h1 tags #}
+  {% endif %}
+
   {% block body %}{% endblock %}
 </body>
 </html>

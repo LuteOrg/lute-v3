@@ -12,14 +12,6 @@
    padding: 0px;
  }
 
- .lutelogo
- {
-     margin-right: 15px;
-     float: left;
-     width: 75px;
-     height: auto;
- }
-
  .lutelogo_small
  {
      margin-right: 2px;
@@ -27,6 +19,106 @@
      width: 50px;
      height: auto;
  }
+
+ /* Style for the header container */
+.header {
+    display: flex;
+    align-items: center; /* Vertically center the items */
+}
+
+/* Style for the logo image */
+.lutelogo {
+    width: auto; /* Reset the width to auto */
+    height: 3em; /* Set the height to match the text's font size */
+    margin-right: 10px; /* Adjust the margin as needed */
+}
+
+/* Style for the title container */
+.title-container {
+    flex: 1; /* Allow the title to take up remaining space */
+}
+
+/* Style for the title text */
+#luteTitle {
+/*    font-size: 1em; /* Set the font size as needed */
+}
+
+p.version {
+    margin: 0px;
+    font-size: 0.6em;
+    font-style: italic;
+}
+
+/* Style for the menu bar */
+.menu-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+/* Style for the title on the left */
+.title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Style for the menu on the right */
+.menu {
+    display: flex;
+}
+
+/* Style for each menu item */
+.menu-item {
+    position: relative; /* Required for sub-menu positioning */
+    margin-right: 40px;
+}
+
+/* Style for main menu item text (not links) */
+.menu-item > span {
+    text-decoration: none;
+    /* font-size: 1.25em; */
+    display: block;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold; /* Make the text heavy */
+    color: black !important; /* Set the text color as needed */
+}
+
+.menu-item > a:hover {
+    text-decoration: none;
+}
+
+/* Style for sub-menu */
+.sub-menu {
+    display: none;
+    position: absolute;
+    list-style-type: none;
+    margin: 0;
+    padding: 10px;
+    background-color: #fff; /* Set background color for sub-menu */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+    z-index: 1000;
+    border: 1px solid #ccc; /* Add a border around the sub-menu */
+}
+
+.last-sub-menu {
+    right: 0; /* Align the right edge of the sub-menu with the right edge of its container */
+}
+
+/* Style for sub-menu items */
+.sub-menu li {
+    margin: 10px 0;
+    white-space: nowrap;
+}
+
+/* Hover effect to show sub-menu on main menu item hover */
+.menu-item:hover .sub-menu {
+    display: block;
+}
+
+
+/* end menu bar. */
 
  .flash-notice {
      margin-top: 20px;

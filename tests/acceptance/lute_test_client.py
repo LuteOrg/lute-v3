@@ -75,7 +75,8 @@ class LuteTestClient:
         Edit a language.
         """
         self.visit("/")
-        self.browser.links.find_by_text("Languages").click()
+        self.browser.find_by_css("#menu_settings").mouse_over()
+        self.browser.find_by_id("lang_index").first.click()
         # WEIRD: find_by_text(langname) doesn't work ...
         self.browser.links.find_by_partial_text(langname).click()
         assert f"Edit {langname}" in self.browser.html
@@ -144,7 +145,8 @@ class LuteTestClient:
     def make_term(self, lang, updates):
         "Create a new term."
         self.visit("/")
-        self.click_link("Terms")
+        self.browser.find_by_css("#menu_terms").mouse_over()
+        self.browser.find_by_id("term_index").first.click()
         self.click_link("Create new")
         assert "New Term" in self.browser.html
 
@@ -156,7 +158,8 @@ class LuteTestClient:
     def get_term_table_content(self):
         "Get term table content."
         self.visit("/")
-        self.click_link("Terms")
+        self.browser.find_by_css("#menu_terms").mouse_over()
+        self.browser.find_by_id("term_index").first.click()
         css = "#termtable tbody tr"
 
         def _to_string(row):

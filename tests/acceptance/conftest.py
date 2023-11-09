@@ -237,7 +237,8 @@ def given_new_term(luteclient, lang, content):
 def import_term_file(luteclient, content):
     "Import the term file."
     luteclient.visit("/")
-    luteclient.browser.links.find_by_text("Import Terms").click()
+    luteclient.browser.find_by_css("#menu_terms").mouse_over()
+    luteclient.browser.find_by_id("term_import_index").first.click()
     fd, path = tempfile.mkstemp()
     with os.fdopen(fd, "w") as tmp:
         # do stuff with temp file
@@ -250,7 +251,8 @@ def import_term_file(luteclient, content):
 def check_term_table(luteclient, content):
     "Check the table."
     luteclient.visit("/")
-    luteclient.browser.links.find_by_text("Terms").click()
+    luteclient.browser.find_by_css("#menu_terms").mouse_over()
+    luteclient.browser.find_by_id("term_index").first.click()
     time.sleep(1)
     if content == "-":
         content = "No data available in table"
