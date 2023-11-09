@@ -82,7 +82,7 @@ class Todout:
         for f in files:
             fullname = os.path.abspath(os.path.join(root_dir, f))
             command = f"grep -i todo {fullname}"
-            self.debug_print(command)
+            # self.debug_print(command)
             result = subprocess.run(
                 command,
                 shell=True,
@@ -114,13 +114,14 @@ class Todout:
         Get the files, gather todo data.
         """
         files = self.find_files(directory, exclude_dirs, exclude_files, maxdepth)
+        files = [f for f in files if f is not None and f.strip() != ""]
         ret = []
-        for file in files:
-            results = self.grepfiles(directory, [file])
-            for file, line in results:
+        for f in files:
+            results = self.grepfiles(directory, [f])
+            for f, line in results:
                 ret.append(
                     {
-                        "file": file,
+                        "file": f,
                         "line": line,
                         "group": self.get_grouping(line.lower()),
                     }
@@ -143,6 +144,7 @@ def write_report(data):
         print("\nGroup: " + heading)
         for gd in curr_group_data:
             print(f"  {gd['file'].ljust(50)}:  {gd['line']}")
+    print("\n")
 
 
 t = Todout()
