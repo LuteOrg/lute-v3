@@ -10,6 +10,9 @@
   <p>Version: {{ version }}</p>
   <p>Data path: {{ datapath }}</p>
   <p>Database: {{ database }}</p>
+  {% if is_docker %}
+  <p><i>Note these are paths in your container, not on the host.  You mounted host paths when you started the container.</i></p>
+  {% endif %}
 </div>
 
 <div style="margin-top:50px;">

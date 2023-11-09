@@ -16,6 +16,7 @@ from flask import (
     jsonify,
 )
 
+from lute.config.app_config import AppConfig
 from lute.db import db
 from lute.db.setup.main import setup_db
 import lute.backup.service as backupservice
@@ -109,11 +110,13 @@ def _add_base_routes(app, app_config):
 
     @app.route("/version")
     def show_version():
+        ac = AppConfig.create_from_config()
         return render_template(
             "version.html",
             version=lute.__version__,
-            datapath=current_app.config["DATAPATH"],
-            database=current_app.config["DATABASE"],
+            datapath=ac.datapath,
+            database=ac.dbfilename,
+            is_docker=ac.is_docker,
         )
 
     @app.route("/info")

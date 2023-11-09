@@ -51,6 +51,8 @@ def start():
     app = create_app(app_config, output_func=_print)
     _print(f"data path: {app_config.datapath}")
     _print(f"database: {app_config.dbfilename}")
+    if app_config.is_docker:
+        _print("(Note these are container paths, not host paths.)")
 
     port = app_config.port
     _print(
