@@ -16,8 +16,6 @@ function runsearch() {
 }
 
 runsearch . 1
-runsearch config 8
-runsearch demo 8
 runsearch lute 8
 runsearch tests 8
 runsearch utils 8
