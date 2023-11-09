@@ -494,20 +494,6 @@ a:active {
    font-weight: bold;
  }
 
- #myfooter
- {
-     clear: both;
-     font-size: 0.8em;
-     font-style: italic;
-     margin-top: 40px;
-     border-top: 1px groove #aaaaaa;
-     padding: 0;
-     vertical-align: middle;
-     line-height: normal;
-     bottom: 0px;
-     width: 100%;
- }
-
  .inline
  {
    display: inline;

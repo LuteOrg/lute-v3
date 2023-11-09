@@ -4,11 +4,18 @@
 
 {% block body %}
 
-<h1>Release info</h1>
-<p>Version: {{ version }}</p>
+<h1>About Lute</h1>
 
-<h1>Data info</h1>
-<p>Data path: {{ datapath }}</p>
-<p>Database: {{ database }}</p>
+<div>
+  <p>Version: {{ version }}</p>
+  <p>Data path: {{ datapath }}</p>
+  <p>Database: {{ database }}</p>
+</div>
+
+<div style="margin-top:50px;">
+  <p>Repository: <a href="https://github.com/jzohrab/lute-v3">lute-v3</a></p>
+  <p>Lute is released under the MIT License.</p>
+</div>
+
 
 {% endblock %}
