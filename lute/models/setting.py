@@ -173,6 +173,9 @@ class BackupSettings:
     def is_acknowledged(self):
         return self.backup_enabled in ("y", "n")
 
+    def is_enabled(self):
+        return self.backup_enabled == "y"
+
     def last_backup_display_date(self):
         "Return the last_backup_datetime as yyyy-mm etc., or None if not set."
         t = self.last_backup_datetime

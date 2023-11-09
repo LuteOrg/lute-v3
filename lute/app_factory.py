@@ -84,6 +84,11 @@ def _add_base_routes(app, app_config):
 
         refresh_stats()
 
+        warning_msg = backupservice.backup_warning(bkp_settings)
+        backup_show_warning = (
+            bkp_settings.backup_warn and bkp_settings.is_enabled and warning_msg != ""
+        )
+
         return render_template(
             "index.html",
             dbname=app_config.dbname,
@@ -94,9 +99,8 @@ def _add_base_routes(app, app_config):
             hide_home_link=True,
             is_production_data=not is_demo,
             backup_acknowledged=bkp_settings.is_acknowledged(),
-            backup_enabled=(bkp_settings.backup_enabled == "y"),
-            backup_show_warning=bkp_settings.backup_warn,
-            backup_warning_msg=backupservice.backup_warning(bkp_settings),
+            backup_show_warning=backup_show_warning,
+            backup_warning_msg=warning_msg,
             backup_directory=bkp_settings.backup_dir,
             backup_last_display_date=bkp_settings.last_backup_display_date(),
         )
