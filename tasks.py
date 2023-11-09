@@ -171,18 +171,18 @@ def coverage(c, html=False):
         c.run(cmd)
 
 
-@task(pre=[test, accept, lint])
+@task(post=[lint])
+def black(c):
+    "black-format things."
+    c.run("python -m black .")
+
+
+@task(pre=[test, accept, black, lint])
 def full(c):  # pylint: disable=unused-argument
     """
     Run full check and lint.
     """
     print("Done.")
-
-
-@task(post=[lint])
-def black(c):
-    "black-format things."
-    c.run("python -m black .")
 
 
 ns = Collection()
