@@ -20,7 +20,7 @@
   let setup_text_datatable = function(initial_search) {
     var table = $('#booktable').DataTable({
       "language": {
-            "emptyTable": "No books available."
+            "emptyTable": "No books available. <a href='/book/new'>Create one?</a>"
       },
       responsive: true,
       select: true,
