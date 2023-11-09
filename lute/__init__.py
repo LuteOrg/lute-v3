@@ -8,4 +8,4 @@ Flit pulls into the pyproject.toml using "dynamic".
 """
 
 # TODO release: fix version number
-__version__ = "0.0.1.post7"
+__version__ = "0.0.1.post8"
