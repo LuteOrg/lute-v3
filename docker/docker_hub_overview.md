@@ -84,7 +84,7 @@ services:
       - 5000:5000
     volumes:
       - ~/lute/data:/lute_data
-      - ./lute/backupts:/lute_backup
+      - ./lute/backups:/lute_backup
 ```
 
 Store that file in some directory on your machine.  Then, starting a console in that directory, starting and stopping examples:
