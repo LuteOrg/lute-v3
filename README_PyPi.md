@@ -8,38 +8,41 @@ Lute v3 is a rewrite of the original Lute PHP application in Python and Flask.
 
 ## Requirements
 
-Python 3.8+
+Python 3.8+ (tested with python 3.8 through 3.11)
+
+Japanese learners will also need to install MeCab.
 
 ## Install
 
-### From PyPi
+`lute3` installs various dependencies, so you should install it in a virtual environment.  For example, using `venv`:
 
-TODO release: add PyPi docs
-
-### From TestPyPi
-
-`lute3` is on TestPyPi to work out packaging issues.
-
-`lute3` has dependencies on packages that aren't in TestPyPi, so we have to pull some things from PyPi as well.
+Create a new folder (e.g. `lute3`) anywhere on your system.
 
 ```
-python3 -m venv .venv
-source .venv/bin/activate
-pip3 install --upgrade --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ lute3
+# Set up the virtual environment
+python3.8 -m venv myenv
+
+# Activate it (Mac or *nix)
+source myenv/bin/activate
+
+# (on Windows: myenv\Scripts\activate)
+
+# Install everything.  Note the package name is lute3!
+pip install lute3
+
+# Start lute
+python -m lute.main
+
+# Open your web browser to http://localhost:5000
+# When done, hit Ctl-C
+
+# Stop the virtual environment.
 deactivate
 ```
 
-## Usage
-
-Assuming you've set up a virtual environment and installed `lute3`:
+Once everything is installed, for future runs you'll just need to go into `lute3` folder created above and:
 
 ```
-source .venv/bin/activate
-python -m lute3.main
-
-# Open web browser to http://localhost:5000
-# ... work work work ...
-# When done, Ctl-C then
-
-deactivate
+source myenv/bin/activate
+python -m lute.main
 ```
