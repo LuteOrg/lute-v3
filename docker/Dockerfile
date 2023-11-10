@@ -1,3 +1,8 @@
+# The Dockerfile can be used to create two variants
+# by using "--build-arg INSTALL_MECAB=[true|false]":
+# - "true": with mecab and dictionary (800+ MB)
+# - "false": without (300 MB)
+
 # Official python base image.
 FROM python:3.11-slim-bookworm
 
