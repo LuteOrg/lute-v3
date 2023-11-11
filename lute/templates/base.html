@@ -60,6 +60,7 @@
       </div>
     </a>
     <div class="menu">
+      {% if have_languages %}
       <div class="menu-item">
         <span>Books</span>
         <ul class="sub-menu">
@@ -77,6 +78,7 @@
           <li><a href="/termtag/index">Term Tags</a></li>
         </ul>
       </div>
+      {% endif %}
       <div class="menu-item">
         <span id="menu_settings">Settings</span>
         <ul class="sub-menu">

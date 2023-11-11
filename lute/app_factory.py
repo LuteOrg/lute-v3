@@ -78,7 +78,9 @@ def _add_base_routes(app, app_config):
         Inject backup settings into the all templates for the menu bar.
         """
         bs = BackupSettings.get_backup_settings()
+        have_languages = len(db.session.query(Language).all()) > 0
         ret = {
+            "have_languages": have_languages,
             "backup_enabled": bs.backup_enabled,
             "backup_directory": bs.backup_dir,
             "backup_last_display_date": bs.last_backup_display_date,
@@ -87,16 +89,22 @@ def _add_base_routes(app, app_config):
 
     @app.route("/")
     def index():
-        # Stop all other calculations if need to backup.
+        is_production = not lute.db.demo.contains_demo_data()
         bkp_settings = BackupSettings.get_backup_settings()
-        if backupservice.should_run_auto_backup(bkp_settings):
+
+        have_books = len(db.session.query(Book).all()) > 0
+        have_languages = len(db.session.query(Language).all()) > 0
+
+        # Only back up if we have books, otherwise the backup is
+        # kicked off when the user empties the demo database.
+        if (
+            is_production
+            and have_books
+            and backupservice.should_run_auto_backup(bkp_settings)
+        ):
             return redirect("/backup/backup", 302)
 
-        is_demo = lute.db.demo.contains_demo_data()
-        tutorial_book_id = lute.db.demo.tutorial_book_id()
-
         refresh_stats()
-
         warning_msg = backupservice.backup_warning(bkp_settings)
         backup_show_warning = (
             bkp_settings.backup_warn
@@ -108,10 +116,10 @@ def _add_base_routes(app, app_config):
             "index.html",
             dbname=app_config.dbname,
             datapath=app_config.datapath,
-            tutorial_book_id=tutorial_book_id,
-            have_books=len(db.session.query(Book).all()) > 0,
-            have_languages=len(db.session.query(Language).all()) > 0,
-            is_production_data=not is_demo,
+            tutorial_book_id=lute.db.demo.tutorial_book_id(),
+            have_books=have_books,
+            have_languages=have_languages,
+            is_production_data=is_production,
             # Backup stats
             backup_show_warning=backup_show_warning,
             backup_warning_msg=warning_msg,

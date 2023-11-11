@@ -8,7 +8,10 @@ import gzip
 from datetime import datetime
 import time
 
+from lute.db import db
 from lute.models.setting import SystemSetting
+from lute.models.book import Book
+from lute.models.term import Term
 
 
 class BackupException(Exception):
@@ -70,6 +73,11 @@ def should_run_auto_backup(backup_settings):
 def backup_warning(backup_settings):
     "Get warning if needed."
     if not backup_settings.backup_warn:
+        return ""
+
+    have_books = len(db.session.query(Book).all()) > 0
+    have_terms = len(db.session.query(Term).all()) > 0
+    if have_books is False and have_terms is False:
         return ""
 
     last = backup_settings.last_backup_datetime
