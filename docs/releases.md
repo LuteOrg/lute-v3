@@ -13,11 +13,32 @@ inv db.reset
 inv db.export.baseline
 ```
 
+## 2a.  Get the old version
+
+```
+OLDVERSION=$(python -c "import lute; print(lute.__version__)")
+echo "CURRENT VERSION: ${OLDVERSION}"
+```
+
 ## 2. Bump version to x.y.z.dev1
 
-See "Versioning" below.
-
 Version is in `lute/__init__.py`
+
+**DON'T FORGET THE dev1**
+
+```
+git add lute/__init__.py
+VERSION=$(python -c "import lute; print(lute.__version__)")
+if [[ "$VERSION" == *"dev"* ]]; then
+   echo "$VERSION   (dev confirmed)"
+else
+   echo "MISSING dev, please fix"
+   exit 1
+fi
+git commit -m "Pre-release ${VERSION}"
+```
+
+See "Versioning" below.
 
 ## 3. Pre-release to testpypi, testing
 
@@ -49,19 +70,32 @@ python -m lute.main
 deactivate
 ```
 
-## 4. Bump version to final value x.y.z, generate change log
-
-Version is in `lute/__init__.py`
+## 4. Generate the change log
 
 ```
-./utils/dump_changelog.sh <prior_version>
+./utils/dump_changelog.sh $OLDVERSION
 ```
 
 Edit the change log, then
 
 ```
 git add -u
-git commit -m "Version bump to x.y.z."
+git commit -m "Changelog."
+
+## 4. Bump version to final value x.y.z, commit.
+
+Version is in `lute/__init__.py`
+
+```
+git add -u
+VERSION=$(python -c "import lute; print(lute.__version__)")
+if [[ "$VERSION" == *"dev"* ]]; then
+   echo "STILL HAS dev, please fix"
+   exit 1
+else
+   echo "Version ${VERSION}"
+fi
+git commit -m "Version ${VERSION}"
 ```
 
 ## 5. Release to pypi and check
