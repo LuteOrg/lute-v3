@@ -50,7 +50,7 @@ def fixture_backup_settings(app_context, bkp_dir):
     # app_context is passed so that the db session is available.
     ret = BackupSettings.get_backup_settings()
     ret.backup_dir = bkp_dir
-    ret.backup_enabled = "y"
+    ret.backup_enabled = True
     yield ret
 
 
@@ -109,13 +109,13 @@ def test_last_import_setting_is_updated_on_successful_backup(
 
 
 def test_should_not_run_autobackup_if_auto_is_no_or_false(backup_settings):
-    backup_settings.backup_enabled = "y"
+    backup_settings.backup_enabled = True
     backup_settings.backup_auto = False
     assert should_run_auto_backup(backup_settings) is False
 
 
 def test_autobackup_returns_true_if_never_backed_up(backup_settings):
-    backup_settings.backup_enabled = "y"
+    backup_settings.backup_enabled = True
     backup_settings.backup_auto = True
     backup_settings.last_backup_datetime = None
     assert should_run_auto_backup(backup_settings) is True

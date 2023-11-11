@@ -54,10 +54,11 @@ def should_run_auto_backup(backup_settings):
     """
     True (if applicable) if last backup was old.
     """
-    if backup_settings.backup_enabled != "y" or not backup_settings.backup_auto:
+    bs = backup_settings
+    if bs.backup_enabled is False or bs.backup_auto is False:
         return False
 
-    last = backup_settings.last_backup_datetime
+    last = bs.last_backup_datetime
     if last is None:
         return True
 

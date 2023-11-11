@@ -79,7 +79,7 @@ def _add_base_routes(app, app_config):
         """
         bs = BackupSettings.get_backup_settings()
         ret = {
-            "backup_acknowledged": bs.is_acknowledged,
+            "backup_enabled": bs.backup_enabled,
             "backup_directory": bs.backup_dir,
             "backup_last_display_date": bs.last_backup_display_date,
         }
@@ -99,7 +99,9 @@ def _add_base_routes(app, app_config):
 
         warning_msg = backupservice.backup_warning(bkp_settings)
         backup_show_warning = (
-            bkp_settings.backup_warn and bkp_settings.is_enabled and warning_msg != ""
+            bkp_settings.backup_warn
+            and bkp_settings.backup_enabled
+            and warning_msg != ""
         )
 
         return render_template(
@@ -111,7 +113,6 @@ def _add_base_routes(app, app_config):
             have_languages=len(db.session.query(Language).all()) > 0,
             is_production_data=not is_demo,
             # Backup stats
-            backup_acknowledged=bkp_settings.is_acknowledged,
             backup_show_warning=backup_show_warning,
             backup_warning_msg=warning_msg,
         )

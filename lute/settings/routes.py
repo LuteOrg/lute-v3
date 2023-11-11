@@ -13,7 +13,7 @@ from flask import (
     jsonify,
 )
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, SelectField, IntegerField, TextAreaField
+from wtforms import BooleanField, StringField, IntegerField, TextAreaField
 from wtforms.validators import InputRequired, NumberRange
 from wtforms import ValidationError
 from lute.config.app_config import AppConfig
@@ -30,9 +30,7 @@ class UserSettingsForm(FlaskForm):
     Note the field names here must match the keys in the settings table.
     """
 
-    backup_enabled = SelectField(
-        "Backup Enabled", choices=[("-", "(not set)"), ("y", "yes"), ("n", "no")]
-    )
+    backup_enabled = BooleanField("Backup Enabled")
     backup_dir = StringField("Backup directory")
     backup_auto = BooleanField("Run backups automatically (daily)")
     backup_warn = BooleanField("Warn if backup hasn't run in a week")
@@ -48,14 +46,9 @@ class UserSettingsForm(FlaskForm):
 
     mecab_path = StringField("MECAB_PATH environment variable")
 
-    def validate_backup_enabled(self, field):
-        "User should acknowledge."
-        if field.data == "-":
-            raise ValidationError('Please change "Backup enabled" to either yes or no.')
-
     def validate_backup_dir(self, field):
         "Field must be set if enabled."
-        if self.backup_enabled.data != "y":
+        if self.backup_enabled.data is False:
             return
         v = field.data
         if (v or "").strip() == "":

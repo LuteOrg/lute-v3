@@ -110,7 +110,7 @@ class UserSetting(SettingBase):
         default_backup = os.path.join(app_config.datapath, "backups")
 
         keys_and_defaults = {
-            "backup_enabled": None,
+            "backup_enabled": True,
             "backup_auto": True,
             "backup_warn": True,
             "backup_dir": default_backup,
@@ -162,25 +162,16 @@ class BackupSettings:
     """
 
     def __init__(self):
-        self.backup_enabled = UserSetting.get_value("backup_enabled")
-        self.backup_dir = UserSetting.get_value("backup_dir")
-
         def _bool(k):
             v = UserSetting.get_value(k)
             return v in (1, "1", "y", True)
 
+        self.backup_enabled = _bool("backup_enabled")
         self.backup_auto = _bool("backup_auto")
         self.backup_warn = _bool("backup_warn")
+        self.backup_dir = UserSetting.get_value("backup_dir")
         self.backup_count = int(UserSetting.get_value("backup_count") or 5)
         self.last_backup_datetime = SystemSetting.get_last_backup_datetime()
-
-    @property
-    def is_acknowledged(self):
-        return self.backup_enabled in ("y", "n")
-
-    @property
-    def is_enabled(self):
-        return self.backup_enabled == "y"
 
     @property
     def last_backup_display_date(self):
