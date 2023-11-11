@@ -76,7 +76,7 @@ def test_user_settings_loaded_with_defaults(app_context):
     assert UserSetting.key_exists("backup_dir") is True, "key created"
     b = BackupSettings.get_backup_settings()
     assert b.backup_enabled is None  # initial defaults
-    assert b.backup_dir is None  # initial defaults
+    assert b.backup_dir is not None  # initial defaults
     assert b.backup_auto is True  # initial defaults
     assert b.backup_warn is True
     assert b.backup_count == 5
