@@ -9,7 +9,6 @@ build-backend = "flit_core.buildapi"
 name = "lute"
 
 [project]
-# TODO release: fix project name
 name = "lute3"
 
 dynamic = ['version']
@@ -52,5 +51,4 @@ dev = [
 ]
 
 [project.urls]
-# TODO release: fix repo.
-Home = "https://github.com/jzohrab/lute_v3"
+Home = "https://github.com/jzohrab/lute-v3"

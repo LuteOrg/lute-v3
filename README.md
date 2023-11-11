@@ -10,13 +10,13 @@
 
 This repo contains the source code for Lute v3.  Lute (Learning Using Texts) v3 is a full rewrite in Python and Flask of the original [Lute v1 and v2](https://github.com/jzohrab/lute) PHP project.
 
+![Lute v3 demo](https://github.com/jzohrab/lute-manual/assets/1637133/7e7f5f66-20bb-4e94-a11c-7b7ffc43255a)
+
 # Getting Started
 
 ## Users
 
-To learn more about Lute v3, or to install it for your own use and study, please see the Lute v3 manual.
-
-TODO docs: link to manual
+To learn more about Lute v3, or to install it for your own use and study, please see the [Lute v3 manual](https://jzohrab.github.io/lute-manual/).
 
 ## Developing
 

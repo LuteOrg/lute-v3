@@ -6,13 +6,12 @@ Contributions are great, but I also need to manage them as sometimes
 they can create a lot of discussion and work.
 
 If you are planning to contribute any non-trivial changes, please
-reach out to me (jz) on Discord or via GitHub issues before you begin
-work.  We need to be sure that your changes fit within the Lute
-architecture, or make changes to the latter to support you, and I may
-have ideas about directions to go with changes but haven't yet had
-time to document them.
-
-TODO - link to repo issues?
+reach out to me (jz) on [Lute Discord](https://discord.gg/CzFUQP5m8u)
+or via [GitHub issues](https://github.com/jzohrab/lute-v3/issues)
+before you begin work.  We need to be sure that your changes fit
+within the Lute architecture, or make changes to the latter to support
+you, and I may have ideas about directions to go with changes but
+haven't yet had time to document them.
 
 # General coding considerations
 
