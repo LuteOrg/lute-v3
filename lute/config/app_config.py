@@ -102,6 +102,19 @@ class AppConfig:
         return os.path.join(self.datapath, "userimages")
 
     @property
+    def system_backup_path(self):
+        """
+        Path to db backup.
+
+        When Lute starts up, it backs up the db
+        if migrations are going to be applied, just in case.
+
+        Hidden directory as a hint to the the user that
+        this is a system dir.
+        """
+        return os.path.join(self.datapath, ".system_db_backups")
+
+    @property
     def dbname(self):
         "Database name."
         return self._db_name

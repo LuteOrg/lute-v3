@@ -156,7 +156,7 @@ def setup_db(app_config, output_func=None):
     Main setup routine.
     """
     dbfile = app_config.dbfilename
-    backup_dir = os.path.join(app_config.datapath, "backups")
+    backup_dir = app_config.system_backup_path
     backup_count = 20  # Arbitrary
     bm = BackupManager(dbfile, backup_dir, backup_count)
 
