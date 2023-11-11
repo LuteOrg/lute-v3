@@ -109,7 +109,7 @@
 
   {% with messages = get_flashed_messages() %}
   {% for message in messages %}
-  <div class="flash-notice">{{ message }}</div>
+  <div class="flash-notice">{{ message | safe}}</div>
   {% endfor %}
   {% endwith %}
 

@@ -120,7 +120,12 @@ def _add_base_routes(app, app_config):
     def wipe_db():
         if lute.db.demo.contains_demo_data():
             lute.db.demo.delete_demo_data()
-            flash("The database has been wiped clean.  Have fun!")
+            msg = """
+            The database has been wiped clean.  Have fun! <br /><br />
+            <i>(Lute has automatically enabled backups --
+            change your <a href="/settings/index">Settings</a> as needed.)</i>
+            """
+            flash(msg)
         return redirect("/", 302)
 
     @app.route("/version")
