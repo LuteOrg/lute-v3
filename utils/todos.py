@@ -160,7 +160,7 @@ testdir = os.path.join(rootdir, "tests")
 d = t.get_todo_data(
     rootdir,
     [venvdir, lutedir, testdir, "./htmlcov", "./.git", "./.venv"],
-    ["./utils/todos.py", "./.pylintrc", "./tasks.py"],
+    ["./utils/todos.py", "./.pylintrc", "./tasks.py", "./docs/development.md"],
     99,
 )
 write_report(d)

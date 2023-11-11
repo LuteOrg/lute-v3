@@ -44,4 +44,4 @@ Feature: Creating and managing terms
             ; 爱好; ; hobby; Classical Chinese; HSK1; New (1)
 
 
-# TODO testing scenarios: term filters.
+# TODO zzfuture fix: testing scenarios: term filters.

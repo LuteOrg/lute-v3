@@ -133,34 +133,6 @@ Then, on a Mac, have to "allow" it:
 
 Will show message: "“chromedriver” can’t be opened because Apple cannot check it for malicious software."  Click "Show in Finder", then in Finder, click "Open" and say "OK" when it can't be verified.  Yes, this is a security risk.
 
-# Packaging
+# Releases
 
-TODO - need more notes here -- this probably belongs in a different document.
-
-## Versioning
-
-The current Lute version is specified in `lute/__init__.py`, and is pulled into the `pyproject.toml` using flit`s `dynamic` keyword.
-
-Lute uses semver, `<major>`.`<minor>`.`<patch>`.
-
-* `<major>` will likely stay at 3, as different modes (e.g. a thick client) will only be extensions of the current code.
-* `<minor>` will increment on breaking DB schema changes, in case anyone writes scripts that directly hit the DB, or breaking API changes if and when an API is released.
-
-This package will start at 0.0.1 until it's complete, and then will jump to 3.0.0.  Lute v1 and v2 were PHP projects, and Lute v3 is this Python rewrite.
-
-## `pyproject.toml` dependencies
-
-Lute uses `pyproject.toml` for packaging, and so the requirements are _also_ specified in the .toml file.
-
-> **Note: I'm not experienced with pyproject.toml, so below is my current understanding.  In fact, I rather dislike the handling of dependencies in toml, as unpinned dependencies could create runtime issues.**
-
-The full requirements are in requirements.txt, so use `pipdeptree` to pull out the requirements in a consumable fashion for the toml file:
-
-```
-pipdeptree --freeze
-```
-
-and then *manually* determine what should go into the `[project][dependencies]` and `dev`.
-
-Note I take the requirements.txt `==` entries and change them to `>=x,<y`, assuming that future changes up until the next major release for that package are backwards-compatible.  E.g, the dependency for `Flask-SQLAlchemy==3.1.1` in requirements.txt becomes `Flask-SQLAlchemy>=3.1.1,<4`.
-
+Covered in [releases](./releases.md).
