@@ -18,7 +18,7 @@ from lute.db.demo import (
     get_demo_language,
 )
 import lute.parse.registry
-from tests.dbasserts import assert_record_count_equals
+from tests.dbasserts import assert_record_count_equals, assert_sql_result
 
 
 def test_new_db_is_demo(app_context):
@@ -106,6 +106,13 @@ def test_load_demo_loads_language_yaml_files(app_context):
     assert contains_demo_data() is False, "not a demo."
     assert_record_count_equals("languages", 0, "wiped out")
 
+    # Wipe out all settings!!!
+    # When user installs, the settings need to be loaded
+    # with values from _their_ config and environment.
+    sql = "delete from settings"
+    db.session.execute(text(sql))
+    db.session.commit()
+
     load_demo_data()
     assert contains_demo_data() is True, "demo loaded"
     checks = [
@@ -114,6 +121,9 @@ def test_load_demo_loads_language_yaml_files(app_context):
     ]
     for c in checks:
         assert_record_count_equals(c, 1, c + " returned 1")
+
+    sql = "select distinct stkeytype from settings"
+    assert_sql_result(sql, ["system"], "only system settings remain")
 
 
 @pytest.fixture(name="_restore_japanese_parser")
