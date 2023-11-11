@@ -18,6 +18,7 @@ from sqlalchemy import text
 from flask import Blueprint, Response, jsonify, redirect, flash
 from lute.config.app_config import AppConfig
 from lute.models.language import Language
+from lute.models.setting import UserSetting
 import lute.parse.registry
 from lute.db import db
 import lute.db.management
@@ -141,3 +142,12 @@ def disable_parser(parsername, renameto):
             "parsers": allparsers,
         }
     )
+
+
+@bp.route("/disable_backup", methods=["GET"])
+def disable_backup():
+    "Disables backup -- tests don't need to back up."
+    UserSetting.set_value("backup_enabled", False)
+    db.session.commit()
+    flash("backup disabled")
+    return redirect("/", 302)

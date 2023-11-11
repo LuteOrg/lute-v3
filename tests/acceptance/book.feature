@@ -5,6 +5,7 @@ Feature: Books and stats are available
         And demo languages
 
     Scenario: Books and stats are shown on the first page.
+        Given I visit "/"
         Given a Spanish book "Hola" with content:
             Hola. Tengo un gato.
         Then the page title is Reading "Hola (1/1)"

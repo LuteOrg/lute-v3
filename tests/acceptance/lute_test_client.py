@@ -1,7 +1,9 @@
 """
 Lute test client.
 
-Convenience wrapper around the browser, clears db.
+Convenience wrapper around the browser.
+
+IMPORTANT: on start, clears db, and disables backup.
 
 Adds the home url to visited urls,
 provides common functions like make_book.
@@ -31,6 +33,7 @@ class LuteTestClient:
         self.home = home
         self.visit("dev_api/wipe_db")
         self.visit("dev_api/load_demo_languages")
+        self.visit("dev_api/disable_backup")
 
         response = requests.get(f"{home}/dev_api/language_ids", timeout=5)
         self.language_ids = response.json()

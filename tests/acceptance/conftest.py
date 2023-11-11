@@ -1,5 +1,10 @@
 """
-Acceptance test fixtures.
+Acceptance test fixtures and step definitions.
+
+Fixtures used in most or all tests:
+_environment_check: ensures site is up
+chromebrowser: creates a properly configured browser
+luteclient: WIPES THE DB and provides helpful wrappers
 """
 
 import os
