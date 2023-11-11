@@ -49,9 +49,20 @@ python -m lute.main
 deactivate
 ```
 
-## 4. Bump version to final value x.y.z
+## 4. Bump version to final value x.y.z, generate change log
 
 Version is in `lute/__init__.py`
+
+```
+./utils/dump_changelog.sh <prior_version>
+```
+
+Edit the change log, then
+
+```
+git add -u
+git commit -m "Version bump to x.y.z."
+```
 
 ## 5. Release to pypi and check
 
@@ -71,7 +82,12 @@ python -m lute.main
 
 ## 6. Tag and push to GitHub
 
-> have to think about when to do this a bit more, also tagging
+git tag x.y.z HEAD
+git push origin x.y.z
+
+On github, make a release, using notes from the generated log
+
+> have to think about when to do this a bit more ...
 
 ## 7. Release to docker hub
 
