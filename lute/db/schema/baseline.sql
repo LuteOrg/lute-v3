@@ -214,13 +214,6 @@ CREATE TABLE IF NOT EXISTS "settings" (
 	"StValue" TEXT NULL,
 	PRIMARY KEY ("StKey")
 );
-INSERT INTO settings VALUES('backup_enabled','user',NULL);
-INSERT INTO settings VALUES('backup_auto','user','1');
-INSERT INTO settings VALUES('backup_warn','user','1');
-INSERT INTO settings VALUES('backup_dir','user',NULL);
-INSERT INTO settings VALUES('backup_count','user','5');
-INSERT INTO settings VALUES('mecab_path','user',NULL);
-INSERT INTO settings VALUES('custom_styles','user','/* Custom css to modify Lute''s appearance. */');
 INSERT INTO settings VALUES('IsDemoData','system','1');
 CREATE UNIQUE INDEX "LgName" ON "languages" ("LgName");
 CREATE UNIQUE INDEX "TgText" ON "tags" ("TgText");
