@@ -218,7 +218,6 @@ p.version {
      min-width: 20%;
      max-width: 20%;
      vertical-align: top;
-     word-break: break-all;
  }
 
  table#book
@@ -231,7 +230,6 @@ p.version {
      min-width: 20%;
      max-width: 20%;
      vertical-align: top;
-     word-break: break-all;
  }
 
  table#termimport
@@ -244,7 +242,6 @@ p.version {
      min-width: 10%;
      max-width: 10%;
      vertical-align: top;
-     word-break: break-all;
  }
 
  table.settingstable
@@ -257,7 +254,6 @@ p.version {
      min-width: 30%;
      max-width: 30%;
      vertical-align: top;
-     word-break: break-word;
  }
 
  table#language
@@ -270,7 +266,6 @@ p.version {
      min-width: 30%;
      max-width: 30%;
      vertical-align: top;
-     word-break: break-word;
  }
 
  table#language ul
