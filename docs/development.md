@@ -98,12 +98,17 @@ Database changes are _only_ managed through `lute.db.setup.migrator`.  To create
 Todos are in the code as comments, e.g. `# TODO [<group name>:] detail`, `<!-- TODO ... -->`.
 `inv todos` collects all of these in a simple report.
 
-
-# Docker
+## Docker
 
 Notes for building and running a Docker container are at ../docker/README.com.
 
 # Misc dev notes
+
+## datatables
+
+Datatables css and js was downloaded from https://datatables.net/download/index
+
+Selected: DataTables, Buttons, HTML5 export; downloaded minified and concat'd files and committed to lute/static/ dirs.
 
 ## read-only db during tests
 

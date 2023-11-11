@@ -76,7 +76,8 @@
       <th>Language</th>
       <th>Tags</th>
       <th>Status</th>
-      <th>Actions</th>
+      <th>TermID</th>
+      <th>LanguageID</th>
     </tr>
   </thead>
 </table>
@@ -85,9 +86,28 @@
 
   let setup_term_datatable = function(initial_search) {
     var table = $('#termtable').DataTable({
+      dom: 'lfrtiBp',
       responsive: true,
       select: true,
-      lengthMenu: [ 25, 50, 100 ],
+      lengthMenu: [ 25, 50, 100, 500, 1000 ],
+      buttons: [
+         {
+           extend: 'csvHtml5',
+           text: 'Export CSV',
+           exportOptions: {
+             columns: [
+               'WoText:name',
+               'ParentText:name',
+               'WoTranslation:name',
+               'LgName:name',
+               'TagList:name',
+               'StText:name',
+               'WoID:name',
+               'LgID:name',
+             ], visible: false
+           },
+         }
+      ],
       paging: true,
       info: true,
       searching: true,
@@ -128,9 +148,9 @@
         { "name": "LgName", "targets": 4 },
         { "name": "TagList", "targets": 5 },
         { "name": "StText", "targets": 6 },
-        { "name": "WoID", "targets": 7, "data": null, "visible": false },
-        { "name": "LgID", "targets": 8, "data": null, "visible": false },
-        { "name": "WiSource", "targets": 9, "data": null, "visible": false },
+        { "name": "WoID", "targets": 7, "visible": false },
+        { "name": "LgID", "targets": 8, "visible": false },
+        { "name": "WiSource", "targets": 9, "visible": false },
       ],
 
       // Ajax call

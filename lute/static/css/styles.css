@@ -132,6 +132,14 @@ p.version {
 
 /* end menu bar. */
 
+
+/* Term listing CSV export. */
+button.buttons-csv {
+    padding: 3px !important;
+    margin: 5px 0 0 10px !important;
+}
+
+
  .flash-notice {
      margin: 20px;
      padding: 20px;
