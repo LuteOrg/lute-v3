@@ -19,8 +19,10 @@
 </div>
 {% endif %}
 
-{% if is_production_data %}
-  {% include '/index_backup_warning.html' %}
+{% if is_production_data and backup_show_warning %}
+<div class="flash-notice">
+  <p>Warning: {{ backup_warning_msg }}  <a href="/backup/backup">Create a backup.</a></p>
+</div>
 {% endif %}
 
 <br />
