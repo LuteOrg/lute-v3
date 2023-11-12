@@ -54,6 +54,15 @@ Then, from other folder, in a _new process_ to get a new venv:
 ```
 cd lute-v3-test
 deactivate
+
+pushd ../lute-v3
+VERSION=$(python -c "import lute; print(lute.__version__)")
+popd
+echo
+echo
+echo "Pulling version ${VERSION}"
+
+deactivate
 rm -rf .venv
 python3.8 -m venv .venv
 source .venv/bin/activate
@@ -61,7 +70,7 @@ source .venv/bin/activate
 # `lute3` has dependencies on packages that aren't in TestPyPi,
 # so we have to pull some things from PyPi as well.
 # Note if it's a pre-release, you have to specify the *full value* of the tag
-pip install --upgrade -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ lute3==3.0.0a1.dev1
+pip install --upgrade -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ lute3==${VERSION}
 
 # Run and check
 python -m lute.main
@@ -70,7 +79,11 @@ python -m lute.main
 deactivate
 ```
 
-## 4. Generate the change log
+## 4. Bump version to final value x.y.z., but don't commit it yet!
+
+Version is in `lute/__init__.py`
+
+## 5. Generate the change log (to use new version number)
 
 ```
 ./utils/dump_changelog.sh $OLDVERSION

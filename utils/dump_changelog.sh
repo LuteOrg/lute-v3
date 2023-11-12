@@ -40,6 +40,13 @@ if [ -z "$TOTAG" ]; then
     exit 1
 fi
 
+if [[ "$TOTAG" == *"dev"* ]]; then
+   echo "Version STILL HAS dev, please fix"
+   exit 1
+else
+   echo "Version ${TOTAG}"
+fi
+
 if [[ "$FROMTAG" == "$TOTAG" ]]; then
     echo
     echo "Same start and end tag $FROMTAG."
@@ -47,11 +54,11 @@ if [[ "$FROMTAG" == "$TOTAG" ]]; then
     exit 1
 fi
 
-TOTAGDATE=$(git log --pretty=format:"%ad" --date=format:'%Y-%m-%d' -n 1 $TOTAG)
+TOCOMMITDATE=$(git log --pretty=format:"%ad" --date=format:'%Y-%m-%d' -n 1 $TOCOMMIT)
 
 # Start changelog entry.
 echo "
-# $TOTAG ($TOTAGDATE)
+# $TOTAG ($TOCOMMITDATE)
 
 Feature changes:
 
