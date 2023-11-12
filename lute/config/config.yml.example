@@ -19,12 +19,6 @@ DBNAME: lute.db
 # OPTIONAL (but REQUIRED for docker)
 # BACKUP_PATH: yourpathhere
 
-# Port to serve on.
-# If not set, defaults to 5000.
-# This is only used in main.py, not in dev.py.
-# OPTIONAL
-# PORT: 5000
-
 # Value to set in environment MECAB_PATH.
 # _May_ be needed for pytest, if natto-py
 # can't find it automatically.

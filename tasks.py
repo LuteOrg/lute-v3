@@ -80,11 +80,10 @@ def test(c):
 
 def _site_is_running(useport=None):
     """
-    Return true if site is running on port, or configured port.
+    Return true if site is running on port, or default 5000.
     """
     if useport is None:
-        ac = AppConfig.create_from_config()
-        useport = ac.port
+        useport = 5000
 
     url = f"http://localhost:{useport}"
     try:
@@ -112,27 +111,21 @@ def _site_is_running(useport=None):
     },
 )
 def accept(  # pylint: disable=too-many-arguments
-    c, port=None, show=False, headless=False, kflag=None, exitfirst=False
+    c, port=5000, show=False, headless=False, kflag=None, exitfirst=False
 ):
     """
-    Start lute on 9876, run tests/acceptance tests, screenshot fails.
+    Start lute, run tests/acceptance tests, screenshot fails.
 
-    If no port specified, use the port in the app config.
+    If no port specified, use default 5000.
 
-    If port is specified, and Lute's not running on that port,
-    start a server.
+    If Lute's not running on specified port, start a server.
     """
-    ac = AppConfig.create_from_config()
-    useport = port
-    if useport is None:
-        useport = ac.port
-
     run_test = [
         "pytest",
         "tests/acceptance",
         "--splinter-screenshot-dir=tests/acceptance/failure_screenshots",
         "--splinter-webdriver=chrome",
-        f"--port={useport}",
+        f"--port={port}",
     ]
 
     if show:
@@ -145,10 +138,10 @@ def accept(  # pylint: disable=too-many-arguments
     if exitfirst:
         run_test.append("--exitfirst")
 
-    if _site_is_running(useport):
+    if _site_is_running(port):
         c.run(" ".join(run_test))
     else:
-        cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{useport}"]
+        cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{port}"]
         with subprocess.Popen(cmd) as app_process:
             subprocess.run(run_test, check=True)
             app_process.terminate()

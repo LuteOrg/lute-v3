@@ -8,7 +8,5 @@ DBNAME: lute.db
 # stored in PlatformDirs.user_data_dir
 # (ref https://pypi.org/project/platformdirs/).
 
-# PORT: 5000
-
 # BACKUP_PATH is not set, user should choose.
 # MECAB_PATH: not set, users set this in settings.
