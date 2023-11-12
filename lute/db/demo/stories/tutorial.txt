@@ -21,7 +21,7 @@ Next to the term is a small arrow, "Lookup".  If you click on this repeatedly, L
 
 1.2 Images
 
-For this demo, English has been configured to do an image search for the second English dictinary, so if you click on the arrow, you'll see some happy elephants (if you clicked on elephant!).
+For this demo, English has been configured to do an image search for the second English dictionary, so if you click on the arrow, you'll see some happy elephants (if you clicked on elephant!).
 
 You can also click on the little "eye icon" next to the term, and it opens up a common image search URL.
 
