@@ -29,7 +29,6 @@
 a.home-link {
     text-decoration: none;
     color: black !important;
-    display: flex; /* Keep the link as a block element for layout purposes */
 }
 
 a.home-link:hover {

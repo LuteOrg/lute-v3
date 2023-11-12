@@ -45,20 +45,20 @@
   {% if not hide_top_menu %}
   {# Menu bar variables are injected with @app.context_processor in the app_factory. #}
   <div class="menu-bar">
-    <a href="/" class="home-link">
-      <div class="header">
+    <div class="header">
+      <a href="/" class="home-link">
         <img src="{{ url_for('static', filename='img/lute.png') }}" class="lutelogo" alt="LUTE Logo">
-        <div class="title-container">
-          <h1 id="luteTitle" title="Learning Using Texts">
-            {% if self.header() | trim %}
-            {% block header %}{% endblock %}
-            {% else %}
-            Lute
-            {% endif %}
-          </h1>
-        </div>
+      </a>
+      <div class="title-container">
+        <h1 id="luteTitle" title="Learning Using Texts">
+          {% if self.header() | trim %}
+          {% block header %}{% endblock %}
+          {% else %}
+          Lute
+          {% endif %}
+        </h1>
       </div>
-    </a>
+    </div>
     <div class="menu">
       {% if have_languages %}
       <div class="menu-item">
