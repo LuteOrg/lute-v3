@@ -158,6 +158,7 @@ class Repository:
         t.language_id = langid
         t.text = text
         t.text_lc = spec.text_lc
+        t.romanization = spec.language.parser.get_reading(text)
         t.original_text = text
 
         return t
