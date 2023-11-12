@@ -1,8 +1,15 @@
 """
 User entry point.
+
+Start lute running on given port, or 5000 if not set.
+
+e.g.
+
+python -m lute.main --port 5001
 """
 
 import os
+import argparse
 import shutil
 import logging
 from waitress import serve
@@ -34,7 +41,7 @@ def _create_prod_config_if_needed():
         _print(["", "Using new production config.", ""])
 
 
-def start():
+def start(port):
     """
     Main entry point: Get the config, init the app, and start.
 
@@ -54,7 +61,6 @@ def start():
     if app_config.is_docker:
         _print("(Note these are container paths, not host paths.)")
 
-    port = app_config.port
     _print(
         f"""
     Running at:
@@ -79,4 +85,9 @@ def start():
 
 
 if __name__ == "__main__":
-    start()
+    parser = argparse.ArgumentParser(description="Start lute.")
+    parser.add_argument(
+        "--port", type=int, default=5000, help="Port number (default: 5000)"
+    )
+    args = parser.parse_args()
+    start(args.port)

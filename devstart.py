@@ -17,6 +17,7 @@ python `pwd`/devstart.py
 """
 
 import os
+import argparse
 import logging
 from lute.app_factory import create_app
 from lute.config.app_config import AppConfig
@@ -24,25 +25,39 @@ from lute.config.app_config import AppConfig
 log = logging.getLogger("werkzeug")
 log.setLevel(logging.ERROR)
 
-ac = AppConfig.create_from_config()
 
-# https://stackoverflow.com/questions/25504149/
-#  why-does-running-the-flask-dev-server-run-itself-twice
-if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    # Reloading.
-    pass
-else:
-    # First run
-    msg = f"""
-    db name: {ac.dbname}
-    data: {ac.datapath}
-
-    Running at:
-
-    http://localhost:{ac.port}
-
+def start(port):
     """
-    print(msg)
+    Start the dev server with reloads on port.
+    """
+    ac = AppConfig.create_from_config()
 
-app = create_app(ac, output_func=print)
-app.run(debug=True, port=ac.port)
+    # https://stackoverflow.com/questions/25504149/
+    #  why-does-running-the-flask-dev-server-run-itself-twice
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        # Reloading.
+        pass
+    else:
+        # First run
+        msg = f"""
+        db name: {ac.dbname}
+        data: {ac.datapath}
+
+        Running at:
+
+        http://localhost:{port}
+
+        """
+        print(msg)
+
+    app = create_app(ac, output_func=print)
+    app.run(debug=True, port=port)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Start dev server lute.")
+    parser.add_argument(
+        "--port", type=int, default=5000, help="Port number (default: 5000)"
+    )
+    args = parser.parse_args()
+    start(args.port)
