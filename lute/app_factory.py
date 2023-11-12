@@ -114,6 +114,7 @@ def _add_base_routes(app, app_config):
 
         return render_template(
             "index.html",
+            hide_homelink=True,
             dbname=app_config.dbname,
             datapath=app_config.datapath,
             tutorial_book_id=lute.db.demo.tutorial_book_id(),

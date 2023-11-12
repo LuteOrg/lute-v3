@@ -60,6 +60,11 @@
       </div>
     </div>
     <div class="menu">
+      {% if not hide_homelink %}
+      <div class="menu-item">
+        <span><a class="home-link" href="/">Home</a></span>
+      </div>
+      {% endif %}
       {% if have_languages %}
       <div class="menu-item">
         <span>Books</span>
