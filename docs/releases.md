@@ -129,8 +129,8 @@ python -m lute.main
 
 ## 6. Tag and push to GitHub
 
-git tag x.y.z HEAD
-git push origin x.y.z
+git tag $VERSION HEAD
+git push origin $VERSION
 
 On github, make a release, using notes from the generated log
 
