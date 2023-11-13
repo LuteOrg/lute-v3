@@ -242,7 +242,8 @@ def _do_schema_export(c, destfile, header_notes, taskname):
     os.rename(tempfile, destfile)
     print(f"{destfile} updated (git diff follows):")
     print("DIFF START " + "-" * 38)
-    c.run(f"git diff -- {destfile}")
+    # -U0 = no context before or after changes.
+    c.run(f"git diff -U0 -- {destfile}")
     print("DIFF END " + "-" * 40)
     print()
 
