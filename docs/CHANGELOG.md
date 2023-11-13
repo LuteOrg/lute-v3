@@ -1,3 +1,12 @@
+# 3.0.0b4 (2023-11-12)
+
+Feature changes:
+
+* Add `--port` param to starter scripts, default is 5000.
+* Load word reading if parser provides it.
+* Add home link.
+
+
 # 3.0.0b3 (2023-11-11)
 
 Feature changes:
