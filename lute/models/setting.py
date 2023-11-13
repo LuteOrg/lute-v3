@@ -2,7 +2,6 @@
 Lute settings, in settings key-value table.
 """
 
-import os
 import datetime
 from lute.db import db
 from lute.parse.mecab_parser import JapaneseParser
@@ -84,38 +83,19 @@ class UserSetting(SettingBase):
             raise MissingUserSettingKeyException(keyname)
 
     @staticmethod
-    def _override_settings_from_config(app_config):
-        """
-        Special settings hardcoded in the config file should
-        override any settings.
-
-        This is necessary for GitHub CI and Docker, where
-        the values should be hardcoded.
-        """
-
-        def _set_key(k, v):
-            "Set the UserSetting and save."
-            if v is not None and v != "":
-                UserSetting.set_value(k, v)
-
-        _set_key("mecab_path", app_config.mecab_path)
-        _set_key("backup_dir", app_config.backup_path)
-        db.session.commit()
-
-    @staticmethod
     def load():
-        "Load missing user settings and default values."
-
+        """
+        Load missing user settings with default values.
+        """
         app_config = AppConfig.create_from_config()
-        default_backup = os.path.join(app_config.datapath, "backups")
 
         keys_and_defaults = {
             "backup_enabled": True,
             "backup_auto": True,
             "backup_warn": True,
-            "backup_dir": default_backup,
+            "backup_dir": app_config.backup_path,
             "backup_count": 5,
-            "mecab_path": None,
+            "mecab_path": app_config.mecab_path,
             "custom_styles": "/* Custom css to modify Lute's appearance. */",
         }
         for k, v in keys_and_defaults.items():
@@ -125,8 +105,6 @@ class UserSetting(SettingBase):
                 s.value = v
                 db.session.add(s)
         db.session.commit()
-
-        UserSetting._override_settings_from_config(app_config)
 
         # This feels wrong, somehow ... possibly could have an event
         # bus that posts messages about the setting.

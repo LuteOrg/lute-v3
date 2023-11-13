@@ -49,6 +49,10 @@ def _setup_app_dirs(app_config):
     required_dirs = [
         {"d": dp, "readme": "Lute data folder."},
         {
+            "d": app_config.backup_path,
+            "readme": "User backups.",
+        },
+        {
             "d": app_config.system_backup_path,
             "readme": "Database backups created by Lute at app start, just in case.",
         },
