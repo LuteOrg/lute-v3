@@ -1,3 +1,17 @@
+
+# 3.0.0b5 (2023-11-13)
+
+Feature changes:
+
+* Bugfix: missing default backup directory.
+* Add container with margin to keep content off edges of screen.
+
+Back end changes:
+
+* Moved docs to wiki, easier to revise.
+* Fix start task port.
+
+
 # 3.0.0b4 (2023-11-12)
 
 Feature changes:
