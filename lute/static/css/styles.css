@@ -117,6 +117,16 @@ p.version {
 
 /* end menu bar. */
 
+/* Book listing */
+
+div#divbooktable {
+    width: 70% !important;
+    display: table;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+/* End book listing */
 
 /* Term listing CSV export. */
 button.buttons-csv {
