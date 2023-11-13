@@ -3,14 +3,28 @@
  * \brief Main stylesheet for the default theme.
  */
 
- body
- {
-   background-color: #FFFFFF;
-   color: #000000;
-   font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
-   margin-left: 30px;
-   padding: 0px;
- }
+body
+{
+    background-color: #FFFFFF;
+    color: #000000;
+    font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
+    margin: 0;
+    padding: 0;
+}
+
+/* Main container div for Lute site content. */
+.container {
+    width: 95%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* Media query for smaller screens */
+@media screen and (max-width: 600px) {
+    .container {
+        width: 95%; /* Adjust as needed */
+    }
+}
 
  .lutelogo_small
  {

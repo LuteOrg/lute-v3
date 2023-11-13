@@ -38,6 +38,7 @@
 </head>
 <body>
 
+<div class="container">
   {% if config.ENV == 'dev' %}
   <p style="background-color: blue; color: white; margin: 2px; padding: 2px;">Dev environment.</p>
   {% endif %}
@@ -121,5 +122,7 @@
   {% endwith %}
 
   {% block body %}{% endblock %}
+
+</div>
 </body>
 </html>
