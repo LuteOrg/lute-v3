@@ -47,29 +47,27 @@ The pre-release to testpypi uncovers any packaging issues.
 ```
 # from lute-v3 dir
 flit publish --repository testpypi
-```
 
-Then, from other folder, in a _new process_ to get a new venv:
-
-```
-cd lute-v3-test
+# deactivate, switch to new folder for testing.
 deactivate
 
-pushd ../lute-v3
-VERSION=$(python -c "import lute; print(lute.__version__)")
-popd
-echo
-echo
-echo "Pulling version ${VERSION}"
+cd ..
+mkdir -p lute-v3-${VERSION}
+cd lute-v3-${VERSION}
 
-deactivate
 rm -rf .venv
 python3.8 -m venv .venv
 source .venv/bin/activate
 
-# `lute3` has dependencies on packages that aren't in TestPyPi,
+echo
+echo "Pulling version ${VERSION}"
+
+# `lute3` has dependencies that aren't in TestPyPi,
 # so we have to pull some things from PyPi as well.
-# Note if it's a pre-release, you have to specify the *full value* of the tag
+#
+# Note if it's a pre-release, you have to specify
+# the *full value* of the tag
+#
 pip install --upgrade -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ lute3==${VERSION}
 
 # Run and check
@@ -92,8 +90,9 @@ Version is in `lute/__init__.py`
 Edit the change log, then
 
 ```
-git add -u
+git add docs/CHANGELOG.md
 git commit -m "Changelog."
+```
 
 ## 4. Bump version to final value x.y.z, commit.
 
