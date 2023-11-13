@@ -37,12 +37,12 @@ def todos(c):
     c.run("python utils/todos.py")
 
 
-@task
-def start(c):
+@task(help={"port": "optional port to run on; default = 5000"})
+def start(c, port):
     """
     Start the dev server, using script dev.py.
     """
-    c.run("python -m devstart")
+    c.run(f"python -m devstart --port {port}")
 
 
 @task
