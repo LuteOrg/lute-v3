@@ -10,12 +10,6 @@
       }
     </style>
 
-    <script>
-      function open_sentence_text(textid) {
-        window.open(`/read/${textid}`, '_blank');
-      }
-    </script>
-
   </head>
 
   <body>
@@ -28,7 +22,11 @@
       <li style="margin-top: 4px;">
         {{ dto.sentence | safe }}
         <br/>
-        <a onclick="open_sentence_text({{ dto.book_id }}, {{ dto.page_number }});" style="cursor: pointer; font-size: 0.9em; font-style: italic;">{{ dto.title }}</a>
+        <a href="/read/{{ dto.book_id }}/page/{{ dto.page_number }}"
+           target="_blank"
+           style="cursor: pointer; font-size: 0.9em; font-style: italic;">
+          {{ dto.title }}
+        </a>
       </li>
       {% endfor %}
     </ul>
