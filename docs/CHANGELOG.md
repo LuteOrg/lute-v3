@@ -1,3 +1,12 @@
+
+# 3.0.0b7 (2023-11-14)
+
+Feature changes:
+
+* Fix sentence link.
+* Fix mecab path manual references.
+
+
 # 3.0.0b6 (2023-11-13)
 
 * Fix image double-slash.
