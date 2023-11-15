@@ -16,7 +16,6 @@ from flask import (
     jsonify,
 )
 
-from lute.config.app_config import AppConfig
 from lute.db import db
 from lute.db.setup.main import setup_db
 import lute.backup.service as backupservice
@@ -49,8 +48,8 @@ def _setup_app_dirs(app_config):
     required_dirs = [
         {"d": dp, "readme": "Lute data folder."},
         {
-            "d": app_config.backup_path,
-            "readme": "User backups.",
+            "d": app_config.default_user_backup_path,
+            "readme": "Default path for user backups, can be overridden in settings.",
         },
         {
             "d": app_config.system_backup_path,
@@ -144,7 +143,7 @@ def _add_base_routes(app, app_config):
 
     @app.route("/version")
     def show_version():
-        ac = AppConfig.create_from_config()
+        ac = current_app.env_config
         return render_template(
             "version.html",
             version=lute.__version__,
@@ -203,6 +202,9 @@ def _create_app(app_config, extra_config):
 
     final_config = {**config, **extra_config}
     app.config.from_mapping(final_config)
+
+    # Attach the app_config to app so it's available at runtime.
+    app.env_config = app_config
 
     db.init_app(app)
     with app.app_context():

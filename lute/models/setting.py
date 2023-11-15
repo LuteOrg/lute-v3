@@ -3,9 +3,9 @@ Lute settings, in settings key-value table.
 """
 
 import datetime
+from flask import current_app
 from lute.db import db
 from lute.parse.mecab_parser import JapaneseParser
-from lute.config.app_config import AppConfig
 
 
 class SettingBase(db.Model):
@@ -87,13 +87,13 @@ class UserSetting(SettingBase):
         """
         Load missing user settings with default values.
         """
-        app_config = AppConfig.create_from_config()
+        app_config = current_app.env_config
 
         keys_and_defaults = {
             "backup_enabled": True,
             "backup_auto": True,
             "backup_warn": True,
-            "backup_dir": app_config.backup_path,
+            "backup_dir": app_config.default_user_backup_path,
             "backup_count": 5,
             "mecab_path": app_config.mecab_path,
             "custom_styles": "/* Custom css to modify Lute's appearance. */",

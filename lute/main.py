@@ -41,20 +41,26 @@ def _create_prod_config_if_needed():
         _print(["", "Using new production config.", ""])
 
 
-def start(port):
+def start(port, config_file_path=None):
     """
-    Main entry point: Get the config, init the app, and start.
+    Main entry point: Configure and init the app, and start.
 
-    If the config file doesn't exist, use the prod config.
+    Uses config file if set (throws if doesn't exist);
+    otherwise, uses the prod config, creating a prod config
+    if necessary.
     """
+    _print(["", "Starting Lute:"])
 
-    _print(["", "Starting Lute:", ""])
+    app_config = None
+    if config_file_path is None:
+        _create_prod_config_if_needed()
+        _print(["Using default config"])
+        app_config = AppConfig.create_from_config()
+    else:
+        app_config = AppConfig(config_file_path)
+        _print([f"Using config: {config_file_path}"])
 
-    _create_prod_config_if_needed()
-
-    app_config = AppConfig.create_from_config()
-
-    _print("Initializing app.")
+    _print(["", "Initializing app."])
     app = create_app(app_config, output_func=_print)
     _print(f"data path: {app_config.datapath}")
     _print(f"database: {app_config.dbfilename}")
@@ -89,5 +95,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--port", type=int, default=5000, help="Port number (default: 5000)"
     )
+    parser.add_argument(
+        "--config",
+        help="Path to override config file.  Uses lute/config/config.yml if not set.",
+    )
     args = parser.parse_args()
-    start(args.port)
+    start(args.port, args.config)

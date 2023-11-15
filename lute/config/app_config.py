@@ -7,9 +7,11 @@ import yaml
 from platformdirs import PlatformDirs
 
 
-class AppConfig:
+class AppConfig:  # pylint: disable=too-many-instance-attributes
     """
     Configuration wrapper around yaml file.
+
+    Adds various properties for lint-time checking.
     """
 
     def __init__(self, config_file_path):
@@ -22,113 +24,46 @@ class AppConfig:
         """
         Load and validate the config file.
         """
-        if not os.path.exists(config_file_path):
-            raise FileNotFoundError(f"Config file not found at {config_file_path}")
-
         with open(config_file_path, "r", encoding="utf-8") as file:
             config = yaml.safe_load(file)
 
-        if not isinstance(config, dict):
-            raise ValueError("Invalid configuration format. Expected a dictionary.")
+        self.env = config.get("ENV", None)
+        if self.env not in ["prod", "dev"]:
+            raise ValueError(f"ENV must be prod or dev, was {self.env}.")
 
-        if "DBNAME" not in config:
+        self.mecab_path = config.get("MECAB_PATH", None)
+        self.is_docker = "IS_DOCKER" in config
+
+        # Database name.
+        self.dbname = config.get("DBNAME", None)
+        if self.dbname is None:
             raise ValueError("Config file must have 'DBNAME'")
 
-        if "ENV" not in config:
-            raise ValueError("Config file must have 'ENV'")
+        # Various invoke tasks in /tasks.py check if the database is a
+        # test_ db prior to running some destructive action.
+        self.is_test_db = self.dbname.startswith("test_")
 
-        env = config.get("ENV")
-        if env not in ["prod", "dev"]:
-            raise ValueError(f"Invalid ENV {env}, can only be prod or dev.")
-        self._env = env
+        # Path to user data.
+        self.datapath = config.get("DATAPATH", self._get_appdata_dir())
+        self.userimagespath = os.path.join(self.datapath, "userimages")
+        self.dbfilename = os.path.join(self.datapath, self.dbname)
 
-        self._mecab_path = None
-        if "MECAB_PATH" in config:
-            self._mecab_path = config.get("MECAB_PATH")
+        # Path to db backup.
+        # When Lute starts up, it backs up the db
+        # if migrations are going to be applied, just in case.
+        # Hidden directory as a hint to the the user that
+        # this is a system dir.
+        self.system_backup_path = os.path.join(self.datapath, ".system_db_backups")
 
-        self._is_docker = False
-        if "IS_DOCKER" in config:
-            self._is_docker = True
-
-        self._db_name = config.get("DBNAME")
-
-        self._data_path = config.get("DATAPATH", self._get_appdata_dir())
-
-        # Put backups in {datapath}/backups, unless BACKUP_PATH is set.
-        default_backup_path = os.path.join(self.datapath, "backups")
-        self._backup_path = config.get("BACKUP_PATH", default_backup_path)
+        # Default backup path for user, can be overridden in settings.
+        self.default_user_backup_path = config.get(
+            "BACKUP_PATH", os.path.join(self.datapath, "backups")
+        )
 
     def _get_appdata_dir(self):
         "Get user's appdata directory from platformdirs."
         dirs = PlatformDirs("Lute3", "Lute3")
         return dirs.user_data_dir
-
-    @property
-    def env(self):
-        "App environment (dev or prod)."
-        return self._env
-
-    @property
-    def is_docker(self):
-        "True if the config file has IS_DOCKER."
-        return self._is_docker
-
-    @property
-    def mecab_path(self):
-        "To be used for MECAB_PATH."
-        return self._mecab_path
-
-    @property
-    def backup_path(self):
-        "To be used for BACKUP_PATH."
-        return self._backup_path
-
-    @property
-    def datapath(self):
-        """
-        Path to user data / app data.  If not present in the
-        dictionary, falls back to platformdirs user_data_dir.
-        """
-        return self._data_path
-
-    @property
-    def userimagespath(self):
-        "Path to user images."
-        return os.path.join(self.datapath, "userimages")
-
-    @property
-    def system_backup_path(self):
-        """
-        Path to db backup.
-
-        When Lute starts up, it backs up the db
-        if migrations are going to be applied, just in case.
-
-        Hidden directory as a hint to the the user that
-        this is a system dir.
-        """
-        return os.path.join(self.datapath, ".system_db_backups")
-
-    @property
-    def dbname(self):
-        "Database name."
-        return self._db_name
-
-    @property
-    def is_test_db(self):
-        """
-        True if the db name starts with test_.
-
-        This is useful because various invoke tasks
-        in /invoke.py check if the database is a test_
-        db prior to running some destructive action.
-        """
-        return self.dbname.startswith("test_")
-
-    @property
-    def dbfilename(self):
-        "Full database file name and path."
-        return os.path.join(self.datapath, self.dbname)
 
     @property
     def sqliteconnstring(self):

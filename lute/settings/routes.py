@@ -5,6 +5,7 @@ Settings routes.
 import os
 from flask import (
     Blueprint,
+    current_app,
     request,
     Response,
     render_template,
@@ -16,7 +17,6 @@ from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, IntegerField, TextAreaField
 from wtforms.validators import InputRequired, NumberRange
 from wtforms import ValidationError
-from lute.config.app_config import AppConfig
 from lute.models.language import Language
 from lute.models.setting import UserSetting
 from lute.db import db
@@ -72,7 +72,7 @@ def edit_settings():
     "Edit settings."
     form = UserSettingsForm()
 
-    ac = AppConfig.create_from_config()
+    ac = current_app.env_config
     if ac.is_docker:
         # User shouldn't change some things with docker.
         kw = {"readonly": True, "style": "background-color: LightGray"}

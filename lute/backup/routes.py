@@ -5,10 +5,9 @@ Backup settings form management, and running backups.
 """
 
 import traceback
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, current_app, render_template, request, jsonify
 from lute.models.setting import BackupSettings
 from lute.backup.service import create_backup
-from lute.config.app_config import AppConfig
 
 
 bp = Blueprint("backup", __name__, url_prefix="/backup")
@@ -41,7 +40,7 @@ def do_backup():
     if "type" in prms:
         backuptype = prms["type"]
 
-    c = AppConfig.create_from_config()
+    c = current_app.env_config
     settings = BackupSettings.get_backup_settings()
     is_manual = backuptype.lower() == "manual"
     try:

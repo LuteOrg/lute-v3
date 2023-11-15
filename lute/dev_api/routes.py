@@ -15,8 +15,7 @@ safeguards, so they can only be run against a test_ db.
 """
 
 from sqlalchemy import text
-from flask import Blueprint, Response, jsonify, redirect, flash
-from lute.config.app_config import AppConfig
+from flask import Blueprint, current_app, Response, jsonify, redirect, flash
 from lute.models.language import Language
 from lute.models.setting import UserSetting
 import lute.parse.registry
@@ -31,8 +30,7 @@ bp = Blueprint("dev_api", __name__, url_prefix="/dev_api")
 @bp.before_request
 def _ensure_is_test_db():
     "These methods should only be run on a test db!"
-    ac = AppConfig.create_from_config()
-    if not ac.is_test_db:
+    if not current_app.env_config.is_test_db:
         raise RuntimeError("Dangerous method, only possible on test_lute database.")
 
 

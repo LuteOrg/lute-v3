@@ -1,6 +1,8 @@
 """
 Developer entry point.  Runs lute on a dev server.
 
+This script _always_ uses the config at /lute/config/config.yml.
+
 You can run with:
 
 inv devstart

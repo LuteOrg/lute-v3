@@ -34,7 +34,7 @@ def test_ENV_required(tmp_path):
     config_data = {"DBNAME": "my_db", "DATAPATH": "data_path"}
     with open(config_file, "w", encoding="utf-8") as file:
         yaml.dump(config_data, file)
-    with pytest.raises(ValueError, match="Config file must have 'ENV'"):
+    with pytest.raises(ValueError, match="ENV must be prod or dev, was None."):
         AppConfig(config_file)
 
 
@@ -75,7 +75,7 @@ def test_env_can_only_be_prod_or_dev(tmp_path):
     config_data = {"DBNAME": "my_db", "ENV": "blah"}
     write_file(config_file, config_data)
 
-    with pytest.raises(ValueError, match="Invalid ENV blah, can only be prod or dev."):
+    with pytest.raises(ValueError, match="ENV must be prod or dev, was blah."):
         AppConfig(config_file)
 
 
@@ -101,9 +101,7 @@ def test_invalid_yaml_throws(tmp_path):
     with open(config_file, "w", encoding="utf-8") as f:
         f.write("bad_data")
 
-    with pytest.raises(
-        ValueError, match="Invalid configuration format. Expected a dictionary."
-    ):
+    with pytest.raises(Exception):
         AppConfig(config_file)
 
 
@@ -113,10 +111,7 @@ def test_nonexistent_config_file_throws(tmp_path):
     in the config folder.
     """
     config_file = tmp_path / "nonexistent_config.yaml"
-
-    with pytest.raises(
-        FileNotFoundError, match=f"Config file not found at {config_file}"
-    ):
+    with pytest.raises(FileNotFoundError, match="No such file"):
         AppConfig(config_file)
 
 
