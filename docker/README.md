@@ -1,17 +1,23 @@
 # Docker and scripts
 
+## Local test builds
+
+```
+./docker/build_test.sh
+```
+
+The `docker-compose.yml.example` in this directory works with the `build_test.sh` image; copy that file to root, rename things, and then it should work:
+
+```
+./docker/build_test.sh && docker compose up
+```
+
 ## Building
 
 tl/dr: To build and push all variants:
 
 ```
 DO_PUSH=1 ./docker/build_all.sh
-```
-
-Building single image:
-
-```
-docker build -f docker/Dockerfile --build-arg INSTALL_MECAB=false -t lute3 .
 ```
 
 ## Using
