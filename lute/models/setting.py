@@ -2,6 +2,7 @@
 Lute settings, in settings key-value table.
 """
 
+import os
 import datetime
 from flask import current_app
 from lute.db import db
@@ -83,6 +84,37 @@ class UserSetting(SettingBase):
             raise MissingUserSettingKeyException(keyname)
 
     @staticmethod
+    def _revised_mecab_path():
+        """
+        Change the mecab_path if it's not found, and a
+        replacement is found.
+
+        Lute Docker images are built to be multi-arch, and
+        interestingly (annoyingly), mecab libraries are installed into
+        different locations depending on the architecture, even with
+        the same Dockerfile and base image.
+
+        Returns: new mecab path if old one is missing _and_
+        new one found, otherwise just return the old one.
+        """
+
+        mp = UserSetting.get_value("mecab_path")
+        if mp is not None and os.path.exists(mp):
+            return mp
+
+        candidates = [
+            # linux/arm64
+            "/lib/aarch64-linux-gnu/libmecab.so.2",
+            # linux/amd64
+            "/lib/x86_64-linux-gnu/libmecab.so.2",
+        ]
+        replacements = [p for p in candidates if os.path.exists(p)]
+        if len(replacements) > 0:
+            return replacements[0]
+        # Replacement not found, leave current value as-is.
+        return mp
+
+    @staticmethod
     def load():
         """
         Load missing user settings with default values.
@@ -104,6 +136,15 @@ class UserSetting(SettingBase):
                 s.key = k
                 s.value = v
                 db.session.add(s)
+        db.session.commit()
+
+        # Revise the mecab path if necessary.
+        # Note this is done _after_ the defaults are loaded,
+        # because the user may have already loaded the defaults
+        # (e.g. on machine upgrade) and stored them in the db,
+        # so we may have to _update_ the existing setting.
+        revised_mecab_path = UserSetting._revised_mecab_path()
+        UserSetting.set_value("mecab_path", revised_mecab_path)
         db.session.commit()
 
         # This feels wrong, somehow ... possibly could have an event
