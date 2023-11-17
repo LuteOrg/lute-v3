@@ -13,7 +13,6 @@ from lute.db.demo import (
     tutorial_book_id,
     demo_data_path,
     load_demo_data,
-    delete_unsupported_demo_data,
     predefined_languages,
     get_demo_language,
 )
@@ -139,25 +138,3 @@ def fixture_restore_mecab_support():
 
     if k not in lute.parse.registry.parsers:
         lute.parse.registry.parsers[k] = old_val
-
-
-def test_clear_unsupported_removes_unsupported_data(
-    app_context, _restore_japanese_parser
-):
-    "All data is loaded, spot check some."
-    delete_demo_data()
-    load_demo_data()
-
-    sql = "select LgID from languages where LgName = 'Japanese'"
-    checks = [sql, f"select * from books where BkLgID in ({sql})"]
-    for c in checks:
-        assert_record_count_equals(c, 1, c + " returned 1")
-
-    delete_unsupported_demo_data()
-    for c in checks:
-        assert_record_count_equals(c, 1, c + " still returned 1")
-
-    del lute.parse.registry.parsers["japanese"]
-    delete_unsupported_demo_data()
-    for c in checks:
-        assert_record_count_equals(c, 0, c + " jp not supported")
