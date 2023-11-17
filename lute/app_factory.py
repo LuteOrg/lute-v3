@@ -5,6 +5,8 @@ Methods: create_app.
 """
 
 import os
+import platform
+import traceback
 from flask import (
     Flask,
     render_template,
@@ -15,7 +17,6 @@ from flask import (
     send_from_directory,
     jsonify,
 )
-
 from lute.db import db
 from lute.db.setup.main import setup_db
 import lute.backup.service as backupservice
@@ -179,6 +180,25 @@ def _add_base_routes(app, app_config):
             "Cache-Control"
         ] = "no-store, no-cache, must-revalidate, max-age=0"
         return response
+
+    @app.errorhandler(500)
+    def _internal_server_error(e):  # pylint: disable=unused-argument
+        """
+        Custom error handler for 500 Internal Server Error
+        """
+        exception_info = traceback.format_exc()
+        # Should add logging ...
+        # app.logger.error(exception_info)
+        return (
+            render_template(
+                "500_error.html",
+                exception_info=exception_info,
+                version=lute.__version__,
+                platform=platform.platform(),
+                is_docker=current_app.env_config.is_docker,
+            ),
+            500,
+        )
 
 
 def _create_app(app_config, extra_config):

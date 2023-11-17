@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Lute error{% endblock %}
+{% block header %}500 internal server error{% endblock %}
+
+{% block body %}
+
+<p><i>Hmm, something went wrong ...</i></p>
+
+<div class="bug_report">
+  <p>Platform: {{ platform }}</p>
+  <p>Version: {{ version }}</p>
+  <p>In docker?: {{ is_docker }}</p>
+  <p>Stack trace:</p>
+  <div class="code">
+    <code><pre>{{ exception_info }}</pre></code>
+  </div>
+</div>
+
+<p>If this issue persists, please open a
+  <a href="https://github.com/jzohrab/lute-v3/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=500%20error"
+     target="_blank">GitHub Issue</a>, including all of the above information in the issue.
+</p>
+
+{% endblock %}

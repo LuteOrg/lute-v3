@@ -623,3 +623,30 @@ ul.form-control label {
     padding: 0;
     cursor: pointer; /* Add pointer cursor for better UX */
 }
+
+/* error handler */
+
+div.bug_report {
+    margin: 20px;
+    padding: 5px;
+    border: 1px solid grey;
+}
+
+div.code {
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 1.5;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+div.code pre {
+    white-space: pre-wrap;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 15px;
+    overflow: auto;
+    max-height: 500px;
+    font-size: 14px;
+    color: #212529;
+}

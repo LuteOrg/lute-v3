@@ -149,3 +149,9 @@ def disable_backup():
     db.session.commit()
     flash("backup disabled")
     return redirect("/", 302)
+
+
+@bp.route("/throw_error", methods=["GET"])
+def throw_error():
+    "Throw an error to ensure handler works!"
+    raise RuntimeError("testing handler")
