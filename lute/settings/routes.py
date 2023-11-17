@@ -76,8 +76,8 @@ def edit_settings():
     if ac.is_docker:
         # User shouldn't change some things with docker.
         kw = {"readonly": True, "style": "background-color: LightGray"}
+        # Backup dir gets mounted from host.
         form.backup_dir.render_kw = kw
-        form.mecab_path.render_kw = kw
 
     if form.validate_on_submit():
         # Update the settings in the database
