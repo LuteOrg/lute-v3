@@ -104,6 +104,24 @@ Notes for building and running a Docker container are at ../docker/README.com.
 
 # Misc dev notes
 
+## Finding mecab.so for Docker
+
+This is much tougher than it needs to be ...
+
+To find the correct path, first build and run the container,
+then connect to it, and find libmecab.so.2 like this:
+
+```
+$ docker exec -it lute_v3-lute-1 bash
+root@cid/# which mecab
+/usr/bin/mecab
+root@cid:/# ldd /usr/bin/mecab
+   ...
+   libmecab.so.2 => /lib/aarch64-linux-gnu/libmecab.so.2 (0x0000ffff9b540000)
+```
+
+Different platform architectures have this in different locations. :-/
+
 ## datatables
 
 Datatables css and js was downloaded from https://datatables.net/download/index

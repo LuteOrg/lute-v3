@@ -79,22 +79,6 @@ def test_env_can_only_be_prod_or_dev(tmp_path):
         AppConfig(config_file)
 
 
-def test_mecab_path_optional(tmp_path):
-    "Needed for CI."
-    config_file = tmp_path / "valid_config.yaml"
-    config_data = {"DBNAME": "my_db", "DATAPATH": "data_path"}
-    write_file(config_file, config_data)
-
-    app_config = AppConfig(config_file)
-    assert app_config.mecab_path is None, "no mecab path"
-
-    config_data["MECAB_PATH"] = "xyz"
-    write_file(config_file, config_data)
-
-    app_config = AppConfig(config_file)
-    assert app_config.mecab_path == "xyz", "have path"
-
-
 def test_invalid_yaml_throws(tmp_path):
     "File must be valid."
     config_file = tmp_path / "invalid_yaml.yaml"

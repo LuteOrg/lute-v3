@@ -50,7 +50,6 @@ jobs:
         echo "ENV: dev" > ${{ github.workspace }}/lute/config/config.yml
         echo "DATAPATH: ${{ github.workspace }}/data" >> ${{ github.workspace }}/lute/config/config.yml
         echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/lute/config/config.yml
-        echo "MECAB_PATH: /lib/x86_64-linux-gnu/libmecab.so.2" >> ${{ github.workspace }}/lute/config/config.yml
         ls ${{ github.workspace }}
         cat ${{ github.workspace }}/lute/config/config.yml
 
@@ -168,7 +167,6 @@ jobs:
         echo "ENV: dev" > ${{ github.workspace }}/lute/config/config.yml
         echo "DATAPATH: ${{ github.workspace }}/data" >> ${{ github.workspace }}/lute/config/config.yml
         echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/lute/config/config.yml
-        echo "MECAB_PATH: /lib/x86_64-linux-gnu/libmecab.so.2" >> ${{ github.workspace }}/lute/config/config.yml
         ls ${{ github.workspace }}
         cat ${{ github.workspace }}/lute/config/config.yml
 

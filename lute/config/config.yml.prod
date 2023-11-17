@@ -9,4 +9,3 @@ DBNAME: lute.db
 # (ref https://pypi.org/project/platformdirs/).
 
 # BACKUP_PATH is not set, user should choose.
-# MECAB_PATH: not set, users set this in settings.

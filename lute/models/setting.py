@@ -102,10 +102,13 @@ class UserSetting(SettingBase):
         if mp is not None and os.path.exists(mp):
             return mp
 
+        # See develop docs for notes on how to find the libmecab path!
         candidates = [
             # linux/arm64
             "/lib/aarch64-linux-gnu/libmecab.so.2",
             # linux/amd64
+            "/lib/x86_64-linux-gnu/libmecab.so.2",
+            # github CI, ubuntu-latest
             "/lib/x86_64-linux-gnu/libmecab.so.2",
         ]
         replacements = [p for p in candidates if os.path.exists(p)]
@@ -127,7 +130,7 @@ class UserSetting(SettingBase):
             "backup_warn": True,
             "backup_dir": app_config.default_user_backup_path,
             "backup_count": 5,
-            "mecab_path": app_config.mecab_path,
+            "mecab_path": None,
             "custom_styles": "/* Custom css to modify Lute's appearance. */",
         }
         for k, v in keys_and_defaults.items():
