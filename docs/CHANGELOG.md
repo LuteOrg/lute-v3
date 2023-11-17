@@ -1,4 +1,13 @@
 
+# 3.0.0b8 (2023-11-15)
+
+* Add `--config` startup param for local prod dogfooding.
+
+Back end changes:
+
+* Simplify app config, attach to app.
+
+
 # 3.0.0b7 (2023-11-14)
 
 Feature changes:
