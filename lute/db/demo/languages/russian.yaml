@@ -1,0 +1,12 @@
+name: Russian
+dict_1: https://www.dict.com/Russian-English/###
+dict_2: https://en.openrussian.org/?search=###
+sentence_translation: "*https://www.deepl.com/translator#ru/en/###"
+# show_romanization: 
+# right_to_left: 
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+# split_sentences: 
+# split_sentence_exceptions:
+word_chars: А-Яа-яЁё 
