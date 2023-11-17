@@ -1,4 +1,19 @@
 
+# 3.0.0b9 (2023-11-17)
+
+* bugfix: parser type select box wasn't updating correctly.
+* bugfix: Skip bad Japanese input tokens during parse.
+* Multi-platform docker builds.
+* Add nicer error handler.
+* Allow change of mecab path, even in docker.
+
+Back end changes:
+
+* Remove MECAB_PATH from config file.
+* Try different mecab path candidates if needed.
+
+
+
 # 3.0.0b8 (2023-11-15)
 
 * Add `--config` startup param for local prod dogfooding.
