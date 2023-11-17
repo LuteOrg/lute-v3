@@ -12,12 +12,12 @@ The `docker-compose.yml.example` in this directory works with the `build_test.sh
 ./docker/build_test.sh && docker compose up
 ```
 
-## Building
+## Building and pushing
 
-tl/dr: To build and push all variants:
+Build and push all variants:
 
 ```
-DO_PUSH=1 ./docker/build_all.sh
+./docker/build_all.sh
 ```
 
 ## Using
