@@ -49,8 +49,6 @@ docker buildx build \
        --build-arg INSTALL_MECAB=true \
        -t $TAG -t $LATEST .
 
-docker tag $TAG $LATEST
-
 echo
 echo "Build and push $LEANTAG, $LEANLATEST"
 echo
