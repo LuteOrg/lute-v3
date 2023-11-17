@@ -18,14 +18,13 @@ def test_get_parser_throws_if_not_found():
         get_parser("trash")
 
 
-def test_list_all_parsers():
+def test_supported_parsers():
     "Sanity check only."
     d = supported_parsers()
-    assert isinstance(d, dict), "returns a dict"
+    assert isinstance(d, list), "returns a list"
 
-    p = d["spacedel"]
-    print(p)
-    assert p == "Space Delimited", "sanity check"
+    p = [n for n in d if n[0] == "spacedel"][0]
+    assert p == ["spacedel", "Space Delimited"], "sanity check"
 
 
 class DummyParser(SpaceDelimitedParser):

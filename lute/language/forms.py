@@ -5,7 +5,6 @@ Flask-wtf forms.
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, SelectField
 from wtforms.validators import DataRequired
-from lute.parse.registry import supported_parsers
 
 
 class LanguageForm(FlaskForm):
@@ -22,7 +21,13 @@ class LanguageForm(FlaskForm):
     show_romanization = BooleanField("Show Romanization field")
     right_to_left = BooleanField("Right-to-left")
 
-    parser_type = SelectField("Parse as", choices=supported_parsers().items())
+    # Note!  The choices have to be set in the routes!
+    # I originally had "choices=lute.parse.registry.supported_parsers()",
+    # but it never worked: the Japanese mecab parser was excluded.
+    # Possible coder error, not sure, but setting the choices at
+    # form creation time works.
+    parser_type = SelectField("Parse as", choices=[("tbd", "tbd")])
+
     character_substitutions = StringField("Character substitutions")
 
     regexp_split_sentences = StringField(

@@ -11,6 +11,7 @@ from lute.models.term import Term
 from lute.language.forms import LanguageForm
 from lute.db import db
 from lute.db.demo import predefined_languages
+from lute.parse.registry import supported_parsers
 
 bp = Blueprint("language", __name__, url_prefix="/language")
 
@@ -97,6 +98,8 @@ def edit(langid):
         return redirect(url_for("language.index"))
 
     form = LanguageForm(obj=language)
+    form.parser_type.choices = supported_parsers()
+
     if _handle_form(language, form):
         return redirect("/")
     return render_template("language/edit.html", form=form, language=language)
@@ -116,6 +119,8 @@ def new(langname):
             language = candidates[0]
 
     form = LanguageForm(obj=language)
+    form.parser_type.choices = supported_parsers()
+
     if _handle_form(language, form):
         return redirect("/")
 
