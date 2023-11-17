@@ -96,11 +96,19 @@ class JapaneseParser(AbstractParser):
                 for n in nm.parse(para, as_nodes=True):
                     lines.append(n.feature)
 
-        lines = [n.strip() for n in lines if n is not None and n.strip() != ""]
+        lines = [
+            n.strip().split("\t") for n in lines if n is not None and n.strip() != ""
+        ]
+
+        # Production bug: JP parsing with MeCab would sometimes return a line
+        # "0\t4" before an end-of-paragraph "EOP\t3\t7", reasons unknown.  These
+        # "0\t4" tokens don't have any function, and cause problems in subsequent
+        # steps of the processing in line_to_token(), so just remove them.
+        lines = [n for n in lines if len(n) == 3]
 
         def line_to_token(lin):
             "Convert parsed line to a ParsedToken."
-            term, node_type, third = lin.split("\t")
+            term, node_type, third = lin
             is_eos = term in language.regexp_split_sentences
             if term == "EOP" and third == "7":
                 term = "¶"

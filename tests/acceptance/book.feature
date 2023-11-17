@@ -15,3 +15,12 @@ Feature: Books and stats are available
         When I set the book table filter to "Hola"
         Then the book table contains:
             Hola; Spanish; ; 4 (0%);
+
+    # Dealing with production bug.
+    Scenario: Japanese book with multiple paragraphs works.
+        Given I visit "/"
+        Given a Japanese book "Jp test" with content:
+            多くなったのは初めてです。
+            
+            韓国から来た人。
+        Then the page title is Reading "Jp test (1/1)"
