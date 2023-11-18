@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Lute 404 error{% endblock %}
+{% block header %}Missing page{% endblock %}
+
+{% block body %}
+
+<p>404 error: the page you were looking for does not exist.</p>
+
+<div class="bug_report">
+  <p>Version: {{ version }}</p>
+  <p>You were on: {{ referring_page }}</p>
+  <p>You were trying to access: {{ requested_url }}</p>
+</div>
+
+<p>If this issue persists, please open a
+  <a href="https://github.com/jzohrab/lute-v3/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=404%20error"
+     target="_blank">GitHub Issue</a>, including all of the above information in the issue.
+</p>
+
+{% endblock %}
