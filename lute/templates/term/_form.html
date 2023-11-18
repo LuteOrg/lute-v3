@@ -42,7 +42,7 @@
       </td>
     </tr>
 
-    <tr>
+    <tr {% if hide_pronunciation %}style="display:none;"{% endif %}>
       <td>
         {{ form.romanization(class="form-control") }}
       </td>
