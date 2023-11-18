@@ -456,6 +456,24 @@ function update_selected_statuses(newStatus) {
 }
 
 
+/**
+ * If the term editing form is visible when reading, and a hotkey is hit,
+ * the form status should also update.
+ */
+function update_term_form(el, new_status) {
+  const sel = 'input[name="status"][value="' + new_status + '"]';
+  var radioButton = top.frames.wordframe.document.querySelector(sel);
+  if (radioButton) {
+    radioButton.click();
+  }
+  else {
+    // Not found - user might just be hovering over the element,
+    // or multiple elements selected.
+    // console.log("Radio button with value " + new_status + " not found.");
+  }
+}
+
+
 function update_status_for_marked_elements(new_status) {
   let els = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
   if (els.length == 0)
@@ -478,6 +496,9 @@ function update_status_for_marked_elements(new_status) {
     contentType: 'application/json',
     success: function(response) {
       update_selected_statuses(new_status);
+      if (els.length == 1) {
+        update_term_form(firstel, new_status);
+      }
     },
     error: function(response, status, err) {
       const msg = {
