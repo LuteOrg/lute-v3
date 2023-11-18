@@ -1,4 +1,16 @@
 
+# 3.0.0b10 (2023-11-17)
+
+Feature changes:
+
+* Bugfix: Fix "archive book" broken link at end of book
+* Issue 7: hotkey updates term form if displayed.
+* Redirect to home if bad book id.
+* Add custom 404 error handler.
+* Change wiki refs on site to manual.
+* Add Russian predefined language and story demo to baseline.
+
+
 # 3.0.0b9 (2023-11-17)
 
 * bugfix: parser type select box wasn't updating correctly.
