@@ -4,7 +4,7 @@
 
 from datetime import datetime
 
-from flask import Blueprint, render_template, redirect
+from flask import Blueprint, flash, render_template, redirect
 from lute.read.service import get_paragraphs, set_unknowns_to_known
 from lute.read.forms import TextForm
 from lute.term.model import Repository
@@ -30,6 +30,10 @@ def read(bookid, pagenum):
     "Display reading pane for book page."
 
     book = Book.find(bookid)
+    if book is None:
+        flash(f"No book matching id {bookid}")
+        return redirect("/", 302)
+
     lang = book.language
 
     pagenum = _page_in_range(book, pagenum)
