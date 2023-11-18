@@ -10,6 +10,7 @@ import traceback
 from flask import (
     Flask,
     render_template,
+    request,
     redirect,
     flash,
     current_app,
@@ -191,13 +192,26 @@ def _add_base_routes(app, app_config):
         # app.logger.error(exception_info)
         return (
             render_template(
-                "500_error.html",
+                "errors/500_error.html",
                 exception_info=exception_info,
                 version=lute.__version__,
                 platform=platform.platform(),
                 is_docker=current_app.env_config.is_docker,
             ),
             500,
+        )
+
+    @app.errorhandler(404)
+    def _page_not_found(e):  # pylint: disable=unused-argument
+        "Show custom error page on 404."
+        return (
+            render_template(
+                "errors/404_error.html",
+                version=lute.__version__,
+                requested_url=request.url,
+                referring_page=request.referrer,
+            ),
+            404,
         )
 
 
