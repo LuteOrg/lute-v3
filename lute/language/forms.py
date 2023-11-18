@@ -18,7 +18,7 @@ class LanguageForm(FlaskForm):
     sentence_translate_uri = StringField(
         "Sentence translation", validators=[DataRequired()]
     )
-    show_romanization = BooleanField("Show Romanization field")
+    show_romanization = BooleanField("Show Pronunciation field")
     right_to_left = BooleanField("Right-to-left")
 
     # Note!  The choices have to be set in the routes!

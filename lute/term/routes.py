@@ -68,11 +68,17 @@ def handle_term_form(
         repo.commit()
         return return_on_success
 
+    hide_pronunciation = False
+    # pylint: disable=protected-access
+    if term._language is not None:
+        hide_pronunciation = not term._language.show_romanization
+
     return render_template(
         form_template_name,
         form=form,
         term=term,
         language_dicts=Language.all_dictionaries(),
+        hide_pronunciation=hide_pronunciation,
         tags=repo.get_term_tags(),
         embedded_in_reading_frame=embedded_in_reading_frame,
     )
