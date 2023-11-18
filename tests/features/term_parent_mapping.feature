@@ -6,9 +6,9 @@ Feature: Term import
         And language Spanish
 
     # The scenarios here use parent term 'dog' and child term 'dogs',
-    # as documented in the wiki.
-    # https://github.com/jzohrab/lute/wiki/Bulk-Mapping-Parent-Terms.
-    # The wiki is actually slightly out of date, as Lute now supports
+    # as documented in the manual.
+    # https://jzohrab.github.io/lute-manual/usage/parent-terms-bulk-mapping.html
+    # The manual is actually slightly out of date (Nov 2023), as Lute now supports
     # multiple parents.
 
 
