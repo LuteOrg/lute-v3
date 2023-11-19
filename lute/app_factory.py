@@ -265,7 +265,11 @@ def _create_app(app_config, extra_config):
     return app
 
 
-def create_app(app_config_path, extra_config=None, output_func=None):
+def create_app(
+    app_config_path=AppConfig.default_config_filename(),
+    extra_config=None,
+    output_func=None,
+):
     """
     App factory.  Calls dbsetup, and returns Flask app.
 

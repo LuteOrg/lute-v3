@@ -1,5 +1,5 @@
 """
-Copy of main.py, running the server on port 9876.
+Copy of main elements of main.py.
 
 This still connects to the test database etc.
 """
@@ -17,12 +17,10 @@ if len(sys.argv) != 2:
 # pylint: disable=wrong-import-position
 sys.path.append("..")
 from lute.app_factory import create_app
-from lute.config.app_config import AppConfig
 
 logging.getLogger("waitress.queue").setLevel(logging.ERROR)
 
-app_config_filename = AppConfig.default_config_filename()
-app = create_app(app_config_filename)
+app = create_app()
 
 port = int(sys.argv[1])
 print(f"running at localhost:{port}")
