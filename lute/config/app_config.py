@@ -24,8 +24,13 @@ class AppConfig:  # pylint: disable=too-many-instance-attributes
         """
         Load and validate the config file.
         """
-        with open(config_file_path, "r", encoding="utf-8") as file:
-            config = yaml.safe_load(file)
+        with open(config_file_path, "r", encoding="utf-8") as cf:
+            config = yaml.safe_load(cf)
+
+        if not isinstance(config, dict):
+            raise RuntimeError(
+                f"File at {config_file_path} is invalid or is not a yaml dictionary."
+            )
 
         self.env = config.get("ENV", None)
         if self.env not in ["prod", "dev"]:

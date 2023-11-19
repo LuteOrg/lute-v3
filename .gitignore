@@ -2,9 +2,12 @@
 # Ignores.
 
 # Configs
+
+# Override config the user can have at root.
+config.yml
+
+# Regular app config
 lute/config/config.yml
-*.ini
-*.ini.bkp
 
 docker/docker-compose.yml
 docker-compose.yml
