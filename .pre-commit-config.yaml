@@ -1,6 +1,9 @@
 # pre-commit config, per https://pre-commit.com/
 #
 # These hooks only use local commands.
+
+fail_fast: true
+
 repos:
   - repo: local
     hooks:
