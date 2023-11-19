@@ -32,7 +32,8 @@ def start(port):
     """
     Start the dev server with reloads on port.
     """
-    ac = AppConfig.create_from_config()
+    config_file = AppConfig.default_config_filename()
+    ac = AppConfig(config_file)
 
     # https://stackoverflow.com/questions/25504149/
     #  why-does-running-the-flask-dev-server-run-itself-twice
@@ -52,7 +53,7 @@ def start(port):
         """
         print(msg)
 
-    app = create_app(ac, output_func=print)
+    app = create_app(config_file, output_func=print)
     app.run(debug=True, port=port)
 
 

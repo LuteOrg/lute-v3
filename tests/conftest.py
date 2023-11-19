@@ -49,14 +49,12 @@ def pytest_sessionstart(session):  # pylint: disable=unused-argument
 @pytest.fixture(name="testconfig")
 def fixture_config():
     "Config using the app config."
-    thisdir = os.path.dirname(os.path.realpath(__file__))
-    configfile = os.path.join(thisdir, "..", "lute", "config", "config.yml")
-    ac = AppConfig(configfile)
+    ac = AppConfig(AppConfig.default_config_filename())
     yield ac
 
 
 @pytest.fixture(name="app")
-def fixture_app(testconfig):
+def fixture_app():
     """
     A clean instance of the demo database.
 
@@ -66,10 +64,12 @@ def fixture_app(testconfig):
     that said, it's much faster to do this than to do a
     "wipe and reload database" on every test run.
     """
-    if os.path.exists(testconfig.dbfilename):
-        os.unlink(testconfig.dbfilename)
+    config_file = AppConfig.default_config_filename()
+    c = AppConfig(config_file)
+    if os.path.exists(c.dbfilename):
+        os.unlink(c.dbfilename)
     extra_config = {"WTF_CSRF_ENABLED": False, "TESTING": True}
-    app = create_app(testconfig, extra_config=extra_config)
+    app = create_app(config_file, extra_config=extra_config)
     yield app
 
 

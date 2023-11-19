@@ -18,6 +18,7 @@ from flask import (
     send_from_directory,
     jsonify,
 )
+from lute.config.app_config import AppConfig
 from lute.db import db
 from lute.db.setup.main import setup_db
 import lute.backup.service as backupservice
@@ -264,13 +265,16 @@ def _create_app(app_config, extra_config):
     return app
 
 
-def create_app(app_config, extra_config=None, output_func=None):
+def create_app(app_config_path, extra_config=None, output_func=None):
     """
     App factory.  Calls dbsetup, and returns Flask app.
 
-    Use extra_config to pass { 'TESTING': True } during unit tests.
+    Args:
+    - app_config_path: path to yml file.
+    - extra_config: dict, e.g. pass { 'TESTING': True } during unit tests.
     """
 
+    app_config = AppConfig(app_config_path)
     _setup_app_dirs(app_config)
     setup_db(app_config, output_func)
 
