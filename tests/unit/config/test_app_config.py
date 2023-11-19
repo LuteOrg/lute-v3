@@ -97,12 +97,3 @@ def test_nonexistent_config_file_throws(tmp_path):
     config_file = tmp_path / "nonexistent_config.yaml"
     with pytest.raises(FileNotFoundError, match="No such file"):
         AppConfig(config_file)
-
-
-def test_create_from_config_file():
-    """
-    Has a method to create a config from the config/config.yml.
-    """
-    ac = AppConfig.create_from_config()
-    assert ac is not None, "sanity check"
-    assert isinstance(ac, AppConfig), "sanity check"

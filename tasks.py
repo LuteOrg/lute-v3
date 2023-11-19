@@ -58,7 +58,7 @@ def search(c, search_for):
 @task
 def _ensure_test_db(c):  # pylint: disable=unused-argument
     "Quits if not a test db. (Hidden task)"
-    ac = AppConfig.create_from_config()
+    ac = AppConfig(AppConfig.default_config_filename())
     if ac.is_test_db is False:
         print(
             f"""

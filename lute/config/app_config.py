@@ -70,13 +70,6 @@ class AppConfig:  # pylint: disable=too-many-instance-attributes
         return f"sqlite:///{self.dbfilename}"
 
     @staticmethod
-    def create_from_config():
-        "Create an AppConfig from the config file."
-        thisdir = AppConfig.configdir()
-        configfile = os.path.join(thisdir, "config.yml")
-        return AppConfig(configfile)
-
-    @staticmethod
     def configdir():
         "Return the path to the configuration file directory."
         return os.path.dirname(os.path.realpath(__file__))
