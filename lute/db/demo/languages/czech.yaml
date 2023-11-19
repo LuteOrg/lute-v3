@@ -1,0 +1,6 @@
+name: Czech
+dict_1: https://slovniky.lingea.cz/Anglicko-cesky/###
+dict_2: https://slovnik.seznam.cz/preklad/cesky_anglicky/###
+sentence_translation: https://www.deepl.com/translator#cs/en/###
+show_romanization: true
+word_chars: a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ
