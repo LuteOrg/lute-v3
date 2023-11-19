@@ -41,9 +41,9 @@ def _create_prod_config_if_needed():
         _print(["", "Using new production config.", ""])
 
 
-def start(port, config_file_path=None):
+def _create_app(config_file_path=None):
     """
-    Main entry point: Configure and init the app, and start.
+    Configure and init the app.
 
     Uses config file if set (throws if doesn't exist);
     otherwise, uses the prod config, creating a prod config
@@ -51,13 +51,15 @@ def start(port, config_file_path=None):
     """
     _print(["", "Starting Lute:"])
 
-    app_config = None
-    if config_file_path is None:
-        _create_prod_config_if_needed()
-        _print(["Using default config"])
-        config_file_path = AppConfig.default_config_filename()
+    if config_file_path is not None:
+        _print([f"Using specified config: {config_file_path}"])
+    elif os.path.exists("config.yml"):
+        _print(["Using config.yml found in root"])
+        config_file_path = "config.yml"
     else:
-        _print([f"Using config: {config_file_path}"])
+        _print(["Using default config"])
+        _create_prod_config_if_needed()
+        config_file_path = AppConfig.default_config_filename()
 
     app_config = AppConfig(config_file_path)
 
@@ -67,14 +69,6 @@ def start(port, config_file_path=None):
     _print(f"database: {app_config.dbfilename}")
     if app_config.is_docker:
         _print("(Note these are container paths, not host paths.)")
-
-    _print(
-        f"""
-    Running at:
-
-    http://localhost:{port}
-    """
-    )
 
     close_msg = """
     When you're finished reading, stop this process
@@ -88,7 +82,21 @@ def start(port, config_file_path=None):
         """
     _print(close_msg)
 
-    serve(app, host="0.0.0.0", port=port)
+    return app
+
+
+def _start(args):
+    "Configure and start the app."
+    app = _create_app(args.config)
+
+    _print(
+        f"""
+    Lute is running.  Open a web browser, and go to:
+
+    http://localhost:{args.port}
+    """
+    )
+    serve(app, host="0.0.0.0", port=args.port)
 
 
 if __name__ == "__main__":
@@ -100,5 +108,12 @@ if __name__ == "__main__":
         "--config",
         help="Path to override config file.  Uses lute/config/config.yml if not set.",
     )
-    args = parser.parse_args()
-    start(args.port, args.config)
+    try:
+        _start(parser.parse_args())
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        print("\n")
+        print("-" * 50)
+        print("Error during startup:")
+        print(e)
+        print("Please try again, or report an issue on GitHub.")
+        print("-" * 50)
