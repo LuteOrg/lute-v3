@@ -21,8 +21,8 @@ from lute.config.app_config import AppConfig
 
 logging.getLogger("waitress.queue").setLevel(logging.ERROR)
 
-app_config = AppConfig.create_from_config()
-app = create_app(app_config)
+app_config_filename = AppConfig.default_config_filename()
+app = create_app(app_config_filename)
 
 port = int(sys.argv[1])
 print(f"running at localhost:{port}")

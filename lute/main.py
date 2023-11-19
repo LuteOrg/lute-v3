@@ -55,13 +55,14 @@ def start(port, config_file_path=None):
     if config_file_path is None:
         _create_prod_config_if_needed()
         _print(["Using default config"])
-        app_config = AppConfig.create_from_config()
+        config_file_path = AppConfig.default_config_filename()
     else:
-        app_config = AppConfig(config_file_path)
         _print([f"Using config: {config_file_path}"])
 
+    app_config = AppConfig(config_file_path)
+
     _print(["", "Initializing app."])
-    app = create_app(app_config, output_func=_print)
+    app = create_app(config_file_path, output_func=_print)
     _print(f"data path: {app_config.datapath}")
     _print(f"database: {app_config.dbfilename}")
     if app_config.is_docker:
