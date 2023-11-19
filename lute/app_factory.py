@@ -266,7 +266,7 @@ def _create_app(app_config, extra_config):
 
 
 def create_app(
-    app_config_path=AppConfig.default_config_filename(),
+    app_config_path=None,
     extra_config=None,
     output_func=None,
 ):
@@ -274,9 +274,15 @@ def create_app(
     App factory.  Calls dbsetup, and returns Flask app.
 
     Args:
-    - app_config_path: path to yml file.
+    - app_config_path: path to yml file.  If None, use root config or default.
     - extra_config: dict, e.g. pass { 'TESTING': True } during unit tests.
     """
+
+    if app_config_path is None:
+        if os.path.exists("config.yml"):
+            app_config_path = "config.yml"
+        else:
+            app_config_path = AppConfig.default_config_filename()
 
     app_config = AppConfig(app_config_path)
     _setup_app_dirs(app_config)
