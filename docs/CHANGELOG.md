@@ -1,4 +1,20 @@
 
+# 3.0.0b11 (2023-11-19)
+
+Feature changes:
+
+* Add language term export command.
+* Add czech language and demo story to baseline db.
+* Bugfix: Respect the 'show pronunciation' lang setting in form.
+
+Back end changes
+
+* CLI command sketch.
+* Use specified, root, or default config, in that order.
+* Change create_app to take config file path, not object.
+* Template for demo stories.
+
+
 # 3.0.0b10 (2023-11-17)
 
 Feature changes:
