@@ -5,7 +5,7 @@
     <title>Sentences</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
     <style>
-      p {
+      p.term {
           font-style: italic;
       }
     </style>
@@ -14,9 +14,22 @@
 
   <body>
 
+    {% if no_references %}
+    <p>No references found for "{{ text }}":</p>
+    <ul>
+      <li>This may be a new term.</li>
+      <li>The page containing this word may not be marked as "read" (see
+        <a href="https://jzohrab.github.io/lute-manual/faq/sentences-only-shown-when-page-is-read.html"
+           target="_blank">the manual</a>
+        ).
+      </li>
+      <li>Books containing this term may have been deleted.</li>
+    </ul>
+    {% endif %}
+
     {% for k, dtos in references.items() %}
     {% if dtos|length > 0 %}
-    <p>{{ k }}</p>
+    <p class="term">{{ k }}</p>
     <ul class="sentencelist">
       {% for dto in dtos %}
       <li style="margin-top: 4px;">
