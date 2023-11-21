@@ -145,13 +145,20 @@ def sentences(langid, text):
     # in the term form, and the parent does not exist yet, then
     # we're creating a new term.
     t = repo.find_or_new(langid, text)
-    references = repo.find_references(t)
-    refcount = sum(len(refs) for groupname, refs in references.items())
+    refs = repo.find_references(t)
+
+    # Transform data for output, to
+    # { "term": [refs], "children": [refs], "parent1": [refs], "parent2" ... }
+    refdata = [(f'"{text}"', refs["term"]), (f'"{text}" child terms', refs["children"])]
+    for p in refs["parents"]:
+        refdata.append((f"\"{p['term']}\"", p["refs"]))
+
+    refcount = sum(len(ref[1]) for ref in refdata)
     return render_template(
         "/term/sentences.html",
         text=text,
         no_references=(refcount == 0),
-        references=references,
+        references=refdata,
     )
 
 

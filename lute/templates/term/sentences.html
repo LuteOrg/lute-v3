@@ -5,6 +5,9 @@
     <title>Sentences</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
     <style>
+      body {
+          margin: 0 50px 0 15px;
+      }
       p.term {
           font-style: italic;
       }
@@ -27,7 +30,7 @@
     </ul>
     {% endif %}
 
-    {% for k, dtos in references.items() %}
+    {% for k, dtos in references %}
     {% if dtos|length > 0 %}
     <p class="term">{{ k }}</p>
     <ul class="sentencelist">
