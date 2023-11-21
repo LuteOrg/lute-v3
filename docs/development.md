@@ -63,7 +63,7 @@ Shut down your dev instance of Lute if it's running, and then run
 inv full
 ```
 
-to do a full pylint, test, and acceptance test run.  This should complete without errors, as lute master and develop branch are always kept passing in CI.
+to do a full pylint, test, acceptance, and playwright test run.  This should complete without errors, as lute master and develop branch are always kept passing in CI.
 
 # Development
 
@@ -88,6 +88,7 @@ Some useful tasks:
 | inv start | start the app on a development Flask server in dev/debug mode |
 | inv lint | lint |
 | inv accept | start a running instance of the app server if needed, and run acceptance tests |
+| inv playwright | start a running instance of the app server if needed, and run playwright tests |
 
 ## Database changes
 

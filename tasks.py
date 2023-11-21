@@ -147,6 +147,31 @@ def accept(  # pylint: disable=too-many-arguments
             app_process.terminate()
 
 
+@task(pre=[_ensure_test_db])
+def playwright(c):
+    """
+    Start lute, run playwright tests.
+
+    Only uses port 5000.
+
+    If Lute's not running on specified port, start a server.
+    """
+    run_test = [
+        "python",
+        "-m",
+        "tests.playwright.playwright",
+    ]
+
+    port = 5000
+    if _site_is_running(port):
+        c.run(" ".join(run_test))
+    else:
+        cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{port}"]
+        with subprocess.Popen(cmd) as app_process:
+            subprocess.run(run_test, check=True)
+            app_process.terminate()
+
+
 @task(pre=[_ensure_test_db], help={"html": "open html report"})
 def coverage(c, html=False):
     """
@@ -170,7 +195,7 @@ def black(c):
     c.run("python -m black .")
 
 
-@task(pre=[test, accept, black, lint])
+@task(pre=[test, accept, playwright, black, lint])
 def full(c):  # pylint: disable=unused-argument
     """
     Run full check and lint.
@@ -183,6 +208,7 @@ ns.add_task(full)
 ns.add_task(lint)
 ns.add_task(test)
 ns.add_task(accept)
+ns.add_task(playwright)
 ns.add_task(coverage)
 ns.add_task(todos)
 ns.add_task(start)
