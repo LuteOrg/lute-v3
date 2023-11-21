@@ -110,7 +110,7 @@ def edit_by_text(langid, text):
     Edit a term.
     """
     repo = Repository(db)
-    term = repo.find(langid, text)
+    term = repo.find_or_new(langid, text)
     return _handle_form(term, repo)
 
 
@@ -127,6 +127,8 @@ def new():
 @bp.route("/search/<text>/<int:langid>", methods=["GET"])
 def search_by_text_in_language(text, langid):
     "JSON data for parent data."
+    if text.strip() == "" or langid == 0:
+        return []
     repo = Repository(db)
     matches = repo.find_matches(langid, text)
     result = []
@@ -139,6 +141,9 @@ def search_by_text_in_language(text, langid):
 def sentences(langid, text):
     "Get sentences for terms."
     repo = Repository(db)
+    # Use find_or_new(): if the user clicks on a parent tag
+    # in the term form, and the parent does not exist yet, then
+    # we're creating a new term.
     t = repo.find_or_new(langid, text)
     references = repo.find_references(t)
     return render_template("/term/sentences.html", references=references)
