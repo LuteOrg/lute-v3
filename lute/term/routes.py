@@ -146,7 +146,13 @@ def sentences(langid, text):
     # we're creating a new term.
     t = repo.find_or_new(langid, text)
     references = repo.find_references(t)
-    return render_template("/term/sentences.html", references=references)
+    refcount = sum(len(refs) for groupname, refs in references.items())
+    return render_template(
+        "/term/sentences.html",
+        text=text,
+        no_references=(refcount == 0),
+        references=references,
+    )
 
 
 @bp.route("/bulk_update_status", methods=["POST"])
