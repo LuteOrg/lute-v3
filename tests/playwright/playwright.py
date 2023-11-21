@@ -165,6 +165,20 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     page.get_by_title("Unarchive", exact=True).click()
     expect(page.get_by_role("link", name="Hola.")).to_be_visible()
 
+    # Import web page.
+    _print("Import web page.")
+    page.locator("#menu_books").hover()
+    page.get_by_role("link", name="Import web page").click()
+    page.get_by_label("Import URL").fill(
+        "http://localhost:5000/dev_api/fake_story.html"
+    )
+    page.get_by_role("button", name="Import").click()
+    # Page is imported, form shown, so save it.
+    page.get_by_role("button", name="Save").click()
+    page.get_by_text("Tengo").click()  # Quick hacky check if exists.
+    page.locator("#reading_home_link").click()
+    expect(page.get_by_role("link", name="Mi perro.")).to_be_visible()
+
     # Check version.
     _print("Version.")
     page.locator("#menu_about").hover()

@@ -10,7 +10,7 @@
       <img src="{{ url_for('static', filename='img/lute.png') }}" class="lutelogo_small" />
     </td>
     <td>
-      <a href="/" tabindex="-1">Home</a>
+      <a href="/" tabindex="-1" id="reading_home_link">Home</a>
       {% if config.ENV == 'dev' %}
       <span style="background-color: blue; color: white; margin: 2px; padding: 2px;">Dev environment</span>
       {% endif %}
