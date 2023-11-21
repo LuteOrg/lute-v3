@@ -150,7 +150,7 @@ def accept(  # pylint: disable=too-many-arguments
 @task(pre=[_ensure_test_db])
 def playwright(c):
     """
-    Start lute, run playwright tests.
+    Start lute, run playwright tests.  export SHOW=true env var to run non-headless.
 
     Only uses port 5000.
 
