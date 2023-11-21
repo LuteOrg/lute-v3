@@ -16,6 +16,7 @@ jobs:
   # Lint, format check, and all tests.
   base-ci:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     strategy:
       matrix:
@@ -118,6 +119,7 @@ jobs:
   # Slightly wasteful re-setup of node.
   docker-build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: base-ci
     steps:
     - uses: actions/checkout@v3
@@ -146,6 +148,7 @@ jobs:
     needs: base-ci
     continue-on-error: true
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
 
@@ -209,6 +212,7 @@ jobs:
 
     needs: base-ci
     runs-on: windows-latest
+    timeout-minutes: 30
 
     strategy:
       matrix:
