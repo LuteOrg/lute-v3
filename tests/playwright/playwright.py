@@ -19,21 +19,24 @@ Menu sub-items are only visible after hovering over the menu, e.g.:
   page.locator("#book_new").click()
 """
 
-from playwright.sync_api import Playwright, sync_playwright  # , expect
+import os
+from playwright.sync_api import Playwright, sync_playwright, expect
 
 
 def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     "Run the smoke test."
 
     # Run headless, can add an env var later for headless or not.
-    headless = True
+    showbrowser = os.environ.get("SHOW", "") == "true"
 
+    # print(os.environ.get("SHOW"), flush=True)
+    # print("-" * 50)
     def _print(s):
-        if headless:
+        if not showbrowser:
             print(s)
 
     _print("Opening browser.")
-    browser = p.chromium.launch(headless=headless)
+    browser = p.chromium.launch(headless=not showbrowser)
     context = browser.new_context()
     context.set_default_timeout(3000)
     page = context.new_page()
@@ -93,11 +96,12 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
         "button", name="Save"
     ).click()
 
-    # Archive book, check archive.
+    # Archive current book "Hello", check archive.
     _print("Archive.")
     page.get_by_role("link", name="Archive book").click()
     page.locator("#menu_books").hover()
     page.get_by_role("link", name="Book archive").click()
+    expect(page.get_by_role("link", name="Hello")).to_be_visible()
 
     # Open term listing.
     _print("Term listing.")
@@ -150,6 +154,17 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     page.locator("#reading-footer").get_by_role("link", name="Home").click()
     page.get_by_role("link", name="Back to home.").click()
 
+    # Archive and unarchive.
+    _print("Archive and unarchive.")
+    expect(page.get_by_role("link", name="Hola.")).to_be_visible()
+    page.get_by_title("Archive", exact=True).click()
+    expect(page.get_by_role("link", name="Create one?")).to_be_visible()
+    page.locator("#menu_books").hover()
+    page.get_by_role("link", name="Book archive").click()
+    expect(page.get_by_role("link", name="Hola.")).to_be_visible()
+    page.get_by_title("Unarchive", exact=True).click()
+    expect(page.get_by_role("link", name="Hola.")).to_be_visible()
+
     # Check version.
     _print("Version.")
     page.locator("#menu_about").hover()
@@ -170,6 +185,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     browser.close()
 
 
-with sync_playwright() as sp:
-    run(sp)
-print("ok.")
+def test_playwright():
+    "Run playwright with tests."
+    with sync_playwright() as sp:
+        run(sp)
