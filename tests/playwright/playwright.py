@@ -29,6 +29,8 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     context.set_default_timeout(3000)
     page = context.new_page()
 
+    page.goto("http://localhost:5000/dev_api/load_demo")
+
     # Hardcoded port will cause problems ...
     page.goto("http://localhost:5000/")
 
