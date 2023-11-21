@@ -23,6 +23,7 @@ def fixture_dt_params():
         # Filters - set "manually" in the route.
         # Cheating here ... had to look at the request payload
         # in devtools to see what was being sent.
+        "filtLanguage": "null",  # Ha!
         "filtParentsOnly": "false",
         "filtAgeMin": "",
         "filtAgeMax": "",
@@ -45,6 +46,7 @@ def test_smoke_term_datatables_query_runs(app_context, _dt_params):
 
 def test_smoke_query_with_filter_params_runs(app_context, _dt_params):
     "Smoke test with filters set."
+    _dt_params["filtLanguage"] = "44"
     _dt_params["filtParentsOnly"] = "true"
     _dt_params["filtAgeMin"] = "1"
     _dt_params["filtAgeMax"] = "10"

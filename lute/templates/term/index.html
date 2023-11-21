@@ -12,6 +12,15 @@
 <div id="filterControls" style="display: none; margin-left: 20px;">
   <table>
     <tr>
+      <td>Language</td>
+      <td>
+        <select id="filtLanguage">
+          {% for langopt in language_options %}
+          <option value={{ langopt[0] }}>{{ langopt[1] }}</option>
+          {% endfor %}
+        </select>
+      </td>
+    <tr>
       <td>Parent terms only</td>
       <td>
         <input id="filtParentsOnly" type="checkbox" />
@@ -163,6 +172,7 @@
         // data sent to the controller, and are used by the
         // TermRepository.
         data: {
+          filtLanguage: () => $('#filtLanguage').val(),
           filtParentsOnly: () => $('#filtParentsOnly').prop('checked'),
           filtAgeMin: () => $('#filtAgeMin').val(),
           filtAgeMax: () => $('#filtAgeMax').val(),
@@ -283,6 +293,7 @@
 
   let handle_filter_update = function() {
     const store = {
+      filtLanguage: $('#filtLanguage').val(),
       filtDisplay: $('#filterControls').css('display'),
       filtParentsOnly: $('#filtParentsOnly').prop('checked'),
       filtAgeMin: $('#filtAgeMin').val(),
@@ -309,10 +320,11 @@
       return;
 
     $('#showHideFilters').prop('src', "{{ url_for('static', filename='icn/minus-button.png') }}");
-    $('#filtParentsOnly').prop('checked', store.filtParentsOnly);
-    if (store.filtAgeMin != '')
+    $('#filtLanguage').val(parseInt(store.filtLanguage ?? '0'));
+    $('#filtParentsOnly').prop('checked', store.filtParentsOnly ?? false);
+    if ((store.filtAgeMin ?? '') != '')
       $('#filtAgeMin').val(parseInt(store.filtAgeMin));
-    if (store.filtAgeMax != '')
+    if ((store.filtAgeMax ?? '') != '')
     $('#filtAgeMax').val(parseInt(store.filtAgeMax));
     $('#filtStatusMin').val(parseInt(store.filtStatusMin));
     $('#filtStatusMax').val(parseInt(store.filtStatusMax));
@@ -334,6 +346,7 @@
   };
 
   let handle_clear_filters = function() {
+    $('#filtLanguage').val(0);
     $('#filtParentsOnly').prop('checked', false);
     $('#filtAgeMin').val('');
     $('#filtAgeMax').val('');
@@ -348,7 +361,8 @@
     set_up_parent_autocomplete();
     $('#btnSetParent').click(handle_set_parent_click);
     $('#showHideFilters').click(handle_show_hide_filter_click);
-    
+
+    $('#filtLanguage').change(handle_filter_update);
     $('#filtParentsOnly').change(handle_filter_update);
     $('#filtAgeMin').keyup(handle_filter_update);
     $('#filtAgeMax').keyup(handle_filter_update);

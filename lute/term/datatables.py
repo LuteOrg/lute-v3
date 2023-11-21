@@ -44,43 +44,50 @@ def get_data_tables_list(parameters):
     LEFT OUTER JOIN wordimages wi on wi.WiWoID = w.WoID
     """
 
-    filt_parents_only = parameters["filtParentsOnly"]
-    filt_age_min = parameters["filtAgeMin"].strip()
-    filt_age_max = parameters["filtAgeMax"].strip()
-    filt_status_min = int(parameters["filtStatusMin"])
-    filt_status_max = int(parameters["filtStatusMax"])
-    filt_include_ignored = parameters["filtIncludeIgnored"]
-
     typecrit = supported_parser_type_criteria()
     wheres = [f"L.LgParserType in ({typecrit})"]
-    if filt_parents_only == "true":
+
+    # Add "where" criteria for all the filters.
+
+    # Have to check for 'null' for language filter.
+    # A new user may filter the language when the demo data is loaded,
+    # but on "wipe database" the filtLanguage value stored in localdata
+    # may be invalid, resulting in the filtLanguage form control actually
+    # sending the **string value** "null" here.
+    # The other filter values don't change with the data,
+    # so we don't need to check for null.
+    # Tricky tricky.
+    language_id = parameters["filtLanguage"]
+    if language_id == "null" or language_id is None:
+        language_id = "0"
+    language_id = int(language_id)
+    if language_id != 0:
+        wheres.append(f"L.LgID == {language_id}")
+
+    if parameters["filtParentsOnly"] == "true":
         wheres.append("parents.parentlist IS NULL")
-    if filt_age_min:
-        filt_age_min = int(filt_age_min)
-        wheres.append(
-            f"cast(julianday('now') - julianday(w.wocreated) as int) >= {filt_age_min}"
-        )
-    if filt_age_max:
-        filt_age_max = int(filt_age_max)
-        wheres.append(
-            f"cast(julianday('now') - julianday(w.wocreated) as int) <= {filt_age_max}"
-        )
+
+    sql_age_calc = "cast(julianday('now') - julianday(w.wocreated) as int)"
+    age_min = parameters["filtAgeMin"].strip()
+    if age_min:
+        wheres.append(f"{sql_age_calc} >= {int(age_min)}")
+    age_max = parameters["filtAgeMax"].strip()
+    if age_max:
+        wheres.append(f"{sql_age_calc} <= {int(age_max)}")
 
     status_wheres = ["StID <> 98"]
-    if filt_status_min > 0:
-        status_wheres.append(f"StID >= {filt_status_min}")
-    if filt_status_max > 0:
-        status_wheres.append(f"StID <= {filt_status_max}")
-
+    status_min = int(parameters["filtStatusMin"])
+    status_max = int(parameters["filtStatusMax"])
+    if status_min > 0:
+        status_wheres.append(f"StID >= {status_min}")
+    if status_max > 0:
+        status_wheres.append(f"StID <= {status_max}")
     status_wheres = " AND ".join(status_wheres)
-    if filt_include_ignored == "true":
+    if parameters["filtIncludeIgnored"] == "true":
         status_wheres = f"({status_wheres} OR StID = 98)"
     wheres.append(status_wheres)
 
-    where = " AND ".join(wheres)
-    full_base_sql = base_sql + " WHERE " + where
-
-    session = db.session
-    connection = session.connection()
-
-    return DataTablesSqliteQuery.get_data(full_base_sql, parameters, connection)
+    # Phew.
+    return DataTablesSqliteQuery.get_data(
+        base_sql + " WHERE " + " AND ".join(wheres), parameters, db.session.connection()
+    )

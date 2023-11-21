@@ -18,7 +18,12 @@ bp = Blueprint("term", __name__, url_prefix="/term")
 @bp.route("/index/<search>", methods=["GET"])
 def index(search):
     "Index page."
-    return render_template("term/index.html", initial_search=search)
+    languages = db.session.query(Language).order_by(Language.name).all()
+    langopts = [(lang.id, lang.name) for lang in languages]
+    langopts = [(0, "(all)")] + langopts
+    return render_template(
+        "term/index.html", initial_search=search, language_options=langopts
+    )
 
 
 @bp.route("/datatables", methods=["POST"])
@@ -29,6 +34,7 @@ def datatables_active_source():
     # The DataTablesFlaskParamParser doesn't know about term-specific filters,
     # add those manually.
     filter_param_names = [
+        "filtLanguage",
         "filtParentsOnly",
         "filtAgeMin",
         "filtAgeMax",
