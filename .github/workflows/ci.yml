@@ -53,12 +53,13 @@ jobs:
         ls ${{ github.workspace }}
         cat ${{ github.workspace }}/lute/config/config.yml
 
-    - name: Lint
-      run: inv lint
+    - name: Playwright install
+      run: playwright install
 
-    - name: Coding style
+    - name: Playwright smoke test
       run: |
-        black --check .
+        set -x
+        inv playwright
 
     - name: Test
       run: |
@@ -73,6 +74,14 @@ jobs:
       run: |
         export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
         inv accept --headless -s
+
+    # Code style etc checks after functionality verified.
+    - name: Lint
+      run: inv lint
+
+    - name: Coding style
+      run: |
+        black --check .
 
     - name: Remove mecab for smoke test without mecab
       run: |
