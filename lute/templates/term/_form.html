@@ -153,7 +153,7 @@
 
           // alert("You clicked me: " + clickedtagtext);
           // We should never reach this point if the lang is not set.
-          const langid = {{ form.language_id.object_data }};
+          const langid = $("#language_id").val();
           let url = '';
           {% if embedded_in_reading_frame %}
           url = `/read/termform/${langid}/${clickedtagtext}`;
