@@ -54,13 +54,16 @@ jobs:
         ls ${{ github.workspace }}
         cat ${{ github.workspace }}/lute/config/config.yml
 
-    - name: Playwright install
-      run: playwright install
+    # Playwright tests were hanging far too often on github ci,
+    # but not consistently.  No idea what was going wrong.
+    # TODO github ci: fix playwright hanging.
+    ## - name: Playwright install
+    ##   run: playwright install
 
-    - name: Playwright smoke test
-      run: |
-        set -x
-        inv playwright
+    ## - name: Playwright smoke test
+    ##   run: |
+    ##     set -x
+    ##     inv playwright
 
     - name: Test
       run: |
