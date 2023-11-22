@@ -1,4 +1,9 @@
 
+# 3.0.0 (2023-11-21)
+
+Lute v3 launch.
+
+
 # 3.0.0b11 (2023-11-19)
 
 Feature changes:
