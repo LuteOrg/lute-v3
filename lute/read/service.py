@@ -115,7 +115,7 @@ def get_paragraphs(text):
         return list(set(arr))
 
     renderable_paragraphs = []
-    paranums = unique([t.paragraph_number for t in tokens])
+    paranums = sorted(unique([t.paragraph_number for t in tokens]))
     for pnum in paranums:
         paratokens = [t for t in tokens if t.paragraph_number == pnum]
         senums = sorted(unique([t.sentence_number for t in paratokens]))
