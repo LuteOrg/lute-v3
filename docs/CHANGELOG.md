@@ -1,4 +1,10 @@
 
+# 3.0.1 (2023-11-23)
+
+* [Issue 23](https://github.com/jzohrab/lute-v3/issues/23): paragraphs not rendered in correct order.
+* Inject custom styles into other pages.
+
+
 # 3.0.0 (2023-11-21)
 
 Lute v3 launch.
