@@ -41,6 +41,7 @@ from lute.term_parent_map.routes import bp as term_parent_map_bp
 from lute.backup.routes import bp as backup_bp
 from lute.dev_api.routes import bp as dev_api_bp
 from lute.settings.routes import bp as settings_bp
+from lute.themes.routes import bp as themes_bp
 from lute.cli.commands import bp as cli_bp
 
 
@@ -260,6 +261,7 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(term_parent_map_bp)
     app.register_blueprint(backup_bp)
     app.register_blueprint(settings_bp)
+    app.register_blueprint(themes_bp)
     app.register_blueprint(cli_bp)
     if app_config.is_test_db:
         app.register_blueprint(dev_api_bp)

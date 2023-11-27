@@ -7,18 +7,18 @@ from flask import (
     Blueprint,
     current_app,
     request,
-    Response,
     render_template,
     redirect,
     flash,
     jsonify,
 )
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, IntegerField, TextAreaField
+from wtforms import BooleanField, StringField, IntegerField, TextAreaField, SelectField
 from wtforms.validators import InputRequired, NumberRange
 from wtforms import ValidationError
 from lute.models.language import Language
 from lute.models.setting import UserSetting
+from lute.themes.service import list_themes
 from lute.db import db
 from lute.parse.mecab_parser import JapaneseParser
 
@@ -42,7 +42,9 @@ class UserSettingsForm(FlaskForm):
         },
     )
 
+    current_theme = SelectField("Theme", choices=list_themes())
     custom_styles = TextAreaField("Custom styles")
+    show_highlights = BooleanField("Highlight terms by status")
 
     mecab_path = StringField("MECAB_PATH environment variable")
 
@@ -98,6 +100,7 @@ def edit_settings():
     # Hack: set boolean settings to ints, otherwise they're always checked.
     form.backup_warn.data = int(form.backup_warn.data or 0)
     form.backup_auto.data = int(form.backup_auto.data or 0)
+    form.show_highlights.data = int(form.show_highlights.data or 0)
 
     return render_template("settings/form.html", form=form)
 
@@ -131,14 +134,3 @@ def test_parse():
         JapaneseParser.set_mecab_path_envkey(old_key)
 
     return jsonify(result)
-
-
-@bp.route("/custom_styles", methods=["GET"])
-def custom_styles():
-    """
-    Return the custom settings for inclusion in the base.html.
-    """
-    css = UserSetting.get_value("custom_styles")
-    response = Response(css, 200)
-    response.content_type = "text/css; charset=utf-8"
-    return response

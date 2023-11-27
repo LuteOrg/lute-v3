@@ -1,0 +1,65 @@
+body {
+  background-color: #48484a; /* dark grey paper */
+  color: #c4c8ce; /* light grey font */
+}
+
+.flash-notice {
+  background-color: #b46b7a;
+}
+
+.menu-item > span {
+    color: #c4c8ce !important;
+}
+
+a.home-link {
+    color: #c4c8ce !important;
+}
+
+a {
+  color: #ACACF9;
+}
+
+a:link {
+  color: #ACACF9;
+}
+
+a:visited {
+  color: #ACACF9;
+}
+
+a:hover {
+  color: #FF5C5C;
+}
+
+div#thetext p { line-height: 1.5; }
+span.textitem { font-family: Georgia; color: #c4c8ce;}
+span.status0 { background-color: #48484a; color: #D5FFFF; }
+span.status1 { background-color: #b46b7a; color: #eff1f2; } /* pink highlight */
+span.status2 { background-color: #988542; color: #eff1f2; } /* yellow highlight */
+span.status3 { background-color: #699859; color: #eff1f2; } /* green highlight */
+span.status4 { background-color: #5692AE; color: #eff1f2; } /* blue highlight */
+span.status5 { background-color: #877aad; color: #eff1f2; } /* purple highlight */
+
+input[type="text"] {
+    border-color: #c4c8ce; /* light grey */
+    background-color: #333333; /* dark grey */
+    color: #c4c8ce; /* light grey font */
+}
+
+.ui-widget-content {
+    border-color: #c4c8ce; /* light grey font */
+    background-color: #333333; /* dark grey */
+    color: #c4c8ce; /* light grey font */
+}
+
+textarea {
+    border-color: #c4c8ce; /* light grey font */
+    background-color: #333333; /* dark grey */
+    color: #c4c8ce; /* light grey font */
+}
+
+.sub-menu {
+    border-color: #c4c8ce; /* light grey font */
+    background-color: #333333; /* dark grey */
+    color: #c4c8ce; /* light grey font */
+}

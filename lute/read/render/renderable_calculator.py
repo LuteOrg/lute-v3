@@ -458,6 +458,13 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         return "-".join(parts)
 
     @property
+    def status_class(self):
+        "Status class to apply."
+        if self.wo_id is None:
+            return "status0"
+        return f"status{self.wo_status}"
+
+    @property
     def html_class_string(self):
         """
         Create class string for TextItem.
@@ -466,7 +473,7 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
             return "textitem"
 
         if self.wo_id is None:
-            classes = ["textitem", "click", "word", "status0"]
+            classes = ["textitem", "click", "word"]
             return " ".join(classes)
 
         st = self.wo_status
@@ -475,7 +482,6 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
             "click",
             "word",
             "word" + str(self.wo_id),
-            "status" + str(st),
         ]
 
         tooltip = (

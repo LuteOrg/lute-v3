@@ -11,6 +11,7 @@ from lute.term.model import Repository
 from lute.term.routes import handle_term_form
 from lute.models.book import Book, Text
 from lute.models.term import Term as DBTerm
+from lute.models.setting import UserSetting
 from lute.book.stats import mark_stale
 from lute.db import db
 
@@ -49,6 +50,8 @@ def read(bookid, pagenum):
     prev10 = _page_in_range(book, pagenum - 10)
     next10 = _page_in_range(book, pagenum + 10)
 
+    show_highlights = bool(int(UserSetting.get_value("show_highlights")))
+
     mark_stale(book)
 
     return render_template(
@@ -67,6 +70,7 @@ def read(bookid, pagenum):
         nextpage=nextpage,
         next10page=next10,
         paragraphs=paragraphs,
+        show_highlights=show_highlights,
     )
 
 
