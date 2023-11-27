@@ -79,6 +79,7 @@
   {% endif %}
 
   <span id="textid" style="display:none">{{ textid }}</span>
+  <span id="show_highlights" style="display:none">{{ show_highlights|lower }}</span>
 
   {# Hack for js translation keyboard shortcut. #}
   <span id="translateURL" style="display:none">{{ dictionary_url }}</span>
@@ -88,7 +89,10 @@
   </div>
 
   <script>
-    $(document).ready(prepareTextInteractions);
+    $(document).ready(function() {
+      prepareTextInteractions();
+      add_status_classes();
+    });
 
     let tooltip_help_hover_content = function (setContent) {
       $.ajax({

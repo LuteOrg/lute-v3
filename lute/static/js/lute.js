@@ -42,6 +42,7 @@ function start_hover_mode(should_clear_frames = true) {
   const w = get_current_word();
   if (w != null) {
     $(w).addClass('wordhover');
+    apply_status_class($(w));
   }
 
   if (should_clear_frames)
@@ -58,6 +59,7 @@ let clear_frames = function() {
   $('#dictframeid').attr('src', '/read/empty');
 }
 
+
 /** 
  * Prepare the interaction events with the text.
  */
@@ -72,7 +74,11 @@ function prepareTextInteractions(textid) {
 
   t.on('mouseover', '.word', hover_over);
   t.on('mouseout', '.word', hover_out);
-  
+
+  if (!_show_highlights()) {
+    t.on('mouseover', '.word', hover_over_add_status_class);
+  }
+
   $(document).on('keydown', handle_keydown);
 
   $('#thetext').tooltip({
@@ -120,6 +126,56 @@ let save_curr_data_order = function(el) {
   LUTE_CURR_TERM_DATA_ORDER = parseInt(el.attr('data_order'));
 }
 
+
+/* ========================================= */
+/** Status highlights.
+ * There is a "show_highlights" UserSetting.
+ *
+ * If showing highlights, then the highlights are shown when the page
+ * is rendered; otherwise, they're only shown/removed on hover enter/exit.
+ *
+ * User setting "show_highlights" is rendered in read/index.html. */
+
+/** True if show_highlights setting is True. */
+let _show_highlights = function() {
+  return ($("#show_highlights").text().toLowerCase() == "true");
+}
+
+/**
+ * Terms have data_status_class attribute.  If highlights should be shown,
+ * then add that value to the actual span. */
+function add_status_classes() {
+  if (!_show_highlights())
+    return;
+  $('span.word').toArray().forEach(function (w) {
+    apply_status_class($(w));
+  });
+}
+
+/** Add the data_status_class to the term's classes. */
+let apply_status_class = function(el) {
+  el.addClass(el.attr("data_status_class"));
+}
+
+/** Remove the status from elements, if not showing highlights. */
+let remove_status_highlights = function() {
+  if (_show_highlights()) {
+    /* Not removing anything, always showing highlights. */
+    return;
+  }
+  $('span.word').toArray().forEach(function (m) {
+    el = $(m);
+    el.removeClass(el.attr("data_status_class"));
+  });
+}
+
+/** Hover and term status classes */
+function hover_over_add_status_class(e) {
+  remove_status_highlights();
+  apply_status_class($(this));
+}
+
+
 /* ========================================= */
 /** Hovering */
 
@@ -136,6 +192,7 @@ function hover_out(e) {
     return;
   $('span.wordhover').removeClass('wordhover');
 }
+
 
 /* ========================================= */
 /** Multiword selection */
@@ -330,8 +387,10 @@ let set_cursor = function(newindex) {
     return;
   let curr = words.eq(newindex);
   save_curr_data_order(curr);
+  remove_status_highlights();
   $('span.kwordmarked').removeClass('kwordmarked');
   curr.addClass('kwordmarked');
+  apply_status_class(curr);
   $(window).scrollTo(curr, { axis: 'y', offset: -150 });
   showEditFrame(curr, { autofocus: false });
 }
@@ -341,8 +400,8 @@ let find_non_Ign_or_Wkn = function(currindex, shiftby) {
   let newindex = currindex + shiftby;
   while (newindex >= 0 && newindex <= maxindex) {
     const nextword = words.eq(newindex);
-    const st = nextword.attr('data_status');
-    if (st != 99 && st != 98) {
+    const st = nextword.attr('data_status_class');
+    if (st != 'status99' && st != 'status98') {
       break;
     }
     newindex += shiftby;
@@ -385,6 +444,51 @@ let show_translation = function(e) {
 }
 
 
+/* Change to the next theme, and reload the page. */
+let next_theme = function(e) {
+  $.ajax({
+    url: '/theme/next',
+    type: 'post',
+    dataType: 'JSON',
+    contentType: 'application/json',
+    success: function(response) {
+      location.reload();
+    },
+    error: function(response, status, err) {
+      const msg = {
+        response: response,
+        status: status,
+        error: err
+      };
+      console.log(`failed: ${JSON.stringify(msg, null, 2)}`);
+    }
+  });
+
+}
+
+
+/* Toggle highlighting, and reload the page. */
+let toggle_highlight = function(e) {
+  $.ajax({
+    url: '/theme/toggle_highlight',
+    type: 'post',
+    dataType: 'JSON',
+    contentType: 'application/json',
+    success: function(response) {
+      location.reload();
+    },
+    error: function(response, status, err) {
+      const msg = {
+        response: response,
+        status: status,
+        error: err
+      };
+      console.log(`failed: ${JSON.stringify(msg, null, 2)}`);
+    }
+  });
+}
+
+
 function handle_keydown (e) {
   if (words.size() == 0) {
     // console.log('no words, exiting');
@@ -402,6 +506,8 @@ function handle_keydown (e) {
   const kRIGHT = 39;
   const kC = 67; // C)opy
   const kT = 84; // T)ranslate
+  const kM = 77; // The(M)e
+  const kH = 72; // Toggle H)ighlight
   const k1 = 49;
   const k2 = 50;
   const k3 = 51;
@@ -414,10 +520,12 @@ function handle_keydown (e) {
   map[kRETURN] = () => start_hover_mode();
   map[kHOME] = () => set_cursor(0);
   map[kEND] = () => set_cursor(maxindex);
-  map[kLEFT] = () => move_cursor(-1, e);;
-  map[kRIGHT] = () => move_cursor(+1, e);;
+  map[kLEFT] = () => move_cursor(-1, e);
+  map[kRIGHT] = () => move_cursor(+1, e);
   map[kC] = () => handle_copy(e);
   map[kT] = () => show_translation(e);
+  map[kM] = () => next_theme(e);
+  map[kH] = () => toggle_highlight(e);
   map[k1] = () => update_status_for_marked_elements(1);
   map[k2] = () => update_status_for_marked_elements(2);
   map[k3] = () => update_status_for_marked_elements(3);
@@ -441,18 +549,18 @@ function handle_keydown (e) {
  */
 function update_selected_statuses(newStatus) {
   const newClass = `status${newStatus}`;
-  let update_status = function (e) {
+  let update_data_status_class = function (e) {
     const curr = $(this);
     ltext = curr.text().toLowerCase();
     matches = $('span.word').toArray().filter(el => $(el).text().toLowerCase() == ltext);
     matches.forEach(function (m) {
       $(m).removeClass('status98 status99 status0 status1 status2 status3 status4 status5 shiftClicked')
         .addClass(newClass)
-        .attr('data_status',`${newStatus}`);
+        .attr('data_status_class',`${newClass}`);
     });
   };
-  $('span.kwordmarked').each(update_status);
-  $('span.wordhover').each(update_status);
+  $('span.kwordmarked').each(update_data_status_class);
+  $('span.wordhover').each(update_data_status_class);
 }
 
 

@@ -39,11 +39,19 @@
 
     <tr>
       <td>
-        <h2>Custom styles</h2>
+        <h2>Appearance</h2>
       </td>
       <td />
     </tr>
 
+    <tr>
+      <td>
+        {{ form.current_theme.label }}
+      </td>
+      <td>
+        {{ form.current_theme }}
+      </td>
+    </tr>
     <tr>
       <td>
         {{ form.custom_styles.label }}
@@ -64,6 +72,14 @@
       </td>
       <td>
         {{ form.custom_styles(class="form-largetextarea") }}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {{ form.show_highlights.label }}
+      </td>
+      <td>
+        {{ form.show_highlights }}
       </td>
     </tr>
 

@@ -1,0 +1,13 @@
+body {
+  background-color: #f8f1e2; /* beige paper */
+  color: #262523; /* dark grey font */
+}
+
+ div#thetext p { line-height: 1.5; }
+ span.textitem { font-family: Georgia; color: #262523; }
+ /* span.status0 { background-color: transparent; } */
+ span.status1 { background-color: #f2a2a9; } /* pink highlight */
+ span.status2 { background-color: #f2d35d; } /* yellow highlight */
+ span.status3 { background-color: #a7d287; } /* green highlight */
+ span.status4 { background-color: #a5bbe2; } /* blue highlight */
+ span.status5 { background-color: #c7b1dd; } /* purple highlight */
