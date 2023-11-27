@@ -1,4 +1,9 @@
 
+# 3.0.2 (2023-11-27)
+
+* Add theming and highlight toggling.
+
+
 # 3.0.1 (2023-11-23)
 
 * [Issue 23](https://github.com/jzohrab/lute-v3/issues/23): paragraphs not rendered in correct order.
