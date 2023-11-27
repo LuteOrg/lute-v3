@@ -164,3 +164,24 @@ Feature: User can actually read and stuff.
         And I press hotkey "1"
         Then the reading pane shows:
             Tengo (1)/ /otro/ /amigo (1)/.
+
+
+    Scenario: Toggling highlighting only shows highlights on hovered terms
+        Given a Spanish book "Hola" with content:
+            Tengo un amigo y otro.
+        When I click "Tengo" and press hotkey "1"
+        When I click "un" and press hotkey "2"
+        When I click "amigo" and press hotkey "3"
+        Then the reading pane shows:
+            Tengo (1)/ /un (2)/ /amigo (3)/ /y/ /otro/.
+        When I press hotkey "h"
+        Then the reading pane shows:
+            Tengo/ /un/ /amigo/ /y/ /otro/.
+        When I hover over "Tengo"
+        Then the reading pane shows:
+            Tengo (1)/ /un/ /amigo/ /y/ /otro/.
+        When I press hotkey "h"
+        And I press hotkey "m"
+        And I press hotkey "m"
+        Then the reading pane shows:
+            Tengo (1)/ /un (2)/ /amigo (3)/ /y/ /otro/.
