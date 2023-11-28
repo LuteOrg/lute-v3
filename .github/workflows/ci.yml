@@ -213,7 +213,6 @@ jobs:
   # particularly PlatformDirs package.
   windows-ci:
 
-    needs: base-ci
     runs-on: windows-latest
     timeout-minutes: 30
 
