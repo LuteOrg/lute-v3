@@ -151,10 +151,10 @@ def disable_backup():
     return redirect("/", 302)
 
 
-@bp.route("/throw_error", methods=["GET"])
-def throw_error():
+@bp.route("/throw_error/<message>", methods=["GET"])
+def throw_error(message):
     "Throw an error to ensure handler works!"
-    raise RuntimeError("testing handler")
+    raise RuntimeError(message)
 
 
 @bp.route("/fake_story.html", methods=["GET"])
