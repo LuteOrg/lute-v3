@@ -17,6 +17,17 @@
   </div>
 </div>
 
+{% if "CERTIFICATE_VERIFY_FAILED" in exception_info %}
+<blockquote>
+<p>This looks like an SSL certificate verification error.</p>
+<p>Possible solutions are outlined in
+  <a href="https://stackoverflow.com/questions/42098126/mac-osx-python-ssl-sslerror-ssl-certificate-verify-failed-certificate-verify"
+     target="_blank">this StackOverflow post</a> ... see if any of these are effective.
+</p>
+<p>After applying any solution, restart Lute.</p>
+</blockquote>
+{% endif %}
+
 <p>If this issue persists, please open a
   <a href="https://github.com/jzohrab/lute-v3/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=500%20error"
      target="_blank">GitHub Issue</a>, including all of the above information in the issue.
