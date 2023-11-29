@@ -2,8 +2,8 @@
 Term entity.
 """
 
+from sqlalchemy import and_
 from lute.db import db
-
 
 wordparents = db.Table(
     "wordparents",
@@ -309,7 +309,7 @@ class Term(
         langid = spec.language.id
         text_lc = spec.text_lc
         query = db.session.query(Term).filter(
-            Term.language_id == langid, Term.text_lc == text_lc
+            and_(Term.language_id == langid, Term.text_lc == text_lc)
         )
         terms = query.all()
         if not terms:

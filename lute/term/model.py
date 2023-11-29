@@ -385,7 +385,7 @@ class Repository:
 
         term_lc = term.text_lc
         query = sqlalchtext(
-            """
+            f"""
             SELECT DISTINCT
                 texts.TxBkID,
                 TxID,
@@ -402,6 +402,7 @@ class Repository:
             ) pc ON pc.TxBkID = texts.TxBkID
             WHERE TxReadDate IS NOT NULL
             AND LOWER(SeText) LIKE :pattern
+            AND BkLgID = {term.language_id}
             LIMIT 20
         """
         )
