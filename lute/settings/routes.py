@@ -47,6 +47,12 @@ class UserSettingsForm(FlaskForm):
     show_highlights = BooleanField("Highlight terms by status")
 
     mecab_path = StringField("MECAB_PATH environment variable")
+    reading_choices = [
+        ("katakana", "Katakana"),
+        ("hiragana", "Hiragana"),
+        ("alphabet", "Romaji"),
+    ]
+    japanese_reading = SelectField("Pronunciation characters", choices=reading_choices)
 
     def validate_backup_dir(self, field):
         "Field must be set if enabled."
