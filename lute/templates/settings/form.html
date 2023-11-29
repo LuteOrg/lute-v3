@@ -85,21 +85,11 @@
 
     <tr>
       <td>
-        <h2>MeCab (Japanese only)</h2>
+        <h2>Japanese</h2>
       </td>
       <td />
     </tr>
 
-    <tr>
-      <td>
-        <button onclick="test_mecab_setup(); return false;">
-          Test my MeCab configuration
-        </button>
-      </td>
-      <td>
-        <div id="parse_result"></div>
-      </td>
-    </tr>
     <tr>
       <td>
         {{ form.mecab_path.label }}
@@ -126,6 +116,20 @@
         </blockquote>
       </td>
       <td>{{ form.mecab_path(class="form-control") }}</td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <button onclick="test_mecab_setup(); return false;">
+          Test my MeCab configuration
+        </button>
+        <div style="margin-top: 5px" id="parse_result"></div>
+      </td>
+    </tr>
+    <tr>
+      <td>{{ form.japanese_reading.label }}</td>
+      <td>{{ form.japanese_reading }}</td>
     </tr>
 
   </table>
