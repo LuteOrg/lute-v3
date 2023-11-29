@@ -30,6 +30,12 @@ class SettingBase(db.Model):
         """
 
     @classmethod
+    def set_value_post(cls, keyname, keyvalue):
+        """
+        Post-setting value for certain keys."
+        """
+
+    @classmethod
     def set_value(cls, keyname, keyvalue):
         "Set, but don't save, a setting."
         cls.key_exists_precheck(keyname)
@@ -39,6 +45,7 @@ class SettingBase(db.Model):
             s.key = keyname
         s.value = keyvalue
         db.session.add(s)
+        cls.set_value_post(keyname, keyvalue)
 
     @classmethod
     def key_exists(cls, keyname):
@@ -82,6 +89,19 @@ class UserSetting(SettingBase):
         """
         if not UserSetting.key_exists(keyname):
             raise MissingUserSettingKeyException(keyname)
+
+    @classmethod
+    def set_value_post(cls, keyname, keyvalue):
+        """
+        Setting some keys runs other code.
+        """
+        if keyname == "mecab_path":
+            mp = "MECAB_PATH"
+            if keyvalue is None or keyvalue == "":
+                if mp in os.environ:
+                    del os.environ[mp]
+            else:
+                os.environ[mp] = keyvalue.strip()
 
     @staticmethod
     def _revised_mecab_path():
