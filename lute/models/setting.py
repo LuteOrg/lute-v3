@@ -150,6 +150,7 @@ class UserSetting(SettingBase):
             "backup_dir": app_config.default_user_backup_path,
             "backup_count": 5,
             "mecab_path": None,
+            "japanese_reading": "katakana",
             "current_theme": "-",
             "custom_styles": "/* Custom css to modify Lute's appearance. */",
             "show_highlights": True,
