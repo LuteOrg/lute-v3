@@ -88,8 +88,6 @@ def edit_settings():
                 UserSetting.set_value(field.id, field.data)
         db.session.commit()
 
-        JapaneseParser.set_mecab_path_envkey(form.mecab_path.data)
-
         flash("Settings updated", "success")
         return redirect("/")
 
@@ -115,10 +113,10 @@ def test_parse():
 
     """
     mecab_path = request.args.get("mecab_path", None)
-    old_key = JapaneseParser.get_mecab_path_envkey()
+    old_setting = UserSetting.get_value("mecab_path")
     result = {"failure": "tbd"}
     try:
-        JapaneseParser.set_mecab_path_envkey(mecab_path)
+        UserSetting.set_value("mecab_path", mecab_path)
         # Parsing requires a language, even if it's a dummy.
         lang = Language()
         p = JapaneseParser()
@@ -131,6 +129,6 @@ def test_parse():
         message = f"{type(e).__name__}: { str(e) }"
         result = {"result": "failure", "message": message}
     finally:
-        JapaneseParser.set_mecab_path_envkey(old_key)
+        UserSetting.set_value("mecab_path", old_setting)
 
     return jsonify(result)

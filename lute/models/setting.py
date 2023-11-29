@@ -6,7 +6,6 @@ import os
 import datetime
 from flask import current_app
 from lute.db import db
-from lute.parse.mecab_parser import JapaneseParser
 
 
 class SettingBase(db.Model):
@@ -171,10 +170,6 @@ class UserSetting(SettingBase):
         revised_mecab_path = UserSetting._revised_mecab_path()
         UserSetting.set_value("mecab_path", revised_mecab_path)
         db.session.commit()
-
-        # This feels wrong, somehow ... possibly could have an event
-        # bus that posts messages about the setting.
-        JapaneseParser.set_mecab_path_envkey(UserSetting.get_value("mecab_path"))
 
 
 class SystemSetting(SettingBase):

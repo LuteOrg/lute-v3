@@ -28,36 +28,24 @@ class JapaneseParser(AbstractParser):
     The parser uses natto-py library, and so should
     be able to find mecab automatically; if it can't,
     you may need to set the MECAB_PATH env variable,
-    managed here by the set_mecab_path_envkey() method.
+    managed by UserSetting.set_value("mecab_path", p)
     """
 
     _is_supported = None
-
-    @staticmethod
-    def set_mecab_path_envkey(v):
-        """
-        Sets the key MECAB_PATH key for natto-py.
-        Deletes if None or ''.
-        """
-        if "MECAB_PATH" in os.environ:
-            del os.environ["MECAB_PATH"]
-        if v is not None and v.strip() != "":
-            os.environ["MECAB_PATH"] = v.strip()
-        JapaneseParser._is_supported = None
-
-    @staticmethod
-    def get_mecab_path_envkey():
-        return os.getenv("MECAB_PATH")
+    _old_mecab_path = None
 
     @classmethod
     def is_supported(cls):
         """
         True if a natto MeCab can be instantiated,
-        otherwise false.  The value is cached _just in case_,
-        thought that's probably premature optimization.
+        otherwise false.
         """
-        if JapaneseParser._is_supported is not None:
+        mecab_path = os.environ.get("MECAB_PATH", "<NOTSET>")
+        if (
+            mecab_path == JapaneseParser._old_mecab_path
+        ) and JapaneseParser._is_supported is not None:
             return JapaneseParser._is_supported
+
         b = False
 
         # Calling MeCab() prints to stderr even if the
@@ -72,6 +60,7 @@ class JapaneseParser(AbstractParser):
         finally:
             sys.stderr = sys.__stderr__
 
+        JapaneseParser._old_mecab_path = mecab_path
         JapaneseParser._is_supported = b
         return b
 
