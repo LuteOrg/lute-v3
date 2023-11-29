@@ -2,6 +2,7 @@
 Settings test.
 """
 
+import os
 import pytest
 from sqlalchemy import text
 from lute.db import db
@@ -100,3 +101,13 @@ def test_get_or_set_user_setting_unknown_key_throws(app_context):
         UserSetting.get_value("bad_key")
     with pytest.raises(MissingUserSettingKeyException):
         UserSetting.set_value("bad_key", 17)
+
+
+def test_setting_mecab_path_sets_env_var(app_context):
+    "Natto-py needs an env var."
+    UserSetting.set_value("mecab_path", "blah")
+    assert os.environ["MECAB_PATH"] == "blah", "was set"
+    UserSetting.set_value("mecab_path", None)
+    assert os.environ.get("MECAB_PATH", "X") == "X", "not set"
+    UserSetting.set_value("mecab_path", "")
+    assert os.environ.get("MECAB_PATH", "Y") == "Y", "not set"

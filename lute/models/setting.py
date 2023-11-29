@@ -6,7 +6,6 @@ import os
 import datetime
 from flask import current_app
 from lute.db import db
-from lute.parse.mecab_parser import JapaneseParser
 
 
 class SettingBase(db.Model):
@@ -30,6 +29,12 @@ class SettingBase(db.Model):
         """
 
     @classmethod
+    def set_value_post(cls, keyname, keyvalue):
+        """
+        Post-setting value for certain keys."
+        """
+
+    @classmethod
     def set_value(cls, keyname, keyvalue):
         "Set, but don't save, a setting."
         cls.key_exists_precheck(keyname)
@@ -39,6 +44,7 @@ class SettingBase(db.Model):
             s.key = keyname
         s.value = keyvalue
         db.session.add(s)
+        cls.set_value_post(keyname, keyvalue)
 
     @classmethod
     def key_exists(cls, keyname):
@@ -82,6 +88,19 @@ class UserSetting(SettingBase):
         """
         if not UserSetting.key_exists(keyname):
             raise MissingUserSettingKeyException(keyname)
+
+    @classmethod
+    def set_value_post(cls, keyname, keyvalue):
+        """
+        Setting some keys runs other code.
+        """
+        if keyname == "mecab_path":
+            mp = "MECAB_PATH"
+            if keyvalue is None or keyvalue == "":
+                if mp in os.environ:
+                    del os.environ[mp]
+            else:
+                os.environ[mp] = keyvalue.strip()
 
     @staticmethod
     def _revised_mecab_path():
@@ -151,10 +170,6 @@ class UserSetting(SettingBase):
         revised_mecab_path = UserSetting._revised_mecab_path()
         UserSetting.set_value("mecab_path", revised_mecab_path)
         db.session.commit()
-
-        # This feels wrong, somehow ... possibly could have an event
-        # bus that posts messages about the setting.
-        JapaneseParser.set_mecab_path_envkey(UserSetting.get_value("mecab_path"))
 
 
 class SystemSetting(SettingBase):

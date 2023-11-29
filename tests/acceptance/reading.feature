@@ -28,6 +28,19 @@ Feature: User can actually read and stuff.
             Hola (2)/. /Adios/ /amigo/.
 
 
+    Scenario: Reading a Japanese book
+        Given a Japanese book "Genki" with content:
+            私は元気です.
+        Then the page title is Reading "Genki (1/1)"
+        And the reading pane shows:
+            私/は/元気/です/.
+        When I click "元気" and edit the form:
+            translation: genki
+            status: 2
+        Then the reading pane shows:
+            私/は/元気 (2)/です/.
+
+
     Scenario: Changing term case in form is allowed
         Given a Spanish book "Hola" with content:
             Hola. Adios amigo.
