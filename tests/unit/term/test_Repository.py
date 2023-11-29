@@ -629,3 +629,29 @@ def test_get_references_only_includes_read_texts(spanish, repo):
 
     refs = repo.find_references(tengo)
     assert len(refs["term"]) == 2, "have refs once text is read"
+
+
+@pytest.mark.sentences
+def test_get_references_only_includes_refs_in_same_language(spanish, english, repo):
+    "Like it says above."
+    text1 = make_text("hola", "Tengo un gato.  No tengo un perro.", spanish)
+    text2 = make_text("hola", "Tengo in english.", english)
+
+    tengo = Term()
+    tengo.language_id = spanish.id
+    tengo.text = "tengo"
+    repo.add(tengo)
+    repo.commit()
+
+    text1.read_date = datetime.now()
+    text2.read_date = datetime.now()
+    db.session.add(text1)
+    db.session.add(text2)
+    db.session.commit()
+
+    refs = repo.find_references(tengo)
+    assert len(refs["term"]) == 2, "only have 2 refs (spanish)"
+    sentences = [r.sentence for r in refs["term"]]
+    assert "<b>Tengo</b> un gato." in sentences
+    assert "No <b>tengo</b> un perro." in sentences
+    assert "<b>Tengo</b> in english." not in sentences
