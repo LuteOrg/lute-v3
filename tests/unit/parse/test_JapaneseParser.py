@@ -54,7 +54,7 @@ def test_end_of_sentence_stored_in_parsed_tokens(japanese):
     assert_tokens_equals(s, japanese, expected)
 
 
-def test_readings():
+def test_readings(app_context):
     """
     Parser returns readings if they add value.
     """
