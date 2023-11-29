@@ -16,7 +16,9 @@ import os
 import re
 from typing import List
 from natto import MeCab
+import jaconv
 from lute.parse.base import ParsedToken, AbstractParser
+from lute.models.setting import UserSetting
 
 
 class JapaneseParser(AbstractParser):
@@ -136,4 +138,12 @@ class JapaneseParser(AbstractParser):
         ret = "".join(readings).strip()
         if ret in ("", text):
             return None
-        return ret
+
+        jp_reading_setting = UserSetting.get_value("japanese_reading")
+        if jp_reading_setting == "katakana":
+            return ret
+        if jp_reading_setting == "hiragana":
+            return jaconv.kata2hira(ret)
+        if jp_reading_setting == "alphabet":
+            return jaconv.kata2alphabet(ret)
+        raise RuntimeError(f"Bad reading type {jp_reading_setting}")
