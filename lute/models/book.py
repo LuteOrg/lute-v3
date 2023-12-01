@@ -147,6 +147,7 @@ class Text(db.Model):
     order = db.Column("TxOrder", db.Integer)
     _read_date = db.Column("TxReadDate", db.DateTime, nullable=True)
     bk_id = db.Column("TxBkID", db.Integer, db.ForeignKey("books.BkID"), nullable=False)
+    word_count = db.Column("TxWordCount", db.Integer, nullable=True)
 
     book = db.relationship("Book", back_populates="texts")
     sentences = db.relationship(
