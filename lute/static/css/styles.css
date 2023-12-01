@@ -650,3 +650,8 @@ div.code pre {
     font-size: 14px;
     color: #212529;
 }
+
+
+/* Stats. */
+
+table.statsWordsRead th, td { padding: 5px; }

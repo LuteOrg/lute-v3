@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Stats{% endblock %}
+
+{% block header %}Stats{% endblock %}
+
+{% block body %}
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/chart.umd.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/chartjs-adapter-date-fns.js') }}" charset="utf-8"></script>
+
+<h2>Words read</h2>
+
+<table class="statsWordsRead">
+  <tr>
+    <th />
+    <th>today</th>
+    <th>last week</th>
+    <th>last month</th>
+    <th>last year</th>
+    <th>all time</th>
+  </tr>
+  {% for lang in read_table_data %}
+  <tr>
+    <td>{{ lang.name }}</td>
+    <td>{{ lang.counts.day }}</td>
+    <td>{{ lang.counts.week }}</td>
+    <td>{{ lang.counts.month }}</td>
+    <td>{{ lang.counts.year }}</td>
+    <td>{{ lang.counts.total }}</td>
+  </tr>
+  {% endfor %}
+</ul>
+</table>
+
+<div style="width:60%;">
+  <canvas id="wordCountChart"></canvas>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch('/stats/data')
+      .then(response => response.json())
+      .then(data => {
+        renderChart(data);
+      });
+  });
+
+  function renderChart(data) {
+    var ctx = document.getElementById('wordCountChart').getContext('2d');
+
+    datasets = [];
+
+    Object.entries(data).forEach(entry => {
+      const [langname, langdata] = entry;
+
+      var daily = {
+        label: `${langname}`,
+        yAxisID: 'daily',
+        data: [],
+        borderWidth: 1,
+        type: 'bar',  // Bar chart for daily count
+      };
+
+      var total = {
+        label: `${langname}`,
+        yAxisID: 'total',
+        data: [],
+        borderWidth: 2,
+        type: 'line',  // Line chart for running total
+        pointRadius: 0,
+      };
+
+      langdata.forEach(item => {
+        // daily.data.push({x: item.readdate, y: item.wordcount});
+        total.data.push({x: item.readdate, y: item.runningTotal});
+      });
+
+      // datasets.push(daily);
+      datasets.push(total);
+    });
+
+    var chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        datasets: datasets
+      },
+      options: {
+        scales: {
+          // Unable to get the "time" scale working correctly,
+          // so now the data just has all of the dates.
+          x: {
+            type: 'time',
+            display: true,
+            time: {
+              unit: 'day'
+            },
+            title: {
+              display: true,
+              text: 'Date'
+            },
+            ticks: {
+              major: {
+                enabled: true
+              },
+              color: (context) => context.tick && context.tick.major && '#FF0000',
+              font: function(context) {
+                if (context.tick && context.tick.major) {
+                  return {
+                    weight: 'bold'
+                  };
+                }
+              }
+            }
+          },
+          /*
+          daily: {
+            position: 'left',
+            title: {
+              display: true,
+              text: 'daily',
+            },
+            grid: {
+              display: false
+            },
+            ticks: {
+              beginAtZero: true,
+              callback: function(value) {
+                return value.toLocaleString(); // Format y-axis labels
+              }
+            }
+            },
+            */
+          total: {
+            position: 'right',
+            title: {
+              display: true,
+              text: 'total',
+            },
+            grid: {
+              display: false
+            },
+            ticks: {
+              beginAtZero: true,
+              callback: function(value) {
+                return value.toLocaleString(); // Format y-axis labels
+              }
+            }
+          },
+        }
+      }
+    });
+  }
+</script>
+
+{% endblock %}
