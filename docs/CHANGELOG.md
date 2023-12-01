@@ -1,4 +1,20 @@
 
+# 3.0.3 (2023-11-30)
+
+Features and big fixes:
+
+* Add read word count stats page.
+* Bugfix: Only return sentence refs in same language.
+* Add japanese automatic reading choices (katakana, hiragana, romaji)
+* Add cert verification failure workaround message on 500 error.
+
+Back-end changes:
+
+* Break setting->JapaneseParser dependency.
+* UserSetting mecab_path sets environ MECAB_PATH.
+* Break ci dependency.
+
+
 # 3.0.2 (2023-11-27)
 
 * Add theming and highlight toggling.
