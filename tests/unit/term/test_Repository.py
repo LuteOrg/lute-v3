@@ -655,3 +655,22 @@ def test_get_references_only_includes_refs_in_same_language(spanish, english, re
     assert "<b>Tengo</b> un gato." in sentences
     assert "No <b>tengo</b> un perro." in sentences
     assert "<b>Tengo</b> in english." not in sentences
+
+
+@pytest.mark.sentences
+def test_get_references_new_term(spanish, repo):
+    "Check references with parents and children."
+    text = make_text("hola", "Tengo un gato.", spanish)
+    text.read_date = datetime.now()
+    db.session.add(text)
+
+    tengo = Term()
+    tengo.language_id = spanish.id
+    tengo.text = "tengo"
+
+    refs = repo.find_references(tengo)
+    assert full_refs_to_string(refs) == {
+        "term": ["hola (1/1), <b>Tengo</b> un gato."],
+        "children": [],
+        "parents": [],
+    }, "term tengo"

@@ -402,7 +402,7 @@ class Repository:
             ) pc ON pc.TxBkID = texts.TxBkID
             WHERE TxReadDate IS NOT NULL
             AND LOWER(SeText) LIKE :pattern
-            AND BkLgID = {term.language_id}
+            AND BkLgID = {term.language.id}
             LIMIT 20
         """
         )
