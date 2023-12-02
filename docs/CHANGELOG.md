@@ -1,4 +1,9 @@
 
+# 3.0.4 (2023-12-01)
+
+* Fix sentence lookup for new term.
+
+
 # 3.0.3 (2023-11-30)
 
 Features and big fixes:
