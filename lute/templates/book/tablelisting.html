@@ -41,10 +41,17 @@
             const pgnum = parseInt(row[10]);
             const pgcount = parseInt(row[8]);
             let pgfraction = '';
-            if (pgnum > 1) {
+
+            const completed = (parseInt(row[11]) == 1);
+            let completed_style = '';
+            if (completed) {
+              completed_style = 'class="completed_book"';
+            }
+            else if (pgnum > 1) {
               pgfraction = ` (${pgnum}/${pgcount})`;
             }
-            return `<a href="/read/${bkid}/page/${pgnum}">${row[0]}${pgfraction}</a>`;
+
+            return `<a ${completed_style} href="/read/${bkid}/page/${pgnum}">${row[0]}${pgfraction}</a>`;
           }
         },
         { "name": "LgName", "targets": 1 },
@@ -98,6 +105,7 @@
         { "name": "PageCount", "targets": 10, "data": null, "visible": false },
         { "name": "DistinctCount", "targets": 11, "data": null, "visible": false },
         { "name": "PageNum", "targets": 12, "data": null, "visible": false },
+        { "name": "IsCompleted", "targets": 13, "data": null, "visible": false },
       ],
 
       // Ajax call
