@@ -3,8 +3,12 @@ Flask-wtf forms.
 """
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, SelectField
+from wtforms import StringField, BooleanField, SelectField, FormField, FieldList
 from wtforms.validators import DataRequired
+
+
+class BForm(FlaskForm):
+    name = StringField("Name")
 
 
 class LanguageForm(FlaskForm):
@@ -15,6 +19,7 @@ class LanguageForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     dict_1_uri = StringField("Dictionary 1", validators=[DataRequired()])
     dict_2_uri = StringField("Dictionary 2")
+    b_entities = FieldList(FormField(BForm))
     sentence_translate_uri = StringField(
         "Sentence translation", validators=[DataRequired()]
     )
