@@ -140,6 +140,11 @@ div#divbooktable {
     margin-left: auto;
 }
 
+a.completed_book:after {
+    content: url('/static/icn/tick.png');
+    margin-left: 5px;
+}
+
 /* End book listing */
 
 /* Term listing CSV export. */
