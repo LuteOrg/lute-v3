@@ -22,10 +22,12 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery.tagit.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/datatables.min.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/player-styles.css') }}" />
 
   <link rel="stylesheet" type="text/css" href="/theme/current">
   <link rel="stylesheet" type="text/css" href="/theme/custom_styles">
 
+  
   <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.scrollTo.min.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"  charset="utf-8"></script>
@@ -33,6 +35,9 @@
   <script type="text/javascript" src="{{ url_for('static', filename='js/tag-it.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.hoverIntent.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
+
+
 
   <!-- this calls a route defined in app_factory to never cache this file -->
   <script type="text/javascript" src="/static/js/never_cache/lute.js" charset="utf-8"></script>
@@ -108,7 +113,6 @@
         <span id="menu_about">About</span>
         <ul class="sub-menu last-sub-menu">
           <li><a href="/version">Version and software info</a></li>
-          <li><a href="/stats/">Statistics</a></li>
           <li><a href="https://jzohrab.github.io/lute-manual/" target="_blank">Docs</a></li>
           <li><a href="https://discord.gg/CzFUQP5m8u" target="_blank">Discord</a></li>
         </ul>
