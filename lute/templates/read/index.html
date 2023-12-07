@@ -4,15 +4,21 @@
 
 {% block body %}
 
-<table style="table-layout: fixed; border-spacing: 0; ">
+<table style="table-layout: fixed; border-spacing: 0">
   <tr>
     <td width="2px">
-      <img src="{{ url_for('static', filename='img/lute.png') }}" class="lutelogo_small" />
+      <img
+        src="{{ url_for('static', filename='img/lute.png') }}"
+        class="lutelogo_small"
+      />
     </td>
     <td>
       <a href="/" tabindex="-1" id="reading_home_link">Home</a>
       {% if config.ENV == 'dev' %}
-      <span style="background-color: blue; color: white; margin: 2px; padding: 2px;">Dev environment</span>
+      <span
+        style="background-color: blue; color: white; margin: 2px; padding: 2px"
+        >Dev environment</span
+      >
       {% endif %}
     </td>
   </tr>
@@ -20,76 +26,155 @@
 
 <div id="read_pane_left">
   <div id="reading-header">
-
     <!-- Lacking css skills, so table layout to the rescue. -->
     <table style="width: 100%">
       <tr>
         <td align="left">
-          <h2 style="margin: 0px;">
+          <h2 style="margin: 0px">
             {% if prev10page != pagenum %}
-            <a id="navPrev10" href="/read/{{ book.id }}/page/{{ prev10page }}" title="page {{ prev10page }}" tabindex="-1">&#171;</a>
+            <a
+              id="navPrev10"
+              href="/read/{{ book.id }}/page/{{ prev10page }}"
+              title="page {{ prev10page }}"
+              tabindex="-1"
+              >&#171;</a>
             {% else %}
-            <span style="color: lightgrey;">&#171;</span>
+            <span style="color: lightgrey">&#171;</span>
             {% endif %}
 
             {% if prevpage != pagenum %}
-            <a id="navPrev" href="/read/{{ book.id }}/page/{{ prevpage }}" title="page {{ prevpage }}" tabindex="-1">&#8249;</a>
+            <a
+              id="navPrev"
+              href="/read/{{ book.id }}/page/{{ prevpage }}"
+              title="page {{ prevpage }}"
+              tabindex="-1"
+              >&#8249;</a>
             {% else %}
-            <span style="color: lightgrey;">&#8249;</span>
+            <span style="color: lightgrey">&#8249;</span>
             {% endif %}
 
             {{ pagenum }}/{{ pagecount }}
 
             {% if pagenum != pagecount %}
-            <a id="navNext" href="/read/{{ book.id }}/page/{{ nextpage }}" title="page {{ nextpage }}" tabindex="-1">&#8250;</a>
+            <a
+              id="navNext"
+              href="/read/{{ book.id }}/page/{{ nextpage }}"
+              title="page {{ nextpage }}"
+              tabindex="-1"
+              >&#8250;</a>
             {% else %}
-            <span style="color: lightgrey;">&#8250;</span>
+            <span style="color: lightgrey">&#8250;</span>
             {% endif %}
 
             {% if next10page != pagecount %}
-            <a id="navNext10" href="/read/{{ book.id }}/page/{{ next10page }}" title="page {{ next10page }}" tabindex="-1">&#187;</a>
+            <a
+              id="navNext10"
+              href="/read/{{ book.id }}/page/{{ next10page }}"
+              title="page {{ next10page }}"
+              tabindex="-1"
+              >&#187;</a>
             {% else %}
-            <span style="color: lightgrey;">&#187;</span>
+            <span style="color: lightgrey">&#187;</span>
             {% endif %}
           </h2>
         </td>
         <td align="right">
           {% if book.source_uri %}
+          <a>
+            <label class="audio-label" for="myfile">
+              <img
+                src="{{ url_for('static', filename='icn/audio.png') }}"
+                title="Load audio file" />
+            </label>
+          </a>
+          <input type="file" id="myfile" name="myfile" />
           <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
-            <img src="{{ url_for('static', filename='icn/external.png') }}" title="Show source URL" />
+            <img
+              src="{{ url_for('static', filename='icn/external.png') }}"
+              title="Show source URL" />
           </a>
           {% endif %}
           <a id="editText" href="/read/editpage/{{ text.id }}" tabindex="-1">
-            <img src="{{ url_for('static', filename='icn/document--pencil.png') }}"
-                 title="Edit" alt="Edit" />
+            <img
+              src="{{ url_for('static', filename='icn/document--pencil.png') }}"
+              title="Edit"
+              alt="Edit" />
           </a>
-          <img id="keyboard_shortcuts" style="margin-right:10px;"
-               src="{{ url_for('static', filename='icn/question-balloon.png') }}"
-               title="Keyboard shortcuts" />
+          <img
+            id="keyboard_shortcuts"
+            style="margin-right: 10px"
+            src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+            title="Keyboard shortcuts"
+          />
         </td>
       </tr>
     </table>
 
     <hr />
+  </div>
+  {% if pagenum == 1 %}
+  <h2>{{ book.title }}</h2>
 
+  <div class="audio-player-container">
+    <audio id="player" preload="metadata" src=""></audio>
+
+    <div class="audio-player-top-container">
+      <div class="play-btn-container">
+        <button id="play-btn"><span></span></button>
+      </div>
+      <div class="audio-player-timeline-container-grid">
+        <div id="timeline-container" class="audio-player-timeline-container">
+          <input type="range" class="timeline" max="100" value="0" />
+          <!-- <div class="marker"></div> -->
+          <div class="duration-container">
+            <span class="current-time">0:00</span>
+            <span class="duration">0:00</span>
+          </div>
+        </div>
+        <button id="playback-rate-btn"><span>1.0</span></button>
+      </div>
+      <div class="audio-player-right-container">
+        <div class="volume-container">
+          <!-- <button id="volume-on-btn"><span></span></button> -->
+          <input type="range" class="volume" max="100" value="100" />
+        </div>
+        <div class="rewind-btn-container">
+          <button id="rewind-btn"></button>
+          <button id="ff-btn"></button>
+        </div>
+        <select name="rewind-option" id="rewind-option">
+          <option value="1">1 sec</option>
+          <option value="2">2 sec</option>
+          <option value="3" selected>3 sec</option>
+          <option value="4">4 sec</option>
+          <option value="5">5 sec</option>
+        </select>
+        <div class="bookmark-btn-container">
+          <button id="bkm-save-btn"></button>
+          <button id="bkm-delete-btn"></button>
+        </div>
+        <div class="bookmark-jump-container">
+          <button id="bkm-prev-btn"></button>
+          <button id="bkm-next-btn"></button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  {% if pagenum == 1 %}
-    <h2>{{ book.title }}</h2>
   {% endif %}
 
-  <span id="textid" style="display:none">{{ textid }}</span>
-  <span id="show_highlights" style="display:none">{{ show_highlights|lower }}</span>
+  <span id="textid" style="display: none">{{ textid }}</span>
+  <span id="show_highlights" style="display: none">{{ show_highlights|lower }}</span>
 
   {# Hack for js translation keyboard shortcut. #}
-  <span id="translateURL" style="display:none">{{ dictionary_url }}</span>
+  <span id="translateURL" style="display: none">{{ dictionary_url }}</span>
 
-  <div id="thetext" {% if is_rtl %}dir="rtl"{% endif %}>
+  <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
     {% include 'read/sentences.html' %}
   </div>
 
   <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
       prepareTextInteractions();
       add_status_classes();
     });
@@ -97,88 +182,123 @@
     let tooltip_help_hover_content = function (setContent) {
       $.ajax({
         url: `/read/keyboard_shortcuts`,
-        type: 'get',
-        success: function(response) {
+        type: "get",
+        success: function (response) {
           setContent(response);
-        }
+        },
       });
-    }
+    };
 
     $("#keyboard_shortcuts").tooltip({
-      position: { my: 'left top+10', at: 'left bottom', collision: 'flipfit flip' },
-      show: { easing: 'easeOutCirc' },
-      content: function (setContent) { tooltip_help_hover_content(setContent); }
+      position: {
+        my: "left top+10",
+        at: "left bottom",
+        collision: "flipfit flip",
+      },
+      show: { easing: "easeOutCirc" },
+      content: function (setContent) {
+        tooltip_help_hover_content(setContent);
+      },
     });
   </script>
 
-  <div id="reading-footer"  style="text-align: center;">
+  <div id="reading-footer" style="text-align: center">
     <h2>
-      <form style="display:none"
-            id="setknown"
-            action="/read/{{ book.id }}/page/{{ pagenum }}/allknown/{{ pagenum }}"
-            method="post">
-      </form>
-      <a id="footerMarkRestAsKnown"
-         style="text-decoration: none; cursor: pointer;"
-         onclick="document.getElementById('setknown').submit(); return false;"
-         title="Mark rest as known, mark page as read" tabindex="-1">
+      <form
+        style="display: none"
+        id="setknown"
+        action="/read/{{ book.id }}/page/{{ pagenum }}/allknown/{{ pagenum }}"
+        method="post"
+      ></form>
+      <a
+        id="footerMarkRestAsKnown"
+        style="text-decoration: none; cursor: pointer"
+        onclick="document.getElementById('setknown').submit(); return false;"
+        title="Mark rest as known, mark page as read"
+        tabindex="-1"
+      >
         <img src="{{ url_for('static', filename='icn/tick.png') }}" />
       </a>
 
-      {% if pagenum != pagecount %}
-      &nbsp;
-      <form style="display:none"
-            id="knowntonext"
-            action="/read/{{ book.id }}/page/{{ pagenum }}/allknown/{{ pagenum + 1 }}"
-            method="post">
-      </form>
-      <a id="footerMarkRestAsKnownNextPage"
-         style="text-decoration: none; cursor: pointer;"
-         onclick="document.getElementById('knowntonext').submit(); return false;"
-         title="Mark rest as known, mark page as read, then go to next page"
-         tabindex="-1">
+      {% if pagenum != pagecount %} &nbsp;
+      <form
+        style="display: none"
+        id="knowntonext"
+        action="/read/{{ book.id }}/page/{{ pagenum }}/allknown/{{ pagenum + 1 }}"
+        method="post"
+      ></form>
+      <a
+        id="footerMarkRestAsKnownNextPage"
+        style="text-decoration: none; cursor: pointer"
+        onclick="document.getElementById('knowntonext').submit(); return false;"
+        title="Mark rest as known, mark page as read, then go to next page"
+        tabindex="-1"
+      >
         <img src="{{ url_for('static', filename='icn/tick.png') }}" />&#8250;
       </a>
       &nbsp;
 
-      <form style="display:none"
-            id="gotonext"
-            action="/read/{{ book.id }}/page/{{ pagenum }}/markread/{{ pagenum + 1 }}"
-            method="post">
-      </form>
-      <a id="footerNextPage"
-         style="text-decoration: none; cursor: pointer;"
-         onclick="document.getElementById('gotonext').submit(); return false;"
-         title="Mark page as read, then go to next page"
-         tabindex="-1">&#8250;</a>
+      <form
+        style="display: none"
+        id="gotonext"
+        action="/read/{{ book.id }}/page/{{ pagenum }}/markread/{{ pagenum + 1 }}"
+        method="post"
+      ></form>
+      <a
+        id="footerNextPage"
+        style="text-decoration: none; cursor: pointer"
+        onclick="document.getElementById('gotonext').submit(); return false;"
+        title="Mark page as read, then go to next page"
+        tabindex="-1"
+        >&#8250;</a>
       {% endif %}
     </h2>
 
     {% if pagenum == pagecount %}
     <h2>&#127881;</h2>
     <p>
-      <a href="" tabindex="-1" onclick="$('#actionposter').submit(); return false;">Archive book</a> |
+      <a
+        href=""
+        tabindex="-1"
+        onclick="$('#actionposter').submit(); return false;"
+        >Archive book</a>
+      |
       <a href="/" tabindex="-1">Home</a>
     </p>
 
-    <form id="actionposter" method="post" action="/book/archive/{{ book.id }}"></form>
+    <form
+      id="actionposter"
+      method="post"
+      action="/book/archive/{{ book.id }}"
+    ></form>
     {% endif %}
-
   </div>
-  
 </div>
 
-
 <div id="read_pane_right">
-    <iframe name="wordframe" id="wordframeid" class="rightreadingframe" src="about:blank" scrolling="auto"
-            style="height: 35%; width: 100%;" frameBorder="0">
-      Frame support required.
-    </iframe>
+  <iframe
+    name="wordframe"
+    id="wordframeid"
+    class="rightreadingframe"
+    src="about:blank"
+    scrolling="auto"
+    style="height: 35%; width: 100%"
+    frameborder="0"
+  >
+    Frame support required.
+  </iframe>
 
-    <iframe name="dictframe" id="dictframeid" class="rightreadingframe" src="about:blank" scrolling="auto"
-            style="height: 65%; width: 100%;" frameBorder="0">
-      Frame support required.
-    </iframe>
+  <iframe
+    name="dictframe"
+    id="dictframeid"
+    class="rightreadingframe"
+    src="about:blank"
+    scrolling="auto"
+    style="height: 65%; width: 100%"
+    frameborder="0"
+  >
+    Frame support required.
+  </iframe>
 </div>
 
 {% endblock %}
