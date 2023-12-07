@@ -82,3 +82,7 @@ wrapt==1.15.0
 wsproto==1.2.0
 WTForms==3.0.1
 zipp==3.17.0
+SudachiDict-core==20230927
+SudachiDict-full==20230927
+SudachiDict-small==20230927
+SudachiPy==0.6.7
