@@ -7,18 +7,12 @@
 <table style="table-layout: fixed; border-spacing: 0">
   <tr>
     <td width="2px">
-      <img
-        src="{{ url_for('static', filename='img/lute.png') }}"
-        class="lutelogo_small"
-      />
+      <img src="{{ url_for('static', filename='img/lute.png') }}" class="lutelogo_small" />
     </td>
     <td>
       <a href="/" tabindex="-1" id="reading_home_link">Home</a>
       {% if config.ENV == 'dev' %}
-      <span
-        style="background-color: blue; color: white; margin: 2px; padding: 2px"
-        >Dev environment</span
-      >
+      <span style="background-color: blue; color: white; margin: 2px; padding: 2px">Dev environment</span>
       {% endif %}
     </td>
   </tr>
