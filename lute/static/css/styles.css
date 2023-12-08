@@ -212,6 +212,10 @@ span.read_page_disabled {
     color: lightgrey;
 }
 
+div#reading-footer a {
+    margin: 5px;
+}
+
 input[type=text]
 {
     font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
