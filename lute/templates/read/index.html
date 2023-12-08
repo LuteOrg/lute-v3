@@ -18,6 +18,8 @@
   </tr>
 </table>
 
+<!-- TODO audio: page navs should ajax content. -->
+<!-- TODO audio: on page change, move audio position to correct value. -->
 <div id="read_pane_left">
   <div id="reading-header">
     <!-- Lacking css skills, so table layout to the rescue. -->
@@ -107,6 +109,7 @@
     <hr />
   </div>
 
+  <!-- TODO audio: if ajaxing content, need to ajax title. -->
   {% if pagenum == 1 %}
   <h2>{{ book.title }}</h2>
   {% endif %}
@@ -145,6 +148,7 @@
           <option value="4">4 sec</option>
           <option value="5">5 sec</option>
         </select>
+        <!-- TODO audio: posting to controller to save bookmarks. -->
         <div class="bookmark-btn-container">
           <button id="bkm-save-btn"></button>
           <button id="bkm-delete-btn"></button>
@@ -163,6 +167,7 @@
   {# Hack for js translation keyboard shortcut. #}
   <span id="translateURL" style="display: none">{{ dictionary_url }}</span>
 
+  <!-- TODO audio: ajax in content. -->
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
     {% include 'read/sentences.html' %}
   </div>
@@ -196,6 +201,7 @@
     });
   </script>
 
+  <!-- TODO audio: footer controls should post and then ajax in content. -->
   <div id="reading-footer" style="text-align: center">
     <h2>
       <form
