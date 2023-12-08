@@ -75,9 +75,9 @@
           </h2>
         </td>
         <td align="right">
-          {% if book.source_uri %}
           <a>
             <label class="audio-label" for="myfile">
+              <!-- TOOD audio - image for loading -->
               <img
                 src="{{ url_for('static', filename='icn/audio.png') }}"
                 title="Load audio file" />
@@ -89,6 +89,8 @@
               src="{{ url_for('static', filename='icn/external.png') }}"
               title="Show source URL" />
           </a>
+          {% if book.source_uri %}
+          <!-- TODO audio - what to do if the book has source uri or not? also, source_uri was for the source of the text, not audio, I think. -->
           {% endif %}
           <a id="editText" href="/read/editpage/{{ text.id }}" tabindex="-1">
             <img
