@@ -159,7 +159,7 @@
       <form
         style="display: none"
         id="setknown"
-        action="/read/{{ book.id }}/page/{{ pagenum }}/allknown/{{ pagenum }}"
+        action="/read/{{ book.id }}/page/{{ page_num }}/allknown/{{ page_num }}"
         method="post"
       ></form>
       <a
@@ -172,11 +172,10 @@
         <img src="{{ url_for('static', filename='icn/tick.png') }}" />
       </a>
 
-      {% if pagenum != pagecount %} &nbsp;
       <form
         style="display: none"
         id="knowntonext"
-        action="/read/{{ book.id }}/page/{{ pagenum }}/allknown/{{ pagenum + 1 }}"
+        action="/read/{{ book.id }}/page/{{ page_num }}/allknown/{{ page_num + 1 }}"
         method="post"
       ></form>
       <a
@@ -188,12 +187,11 @@
       >
         <img src="{{ url_for('static', filename='icn/tick.png') }}" />&#8250;
       </a>
-      &nbsp;
 
       <form
         style="display: none"
         id="gotonext"
-        action="/read/{{ book.id }}/page/{{ pagenum }}/markread/{{ pagenum + 1 }}"
+        action="/read/{{ book.id }}/page/{{ page_num }}/markread/{{ page_num + 1 }}"
         method="post"
       ></form>
       <a
@@ -203,27 +201,27 @@
         title="Mark page as read, then go to next page"
         tabindex="-1"
         >&#8250;</a>
-      {% endif %}
     </h2>
 
-    {% if pagenum == pagecount %}
-    <h2>&#127881;</h2>
-    <p>
-      <a
-        href=""
-        tabindex="-1"
-        onclick="$('#actionposter').submit(); return false;"
-        >Archive book</a>
-      |
-      <a href="/" tabindex="-1">Home</a>
-    </p>
+    <div id="final_page_controls" class="hide">
+      <h2>&#127881;</h2>
+      <p>
+        <a
+          href=""
+          tabindex="-1"
+          onclick="$('#actionposter').submit(); return false;"
+          >Archive book</a>
+        |
+        <a href="/" tabindex="-1">Home</a>
+      </p>
 
-    <form
-      id="actionposter"
-      method="post"
-      action="/book/archive/{{ book.id }}"
-    ></form>
-    {% endif %}
+      <form
+        id="actionposter"
+        method="post"
+        action="/book/archive/{{ book.id }}"
+        ></form>
+    </div>
+
   </div>
 </div>
 
@@ -287,6 +285,24 @@
     }
   };
 
+
+  // Show/hide footer controls.
+  let set_footer_control_visibility = function() {
+    const pagenum = parseInt($('#page_num').val());
+    const maxpage = parseInt($('#page_count').val());
+    if (pagenum == maxpage) {
+      $('#final_page_controls').removeClass("hide");
+      $('#footerMarkRestAsKnownNextPage').addClass("hide");
+      $('#footerNextPage').addClass("hide");
+    }
+    else {
+      $('#final_page_controls').addClass("hide");
+      $('#footerMarkRestAsKnownNextPage').removeClass("hide");
+      $('#footerNextPage').removeClass("hide");
+    }
+  };
+
+
   // Go to page relative to that stored in page_num input.
   function goto_relative_page(p) {
     const bookid = $('#book_id').val();
@@ -308,6 +324,7 @@
         $('#page_num').val(relpage);
         enable_page_nav_links();
         set_page_fraction();
+        set_footer_control_visibility();
       }
     );
   }
