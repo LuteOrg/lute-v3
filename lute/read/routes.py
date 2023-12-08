@@ -25,9 +25,33 @@ def _page_in_range(book, n):
     return ret
 
 
+def _render_book_page(book, pagenum):
+    """
+    Render a particular book page.
+    """
+    lang = book.language
+    show_highlights = bool(int(UserSetting.get_value("show_highlights")))
+
+    return render_template(
+        "read/new_index.html",
+        hide_top_menu=True,
+        is_rtl=lang.right_to_left,
+        html_title=book.title,
+        book=book,
+        dictionary_url=lang.sentence_translate_uri,
+        page_num=pagenum,
+        page_count=book.page_count,
+        show_highlights=show_highlights,
+    )
+
+
 @bp.route("/<int:bookid>", methods=["GET"])
 def read(bookid):
-    "Read a book, opening to its current page."
+    """
+    Read a book, opening to its current page.
+
+    This is called from the book listing, on Lute index.
+    """
     book = Book.find(bookid)
     if book is None:
         flash(f"No book matching id {bookid}")
@@ -39,73 +63,23 @@ def read(bookid):
         text = Text.find(book.current_tx_id)
         page_num = text.order
 
-    if text.book.id != book.id:
-        flash(f"Text {text.id} doesn't belong in book {book.id}?")
-        return redirect("/", 302)
-
-    mark_stale(book)
-    lang = book.language
-    show_highlights = bool(int(UserSetting.get_value("show_highlights")))
-
-    return render_template(
-        "read/new_index.html",
-        hide_top_menu=True,
-        is_rtl=lang.right_to_left,
-        html_title=book.title,
-        book=book,
-        dictionary_url=lang.sentence_translate_uri,
-        page_num=page_num,
-        page_count=book.page_count,
-        show_highlights=show_highlights,
-    )
+    return _render_book_page(book, page_num)
 
 
 @bp.route("/<int:bookid>/page/<int:pagenum>", methods=["GET"])
 def read_page(bookid, pagenum):
-    "Display reading pane for book page."
+    """
+    Read a particular page of a book.
 
+    Called from term Sentences link.
+    """
     book = Book.find(bookid)
     if book is None:
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
 
-    lang = book.language
-
     pagenum = _page_in_range(book, pagenum)
-    text = book.texts[pagenum - 1]
-    book.current_tx_id = text.id
-    db.session.add(book)
-    db.session.commit()
-
-    paragraphs = get_paragraphs(text)
-
-    prevpage = _page_in_range(book, pagenum - 1)
-    nextpage = _page_in_range(book, pagenum + 1)
-    prev10 = _page_in_range(book, pagenum - 10)
-    next10 = _page_in_range(book, pagenum + 10)
-
-    show_highlights = bool(int(UserSetting.get_value("show_highlights")))
-
-    mark_stale(book)
-
-    return render_template(
-        "read/index.html",
-        hide_top_menu=True,
-        text=text,
-        textid=text.id,
-        is_rtl=lang.right_to_left,
-        html_title=text.title,
-        book=book,
-        dictionary_url=lang.sentence_translate_uri,
-        pagenum=pagenum,
-        pagecount=book.page_count,
-        prevpage=prevpage,
-        prev10page=prev10,
-        nextpage=nextpage,
-        next10page=next10,
-        paragraphs=paragraphs,
-        show_highlights=show_highlights,
-    )
+    return _render_book_page(book, pagenum)
 
 
 @bp.route("/page_done", methods=["post"])
@@ -127,15 +101,6 @@ def page_done():
     return jsonify("ok")
 
 
-# TODO audio: remove this method
-@bp.route("/sentences/<int:textid>", methods=["GET"])
-def sentences(textid):
-    "Display sentences for the given text."
-    text = db.session.query(Text).filter(Text.id == textid).first()
-    paragraphs = get_paragraphs(text)
-    return render_template("read/sentences.html", paragraphs=paragraphs)
-
-
 @bp.route("/renderpage/<int:bookid>/<int:pagenum>", methods=["GET"])
 def render_page(bookid, pagenum):
     "Method called by ajax, render the given page."
@@ -147,6 +112,7 @@ def render_page(bookid, pagenum):
     pagenum = _page_in_range(book, pagenum)
     text = book.texts[pagenum - 1]
 
+    mark_stale(book)
     book.current_tx_id = text.id
     db.session.add(book)
     db.session.commit()
