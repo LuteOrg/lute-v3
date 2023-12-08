@@ -106,8 +106,10 @@
 
     <hr />
   </div>
+
   {% if pagenum == 1 %}
   <h2>{{ book.title }}</h2>
+  {% endif %}
 
   <div class="audio-player-container">
     <audio id="player" preload="metadata" src=""></audio>
@@ -154,8 +156,6 @@
       </div>
     </div>
   </div>
-
-  {% endif %}
 
   <span id="textid" style="display: none">{{ textid }}</span>
   <span id="show_highlights" style="display: none">{{ show_highlights|lower }}</span>
