@@ -156,51 +156,28 @@
   <!-- TODO audio: footer controls should post and then ajax in content. -->
   <div id="reading-footer" style="text-align: center">
     <h2>
-      <form
-        style="display: none"
-        id="setknown"
-        action="/read/{{ book.id }}/page/{{ page_num }}/allknown/{{ page_num }}"
-        method="post"
-      ></form>
-      <a
+      <span
         id="footerMarkRestAsKnown"
-        style="text-decoration: none; cursor: pointer"
-        onclick="document.getElementById('setknown').submit(); return false;"
-        title="Mark rest as known, mark page as read"
-        tabindex="-1"
-      >
+        style="cursor: pointer"
+        onclick="handle_page_done(true, 0)"
+        title="Mark rest as known, mark page as read">
         <img src="{{ url_for('static', filename='icn/tick.png') }}" />
-      </a>
+      </span>
 
-      <form
-        style="display: none"
-        id="knowntonext"
-        action="/read/{{ book.id }}/page/{{ page_num }}/allknown/{{ page_num + 1 }}"
-        method="post"
-      ></form>
-      <a
+      <span
         id="footerMarkRestAsKnownNextPage"
-        style="text-decoration: none; cursor: pointer"
-        onclick="document.getElementById('knowntonext').submit(); return false;"
-        title="Mark rest as known, mark page as read, then go to next page"
-        tabindex="-1"
-      >
+        style="cursor: pointer"
+        onclick="handle_page_done(true, 1)"
+        title="Mark rest as known, mark page as read, then go to next page">
         <img src="{{ url_for('static', filename='icn/tick.png') }}" />&#8250;
-      </a>
+      </span>
 
-      <form
-        style="display: none"
-        id="gotonext"
-        action="/read/{{ book.id }}/page/{{ page_num }}/markread/{{ page_num + 1 }}"
-        method="post"
-      ></form>
-      <a
+      <span
         id="footerNextPage"
-        style="text-decoration: none; cursor: pointer"
-        onclick="document.getElementById('gotonext').submit(); return false;"
+        style="cursor: pointer"
+        onclick="handle_page_done(false, 1)"
         title="Mark page as read, then go to next page"
-        tabindex="-1"
-        >&#8250;</a>
+        >&#8250;</span>
     </h2>
 
     <div id="final_page_controls" class="hide">
@@ -357,6 +334,27 @@
     const pagenum = parseInt($('#page_num').val());
     location.href = `/read/editpage/${bookid}/${pagenum}`;
   }
+
+
+  // Handle green checkmark in footer.
+  function handle_page_done(mark_rest_known = false, next_relative_page = 0) {
+    const bookid = $('#book_id').val();
+    const pagenum = parseInt($('#page_num').val());
+    data = {
+      bookid: bookid,
+      pagenum: pagenum,
+      restknown: mark_rest_known
+    };
+    $.ajax({
+      type: 'post',
+      url: '/read/page_done',
+      data: JSON.stringify(data),
+      contentType: "application/json; charset=utf-8"
+    }).done(function(d) {
+      goto_relative_page(next_relative_page);
+    });
+  }
+
 
 </script>
 
