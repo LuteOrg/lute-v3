@@ -29,7 +29,6 @@
   </pre>
 </div>
 
-<!-- TODO audio: page navs should ajax content. -->
 <!-- TODO audio: on page change, move audio position to correct value. -->
 <div id="read_pane_left">
   <div id="reading-header">
@@ -38,7 +37,6 @@
       <tr>
         <td align="left">
           <h2 style="margin: 0px">
-            <!-- TODO audio: ajax update, enable/dis -->
             <span
               class="read_page_nav read_page_disabled"
               id="navPrev10"
@@ -84,12 +82,12 @@
           <!-- TODO audio - what to do if the book has source uri or not? also, source_uri was for the source of the text, not audio, I think. -->
           {% endif %}
           <!-- TODO audio: change href for edit, use current page. -->
-          <a id="editText" href="/read/editpage/42" tabindex="-1">
+          <span id="editText" style="cursor: pointer" onclick="edit_current_page()">
             <img
               src="{{ url_for('static', filename='icn/document--pencil.png') }}"
               title="Edit"
               alt="Edit" />
-          </a>
+          </span>
           <img
             id="keyboard_shortcuts"
             style="margin-right: 10px"
@@ -154,88 +152,6 @@
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
     ...
   </div>
-
-  <script>
-    $(document).ready(function () {
-      goto_relative_page(0);
-    });
-
-    // Set "page X/Y" in page nav.
-    let set_page_fraction = function() {
-      const pagenum = parseInt($('#page_num').val());
-      const maxpage = parseInt($('#page_count').val());
-      $('#page_indicator').text(`${pagenum}/${maxpage}`);
-    };
-
-    // Enable page nav links, depending on page num.
-    let enable_page_nav_links = function() {
-      const pagenum = parseInt($('#page_num').val());
-      const maxpage = parseInt($('#page_count').val());
-      if (pagenum > 1) {
-        $('#navPrev10').removeClass('read_page_disabled');
-        $('#navPrev').removeClass('read_page_disabled');
-      }
-      else {
-        $('#navPrev10').addClass('read_page_disabled');
-        $('#navPrev').addClass('read_page_disabled');
-      }
-      if (pagenum < maxpage) {
-        $('#navNext').removeClass('read_page_disabled');
-        $('#navNext10').removeClass('read_page_disabled');
-      }
-      else {
-        $('#navNext').addClass('read_page_disabled');
-        $('#navNext10').addClass('read_page_disabled');
-      }
-    };
-
-    // Go to page relative to that stored in page_num input.
-    function goto_relative_page(p) {
-      const bookid = $('#book_id').val();
-      const pagenum = parseInt($('#page_num').val());
-      const maxpage = parseInt($('#page_count').val());
-      let relpage = pagenum + p;
-      if (relpage < 1)
-        relpage = 1;
-      if (relpage > maxpage)
-        relpage = maxpage;
-      const url = `/read/renderpage/${bookid}/${relpage}`;
-      $.get(
-        url,
-        function(data, status) {
-          $('#thetext').html(data);
-          prepareTextInteractions();
-          add_status_classes();
-          start_hover_mode(false);
-          $('#page_num').val(relpage);
-          enable_page_nav_links();
-          set_page_fraction();
-        }
-      );
-    }
-
-    let tooltip_help_hover_content = function (setContent) {
-      $.ajax({
-        url: `/read/keyboard_shortcuts`,
-        type: "get",
-        success: function (response) {
-          setContent(response);
-        },
-      });
-    };
-
-    $("#keyboard_shortcuts").tooltip({
-      position: {
-        my: "left top+10",
-        at: "left bottom",
-        collision: "flipfit flip",
-      },
-      show: { easing: "easeOutCirc" },
-      content: function (setContent) {
-        tooltip_help_hover_content(setContent);
-      },
-    });
-  </script>
 
   <!-- TODO audio: footer controls should post and then ajax in content. -->
   <div id="reading-footer" style="text-align: center">
@@ -336,5 +252,95 @@
     Frame support required.
   </iframe>
 </div>
+
+<script>
+  $(document).ready(function () {
+    goto_relative_page(0);
+  });
+
+  // Set "page X/Y" in page nav.
+  let set_page_fraction = function() {
+    const pagenum = parseInt($('#page_num').val());
+    const maxpage = parseInt($('#page_count').val());
+    $('#page_indicator').text(`${pagenum}/${maxpage}`);
+  };
+
+  // Enable page nav links, depending on page num.
+  let enable_page_nav_links = function() {
+    const pagenum = parseInt($('#page_num').val());
+    const maxpage = parseInt($('#page_count').val());
+    if (pagenum > 1) {
+      $('#navPrev10').removeClass('read_page_disabled');
+      $('#navPrev').removeClass('read_page_disabled');
+    }
+    else {
+      $('#navPrev10').addClass('read_page_disabled');
+      $('#navPrev').addClass('read_page_disabled');
+    }
+    if (pagenum < maxpage) {
+      $('#navNext').removeClass('read_page_disabled');
+      $('#navNext10').removeClass('read_page_disabled');
+    }
+    else {
+      $('#navNext').addClass('read_page_disabled');
+      $('#navNext10').addClass('read_page_disabled');
+    }
+  };
+
+  // Go to page relative to that stored in page_num input.
+  function goto_relative_page(p) {
+    const bookid = $('#book_id').val();
+    const pagenum = parseInt($('#page_num').val());
+    const maxpage = parseInt($('#page_count').val());
+    let relpage = pagenum + p;
+    if (relpage < 1)
+      relpage = 1;
+    if (relpage > maxpage)
+      relpage = maxpage;
+    const url = `/read/renderpage/${bookid}/${relpage}`;
+    $.get(
+      url,
+      function(data, status) {
+        $('#thetext').html(data);
+        prepareTextInteractions();
+        add_status_classes();
+        start_hover_mode(false);
+        $('#page_num').val(relpage);
+        enable_page_nav_links();
+        set_page_fraction();
+      }
+    );
+  }
+
+  let tooltip_help_hover_content = function (setContent) {
+    $.ajax({
+      url: `/read/keyboard_shortcuts`,
+      type: "get",
+      success: function (response) {
+        setContent(response);
+      },
+    });
+  };
+
+  $("#keyboard_shortcuts").tooltip({
+    position: {
+      my: "left top+10",
+      at: "left bottom",
+      collision: "flipfit flip",
+    },
+    show: { easing: "easeOutCirc" },
+    content: function (setContent) {
+      tooltip_help_hover_content(setContent);
+    },
+  });
+
+
+  function edit_current_page() {
+    const bookid = $('#book_id').val();
+    const pagenum = parseInt($('#page_num').val());
+    location.href = `/read/editpage/${bookid}/${pagenum}`;
+  }
+
+</script>
 
 {% endblock %}

@@ -241,10 +241,12 @@ def flashcopied():
     return render_template("read/flashcopied.html")
 
 
-@bp.route("/editpage/<int:textid>", methods=["GET", "POST"])
-def edit_page(textid):
+@bp.route("/editpage/<int:bookid>/<int:pagenum>", methods=["GET", "POST"])
+def edit_page(bookid, pagenum):
     "Edit the text on a page."
-    text = db.session.get(Text, textid)
+    book = Book.find(bookid)
+    pagenum = _page_in_range(book, pagenum)
+    text = book.texts[pagenum - 1]
     if text is None:
         return redirect("/", 302)
     form = TextForm(obj=text)
@@ -253,6 +255,6 @@ def edit_page(textid):
         form.populate_obj(text)
         db.session.add(text)
         db.session.commit()
-        return redirect(f"/read/{text.book.id}/page/{text.order}", 302)
+        return redirect(f"/read/{book.id}", 302)
 
     return render_template("read/page_edit_form.html", hide_top_menu=True, form=form)
