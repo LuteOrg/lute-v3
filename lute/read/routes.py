@@ -3,8 +3,7 @@
 """
 
 from datetime import datetime
-
-from flask import Blueprint, flash, render_template, redirect
+from flask import Blueprint, flash, request, render_template, redirect, jsonify
 from lute.read.service import get_paragraphs, set_unknowns_to_known
 from lute.read.forms import TextForm
 from lute.term.model import Repository
@@ -109,33 +108,23 @@ def read_page(bookid, pagenum):
     )
 
 
-def _process_footer_action(bookid, pagenum, nextpage, set_to_known=True):
-    """ "
-    Mark as read,
-    optionally mark all terms as known on the current page,
-    and go to the next page.
-    """
+@bp.route("/page_done", methods=["post"])
+def page_done():
+    "Handle POST when page is done."
+    data = request.json
+    bookid = int(data.get("bookid"))
+    pagenum = int(data.get("pagenum"))
+    restknown = data.get("restknown")
+
     book = Book.find(bookid)
     pagenum = _page_in_range(book, pagenum)
     text = book.texts[pagenum - 1]
     text.read_date = datetime.now()
     db.session.add(text)
     db.session.commit()
-    if set_to_known:
+    if restknown:
         set_unknowns_to_known(text)
-    return redirect(f"/read/{bookid}/page/{nextpage}", code=302)
-
-
-@bp.route("/<int:bookid>/page/<int:pagenum>/allknown/<int:nextpage>", methods=["post"])
-def allknown(bookid, pagenum, nextpage):
-    "Mark all as known, go to next page."
-    return _process_footer_action(bookid, pagenum, nextpage, True)
-
-
-@bp.route("/<int:bookid>/page/<int:pagenum>/markread/<int:nextpage>", methods=["post"])
-def mark_read(bookid, pagenum, nextpage):
-    "Mark page as read, go to the next page."
-    return _process_footer_action(bookid, pagenum, nextpage, False)
+    return jsonify("ok")
 
 
 # TODO audio: remove this method
