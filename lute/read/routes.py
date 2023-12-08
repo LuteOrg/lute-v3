@@ -33,7 +33,7 @@ def _render_book_page(book, pagenum):
     show_highlights = bool(int(UserSetting.get_value("show_highlights")))
 
     return render_template(
-        "read/new_index.html",
+        "read/index.html",
         hide_top_menu=True,
         is_rtl=lang.right_to_left,
         html_title=book.title,
