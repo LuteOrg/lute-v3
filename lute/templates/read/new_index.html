@@ -21,9 +21,9 @@
 <!-- TODO audio: set style="display: none" for controls -->
 <div id="rendering" style="display: block">
   <pre>
-    book_id: <span id="book_id">{{ book.id }}</span>
-    page_num: <span id="page_num">{{ page_num }}</span>
-    page_count: <span id="page_count">{{ page_count }}</span>
+    book_id: <input id="book_id" value="{{ book.id }}">
+    page_num: <input id="page_num" value="{{ page_num }}">
+    page_count: <input id="page_count" value="{{ page_count }}">
     highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
     sentence translation url: <span id="translateURL" style="display: none">{{ dictionary_url }}</span>
   </pre>
@@ -38,51 +38,31 @@
       <tr>
         <td align="left">
           <h2 style="margin: 0px">
-            {% if prev10page != pagenum %}
-            <a
+            <!-- TODO audio: ajax update, enable/dis -->
+            <span
+              class="read_page_nav read_page_disabled"
               id="navPrev10"
-              href="/read/{{ book.id }}/page/{{ prev10page }}"
-              title="page {{ prev10page }}"
-              tabindex="-1"
-              >&#171;</a>
-            {% else %}
-            <span style="color: lightgrey">&#171;</span>
-            {% endif %}
-
-            {% if prevpage != pagenum %}
-            <a
+              onclick="goto_relative_page(-10)"
+              >&#171;</span>
+            <span
+              class="read_page_nav read_page_disabled"
               id="navPrev"
-              href="/read/{{ book.id }}/page/{{ prevpage }}"
-              title="page {{ prevpage }}"
-              tabindex="-1"
-              >&#8249;</a>
-            {% else %}
-            <span style="color: lightgrey">&#8249;</span>
-            {% endif %}
+              onclick="goto_relative_page(-1)"
+              >&#8249;</span>
 
-            {{ pagenum }}/{{ pagecount }}
+            <span id="page_indicator">{{ page_num }}/{{ page_count }}</span>
 
-            {% if pagenum != pagecount %}
-            <a
+            <span
+              class="read_page_nav read_page_disabled"
               id="navNext"
-              href="/read/{{ book.id }}/page/{{ nextpage }}"
-              title="page {{ nextpage }}"
-              tabindex="-1"
-              >&#8250;</a>
-            {% else %}
-            <span style="color: lightgrey">&#8250;</span>
-            {% endif %}
+              onclick="goto_relative_page(1)"
+              >&#8250;</span>
 
-            {% if next10page != pagecount %}
-            <a
+            <span
+              class="read_page_nav read_page_disabled"
               id="navNext10"
-              href="/read/{{ book.id }}/page/{{ next10page }}"
-              title="page {{ next10page }}"
-              tabindex="-1"
-              >&#187;</a>
-            {% else %}
-            <span style="color: lightgrey">&#187;</span>
-            {% endif %}
+              onclick="goto_relative_page(10)"
+              >&#187;</span>
           </h2>
         </td>
         <td align="right">
@@ -122,11 +102,6 @@
 
     <hr />
   </div>
-
-  <!-- TODO audio: if ajaxing content, need to ajax title. -->
-  {% if pagenum == 1 %}
-  <h2>{{ book.title }}</h2>
-  {% endif %}
 
   <div class="audio-player-container">
     <audio id="player" preload="metadata" src=""></audio>
@@ -182,10 +157,49 @@
 
   <script>
     $(document).ready(function () {
-      const bookid = $('#book_id').text();
-      const pagenum = $('#page_num').text();
-      const url = `/read/renderpage/${bookid}/${pagenum}`;
-      data = {};
+      goto_relative_page(0);
+    });
+
+    // Set "page X/Y" in page nav.
+    let set_page_fraction = function() {
+      const pagenum = parseInt($('#page_num').val());
+      const maxpage = parseInt($('#page_count').val());
+      $('#page_indicator').text(`${pagenum}/${maxpage}`);
+    };
+
+    // Enable page nav links, depending on page num.
+    let enable_page_nav_links = function() {
+      const pagenum = parseInt($('#page_num').val());
+      const maxpage = parseInt($('#page_count').val());
+      if (pagenum > 1) {
+        $('#navPrev10').removeClass('read_page_disabled');
+        $('#navPrev').removeClass('read_page_disabled');
+      }
+      else {
+        $('#navPrev10').addClass('read_page_disabled');
+        $('#navPrev').addClass('read_page_disabled');
+      }
+      if (pagenum < maxpage) {
+        $('#navNext').removeClass('read_page_disabled');
+        $('#navNext10').removeClass('read_page_disabled');
+      }
+      else {
+        $('#navNext').addClass('read_page_disabled');
+        $('#navNext10').addClass('read_page_disabled');
+      }
+    };
+
+    // Go to page relative to that stored in page_num input.
+    function goto_relative_page(p) {
+      const bookid = $('#book_id').val();
+      const pagenum = parseInt($('#page_num').val());
+      const maxpage = parseInt($('#page_count').val());
+      let relpage = pagenum + p;
+      if (relpage < 1)
+        relpage = 1;
+      if (relpage > maxpage)
+        relpage = maxpage;
+      const url = `/read/renderpage/${bookid}/${relpage}`;
       $.get(
         url,
         function(data, status) {
@@ -193,9 +207,12 @@
           prepareTextInteractions();
           add_status_classes();
           start_hover_mode(false);
+          $('#page_num').val(relpage);
+          enable_page_nav_links();
+          set_page_fraction();
         }
       );
-    });
+    }
 
     let tooltip_help_hover_content = function (setContent) {
       $.ajax({

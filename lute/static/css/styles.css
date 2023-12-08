@@ -203,6 +203,15 @@ div#read_pane_right {
 
 /* End layouts *****************************************/
 
+span.read_page_nav {
+    color: #0000FF;
+    cursor: pointer;
+}
+
+span.read_page_disabled {
+    color: lightgrey;
+}
+
 input[type=text]
 {
     font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
