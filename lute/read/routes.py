@@ -157,6 +157,11 @@ def render_page(bookid, pagenum):
 
     pagenum = _page_in_range(book, pagenum)
     text = book.texts[pagenum - 1]
+
+    book.current_tx_id = text.id
+    db.session.add(book)
+    db.session.commit()
+
     paragraphs = get_paragraphs(text)
     return render_template("read/sentences.html", paragraphs=paragraphs)
 
