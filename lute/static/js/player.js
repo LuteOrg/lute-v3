@@ -26,7 +26,7 @@ const theTextItems = document.querySelectorAll("#thetext .textitem");
 
 const bookmarksArray = [];
 let lastPlayTime = null;
-let activeBookmark = null;
+// let activeBookmark = null;
 
 //let duration = 0;
 let jumpTimeBy = Number(rewindAmountOption.value);
@@ -64,7 +64,7 @@ player.onloadedmetadata = function () {
 
 function addMarker(pos) {
   const marker = document.createElement("div");
-  marker.classList.add("marker");
+  marker.classList.add(`marker-${pos}`);
   timelineContainer.appendChild(marker);
   marker.style.cssText = `
                           position: absolute;
@@ -146,7 +146,7 @@ function changeTimelinePosition() {
   currentTimeElement.textContent = calculateTime(player.currentTime);
 
   lastPlayTime = Number(Number(timeline.value).toPrecision(3));
-  // console.log(lastPlayTime);
+  console.log(lastPlayTime);
 }
 
 function convertTimeToPercentage() {
@@ -165,13 +165,15 @@ browseButton.addEventListener("change", function (e) {
   }
 });
 
-playBtn.addEventListener("click", function (e) {
-  if (player.paused) {
-    player.play();
-    // playBtn.style.backgroundImage = 'url("/static/icn/pause.svg")';
-  } else {
-    player.pause();
-    // playBtn.style.backgroundImage = 'url("/static/icn/play.svg")';
+playBtn.addEventListener("click", function () {
+  if (player.duration){
+    if (player.paused) {
+      player.play();
+      // playBtn.style.backgroundImage = 'url("/static/icn/pause.svg")';
+    } else {
+      player.pause();
+      // playBtn.style.backgroundImage = 'url("/static/icn/play.svg")';
+    }
   }
 });
 
@@ -211,9 +213,12 @@ volumeLine.addEventListener("input", changeVolume);
 
 bookmarkSaveBtn.addEventListener("click", function () {
   const markerPos = Number(convertTimeToPercentage().toPrecision(3));
+
+  if (bookmarksArray.includes(markerPos)) return;
+
   addMarker(markerPos);
   // activateBookmark(markerPos);
-  activeBookmark = markerPos;
+  // activeBookmark = markerPos;
   bookmarksArray.push(markerPos);
   bookmarksArray.sort(function (a, b) {
     return a - b;
@@ -221,6 +226,21 @@ bookmarkSaveBtn.addEventListener("click", function () {
 
   console.log(bookmarksArray);
 });
+
+bookmarkDeleteBtn.addEventListener("click", function() {
+  if (lastPlayTime) {
+    console.log(lastPlayTime);
+
+    const markerDiv = document.querySelector(`.marker-${lastPlayTime}`);
+    if (markerDiv) {
+      markerDiv.remove();
+      const ind = bookmarksArray.indexOf(lastPlayTime);
+      bookmarksArray.splice(ind, 1);
+    }
+
+    console.log(bookmarksArray);
+  }
+})
 
 // function jumpToBookmark(oper) {
 //   if (activeBookmark) {
@@ -250,26 +270,15 @@ function jumpToBookmark(oper) {
     let ind;
 
     // console.log(`lastPlayTime initially is ${lastPlayTime}`);
-
-    const firstBiggerInd = bookmarksArray.findIndex(
-      (element) => element > lastPlayTime
-    );
-
-    // console.log(`firstBiggerInd is ${bookmarksArray[firstBiggerInd]}`);
-
-    if (oper === "next") {
-      if (firstBiggerInd == -1) return;
-      else ind = firstBiggerInd;
-    } else {
-      if (firstBiggerInd == -1) ind = bookmarksArray.length - 1;
-      else ind = firstBiggerInd - 1;
-
-      if (ind == 0) return;
-      else if (bookmarksArray[ind] == lastPlayTime) ind = ind - 1;
-    }
+    
+    if (oper === "next") ind = bookmarksArray.findIndex((element) => element > lastPlayTime);
+    else ind = bookmarksArray.findLastIndex((element) => element < lastPlayTime);
+    // console.log(`matchedInd is ${bookmarksArray[matchedInd]}`)
+    if (ind == -1) return;
+    // else ind = ind;
 
     const m = bookmarksArray[ind];
-    activeBookmark = m;
+    // activeBookmark = m;
     timeline.value = m;
     lastPlayTime = m;
     updateCurrentTime();
