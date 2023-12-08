@@ -26,8 +26,43 @@ def _page_in_range(book, n):
     return ret
 
 
+@bp.route("/<int:bookid>", methods=["GET"])
+def read(bookid):
+    "Read a book, opening to its current page."
+    book = Book.find(bookid)
+    if book is None:
+        flash(f"No book matching id {bookid}")
+        return redirect("/", 302)
+
+    page_num = 1
+    text = book.texts[0]
+    if book.current_tx_id:
+        text = Text.find(book.current_tx_id)
+        page_num = text.order
+
+    if text.book.id != book.id:
+        flash(f"Text {text.id} doesn't belong in book {book.id}?")
+        return redirect("/", 302)
+
+    mark_stale(book)
+    lang = book.language
+    show_highlights = bool(int(UserSetting.get_value("show_highlights")))
+
+    return render_template(
+        "read/new_index.html",
+        hide_top_menu=True,
+        is_rtl=lang.right_to_left,
+        html_title=book.title,
+        book=book,
+        dictionary_url=lang.sentence_translate_uri,
+        page_num=page_num,
+        page_count=book.page_count,
+        show_highlights=show_highlights,
+    )
+
+
 @bp.route("/<int:bookid>/page/<int:pagenum>", methods=["GET"])
-def read(bookid, pagenum):
+def read_page(bookid, pagenum):
     "Display reading pane for book page."
 
     book = Book.find(bookid)
