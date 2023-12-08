@@ -118,7 +118,7 @@ def render_page(bookid, pagenum):
     db.session.commit()
 
     paragraphs = get_paragraphs(text)
-    return render_template("read/sentences.html", paragraphs=paragraphs)
+    return render_template("read/page_content.html", paragraphs=paragraphs)
 
 
 @bp.route("/empty", methods=["GET"])
