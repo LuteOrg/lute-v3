@@ -138,10 +138,25 @@ def mark_read(bookid, pagenum, nextpage):
     return _process_footer_action(bookid, pagenum, nextpage, False)
 
 
+# TODO audio: remove this method
 @bp.route("/sentences/<int:textid>", methods=["GET"])
 def sentences(textid):
     "Display sentences for the given text."
     text = db.session.query(Text).filter(Text.id == textid).first()
+    paragraphs = get_paragraphs(text)
+    return render_template("read/sentences.html", paragraphs=paragraphs)
+
+
+@bp.route("/renderpage/<int:bookid>/<int:pagenum>", methods=["GET"])
+def render_page(bookid, pagenum):
+    "Method called by ajax, render the given page."
+    book = Book.find(bookid)
+    if book is None:
+        flash(f"No book matching id {bookid}")
+        return redirect("/", 302)
+
+    pagenum = _page_in_range(book, pagenum)
+    text = book.texts[pagenum - 1]
     paragraphs = get_paragraphs(text)
     return render_template("read/sentences.html", paragraphs=paragraphs)
 
