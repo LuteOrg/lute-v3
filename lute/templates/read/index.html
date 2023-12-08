@@ -1,13 +1,13 @@
-{% extends 'base.html' %}
-
-{% block title %}Reading &quot;{{ html_title }}&quot;{% endblock %}
-
-{% block body %}
+{% extends 'base.html' %} {% block title %}Reading &quot;{{ html_title
+}}&quot;{% endblock %} {% block body %}
 
 <table style="table-layout: fixed; border-spacing: 0">
   <tr>
     <td width="2px">
-      <img src="{{ url_for('static', filename='img/lute.png') }}" class="lutelogo_small" />
+      <img
+        src="{{ url_for('static', filename='img/lute.png') }}"
+        class="lutelogo_small"
+      />
     </td>
     <td>
       <a href="/" tabindex="-1" id="reading_home_link">Home</a>
@@ -132,32 +132,43 @@
             <span class="duration">0:00</span>
           </div>
         </div>
-        <button id="playback-rate-btn"><span>1.0</span></button>
+        <div class="audio-player-central-container">
+          <div class="skip-back-btn-container">
+            <button id="skip-back-btn"></button>
+          </div>
+          <div class="rewind-container">
+            <div class="rewind-btn-container">
+              <button id="rewind-btn"></button>
+              <button id="ff-btn"></button>
+            </div>
+            <select name="rewind-option" id="rewind-option">
+              <option value="1">1 sec</option>
+              <option value="2">2 sec</option>
+              <option value="3" selected>3 sec</option>
+              <option value="4">4 sec</option>
+              <option value="5">5 sec</option>
+            </select>
+          </div>
+          <div class="playback-rate-container">
+            <button id="playback-rate-btn"><span>1.0</span></button>
+          </div>
+        </div>
       </div>
       <div class="audio-player-right-container">
         <div class="volume-container">
           <!-- <button id="volume-on-btn"><span></span></button> -->
-          <input type="range" class="volume" max="100" value="100" />
+          <input type="range" class="volume" max="100" value="100" orient="vertical"/>
         </div>
-        <div class="rewind-btn-container">
-          <button id="rewind-btn"></button>
-          <button id="ff-btn"></button>
-        </div>
-        <select name="rewind-option" id="rewind-option">
-          <option value="1">1 sec</option>
-          <option value="2">2 sec</option>
-          <option value="3" selected>3 sec</option>
-          <option value="4">4 sec</option>
-          <option value="5">5 sec</option>
-        </select>
         <!-- TODO audio: posting to controller to save bookmarks. -->
-        <div class="bookmark-btn-container">
-          <button id="bkm-save-btn"></button>
-          <button id="bkm-delete-btn"></button>
+        <div class="bookmark-container">
+          <div class="bookmark-btn-container">
+            <button id="bkm-save-btn"></button>
+            <button id="bkm-delete-btn"></button>
+          </div>
+          <div class="bookmark-jump-container">
+            <button id="bkm-prev-btn"></button>
+            <button id="bkm-next-btn"></button>
         </div>
-        <div class="bookmark-jump-container">
-          <button id="bkm-prev-btn"></button>
-          <button id="bkm-next-btn"></button>
         </div>
       </div>
     </div>

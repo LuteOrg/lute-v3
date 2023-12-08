@@ -1,12 +1,17 @@
 .audio-player-container {
-  margin: 0 20px 30px 20px;
+  /* margin: 0 20px 30px 20px; */
 
   border: 2px solid #d7e6f4;
   border-radius: 5px;
   padding: 0.9rem;
   background-color: aliceblue;
+  width: 80%;
+  margin: 0 auto;
+  min-width: 520px;
+  box-sizing: border-box;
 
   --audio-color-1: #5abaf4;
+  --button-size-small: 28px;
 }
 
 .audio-player-top-container {
@@ -18,7 +23,7 @@
 }
 
 .play-btn-container {
-  padding: 0.9rem;
+  padding: 0.7rem;
   background-color: #ddf3fc;
   border-radius: 50%;
 }
@@ -27,19 +32,40 @@
   width: 100%;
   /* for marker overlay */
   position: relative;
+
+  background-color: #faebd77d;
+  padding: 0.5rem;
+  border-radius: 5px;
+  box-sizing: border-box;
+  margin-bottom: 6px;
 }
 
 .audio-player-timeline-container-grid {
-  display: grid;
-  grid-template-columns: 1fr min-content;
-  align-items: center;
-  gap: 2%;
+  /* display: grid; */
+  /* grid-template-columns: 1fr min-content; */
+  /* align-items: center; */
+  /* gap: 2%; */
   background-color: #ddf3fc;
-  padding-left: 0.8rem;
-  padding-top: 0.8rem;
-  padding-bottom: 0.8rem;
-  padding-right: 0.8rem;
   border-radius: 5px;
+  padding: 0.5rem;
+}
+
+.audio-player-central-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  justify-content: center;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.skip-back-btn-container,
+.playback-rate-container {
+  background-color: #9bfddc75;
+  padding: 0.3rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #myfile {
@@ -58,25 +84,25 @@
 
   /* mask-size: cover; */
   /* background-color: var(--audio-color-1); */
-  height: 72px;
-  width: 72px;
+  height: 64px;
+  width: 64px;
   /* height: 100%; */
   display: block;
   /* transform: scale(60%); */
   /* background-color: #565656; */
 }
 
-#volume-on-btn {
-  background: url("/static/icn/volume-up.svg");
-  height: 32px;
-  width: 32px;
-  display: block;
-}
+/* #volume-on-btn { */
+  /* background: url("/static/icn/volume-up.svg"); */
+  /* height: 32px; */
+  /* width: 32px; */
+  /* display: block; */
+/* } */
 
 #playback-rate-btn {
   background: url("/static/icn/speed.svg");
-  height: 48px;
-  width: 48px;
+  height: var(--button-size-small);
+  width: var(--button-size-small);
   display: block;
   position: relative;
   font-family: inherit;
@@ -91,40 +117,46 @@
   font-family: inherit;
 }
 
+#skip-back-btn {
+  background: url("/static/icn/skip-backward.svg");
+  height: var(--button-size-small);
+  width: var(--button-size-small);
+}
+
 #rewind-btn {
   background: url("/static/icn/rewind.svg");
-  height: 28px;
-  width: 28px;
+  height: var(--button-size-small);
+  width: var(--button-size-small);
 }
 
 #ff-btn {
   background: url("/static/icn/ff.svg");
-  height: 28px;
-  width: 28px;
+  height: var(--button-size-small);
+  width: var(--button-size-small);
 }
 
 #bkm-save-btn {
   background: url("/static/icn/bookmark-save.svg");
-  height: 28px;
-  width: 28px;
+  height: var(--button-size-small);
+  width: var(--button-size-small);
 }
 
 #bkm-delete-btn {
   background: url("/static/icn/bookmark-delete.svg");
-  height: 28px;
-  width: 28px;
+  height: var(--button-size-small);
+  width: var(--button-size-small);
 }
 
 #bkm-prev-btn {
   background: url("/static/icn/bookmark-prev.svg");
-  height: 28px;
-  width: 28px;
+  height: var(--button-size-small);
+  width: var(--button-size-small);
 }
 
 #bkm-next-btn {
   background: url("/static/icn/bookmark-next.svg");
-  height: 28px;
-  width: 28px;
+  height: var(--button-size-small);
+  width: var(--button-size-small);
 }
 
 #play-btn,
@@ -132,6 +164,7 @@
 #volume-off-btn,
 #rewind-btn,
 #ff-btn,
+#skip-back-btn,
 #playback-rate-btn,
 #bkm-save-btn,
 #bkm-delete-btn,
@@ -191,14 +224,16 @@
 
 .volume {
   -webkit-appearance: none;
-  width: 100%;
-  height: 0.6em;
+  width: 0.8rem;
+  height: 100px;
   margin: 0;
   background-color: #fff;
   border-radius: 5px;
   background-size: 100% 100%;
   background-image: linear-gradient(var(--audio-color-1), var(--audio-color-1));
   background-repeat: no-repeat;
+
+  appearance: slider-vertical;
   /* margin-bottom: 1.1rem; */
 }
 
@@ -217,44 +252,48 @@
   /* background: transparent; */
 }
 
-.volume-container {
-  grid-column: 1/-1;
-  /* display: flex; */
-  /* align-items: center; */
-  /* flex: 0.2; */
-}
+/* .volume-container { */
+  /* grid-column: 1/-1; */
+  /* /~ display: flex; ~/ */
+  /* /~ align-items: center; ~/ */
+  /* /~ flex: 0.2; ~/ */
+/* } */
 
 .rewind-container {
   display: grid;
-  grid-template-columns: 1fr min-content;
-  /* justify-content: space-between; */
-  /* align-items: center; */
-  /* width: max-content; */
-  /* gap: 1.2rem; */
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+
+  background-color: #9bfddc75;
+  border-radius: 5px;
+  padding: 0.3rem 0.4rem 0.3rem 0.4rem;
 }
 
-/* .rewind-btn-container { */
-/* display: flex; */
-/* gap: 0.3rem; */
-/* } */
+.rewind-btn-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
 #rewind-option {
   border: none;
   border-radius: 5px;
-  width: 90%;
+  /* width: 90%; */
   height: 1.6rem;
-  padding: 0.2rem 0 0.2rem 0.8rem;
+  padding-left: 0.8rem;
   font-family: inherit;
 }
 
 .audio-player-right-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* grid-template-columns: 1fr 1fr; */
   /* padding: 0.7rem 0.7rem 0.7rem 0; */
   grid-template-columns: max-content max-content;
   align-items: center;
   justify-items: center;
-  row-gap: 0.6rem;
+  /* row-gap: 0.6rem; */
   column-gap: 0.8rem;
 }
 
@@ -296,8 +335,8 @@
 }
 
 .volume::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   background-image: url("/static/icn/volume-up.svg");
   border: 2px solid #89c2f9;
   background-size: 80%;
@@ -306,8 +345,8 @@
 
 .volume::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   background-image: url("/static/icn/volume-up.svg");
   border: 2px solid #89c2f9;
   background-size: 80%;
@@ -352,10 +391,11 @@
 /* transparent = 28 */
 
 .bookmark-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  background-color: #9bfddc75;
+  padding: 0.3rem;
+  border-radius: 5px;
 }
 
-.bookmar-jump-container {
-  justify-self: end;
-}
+/* .bookmark-jump-container { */
+  /* justify-self: end; */
+/* } */
