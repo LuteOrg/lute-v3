@@ -21,6 +21,7 @@
 <!-- TODO audio: set style="display: none" for controls -->
 <div id="rendering" style="display: block">
   <pre>
+    book_id: <span id="book_id">{{ book.id }}</span>
     page_num: <span id="page_num">{{ page_num }}</span>
     page_count: <span id="page_count">{{ page_count }}</span>
     highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
@@ -176,13 +177,24 @@
 
   <!-- TODO audio: ajax in content. -->
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
-    {% include 'read/sentences.html' %}
+    ...
   </div>
 
   <script>
     $(document).ready(function () {
-      prepareTextInteractions();
-      add_status_classes();
+      const bookid = $('#book_id').text();
+      const pagenum = $('#page_num').text();
+      const url = `/read/renderpage/${bookid}/${pagenum}`;
+      data = {};
+      $.get(
+        url,
+        function(data, status) {
+          $('#thetext').html(data);
+          prepareTextInteractions();
+          add_status_classes();
+          start_hover_mode(false);
+        }
+      );
     });
 
     let tooltip_help_hover_content = function (setContent) {
