@@ -3,7 +3,7 @@ const timeline = document.querySelector(".timeline");
 const volumeLine = document.querySelector(".volume");
 const playBtn = document.querySelector("#play-btn");
 const playBtnIcon = document.querySelector("#play-btn span");
-const browseButton = document.querySelector("#myfile");
+const browseButton = document.querySelector("#audio_file");
 const durationContainer = document.querySelector(".duration-container");
 const durationElement = document.querySelector(".duration-container .duration");
 const currentTimeElement = document.querySelector(
@@ -81,7 +81,7 @@ function addMarker(pos) {
 }
 
 // function getAudioName() {
-//   let audioPath = document.getElementById("#myfile").value;
+//   let audioPath = document.getElementById("#audio_file").value;
 //   console.log(audioPath);
 //   if (audioPath) {
 //     let startIndex =
@@ -96,7 +96,7 @@ function addMarker(pos) {
 // }
 
 // browseButton.addEventListener("input", function () {
-//   const audioFile = document.getElementById("#myfile").files[0];
+//   const audioFile = document.getElementById("#audio_file").files[0];
 //   player.src = URL.createObjectURL(audioFile);
 // });
 
@@ -160,7 +160,7 @@ rewindAmountOption.addEventListener("change", function () {
 browseButton.addEventListener("change", function (e) {
   if (e.target.files[0]) {
     // player.setAttribute("src", `/static/${e.target.files[0].name}`);
-    // const audioFile = document.getElementById("#myfile").files[0];
+    // const audioFile = document.getElementById("#audio_file").files[0];
     player.src = URL.createObjectURL(e.target.files[0]);
   }
 });
