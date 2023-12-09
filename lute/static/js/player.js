@@ -29,6 +29,12 @@ let lastPlayTime = null;
 
 let jumpTimeBy = Number(rewindAmountOption.value);
 
+browseButton.addEventListener("change", function (e) {
+  if (e.target.files[0]) {
+    player.src = URL.createObjectURL(e.target.files[0]);
+  }
+});
+
 player.onloadedmetadata = function () {
   durationElement.textContent = timeToDisplayString(player.duration);
   timeline.max = player.duration;
@@ -39,10 +45,128 @@ player.onloadedmetadata = function () {
   resetPlaybackRate();
 };
 
-
-function marker_classname_from_time(timeline_value) {
-  return `marker-${timeline_value}`.replace('.', '-');
+function timeToDisplayString(secs) {
+  const minutes = Math.floor(secs / 60);
+  const seconds = parseFloat((secs % 60).toFixed(1));
+  const m = minutes < 10 ? `0${minutes}` : `${minutes}`;
+  const s = seconds < 10 ? `0${seconds}` : `${seconds}`;
+  return `${m}:${s}`;
 }
+
+function updateCurrentTime() {
+  if ((player.duration ?? 0) == 0)
+    return;
+  player.currentTime = timeline.value;
+}
+
+function timeToPercent(t) {
+  return (t * 100 / player.duration);
+}
+
+playBtn.addEventListener("click", function () {
+  if ((player.duration ?? 0) == 0)
+    return;
+  if (player.paused)
+    player.play();
+  else
+    player.pause();
+});
+
+player.addEventListener("pause", function () {
+  playBtn.style.backgroundImage = 'url("/static/icn/play.svg")';
+});
+
+player.addEventListener("play", function () {
+  playBtn.style.backgroundImage = 'url("/static/icn/pause.svg")';
+});
+
+theTextItems.forEach((item) =>
+  item.addEventListener("mousedown", () => player.pause())
+);
+
+player.addEventListener("timeupdate", function () {
+  // const timelinePosition = (player.currentTime / player.duration) * 100;
+  timeline.value = player.currentTime;
+
+  const t = timeline.value;  // quantized value.
+  timeline.style.backgroundSize = `${timeToPercent(t)}% 100%`;
+  currentTimeElement.textContent = timeToDisplayString(timeline.value);
+  lastPlayTime = timeline.value;
+});
+
+timeline.addEventListener("input", updateCurrentTime);
+
+
+/* ****************************
+ * Volume.
+ */
+
+function changeVolume() {
+  player.volume = volumeLine.value / 100;
+  volumeLine.style.backgroundSize = `${volumeLine.value}% 100%`;
+}
+
+volumeLine.addEventListener("input", changeVolume);
+
+
+/* ****************************
+ * Rewind, ff.
+ */
+
+rewindAmountOption.addEventListener("change", function () {
+  jumpTimeBy = Number(rewindAmountOption.value);
+});
+
+ffButton.addEventListener("click", function () {
+  player.currentTime = player.currentTime + jumpTimeBy;
+});
+
+rewindButton.addEventListener("click", function () {
+  player.currentTime = player.currentTime - jumpTimeBy;
+});
+
+
+/* ****************************
+ * Playback rate.
+ */
+
+playbackRateButton.addEventListener("mouseover", function() {
+  scrollLeft = document.documentElement.scrollLeft;
+  scrollTop = document.documentElement.scrollTop;
+  window.onscroll = function () {
+    window.scrollTo(scrollLeft, scrollTop);
+  };
+});
+
+playbackRateButton.addEventListener("mouseleave", function() {
+  window.onscroll = function () {};
+});
+
+playbackRateButton.addEventListener("wheel", function (e) {
+  let r = player.playbackRate;
+  if (e.deltaY < 0)
+    r += 0.1;
+  else
+    r -= 0.1;
+  if (r < 0.1)
+    r = 0.1;
+  if (r > 10)
+    r = 10;
+  player.playbackRate = r
+  playbackRateIndicator.textContent = player.playbackRate.toFixed(1);
+});
+
+playbackRateButton.addEventListener("click", resetPlaybackRate);
+
+function resetPlaybackRate() {
+  player.playbackRate = 1.0;
+  playbackRateIndicator.textContent = "1.0";
+}
+
+
+/* ****************************
+ * Bookmark management.
+ */
 
 function addBookmark(currtime) {
   // console.log(`adding bookmark for currtime = ${currtime}`);
@@ -62,151 +186,9 @@ function addBookmark(currtime) {
      pointer-events: none;`;
 }
 
-function jumpToBookmark(oper) {
-  if (lastPlayTime == null)
-    return;
-  // console.log(`jumping to bookmark from time ${lastPlayTime}, currently have ${bookmarksArray}`);
-
-  // Note for the findIndex, we have to use Number(d), as it
-  // appears that javascript can sometimes do string comparisons.
-  // e.g., if I had bookmarks [ 93.4, 224, 600 ], jumping backwards
-  // from 224 doesn't find 93.4, because "93.4" > "224".
-  if (oper === "next") {
-    ind = bookmarksArray.findIndex((d) => Number(d) > lastPlayTime);
-  }
-  else {
-    ind = bookmarksArray.findLastIndex((d) => Number(d) < lastPlayTime);
-  }
-  if (ind == -1) {
-    // console.log('not found');
-    return;
-  }
-
-  const m = bookmarksArray[ind];
-  // console.log(`ind is ${ind} => bookmarksArray entry ${m}`);
-  timeline.value = m;
-  lastPlayTime = m;
-  updateCurrentTime();
+function marker_classname_from_time(timeline_value) {
+  return `marker-${timeline_value}`.replace('.', '-');
 }
-
-function timeToDisplayString(secs) {
-  const minutes = Math.floor(secs / 60);
-  const seconds = parseFloat((secs % 60).toFixed(1));
-  const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
-  return `${minutes}:${returnedSeconds}`;
-}
-
-function disableScroll() {
-  scrollTop = document.documentElement.scrollTop;
-  scrollLeft = document.documentElement.scrollLeft;
-
-  window.onscroll = function () {
-    window.scrollTo(scrollLeft, scrollTop);
-  };
-}
-
-function enableScroll() {
-  window.onscroll = function () {};
-}
-
-function resetPlaybackRate() {
-  player.playbackRate = 1.0;
-  playbackRateIndicator.textContent = "1.0";
-}
-
-function changeVolume() {
-  player.volume = volumeLine.value / 100;
-  volumeLine.style.backgroundSize = `${volumeLine.value}% 100%`;
-}
-
-function updateCurrentTime() {
-  if ((player.duration ?? 0) == 0)
-    return;
-
-  player.currentTime = timeline.value;
-}
-
-function changeTimelinePosition() {
-  // const timelinePosition = (player.currentTime / player.duration) * 100;
-  timeline.value = player.currentTime;
-
-  const t = timeline.value;  // quantized value.
-  timeline.style.backgroundSize = `${timeToPercent(t)}% 100%`;
-  currentTimeElement.textContent = timeToDisplayString(timeline.value);
-  lastPlayTime = timeline.value;
-}
-
-function timeToPercent(t) {
-  return (t * 100 / player.duration);
-}
-
-rewindAmountOption.addEventListener("change", function () {
-  jumpTimeBy = Number(rewindAmountOption.value);
-});
-
-browseButton.addEventListener("change", function (e) {
-  if (e.target.files[0]) {
-    // player.setAttribute("src", `/static/${e.target.files[0].name}`);
-    // const audioFile = document.getElementById("#audio_file").files[0];
-    player.src = URL.createObjectURL(e.target.files[0]);
-  }
-});
-
-playBtn.addEventListener("click", function () {
-  if ((player.duration ?? 0) == 0)
-    return;
-
-  if (player.paused) {
-    player.play();
-  }
-  else {
-    player.pause();
-  }
-});
-
-player.addEventListener("pause", function () {
-  playBtn.style.backgroundImage = 'url("/static/icn/play.svg")';
-});
-
-player.addEventListener("play", function () {
-  playBtn.style.backgroundImage = 'url("/static/icn/pause.svg")';
-});
-
-ffButton.addEventListener("click", function () {
-  player.currentTime = player.currentTime + jumpTimeBy;
-});
-
-rewindButton.addEventListener("click", function () {
-  player.currentTime = player.currentTime - jumpTimeBy;
-});
-
-playbackRateButton.addEventListener("wheel", function (e) {
-  if (e.deltaY < 0)
-    player.playbackRate += 0.1;
-  else
-    player.playbackRate -= 0.1;
-
-  playbackRateIndicator.textContent = player.playbackRate.toFixed(1);
-});
-
-theTextItems.forEach((item) =>
-  item.addEventListener("mousedown", () => player.pause())
-);
-
-playbackRateButton.addEventListener("mouseover", disableScroll);
-playbackRateButton.addEventListener("mouseleave", enableScroll);
-playbackRateButton.addEventListener("click", resetPlaybackRate);
-player.addEventListener("timeupdate", changeTimelinePosition);
-timeline.addEventListener("input", updateCurrentTime);
-volumeLine.addEventListener("input", changeVolume);
-
-bookmarkPrevBtn.addEventListener("click", function () {
-  jumpToBookmark("prev");
-});
-
-bookmarkNextBtn.addEventListener("click", function () {
-  jumpToBookmark("next");
-});
 
 bookmarkSaveBtn.addEventListener("click", function () {
   // Note that for the time, we use the timeline.value, which has
@@ -242,3 +224,43 @@ bookmarkDeleteBtn.addEventListener("click", function() {
     bookmarksArray.splice(ind, 1);
   // console.log(`post-delete, have ${bookmarksArray}`);
 })
+
+
+/* ****************************
+ * Bookmark navigation.
+ */
+
+bookmarkPrevBtn.addEventListener("click", function () {
+  jumpToBookmark("prev");
+});
+
+bookmarkNextBtn.addEventListener("click", function () {
+  jumpToBookmark("next");
+});
+
+function jumpToBookmark(oper) {
+  if (lastPlayTime == null)
+    return;
+  // console.log(`jumping to bookmark from time ${lastPlayTime}, currently have ${bookmarksArray}`);
+
+  // Note for the findIndex, we have to use Number(d), as it
+  // appears that javascript can sometimes do string comparisons.
+  // e.g., if I had bookmarks [ 93.4, 224, 600 ], jumping backwards
+  // from 224 doesn't find 93.4, because "93.4" > "224".
+  if (oper === "next") {
+    ind = bookmarksArray.findIndex((d) => Number(d) > lastPlayTime);
+  }
+  else {
+    ind = bookmarksArray.findLastIndex((d) => Number(d) < lastPlayTime);
+  }
+  if (ind == -1) {
+    // console.log('not found');
+    return;
+  }
+
+  const m = bookmarksArray[ind];
+  // console.log(`ind is ${ind} => bookmarksArray entry ${m}`);
+  timeline.value = m;
+  lastPlayTime = m;
+  updateCurrentTime();
+}
