@@ -11,6 +11,7 @@ const currentTimeElement = document.querySelector(
 );
 const rewindButton = document.querySelector("#rewind-btn");
 const ffButton = document.querySelector("#ff-btn");
+const skipbackButton = document.querySelector("#skip-back-btn");
 const playbackRateButton = document.querySelector("#playback-rate-btn");
 const playbackRateIndicator = document.querySelector("#playback-rate-btn span");
 const rewindAmountOption = document.querySelector("#rewind-option");
@@ -125,6 +126,9 @@ rewindButton.addEventListener("click", function () {
   player.currentTime = player.currentTime - jumpTimeBy;
 });
 
+skipbackButton.addEventListener("click", function () {
+  player.currentTime = 0;
+});
 
 /* ****************************
  * Playback rate.
