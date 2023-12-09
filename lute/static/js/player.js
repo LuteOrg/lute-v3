@@ -38,6 +38,7 @@ player.onloadedmetadata = function () {
   //player.playbackRate = 1.0;
   // console.log(lastPlayTime);
   // if (lastPlayTime) player.currentTime = lastPlayTime;
+  timeline.max = player.duration;
   if (lastPlayTime) timeline.value = lastPlayTime;
 
   playBtn.style.backgroundImage = 'url("/static/icn/play.svg")';
@@ -46,13 +47,21 @@ player.onloadedmetadata = function () {
   // changeTimelinePosition();
 };
 
-function addBookmark(pos) {
+
+function marker_classname_from_time(timeline_value) {
+  return `marker-${timeline_value}`.replace('.', '-');
+}
+
+function addBookmark(currtime) {
+  console.log(`adding bookmark for currtime = ${currtime}`);
   const marker = document.createElement("div");
-  marker.classList.add(`marker-${pos}`);
+  marker.classList.add(marker_classname_from_time(currtime));
   timelineContainer.appendChild(marker);
+
+  pos_percent = Math.floor((currtime * 100) / player.duration);
   marker.style.cssText = `
                           position: absolute;
-                          left: ${pos}%;
+                          left: ${pos_percent}%;
                           height: 1.1rem;
                           top: 0;
                           width: 1%;
@@ -65,26 +74,44 @@ function addBookmark(pos) {
 }
 
 function jumpToBookmark(oper) {
-  if (lastPlayTime) {
-    let ind;
+  if (lastPlayTime == null)
+    return;
 
-    // console.log(`lastPlayTime initially is ${lastPlayTime}`);
-    
-    if (oper === "next") ind = bookmarksArray.findIndex((element) => element > lastPlayTime);
-    else ind = bookmarksArray.findLastIndex((element) => element < lastPlayTime);
-    // console.log(`matchedInd is ${bookmarksArray[matchedInd]}`)
-    if (ind == -1) return;
-    // else ind = ind;
+  console.log(`jumping to bookmark from time ${lastPlayTime}, currently have ${bookmarksArray}`);
 
-    const m = bookmarksArray[ind];
-    // activeBookmark = m;
-    timeline.value = m;
-    lastPlayTime = m;
-    updateCurrentTime();
-    // console.log(`m is ${m}`);
-    // console.log(`lastPlayTime after is ${lastPlayTime}`);
-    // console.log(calculateTime(player.currentTime));
+  // Note for the findIndex, we have to use Number(element), as it
+  // appears that javascript can sometimes do string comparisons.
+  // e.g., if I had bookmarks [ 93.4, 224, 600 ], jumping backwards
+  // from 224 doesn't find 93.4, because "93.4" > "224".
+  if (oper === "next") {
+    ind = bookmarksArray.findIndex((element) => Number(element) > lastPlayTime);
   }
+  else {
+    ind = bookmarksArray.findLastIndex((element) => Number(element) < lastPlayTime);
+  }
+
+  if (ind == -1) {
+    console.log('not found');
+    return;
+  }
+
+  const m = bookmarksArray[ind];
+  console.log(`ind is ${ind} => bookmarksArray entry ${m}`);
+
+  // activeBookmark = m;
+  timeline.value = m;
+  lastPlayTime = m;
+  console.log(`timeline.value = ${timeline.value}`);
+  console.log(`lastPlayTime = ${lastPlayTime}`);
+
+  // call to updateCurrentTime() is required to fix the timeline and
+  // update the UI.  This also quantizes the lastPlayTime to 0.1s
+  // precision.
+  updateCurrentTime();
+
+  // console.log(`m is ${m}`);
+  // console.log(`lastPlayTime after is ${lastPlayTime}`);
+  // console.log(calculateTime(player.currentTime));
 }
 
 function calculateTime(secs) {
@@ -120,24 +147,30 @@ function changeVolume() {
 
 function updateCurrentTime() {
   // console.log(player.duration);
-  if (player.duration) {
-    player.currentTime = (timeline.value / 100) * player.duration;
-  }
+  if ((player.duration ?? 0) == 0)
+    return;
+
+  player.currentTime = timeline.value;
 }
 
 function changeTimelinePosition() {
   // const timelinePosition = (player.currentTime / player.duration) * 100;
   timelinePositionPercent = convertTimeToPercentage();
   timeline.style.backgroundSize = `${timelinePositionPercent}% 100%`;
-  timeline.value = timelinePositionPercent;
+  timeline.value = player.currentTime;
+  console.log(`timeline value = ${timeline.value}`);
   currentTimeElement.textContent = calculateTime(player.currentTime);
 
-  lastPlayTime = Number(Number(timeline.value).toPrecision(3));
-  // console.log(lastPlayTime);
+  lastPlayTime = timeline.value;
+  console.log(`lastPlayTime = ${lastPlayTime}`);
 }
 
 function convertTimeToPercentage() {
-  return (player.currentTime / player.duration) * 100;
+  console.log(`curr time: ${player.currentTime}`);
+  console.log(`duration: ${player.duration}`);
+  const pct = (player.currentTime / player.duration) * 100;
+  console.log(`percent: ${pct}`);
+  return pct;
 }
 
 rewindAmountOption.addEventListener("change", function () {
@@ -153,14 +186,15 @@ browseButton.addEventListener("change", function (e) {
 });
 
 playBtn.addEventListener("click", function () {
-  if (player.duration){
-    if (player.paused) {
-      player.play();
-      // playBtn.style.backgroundImage = 'url("/static/icn/pause.svg")';
-    } else {
-      player.pause();
-      // playBtn.style.backgroundImage = 'url("/static/icn/play.svg")';
-    }
+  if ((player.duration ?? 0) == 0)
+    return;
+
+  if (player.paused) {
+    player.play();
+    // playBtn.style.backgroundImage = 'url("/static/icn/pause.svg")';
+  } else {
+    player.pause();
+    // playBtn.style.backgroundImage = 'url("/static/icn/play.svg")';
   }
 });
 
@@ -206,32 +240,37 @@ bookmarkNextBtn.addEventListener("click", function () {
 });
 
 bookmarkSaveBtn.addEventListener("click", function () {
-  const markerPos = Number(convertTimeToPercentage().toPrecision(3));
+  // Note that for the time, we use the timeline.value, which has
+  // step=0.1 and so is quantized to 0.1 of a second.  Should be good
+  // enough.
+  const currtime = timeline.value;
 
-  if (bookmarksArray.includes(markerPos)) return;
+  if (bookmarksArray.includes(currtime))
+    return;
 
-  addBookmark(markerPos);
+  addBookmark(currtime);
   // activateBookmark(markerPos);
   // activeBookmark = markerPos;
-  bookmarksArray.push(markerPos);
+  bookmarksArray.push(currtime);
   bookmarksArray.sort(function (a, b) {
     return a - b;
   });
 
-  // console.log(bookmarksArray);
+  console.log(`added ${currtime} to bookmarksArray ${bookmarksArray}`);
 });
 
 bookmarkDeleteBtn.addEventListener("click", function() {
-  if (lastPlayTime) {
-    // console.log(lastPlayTime);
+  if (lastPlayTime == null)
+    return;
 
-    const markerDiv = document.querySelector(`.marker-${lastPlayTime}`);
-    if (markerDiv) {
-      markerDiv.remove();
-      const ind = bookmarksArray.indexOf(lastPlayTime);
-      bookmarksArray.splice(ind, 1);
-    }
-
-    // console.log(bookmarksArray);
+  t = marker_classname_from_time(timeline.value);
+  console.log(`pre-delete, have ${bookmarksArray}`);
+  console.log(`with tval ${timeline.value}, deleting class ${t}`);
+  const markerDiv = document.querySelector(`.${t}`);
+  if (markerDiv) {
+    markerDiv.remove();
+    const ind = bookmarksArray.indexOf(lastPlayTime);
+    bookmarksArray.splice(ind, 1);
   }
+  console.log(`post-delete, have ${bookmarksArray}`);
 })
