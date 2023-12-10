@@ -27,6 +27,7 @@
   <pre>
     book_id: <input id="book_id" value="{{ book.id }}">
     book_audio: <input id="book_audio_file" value="{{ book.audio_filename or '' }}">
+    book_audio_current_pos: <input id="book_audio_current_pos" value="{{ book.audio_current_pos or 0 }}">
     page_num: <input id="page_num" value="{{ page_num }}">
     page_count: <input id="page_count" value="{{ page_count }}">
     highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
@@ -115,8 +116,10 @@
       </div>
       <div class="audio-player-timeline-container-grid">
         <div id="timeline-container" class="audio-player-timeline-container">
-          <input type="range" class="timeline" max="100" value="0" step="0.1" />
-          <!-- <div class="marker"></div> -->
+          <!-- max is set very large so that when file is pre-loaded,
+          the current position isn't truncated. -->
+          <input type="range" class="timeline" max="1000000000" value="0"
+          step="0.1" />
           <div class="duration-container">
             <span class="current-time">0:00</span>
             <span class="duration">0:00</span>
@@ -253,7 +256,9 @@
     const have_file = ($('#book_audio_file').val() != '');
     if (!have_file)
       return;
+    t = parseFloat($('#book_audio_current_pos').val());
     const book_id = $('#book_id').val();
+    player.currentTime = t;
     player.src = `/useraudio/stream/${book_id}`;
   };
 

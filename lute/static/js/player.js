@@ -39,8 +39,6 @@ browseButton.addEventListener("change", function (e) {
 player.onloadedmetadata = function () {
   durationElement.textContent = timeToDisplayString(player.duration);
   timeline.max = player.duration;
-  if (lastPlayTime) timeline.value = lastPlayTime;
-
   playBtn.style.backgroundImage = 'url("/static/icn/play.svg")';
   changeVolume();
   resetPlaybackRate();
