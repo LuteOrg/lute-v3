@@ -25,7 +25,7 @@ const bookmarkNextBtn = document.querySelector("#bkm-next-btn");
 
 const theTextItems = document.querySelectorAll("#thetext .textitem");
 
-const bookmarksArray = [];
+var bookmarksArray = [];
 let lastPlayTime = null;
 
 let jumpTimeBy = Number(rewindAmountOption.value);
@@ -39,6 +39,9 @@ browseButton.addEventListener("change", function (e) {
 player.onloadedmetadata = function () {
   durationElement.textContent = timeToDisplayString(player.duration);
   timeline.max = player.duration;
+  for (b of bookmarksArray) {
+    add_bookmark_marker(b);
+  }
   playBtn.style.backgroundImage = 'url("/static/icn/play.svg")';
   changeVolume();
   resetPlaybackRate();
@@ -59,7 +62,8 @@ function updateCurrentTime() {
 }
 
 function timeToPercent(t) {
-  return (t * 100 / player.duration);
+  console.log(`time %, t = ${t}, max = ${timeline.max}`);
+  return (t * 100 / timeline.max);
 }
 
 playBtn.addEventListener("click", function () {
@@ -104,26 +108,22 @@ timeline.addEventListener("input", updateCurrentTime);
 
 
 /* ****************************
- * Ajax post player position updates every 2 seconds.
+ * Ajax post player data updates every 2 seconds.
  */
 
 var last_sent_pos = null;
 
-function post_player_position() {
-  var currentPosition = player.currentTime;
-  if (last_sent_pos == currentPosition) {
-    // console.log("Same pos, skipping");
-    return;
-  }
-
+function post_player_data() {
   const bookid = $('#book_id').val();
+  const bookmarks = $('#book_audio_bookmarks').val();
   var currentPosition = player.currentTime;
   data = {
     bookid: bookid,
     position: currentPosition,
+    bookmarks: bookmarks,
   };
   $.ajax({
-    url: '/read/save_player_position',
+    url: '/read/save_player_data',
     method: 'POST',
     data: JSON.stringify(data),
     contentType: "application/json; charset=utf-8"
@@ -132,8 +132,17 @@ function post_player_position() {
   });
 }
 
+let _post_if_changed = function() {
+  var currentPosition = player.currentTime;
+  if (last_sent_pos == currentPosition) {
+    // console.log("Same pos, skipping");
+    return;
+  }
+  post_player_data();
+};
+
 // Post every 2 seconds, good enough.
-setInterval(post_player_position, 2000);
+setInterval(_post_if_changed(), 2000);
 
 
 /* ****************************
@@ -210,7 +219,7 @@ function resetPlaybackRate() {
  * Bookmark management.
  */
 
-function addBookmark(currtime) {
+let add_bookmark_marker = function(currtime) {
   // console.log(`adding bookmark for currtime = ${currtime}`);
   const marker = document.createElement("div");
   marker.classList.add(marker_classname_from_time(currtime));
@@ -242,17 +251,23 @@ bookmarkSaveBtn.addEventListener("click", function () {
   // step=0.1 and so is quantized to 0.1 of a second.  Should be good
   // enough.
   const t = timeline.value;
+  add_bookmark(t);
+  _update_bookmarks_control();
+  post_player_data();
+  // console.log(`added ${t} to bookmarksArray ${bookmarksArray}`);
+});
+
+
+function add_bookmark(t) {
   if (bookmarksArray.includes(t))
     return;
-
-  addBookmark(t);
+  add_bookmark_marker(t);
   bookmarksArray.push(t);
   bookmarksArray.sort(function (a, b) {
     return a - b;
   });
-  _update_bookmarks_control();
-  // console.log(`added ${t} to bookmarksArray ${bookmarksArray}`);
-});
+}
+
 
 bookmarkDeleteBtn.addEventListener("click", function() {
   const t = timeline.value;
@@ -268,9 +283,14 @@ bookmarkDeleteBtn.addEventListener("click", function() {
 
   // console.log(`pre-delete, have ${bookmarksArray}`);
   const ind = bookmarksArray.indexOf(t);
-  if (ind != -1)
-    bookmarksArray.splice(ind, 1);
-    _update_bookmarks_control();
+  if (ind == -1) {
+    // Not found.
+    return;
+  }
+  
+  bookmarksArray.splice(ind, 1);
+  _update_bookmarks_control();
+  post_player_data();
   // console.log(`post-delete, have ${bookmarksArray}`);
 })
 
@@ -312,4 +332,5 @@ function jumpToBookmark(oper) {
   timeline.value = m;
   lastPlayTime = m;
   updateCurrentTime();
+  post_player_data();
 }
