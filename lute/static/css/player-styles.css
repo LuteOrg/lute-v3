@@ -397,3 +397,51 @@
 /* .bookmark-jump-container { */
   /* justify-self: end; */
 /* } */
+
+
+
+/* CSS */
+.play-btn-container,
+.skip-back-btn-container,
+#rewind-btn,
+#ff-btn,
+#playback-rate-btn {
+  /* width: 72px; */
+  /* height: 72px; */
+  /* background-color: #fbeee0; */
+  /* border: 2px solid #422800; */
+  /* border-radius: 50%; */
+  box-shadow: #58585852 0px 2px 5px 0;
+  
+  /* color: #422800; */
+  /* cursor: pointer; */
+  /* display: inline-block; */
+  /* font-weight: 600; */
+  /* font-size: 18px; */
+  /* padding: 0 18px; */
+  /* line-height: 50px; */
+  /* text-align: center; */
+  /* text-decoration: none; */
+  /* user-select: none; */
+  /* -webkit-user-select: none; */
+  /* touch-action: manipulation; */
+  transition: all .02s;
+  cursor: pointer;
+}
+
+.play-btn-container:hover,
+.skip-back-btn-container:hover,
+#rewind-btn:hover,
+#ff-btn:hover,
+#playback-rate-btn:hover  {
+  background-color: #fff;
+}
+
+.play-btn-container:active,
+.skip-back-btn-container:active,
+#rewind-btn:active,
+#ff-btn:active,
+#playback-rate-btn:active {
+  box-shadow: #58585852 0px 1px 1px 0px;
+  transform: translate(0, 2px);
+}
