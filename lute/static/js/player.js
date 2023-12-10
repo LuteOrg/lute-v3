@@ -224,6 +224,8 @@ skipBackButton.addEventListener("click", function() {
 
 bookmarkSaveBtn.addEventListener("click", function () {
   // const markerPos = Number(convertTimeToPercentage().toPrecision(3));
+  if (!player.duration) return;
+  
   const markerPos = Number(timeline.value);
 
   if (bookmarksArray.includes(markerPos)) return;
