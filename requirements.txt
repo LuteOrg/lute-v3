@@ -86,3 +86,5 @@ SudachiDict-core==20230927
 SudachiDict-full==20230927
 SudachiDict-small==20230927
 SudachiPy==0.6.7
+fugashi==1.3.0
+unidic-lite==1.0.8
