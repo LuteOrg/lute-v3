@@ -289,8 +289,8 @@ bookmarkNextBtn.addEventListener("click", function () {
 
 function jumpToBookmark(oper) {
   if (lastPlayTime == null)
-    return;
-  // console.log(`jumping to bookmark from time ${lastPlayTime}, currently have ${bookmarksArray}`);
+    lastPlayTime = 0;
+  // console.log(`jumpToBookmark from time ${lastPlayTime}, currently have ${bookmarksArray}`);
 
   // Note for the findIndex, we have to use Number(d), as it
   // appears that javascript can sometimes do string comparisons.
