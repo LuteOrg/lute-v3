@@ -13,7 +13,7 @@
 
 <p style="width: 50%; margin-bottom: 20px;">Note: you can't change the language or text of a book after it has been created.  If you need to do that, please create a new book instead, and delete the old one.</p>
 
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
 
   <table id="book">
@@ -30,8 +30,8 @@
     </tr>
 
     <tr>
-      <td>{{ form.audio_file.label }}</td>
-      <td>{{ form.audio_file(class="form-control") }}</td>
+      <td>{{ form.audiofile.label }}</td>
+      <td>{{ form.audiofile() }}</td>
     </tr>
 
     {# Tags li entries are managed by tagit. #}
