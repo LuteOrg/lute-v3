@@ -106,6 +106,39 @@ timeline.addEventListener("input", updateCurrentTime);
 
 
 /* ****************************
+ * Ajax post player position updates every 2 seconds.
+ */
+
+var last_sent_pos = null;
+
+function post_player_position() {
+  var currentPosition = player.currentTime;
+  if (last_sent_pos == currentPosition) {
+    // console.log("Same pos, skipping");
+    return;
+  }
+
+  const bookid = $('#book_id').val();
+  var currentPosition = player.currentTime;
+  data = {
+    bookid: bookid,
+    position: currentPosition,
+  };
+  $.ajax({
+    url: '/read/save_player_position',
+    method: 'POST',
+    data: JSON.stringify(data),
+    contentType: "application/json; charset=utf-8"
+  }).done(function(d) {
+    last_sent_pos = currentPosition;
+  });
+}
+
+// Post every 2 seconds, good enough.
+setInterval(post_player_position, 2000);
+
+
+/* ****************************
  * Volume.
  */
 
