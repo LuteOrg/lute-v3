@@ -49,9 +49,9 @@ player.onloadedmetadata = function () {
 
 function timeToDisplayString(secs) {
   const minutes = Math.floor(secs / 60);
-  const seconds = parseFloat((secs % 60).toFixed(1));
+  const seconds = (secs % 60).toFixed(1);
   const m = minutes < 10 ? `0${minutes}` : `${minutes}`;
-  const s = seconds < 10 ? `0${seconds}` : `${seconds}`;
+  const s = (secs % 60) < 10 ? `0${seconds}` : `${seconds}`;
   return `${m}:${s}`;
 }
 
@@ -59,10 +59,11 @@ function updateCurrentTime() {
   if ((player.duration ?? 0) == 0)
     return;
   player.currentTime = timeline.value;
+  // console.log(`currTime = ${player.currentTime}`);
 }
 
 function timeToPercent(t) {
-  console.log(`time %, t = ${t}, max = ${timeline.max}`);
+  // console.log(`time %, t = ${t}, max = ${timeline.max}`);
   return (t * 100 / timeline.max);
 }
 
@@ -117,6 +118,7 @@ function post_player_data() {
   const bookid = $('#book_id').val();
   const bookmarks = $('#book_audio_bookmarks').val();
   var currentPosition = player.currentTime;
+  // console.log(`posting curr pos = ${currentPosition}`);
   data = {
     bookid: bookid,
     position: currentPosition,
@@ -132,7 +134,8 @@ function post_player_data() {
   });
 }
 
-let _post_if_changed = function() {
+let post_if_changed = function() {
+  // console.log(`called post_if_changed, with currTime = ${player.currentTime}`);
   var currentPosition = player.currentTime;
   if (last_sent_pos == currentPosition) {
     // console.log("Same pos, skipping");
@@ -142,8 +145,9 @@ let _post_if_changed = function() {
 };
 
 // Post every 2 seconds, good enough.
-setInterval(_post_if_changed(), 2000);
-
+function start_player_post_loop() {
+  setInterval(post_if_changed, 2000);
+}
 
 /* ****************************
  * Volume.
@@ -271,8 +275,19 @@ function add_bookmark(t) {
 
 bookmarkDeleteBtn.addEventListener("click", function() {
   const t = timeline.value;
-  if (t == null)
+  if (t == null) {
+    // console.log('null timeline value.');
     return;
+  }
+  // console.log(`pre-delete, have ${bookmarksArray}, t = ${t}`);
+  fixedBa = bookmarksArray.map((e) => e.toFixed(1));
+  findt = Number(t).toFixed(1);
+  // console.log(`t = ${t}, type = ${typeof(t)}, findt = ${findt}`);
+  const ind = fixedBa.indexOf(`${findt}`);
+  if (ind == -1) {
+    // console.log(`time ${t} not found.`);
+    return;
+  }
 
   mc = marker_classname_from_time(t);
   // console.log(`with tval ${t}, deleting class ${mc}`);
@@ -281,13 +296,6 @@ bookmarkDeleteBtn.addEventListener("click", function() {
     markerDiv.remove();
   }
 
-  // console.log(`pre-delete, have ${bookmarksArray}`);
-  const ind = bookmarksArray.indexOf(t);
-  if (ind == -1) {
-    // Not found.
-    return;
-  }
-  
   bookmarksArray.splice(ind, 1);
   _update_bookmarks_control();
   post_player_data();
