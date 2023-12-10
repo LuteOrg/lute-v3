@@ -249,17 +249,25 @@
 <script>
   $(document).ready(function () {
     goto_relative_page(0);
-    load_audio_if_present();
+    initialize_player();
   });
 
   // If book_audio_file is not null, stream the file.
-  let load_audio_if_present = function() {
+  let initialize_player = function() {
     const have_file = ($('#book_audio_file').val() != '');
     if (!have_file)
       return;
     t = parseFloat($('#book_audio_current_pos').val());
     const book_id = $('#book_id').val();
     player.currentTime = t;
+    bks = $('#book_audio_bookmarks').val().split(';');
+    bookmarksArray = [];
+    for (b of bks) {
+      bf = parseFloat(b);
+      // console.log(`adding bookmark ${bf}`);
+      bookmarksArray.push(bf);
+    }
+
     player.src = `/useraudio/stream/${book_id}`;
   };
 

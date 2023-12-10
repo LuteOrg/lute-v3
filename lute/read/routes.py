@@ -101,14 +101,14 @@ def page_done():
     return jsonify("ok")
 
 
-@bp.route("/save_player_position", methods=["post"])
-def save_player_position():
-    "Save current player position.  Called on a loop by the player."
+@bp.route("/save_player_data", methods=["post"])
+def save_player_data():
+    "Save current player position, bookmarks.  Called on a loop by the player."
     data = request.json
     bookid = int(data.get("bookid"))
-    pos = float(data.get("position"))
     book = Book.find(bookid)
-    book.audio_current_pos = pos
+    book.audio_current_pos = float(data.get("position"))
+    book.audio_bookmarks = data.get("bookmarks")
     db.session.add(book)
     db.session.commit()
     return jsonify("ok")
