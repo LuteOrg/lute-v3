@@ -68,7 +68,7 @@ function timeToPercent(t) {
 }
 
 playBtn.addEventListener("click", function () {
-  if ((player.duration ?? 0) == 0)
+  if ((player.duration ?? 0) == 0 || isNaN(player.duration))
     return;
   if (player.paused)
     player.play();
