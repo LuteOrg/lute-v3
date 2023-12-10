@@ -77,6 +77,13 @@ player.addEventListener("pause", function () {
   playBtn.style.backgroundImage = 'url("/static/icn/play.svg")';
 });
 
+// Listening for form opened event created by lute/templates/term/_form.html.
+window.addEventListener("message", function(event) {
+    if (event.data.event === "LuteTermFormOpened") {
+        player.pause();
+    }
+});
+
 player.addEventListener("play", function () {
   playBtn.style.backgroundImage = 'url("/static/icn/pause.svg")';
 });
