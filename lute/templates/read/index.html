@@ -70,14 +70,6 @@
           </h2>
         </td>
         <td align="right">
-          <a>
-            <label class="audio-label" for="audio_file">
-              <img
-                src="{{ url_for('static', filename='icn/speaker-volume.png') }}"
-                title="Load audio file" />
-            </label>
-          </a>
-          <input type="file" id="audio_file" name="audio_file" />
           {% if book.source_uri %}
           <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
             <img

@@ -3,7 +3,6 @@ const timeline = document.querySelector(".timeline");
 const volumeLine = document.querySelector(".volume");
 const playBtn = document.querySelector("#play-btn");
 const playBtnIcon = document.querySelector("#play-btn span");
-const browseButton = document.querySelector("#audio_file");
 const durationContainer = document.querySelector(".duration-container");
 const durationElement = document.querySelector(".duration-container .duration");
 const currentTimeElement = document.querySelector(
@@ -29,12 +28,6 @@ var bookmarksArray = [];
 let lastPlayTime = null;
 
 let jumpTimeBy = Number(rewindAmountOption.value);
-
-browseButton.addEventListener("change", function (e) {
-  if (e.target.files[0]) {
-    player.src = URL.createObjectURL(e.target.files[0]);
-  }
-});
 
 player.onloadedmetadata = function () {
   durationElement.textContent = timeToDisplayString(player.duration);
