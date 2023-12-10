@@ -101,6 +101,19 @@ def page_done():
     return jsonify("ok")
 
 
+@bp.route("/save_player_position", methods=["post"])
+def save_player_position():
+    "Save current player position.  Called on a loop by the player."
+    data = request.json
+    bookid = int(data.get("bookid"))
+    pos = float(data.get("position"))
+    book = Book.find(bookid)
+    book.audio_current_pos = pos
+    db.session.add(book)
+    db.session.commit()
+    return jsonify("ok")
+
+
 @bp.route("/renderpage/<int:bookid>/<int:pagenum>", methods=["GET"])
 def render_page(bookid, pagenum):
     "Method called by ajax, render the given page."
