@@ -260,15 +260,19 @@
     t = parseFloat($('#book_audio_current_pos').val());
     const book_id = $('#book_id').val();
     player.currentTime = t;
-    bks = $('#book_audio_bookmarks').val().split(';');
+    timeline.value = t;
+
     bookmarksArray = [];
+    bkstring = $('#book_audio_bookmarks').val();
+    bks = [];
+    if (bkstring != "")
+      bks = bkstring.split(';').map((b) => parseFloat(b));
     for (b of bks) {
-      bf = parseFloat(b);
-      // console.log(`adding bookmark ${bf}`);
-      bookmarksArray.push(bf);
+      bookmarksArray.push(b);
     }
 
     player.src = `/useraudio/stream/${book_id}`;
+    start_player_post_loop();
   };
 
   // Set "page X/Y" in page nav.
