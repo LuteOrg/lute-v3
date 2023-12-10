@@ -82,6 +82,7 @@ def new():
         f = form.audiofile.data
         if f:
             filename = _secure_unique_fname(f)
+            b.audio_filename = filename
             fp = os.path.join(current_app.env_config.useraudiopath, filename)
             f.save(fp)
         book = repo.add(b)
