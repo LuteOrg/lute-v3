@@ -255,8 +255,11 @@
   // If book_audio_file is not null, stream the file.
   let initialize_player = function() {
     const have_file = ($('#book_audio_file').val() != '');
-    if (!have_file)
+    if (!have_file) {
+      $('div.audio-player-container').hide();
       return;
+    }
+
     t = parseFloat($('#book_audio_current_pos').val());
     const book_id = $('#book_id').val();
     player.currentTime = t;
