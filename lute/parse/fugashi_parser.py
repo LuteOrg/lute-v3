@@ -40,19 +40,9 @@ class FugashiParser(AbstractParser):
         FugashiParser._cache[key] = res
 
     @classmethod
-    def parse_para(cls, text: str, language) -> List[ParsedToken]:
+    def parse_para(cls, text: str, language) -> List[List[str]]:
         lines = []
 
-        def line_to_token(lin):
-            "Convert parsed line to a ParsedToken."
-            term, node_type, third = lin
-            is_eos = term in language.regexp_split_sentences
-            if term == "EOP" and third == "7":
-                term = "¶"
-            is_word = (
-                node_type in "2678" and third !='-1'
-            )  # or node_type in "2678"
-            return ParsedToken(term, is_word, is_eos)
 
         if FugashiParser._get_cache(text):
             return FugashiParser._get_cache(text)
@@ -65,10 +55,10 @@ class FugashiParser(AbstractParser):
                 ]
             )
         lines.append(["EOP", "3", "7"])
-        res = [line_to_token(lin) for lin in lines]
+        # res = [line_to_token(lin) for lin in lines]
 
-        FugashiParser._set_cache(text, res)
-        return res
+        FugashiParser._set_cache(text, lines)
+        return lines
 
     def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
         """
@@ -76,14 +66,25 @@ class FugashiParser(AbstractParser):
         """
         text = re.sub(r"[ \t]+", " ", text).strip()
         tokens = []
+        lines = []
+        def line_to_token(lin):
+            "Convert parsed line to a ParsedToken."
+            term, node_type, third = lin
+            is_eos = term in language.regexp_split_sentences
+            if term == "EOP" and third == "7":
+                term = "¶"
+            is_word = (
+                node_type in "2678" and third !='-1'
+            )  # or node_type in "2678"
+            return ParsedToken(term, is_word, is_eos)
 
         # ref: https://tdual.hatenablog.com/entry/2020/07/13/162151
         # sudachi has three dicts, core, small, full ,need to be installed by pip
         # Split unit: "A" (short), "B" (middle), or "C" (Named Entity) [default: C]
         for para in text.split("\n"):
-            tokens.extend(FugashiParser.parse_para(para, language))
+            lines.extend(FugashiParser.parse_para(para, language))
 
-        # tokens = [line_to_token(lin) for lin in lines]
+        tokens = [line_to_token(lin) for lin in lines]
         return tokens
 
     # Hiragana is Unicode code block U+3040 - U+309F
