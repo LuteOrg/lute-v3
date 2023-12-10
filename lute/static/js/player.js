@@ -228,6 +228,11 @@ function addBookmark(currtime) {
      pointer-events: none;`;
 }
 
+let _update_bookmarks_control = function() {
+  bs = bookmarksArray.map(b => `${b}`).join(';');
+  $('#book_audio_bookmarks').val(bs);
+};
+
 function marker_classname_from_time(timeline_value) {
   return `marker-${timeline_value}`.replace('.', '-');
 }
@@ -245,6 +250,7 @@ bookmarkSaveBtn.addEventListener("click", function () {
   bookmarksArray.sort(function (a, b) {
     return a - b;
   });
+  _update_bookmarks_control();
   // console.log(`added ${t} to bookmarksArray ${bookmarksArray}`);
 });
 
@@ -264,6 +270,7 @@ bookmarkDeleteBtn.addEventListener("click", function() {
   const ind = bookmarksArray.indexOf(t);
   if (ind != -1)
     bookmarksArray.splice(ind, 1);
+    _update_bookmarks_control();
   // console.log(`post-delete, have ${bookmarksArray}`);
 })
 
