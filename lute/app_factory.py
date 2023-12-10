@@ -36,6 +36,7 @@ from lute.termtag.routes import bp as termtag_bp
 from lute.read.routes import bp as read_bp
 from lute.bing.routes import bp as bing_bp
 from lute.userimage.routes import bp as userimage_bp
+from lute.useraudio.routes import bp as useraudio_bp
 from lute.termimport.routes import bp as termimport_bp
 from lute.term_parent_map.routes import bp as term_parent_map_bp
 from lute.backup.routes import bp as backup_bp
@@ -64,6 +65,10 @@ def _setup_app_dirs(app_config):
         {
             "d": app_config.userimagespath,
             "readme": "User images.  Each subfolder is a language's ID.",
+        },
+        {
+            "d": app_config.useraudiopath,
+            "readme": "User audio.  Each file is a book's audio.",
         },
     ]
     for rec in required_dirs:
@@ -258,6 +263,7 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(read_bp)
     app.register_blueprint(bing_bp)
     app.register_blueprint(userimage_bp)
+    app.register_blueprint(useraudio_bp)
     app.register_blueprint(termimport_bp)
     app.register_blueprint(term_parent_map_bp)
     app.register_blueprint(backup_bp)

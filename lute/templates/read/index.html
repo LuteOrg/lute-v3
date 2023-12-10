@@ -1,5 +1,10 @@
-{% extends 'base.html' %} {% block title %}Reading &quot;{{ html_title
-}}&quot;{% endblock %} {% block body %}
+{% extends 'base.html' %}
+
+{% block title %}Reading &quot;{{ html_title }}&quot;{% endblock %}
+
+{% block body %}
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
 
 <table style="table-layout: fixed; border-spacing: 0">
   <tr>
@@ -18,7 +23,17 @@
   </tr>
 </table>
 
-<!-- TODO audio: page navs should ajax content. -->
+<div id="rendering_controls" style="display: block">
+  <pre>
+    book_id: <input id="book_id" value="{{ book.id }}">
+    book_audio: <input id="book_audio_file" value="{{ book.audio_filename or '' }}">
+    page_num: <input id="page_num" value="{{ page_num }}">
+    page_count: <input id="page_count" value="{{ page_count }}">
+    highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
+    sentence translation url: <span id="translateURL" style="display: none">{{ dictionary_url }}</span>
+  </pre>
+</div>
+
 <!-- TODO audio: on page change, move audio position to correct value. -->
 <div id="read_pane_left">
   <div id="reading-header">
@@ -27,63 +42,42 @@
       <tr>
         <td align="left">
           <h2 style="margin: 0px">
-            {% if prev10page != pagenum %}
-            <a
+            <span
+              class="read_page_nav read_page_disabled"
               id="navPrev10"
-              href="/read/{{ book.id }}/page/{{ prev10page }}"
-              title="page {{ prev10page }}"
-              tabindex="-1"
-              >&#171;</a>
-            {% else %}
-            <span style="color: lightgrey">&#171;</span>
-            {% endif %}
-
-            {% if prevpage != pagenum %}
-            <a
+              onclick="goto_relative_page(-10)"
+              >&#171;</span>
+            <span
+              class="read_page_nav read_page_disabled"
               id="navPrev"
-              href="/read/{{ book.id }}/page/{{ prevpage }}"
-              title="page {{ prevpage }}"
-              tabindex="-1"
-              >&#8249;</a>
-            {% else %}
-            <span style="color: lightgrey">&#8249;</span>
-            {% endif %}
+              onclick="goto_relative_page(-1)"
+              >&#8249;</span>
 
-            {{ pagenum }}/{{ pagecount }}
+            <span id="page_indicator">{{ page_num }}/{{ page_count }}</span>
 
-            {% if pagenum != pagecount %}
-            <a
+            <span
+              class="read_page_nav read_page_disabled"
               id="navNext"
-              href="/read/{{ book.id }}/page/{{ nextpage }}"
-              title="page {{ nextpage }}"
-              tabindex="-1"
-              >&#8250;</a>
-            {% else %}
-            <span style="color: lightgrey">&#8250;</span>
-            {% endif %}
+              onclick="goto_relative_page(1)"
+              >&#8250;</span>
 
-            {% if next10page != pagecount %}
-            <a
+            <span
+              class="read_page_nav read_page_disabled"
               id="navNext10"
-              href="/read/{{ book.id }}/page/{{ next10page }}"
-              title="page {{ next10page }}"
-              tabindex="-1"
-              >&#187;</a>
-            {% else %}
-            <span style="color: lightgrey">&#187;</span>
-            {% endif %}
+              onclick="goto_relative_page(10)"
+              >&#187;</span>
           </h2>
         </td>
         <td align="right">
           <a>
-            <label class="audio-label" for="myfile">
+            <label class="audio-label" for="audio_file">
               <!-- TOOD audio - image for loading -->
               <img
                 src="{{ url_for('static', filename='icn/speaker-volume.png') }}"
                 title="Load audio file" />
             </label>
           </a>
-          <input type="file" id="myfile" name="myfile" />
+          <input type="file" id="audio_file" name="audio_file" />
           <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
             <img
               src="{{ url_for('static', filename='icn/external.png') }}"
@@ -92,12 +86,13 @@
           {% if book.source_uri %}
           <!-- TODO audio - what to do if the book has source uri or not? also, source_uri was for the source of the text, not audio, I think. -->
           {% endif %}
-          <a id="editText" href="/read/editpage/{{ text.id }}" tabindex="-1">
+          <!-- TODO audio: change href for edit, use current page. -->
+          <span id="editText" style="cursor: pointer" onclick="edit_current_page()">
             <img
               src="{{ url_for('static', filename='icn/document--pencil.png') }}"
               title="Edit"
               alt="Edit" />
-          </a>
+          </span>
           <img
             id="keyboard_shortcuts"
             style="margin-right: 10px"
@@ -111,11 +106,6 @@
     <hr />
   </div>
 
-  <!-- TODO audio: if ajaxing content, need to ajax title. -->
-  {% if pagenum == 1 %}
-  <h2>{{ book.title }}</h2>
-  {% endif %}
-
   <div class="audio-player-container">
     <audio id="player" preload="metadata" src=""></audio>
 
@@ -124,8 +114,8 @@
         <button id="play-btn"><span></span></button>
       </div>
       <div class="audio-player-timeline-container-grid">
-        <div id="timeline-container" class="audio-player-timeline-container"">
-          <input type="range" class="timeline" max="100" value="0"  step="0.001"/>
+        <div id="timeline-container" class="audio-player-timeline-container">
+          <input type="range" class="timeline" max="100" value="0" step="0.1" />
           <!-- <div class="marker"></div> -->
           <div class="duration-container">
             <span class="current-time">0:00</span>
@@ -142,11 +132,11 @@
               <button id="ff-btn"></button>
             </div>
             <select name="rewind-option" id="rewind-option">
-              <option value="1">1 sec</option>
-              <option value="2">2 sec</option>
-              <option value="3" selected>3 sec</option>
-              <option value="4">4 sec</option>
-              <option value="5">5 sec</option>
+              <option value="3">3 sec</option>
+              <option value="5" selected>5 sec</option>
+              <option value="10">10 sec</option>
+              <option value="30">30 sec</option>
+              <option value="60">60 sec</option>
             </select>
           </div>
           <div class="playback-rate-container">
@@ -174,117 +164,55 @@
     </div>
   </div>
 
-  <span id="textid" style="display: none">{{ textid }}</span>
-  <span id="show_highlights" style="display: none">{{ show_highlights|lower }}</span>
-
-  {# Hack for js translation keyboard shortcut. #}
-  <span id="translateURL" style="display: none">{{ dictionary_url }}</span>
-
-  <!-- TODO audio: ajax in content. -->
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
-    {% include 'read/sentences.html' %}
+    ...
   </div>
 
-  <script>
-    $(document).ready(function () {
-      prepareTextInteractions();
-      add_status_classes();
-    });
-
-    let tooltip_help_hover_content = function (setContent) {
-      $.ajax({
-        url: `/read/keyboard_shortcuts`,
-        type: "get",
-        success: function (response) {
-          setContent(response);
-        },
-      });
-    };
-
-    $("#keyboard_shortcuts").tooltip({
-      position: {
-        my: "left top+10",
-        at: "left bottom",
-        collision: "flipfit flip",
-      },
-      show: { easing: "easeOutCirc" },
-      content: function (setContent) {
-        tooltip_help_hover_content(setContent);
-      },
-    });
-  </script>
-
-  <!-- TODO audio: footer controls should post and then ajax in content. -->
   <div id="reading-footer" style="text-align: center">
     <h2>
-      <form
-        style="display: none"
-        id="setknown"
-        action="/read/{{ book.id }}/page/{{ pagenum }}/allknown/{{ pagenum }}"
-        method="post"
-      ></form>
-      <a
+      <span
         id="footerMarkRestAsKnown"
-        style="text-decoration: none; cursor: pointer"
-        onclick="document.getElementById('setknown').submit(); return false;"
-        title="Mark rest as known, mark page as read"
-        tabindex="-1"
-      >
+        style="cursor: pointer"
+        onclick="handle_page_done(true, 0)"
+        title="Mark rest as known, mark page as read">
         <img src="{{ url_for('static', filename='icn/tick.png') }}" />
-      </a>
+      </span>
 
-      {% if pagenum != pagecount %} &nbsp;
-      <form
-        style="display: none"
-        id="knowntonext"
-        action="/read/{{ book.id }}/page/{{ pagenum }}/allknown/{{ pagenum + 1 }}"
-        method="post"
-      ></form>
-      <a
+      <span
         id="footerMarkRestAsKnownNextPage"
-        style="text-decoration: none; cursor: pointer"
-        onclick="document.getElementById('knowntonext').submit(); return false;"
-        title="Mark rest as known, mark page as read, then go to next page"
-        tabindex="-1"
-      >
+        style="cursor: pointer"
+        onclick="handle_page_done(true, 1)"
+        title="Mark rest as known, mark page as read, then go to next page">
         <img src="{{ url_for('static', filename='icn/tick.png') }}" />&#8250;
-      </a>
-      &nbsp;
+      </span>
 
-      <form
-        style="display: none"
-        id="gotonext"
-        action="/read/{{ book.id }}/page/{{ pagenum }}/markread/{{ pagenum + 1 }}"
-        method="post"
-      ></form>
-      <a
+      <span
         id="footerNextPage"
-        style="text-decoration: none; cursor: pointer"
-        onclick="document.getElementById('gotonext').submit(); return false;"
+        style="cursor: pointer"
+        onclick="handle_page_done(false, 1)"
         title="Mark page as read, then go to next page"
-        tabindex="-1"
-        >&#8250;</a>
-      {% endif %}
+        >&#8250;</span>
     </h2>
 
-    {% if pagenum == pagecount %}
-    <h2>&#127881;</h2>
-    <p>
-      <a
-        href=""
-        tabindex="-1"
-        onclick="$('#actionposter').submit(); return false;"
-        >Archive book</a>
-      |
-      <a href="/" tabindex="-1">Home</a>
-    </p>
+    <div id="final_page_controls" class="hide">
+      <h2>&#127881;</h2>
+      <p>
+        <a
+          href=""
+          tabindex="-1"
+          onclick="$('#actionposter').submit(); return false;"
+          >Archive book</a>
+        |
+        <a href="/" tabindex="-1">Home</a>
+      </p>
 
-    <form
-      id="actionposter"
-      method="post"
-      action="/book/archive/{{ book.id }}"
-    ></form>
-    {% endif %}
+      <form
+        id="actionposter"
+        method="post"
+        action="/book/archive/{{ book.id }}"
+        ></form>
+    </div>
+
   </div>
 </div>
 
@@ -313,5 +241,145 @@
     Frame support required.
   </iframe>
 </div>
+
+<script>
+  $(document).ready(function () {
+    goto_relative_page(0);
+    load_audio_if_present();
+  });
+
+  // If book_audio_file is not null, stream the file.
+  let load_audio_if_present = function() {
+    const have_file = ($('#book_audio_file').val() != '');
+    if (!have_file)
+      return;
+    const book_id = $('#book_id').val();
+    player.src = `/useraudio/stream/${book_id}`;
+  };
+
+  // Set "page X/Y" in page nav.
+  let set_page_fraction = function() {
+    const pagenum = parseInt($('#page_num').val());
+    const maxpage = parseInt($('#page_count').val());
+    $('#page_indicator').text(`${pagenum}/${maxpage}`);
+  };
+
+  // Enable page nav links, depending on page num.
+  let enable_page_nav_links = function() {
+    const pagenum = parseInt($('#page_num').val());
+    const maxpage = parseInt($('#page_count').val());
+    if (pagenum > 1) {
+      $('#navPrev10').removeClass('read_page_disabled');
+      $('#navPrev').removeClass('read_page_disabled');
+    }
+    else {
+      $('#navPrev10').addClass('read_page_disabled');
+      $('#navPrev').addClass('read_page_disabled');
+    }
+    if (pagenum < maxpage) {
+      $('#navNext').removeClass('read_page_disabled');
+      $('#navNext10').removeClass('read_page_disabled');
+    }
+    else {
+      $('#navNext').addClass('read_page_disabled');
+      $('#navNext10').addClass('read_page_disabled');
+    }
+  };
+
+
+  // Show/hide footer controls.
+  let set_footer_control_visibility = function() {
+    const pagenum = parseInt($('#page_num').val());
+    const maxpage = parseInt($('#page_count').val());
+    if (pagenum == maxpage) {
+      $('#final_page_controls').removeClass("hide");
+      $('#footerMarkRestAsKnownNextPage').addClass("hide");
+      $('#footerNextPage').addClass("hide");
+    }
+    else {
+      $('#final_page_controls').addClass("hide");
+      $('#footerMarkRestAsKnownNextPage').removeClass("hide");
+      $('#footerNextPage').removeClass("hide");
+    }
+  };
+
+
+  // Go to page relative to that stored in page_num input.
+  function goto_relative_page(p) {
+    const bookid = $('#book_id').val();
+    const pagenum = parseInt($('#page_num').val());
+    const maxpage = parseInt($('#page_count').val());
+    let relpage = pagenum + p;
+    if (relpage < 1)
+      relpage = 1;
+    if (relpage > maxpage)
+      relpage = maxpage;
+    const url = `/read/renderpage/${bookid}/${relpage}`;
+    $.get(
+      url,
+      function(data, status) {
+        $('#thetext').html(data);
+        prepareTextInteractions();
+        add_status_classes();
+        start_hover_mode(false);
+        $('#page_num').val(relpage);
+        enable_page_nav_links();
+        set_page_fraction();
+        set_footer_control_visibility();
+      }
+    );
+  }
+
+  let tooltip_help_hover_content = function (setContent) {
+    $.ajax({
+      url: `/read/keyboard_shortcuts`,
+      type: "get",
+      success: function (response) {
+        setContent(response);
+      },
+    });
+  };
+
+  $("#keyboard_shortcuts").tooltip({
+    position: {
+      my: "left top+10",
+      at: "left bottom",
+      collision: "flipfit flip",
+    },
+    show: { easing: "easeOutCirc" },
+    content: function (setContent) {
+      tooltip_help_hover_content(setContent);
+    },
+  });
+
+
+  function edit_current_page() {
+    const bookid = $('#book_id').val();
+    const pagenum = parseInt($('#page_num').val());
+    location.href = `/read/editpage/${bookid}/${pagenum}`;
+  }
+
+
+  // Handle green checkmark in footer.
+  function handle_page_done(mark_rest_known = false, next_relative_page = 0) {
+    const bookid = $('#book_id').val();
+    const pagenum = parseInt($('#page_num').val());
+    data = {
+      bookid: bookid,
+      pagenum: pagenum,
+      restknown: mark_rest_known
+    };
+    $.ajax({
+      type: 'post',
+      url: '/read/page_done',
+      data: JSON.stringify(data),
+      contentType: "application/json; charset=utf-8"
+    }).done(function(d) {
+      goto_relative_page(next_relative_page);
+    });
+  }
+
+
+</script>
 
 {% endblock %}

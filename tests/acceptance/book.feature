@@ -8,7 +8,7 @@ Feature: Books and stats are available
         Given I visit "/"
         Given a Spanish book "Hola" with content:
             Hola. Tengo un gato.
-        Then the page title is Reading "Hola (1/1)"
+        Then the page title is Reading "Hola"
         And the reading pane shows:
             Hola/. /Tengo/ /un/ /gato/.
         Given I visit "/"
@@ -23,4 +23,4 @@ Feature: Books and stats are available
             多くなったのは初めてです。
             
             韓国から来た人。
-        Then the page title is Reading "Jp test (1/1)"
+        Then the page title is Reading "Jp test"
