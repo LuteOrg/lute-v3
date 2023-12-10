@@ -28,6 +28,7 @@
     book_id: <input id="book_id" value="{{ book.id }}">
     book_audio: <input id="book_audio_file" value="{{ book.audio_filename or '' }}">
     book_audio_current_pos: <input id="book_audio_current_pos" value="{{ book.audio_current_pos or 0 }}">
+    book_audio_bookmarks: <input id="book_audio_bookmarks" value="{{ book.audio_bookmarks or '' }}">
     page_num: <input id="page_num" value="{{ page_num }}">
     page_count: <input id="page_count" value="{{ page_count }}">
     highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
