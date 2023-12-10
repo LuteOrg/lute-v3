@@ -22,8 +22,6 @@ const bookmarkDeleteBtn = document.querySelector("#bkm-delete-btn");
 const bookmarkPrevBtn = document.querySelector("#bkm-prev-btn");
 const bookmarkNextBtn = document.querySelector("#bkm-next-btn");
 
-const theTextItems = document.querySelectorAll("#thetext .textitem");
-
 var bookmarksArray = [];
 let lastPlayTime = null;
 
@@ -83,10 +81,6 @@ window.addEventListener("message", function(event) {
 player.addEventListener("play", function () {
   playBtn.style.backgroundImage = 'url("/static/icn/pause.svg")';
 });
-
-theTextItems.forEach((item) =>
-  item.addEventListener("mousedown", () => player.pause())
-);
 
 player.addEventListener("timeupdate", function () {
   // const timelinePosition = (player.currentTime / player.duration) * 100;
