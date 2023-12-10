@@ -23,9 +23,10 @@
   </tr>
 </table>
 
-<div id="rendering_controls" style="display: none">
+<div id="rendering_controls" style="display: block">
   <pre>
     book_id: <input id="book_id" value="{{ book.id }}">
+    book_audio: <input id="book_audio_file" value="{{ book.audio_filename or '' }}">
     page_num: <input id="page_num" value="{{ page_num }}">
     page_count: <input id="page_count" value="{{ page_count }}">
     highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
@@ -244,7 +245,17 @@
 <script>
   $(document).ready(function () {
     goto_relative_page(0);
+    load_audio_if_present();
   });
+
+  // If book_audio_file is not null, stream the file.
+  let load_audio_if_present = function() {
+    const have_file = ($('#book_audio_file').val() != '');
+    if (!have_file)
+      return;
+    const book_id = $('#book_id').val();
+    player.src = `/useraudio/stream/${book_id}`;
+  };
 
   // Set "page X/Y" in page nav.
   let set_page_fraction = function() {
