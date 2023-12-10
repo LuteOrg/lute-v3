@@ -14,11 +14,10 @@ class SudachiParser(AbstractParser):
 
     """
 
-    _is_supported = True
-
-    @classmethod
-    def is_supported(cls):
-        return True
+    def __init__(self):
+        self.tokenizer_obj = dictionary.Dictionary(dict="full").create()
+        self.split_mode = sudachipy.SplitMode.B
+        super().__init__()
 
     @classmethod
     def name(cls):
@@ -31,17 +30,17 @@ class SudachiParser(AbstractParser):
         text = re.sub(r"[ \t]+", " ", text).strip()
         lines = []
         # ref: https://tdual.hatenablog.com/entry/2020/07/13/162151
-        # sudachi has three dicts, core, small, full ,need to be installed by pip
-        tokenizer_obj = dictionary.Dictionary(dict="full").create()
+        # Sudachi has three dicts, core, small and full ,need to be installed by pip
+
         # Split unit: "A" (short), "B" (middle), or "C" (Named Entity) [default: C]
-        mode = sudachipy.Tokenizer.SplitMode.B
+
         for para in text.split("\n"):
-            for tok in tokenizer_obj.tokenize(para, mode):
+            for tok in self.tokenizer_obj.tokenize(para, self.split_mode):
                 #  https://github.com/WorksApplications/SudachiPy   
                 # Dictionary ID    
-                #0 for the system dictionary
-                #1 and above for the user dictionaries
-                #-1\t(OOV) if a word is Out-of-Vocabulary (not in the dictionary)
+                # 0 for the system dictionary
+                # 1 and above for the user dictionaries
+                # -1\t(OOV) if a word is Out-of-Vocabulary (not in the dictionary)
                 lines.append(
                     [
                         tok.surface(),
@@ -60,7 +59,7 @@ class SudachiParser(AbstractParser):
                 term = "¶"
             # all_word_types=['名詞', '記号', '感動詞', '副詞', '形状詞', '補助記号', '接尾辞', '形容詞', '助詞', '連体詞',
             #        '接続詞', '接頭辞', '代名詞', '動詞']
-            is_word = node_type not in ['記号','補助記号']  and third !='-1'
+            is_word = node_type not in ['記号', '補助記号'] and third != '-1'
             return ParsedToken(term, is_word, is_eos)
 
         tokens = [line_to_token(lin) for lin in lines]
@@ -82,14 +81,12 @@ class SudachiParser(AbstractParser):
         Returns None if the text is all hiragana, or the pronunciation
         doesn't add value (same as text).
         """
-        tokenizer_obj = dictionary.Dictionary(dict="full").create()
-        mode = sudachipy.Tokenizer.SplitMode.B
         if self._string_is_hiragana(text):
             return None
 
         readings = []
         # with MeCab(flags) as nm:
-        for tok in tokenizer_obj.tokenize(text, mode):
+        for tok in self.tokenizer_obj.tokenize(text, self.split_mode):
             readings.append(tok.reading_form())
 
         # for n in (text, as_nodes=True):
