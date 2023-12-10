@@ -149,6 +149,12 @@ def edit(bookid):
 
     if form.validate_on_submit():
         form.populate_obj(b)
+        f = form.audiofile.data
+        if f:
+            filename = _secure_unique_fname(f)
+            b.audio_filename = filename
+            fp = os.path.join(current_app.env_config.useraudiopath, filename)
+            f.save(fp)
         repo.add(b)
         repo.commit()
         flash(f"{b.title} updated.")
