@@ -2,10 +2,21 @@
 /book routes.
 """
 
+import os
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
-from flask import Blueprint, request, jsonify, render_template, redirect, flash
+from flask import (
+    Blueprint,
+    current_app,
+    request,
+    jsonify,
+    render_template,
+    redirect,
+    flash,
+)
+from werkzeug.utils import secure_filename
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm
@@ -45,6 +56,16 @@ def datatables_archived_source():
     return datatables_source(True)
 
 
+def _secure_unique_fname(filefielddata):
+    """
+    Return secure name pre-pended with datetime string.
+    """
+    current_datetime = datetime.now()
+    formatted_datetime = current_datetime.strftime("%Y%m%d_%H%M%S")
+    f = "_".join([formatted_datetime, secure_filename(filefielddata.filename)])
+    return f
+
+
 @bp.route("/new", methods=["GET", "POST"])
 def new():
     "Create a new book, either from text or from a file."
@@ -58,6 +79,11 @@ def new():
         if form.textfile.data:
             content = form.textfile.data.read()
             b.text = str(content, "utf-8")
+        f = form.audiofile.data
+        if f:
+            filename = _secure_unique_fname(f)
+            fp = os.path.join(current_app.env_config.useraudiopath, filename)
+            f.save(fp)
         book = repo.add(b)
         repo.commit()
         return redirect(f"/read/{book.id}/page/1", 302)

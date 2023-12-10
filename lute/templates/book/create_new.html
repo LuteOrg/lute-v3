@@ -34,12 +34,17 @@
 
     <tr>
       <td>{{ form.textfile.label }}</td>
-      <td>{{ form.textfile(class="form-control") }}</td>
+      <td>{{ form.textfile() }}</td>
     </tr>
 
     <tr>
       <td>{{ form.source_uri.label }}</td>
       <td>{{ form.source_uri(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.audiofile.label }}</td>
+      <td>{{ form.audiofile() }}</td>
     </tr>
 
     {# Tags li entries are managed by tagit. #}
