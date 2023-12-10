@@ -28,7 +28,11 @@ class NewBookForm(FlaskForm):
         description="Max file size 2048K",
         validators=[FileAllowed(["txt"], "Please upload a valid text document")],
     )
-    source_uri = StringField("Source URI", validators=[Length(max=255)])
+    source_uri = StringField("Text source", validators=[Length(max=255)])
+    audiofile = FileField(
+        "Audio file (mp3)",
+        validators=[FileAllowed(["mp3"], "Please upload a valid audio file")],
+    )
     book_tags = FieldList(StringField("book_tags"))
 
     def validate_language_id(self, field):  # pylint: disable=unused-argument
@@ -56,3 +60,7 @@ class EditBookForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired(), Length(max=255)])
     source_uri = StringField("Source URI", validators=[Length(max=255)])
     book_tags = FieldList(StringField("book_tags"))
+    audiofile = FileField(
+        "Audio file (mp3)",
+        validators=[FileAllowed(["mp3"], "Please upload a valid audio file")],
+    )

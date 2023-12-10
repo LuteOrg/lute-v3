@@ -62,6 +62,10 @@ class Book(
     current_tx_id = db.Column("BkCurrentTxID", db.Integer, default=0)
     archived = db.Column("BkArchived", db.Boolean, default=False)
 
+    audio_filename = db.Column("BkAudioFilename", db.String)
+    audio_current_pos = db.Column("BkAudioCurrentPos", db.Float)
+    audio_bookmarks = db.Column("BkAudioBookmarks", db.String)
+
     language = db.relationship("Language")
     texts = db.relationship(
         "Text",

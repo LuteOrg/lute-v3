@@ -212,7 +212,7 @@ span.read_page_disabled {
     color: lightgrey;
 }
 
-div#reading-footer a {
+div#reading-footer span {
     margin: 5px;
 }
 

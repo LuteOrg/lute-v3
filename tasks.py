@@ -143,8 +143,14 @@ def accept(  # pylint: disable=too-many-arguments
     else:
         cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{port}"]
         with subprocess.Popen(cmd) as app_process:
-            subprocess.run(run_test, check=True)
-            app_process.terminate()
+            try:
+                subprocess.run(run_test, check=True)
+            except subprocess.CalledProcessError:
+                # This just means a test failed.  We don't need to see
+                # a stack trace, the assert failures are already displayed.
+                pass
+            finally:
+                app_process.terminate()
 
 
 @task(pre=[_ensure_test_db])
