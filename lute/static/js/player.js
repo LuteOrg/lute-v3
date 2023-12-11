@@ -1,3 +1,4 @@
+const readPaneLeft = document.querySelector("#read_pane_left")
 const player = document.querySelector("#player");
 const timeline = document.querySelector(".timeline");
 const volumeLine = document.querySelector(".volume");
@@ -16,7 +17,10 @@ const playbackRateButton = document.querySelector("#playback-rate-btn");
 const playbackRateIndicator = document.querySelector("#playback-rate-btn span");
 const rewindAmountOption = document.querySelector("#rewind-option");
 
+const pinButton = document.querySelector("#pin");
+
 // const markerOverlay = document.querySelector(".marker");
+const playerContainer = document.querySelector(".audio-player-container");
 const timelineContainer = document.querySelector("#timeline-container");
 const bookmarkSaveBtn = document.querySelector("#bkm-save-btn");
 const bookmarkDeleteBtn = document.querySelector("#bkm-delete-btn");
@@ -46,6 +50,13 @@ player.onloadedmetadata = function () {
   resetPlaybackRate();
 };
 
+function togglePlayPause() {
+  if (player.paused)
+    player.play();
+  else
+    player.pause();
+}
+
 function timeToDisplayString(secs) {
   const minutes = Math.floor(secs / 60);
   const seconds = parseFloat((secs % 60).toFixed(1));
@@ -67,10 +78,7 @@ function timeToPercent(t) {
 playBtn.addEventListener("click", function () {
   if ((player.duration ?? 0) == 0)
     return;
-  if (player.paused)
-    player.play();
-  else
-    player.pause();
+  togglePlayPause()
 });
 
 player.addEventListener("pause", function () {
@@ -174,6 +182,13 @@ function resetPlaybackRate() {
   playbackRateIndicator.textContent = "1.0";
 }
 
+/* ****************************
+ * Toggle player sticky.
+ */
+
+pin.addEventListener("click", function() {
+  readPaneLeft.classList.toggle("sticky-player");
+})
 
 /* ****************************
  * Bookmark management.
@@ -253,7 +268,7 @@ function jumpToBookmark(oper) {
   if (lastPlayTime == null)
     return;
   // console.log(`jumping to bookmark from time ${lastPlayTime}, currently have ${bookmarksArray}`);
-
+  
   // Note for the findIndex, we have to use Number(d), as it
   // appears that javascript can sometimes do string comparisons.
   // e.g., if I had bookmarks [ 93.4, 224, 600 ], jumping backwards
@@ -268,10 +283,28 @@ function jumpToBookmark(oper) {
     // console.log('not found');
     return;
   }
-
+  
   const m = bookmarksArray[ind];
   // console.log(`ind is ${ind} => bookmarksArray entry ${m}`);
   timeline.value = m;
   lastPlayTime = m;
   updateCurrentTime();
 }
+
+
+/* ****************************
+ * Keyboard shortcuts
+ */
+
+document.addEventListener("keydown", function (e) {
+  if (e.code == "Space") {
+    togglePlayPause();
+  }
+})
+
+// prevent scrolling when space is pressed
+window.addEventListener('keydown', function(e) {
+  if(e.code == "Space" && e.target == document.body) {
+    e.preventDefault();
+  }
+});
