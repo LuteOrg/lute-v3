@@ -654,7 +654,13 @@ function increment_status_for_marked_elements(shiftBy) {
 
     if (newIndex != originalIndex) {
       const newStatusCode = Number(validStatuses[newIndex].replace(/\D/g, ''));
-      update_status_for_elements(newStatusCode, payloads[key]);
+
+      // Can't set status to 0, that implies term deletion, which is a different issue
+      // (at the moment).
+      // TODO delete term from reading screen: setting to 0 could equal deleting term.
+      if (newStatusCode != 0) {
+        update_status_for_elements(newStatusCode, payloads[key]);
+      }
     }
   })
 }

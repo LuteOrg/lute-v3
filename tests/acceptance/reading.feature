@@ -179,6 +179,67 @@ Feature: User can actually read and stuff.
             Tengo (1)/ /otro/ /amigo (1)/.
 
 
+    Scenario: Up and down arrow sets status
+        Given a Spanish book "Hola" with content:
+            Tengo un amigo.
+        When I click "Tengo" and press hotkey "1"
+        When I click "un" and press hotkey "2"
+        When I click "amigo" and press hotkey "3"
+        Then the reading pane shows:
+            Tengo (1)/ /un (2)/ /amigo (3)/.
+
+        When I shift click:
+            Tengo
+            un
+            amigo
+        And I press hotkey "UP"
+        Then the reading pane shows:
+            Tengo (2)/ /un (3)/ /amigo (4)/.
+
+        When I shift click:
+            Tengo
+            un
+            amigo
+        When I press hotkey "UP"
+        Then the reading pane shows:
+            Tengo (3)/ /un (4)/ /amigo (5)/.
+
+        When I shift click:
+            Tengo
+            un
+            amigo
+        When I press hotkey "UP"
+        Then the reading pane shows:
+            Tengo (4)/ /un (5)/ /amigo (99)/.
+
+        When I shift click:
+            Tengo
+            un
+            amigo
+        When I press hotkey "UP"
+        Then the reading pane shows:
+            Tengo (5)/ /un (99)/ /amigo (99)/.
+
+        When I shift click:
+            Tengo
+            un
+            amigo
+        When I press hotkey "DOWN"
+        Then the reading pane shows:
+            Tengo (4)/ /un (5)/ /amigo (5)/.
+
+        When I click "Tengo" and press hotkey "DOWN"
+        And I click "Tengo" and press hotkey "DOWN"
+        And I click "Tengo" and press hotkey "DOWN"
+        And I click "Tengo" and press hotkey "DOWN"
+        And I click "Tengo" and press hotkey "DOWN"
+        And I click "Tengo" and press hotkey "DOWN"
+        And I click "Tengo" and press hotkey "DOWN"
+        And I click "Tengo" and press hotkey "DOWN"
+        Then the reading pane shows:
+            Tengo (1)/ /un (5)/ /amigo (5)/.
+
+
     Scenario: Toggling highlighting only shows highlights on hovered terms
         Given a Spanish book "Hola" with content:
             Tengo un amigo y otro.

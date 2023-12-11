@@ -238,6 +238,8 @@ class LuteTestClient:
             "t": 84,
             "m": 77,
             "h": 72,
+            "up": 38,
+            "down": 40,
         }
         jscode = map_to_js_keycode[hotkey.lower()]
         shift_pressed = "true" if hotkey in ["C", "T"] else "false"
