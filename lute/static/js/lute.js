@@ -12,7 +12,6 @@ let LUTE_CURR_TERM_DATA_ORDER = -1;  // initially not set.
  */ 
 let LUTE_HOVERING = true;
 
-
 /**
  * When the reading pane is first loaded, it is set in "hover mode",
  * meaning that when the user hovers over a word, that word becomes
@@ -504,6 +503,8 @@ function handle_keydown (e) {
   const kEND = 35;
   const kLEFT = 37;
   const kRIGHT = 39;
+  const kUP = 38;
+  const kDOWN = 40;
   const kC = 67; // C)opy
   const kT = 84; // T)ranslate
   const kM = 77; // The(M)e
@@ -522,6 +523,8 @@ function handle_keydown (e) {
   map[kEND] = () => set_cursor(maxindex);
   map[kLEFT] = () => move_cursor(-1, e);
   map[kRIGHT] = () => move_cursor(+1, e);
+  map[kUP] = () => increment_status_for_marked_elements(+1);
+  map[kDOWN] = () => increment_status_for_marked_elements(-1);
   map[kC] = () => handle_copy(e);
   map[kT] = () => show_translation(e);
   map[kM] = () => next_theme(e);
@@ -547,7 +550,11 @@ function handle_keydown (e) {
 /**
  * post update ajax call, fix the UI.
  */
-function update_selected_statuses(newStatus) {
+function update_selected_statuses(newStatus, elements) {
+  if (!elements) {
+    console.error('Expecting argument `elements` to exist');
+    return;
+  }
   const newClass = `status${newStatus}`;
   let update_data_status_class = function (e) {
     const curr = $(this);
@@ -559,10 +566,8 @@ function update_selected_statuses(newStatus) {
         .attr('data_status_class',`${newClass}`);
     });
   };
-  $('span.kwordmarked').each(update_data_status_class);
-  $('span.wordhover').each(update_data_status_class);
+  $(elements).each(update_data_status_class)
 }
-
 
 /**
  * If the term editing form is visible when reading, and a hotkey is hit,
@@ -583,16 +588,20 @@ function update_term_form(el, new_status) {
 
 
 function update_status_for_marked_elements(new_status) {
-  let els = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
-  if (els.length == 0)
+  let elements = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
+  update_status_for_elements(new_status, elements);
+}
+
+function update_status_for_elements(new_status, elements) {
+  if (elements.length == 0)
     return;
-  const firstel = $(els[0]);
+  const firstel = $(elements[0]);
   const langid = firstel.attr('lid');
-  els = els.map(el => $(el).text());
+  const texts = elements.map(el => $(el).text());
 
   data = JSON.stringify({
     langid: langid,
-    terms: els,
+    terms: texts,
     new_status: new_status
   });
 
@@ -603,8 +612,8 @@ function update_status_for_marked_elements(new_status) {
     dataType: 'JSON',
     contentType: 'application/json',
     success: function(response) {
-      update_selected_statuses(new_status);
-      if (els.length == 1) {
+      update_selected_statuses(new_status, elements);
+      if (texts.length == 1) {
         update_term_form(firstel, new_status);
       }
     },
@@ -618,4 +627,34 @@ function update_status_for_marked_elements(new_status) {
     }
   });
 
+}
+
+function increment_status_for_marked_elements(shiftBy) {
+  const validStatuses = ['status0', 'status1', 'status2', 'status3', 'status4', 'status5', 'status99'];
+  const elements = Array.from(document.querySelectorAll('span.kwordmarked, span.wordhover'));
+
+  // Build payloads to update for each unique status that will be changing
+  let payloads = {};
+
+  elements.forEach((element) => {
+    let statusClass = element.getAttribute('data_status_class');
+    
+    if (!statusClass || !validStatuses.includes(statusClass)) return;
+
+    payloads[statusClass] ||= [];
+    payloads[statusClass].push(element);
+  })
+
+  Object.keys(payloads).forEach((key) => {
+    let originalIndex = validStatuses.indexOf(key);
+
+    if (originalIndex == -1) return;
+    
+    newIndex = Math.max(0, Math.min((validStatuses.length-1), originalIndex+shiftBy));
+
+    if (newIndex != originalIndex) {
+      const newStatusCode = Number(validStatuses[newIndex].replace(/\D/g, ''));
+      update_status_for_elements(newStatusCode, payloads[key]);
+    }
+  })
 }
