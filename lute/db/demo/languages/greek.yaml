@@ -7,6 +7,6 @@ show_romanization: true
 
 # parser_type: defaults to space delimited.
 # character_substitutions:
-# split_sentences:
-# split_sentence_exceptions:
-word_chars: a-zA-ZÀ-ÖØ-öø-ȳͰ-Ͽἀ-ῼ
+split_sentences: .!?;
+split_sentence_exceptions: Mr.|Mrs.|Dr.|[A-Z].|κτλ.
+word_chars: α-ωΑ-ΩάόήέώύίΊΏΈΉΌΆΎϊΪϋΫΐΰ
