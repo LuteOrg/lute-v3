@@ -45,3 +45,4 @@ Feature: Creating and managing terms
 
 
 # TODO zzfuture fix: testing scenarios: term filters.
+# TODO zzfuture fix: testing scenarios: bulk set parents.
