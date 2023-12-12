@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 75">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #79b7e7;
+      }
+    </style>
+  </defs>
+  <title>bookmark-on</title>
+  <g id="Layer_2" data-name="Layer 2">
+    <g id="Layer_1-2" data-name="Layer 1">
+      <path class="cls-1" d="M48,0H6A6,6,0,0,0,0,6V72a3,3,0,0,0,4.59,2.54L27,60.54l22.41,14A3,3,0,0,0,54,72V6A6,6,0,0,0,48,0Z"/>
+    </g>
+  </g>
+</svg>

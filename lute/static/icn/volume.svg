@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 81 78">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #79b7e7;
+      }
+    </style>
+  </defs>
+  <title>volume</title>
+  <g id="Layer_2" data-name="Layer 2">
+    <g id="Layer_1-2" data-name="Layer 1">
+      <path class="cls-1" d="M54,3V75a3,3,0,0,1-4.84,2.36L23,57H6a6,6,0,0,1-6-6V27a6,6,0,0,1,6-6H23L49.16.63A3,3,0,0,1,54,3ZM66,27a3,3,0,0,0-3,3V48a3,3,0,0,0,6,0V30A3,3,0,0,0,66,27Zm12-6a3,3,0,0,0-3,3V54a3,3,0,0,0,6,0V24A3,3,0,0,0,78,21Z"/>
+    </g>
+  </g>
+</svg>
