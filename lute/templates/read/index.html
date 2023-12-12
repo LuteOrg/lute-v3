@@ -6,23 +6,6 @@
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
 
-<table style="table-layout: fixed; border-spacing: 0">
-  <tr>
-    <td width="2px">
-      <img
-        src="{{ url_for('static', filename='img/lute.png') }}"
-        class="lutelogo_small"
-      />
-    </td>
-    <td>
-      <a href="/" tabindex="-1" id="reading_home_link">Home</a>
-      {% if config.ENV == 'dev' %}
-      <span style="background-color: blue; color: white; margin: 2px; padding: 2px">Dev environment</span>
-      {% endif %}
-    </td>
-  </tr>
-</table>
-
 <div id="rendering_controls" style="display: none">
   <pre>
     book_id: <input id="book_id" value="{{ book.id }}">
@@ -41,6 +24,14 @@
     <!-- Lacking css skills, so table layout to the rescue. -->
     <table style="width: 100%">
       <tr>
+        <td width="2px">
+          <img
+            src="{{ url_for('static', filename='img/lute.png') }}"
+            class="lutelogo_small"
+            style="cursor: pointer"
+            onclick="window.location='/'"
+            />
+        </td>
         <td align="left">
           <h2 style="margin: 0px">
             <span
@@ -70,6 +61,7 @@
           </h2>
         </td>
         <td align="right">
+          <span><a class="home-link" href="/">Home</a></span>
           {% if book.source_uri %}
           <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
             <img
@@ -93,7 +85,6 @@
       </tr>
     </table>
 
-    <hr />
   </div>
 
   <div class="audio-player-container" style="display: none">

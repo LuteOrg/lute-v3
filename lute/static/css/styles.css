@@ -201,6 +201,10 @@ div#read_pane_right {
     height: 95%;
 }
 
+div#reading-header {
+    margin-bottom: 25px;
+}
+
 /* End layouts *****************************************/
 
 span.read_page_nav {
