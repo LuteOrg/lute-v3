@@ -12,6 +12,8 @@
 
   --audio-color-1: #5abaf4;
   --button-size-small: 28px;
+
+  position: relative; 
 }
 
 .audio-player-top-container {
@@ -170,7 +172,8 @@
 #bkm-save-btn,
 #bkm-delete-btn,
 #bkm-prev-btn,
-#bkm-next-btn {
+#bkm-next-btn,
+#pin {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -199,6 +202,7 @@
 
 .timeline {
   -webkit-appearance: none;
+  appearance: none;
   width: 100%;
   height: 1.1rem;
   margin: 0;
@@ -211,6 +215,7 @@
 
 .volume {
   -webkit-appearance: none;
+  appearance: none;
   width: 100px;
   height: 1em;
   margin: 0;
@@ -397,3 +402,135 @@
 /* .bookmark-jump-container { */
   /* justify-self: end; */
 /* } */
+
+.sticky-player .audio-player-container {
+  position: fixed;
+  width: 100%;
+  height: 130px;
+  left: 0;
+  bottom: 0;
+  border: none;
+  z-index: 999;
+}
+
+.sticky-player {
+  margin-bottom: 140px;
+}
+
+.sticky-player + #read_pane_right {
+  height: calc(100% - 140px);
+}
+
+#pin {
+  position: absolute;
+  left: 0.6rem;
+  top: 0.6rem;
+  width: 16px;
+  height: 16px;
+  background-image: url("/static/icn/pin.png");
+}
+
+
+
+/* CSS */
+/* .play-btn-container, */
+/* .skip-back-btn-container, */
+/* #rewind-btn, */
+/* #ff-btn, */
+/* #playback-rate-btn { */
+  /* /~ width: 72px; ~/ */
+  /* /~ height: 72px; ~/ */
+  /* /~ background-color: #fbeee0; ~/ */
+  /* /~ border: 2px solid #422800; ~/ */
+  /* /~ border-radius: 50%; ~/ */
+  /* box-shadow: #58585852 0px 2px 5px 0; */
+  
+  /* /~ color: #422800; ~/ */
+  /* /~ cursor: pointer; ~/ */
+  /* /~ display: inline-block; ~/ */
+  /* /~ font-weight: 600; ~/ */
+  /* /~ font-size: 18px; ~/ */
+  /* /~ padding: 0 18px; ~/ */
+  /* /~ line-height: 50px; ~/ */
+  /* /~ text-align: center; ~/ */
+  /* /~ text-decoration: none; ~/ */
+  /* /~ user-select: none; ~/ */
+  /* /~ -webkit-user-select: none; ~/ */
+  /* /~ touch-action: manipulation; ~/ */
+  /* transition: all .02s; */
+  /* cursor: pointer; */
+/* } */
+
+/* .play-btn-container:hover, */
+/* .skip-back-btn-container:hover, */
+/* #rewind-btn:hover, */
+/* #ff-btn:hover, */
+/* #playback-rate-btn:hover  { */
+  /* background-color: #fff; */
+/* } */
+
+/* .play-btn-container:active, */
+/* .skip-back-btn-container:active, */
+/* #rewind-btn:active, */
+/* #ff-btn:active, */
+/* #playback-rate-btn:active { */
+  /* box-shadow: #58585852 0px 1px 1px 0px; */
+  /* transform: translate(0, 2px); */
+/* } */
+
+
+
+
+/* /~ CSS ~/ */
+/* .play-btn-container, */
+/* .skip-back-btn-container, */
+/* #rewind-btn, */
+/* #ff-btn, */
+/* #playback-rate-btn { */
+  /* appearance: none; */
+  /* background-color: #FAFBFC; */
+  /* border: 1px solid rgba(27, 31, 35, 0.15); */
+  /* border-radius: 50%; */
+  /* box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset; */
+  /* box-sizing: border-box; */
+  /* color: #24292E; */
+  /* cursor: pointer; */
+  /* width: 56px; */
+  /* height: 56px; */
+  /* transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1); */
+  /* user-select: none; */
+  /* -webkit-user-select: none; */
+  /* touch-action: manipulation; */
+  /* vertical-align: middle; */
+/* } */
+
+/* .play-btn-container:hover, */
+/* .skip-back-btn-container:hover, */
+/* #rewind-btn:hover, */
+/* #ff-btn:hover, */
+/* #playback-rate-btn:hover  { */
+  /* background-color: #F3F4F6; */
+  /* text-decoration: none; */
+  /* transition-duration: 0.1s; */
+/* } */
+
+/* /~ .button-4:disabled { ~/ */
+  /* /~ background-color: #FAFBFC; ~/ */
+  /* /~ border-color: rgba(27, 31, 35, 0.15); ~/ */
+  /* /~ color: #959DA5; ~/ */
+  /* /~ cursor: default; ~/ */
+/* /~ } ~/ */
+
+/* .play-btn-container:active, */
+/* .skip-back-btn-container:active, */
+/* #rewind-btn:active, */
+/* #ff-btn:active, */
+/* #playback-rate-btn:active { */
+  /* background-color: #EDEFF2; */
+  /* box-shadow: rgba(225, 228, 232, 0.2) 0 1px 0 inset; */
+  /* transition: none 0s; */
+/* } */
+
+/* /~ .button-4:focus { ~/ */
+  /* /~ outline: 1px transparent; ~/ */
+/* /~ } ~/ */
