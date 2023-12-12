@@ -4,181 +4,396 @@
 
 {% block body %}
 
-<table style="table-layout: fixed; border-spacing: 0; ">
-  <tr>
-    <td width="2px">
-      <img src="{{ url_for('static', filename='img/lute.png') }}" class="lutelogo_small" />
-    </td>
-    <td>
-      <a href="/" tabindex="-1" id="reading_home_link">Home</a>
-      {% if config.ENV == 'dev' %}
-      <span style="background-color: blue; color: white; margin: 2px; padding: 2px;">Dev environment</span>
-      {% endif %}
-    </td>
-  </tr>
-</table>
+<script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
+
+<div id="rendering_controls" style="display: none">
+  <pre>
+    book_id: <input id="book_id" value="{{ book.id }}">
+    book_audio: <input id="book_audio_file" value="{{ book.audio_filename or '' }}">
+    book_audio_current_pos: <input id="book_audio_current_pos" value="{{ book.audio_current_pos or 0 }}">
+    book_audio_bookmarks: <input id="book_audio_bookmarks" value="{{ book.audio_bookmarks or '' }}">
+    page_num: <input id="page_num" value="{{ page_num }}">
+    page_count: <input id="page_count" value="{{ page_count }}">
+    highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
+    sentence translation url: <span id="translateURL" style="display: none">{{ dictionary_url }}</span>
+  </pre>
+</div>
 
 <div id="read_pane_left">
   <div id="reading-header">
-
     <!-- Lacking css skills, so table layout to the rescue. -->
     <table style="width: 100%">
       <tr>
+        <td width="2px">
+          <img
+            src="{{ url_for('static', filename='img/lute.png') }}"
+            class="lutelogo_small"
+            style="cursor: pointer"
+            onclick="window.location='/'"
+            />
+        </td>
         <td align="left">
-          <h2 style="margin: 0px;">
-            {% if prev10page != pagenum %}
-            <a id="navPrev10" href="/read/{{ book.id }}/page/{{ prev10page }}" title="page {{ prev10page }}" tabindex="-1">&#171;</a>
-            {% else %}
-            <span style="color: lightgrey;">&#171;</span>
-            {% endif %}
+          <h2 style="margin: 0px">
+            <span
+              class="read_page_nav read_page_disabled"
+              id="navPrev10"
+              onclick="goto_relative_page(-10)"
+              >&#171;</span>
+            <span
+              class="read_page_nav read_page_disabled"
+              id="navPrev"
+              onclick="goto_relative_page(-1)"
+              >&#8249;</span>
 
-            {% if prevpage != pagenum %}
-            <a id="navPrev" href="/read/{{ book.id }}/page/{{ prevpage }}" title="page {{ prevpage }}" tabindex="-1">&#8249;</a>
-            {% else %}
-            <span style="color: lightgrey;">&#8249;</span>
-            {% endif %}
+            <span id="page_indicator">{{ page_num }}/{{ page_count }}</span>
 
-            {{ pagenum }}/{{ pagecount }}
+            <span
+              class="read_page_nav read_page_disabled"
+              id="navNext"
+              onclick="goto_relative_page(1)"
+              >&#8250;</span>
 
-            {% if pagenum != pagecount %}
-            <a id="navNext" href="/read/{{ book.id }}/page/{{ nextpage }}" title="page {{ nextpage }}" tabindex="-1">&#8250;</a>
-            {% else %}
-            <span style="color: lightgrey;">&#8250;</span>
-            {% endif %}
-
-            {% if next10page != pagecount %}
-            <a id="navNext10" href="/read/{{ book.id }}/page/{{ next10page }}" title="page {{ next10page }}" tabindex="-1">&#187;</a>
-            {% else %}
-            <span style="color: lightgrey;">&#187;</span>
-            {% endif %}
+            <span
+              class="read_page_nav read_page_disabled"
+              id="navNext10"
+              onclick="goto_relative_page(10)"
+              >&#187;</span>
           </h2>
         </td>
         <td align="right">
+          <span><a class="home-link" href="/">Home</a></span>
           {% if book.source_uri %}
           <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
-            <img src="{{ url_for('static', filename='icn/external.png') }}" title="Show source URL" />
+            <img
+              src="{{ url_for('static', filename='icn/external.png') }}"
+              title="Show source URL" />
           </a>
           {% endif %}
-          <a id="editText" href="/read/editpage/{{ text.id }}" tabindex="-1">
-            <img src="{{ url_for('static', filename='icn/document--pencil.png') }}"
-                 title="Edit" alt="Edit" />
-          </a>
-          <img id="keyboard_shortcuts" style="margin-right:10px;"
-               src="{{ url_for('static', filename='icn/question-balloon.png') }}"
-               title="Keyboard shortcuts" />
+          <span id="editText" style="cursor: pointer" onclick="edit_current_page()">
+            <img
+              src="{{ url_for('static', filename='icn/document--pencil.png') }}"
+              title="Edit"
+              alt="Edit" />
+          </span>
+          <img
+            id="keyboard_shortcuts"
+            style="margin-right: 10px"
+            src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+            title="Keyboard shortcuts"
+          />
         </td>
       </tr>
     </table>
 
-    <hr />
-
   </div>
 
-  {% if pagenum == 1 %}
-    <h2>{{ book.title }}</h2>
-  {% endif %}
+  <div class="audio-player-container" style="display: none">
+    <audio id="player" preload="metadata" src=""></audio>
 
-  <span id="textid" style="display:none">{{ textid }}</span>
-  <span id="show_highlights" style="display:none">{{ show_highlights|lower }}</span>
-
-  {# Hack for js translation keyboard shortcut. #}
-  <span id="translateURL" style="display:none">{{ dictionary_url }}</span>
-
-  <div id="thetext" {% if is_rtl %}dir="rtl"{% endif %}>
-    {% include 'read/sentences.html' %}
+    <div class="audio-player-top-container">
+      <!-- <div class="play-btn-container"> -->
+      <button id="play-btn" class="audio-button"></button>
+      <!-- </div> -->
+      <div class="audio-player-central-container">
+        <div id="timeline-container" class="audio-player-timeline-container">
+          <!-- max is set very large so that when file is pre-loaded,
+          the current position isn't truncated. -->
+          <input type="range" class="timeline" max="1000000000" value="0"
+          step="0.1" />
+          <div class="bookmark-markers-container"></div>
+          <div class="duration-container">
+            <span class="current-time">0:00</span>
+            <span class="duration">0:00</span>
+          </div>
+        </div>
+        <div class="audio-player-controls-container">
+          <!-- <div class="skip-back-btn-container"> -->
+          <button id="skip-back-btn" class="audio-button"></button>
+          <!-- </div> -->
+          <div class="rewind-container">
+            <div class="rewind-btn-container">
+              <button id="rewind-btn" class="audio-button"></button>
+              <button id="ff-btn" class="audio-button"></button>
+            </div>
+            <select name="rewind-option" id="rewind-option">
+              <option value="3">3 sec</option>
+              <option value="5" selected>5 sec</option>
+              <option value="10">10 sec</option>
+              <option value="30">30 sec</option>
+              <option value="60">60 sec</option>
+            </select>
+          </div>
+          <!-- <div class="playback-rate-container"> -->
+          <button id="playback-rate-btn" class="audio-button"><span>1.0</span></button>
+          <!-- </div> -->
+        </div>
+      </div>
+      <div class="audio-player-right-container">
+        <!-- <div class="volume-container"> -->
+          <!-- <button id="volume-on-btn"><span></span></button> -->
+        <input type="range" class="volume" max="100" value="100"/>
+        <!-- </div> -->
+        <div class="bookmark-buttons-container">
+          <!-- <div class="bookmark-btn-container"> -->
+          <button id="bkm-save-btn" class="audio-button"></button>
+            <!-- <button id="bkm-delete-btn"></button> -->
+          <!-- </div> -->
+          <div class="bookmark-jump-container">
+            <button id="bkm-prev-btn" class="audio-button"></button>
+            <button id="bkm-next-btn" class="audio-button"></button>
+          </div>
+        </div>
+      </div>
+      <button id="pin" class="audio-button"></button>
+    </div>
   </div>
 
-  <script>
-    $(document).ready(function() {
-      prepareTextInteractions();
-      add_status_classes();
-    });
+  <h2 id="thetexttitle">{{ book.title }}</h2>
 
-    let tooltip_help_hover_content = function (setContent) {
-      $.ajax({
-        url: `/read/keyboard_shortcuts`,
-        type: 'get',
-        success: function(response) {
-          setContent(response);
-        }
-      });
-    }
+  <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
+    ...
+  </div>
 
-    $("#keyboard_shortcuts").tooltip({
-      position: { my: 'left top+10', at: 'left bottom', collision: 'flipfit flip' },
-      show: { easing: 'easeOutCirc' },
-      content: function (setContent) { tooltip_help_hover_content(setContent); }
-    });
-  </script>
-
-  <div id="reading-footer"  style="text-align: center;">
+  <div id="reading-footer" style="text-align: center">
     <h2>
-      <form style="display:none"
-            id="setknown"
-            action="/read/{{ book.id }}/page/{{ pagenum }}/allknown/{{ pagenum }}"
-            method="post">
-      </form>
-      <a id="footerMarkRestAsKnown"
-         style="text-decoration: none; cursor: pointer;"
-         onclick="document.getElementById('setknown').submit(); return false;"
-         title="Mark rest as known, mark page as read" tabindex="-1">
+      <span
+        id="footerMarkRestAsKnown"
+        style="cursor: pointer"
+        onclick="handle_page_done(true, 0)"
+        title="Mark rest as known, mark page as read">
         <img src="{{ url_for('static', filename='icn/tick.png') }}" />
-      </a>
+      </span>
 
-      {% if pagenum != pagecount %}
-      &nbsp;
-      <form style="display:none"
-            id="knowntonext"
-            action="/read/{{ book.id }}/page/{{ pagenum }}/allknown/{{ pagenum + 1 }}"
-            method="post">
-      </form>
-      <a id="footerMarkRestAsKnownNextPage"
-         style="text-decoration: none; cursor: pointer;"
-         onclick="document.getElementById('knowntonext').submit(); return false;"
-         title="Mark rest as known, mark page as read, then go to next page"
-         tabindex="-1">
+      <span
+        id="footerMarkRestAsKnownNextPage"
+        style="cursor: pointer"
+        onclick="handle_page_done(true, 1)"
+        title="Mark rest as known, mark page as read, then go to next page">
         <img src="{{ url_for('static', filename='icn/tick.png') }}" />&#8250;
-      </a>
-      &nbsp;
+      </span>
 
-      <form style="display:none"
-            id="gotonext"
-            action="/read/{{ book.id }}/page/{{ pagenum }}/markread/{{ pagenum + 1 }}"
-            method="post">
-      </form>
-      <a id="footerNextPage"
-         style="text-decoration: none; cursor: pointer;"
-         onclick="document.getElementById('gotonext').submit(); return false;"
-         title="Mark page as read, then go to next page"
-         tabindex="-1">&#8250;</a>
-      {% endif %}
+      <span
+        id="footerNextPage"
+        style="cursor: pointer"
+        onclick="handle_page_done(false, 1)"
+        title="Mark page as read, then go to next page"
+        >&#8250;</span>
     </h2>
 
-    {% if pagenum == pagecount %}
-    <h2>&#127881;</h2>
-    <p>
-      <a href="" tabindex="-1" onclick="$('#actionposter').submit(); return false;">Archive book</a> |
-      <a href="/" tabindex="-1">Home</a>
-    </p>
+    <div id="final_page_controls" class="hide">
+      <h2>&#127881;</h2>
+      <p>
+        <a
+          href=""
+          tabindex="-1"
+          onclick="$('#actionposter').submit(); return false;"
+          >Archive book</a>
+        |
+        <a href="/" tabindex="-1">Home</a>
+      </p>
 
-    <form id="actionposter" method="post" action="/book/archive/{{ book.id }}"></form>
-    {% endif %}
+      <form
+        id="actionposter"
+        method="post"
+        action="/book/archive/{{ book.id }}"
+        ></form>
+    </div>
 
   </div>
-  
 </div>
-
 
 <div id="read_pane_right">
-    <iframe name="wordframe" id="wordframeid" class="rightreadingframe" src="about:blank" scrolling="auto"
-            style="height: 35%; width: 100%;" frameBorder="0">
-      Frame support required.
-    </iframe>
+  <iframe
+    name="wordframe"
+    id="wordframeid"
+    class="rightreadingframe"
+    src="about:blank"
+    scrolling="auto"
+    style="height: 35%; width: 100%"
+    frameborder="0"
+  >
+    Frame support required.
+  </iframe>
 
-    <iframe name="dictframe" id="dictframeid" class="rightreadingframe" src="about:blank" scrolling="auto"
-            style="height: 65%; width: 100%;" frameBorder="0">
-      Frame support required.
-    </iframe>
+  <iframe
+    name="dictframe"
+    id="dictframeid"
+    class="rightreadingframe"
+    src="about:blank"
+    scrolling="auto"
+    style="height: 65%; width: 100%"
+    frameborder="0"
+  >
+    Frame support required.
+  </iframe>
 </div>
+
+<script>
+  $(document).ready(function () {
+    goto_relative_page(0);
+    initialize_player();
+  });
+
+  // If book_audio_file is not null, stream the file.
+  let initialize_player = function() {
+    const have_file = ($('#book_audio_file').val() != '');
+    if (!have_file) {
+      return;
+    }
+
+    $('div.audio-player-container').show();
+    t = parseFloat($('#book_audio_current_pos').val());
+    const book_id = $('#book_id').val();
+    player.currentTime = t;
+    timeline.value = t;
+
+    bookmarksArray = [];
+    bkstring = $('#book_audio_bookmarks').val();
+    bks = [];
+    if (bkstring != "")
+      bks = bkstring.split(';').map((b) => parseFloat(b));
+    for (b of bks) {
+      bookmarksArray.push(b);
+    }
+
+    player.src = `/useraudio/stream/${book_id}`;
+    start_player_post_loop();
+  };
+
+  // Set "page X/Y" in page nav.
+  let set_page_fraction = function() {
+    const pagenum = parseInt($('#page_num').val());
+    const maxpage = parseInt($('#page_count').val());
+    $('#page_indicator').text(`${pagenum}/${maxpage}`);
+  };
+
+  // Enable page nav links, depending on page num.
+  let enable_page_nav_links = function() {
+    const pagenum = parseInt($('#page_num').val());
+    const maxpage = parseInt($('#page_count').val());
+    if (pagenum > 1) {
+      $('#navPrev10').removeClass('read_page_disabled');
+      $('#navPrev').removeClass('read_page_disabled');
+    }
+    else {
+      $('#navPrev10').addClass('read_page_disabled');
+      $('#navPrev').addClass('read_page_disabled');
+    }
+    if (pagenum < maxpage) {
+      $('#navNext').removeClass('read_page_disabled');
+      $('#navNext10').removeClass('read_page_disabled');
+    }
+    else {
+      $('#navNext').addClass('read_page_disabled');
+      $('#navNext10').addClass('read_page_disabled');
+    }
+  };
+
+
+  // Show/hide footer controls.
+  let set_footer_control_visibility = function() {
+    const pagenum = parseInt($('#page_num').val());
+    const maxpage = parseInt($('#page_count').val());
+    if (pagenum == maxpage) {
+      $('#final_page_controls').removeClass("hide");
+      $('#footerMarkRestAsKnownNextPage').addClass("hide");
+      $('#footerNextPage').addClass("hide");
+    }
+    else {
+      $('#final_page_controls').addClass("hide");
+      $('#footerMarkRestAsKnownNextPage').removeClass("hide");
+      $('#footerNextPage').removeClass("hide");
+    }
+  };
+
+
+  let show_hide_title = function(p) {
+    const t = $('#thetexttitle');
+    if (p == 1)
+      t.removeClass('hide');
+    else
+      t.addClass('hide');
+  };
+
+
+  // Go to page relative to that stored in page_num input.
+  function goto_relative_page(p) {
+    const bookid = $('#book_id').val();
+    const pagenum = parseInt($('#page_num').val());
+    const maxpage = parseInt($('#page_count').val());
+    let relpage = pagenum + p;
+    if (relpage < 1)
+      relpage = 1;
+    if (relpage > maxpage)
+      relpage = maxpage;
+
+    const url = `/read/renderpage/${bookid}/${relpage}`;
+    $.get(
+      url,
+      function(data, status) {
+        $('#thetext').html(data);
+        prepareTextInteractions();
+        add_status_classes();
+        start_hover_mode(false);
+        $('#page_num').val(relpage);
+        enable_page_nav_links();
+        set_page_fraction();
+        set_footer_control_visibility();
+        show_hide_title(relpage);
+      }
+    );
+  }
+
+  let tooltip_help_hover_content = function (setContent) {
+    $.ajax({
+      url: `/read/keyboard_shortcuts`,
+      type: "get",
+      success: function (response) {
+        setContent(response);
+      },
+    });
+  };
+
+  $("#keyboard_shortcuts").tooltip({
+    position: {
+      my: "left top+10",
+      at: "left bottom",
+      collision: "flipfit flip",
+    },
+    show: { easing: "easeOutCirc" },
+    content: function (setContent) {
+      tooltip_help_hover_content(setContent);
+    },
+  });
+
+
+  function edit_current_page() {
+    const bookid = $('#book_id').val();
+    const pagenum = parseInt($('#page_num').val());
+    location.href = `/read/editpage/${bookid}/${pagenum}`;
+  }
+
+
+  // Handle green checkmark in footer.
+  function handle_page_done(mark_rest_known = false, next_relative_page = 0) {
+    const bookid = $('#book_id').val();
+    const pagenum = parseInt($('#page_num').val());
+    data = {
+      bookid: bookid,
+      pagenum: pagenum,
+      restknown: mark_rest_known
+    };
+    $.ajax({
+      type: 'post',
+      url: '/read/page_done',
+      data: JSON.stringify(data),
+      contentType: "application/json; charset=utf-8"
+    }).done(function(d) {
+      goto_relative_page(next_relative_page);
+    });
+  }
+
+
+</script>
 
 {% endblock %}

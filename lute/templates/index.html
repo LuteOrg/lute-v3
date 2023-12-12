@@ -16,19 +16,21 @@
   <p>When you're done trying out the demo, <a href="/wipe_database"
   style="text-decoration: underline;">click here</a> to clear out the
   database.  <i>Note: this removes everything in the db.</i></p>
+  </p>
 </div>
 {% endif %}
 
 {% if is_production_data and backup_show_warning %}
 <div class="flash-notice">
-  <p>Warning: {{ backup_warning_msg }}  <a href="/backup/backup">Create a backup.</a></p>
+  <p>Warning: {{ backup_warning_msg }} <a href="/backup/backup">Create a backup.</a></p>
 </div>
 {% endif %}
 
 <br />
 
 {% if not have_languages %}
-  <p>To get started using Lute, first <a href="/language/new">create your language.</a></p>
+  <p>To get started using Lute, first <a href="/language/new">create your language.</a>
+</p>
 {% else %}
   {% include "book/tablelisting.html" %}
 {% endif %}
