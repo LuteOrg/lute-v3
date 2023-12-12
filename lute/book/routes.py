@@ -153,6 +153,8 @@ def edit(bookid):
         if f:
             filename = _secure_unique_fname(f)
             b.audio_filename = filename
+            b.audio_bookmarks = None
+            b.audio_current_pos = None
             fp = os.path.join(current_app.env_config.useraudiopath, filename)
             f.save(fp)
         repo.add(b)
