@@ -267,6 +267,11 @@ table#book thead, table#book tr, table#book th:first-child, table#book tbody, ta
     vertical-align: top;
 }
 
+.smallfilename {
+    font-size: 0.8em;
+    font-style: italic;
+}
+
 table#termimport
 {
     width: 70%;

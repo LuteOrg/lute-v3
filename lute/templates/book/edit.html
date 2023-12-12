@@ -31,7 +31,12 @@
 
     <tr>
       <td>{{ form.audiofile.label }}</td>
-      <td>{{ form.audiofile() }}</td>
+      <td>
+        {{ form.audiofile() }}
+        {% if book.audio_filename %}
+        <br /><span class="smallfilename">Current file: {{ book.audio_filename }}</span>
+        {% endif %}
+      </td>
     </tr>
 
     {# Tags li entries are managed by tagit. #}
