@@ -100,28 +100,29 @@
     <audio id="player" preload="metadata" src=""></audio>
 
     <div class="audio-player-top-container">
-      <div class="play-btn-container">
-        <button id="play-btn"><span></span></button>
-      </div>
-      <div class="audio-player-timeline-container-grid">
+      <!-- <div class="play-btn-container"> -->
+      <button id="play-btn" class="audio-button"></button>
+      <!-- </div> -->
+      <div class="audio-player-central-container">
         <div id="timeline-container" class="audio-player-timeline-container">
           <!-- max is set very large so that when file is pre-loaded,
           the current position isn't truncated. -->
           <input type="range" class="timeline" max="1000000000" value="0"
           step="0.1" />
+          <div class="bookmark-markers-container"></div>
           <div class="duration-container">
             <span class="current-time">0:00</span>
             <span class="duration">0:00</span>
           </div>
         </div>
-        <div class="audio-player-central-container">
-          <div class="skip-back-btn-container">
-            <button id="skip-back-btn"></button>
-          </div>
+        <div class="audio-player-controls-container">
+          <!-- <div class="skip-back-btn-container"> -->
+          <button id="skip-back-btn" class="audio-button"></button>
+          <!-- </div> -->
           <div class="rewind-container">
             <div class="rewind-btn-container">
-              <button id="rewind-btn"></button>
-              <button id="ff-btn"></button>
+              <button id="rewind-btn" class="audio-button"></button>
+              <button id="ff-btn" class="audio-button"></button>
             </div>
             <select name="rewind-option" id="rewind-option">
               <option value="3">3 sec</option>
@@ -131,28 +132,28 @@
               <option value="60">60 sec</option>
             </select>
           </div>
-          <div class="playback-rate-container">
-            <button id="playback-rate-btn"><span>1.0</span></button>
-          </div>
+          <!-- <div class="playback-rate-container"> -->
+          <button id="playback-rate-btn" class="audio-button"><span>1.0</span></button>
+          <!-- </div> -->
         </div>
       </div>
       <div class="audio-player-right-container">
-        <div class="volume-container">
+        <!-- <div class="volume-container"> -->
           <!-- <button id="volume-on-btn"><span></span></button> -->
-          <input type="range" class="volume" max="100" value="100"/>
-        </div>
-        <div class="bookmark-container">
-          <div class="bookmark-btn-container">
-            <button id="bkm-save-btn"></button>
-            <button id="bkm-delete-btn"></button>
-          </div>
+        <input type="range" class="volume" max="100" value="100"/>
+        <!-- </div> -->
+        <div class="bookmark-buttons-container">
+          <!-- <div class="bookmark-btn-container"> -->
+          <button id="bkm-save-btn" class="audio-button"></button>
+            <!-- <button id="bkm-delete-btn"></button> -->
+          <!-- </div> -->
           <div class="bookmark-jump-container">
-            <button id="bkm-prev-btn"></button>
-            <button id="bkm-next-btn"></button>
-        </div>
+            <button id="bkm-prev-btn" class="audio-button"></button>
+            <button id="bkm-next-btn" class="audio-button"></button>
+          </div>
         </div>
       </div>
-      <button id="pin"></button>
+      <button id="pin" class="audio-button"></button>
     </div>
   </div>
 
