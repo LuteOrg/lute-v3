@@ -30,8 +30,13 @@ class NewBookForm(FlaskForm):
     )
     source_uri = StringField("Text source", validators=[Length(max=255)])
     audiofile = FileField(
-        "Audio file (mp3)",
-        validators=[FileAllowed(["mp3"], "Please upload a valid audio file")],
+        "Audio file",
+        validators=[
+            FileAllowed(
+                ["mp3", "wav", "ogg"],
+                "Please upload a valid audio file (mp3, wav, ogg)",
+            )
+        ],
     )
     book_tags = FieldList(StringField("book_tags"))
 
@@ -61,6 +66,11 @@ class EditBookForm(FlaskForm):
     source_uri = StringField("Source URI", validators=[Length(max=255)])
     book_tags = FieldList(StringField("book_tags"))
     audiofile = FileField(
-        "Audio file (mp3)",
-        validators=[FileAllowed(["mp3"], "Please upload a valid audio file")],
+        "Audio file",
+        validators=[
+            FileAllowed(
+                ["mp3", "wav", "ogg"],
+                "Please upload a valid audio file (mp3, wav, ogg)",
+            )
+        ],
     )
