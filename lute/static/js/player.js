@@ -27,6 +27,8 @@ const bookmarkNextBtn = document.querySelector("#bkm-next-btn");
 
 var bookmarksArray = [];
 let lastPlayTime = null;
+let playerSticky = localStorage.getItem("player-sticky") ?? 0;
+if (playerSticky != 0) readPaneLeft.classList.add("sticky-player");
 
 let jumpTimeBy = Number(rewindAmountOption.value);
 
@@ -218,13 +220,18 @@ function resetPlaybackRate() {
 /* ****************************
  * Toggle player sticky.
  */
+
+
 pin.addEventListener("click", function() {
   // add the class to readpaneleft and not the player itself 
   // so that we can get it's sibling (paneright) to add a bottom margin in css
   readPaneLeft.classList.toggle("sticky-player");
+  // save sticky state to local storage
+  localStorage.setItem("player-sticky", 1 - Number(playerSticky))
   // remove focus off the button so it doesn't accidentally get activated by spacebar
   pin.blur();
 });
+
 
 /* ****************************
  * Bookmark management.
