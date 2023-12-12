@@ -1,4 +1,18 @@
 
+# 3.0.5 (2023-12-13)
+
+Feature changes:
+
+* Add audio player to play mp3, wav, or ogg files.  See [docs](https://jzohrab.github.io/lute-manual/usage/audio.html)
+* Add up/down arrow hotkey to change term status.
+* Tweak Greek character range.
+* Add 'is completed' check to book title in listing.
+
+Supporting changes:
+
+* Page content is now ajaxed in.
+
+
 # 3.0.4 (2023-12-01)
 
 * Fix sentence lookup for new term.
