@@ -201,7 +201,24 @@ div#read_pane_right {
     height: 95%;
 }
 
+div#reading-header {
+    margin-bottom: 25px;
+}
+
 /* End layouts *****************************************/
+
+span.read_page_nav {
+    color: #0000FF;
+    cursor: pointer;
+}
+
+span.read_page_disabled {
+    color: lightgrey;
+}
+
+div#reading-footer span {
+    margin: 5px;
+}
 
 input[type=text]
 {
@@ -252,6 +269,11 @@ table#book thead, table#book tr, table#book th:first-child, table#book tbody, ta
     min-width: 20%;
     max-width: 20%;
     vertical-align: top;
+}
+
+.smallfilename {
+    font-size: 0.8em;
+    font-style: italic;
 }
 
 table#termimport

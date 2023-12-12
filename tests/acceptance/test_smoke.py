@@ -8,7 +8,7 @@ def test_smoke_test(chromebrowser, luteclient):
     luteclient.visit("/")
     assert chromebrowser.is_text_present("Lute"), "have main page."
     luteclient.make_book("Hola", "Hola. Adios amigo.", "Spanish")
-    assert chromebrowser.title == 'Reading "Hola (1/1)"', "title"
+    assert chromebrowser.title == 'Reading "Hola"', "title"
     assert chromebrowser.is_text_present("Hola")
     assert "Hola/. /Adios/ /amigo/." == luteclient.displayed_text()
 

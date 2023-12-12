@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 94.61 94.61">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #79b7e7;
+      }
+    </style>
+  </defs>
+  <title>skip-back</title>
+  <g id="Layer_2" data-name="Layer 2">
+    <g id="Layer_1-2" data-name="Layer 1">
+      <path class="cls-1" d="M47.3,0A47.31,47.31,0,1,0,94.61,47.3,47.3,47.3,0,0,0,47.3,0ZM65.5,65.5a3.64,3.64,0,0,1-5.76,3L36.39,51.78V65.5a3.64,3.64,0,0,1-7.28,0V29.11a3.64,3.64,0,0,1,7.28,0V42.83L59.74,26.15a3.65,3.65,0,0,1,5.76,3Z"/>
+    </g>
+  </g>
+</svg>

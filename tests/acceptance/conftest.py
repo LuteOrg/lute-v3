@@ -343,9 +343,13 @@ def when_press_hotkey(luteclient, hotkey):
 
 @when(parsers.parse("I click the footer green check"))
 def when_click_footer_check(luteclient):
+    "Click footer."
     luteclient.browser.find_by_id("footerMarkRestAsKnown").click()
+    time.sleep(0.1)  # Leave this, remove and test fails.
 
 
 @when(parsers.parse("I click the footer next page"))
 def when_click_footer_next_page(luteclient):
+    "Click footer."
     luteclient.browser.find_by_id("footerNextPage").click()
+    time.sleep(0.1)  # Leave this, remove and test fails.
