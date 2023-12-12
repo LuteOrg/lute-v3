@@ -156,6 +156,8 @@
     </div>
   </div>
 
+  <h2 id="thetexttitle">{{ book.title }}</h2>
+
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
     ...
   </div>
@@ -313,6 +315,15 @@
   };
 
 
+  let show_hide_title = function(p) {
+    const t = $('#thetexttitle');
+    if (p == 1)
+      t.removeClass('hide');
+    else
+      t.addClass('hide');
+  };
+
+
   // Go to page relative to that stored in page_num input.
   function goto_relative_page(p) {
     const bookid = $('#book_id').val();
@@ -323,6 +334,7 @@
       relpage = 1;
     if (relpage > maxpage)
       relpage = maxpage;
+
     const url = `/read/renderpage/${bookid}/${relpage}`;
     $.get(
       url,
@@ -335,6 +347,7 @@
         enable_page_nav_links();
         set_page_fraction();
         set_footer_control_visibility();
+        show_hide_title(relpage);
       }
     );
   }
