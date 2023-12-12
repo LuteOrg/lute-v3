@@ -18,11 +18,10 @@ const rewindAmountOption = document.querySelector("#rewind-option");
 
 const pinButton = document.querySelector("#pin");
 
-// const markerOverlay = document.querySelector(".marker");
 const playerContainer = document.querySelector(".audio-player-container");
+const bookmarkContainer = document.querySelector(".bookmark-markers-container");
 const timelineContainer = document.querySelector("#timeline-container");
-const bookmarkSaveBtn = document.querySelector("#bkm-save-btn");
-const bookmarkDeleteBtn = document.querySelector("#bkm-delete-btn");
+const bookmarkSaveDeleteBtn = document.querySelector("#bkm-save-btn");
 const bookmarkPrevBtn = document.querySelector("#bkm-prev-btn");
 const bookmarkNextBtn = document.querySelector("#bkm-next-btn");
 
@@ -35,7 +34,7 @@ player.onloadedmetadata = function () {
   durationElement.textContent = timeToDisplayString(player.duration);
   timeline.max = player.duration;
   for (b of bookmarksArray) {
-    add_bookmark_marker(b);
+    addBookmarkMarker(b);
   }
   playBtn.style.backgroundImage = 'url("/static/icn/play.svg")';
   changeVolume();
@@ -98,6 +97,9 @@ player.addEventListener("timeupdate", function () {
   timeline.style.backgroundSize = `${timeToPercent(t)}% 100%`;
   currentTimeElement.textContent = timeToDisplayString(timeline.value);
   lastPlayTime = timeline.value;
+
+  if (bookmarksArray.includes(Number(timeline.value))) toggleBookmarkIcon("on");
+  else toggleBookmarkIcon("off");
 });
 
 timeline.addEventListener("input", updateCurrentTime);
@@ -216,29 +218,33 @@ function resetPlaybackRate() {
 /* ****************************
  * Toggle player sticky.
  */
-
 pin.addEventListener("click", function() {
+  // add the class to readpaneleft and not the player itself 
+  // so that we can get it's sibling (paneright) to add a bottom margin in css
   readPaneLeft.classList.toggle("sticky-player");
-})
+  // remove focus off the button so it doesn't accidentally get activated by spacebar
+  pin.blur();
+});
 
 /* ****************************
  * Bookmark management.
  */
 
-let add_bookmark_marker = function(currtime) {
+let addBookmarkMarker = function(currtime) {
   // console.log(`adding bookmark for currtime = ${currtime}`);
   const marker = document.createElement("div");
   marker.classList.add(marker_classname_from_time(currtime));
-  timelineContainer.appendChild(marker);
+  bookmarkContainer.appendChild(marker);
   marker.style.cssText =
     `position: absolute;
      left: ${timeToPercent(currtime)}%;
-     height: 1.1rem;
+     height: calc(var(--timeline-height) + 1px);
      top: 0;
      width: 1%;
      transform: translate(-50%, 0);
-     background-color: orangered;
+     background-color: var(--audio-color-2);
      box-sizing: border-box;
+     border-radius: 1px;
      user-select: none;
      pointer-events: none;`;
 }
@@ -252,38 +258,43 @@ function marker_classname_from_time(timeline_value) {
   return `marker-${timeline_value}`.replace('.', '-');
 }
 
-bookmarkSaveBtn.addEventListener("click", function () {
+bookmarkSaveDeleteBtn.addEventListener("click", function () {
   // Note that for the time, we use the timeline.value, which has
   // step=0.1 and so is quantized to 0.1 of a second.  Should be good
   // enough.
-  const t = timeline.value;
-  add_bookmark(t);
+  const t = Number(timeline.value);
+
+  if (bookmarksArray.includes(t)) deleteBookmark(t);
+  else addBookmark(t);
+
   _update_bookmarks_control();
   post_player_data();
   // console.log(`added ${t} to bookmarksArray ${bookmarksArray}`);
 });
 
 
-function add_bookmark(t) {
+function addBookmark(t) {
   if (bookmarksArray.includes(t))
     return;
-  add_bookmark_marker(t);
+  addBookmarkMarker(t);
   bookmarksArray.push(t);
   bookmarksArray.sort(function (a, b) {
     return a - b;
   });
+
+  toggleBookmarkIcon("on");
 }
 
 
-bookmarkDeleteBtn.addEventListener("click", function() {
-  const t = timeline.value;
+function deleteBookmark(t) {
+  // const t = timeline.value;
   if (t == null) {
     // console.log('null timeline value.');
     return;
   }
   // console.log(`pre-delete, have ${bookmarksArray}, t = ${t}`);
-  fixedBa = bookmarksArray.map((e) => e.toFixed(1));
-  findt = Number(t).toFixed(1);
+  const fixedBa = bookmarksArray.map((e) => e.toFixed(1));
+  const findt = Number(t).toFixed(1);
   // console.log(`t = ${t}, type = ${typeof(t)}, findt = ${findt}`);
   const ind = fixedBa.indexOf(`${findt}`);
   if (ind == -1) {
@@ -291,7 +302,7 @@ bookmarkDeleteBtn.addEventListener("click", function() {
     return;
   }
 
-  mc = marker_classname_from_time(t);
+  const mc = marker_classname_from_time(t);
   // console.log(`with tval ${t}, deleting class ${mc}`);
   const markerDiv = document.querySelector(`.${mc}`);
   if (markerDiv) {
@@ -299,10 +310,19 @@ bookmarkDeleteBtn.addEventListener("click", function() {
   }
 
   bookmarksArray.splice(ind, 1);
-  _update_bookmarks_control();
-  post_player_data();
+
+  toggleBookmarkIcon("off");
+  // _update_bookmarks_control();
+  // post_player_data();
   // console.log(`post-delete, have ${bookmarksArray}`);
-})
+}
+
+function toggleBookmarkIcon(state) {
+  let url = 'url("/static/icn/bookmark-on.svg")';
+  if (state == "off") url = 'url("/static/icn/bookmark-off.svg")';
+
+  bookmarkSaveDeleteBtn.style.backgroundImage = url;
+}
 
 
 /* ****************************
@@ -350,15 +370,17 @@ function jumpToBookmark(oper) {
  * Keyboard shortcuts
  */
 
-document.addEventListener("keydown", function (e) {
+window.addEventListener("keydown", function (e) {
+  // console.log(e.code);
   if (e.code == "Space") {
+    // prevent scrolling when space is pressed
+    // and it seems this fixes the issue where there's flashing
+    // where one keydown event continiously makes the button play and pause
+    e.preventDefault()
     togglePlayPause();
-  }
-})
-
-// prevent scrolling when space is pressed
-window.addEventListener('keydown', function(e) {
-  if(e.code == "Space" && e.target == document.body) {
-    e.preventDefault();
+    // if (e.target == document.body) {
+    //   // prevent scrolling when space is pressed
+    //   e.preventDefault()
+    // };
   }
 });
