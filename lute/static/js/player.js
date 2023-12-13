@@ -247,7 +247,7 @@ let addBookmarkMarker = function(currtime) {
      left: ${timeToPercent(currtime)}%;
      height: calc(var(--timeline-height) + 1px);
      top: 0;
-     width: 1%;
+     width: min(5px, 1%);
      transform: translate(-50%, 0);
      background-color: var(--audio-color-2);
      box-sizing: border-box;
