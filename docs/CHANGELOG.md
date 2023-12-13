@@ -1,5 +1,5 @@
 
-# 3.0.5 (2023-12-13)
+# 3.0.6 (2023-12-13)
 
 Feature changes:
 
@@ -11,6 +11,11 @@ Feature changes:
 Supporting changes:
 
 * Page content is now ajaxed in.
+
+
+# 3.0.5 (2023-12-13)
+
+(Skipped, botched release due to wifi problems.)
 
 
 # 3.0.4 (2023-12-01)
