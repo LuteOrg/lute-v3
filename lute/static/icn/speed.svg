@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #79b7e7;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <title>speed</title>
+  <g id="Layer_2" data-name="Layer 2">
+    <g id="Layer_1-2" data-name="Layer 1">
+      <path class="cls-1" d="M40,0A40,40,0,1,0,80,40,40,40,0,0,0,40,0ZM32,40a8,8,0,0,1,8-8,7.83,7.83,0,0,1,2.07.27l11.1-11.1a4,4,0,0,1,5.66,5.66l-11.1,11.1A7.83,7.83,0,0,1,48,40a8,8,0,0,1-16,0Z"/>
+    </g>
+  </g>
+</svg>

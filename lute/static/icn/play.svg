@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 78 78">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #79b7e7;
+      }
+    </style>
+  </defs>
+  <title>play</title>
+  <g id="Layer_2" data-name="Layer 2">
+    <g id="Layer_1-2" data-name="Layer 1">
+      <path class="cls-1" d="M39,0A39,39,0,1,0,78,39,39,39,0,0,0,39,0ZM52.67,41.5l-18,12A3.11,3.11,0,0,1,33,54a3,3,0,0,1-3-3V27a3,3,0,0,1,3-3,3,3,0,0,1,1.67.5l18,12a3,3,0,0,1,0,5Z"/>
+    </g>
+  </g>
+</svg>

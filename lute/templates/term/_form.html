@@ -255,6 +255,12 @@
     if (($('#text').val() ?? '') != '') {
       do_term_lookup(false);
     }
+
+    // Post message re form opened.
+    // Note have to use this rather than the better
+    // this.dispatchEvent(new Event("termFormOpened"));
+    // because this form is opened in a frame.
+    window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
   });
 
   /** LOOKUPS */

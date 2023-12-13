@@ -22,7 +22,8 @@ def get_data_tables_list(parameters, is_archived):
         case when ifnull(b.BkWordCount, 0) = 0 then 'n/a' else b.BkWordCount end as WordCount,
         c.distinctterms as DistinctCount,
         c.distinctunknowns as UnknownCount,
-        c.unknownpercent as UnknownPercent
+        c.unknownpercent as UnknownPercent,
+        case when completed_books.BkID is null then 0 else 1 end as IsCompleted
 
     FROM books b
     INNER JOIN languages ON LgID = b.BkLgID
@@ -32,6 +33,7 @@ def get_data_tables_list(parameters, is_archived):
         GROUP BY TxBkID
     ) pagecnt on pagecnt.TxBkID = b.BkID
     LEFT OUTER JOIN bookstats c on c.BkID = b.BkID
+
     LEFT OUTER JOIN (
         SELECT BtBkID as BkID, GROUP_CONCAT(T2Text, ', ') AS taglist
         FROM
@@ -43,6 +45,18 @@ def get_data_tables_list(parameters, is_archived):
         ) tagssrc
         GROUP BY BtBkID
     ) AS tags ON tags.BkID = b.BkID
+
+    LEFT OUTER JOIN (
+      SELECT BkID
+      FROM books B
+      JOIN texts T ON B.BkID = T.TxBkID
+      WHERE T.TxID = (
+        SELECT MAX(TxID)
+        FROM texts
+        WHERE TxBkID = B.BkID
+      )
+      AND T.TxReadDate IS NOT NULL
+    ) completed_books on completed_books.BkID = b.BkID
 
     WHERE b.BkArchived = {archived}
       and languages.LgParserType in ({ supported_parser_type_criteria() })

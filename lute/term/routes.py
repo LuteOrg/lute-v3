@@ -185,6 +185,21 @@ def bulk_update_status():
     return jsonify("ok")
 
 
+@bp.route("/bulk_set_parent", methods=["POST"])
+def bulk_set_parent():
+    "Set the parent for terms."
+    data = request.get_json()
+    termids = data.get("wordids")
+    parenttext = data.get("parenttext")
+    repo = Repository(db)
+    for tid in termids:
+        term = repo.load(int(tid))
+        term.parents = [parenttext]
+        repo.add(term)
+    repo.commit()
+    return jsonify("ok")
+
+
 @bp.route("/delete/<int:termid>", methods=["POST"])
 def delete(termid):
     """

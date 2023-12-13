@@ -6,7 +6,7 @@ from lute.models.book import Book as DBBook, BookTag
 from lute.models.language import Language
 
 
-class Book:
+class Book:  # pylint: disable=too-many-instance-attributes
     """
     A book domain object, to create/edit lute.models.book.Books.
     """
@@ -17,6 +17,9 @@ class Book:
         self.title = None
         self.text = None
         self.source_uri = None
+        self.audio_filename = None
+        self.audio_current_pos = None
+        self.audio_bookmarks = None
         self.book_tags = []
 
     def __repr__(self):
@@ -83,6 +86,9 @@ class Repository:
             b = DBBook.find(book.id)
         b.title = book.title
         b.source_uri = book.source_uri
+        b.audio_filename = book.audio_filename
+        b.audio_current_pos = book.audio_current_pos
+        b.audio_bookmarks = book.audio_bookmarks
 
         booktags = []
         for s in book.book_tags:
@@ -101,5 +107,8 @@ class Repository:
         b.title = dbbook.title
         b.text = None  # Not returning this for now
         b.source_uri = dbbook.source_uri
+        b.audio_filename = dbbook.audio_filename
+        b.audio_current_pos = dbbook.audio_current_pos
+        b.audio_bookmarks = dbbook.audio_bookmarks
         b.book_tags = [t.text for t in dbbook.book_tags]
         return b

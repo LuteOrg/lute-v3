@@ -237,15 +237,16 @@
     if (! resp)
       return;
 
+    data = {
+      wordids: wordids,
+      langid: lang_id,
+      parenttext: ptxt
+    };
     $.ajax({
       url: '/term/bulk_set_parent',
-      data: {
-        wordids: wordids,
-        langid: lang_id,
-        parenttext: ptxt
-      },
-      type: 'POST',
-      dataType: 'json',
+      method: 'POST',
+      data: JSON.stringify(data),
+      contentType: "application/json; charset=utf-8",
       success: function(data) {
         location.reload();
       }
