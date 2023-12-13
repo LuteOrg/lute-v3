@@ -66,13 +66,13 @@ body {
 /* height: 100vh; */
 /* } */
 
-.container {
-  width: unset;
-  margin: 0;
+/* .container { */
+  /* width: unset; */
+  /* margin: 0; */
 
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
+  /* display: grid; */
+  /* grid-template-columns: 1fr 1fr; */
+/* } */
 
 div#read_pane_right > * {
   /* height: 100%; */
@@ -83,6 +83,7 @@ div#read_pane_right > * {
 
 div#read_pane_right {
   height: 100vh;
+  margin-top: 3rem;
 
   display: grid;
   grid-template-rows: 20rem 1fr;
@@ -90,7 +91,25 @@ div#read_pane_right {
 }
 
 div#read_pane_left {
-  width: 100%;
+  margin-top: 3rem;
+
+  --margin-side: 2rem;
+}
+
+#thetexttitle {
+  /* padding-bottom: 21px; */
+  /* padding-top: 21px; */
+  /* padding-left: 29px; */
+  font-size: 2.1rem;
+  margin: 20px 2rem 30px 2rem;
+  /* background-color: rgb(240, 238, 223); */
+}
+
+div#thetext {
+  /* padding: 0 var(--margin-side); */
+  padding-right: var(--margin-side);
+  word-spacing: -2px;
+  margin: 0;
 }
 
 #wordframeid {
@@ -199,20 +218,7 @@ td[align="right"] > a {
   display: inline-block;
 }
 
-#thetexttitle {
-  /* padding-bottom: 21px; */
-  /* padding-top: 21px; */
-  /* padding-left: 29px; */
-  font-size: 2.2rem;
-  /* margin: 20px 30px 30px 30px; */
-  /* background-color: rgb(240, 238, 223); */
-}
 
-div#thetext {
-  /* padding: 0 20px; */
-  word-spacing: -2px;
-  margin: 0;
-}
 
 /* div#thetext:has(span[lid="1"]) { */
 /* word-spacing: 20px; */
@@ -473,4 +479,9 @@ table#term {
 
 #reading-header-left {
   width: 200px;
+}
+
+#reading-header {
+  /* margin-left: var(--margin-side); */
+  padding-right: var(--margin-side);
 }
