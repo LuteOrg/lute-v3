@@ -90,6 +90,8 @@
     </div>
   </div>
 
+  <h2 id="thetexttitle">{{ book.title }}</h2>
+
   <div class="audio-player-container" style="display: none">
     <audio id="player" preload="metadata" src=""></audio>
 
@@ -150,8 +152,6 @@
       <button id="pin" class="audio-button"></button>
     </div>
   </div>
-
-  <h2 id="thetexttitle">{{ book.title }}</h2>
 
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
     ...
