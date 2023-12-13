@@ -232,6 +232,13 @@ pin.addEventListener("click", function() {
   pin.blur();
 });
 
+// remove the sticky if player is not used 
+// (to reset added bottom margin to left and right containers)
+document.addEventListener("DOMContentLoaded", () => {
+  if (playerContainer.getAttribute("style") == "display: none") {
+    readPaneLeft.classList.remove("sticky-player");
+  }
+});
 
 /* ****************************
  * Bookmark management.

@@ -1,0 +1,476 @@
+/* xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */
+/* /~ USER OVERRIDES ~/ */
+/* xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */
+
+/* normal */
+@font-face {
+  font-family: "Rubik";
+  src: url("Rubik-Regular.woff") format("woff");
+
+  font-style: normal;
+  font-weight: normal;
+}
+
+/* semibold */
+@font-face {
+  font-family: "Rubik";
+  src: url("Rubik-Medium.woff") format("woff");
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* bold */
+@font-face {
+  font-family: "Rubik";
+  src: url("Rubik-Bold.woff") format("woff");
+  font-style: normal;
+  font-weight: 700;
+}
+
+body {
+  font-family: "Rubik" !important;
+  margin: 0;
+}
+
+/* translation popup */
+.ui-tooltip {
+  font-family: inherit;
+  color: inherit !important;
+  font-size: 1rem;
+  padding: 0.6rem 1rem;
+  /* padding: 0; */
+  border: none;
+}
+
+/* hide the real translated word (same word in the text) */
+/* .ui-tooltip p:nth-child(1) { */
+/* /~ display: none; ~/ */
+/* /~ margin-top: 0.8rem; ~/ */
+/* /~ margin-bottom: 0.8rem; ~/ */
+/* margin: 0.4rem 0 0.9rem 0; */
+/* /~ border-bottom: 2px solid #343a40; ~/ */
+/* } */
+
+/* /~ make the first line of the translation look like the real translation ~/ */
+/* .ui-tooltip p:nth-child(2):first-line { */
+/* font-size: 1rem; */
+/* font-weight: 700; */
+/* } */
+
+/* div#thetext:has(span[lid="2"]) { */
+/* height: 100vh; */
+/* } */
+
+/* apply only to the body on the left */
+/* body:has(.read_pane_left) { */
+/* height: 100vh; */
+/* } */
+
+.container {
+  width: unset;
+  margin: 0;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+div#read_pane_right > * {
+  /* height: 100%; */
+  /* width: 100%; */
+  box-sizing: border-box;
+  /* margin-left: 20px; */
+}
+
+div#read_pane_right {
+  height: 100vh;
+
+  display: grid;
+  grid-template-rows: 20rem 1fr;
+  /* gap: 20px; */
+}
+
+div#read_pane_left {
+  width: 100%;
+}
+
+#wordframeid {
+  height: 100% !important;
+  /* margin: 0 !important; */
+  /* padding: 45px 20px 0 20px; */
+}
+
+#dictframeid {
+  /* calc for crawlbar */
+  height: calc(100% - 20px) !important;
+  /* padding-left: 20px; */
+}
+
+#translation {
+  /* override style from _form.html */
+  width: 100% !important;
+  height: 100px !important;
+
+  resize: none;
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 0.5rem 0.8rem;
+  background-color: #f5faff;
+  /* border: none; */
+  border: 1px solid #c6c6c6;
+  font-family: inherit;
+  outline: none;
+
+  margin-bottom: 0.4rem;
+}
+
+#parentslist {
+  /* display: none; */
+  font-family: inherit;
+  background-color: #f5faff;
+  border-radius: 5px;
+  height: 37px;
+}
+
+#parentslist .tagit-new {
+  padding: 0 !important;
+}
+
+input[type="text"].form-control {
+  border-radius: 5px;
+  padding: 0.5rem 0.8rem;
+  background-color: aliceblue;
+  font-weight: 500;
+}
+
+input[type="text"] {
+  font-family: inherit;
+  color: inherit;
+  font-weight: 500;
+  outline: none;
+}
+
+::placeholder {
+  font-size: 0.8rem;
+  font-weight: normal;
+}
+
+#termtagslist {
+  display: none;
+
+  height: 40px;
+  margin-bottom: 1rem;
+}
+
+#parentslist .ui-widget-content {
+  /* padding: .5rem .8rem; */
+  background-color: #f5faff;
+}
+
+/* textarea.form-largetextarea { */
+/* font: 85% "MYFONT"; */
+/* } */
+
+span.status0 {
+  background-color: var(--status-0-color);
+}
+
+span.status1 {
+  background-color: var(--status-1-color);
+}
+
+span.status2 {
+  background-color: var(--status-2-color);
+}
+
+span.status3 {
+  background-color: var(--status-3-color);
+}
+
+span.status5 {
+  background-color: unset;
+}
+
+/* .rightreadingframe { */
+/* margin-top: 20px; */
+/* } */
+
+td[align="right"] > a {
+  margin-right: 1rem;
+  display: inline-block;
+}
+
+#thetexttitle {
+  /* padding-bottom: 21px; */
+  /* padding-top: 21px; */
+  /* padding-left: 29px; */
+  font-size: 2.2rem;
+  /* margin: 20px 30px 30px 30px; */
+  /* background-color: rgb(240, 238, 223); */
+}
+
+div#thetext {
+  /* padding: 0 20px; */
+  word-spacing: -2px;
+  margin: 0;
+}
+
+/* div#thetext:has(span[lid="1"]) { */
+/* word-spacing: 20px; */
+/* background-color: red; */
+/* } */
+
+span.textitem {
+  /* font-size: 1.2rem; */
+  color: inherit;
+  margin-bottom: 0.1em;
+  border-radius: 2px;
+}
+
+/* .textarea { */
+/* font: 85% "MYFONT"; */
+/* } */
+
+/* select only text elements (not whitespace or punctuations */
+span:not([class="textitem"]) {
+  padding-left: 0.15rem;
+  padding-right: 0.15rem;
+}
+
+/* selecting multiple words adds padding to whitespace. remove them */
+span[class="textitem newmultiterm"] {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* undoes above code for close ui icon in parents input field*/
+span.ui-icon-close {
+  padding: 0;
+}
+
+ul.shorttaglist {
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 0.5rem 0.8rem;
+  background-color: aliceblue;
+}
+
+/* ul.form-control input[type="radio"] { */
+  /* /~ display: none; ~/ */
+  /* opacity: 0; */
+  /* transform: translateX(10px); */
+/* } */
+
+ul.form-control {
+  /* display: inline-block; */
+  --status-border-color: rgb(173, 203, 208);
+}
+
+ul.form-control input[checked] + label {
+  font-weight: 500;
+  /* font-size: 0.9rem; */
+  color: #343a40;
+}
+
+/* ul.form-control li { */
+/* outline: red; */
+/* } */
+
+/* ul.form-control li:hover, */
+/* ul.form-control li:focus { */
+/* font-weight: 500; */
+/* color: red !important; */
+/* /~ font-size: 0.9rem; ~/ */
+/* background-color: #81adf487 !important; */
+/* } */
+
+/* ul.form-control li:hover { */
+/* font-weight: 500; */
+/* /~ font-size: 0.9rem; ~/ */
+/* background-color: #81adf487 !important; */
+/* } */
+
+/* selected radio */
+
+/* ul.form-control input + label:hover, */
+/* ul.form-control input + label:active { */
+/* /~ font-weight: 500; ~/ */
+/* /~ font-size: 0.9rem; ~/ */
+/* color: #343a40; */
+/* } */
+
+ul.form-control label {
+  font-size: 0.8rem;
+}
+
+ul.form-control li {
+  color: #797f86;
+  width: 30px;
+  height: 25px;
+  /* border-radius: 50%; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin: 0;
+  position: relative;
+}
+
+ul.form-control li:nth-child(1) {
+  background-color: var(--status-1-color);
+  border-top-left-radius: 45%;
+  border-bottom-left-radius: 45%;
+
+  border: 2px solid var(--status-border-color);
+  border-right: none;
+}
+
+ul.form-control li:nth-child(2) {
+  background-color: var(--status-2-color);
+
+  border: 2px solid var(--status-border-color);
+  border-right: none;
+  border-left: none;
+}
+
+ul.form-control li:nth-child(3) {
+  background-color: var(--status-3-color);
+
+  border: 2px solid var(--status-border-color);
+  border-right: none;
+  border-left: none;
+}
+
+ul.form-control li:nth-child(4) {
+  border: 2px solid var(--status-border-color);
+  border-right: none;
+  border-left: none;
+}
+
+ul.form-control li:nth-child(5) {
+  border: 2px solid var(--status-border-color);
+  border-right: none;
+  border-left: none;
+}
+
+ul.form-control li:nth-child(6) {
+  background-color: var(--status-6-color);
+  /* margin-left: 15px; */
+  border-top-right-radius: 45%;
+  border-bottom-right-radius: 45%;
+
+  border: 2px solid var(--status-border-color);
+}
+
+ul.form-control li:nth-child(7) {
+  background-color: var(--status-7-color);
+  margin-left: 10px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+
+  /* to get the same size as others */
+  border: 2px solid transparent;
+}
+
+ul.form-control li:nth-child(6) label,
+ul.form-control li:nth-child(7) label {
+  color: transparent;
+}
+
+ul.form-control li:nth-child(6)::after {
+  content: "\2714";
+  color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  /* z-index: 100; */
+}
+ul.form-control li:nth-child(7)::after {
+  content: "\1F6C7";
+  color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+/* ul.form-control li:nth-child(4) { */
+/* display: none; */
+/* } */
+
+/* ul.form-control li:nth-child(5) { */
+/* display: none; */
+/* } */
+
+#reading-footer h2 + h2 {
+  display: none;
+}
+
+#maincontent {
+  margin-left: 0;
+}
+
+form td {
+  min-width: 100%;
+}
+
+#submit {
+  padding: 0.5rem 3rem;
+  background-color: #8ce99a;
+  border-radius: 4px;
+  border: none;
+  text-transform: uppercase;
+  color: inherit;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#submit:hover,
+#submit:active {
+  background-color: #b2f2bb;
+  box-shadow: inset 0 0 0 2px #8ce99a;
+}
+
+th,
+td {
+  padding: auto !important;
+}
+
+table#term {
+  width: 100% !important;
+}
+
+/* input[type="text"] { */
+/* /~ font: 85% "MYFONT" !important; ~/ */
+/* /~ color: inherit !important; ~/ */
+/* font-weight: 500 !important; */
+/* } */
+
+/* #text */
+/* #parentslist */
+/* #translation */
+/* #termtagslist */
+
+/* .audio-player-container audio { */
+/* width: 100%; */
+/* border-radius: 20px; */
+/* } */
+
+/* *********** */
+/* read page layout */
+/* *********** */
+#reading-header,
+#reading-header-left  {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#reading-header-left {
+  width: 200px;
+}

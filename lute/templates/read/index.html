@@ -22,69 +22,72 @@
 <div id="read_pane_left">
   <div id="reading-header">
     <!-- Lacking css skills, so table layout to the rescue. -->
-    <table style="width: 100%">
-      <tr>
-        <td width="2px">
+    <!-- <table style="width: 100%"> -->
+      <!-- <tr> -->
+        <!-- <td width="2px"> -->
+    <div id="reading-header-left">
+      <img
+        src="{{ url_for('static', filename='img/lute.png') }}"
+        class="lutelogo_small"
+        style="cursor: pointer"
+        onclick="window.location='/'"
+        />
+    <!-- </td> -->
+    <!-- <td align="left"> -->
+      <h2 style="margin: 0px">
+        <span
+          class="read_page_nav read_page_disabled"
+          id="navPrev10"
+          onclick="goto_relative_page(-10)"
+          >&#171;</span>
+        <span
+          class="read_page_nav read_page_disabled"
+          id="navPrev"
+          onclick="goto_relative_page(-1)"
+          >&#8249;</span>
+  
+        <span id="page_indicator">{{ page_num }}/{{ page_count }}</span>
+  
+        <span
+          class="read_page_nav read_page_disabled"
+          id="navNext"
+          onclick="goto_relative_page(1)"
+          >&#8250;</span>
+  
+        <span
+          class="read_page_nav read_page_disabled"
+          id="navNext10"
+          onclick="goto_relative_page(10)"
+          >&#187;</span>
+      </h2>
+    </div>
+    <div id="reading-header-right">
+      <!-- </td> -->
+      <!-- <td align="right"> -->
+        <span><a id="reading_home_link" class="home-link" href="/">Home</a></span>
+        {% if book.source_uri %}
+        <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
           <img
-            src="{{ url_for('static', filename='img/lute.png') }}"
-            class="lutelogo_small"
-            style="cursor: pointer"
-            onclick="window.location='/'"
-            />
-        </td>
-        <td align="left">
-          <h2 style="margin: 0px">
-            <span
-              class="read_page_nav read_page_disabled"
-              id="navPrev10"
-              onclick="goto_relative_page(-10)"
-              >&#171;</span>
-            <span
-              class="read_page_nav read_page_disabled"
-              id="navPrev"
-              onclick="goto_relative_page(-1)"
-              >&#8249;</span>
-
-            <span id="page_indicator">{{ page_num }}/{{ page_count }}</span>
-
-            <span
-              class="read_page_nav read_page_disabled"
-              id="navNext"
-              onclick="goto_relative_page(1)"
-              >&#8250;</span>
-
-            <span
-              class="read_page_nav read_page_disabled"
-              id="navNext10"
-              onclick="goto_relative_page(10)"
-              >&#187;</span>
-          </h2>
-        </td>
-        <td align="right">
-          <span><a id="reading_home_link" class="home-link" href="/">Home</a></span>
-          {% if book.source_uri %}
-          <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
-            <img
-              src="{{ url_for('static', filename='icn/external.png') }}"
-              title="Show source URL" />
-          </a>
-          {% endif %}
-          <span id="editText" style="cursor: pointer" onclick="edit_current_page()">
-            <img
-              src="{{ url_for('static', filename='icn/document--pencil.png') }}"
-              title="Edit"
-              alt="Edit" />
-          </span>
+            src="{{ url_for('static', filename='icn/external.png') }}"
+            title="Show source URL" />
+        </a>
+        {% endif %}
+        <span id="editText" style="cursor: pointer" onclick="edit_current_page()">
           <img
-            id="keyboard_shortcuts"
-            style="margin-right: 10px"
-            src="{{ url_for('static', filename='icn/question-balloon.png') }}"
-            title="Keyboard shortcuts"
-          />
-        </td>
-      </tr>
-    </table>
-
+            src="{{ url_for('static', filename='icn/document--pencil.png') }}"
+            title="Edit"
+            alt="Edit" />
+        </span>
+        <img
+          id="keyboard_shortcuts"
+          style="margin-right: 10px"
+          src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+          title="Keyboard shortcuts"
+        />
+      <!-- </td> -->
+    <!-- </tr> -->
+    <!-- </table> -->
+    </div>
   </div>
 
   <div class="audio-player-container" style="display: none">
