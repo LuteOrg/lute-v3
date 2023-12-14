@@ -5,6 +5,7 @@
 {% block body %}
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/type.js') }}" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
   <pre>
@@ -65,6 +66,27 @@
       <!-- </td> -->
       <!-- <td align="right"> -->
         <span><a id="reading_home_link" class="home-link" href="/">Home</a></span>
+        <a id="text-control-btn">
+          <img
+            src="{{ url_for('static', filename='icn/text.svg') }}"
+            title="Text Controls" />
+          <div id="type-control-container" class="hide-type">
+            <div class="type-control-size row">
+                <button class="btn row-elem type-minus">-</button>
+                <!-- <div class="row-elem type-value"> -->
+                  <input min="5" step="0.1" id="font-size">
+                <!-- </div> -->
+                <button class="btn row-elem type-plus">+</button>
+            </div>
+            <div class="type-control-lh row">
+                <button class="btn row-elem lh-minus">-</button>
+                <!-- <div class="row-elem type-value"> -->
+                  <input type="number" min="1" max="5" step="0.1" id="line-height">
+                <!-- </div> -->
+                <button class="btn row-elem lh-plus">+</button>
+            </div>
+          </div>
+        </a>
         {% if book.source_uri %}
         <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
           <img
@@ -89,6 +111,8 @@
     <!-- </table> -->
     </div>
   </div>
+
+
 
   <h2 id="thetexttitle">{{ book.title }}</h2>
 
