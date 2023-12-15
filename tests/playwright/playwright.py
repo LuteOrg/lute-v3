@@ -60,7 +60,6 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     page.frame_locator('iframe[name="wordframe"]').get_by_role(
         "button", name="Save"
     ).click()
-    page.get_by_title("Mark rest as known, mark page as read", exact=True).click()
     page.get_by_title(
         "Mark rest as known, mark page as read, then go to next page"
     ).click()
