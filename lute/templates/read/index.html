@@ -155,32 +155,43 @@
   </div>
 
   <div id="reading-footer" style="text-align: center">
-    <h2>
-      <span
-        id="footerMarkRestAsKnown"
-        style="cursor: pointer"
-        onclick="handle_page_done(true, 0)"
-        title="Mark rest as known, mark page as read">
-        <img src="{{ url_for('static', filename='icn/tick.png') }}" />
-      </span>
-
+    <p>
       <span
         id="footerMarkRestAsKnownNextPage"
-        style="cursor: pointer"
+        style="cursor: pointer; font-size: 1.25em; color: #4CBB17;"
         onclick="handle_page_done(true, 1)"
         title="Mark rest as known, mark page as read, then go to next page">
-        <img src="{{ url_for('static', filename='icn/tick.png') }}" />&#8250;
+        &#x2714;
       </span>
 
       <span
         id="footerNextPage"
-        style="cursor: pointer"
+        style="cursor: pointer; font-size: 1.5em; font-weight: bold;"
         onclick="handle_page_done(false, 1)"
-        title="Mark page as read, then go to next page"
-        >&#8250;</span>
-    </h2>
+        title="Mark page as read, then go to next page">
+        &#8250;
+      </span>
+    </p>
 
     <div id="final_page_controls" class="hide">
+      <p>
+        <span
+          id="footerMarkRestAsKnown"
+          style="cursor: pointer; font-size: 1.25em; color: #4CBB17;"
+          onclick="handle_page_done(true, 0)"
+          title="Mark rest as known, mark page as read">
+          &#x2714;
+        </span>
+
+        <span
+          id="footerDone"
+          style="cursor: pointer; font-size: 1.25em;"
+          onclick="handle_page_done(false, 0)"
+          title="Mark page as read">
+          &#x2714;
+        </span>
+      </p>
+
       <h2>&#127881;</h2>
       <p>
         <a
