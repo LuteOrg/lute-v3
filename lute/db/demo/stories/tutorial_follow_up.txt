@@ -18,6 +18,8 @@ A1. Term sentences
 
 In the "Term" edit form, you can click on the "Sentences" link to see where that term or its relations have been used.  Click on "elephant", and then click the Sentences link shown to see where that term has been used.
 
+You're only shown sentences on pages that have been marked "Read", using the controls in the footer of the reading screen, i.e. the green checkmark or the ">".  This ensures that you only see references that you have already seen before, so you don't get overwhelmed with new vocabulary, and avoids spoilers of the material you're reading.
+
 A2. Archiving, Unarchiving, and Deleting Texts
 
 When you're done reading a text, you can either Archive it, or Delete it.  Archiving clears out the parsing data for a given text, but the text is still available and can be unarchived and re-read.  The sentences are also available for searching with the Term "Sentences" link.  Deletion completely removes a text, the parsing data, and its sentences.  Neither archiving nor deleting touch any Terms you've created, it just clears out the texts.
@@ -26,7 +28,9 @@ On the last page of every book, Lute shows a link for you to archive the book.  
 
 To unarchive the text, go to Home, Text Archive, and click the "Unarchive" action (the little up arrow).
 
+A3. Audio
 
+You can add an audio file (mp3, wav, or ogg) to your books, so you can read along to an audio track.  See the Lute manual for more notes on usage and tips.
 
 ===
 
