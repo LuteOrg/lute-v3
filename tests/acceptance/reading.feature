@@ -103,8 +103,6 @@ Feature: User can actually read and stuff.
     Scenario: Clicking next w/ checkmark or next in footer sets bookmark
         Given the demo stories are loaded
         When I click the "Tutorial" link
-        # The green check doesn't advance the page
-        And I click the footer green check
         And I click the footer next page
         Given I visit "/"
         And the book table loads "Tutorial"
