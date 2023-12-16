@@ -59,11 +59,9 @@ The small blue question mark in the header shows some keyboard shortcuts.
 
 If you've worked through the tutorial, you'll have noted that words are underlined in blue when you move the mouse over them.  You can quickly change the status of the current word by hitting 1, 2, 3, 4, 5, w (for Well-Known), or i (for Ignore).  Try hovering over the following words and hit the status buttons: apple, banana, cranberry, donut.
 
-You can also increase or decrease the status of a word by using the up and down arrow keys when that word has the focus, or when you're hovering over them.
+If you click on a word, it's underlined in red, and the Term edit form is shown.  Before you switch over to the Term editing form, you can still update its status using the hotkeys above, or by using the up and down arrows.  You can jump over to the edit form by hitting Tab, and then start editing.
 
-If you click on a word, it's underlined in red, and the Term edit form is shown.  (Before you switch over to the Term editing form, you can still update its status.)  You can jump over to the edit form by hitting Tab, and then start editing.
-
-When a word has been clicked, it's "active", so it keeps the focus.  Hovering the mouse over other words won't underline them in blue anymore, and hitting status update hotkeys (1 - 5, w, i) will only update the active word.  To "un-click" a word underlined in red, click it again, or hit Escape or Return.  Then you'll be back in "Hover mode".  Try clicking and un-clicking or Escaping any word in this paragraph to get a feel for it.
+When a word has been clicked, it's "active", so it keeps the focus.  Hovering the mouse over other words won't underline them in blue anymore, and hitting status update hotkeys (1 - 5, w, i) will only update the active word.  To "un-click" a word underlined in red, click it again, or hit Escape or Return.  Then you'll be back in "Hover mode".  In "Hover mode", the hotkeys 1-5, w, and i still update the status, but the arrow keys just scroll the window.  Try clicking and un-clicking or Escaping any word in this paragraph to get a feel for it.
 
 Note that for the keyboard shortcuts to work, the reading pane (where the text is) must have the "focus".  Click anywhere on the reading pane to re-establish focus.
 
