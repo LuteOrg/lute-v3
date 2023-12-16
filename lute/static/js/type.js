@@ -13,58 +13,50 @@ const lhField = document.querySelector(".type-control-lh input");
 
 const widthPlusButton = document.querySelector(".width-plus");
 const widthMinusButton = document.querySelector(".width-minus");
+const widthField = document.querySelector(".type-control-width input");
+
+const oneColButton = document.querySelector(".column-one");
+const twoColButton = document.querySelector(".column-two");
+const threeColButton = document.querySelector(".column-three");
 
 const readGridContainer = document.querySelector("#read_grid_container");
 const theText = document.querySelector("#thetext");
 
 const domObserver = new MutationObserver((mutationList, observer) => {
   textItems = document.querySelectorAll("span.textitem");
-
-  // if (textItems) console.log(textItems);
+  fontField.value = `${getFontSize(textItems[0])}px`;
+  lhField.value = `${getLineHeight(textItems[0])}`;
+  widthField.value = `${Math.round(convertWidthValueToPercentage())}%`;
 
   observer.disconnect();
 });
 
-domObserver.observe(theText, {childList: true, subtree: true});
-// console.log(`items are ${textItems[0]}`);
+function convertWidthValueToPercentage() {
+  const [x, y] = getTextWidth(readGridContainer);
+  return x / (x + y) * 100;
+}
+
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
+domObserver.observe(theText, {childList: true, subtree: true});
+
 typeButton.addEventListener("click", (e)=> {
-  // const textItem = document.querySelector("span.textitem");
-  // console.log(textItems);
-  e.stopPropagation();
-  fontField.value = `${getFontSize(textItems[0])}px`;
-  lhField.value = `${getLineHeight(textItems[0])}`;
+  typeControlContainer.classList.toggle("hide-type");
 })
 
+// stop propagation so clicking anything inside the popup
+// doesn't trigger type button click event
+typeControlContainer.addEventListener("click", (e)=> {
+  e.stopPropagation();
+  // e.preventDefault();
+})
 
-// // typeButton.addEventListener("click", (e)=> {
-// //   e.stopPropagation();
-// // }, true)
-// typeButton.addEventListener("click", (e)=> {
-//   e.stopPropagation();
-//   typeControlContainer.classList.toggle("hide-type");
-//   // e.preventDefault();
-// })
-
-
-// function closeOnOutsideClick(element) {
-//   document.addEventListener("click", (e) => {
-//     if (!element.contains(e.target)) {
-//       console.log(element);
-//       if (!element.classList.contains("hide-type")) {
-//         element.classList.add("hide-type");
-
-//       }
-//     }
-//   })
-// }
-
-// closeOnOutsideClick(typeControlContainer);
-
-// typeControlContainer.addEventListener("focusout", (e) => {
-//   e.target.classList.add("hide-type");
-// })
+// clicking away closes the popup
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#text-control-btn")) {
+    typeControlContainer.classList.add("hide-type");
+  }
+})
 
 typePlusButton.addEventListener("click", () => {
   resizeFont("+")
@@ -84,18 +76,28 @@ lhMinusButton.addEventListener("click", () => {
 })
 
 widthPlusButton.addEventListener("click", () => {
-  changeTextWidth();
+  changeTextWidth("+");
 })
 
-fontField.addEventListener("change", (e) => {
-  // const textItems = document.querySelectorAll("span.textitem");
-  const size = `${parseFloat(e.target.value)}px`;
-  // console.log(size);
-
-  textItems.forEach((item) => {
-    setFontSize(item, size);
-  })
+widthMinusButton.addEventListener("click", () => {
+  changeTextWidth("-");
 })
+
+oneColButton.addEventListener("click", () => {
+  changeColumnCount(1);
+})
+
+twoColButton.addEventListener("click", () => {
+  changeColumnCount(2);
+})
+
+threeColButton.addEventListener("click", () => {
+  changeColumnCount(3);
+})
+
+function changeColumnCount(num) {
+  theText.style.columnCount = num;
+}
 
 function getTextWidth() {
   const elementComputedStyle = window.getComputedStyle(readGridContainer)
@@ -142,7 +144,25 @@ function resizeLineHeight(operation) {
   textItems.forEach((item) => {
     setLineHeight(item, Number(newSize.toPrecision(2)));
   })
+
+  lhField.value = Number(newSize.toPrecision(2));
 }
+
+fontField.addEventListener("change", (e) => {
+  const size = `${parseFloat(e.target.value)}px`;
+
+  textItems.forEach((item) => {
+    setFontSize(item, size);
+  })
+})
+
+lhField.addEventListener("change", (e) => {
+  const size = parseFloat(e.target.value);
+
+  textItems.forEach((item) => {
+    setLineHeight(item, size);
+  })
+})
 
 function resizeFont(operation) {
   // console.log("click +");
@@ -150,16 +170,31 @@ function resizeFont(operation) {
   const currentSize = getFontSize(textItems[0]);
   // console.log(`${parseFloat(currentSize) + 1} + px`);
   const add = (operation === "+");
-  const newSize = add ? `${currentSize + 1}px` : `${currentSize - 1}px`;
+  const newSize = add ? currentSize + 1 : currentSize - 1;
   textItems.forEach((item) => {
-    setFontSize(item, newSize);
+    setFontSize(item, `${convertPixelsToRem(newSize)}rem`);
+    // setFontSize(item, `${newSize}px`);
   })
+
+  fontField.value = `${newSize}px`;
 }
 
-function changeTextWidth() {
-
+function changeTextWidth(operation) {
   const [x, y] = getTextWidth();
-  const newWidth = (x / (x + y)) + (x / (x + y)) * 0.05;
+  const add = (operation === "+");
+  const per = convertWidthValueToPercentage();
 
-  readGridContainer.style.gridTemplateColumns = `${newWidth}fr ${1 - newWidth}fr`;
+  let newWidth = add ? per + per * 0.05 : per - per * 0.05;
+
+  newWidth = clamp(newWidth, 25, 75);
+
+  readGridContainer.style.gridTemplateColumns = `${newWidth}fr ${100 - newWidth}fr`;
+
+  widthField.value = `${Math.round(newWidth)}%`;
+}
+
+function convertPixelsToRem(sizePx) {
+  const bodyFontSize =  window.getComputedStyle(document.querySelector("body")).fontSize;
+  const sizeRem = sizePx / parseFloat(bodyFontSize);
+  return sizeRem;
 }

@@ -568,11 +568,11 @@ div#reading-header {
   cursor: pointer;
 }
 
-/* .hide-type { */
-  /* opacity: 0; */
-  /* user-select: none; */
-  /* pointer-events: none; */
-/* } */
+#type-control-container.hide-type {
+  opacity: 0;
+  user-select: none;
+  pointer-events: none;
+}
 
 #text-control-btn {
   position: relative;
@@ -582,14 +582,16 @@ div#reading-header {
   position: absolute;
   left: 50%;
   top: 0;
-  transform: translate(-50%, 30px);
+  transform: translate(-50%, 40px);
   display: grid;
-  background-color: #8dc3d4;
+  background-color: #a7d0f0;
   padding: 0.7rem;
+  padding-top: 1.3rem;
   row-gap: 0.3rem;
   border-radius: 5px;
 
   transition: all .5s;
+  opacity: 0.95;
 }
 
 #type-control-container .row-elem{
@@ -600,6 +602,7 @@ div#reading-header {
 #type-control-container .btn{
   border-radius: 50%;
   border: 2px solid aliceblue;
+  font-weight: bold;
 }
 
 #type-control-container .row{
@@ -607,6 +610,35 @@ div#reading-header {
   grid-template-columns: 1fr 4.7rem 1fr;
   column-gap: .5rem;
 }
+
+#type-control-container div.type-control-column {
+  display: flex;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.type-control-width {
+  margin-bottom: 0.3rem;
+}
+
+.column-btn {
+  width: max(40px, 100%);
+  height: 30px;
+
+  border: 2px solid aliceblue;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+/* .column-one { */
+  /* grid-column: 1 / span 2; */
+/* } */
+/* .column-two { */
+  /* grid-column: 3 / span 2; */
+/* } */
+/* .column-three { */
+  /* grid-column: 5 / span 2; */
+/* } */
 
 #type-control-container .type-value {
   display: flex;
@@ -625,24 +657,20 @@ div#reading-header {
   border-radius: 2px;
   border: none;
   background-color: aliceblue;
-  font-size: inherit;
+  font-size: 1rem;
   font-family: inherit;
   text-align: center;
 }
 
-#type-control-container input::-webkit-outer-spin-button,
-#type-control-container input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
+/* #type-control-container input::-webkit-outer-spin-button, */
+/* #type-control-container input::-webkit-inner-spin-button { */
+    /* -webkit-appearance: none; */
+    /* margin: 0; */
+/* } */
 
-#type-control-container input[type="number"]{
-  appearance: textfield;
-  -moz-appearance: textfield;
-}
-
-/* #text-control-btn:focus { */
-  /* display: block !important; */
+/* #type-control-container input[type="number"]{ */
+  /* appearance: textfield; */
+  /* -moz-appearance: textfield; */
 /* } */
 
 .type-triangle {
@@ -650,7 +678,7 @@ div#reading-header {
 	height: 0;
 	border-left: 25px solid transparent;
 	border-right: 25px solid transparent;
-	border-bottom: 20px solid #8dc3d4;
+	border-bottom: 20px solid #a7d0f0;
 
   position: absolute;
   top: -12px;

@@ -23,10 +23,6 @@
 <div id="read_grid_container">
   <div id="read_pane_left">
     <div id="reading-header">
-      <!-- Lacking css skills, so table layout to the rescue. -->
-      <!-- <table style="width: 100%"> -->
-        <!-- <tr> -->
-          <!-- <td width="2px"> -->
       <div id="reading-header-left">
         <img
           src="{{ url_for('static', filename='img/lute.png') }}"
@@ -34,8 +30,6 @@
           style="cursor: pointer"
           onclick="window.location='/'"
           />
-      <!-- </td> -->
-      <!-- <td align="left"> -->
         <h2 style="margin: 0px">
           <span
             class="read_page_nav read_page_disabled"
@@ -61,12 +55,6 @@
             id="navNext10"
             onclick="goto_relative_page(10)"
             >&#187;</span>
-        </h2>
-      </div>
-      <div id="reading-header-right">
-        <!-- </td> -->
-        <!-- <td align="right"> -->
-          <span><a id="reading_home_link" class="home-link" href="/">Home</a></span>
           <a id="text-control-btn">
             <img
               src="{{ url_for('static', filename='icn/text.svg') }}"
@@ -80,16 +68,25 @@
               </div>
               <div class="type-control-lh row">
                 <button class="btn row-elem lh-minus">-</button>
-                <input type="number" min="1" max="5" step="0.1" id="line-height">
+                <input min="1" max="5" step="0.1" id="line-height">
                 <button class="btn row-elem lh-plus">+</button>
               </div>
               <div class="type-control-width row">
                 <button class="btn row-elem width-minus">-</button>
-                <input type="number" min="10" max="90" step="5" id="content-width">
+                <input min="10" max="90" step="5" id="content-width">
                 <button class="btn row-elem width-plus">+</button>
+              </div>
+              <div class="type-control-column row">
+                <button class="column-one column-btn">&#124;</button>
+                <button class="column-two column-btn">&#124;&#124;</button>
+                <button class="column-three column-btn">&#124;&#124;&#124;</button>
               </div>
             </div>
           </a>
+        </h2>
+      </div>
+      <div id="reading-header-right">
+          <span><a id="reading_home_link" class="home-link" href="/">Home</a></span>
           {% if book.source_uri %}
           <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
             <img
@@ -109,12 +106,9 @@
             src="{{ url_for('static', filename='icn/question-balloon.png') }}"
             title="Keyboard shortcuts"
           />
-        <!-- </td> -->
-      <!-- </tr> -->
-      <!-- </table> -->
       </div>
     </div>
-  
+
   
   
     <h2 id="thetexttitle">{{ book.title }}</h2>
