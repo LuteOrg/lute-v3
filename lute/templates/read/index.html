@@ -20,239 +20,243 @@
   </pre>
 </div>
 
-<div id="read_pane_left">
-  <div id="reading-header">
-    <!-- Lacking css skills, so table layout to the rescue. -->
-    <!-- <table style="width: 100%"> -->
-      <!-- <tr> -->
-        <!-- <td width="2px"> -->
-    <div id="reading-header-left">
-      <img
-        src="{{ url_for('static', filename='img/lute.png') }}"
-        class="lutelogo_small"
-        style="cursor: pointer"
-        onclick="window.location='/'"
-        />
-    <!-- </td> -->
-    <!-- <td align="left"> -->
-      <h2 style="margin: 0px">
-        <span
-          class="read_page_nav read_page_disabled"
-          id="navPrev10"
-          onclick="goto_relative_page(-10)"
-          >&#171;</span>
-        <span
-          class="read_page_nav read_page_disabled"
-          id="navPrev"
-          onclick="goto_relative_page(-1)"
-          >&#8249;</span>
-  
-        <span id="page_indicator">{{ page_num }}/{{ page_count }}</span>
-  
-        <span
-          class="read_page_nav read_page_disabled"
-          id="navNext"
-          onclick="goto_relative_page(1)"
-          >&#8250;</span>
-  
-        <span
-          class="read_page_nav read_page_disabled"
-          id="navNext10"
-          onclick="goto_relative_page(10)"
-          >&#187;</span>
-      </h2>
-    </div>
-    <div id="reading-header-right">
-      <!-- </td> -->
-      <!-- <td align="right"> -->
-        <span><a id="reading_home_link" class="home-link" href="/">Home</a></span>
-        <a id="text-control-btn">
-          <img
-            src="{{ url_for('static', filename='icn/text.svg') }}"
-            title="Text Controls" />
-          <div id="type-control-container" class="hide-type">
-            <div class="type-control-size row">
-                <button class="btn row-elem type-minus">-</button>
-                <!-- <div class="row-elem type-value"> -->
-                  <input min="5" step="0.1" id="font-size">
-                <!-- </div> -->
-                <button class="btn row-elem type-plus">+</button>
-            </div>
-            <div class="type-control-lh row">
-                <button class="btn row-elem lh-minus">-</button>
-                <!-- <div class="row-elem type-value"> -->
-                  <input type="number" min="1" max="5" step="0.1" id="line-height">
-                <!-- </div> -->
-                <button class="btn row-elem lh-plus">+</button>
-            </div>
-          </div>
-        </a>
-        {% if book.source_uri %}
-        <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
-          <img
-            src="{{ url_for('static', filename='icn/external.png') }}"
-            title="Show source URL" />
-        </a>
-        {% endif %}
-        <span id="editText" style="cursor: pointer" onclick="edit_current_page()">
-          <img
-            src="{{ url_for('static', filename='icn/document--pencil.png') }}"
-            title="Edit"
-            alt="Edit" />
-        </span>
+<div id="read_grid_container">
+  <div id="read_pane_left">
+    <div id="reading-header">
+      <!-- Lacking css skills, so table layout to the rescue. -->
+      <!-- <table style="width: 100%"> -->
+        <!-- <tr> -->
+          <!-- <td width="2px"> -->
+      <div id="reading-header-left">
         <img
-          id="keyboard_shortcuts"
-          style="margin-right: 10px"
-          src="{{ url_for('static', filename='icn/question-balloon.png') }}"
-          title="Keyboard shortcuts"
-        />
+          src="{{ url_for('static', filename='img/lute.png') }}"
+          class="lutelogo_small"
+          style="cursor: pointer"
+          onclick="window.location='/'"
+          />
       <!-- </td> -->
-    <!-- </tr> -->
-    <!-- </table> -->
-    </div>
-  </div>
-
-
-
-  <h2 id="thetexttitle">{{ book.title }}</h2>
-
-  <div class="audio-player-container" style="display: none">
-    <audio id="player" preload="metadata" src=""></audio>
-
-    <div class="audio-player-top-container">
-      <!-- <div class="play-btn-container"> -->
-      <button id="play-btn" class="audio-button"></button>
-      <!-- </div> -->
-      <div class="audio-player-central-container">
-        <div id="timeline-container" class="audio-player-timeline-container">
-          <!-- max is set very large so that when file is pre-loaded,
-          the current position isn't truncated. -->
-          <input type="range" class="timeline" max="1000000000" value="0"
-          step="0.1" />
-          <div class="bookmark-markers-container"></div>
-          <div class="duration-container">
-            <span class="current-time">0:00</span>
-            <span class="duration">0:00</span>
-          </div>
-        </div>
-        <div class="audio-player-controls-container">
-          <!-- <div class="skip-back-btn-container"> -->
-          <button id="skip-back-btn" class="audio-button"></button>
-          <!-- </div> -->
-          <div class="rewind-container">
-            <div class="rewind-btn-container">
-              <button id="rewind-btn" class="audio-button"></button>
-              <button id="ff-btn" class="audio-button"></button>
+      <!-- <td align="left"> -->
+        <h2 style="margin: 0px">
+          <span
+            class="read_page_nav read_page_disabled"
+            id="navPrev10"
+            onclick="goto_relative_page(-10)"
+            >&#171;</span>
+          <span
+            class="read_page_nav read_page_disabled"
+            id="navPrev"
+            onclick="goto_relative_page(-1)"
+            >&#8249;</span>
+    
+          <span id="page_indicator">{{ page_num }}/{{ page_count }}</span>
+    
+          <span
+            class="read_page_nav read_page_disabled"
+            id="navNext"
+            onclick="goto_relative_page(1)"
+            >&#8250;</span>
+    
+          <span
+            class="read_page_nav read_page_disabled"
+            id="navNext10"
+            onclick="goto_relative_page(10)"
+            >&#187;</span>
+        </h2>
+      </div>
+      <div id="reading-header-right">
+        <!-- </td> -->
+        <!-- <td align="right"> -->
+          <span><a id="reading_home_link" class="home-link" href="/">Home</a></span>
+          <a id="text-control-btn">
+            <img
+              src="{{ url_for('static', filename='icn/text.svg') }}"
+              title="Text Controls" />
+            <div id="type-control-container" class="hide-type">
+              <div class="type-triangle"></div>
+              <div class="type-control-size row">
+                <button class="btn row-elem type-minus">-</button>
+                <input min="5" step="0.1" id="font-size">
+                <button class="btn row-elem type-plus">+</button>
+              </div>
+              <div class="type-control-lh row">
+                <button class="btn row-elem lh-minus">-</button>
+                <input type="number" min="1" max="5" step="0.1" id="line-height">
+                <button class="btn row-elem lh-plus">+</button>
+              </div>
+              <div class="type-control-width row">
+                <button class="btn row-elem width-minus">-</button>
+                <input type="number" min="10" max="90" step="5" id="content-width">
+                <button class="btn row-elem width-plus">+</button>
+              </div>
             </div>
-            <select name="rewind-option" id="rewind-option">
-              <option value="3">3 sec</option>
-              <option value="5" selected>5 sec</option>
-              <option value="10">10 sec</option>
-              <option value="30">30 sec</option>
-              <option value="60">60 sec</option>
-            </select>
-          </div>
-          <!-- <div class="playback-rate-container"> -->
-          <button id="playback-rate-btn" class="audio-button"><span>1.0</span></button>
-          <!-- </div> -->
-        </div>
+          </a>
+          {% if book.source_uri %}
+          <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
+            <img
+              src="{{ url_for('static', filename='icn/external.png') }}"
+              title="Show source URL" />
+          </a>
+          {% endif %}
+          <span id="editText" style="cursor: pointer" onclick="edit_current_page()">
+            <img
+              src="{{ url_for('static', filename='icn/document--pencil.png') }}"
+              title="Edit"
+              alt="Edit" />
+          </span>
+          <img
+            id="keyboard_shortcuts"
+            style="margin-right: 10px"
+            src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+            title="Keyboard shortcuts"
+          />
+        <!-- </td> -->
+      <!-- </tr> -->
+      <!-- </table> -->
       </div>
-      <div class="audio-player-right-container">
-        <!-- <div class="volume-container"> -->
-          <!-- <button id="volume-on-btn"><span></span></button> -->
-        <input type="range" class="volume" max="100" value="100"/>
+    </div>
+  
+  
+  
+    <h2 id="thetexttitle">{{ book.title }}</h2>
+  
+    <div class="audio-player-container" style="display: none">
+      <audio id="player" preload="metadata" src=""></audio>
+  
+      <div class="audio-player-top-container">
+        <!-- <div class="play-btn-container"> -->
+        <button id="play-btn" class="audio-button"></button>
         <!-- </div> -->
-        <div class="bookmark-buttons-container">
-          <!-- <div class="bookmark-btn-container"> -->
-          <button id="bkm-save-btn" class="audio-button"></button>
-            <!-- <button id="bkm-delete-btn"></button> -->
-          <!-- </div> -->
-          <div class="bookmark-jump-container">
-            <button id="bkm-prev-btn" class="audio-button"></button>
-            <button id="bkm-next-btn" class="audio-button"></button>
+        <div class="audio-player-central-container">
+          <div id="timeline-container" class="audio-player-timeline-container">
+            <!-- max is set very large so that when file is pre-loaded,
+            the current position isn't truncated. -->
+            <input type="range" class="timeline" max="1000000000" value="0"
+            step="0.1" />
+            <div class="bookmark-markers-container"></div>
+            <div class="duration-container">
+              <span class="current-time">0:00</span>
+              <span class="duration">0:00</span>
+            </div>
+          </div>
+          <div class="audio-player-controls-container">
+            <!-- <div class="skip-back-btn-container"> -->
+            <button id="skip-back-btn" class="audio-button"></button>
+            <!-- </div> -->
+            <div class="rewind-container">
+              <div class="rewind-btn-container">
+                <button id="rewind-btn" class="audio-button"></button>
+                <button id="ff-btn" class="audio-button"></button>
+              </div>
+              <select name="rewind-option" id="rewind-option">
+                <option value="3">3 sec</option>
+                <option value="5" selected>5 sec</option>
+                <option value="10">10 sec</option>
+                <option value="30">30 sec</option>
+                <option value="60">60 sec</option>
+              </select>
+            </div>
+            <!-- <div class="playback-rate-container"> -->
+            <button id="playback-rate-btn" class="audio-button"><span>1.0</span></button>
+            <!-- </div> -->
           </div>
         </div>
+        <div class="audio-player-right-container">
+          <!-- <div class="volume-container"> -->
+            <!-- <button id="volume-on-btn"><span></span></button> -->
+          <input type="range" class="volume" max="100" value="100"/>
+          <!-- </div> -->
+          <div class="bookmark-buttons-container">
+            <!-- <div class="bookmark-btn-container"> -->
+            <button id="bkm-save-btn" class="audio-button"></button>
+              <!-- <button id="bkm-delete-btn"></button> -->
+            <!-- </div> -->
+            <div class="bookmark-jump-container">
+              <button id="bkm-prev-btn" class="audio-button"></button>
+              <button id="bkm-next-btn" class="audio-button"></button>
+            </div>
+          </div>
+        </div>
+        <button id="pin" class="audio-button"></button>
       </div>
-      <button id="pin" class="audio-button"></button>
+    </div>
+  
+    <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
+      ...
+    </div>
+  
+    <div id="reading-footer" style="text-align: center">
+      <h2>
+        <span
+          id="footerMarkRestAsKnown"
+          style="cursor: pointer"
+          onclick="handle_page_done(true, 0)"
+          title="Mark rest as known, mark page as read">
+          <img src="{{ url_for('static', filename='icn/tick.png') }}" />
+        </span>
+  
+        <span
+          id="footerMarkRestAsKnownNextPage"
+          style="cursor: pointer"
+          onclick="handle_page_done(true, 1)"
+          title="Mark rest as known, mark page as read, then go to next page">
+          <img src="{{ url_for('static', filename='icn/tick.png') }}" />&#8250;
+        </span>
+  
+        <span
+          id="footerNextPage"
+          style="cursor: pointer"
+          onclick="handle_page_done(false, 1)"
+          title="Mark page as read, then go to next page"
+          >&#8250;</span>
+      </h2>
+  
+      <div id="final_page_controls" class="hide">
+        <h2>&#127881;</h2>
+        <p>
+          <a
+            href=""
+            tabindex="-1"
+            onclick="$('#actionposter').submit(); return false;"
+            >Archive book</a>
+          |
+          <a href="/" tabindex="-1">Home</a>
+        </p>
+  
+        <form
+          id="actionposter"
+          method="post"
+          action="/book/archive/{{ book.id }}"
+          ></form>
+      </div>
+  
     </div>
   </div>
-
-  <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
-    ...
+  
+  <div id="read_pane_right">
+    <iframe
+      name="wordframe"
+      id="wordframeid"
+      class="rightreadingframe"
+      src="about:blank"
+      scrolling="auto"
+      style="height: 35%; width: 100%"
+      frameborder="0"
+    >
+      Frame support required.
+    </iframe>
+  
+    <iframe
+      name="dictframe"
+      id="dictframeid"
+      class="rightreadingframe"
+      src="about:blank"
+      scrolling="auto"
+      style="height: 65%; width: 100%"
+      frameborder="0"
+    >
+      Frame support required.
+    </iframe>
   </div>
-
-  <div id="reading-footer" style="text-align: center">
-    <h2>
-      <span
-        id="footerMarkRestAsKnown"
-        style="cursor: pointer"
-        onclick="handle_page_done(true, 0)"
-        title="Mark rest as known, mark page as read">
-        <img src="{{ url_for('static', filename='icn/tick.png') }}" />
-      </span>
-
-      <span
-        id="footerMarkRestAsKnownNextPage"
-        style="cursor: pointer"
-        onclick="handle_page_done(true, 1)"
-        title="Mark rest as known, mark page as read, then go to next page">
-        <img src="{{ url_for('static', filename='icn/tick.png') }}" />&#8250;
-      </span>
-
-      <span
-        id="footerNextPage"
-        style="cursor: pointer"
-        onclick="handle_page_done(false, 1)"
-        title="Mark page as read, then go to next page"
-        >&#8250;</span>
-    </h2>
-
-    <div id="final_page_controls" class="hide">
-      <h2>&#127881;</h2>
-      <p>
-        <a
-          href=""
-          tabindex="-1"
-          onclick="$('#actionposter').submit(); return false;"
-          >Archive book</a>
-        |
-        <a href="/" tabindex="-1">Home</a>
-      </p>
-
-      <form
-        id="actionposter"
-        method="post"
-        action="/book/archive/{{ book.id }}"
-        ></form>
-    </div>
-
-  </div>
-</div>
-
-<div id="read_pane_right">
-  <iframe
-    name="wordframe"
-    id="wordframeid"
-    class="rightreadingframe"
-    src="about:blank"
-    scrolling="auto"
-    style="height: 35%; width: 100%"
-    frameborder="0"
-  >
-    Frame support required.
-  </iframe>
-
-  <iframe
-    name="dictframe"
-    id="dictframeid"
-    class="rightreadingframe"
-    src="about:blank"
-    scrolling="auto"
-    style="height: 65%; width: 100%"
-    frameborder="0"
-  >
-    Frame support required.
-  </iframe>
 </div>
 
 <script>

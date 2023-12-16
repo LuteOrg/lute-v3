@@ -84,6 +84,8 @@ div#read_pane_right > * {
 div#read_pane_right {
   /* height: 100vh; */
   padding-top: 2rem;
+  position: static;
+  width: 100%;
 
   display: grid;
   grid-template-rows: 24rem 1fr;
@@ -97,7 +99,7 @@ div#read_pane_left {
   margin-top: 1.4rem;
 
   /* --margin-side: 2rem; */
-  width: 46%;
+  width: 96%;
 }
 
 #thetexttitle {
@@ -245,21 +247,21 @@ span.textitem {
 /* } */
 
 /* select only text elements (not whitespace or punctuations */
-span:not([class="textitem"]) {
+.textsentence span:not([class="textitem"]) {
   padding-left: 0.15rem;
   padding-right: 0.15rem;
 }
 
 /* selecting multiple words adds padding to whitespace. remove them */
-span[class="textitem newmultiterm"] {
+.textsentence span[class="textitem newmultiterm"] {
   padding-left: 0;
   padding-right: 0;
 }
 
 /* undoes above code for close ui icon in parents input field*/
-span.ui-icon-close {
-  padding: 0;
-}
+/* span.ui-icon-close { */
+  /* padding: 0; */
+/* } */
 
 ul.shorttaglist {
   box-sizing: border-box;
@@ -526,6 +528,13 @@ table#term {
 /* *********** */
 /* read page layout */
 /* *********** */
+
+#read_grid_container {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  height: 100vh;
+}
+
 #reading-header,
 #reading-header-left  {
   display: flex;
@@ -575,7 +584,7 @@ div#reading-header {
   top: 0;
   transform: translate(-50%, 30px);
   display: grid;
-  background-color: #8dc3d4cc;
+  background-color: #8dc3d4;
   padding: 0.7rem;
   row-gap: 0.3rem;
   border-radius: 5px;
@@ -595,7 +604,7 @@ div#reading-header {
 
 #type-control-container .row{
   display: grid;
-  grid-template-columns: 1fr 3.7rem 1fr;
+  grid-template-columns: 1fr 4.7rem 1fr;
   column-gap: .5rem;
 }
 
@@ -618,6 +627,7 @@ div#reading-header {
   background-color: aliceblue;
   font-size: inherit;
   font-family: inherit;
+  text-align: center;
 }
 
 #type-control-container input::-webkit-outer-spin-button,
@@ -634,3 +644,22 @@ div#reading-header {
 /* #text-control-btn:focus { */
   /* display: block !important; */
 /* } */
+
+.type-triangle {
+	width: 0;
+	height: 0;
+	border-left: 25px solid transparent;
+	border-right: 25px solid transparent;
+	border-bottom: 20px solid #8dc3d4;
+
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+/* remove all whitespace that gets left 
+when font is very small */
+#thetext p {
+  font-size: 0;
+}
