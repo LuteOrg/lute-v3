@@ -32,47 +32,18 @@ body {
   margin: 0;
 }
 
-/* translation popup */
-.ui-tooltip {
-  font-family: inherit;
-  color: inherit !important;
-  font-size: 1rem;
-  padding: 0.6rem 1rem;
-  /* padding: 0; */
-  border: none;
+div#read_pane_right {
+  padding-top: 2rem;
+  padding-left: 2rem;
+  border-left: 2px solid #d6edff;
+  grid-template-rows: 22rem 1fr;
 }
 
-/* hide the real translated word (same word in the text) */
-/* .ui-tooltip p:nth-child(1) { */
-/* /~ display: none; ~/ */
-/* /~ margin-top: 0.8rem; ~/ */
-/* /~ margin-bottom: 0.8rem; ~/ */
-/* margin: 0.4rem 0 0.9rem 0; */
-/* /~ border-bottom: 2px solid #343a40; ~/ */
-/* } */
-
-/* /~ make the first line of the translation look like the real translation ~/ */
-/* .ui-tooltip p:nth-child(2):first-line { */
-/* font-size: 1rem; */
-/* font-weight: 700; */
-/* } */
-
-/* div#thetext:has(span[lid="2"]) { */
-/* height: 100vh; */
-/* } */
-
-/* apply only to the body on the left */
-/* body:has(.read_pane_left) { */
-/* height: 100vh; */
-/* } */
-
-/* .container { */
-  /* width: unset; */
-  /* margin: 0; */
-
-  /* display: grid; */
-  /* grid-template-columns: 1fr 1fr; */
-/* } */
+div#reading-header {
+  /* margin-left: var(--margin-side); */
+  /* margin-right: var(--margin-side); */
+    border-bottom: 2px solid #d6edff;
+}
 
 div#read_pane_right > * {
   /* height: 100%; */
@@ -81,121 +52,23 @@ div#read_pane_right > * {
   /* margin-left: 20px; */
 }
 
-div#read_pane_right {
-  /* height: 100vh; */
-  padding-top: 2rem;
-  position: static;
-  width: 100%;
-
-  display: grid;
-  grid-template-rows: 24rem 1fr;
-  /* gap: 20px; */
-
-  border-left: 2px solid #d6edff;
-  padding-left: 2rem;
-}
-
 div#read_pane_left {
   margin-top: 1.4rem;
-
-  /* --margin-side: 2rem; */
   width: 96%;
 }
 
-#thetexttitle {
-  font-size: 2rem;
-  /* padding-bottom: 21px; */
-  /* padding-top: 21px; */
-  /* padding-left: 29px; */
-  /* margin: 20px 2rem 30px 2rem; */
-  /* margin-left: 2rem; */
-  /* background-color: rgb(240, 238, 223); */
+div#reading-header {
+  /* margin-left: var(--margin-side); */
+  /* margin-right: var(--margin-side); */
+    margin-bottom: 2.8rem;
+    /* border-bottom: 2px solid #d6edff; */
+    padding-bottom: 0.3rem;
 }
 
-div#thetext {
-  /* padding: 0 var(--margin-side); */
-  /* padding-right: var(--margin-side); */
-  word-spacing: -2px;
-  margin: 0;
-  margin-top: 2rem;
+th,
+td {
+    padding: auto !important;
 }
-
-#wordframeid {
-  height: 100% !important;
-  /* margin: 0 !important; */
-  /* padding: 45px 20px 0 20px; */
-}
-
-#dictframeid {
-  /* calc for crawlbar */
-  height: calc(100% - 20px) !important;
-  /* padding-left: 20px; */
-}
-
-#translation {
-  /* override style from _form.html */
-  width: 100% !important;
-  height: 100px !important;
-
-  resize: none;
-  box-sizing: border-box;
-  border-radius: 5px;
-  padding: 0.5rem 0.8rem;
-  background-color: #f5faff;
-  /* border: none; */
-  border: 1px solid #c6c6c6;
-  font-family: inherit;
-  outline: none;
-
-  /* margin-bottom: 0.4rem; */
-}
-
-#parentslist {
-  /* display: none; */
-  font-family: inherit;
-  background-color: #f5faff;
-  border-radius: 5px;
-  height: 37px;
-}
-
-#parentslist .tagit-new {
-  padding: 0 !important;
-}
-
-input[type="text"].form-control {
-  border-radius: 5px;
-  padding: 0.5rem 0.8rem;
-  background-color: aliceblue;
-  font-weight: 500;
-}
-
-input[type="text"] {
-  font-family: inherit;
-  color: inherit;
-  font-weight: 500;
-  outline: none;
-}
-
-::placeholder {
-  font-size: 0.8rem;
-  font-weight: normal;
-}
-
-#termtagslist {
-  /* display: none; */
-
-  /* height: 40px; */
-  margin-bottom: 1rem;
-}
-
-#parentslist .ui-widget-content {
-  /* padding: .5rem .8rem; */
-  background-color: #f5faff;
-}
-
-/* textarea.form-largetextarea { */
-/* font: 85% "MYFONT"; */
-/* } */
 
 span.status0 {
   background-color: var(--status-0-color);
@@ -221,55 +94,6 @@ span.status5 {
   background-color: var(--status-5-color);
 }
 
-/* .rightreadingframe { */
-/* margin-top: 20px; */
-/* } */
-
-td[align="right"] > a {
-  margin-right: 1rem;
-  display: inline-block;
-}
-
-/* div#thetext:has(span[lid="1"]) { */
-/* word-spacing: 20px; */
-/* background-color: red; */
-/* } */
-
-span.textitem {
-  /* font-size: 1.2rem; */
-  color: inherit;
-  margin-bottom: 0.1em;
-  border-radius: 2px;
-}
-
-/* .textarea { */
-/* font: 85% "MYFONT"; */
-/* } */
-
-/* select only text elements (not whitespace or punctuations */
-.textsentence span:not([class="textitem"]) {
-  padding-left: 0.15rem;
-  padding-right: 0.15rem;
-}
-
-/* selecting multiple words adds padding to whitespace. remove them */
-.textsentence span[class="textitem newmultiterm"] {
-  padding-left: 0;
-  padding-right: 0;
-}
-
-/* undoes above code for close ui icon in parents input field*/
-/* span.ui-icon-close { */
-  /* padding: 0; */
-/* } */
-
-ul.shorttaglist {
-  box-sizing: border-box;
-  border-radius: 5px;
-  padding: 0.5rem 0.8rem;
-  background-color: aliceblue;
-}
-
 ul.form-control input[type="radio"] {
   display: none;
   /* opacity: 0; */
@@ -286,39 +110,6 @@ ul.form-control {
   margin-bottom: 1rem;
   /* margin-top: 1rem; */
 }
-
-/* ul.form-control input[checked] + label { */
-  /* font-weight: 500; */
-  /* /~ font-size: 0.9rem; ~/ */
-  /* color: #343a40; */
-/* } */
-
-/* ul.form-control li { */
-/* outline: red; */
-/* } */
-
-/* ul.form-control li:hover, */
-/* ul.form-control li:focus { */
-/* font-weight: 500; */
-/* color: red !important; */
-/* /~ font-size: 0.9rem; ~/ */
-/* background-color: #81adf487 !important; */
-/* } */
-
-/* ul.form-control li:hover { */
-/* font-weight: 500; */
-/* /~ font-size: 0.9rem; ~/ */
-/* background-color: #81adf487 !important; */
-/* } */
-
-/* selected radio */
-
-/* ul.form-control input + label:hover, */
-/* ul.form-control input + label:active { */
-/* /~ font-weight: 500; ~/ */
-/* /~ font-size: 0.9rem; ~/ */
-/* color: #343a40; */
-/* } */
 
 ul.form-control label {
   font-size: 0.8rem;
@@ -435,9 +226,181 @@ ul.form-control li:nth-child(7) label {
   color: #fff;
 }
 
+/* translation popup */
+.ui-tooltip {
+  font-family: inherit;
+  color: inherit !important;
+  font-size: 1rem;
+  padding: 0.6rem 1rem;
+  /* padding: 0; */
+  border: none;
+}
+
+/* hide the real translated word (same word in the text) */
+/* .ui-tooltip p:nth-child(1) { */
+/* /~ display: none; ~/ */
+/* /~ margin-top: 0.8rem; ~/ */
+/* /~ margin-bottom: 0.8rem; ~/ */
+/* margin: 0.4rem 0 0.9rem 0; */
+/* /~ border-bottom: 2px solid #343a40; ~/ */
+/* } */
+
+/* /~ make the first line of the translation look like the real translation ~/ */
+/* .ui-tooltip p:nth-child(2):first-line { */
+/* font-size: 1rem; */
+/* font-weight: 700; */
+/* } */
+
+/* div#thetext:has(span[lid="2"]) { */
+/* height: 100vh; */
+/* } */
+
+/* apply only to the body on the left */
+/* body:has(.read_pane_left) { */
+/* height: 100vh; */
+/* } */
+
+/* .container { */
+  /* width: unset; */
+  /* margin: 0; */
+
+  /* display: grid; */
+  /* grid-template-columns: 1fr 1fr; */
+/* } */
+
+#thetexttitle {
+  font-size: 2rem;
+}
+
+div#thetext {
+  word-spacing: -2px;
+  margin: 0;
+  /* margin-top: 2rem; */
+}
+
+#parentslist {
+  /* display: none; */
+  font-family: inherit;
+  background-color: #f5faff;
+  border-radius: 5px;
+  height: 37px;
+}
+
+#parentslist .tagit-new {
+  padding: 0 !important;
+}
+
+input[type="text"].form-control {
+  border-radius: 5px;
+  padding: 0.5rem 0.8rem;
+  background-color: aliceblue;
+  font-weight: 500;
+}
+
+input[type="text"] {
+  font-family: inherit;
+  color: inherit;
+  font-weight: 500;
+  outline: none;
+}
+
+::placeholder {
+  font-size: 0.8rem;
+  font-weight: normal;
+}
+
+#termtagslist {
+  /* display: none; */
+
+  /* height: 40px; */
+  margin-bottom: 1rem;
+}
+
+#parentslist .ui-widget-content {
+  /* padding: .5rem .8rem; */
+  background-color: #f5faff;
+}
+
+ul.shorttaglist {
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 0.5rem 0.8rem;
+  background-color: aliceblue;
+}
+
+#translation {
+  /* override style from _form.html */
+  /* width: 100% !important; */
+  /* height: 100px !important; */
+
+  resize: none;
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 0.5rem 0.8rem;
+  background-color: #f5faff;
+  /* border: none; */
+  border: 1px solid #c6c6c6;
+  font-family: inherit;
+  outline: none;
+
+  /* margin-bottom: 0.4rem; */
+}
+
+#submit {
+  padding: 0.5rem 3rem;
+  background-color: #8ce99a;
+  border-radius: 4px;
+  border: none;
+  text-transform: uppercase;
+  color: #fff;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#submit:hover,
+#submit:active {
+  background-color: #b2f2bb;
+  box-shadow: inset 0 0 0 2px #8ce99a;
+}
+
+td[align="right"] > a {
+  margin-right: 1rem;
+  display: inline-block;
+}
+
+span.textitem {
+  /* font-size: 1.2rem; */
+  color: inherit;
+  margin-bottom: 0.1em;
+  border-radius: 2px;
+}
+
+/* select only text elements (not whitespace or punctuations */
+.textsentence span:not([class="textitem"]) {
+  padding-left: 0.15rem;
+  padding-right: 0.15rem;
+}
+
+/* selecting multiple words adds padding to whitespace. remove them */
+.textsentence span[class="textitem newmultiterm"] {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#reading-footer h2 + h2 {
+  display: none;
+}
+
 .zoomableTermImage:hover {
   transform: scale(10) translate(-10px);
 }
+
+/* div#thetext:has(span[lid="1"]) { */
+/* word-spacing: 20px; */
+/* background-color: red; */
+/* } */
 
 /* ul.form-control li:nth-child(6)::after { */
   /* content: "\2714"; */
@@ -471,48 +434,9 @@ ul.form-control li:nth-child(7) label {
 /* display: none; */
 /* } */
 
-#reading-footer h2 + h2 {
-  display: none;
-}
-
-#maincontent {
-  margin-left: 0;
-}
-
-form td {
-  min-width: 100%;
-}
-
-#submit {
-  padding: 0.5rem 3rem;
-  background-color: #8ce99a;
-  border-radius: 4px;
-  border: none;
-  text-transform: uppercase;
-  color: #fff;
-  font-family: inherit;
-  font-weight: 500;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-#submit:hover,
-#submit:active {
-  background-color: #b2f2bb;
-  box-shadow: inset 0 0 0 2px #8ce99a;
-}
-
-th,
-td {
-  padding: auto !important;
-}
-
-table#term {
-  width: calc(100% - 2.3rem);
-  /* border-bottom: 2px solid #d6edff; */
-  /* padding-right: 2.3rem; */
-  padding-bottom: 1.5rem;
-}
+/* #maincontent { */
+  /* margin-left: 0; */
+/* } */
 
 /* input[type="text"] { */
 /* /~ font: 85% "MYFONT" !important; ~/ */
@@ -524,170 +448,3 @@ table#term {
 /* #parentslist */
 /* #translation */
 /* #termtagslist */
-
-/* *********** */
-/* read page layout */
-/* *********** */
-
-#read_grid_container {
-  display: grid;
-  grid-template-columns: 1.7fr 1fr;
-  height: 100vh;
-}
-
-#reading-header,
-#reading-header-left  {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  align-items: baseline;
-}
-
-#reading-header-left {
-  width: 200px;
-}
-
-div#reading-header {
-  /* margin-left: var(--margin-side); */
-  /* margin-right: var(--margin-side); */
-  margin-bottom: 2.8rem;
-  border-bottom: 2px solid #d6edff;
-  padding-bottom: 0.3rem;
-}
-
-
-/* text */
-
-/* #text-control-btn { */
-  /* cursor: pointer; */
-/* } */
-
-#text-control-btn img {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-#type-control-container.hide-type {
-  opacity: 0;
-  user-select: none;
-  pointer-events: none;
-}
-
-#text-control-btn {
-  position: relative;
-}
-
-#type-control-container {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  transform: translate(-50%, 40px);
-  display: grid;
-  background-color: #a7d0f0;
-  padding: 0.7rem;
-  padding-top: 1.3rem;
-  row-gap: 0.3rem;
-  border-radius: 5px;
-
-  transition: all .5s;
-  opacity: 0.95;
-}
-
-#type-control-container .row-elem{
-  width: 32px;
-  height: 32px;
-}
-
-#type-control-container .btn{
-  border-radius: 50%;
-  border: 2px solid aliceblue;
-  font-weight: bold;
-}
-
-#type-control-container .row{
-  display: grid;
-  grid-template-columns: 1fr 4.7rem 1fr;
-  column-gap: .5rem;
-}
-
-#type-control-container div.type-control-column {
-  display: flex;
-  justify-content: center;
-  gap: 0.2rem;
-}
-
-.type-control-width {
-  margin-bottom: 0.3rem;
-}
-
-.column-btn {
-  width: max(40px, 100%);
-  height: 30px;
-
-  border: 2px solid aliceblue;
-  border-radius: 5px;
-  font-weight: bold;
-}
-
-/* .column-one { */
-  /* grid-column: 1 / span 2; */
-/* } */
-/* .column-two { */
-  /* grid-column: 3 / span 2; */
-/* } */
-/* .column-three { */
-  /* grid-column: 5 / span 2; */
-/* } */
-
-#type-control-container .type-value {
-  display: flex;
-  align-items: center;
-  width: 3.5rem;
-  justify-content: center;
-  background-color: #3c3c3c;
-  background-color: #6e6e6e80;
-  border-radius: 5px;
-
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-
-#type-control-container input {
-  border-radius: 2px;
-  border: none;
-  background-color: aliceblue;
-  font-size: 1rem;
-  font-family: inherit;
-  text-align: center;
-}
-
-/* #type-control-container input::-webkit-outer-spin-button, */
-/* #type-control-container input::-webkit-inner-spin-button { */
-    /* -webkit-appearance: none; */
-    /* margin: 0; */
-/* } */
-
-/* #type-control-container input[type="number"]{ */
-  /* appearance: textfield; */
-  /* -moz-appearance: textfield; */
-/* } */
-
-.type-triangle {
-	width: 0;
-	height: 0;
-	border-left: 25px solid transparent;
-	border-right: 25px solid transparent;
-	border-bottom: 20px solid #a7d0f0;
-
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translate(-50%, 0);
-}
-
-/* remove all whitespace that gets left 
-when font is very small */
-#thetext p {
-  font-size: 0;
-}

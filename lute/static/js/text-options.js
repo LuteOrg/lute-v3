@@ -19,7 +19,7 @@ const oneColButton = document.querySelector(".column-one");
 const twoColButton = document.querySelector(".column-two");
 const threeColButton = document.querySelector(".column-three");
 
-const readGridContainer = document.querySelector("#read_grid_container");
+// const readGridContainer = document.querySelector("#read_grid_container");
 const theText = document.querySelector("#thetext");
 
 const domObserver = new MutationObserver((mutationList, observer) => {

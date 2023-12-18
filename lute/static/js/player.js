@@ -1,4 +1,5 @@
-const readPaneLeft = document.querySelector("#read_pane_left")
+const readGridContainer = document.querySelector("#read_grid_container");
+const readPaneLeft = document.querySelector("#read_pane_left");
 const player = document.querySelector("#player");
 const timeline = document.querySelector(".timeline");
 const volumeLine = document.querySelector(".volume");
@@ -28,7 +29,7 @@ const bookmarkNextBtn = document.querySelector("#bkm-next-btn");
 var bookmarksArray = [];
 let lastPlayTime = null;
 let playerSticky = localStorage.getItem("player-sticky") ?? 0;
-if (playerSticky != 0) readPaneLeft.classList.add("sticky-player");
+if (playerSticky != 0) readGridContainer.classList.add("sticky-player");
 
 let jumpTimeBy = Number(rewindAmountOption.value);
 
@@ -225,7 +226,8 @@ function resetPlaybackRate() {
 pin.addEventListener("click", function() {
   // add the class to readpaneleft and not the player itself 
   // so that we can get it's sibling (paneright) to add a bottom margin in css
-  readPaneLeft.classList.toggle("sticky-player");
+  // readPaneLeft.classList.toggle("sticky-player");
+  readGridContainer.classList.toggle("sticky-player");
   // save sticky state to local storage
   localStorage.setItem("player-sticky", 1 - Number(playerSticky))
   // remove focus off the button so it doesn't accidentally get activated by spacebar
@@ -236,7 +238,10 @@ pin.addEventListener("click", function() {
 // (to reset added bottom margin to left and right containers)
 document.addEventListener("DOMContentLoaded", () => {
   if (playerContainer.getAttribute("style") == "display: none") {
-    readPaneLeft.classList.remove("sticky-player");
+    // const mc = document.querySelector(".right-btm-margin-container");
+    // mc.style.marginTop = 0;
+    readGridContainer.classList.remove("sticky-player");
+    // readPaneLeft.style.gridTemplateRows = "unset";
   }
 });
 

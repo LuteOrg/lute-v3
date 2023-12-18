@@ -55,6 +55,12 @@
 
     <tr>
       <td>
+        {{ form.status(class="form-control") }}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
         {{ form.current_image(class="form-control") }}
       </td>
     </tr>
@@ -67,12 +73,6 @@
           <li>{{ t.object_data }}</li>
           {% endfor %}
         </ul>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        {{ form.status(class="form-control") }}
       </td>
     </tr>
 

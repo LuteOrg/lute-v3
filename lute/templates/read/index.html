@@ -5,7 +5,7 @@
 {% block body %}
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/type.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/text-settings.js') }}" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
   <pre>
@@ -62,24 +62,24 @@
             <div id="type-control-container" class="hide-type">
               <div class="type-triangle"></div>
               <div class="type-control-size row">
-                <button class="btn row-elem type-minus">-</button>
+                <button class="btn row-elem type-minus" title="Decrease font size">-</button>
                 <input min="5" step="0.1" id="font-size">
-                <button class="btn row-elem type-plus">+</button>
+                <button class="btn row-elem type-plus" title="Increase font size">+</button>
               </div>
               <div class="type-control-lh row">
-                <button class="btn row-elem lh-minus">-</button>
+                <button class="btn row-elem lh-minus" title="Decrease line width">-</button>
                 <input min="1" max="5" step="0.1" id="line-height">
-                <button class="btn row-elem lh-plus">+</button>
+                <button class="btn row-elem lh-plus" title="Increase line width">+</button>
               </div>
               <div class="type-control-width row">
-                <button class="btn row-elem width-minus">-</button>
+                <button class="btn row-elem width-minus" title="Decrease content width">-</button>
                 <input min="10" max="90" step="5" id="content-width">
-                <button class="btn row-elem width-plus">+</button>
+                <button class="btn row-elem width-plus" title="Increase content width">+</button>
               </div>
               <div class="type-control-column row">
-                <button class="column-one column-btn">&#124;</button>
-                <button class="column-two column-btn">&#124;&#124;</button>
-                <button class="column-three column-btn">&#124;&#124;&#124;</button>
+                <button class="column-one column-btn" title="One column text">&#124;</button>
+                <button class="column-two column-btn" title="Two column text">&#124;&#124;</button>
+                <button class="column-three column-btn" title="Three column text">&#124;&#124;&#124;</button>
               </div>
             </div>
           </a>
@@ -134,14 +134,14 @@
           </div>
           <div class="audio-player-controls-container">
             <!-- <div class="skip-back-btn-container"> -->
-            <button id="skip-back-btn" class="audio-button"></button>
+            <button id="skip-back-btn" class="audio-button" title="Jump to start"></button>
             <!-- </div> -->
             <div class="rewind-container">
               <div class="rewind-btn-container">
-                <button id="rewind-btn" class="audio-button"></button>
-                <button id="ff-btn" class="audio-button"></button>
+                <button id="rewind-btn" class="audio-button" title="Rewind"></button>
+                <button id="ff-btn" class="audio-button" title="Fast forward"></button>
               </div>
-              <select name="rewind-option" id="rewind-option">
+              <select name="rewind-option" id="rewind-option" title="Rewind/FF by">
                 <option value="3">3 sec</option>
                 <option value="5" selected>5 sec</option>
                 <option value="10">10 sec</option>
@@ -150,7 +150,7 @@
               </select>
             </div>
             <!-- <div class="playback-rate-container"> -->
-            <button id="playback-rate-btn" class="audio-button"><span>1.0</span></button>
+            <button id="playback-rate-btn" class="audio-button" title="Playback speed. Scroll to change. Click to reset"><span>1.0</span></button>
             <!-- </div> -->
           </div>
         </div>
@@ -161,16 +161,16 @@
           <!-- </div> -->
           <div class="bookmark-buttons-container">
             <!-- <div class="bookmark-btn-container"> -->
-            <button id="bkm-save-btn" class="audio-button"></button>
+            <button id="bkm-save-btn" class="audio-button" title="Save/Delete bookmark"></button>
               <!-- <button id="bkm-delete-btn"></button> -->
             <!-- </div> -->
             <div class="bookmark-jump-container">
-              <button id="bkm-prev-btn" class="audio-button"></button>
-              <button id="bkm-next-btn" class="audio-button"></button>
+              <button id="bkm-prev-btn" class="audio-button" title="Jump to previous bookmark"></button>
+              <button id="bkm-next-btn" class="audio-button" title="Jump to next bookmark"></button>
             </div>
           </div>
         </div>
-        <button id="pin" class="audio-button"></button>
+        <button id="pin" class="audio-button" title="Toggle sticky mode"></button>
       </div>
     </div>
   
@@ -224,7 +224,9 @@
       </div>
   
     </div>
+    <div class="btm-margin-container"></div>
   </div>
+  <!-- <div class="left-btm-margin-container"></div> -->
   
   <div id="read_pane_right">
     <iframe
@@ -251,6 +253,7 @@
       Frame support required.
     </iframe>
   </div>
+  <!-- <div class="right-btm-margin-container"></div> -->
 </div>
 
 <script>
