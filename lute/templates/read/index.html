@@ -24,7 +24,7 @@
   <div id="reading-header">
 
     <div id="menuToggle" class="reading_header_left">
-      <input type="checkbox" />
+      <input name="hamburger_check" type="checkbox" />
       <span class="hamburger"></span>
       <span class="hamburger"></span>
       <span class="hamburger"></span>
@@ -33,7 +33,7 @@
         {% if book.source_uri %}
         <li><a href="{{ book.source_uri }}" target="_blank" tabindex="-1">Show source URL</a></li>
         {% endif %}
-        <li><a href="" onclick="edit_current_page(); return false;">Edit page</a></li>
+        <li><a id="editText" href="" onclick="edit_current_page(); return false;">Edit page</a></li>
         <li><a id="next_theme" onclick="next_theme(); return false;" title="Next theme">Next theme (m)</a></li>
         <li><a id="toggle_highlights" onclick="toggle_highlight(); return false;" title="Toggle highlights">Toggle highlights (h)</a></li>
         <li><a id="keyboard_shortcuts" title="Keyboard shortcuts">Keyboard shortcuts</a></li>
