@@ -10,6 +10,7 @@ body
     font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 /* Main container div for Lute site content. */
@@ -202,10 +203,121 @@ div#read_pane_right {
 }
 
 div#reading-header {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
     margin-bottom: 50px;
 }
 
+.reading_header_left {
+    width: fit-content;
+    margin-right: 20px;
+}
+
+.reading_header_right {
+    width: fit-content;
+    margin-right: 10px;
+}
+
+.reading_header_middle {
+    flex-grow: 1;
+}
+    
 /* End layouts *****************************************/
+
+/* Reader slide-in hamburger menu. *********************/
+/* Borrowed from code by Erik Terwan, MIT License. */
+
+#menuToggle
+{
+  z-index: 1;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* The menu checkbox, hidden but on top of the hamburger to intercept clicks. */
+#menuToggle input {
+  position: absolute;
+  display: block;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  opacity: 0; /* hide this */
+  z-index: 2; /* and place it over the hamburger */
+  -webkit-touch-callout: none;
+}
+
+/* The hamburger slices. */
+#menuToggle span.hamburger {
+  width: 20px;
+  height: 4px;
+  margin-left: 3px;
+  margin-bottom: 3px;
+  background: grey;
+  border-radius: 3px;
+  z-index: 1;
+  position: relative;
+  display: block;
+  transform-origin: 0px 0px;
+  transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+              background 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+              opacity 0.55s ease;
+}
+
+#menu {
+  position: absolute;
+  margin: 10px 0 0 -50px;
+  height: 100%;
+  padding: 15px;
+  padding-left: 50px;
+  z-index: 1;
+  border-right: 1px solid grey;
+  background-color: #FFFFFF;
+
+  list-style-type: none;
+  -webkit-font-smoothing: antialiased;
+  
+  transform-origin: 0% 0%;
+  transform: translate(-100%, 0);
+  transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+}
+
+#menu li {
+  padding: 5px 0;
+}
+
+/* Slide in menu when toggle clicked. */
+#menuToggle input:checked ~ ul {
+  transform: none;
+}
+
+#menuToggle span.hamburger:first-child {
+  transform-origin: 0% 0%;
+}
+
+#menuToggle span.hamburger:nth-last-child(2) {
+  transform-origin: 0% 100%;
+}
+
+/* Top slice rotates down. */
+#menuToggle input:checked ~ span.hamburger {
+  opacity: 1;
+  transform: rotate(45deg) translate(0px, 0px);
+}
+
+/* Hide middle slice. */
+#menuToggle input:checked ~ span.hamburger:nth-last-child(3) {
+  opacity: 0;
+  transform: rotate(0deg) scale(0, 0);
+}
+
+/* Bottom slice rotates up. */
+#menuToggle input:checked ~ span.hamburger:nth-last-child(2) {
+  transform: rotate(-45deg) translate(0px, -1px);
+}
+
+/* End reader slide-in hamburger menu. *********************/
+
 
 span.read_page_nav {
     color: #0000FF;

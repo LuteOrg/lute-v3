@@ -444,7 +444,7 @@ let show_translation = function(e) {
 
 
 /* Change to the next theme, and reload the page. */
-let next_theme = function(e) {
+function next_theme() {
   $.ajax({
     url: '/theme/next',
     type: 'post',
@@ -467,7 +467,7 @@ let next_theme = function(e) {
 
 
 /* Toggle highlighting, and reload the page. */
-let toggle_highlight = function(e) {
+function toggle_highlight() {
   $.ajax({
     url: '/theme/toggle_highlight',
     type: 'post',
@@ -527,8 +527,8 @@ function handle_keydown (e) {
   map[kDOWN] = () => increment_status_for_selected_elements(e, -1);
   map[kC] = () => handle_copy(e);
   map[kT] = () => show_translation(e);
-  map[kM] = () => next_theme(e);
-  map[kH] = () => toggle_highlight(e);
+  map[kM] = () => next_theme();
+  map[kH] = () => toggle_highlight();
   map[k1] = () => update_status_for_marked_elements(1);
   map[k2] = () => update_status_for_marked_elements(2);
   map[k3] = () => update_status_for_marked_elements(3);
