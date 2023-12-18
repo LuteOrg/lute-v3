@@ -15,7 +15,7 @@ This repo contains the source code for Lute v3.  Lute (Learning Using Texts) v3 
 
 ## Users
 
-To learn more about Lute v3, or to install it for your own use and study, please see the [Lute v3 manual](https://jzohrab.github.io/lute-manual/).  Hop onto the [Discord](https://badgen.net/badge/icon/discord?icon=discord&label) too.
+To learn more about Lute v3, or to install it for your own use and study, please see the [Lute v3 manual](https://jzohrab.github.io/lute-manual/).  Hop onto the [Discord](https://discord.gg/CzFUQP5m8u) too.
 
 ## Developing
 
