@@ -3,6 +3,8 @@ body {
   color: #262523; /* dark grey font */
 }
 
+ #reading_menu { background-color: #f8f1e2; }
+
  div#thetext p { line-height: 1.5; }
  span.textitem { font-family: Georgia; color: #262523; }
  /* span.status0 { background-color: transparent; } */

@@ -279,6 +279,7 @@ def when_change_content(luteclient, content):
     "Change the content."
     assert "Reading" in luteclient.browser.title, "sanity check"
     b = luteclient.browser
+    b.check("hamburger_check")
     b.find_by_id("editText").click()
     b.find_by_id("text").fill(content)
     b.find_by_id("submit").click()
