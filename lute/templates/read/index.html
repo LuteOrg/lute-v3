@@ -38,7 +38,14 @@
         <li><a id="toggle_highlights" onclick="toggle_highlight(); return false;" title="Toggle highlights">Toggle highlights (h)</a></li>
         <li><a id="keyboard_shortcuts" title="Keyboard shortcuts">Keyboard shortcuts</a></li>
       </ul>
+    </div>
 
+    <div id="menuToggle" class="reading_header_left">
+      <img
+        src="{{ url_for('static', filename='img/lute.png') }}"
+        class="lutelogo_small"
+        style="cursor: pointer"
+        onclick="window.location='/'" />
     </div>
 
     <div class="reading_header_middle">
