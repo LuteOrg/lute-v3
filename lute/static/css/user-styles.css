@@ -346,6 +346,18 @@ ul.shorttaglist {
   /* margin-bottom: 0.4rem; */
 }
 
+form td {
+    min-width: 100%;
+}
+
+table#term {
+    /* width: calc(100% - 2.3rem) !important; */
+    width: 100% !important;
+    /* border-bottom: 2px solid #d6edff; */
+    /* padding-right: 2.3rem; */
+    /* padding-bottom: 1.5rem !important; */
+}
+
 #submit {
   padding: 0.5rem 3rem;
   background-color: #8ce99a;

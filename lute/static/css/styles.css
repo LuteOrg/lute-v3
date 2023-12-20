@@ -738,9 +738,13 @@ NEED TO CLEAN UP LATER */
 }
 
 #text-options-container .btn {
-    border-radius: 50%;
+    border-radius: 5px;
     border: 2px solid aliceblue;
     font-weight: bold;
+
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 #text-options-container .row {
@@ -768,19 +772,6 @@ NEED TO CLEAN UP LATER */
     font-weight: bold;
 }
 
-/* #text-options-container .type-value { */
-    /* display: flex; */
-    /* align-items: center; */
-    /* width: 3.5rem; */
-    /* justify-content: center; */
-    /* background-color: #3c3c3c; */
-    /* background-color: #6e6e6e80; */
-    /* border-radius: 5px; */
-
-    /* padding-left: 0.5rem; */
-    /* padding-right: 0.5rem; */
-/* } */
-
 #text-options-container input {
     border-radius: 2px;
     border: none;
@@ -788,6 +779,36 @@ NEED TO CLEAN UP LATER */
     font-size: 1rem;
     font-family: inherit;
     text-align: center;
+}
+
+.font-plus {
+    background-image: url("/static/icn/font-increase.svg");
+}
+
+.font-minus {
+    background-image: url("/static/icn/font-decrease.svg");
+}
+
+.lh-plus {
+    background-image: url("/static/icn/line-spacing-increase.svg");
+}
+
+.lh-minus {
+    background-image: url("/static/icn/line-spacing-decrease.svg");
+}
+
+.width-plus {
+    background-image: url("/static/icn/caret-right.svg");
+}
+
+.width-minus {
+    background-image: url("/static/icn/caret-left.svg");
+}
+
+/* thetext */
+#thetext,
+#thetexttitle {
+    padding-right: 2rem;
 }
 
 /* remove all whitespace that gets left 
@@ -842,10 +863,6 @@ div#read_pane_right {
     position: static;
     width: 100%;
     height: 100%;
-    /* height: max(100%, 100vh - 140px); */
-    /* height: 100vh; */
-    /* height: unset; */
-    /* height: max(100%, calc(100vh - 130px)); */
 
     box-sizing: border-box;
     
@@ -866,18 +883,6 @@ div#read_pane_right {
     /* height: calc(100% - 20px) !important; */
     height: 100% !important;
     align-self: end;
-}
-
-form td {
-    min-width: 100%;
-}
-
-table#term {
-    /* width: calc(100% - 2.3rem) !important; */
-    width: 100% !important;
-    /* border-bottom: 2px solid #d6edff; */
-    /* padding-right: 2.3rem; */
-    /* padding-bottom: 1.5rem !important; */
 }
 
 /* move the image left instead of right */

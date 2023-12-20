@@ -33,11 +33,11 @@ const domObserver = new MutationObserver((mutationList, observer) => {
 
   fontDefault = getFontSize(textItems[0]);
   lhDefault = getLineHeight(textItems[0]);
-  widthDefault = getTextWidth();
+  widthDefault = getTextWidthPercentage();
   columnDefault = getColumnCount();
 
   const fontSize = getFromLocalStorage("fontSize", fontDefault);
-  const lhSize = getFromLocalStorage("lineWidth", lhDefault);
+  const lhSize = getFromLocalStorage("lineHeight", lhDefault);
   const width = getFromLocalStorage("textWidth", widthDefault);
   const columnCount = getFromLocalStorage("columnCount", columnDefault);
 
@@ -48,10 +48,10 @@ const domObserver = new MutationObserver((mutationList, observer) => {
   textItems.forEach((item) => {
     setFontSize(item, `${convertPixelsToRem(fontSize)}rem`);
     setLineHeight(item, Number(lhSize.toPrecision(2)));
-  })
+  });
 
   readPaneLeft.style.width = `${width}%`;
-  readPaneRight.style.width = `${(100 - width) * getReadGridWidthRatio()}%`;
+  readPaneRight.style.width = `${(100 - width) * getReadPaneWidthRatio()}%`;
   theText.style.columnCount = columnCount;
 
   observer.disconnect();
@@ -59,59 +59,58 @@ const domObserver = new MutationObserver((mutationList, observer) => {
 
 domObserver.observe(theText, {childList: true, subtree: true});
 
-textButton.addEventListener("click", (e)=> {
+textButton.addEventListener("click", ()=> {
   textOptionsContainer.classList.toggle("hide-text-options");
-})
+});
 
 // stop propagation so clicking anything inside the popup
 // doesn't trigger text button click event
 textOptionsContainer.addEventListener("click", (e)=> {
   e.stopPropagation();
-  // e.preventDefault();
-})
+});
 
 // clicking away closes the popup
 document.addEventListener("click", (e) => {
   if (!e.target.closest("#text-options-btn")) {
     textOptionsContainer.classList.add("hide-text-options");
   }
-})
+});
 
 fontPlusButton.addEventListener("click", () => {
-  resizeFont("+")
-})
+  resizeFont("+");
+});
 
 fontMinusButton.addEventListener("click", () => {
-  resizeFont("-")
-})
+  resizeFont("-");
+});
 
 lhPlusButton.addEventListener("click", () => {
   resizeLineHeight("+");
-})
+});
 
 lhMinusButton.addEventListener("click", () => {
   resizeLineHeight("-");
-})
+});
 
 widthPlusButton.addEventListener("click", () => {
   changeTextWidth("+");
-})
+});
 
 widthMinusButton.addEventListener("click", () => {
   changeTextWidth("-");
-})
+});
 
 oneColButton.addEventListener("click", () => {
   changeColumnCount(1);
-})
+});
 
 twoColButton.addEventListener("click", () => {
   changeColumnCount(2);
-})
+});
 
 threeColButton.addEventListener("click", () => {
   changeColumnCount(3);
-})
+});
 
 function changeColumnCount(num) {
   theText.style.columnCount = num;
@@ -125,10 +124,10 @@ fontField.addEventListener("change", (e) => {
 
   textItems.forEach((item) => {
     setFontSize(item, `${convertPixelsToRem(size)}rem`);
-  })
+  });
 
   localStorage.setItem("fontSize", size);
-})
+});
 
 lhField.addEventListener("change", (e) => {
   let size = parseFloat(e.target.value);
@@ -137,10 +136,10 @@ lhField.addEventListener("change", (e) => {
 
   textItems.forEach((item) => {
     setLineHeight(item, size);
-  })
+  });
 
-  localStorage.setItem("lineWidth", size.toPrecision(2));
-})
+  localStorage.setItem("lineHeight", size.toPrecision(2));
+});
 
 widthField.addEventListener("change", (e) => {
   let size = parseFloat(e.target.value);
@@ -148,10 +147,10 @@ widthField.addEventListener("change", (e) => {
   e.target.value = `${size}%`;
 
   readPaneLeft.style.width = `${size}%`;
-  readPaneRight.style.width = `${(100 - size) * getReadGridWidthRatio()}%`;
+  readPaneRight.style.width = `${(100 - size) * getReadPaneWidthRatio()}%`;
 
   localStorage.setItem("textWidth", size);
-})
+});
 
 function getFontSize(element) {
   const elementComputedStyle = window.getComputedStyle(element);
@@ -164,9 +163,11 @@ function getLineHeight(element) {
   // return parseFloat(elementComputedStyle.marginBottom);
 }
 
-function getTextWidth() {
+function getTextWidthPercentage() {
+  // returns percentage value
   const elementComputedStyle = window.getComputedStyle(readPaneLeft);
-  return parseFloat(elementComputedStyle.width);
+  return (parseFloat(elementComputedStyle.getPropertyValue("width")) / parseFloat(window.getComputedStyle(readPaneContainer).getPropertyValue("width"))) * 100;
+  // return parseFloat(elementComputedStyle.width);
 }
 
 function getColumnCount() {
@@ -184,26 +185,30 @@ function setLineHeight(element, size) {
 }
 
 function resizeLineHeight(operation) {
-  const currentSize = getFromLocalStorage("lineWidth", lhDefault);
+  const currentSize = getFromLocalStorage("lineHeight", lhDefault);
   const add = (operation === "+");
   let newSize = add ? currentSize + 0.1 : currentSize - 0.1;
   newSize = clamp(newSize, 1, 5);
 
   textItems.forEach((item) => {
     setLineHeight(item, Number(newSize.toPrecision(2)));
-  })
+  });
 
   lhField.value = Number(newSize.toPrecision(2)).toFixed(1);
-  localStorage.setItem("lineWidth", newSize.toPrecision(2));
+  localStorage.setItem("lineHeight", newSize.toPrecision(2));
 }
 
 function resizeFont(operation) {
-  const currentSize = getFromLocalStorage("fontSize", fontDefault)
+  const currentSize = getFromLocalStorage("fontSize", fontDefault);
   const add = (operation === "+");
-  const newSize = add ? currentSize + 1 : currentSize - 1;
+  let newSize = add ? currentSize + 1 : currentSize - 1;
+  console.log(newSize);
+  newSize = clamp(newSize, 1, 50);
+  console.log(newSize);
+
   textItems.forEach((item) => {
     setFontSize(item, `${convertPixelsToRem(newSize)}rem`);
-  })
+  });
 
   fontField.value = `${newSize}px`;
   localStorage.setItem("fontSize", newSize);
@@ -218,7 +223,7 @@ function changeTextWidth(operation) {
   newWidth = clamp(newWidth, 25, 75);
 
   readPaneLeft.style.width = `${newWidth}%`;
-  readPaneRight.style.width = `${(100 - newWidth) * getReadGridWidthRatio()}%`;
+  readPaneRight.style.width = `${(100 - newWidth) * getReadPaneWidthRatio()}%`;
 
   widthField.value = `${Math.round(newWidth)}%`;
   localStorage.setItem("textWidth", newWidth);
@@ -233,22 +238,21 @@ function convertPixelsToRem(sizePx) {
 function getFromLocalStorage(item, defaultVal) {
   // return Number(localStorage.getItem(item) ?? defaultVal);
   const storageVal = localStorage.getItem(item);
-  if (!storageVal) return Number(defaultVal);
-  else return Number(storageVal);
+  
+  if ((!storageVal) || isNaN(storageVal)) {
+    return Number(defaultVal);
+  } else {
+    return Number(storageVal);
+  }
 }
 
-// function convertWidthValueToPercentage() {
-//   const [x, y] = getTextWidth(readPaneContainer);
-//   return x / (x + y) * 100;
-// }
-
 function clamp (num, min, max) {
-  return Math.min(Math.max(num, min), max)
-};
+  return Math.min(Math.max(num, min), max);
+}
 
 // because right side is fixed. it's width value is different. need to find ratio
 // basically: when gridContainer width is 100%, this doesn't mean that it takes the whole 
 // viewport width. it can be less than that. but for the right side it's an absolute percentage value
-function getReadGridWidthRatio() {
+function getReadPaneWidthRatio() {
   return parseFloat(window.getComputedStyle(readPaneContainer).getPropertyValue("width")) / parseFloat(document.documentElement.clientWidth);
 }
