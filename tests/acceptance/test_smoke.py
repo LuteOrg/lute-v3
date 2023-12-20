@@ -6,6 +6,7 @@ Smoke tests.
 def test_smoke_test(chromebrowser, luteclient):
     "Hit the main page, create a book, update a term."
     luteclient.visit("/")
+    luteclient.clear_book_filter()
     assert chromebrowser.is_text_present("Lute"), "have main page."
     luteclient.make_book("Hola", "Hola. Adios amigo.", "Spanish")
     assert chromebrowser.title == 'Reading "Hola"', "title"
@@ -26,6 +27,7 @@ def test_unsupported_language_not_shown(luteclient, _restore_jp_parser):
 
     luteclient.change_parser_registry_key("japanese", "disabled_japanese")
     luteclient.visit("/")
+    luteclient.clear_book_filter()
     assert not luteclient.browser.is_text_present("Japanese"), "no Japanese demo book."
     assert luteclient.browser.is_text_present(
         "Tutorial"

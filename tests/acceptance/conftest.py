@@ -139,6 +139,7 @@ def given_running_site(luteclient):
     resp = requests.get(luteclient.home, timeout=5)
     assert resp.status_code == 200, f"{luteclient.home} is up"
     luteclient.visit("/")
+    luteclient.clear_book_filter()
     assert luteclient.browser.is_text_present("Lute")
 
 
@@ -188,7 +189,17 @@ def given_demo_langs_loaded(luteclient):
 
 @given("the demo stories are loaded")
 def given_demo_stories_loaded(luteclient):
+    "Load the demo stories."
     luteclient.load_demo_stories()
+    luteclient.visit("/")
+    luteclient.clear_book_filter()
+
+
+@given("I clear the book filter")
+def given_clear_book_filter(luteclient):
+    "clear filter."
+    luteclient.visit("/")
+    luteclient.clear_book_filter()
 
 
 @given(parsers.parse("I update the {lang} language:\n{content}"))
