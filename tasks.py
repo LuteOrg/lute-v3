@@ -206,7 +206,15 @@ def black(c):
     c.run("python -m black .")
 
 
-@task(pre=[test, accept, playwright, black, lint])
+@task(pre=[test, accept, playwright])
+def fulltest(c):  # pylint: disable=unused-argument
+    """
+    Run full tests check.
+    """
+    print("Done.")
+
+
+@task(pre=[fulltest, black, lint])
 def full(c):  # pylint: disable=unused-argument
     """
     Run full check and lint.
@@ -215,6 +223,7 @@ def full(c):  # pylint: disable=unused-argument
 
 
 ns = Collection()
+ns.add_task(fulltest)
 ns.add_task(full)
 ns.add_task(lint)
 ns.add_task(test)
