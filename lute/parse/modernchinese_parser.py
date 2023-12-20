@@ -1,31 +1,61 @@
+"""
+Parsing modern chinese with hanlp,
+which requires PyTorch、TensorFlow, so it's not supported by default until installed hanlp by pip.
+https://github.com/hankcs/HanLP/tree/master
+about the model path configuration
+https://hanlp.hankcs.com/docs/configure.html
+"""
 from typing import List
+from functools import lru_cache
+
 from lute.parse.base import AbstractParser
 from lute.parse.base import ParsedToken
-from functools import lru_cache
-import pkuseg
 
-# Chinese Punctuation using to determine if a token is a word.
 CHINESE_PUNCTUATIONS = (
-    r"！？｡＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏.\n"
+    r"！？｡。＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏.\n"
 )
 
 
 class ModernChineseParser(AbstractParser):
     """
-    Using pkuseg to parsing the chinese
-    https://github.com/lancopku/pkuseg-python
+    Using hanlp for parsing modern Chinese,
+    if the user don't install hanlp, the parser is not supported.
+    https://github.com/hankcs/HanLP/blob/doc-zh/plugins/hanlp_demo/hanlp_demo/zh/tok_stl.ipynb
     """
 
-    _seg = pkuseg.pkuseg()
+    _seg = None
+
+    @classmethod
+    @lru_cache()
+    def is_supported(cls):
+        """
+        Using lru_cache to make the test execution run fast,
+        otherwise the test execution will run very slowly,
+        the process of checking whether the hanlp package is installed can be slow.
+        """
+        _res = False
+        try:
+            import hanlp
+
+            ModernChineseParser._seg = hanlp.load(
+                hanlp.pretrained.tok.FINE_ELECTRA_SMALL_ZH
+            )
+            _res = True
+        except ImportError as _:
+            pass
+        return _res
 
     @classmethod
     def name(cls):
         return "ModernChinese"
 
     @lru_cache()
-    def _parse_para(self, para_text):
+    def parse_para(self, para_text):
+        """
+        Parsing the paragraph using hanlp
+        """
         para_result = []
-        for tok in ModernChineseParser._seg.cut(para_text):
+        for tok in ModernChineseParser._seg(para_text):
             is_word = tok not in CHINESE_PUNCTUATIONS
             para_result.append((tok, is_word))
         return para_result
@@ -33,12 +63,17 @@ class ModernChineseParser(AbstractParser):
     @lru_cache()
     def get_parsed_tokens(self, text: str, language) -> List:
         """
-        using lru_cache for caching the parsed result
+        Parsing the text by paragraph, then generate the ParsedToken List,
+        for the correct token order.
+        cached the parsed result
         """
         tokens = []
         for para in text.split("\n"):
             para = para.strip()
-            tokens.extend(self._parse_para(para))
+            tokens.extend(self.parse_para(para))
             tokens.append(["¶", False])
+        # Remove the trailing ¶
+        # by stripping it from the result
+        tokens.pop()
 
         return [ParsedToken(tok, is_word, tok == "¶") for tok, is_word in tokens]

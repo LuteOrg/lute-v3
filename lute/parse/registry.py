@@ -3,6 +3,7 @@ Parser registry.
 
 List of available parsers.
 """
+from functools import lru_cache
 
 from lute.parse.base import AbstractParser
 from lute.parse.space_delimited_parser import SpaceDelimitedParser, TurkishParser
@@ -30,7 +31,7 @@ def _supported_parsers():
     return ret
 
 
-# @lru_cache()
+@lru_cache()
 def get_parser(parser_name) -> AbstractParser:
     "Return the supported parser with the given name."
     if parser_name in _supported_parsers():
