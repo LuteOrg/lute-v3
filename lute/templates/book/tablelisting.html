@@ -15,9 +15,12 @@
 </form>
 
 <script>
-  
+
+  /* The book listing. */
+  var book_listing_table;
+
   let setup_text_datatable = function(initial_search) {
-    var table = $('#booktable').DataTable({
+    book_listing_table = $('#booktable').DataTable({
       {% if status != 'Archived' %}
       "language": {
             "emptyTable": "No books available. <a href='/book/new'>Create one?</a>"
@@ -32,6 +35,7 @@
       searching: true,
       processing: true,
       serverSide: true,
+      stateSave: true,
       search: { search: initial_search },
       columnDefs: [
         {
@@ -156,4 +160,16 @@
     do_action_post('delete', bookid);
   }
 
+  /**
+   * Clearing the state is required for acceptance tests,
+   * because otherwise state is accidentally applied to
+   * following tests, messing up test results.
+   * I tried various things such as setting and clearing
+   * the filter input box, but this was the only method
+   * that worked reliably.
+   * This is called from the lute_test_client.py.
+   */
+  function clear_datatable_state() {
+    book_listing_table.state.clear();
+  }
 </script>
