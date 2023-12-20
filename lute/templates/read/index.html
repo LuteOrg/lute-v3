@@ -234,20 +234,35 @@
 
 <script>
   $(document).ready(function () {
-    goto_relative_page(0);
-    initialize_player();
+    show_player();
+    goto_relative_page(0, true);
   });
 
-  // If book_audio_file is not null, stream the file.
-  let initialize_player = function() {
+  /**
+   * If book_audio_file is not null, set up the player.
+   *
+   * Don't actually load the source -- for some reason,
+   * the ajax page load was causing the audio src to
+   * only load occasionally!  Not sure why.  Source loading
+   * is handled in load_player_source().
+   */
+  let show_player = function() {
     const have_file = ($('#book_audio_file').val() != '');
-    if (!have_file) {
-      return;
+    if (have_file) {
+      $('div.audio-player-container').show();
     }
+  }
 
-    $('div.audio-player-container').show();
-    t = parseFloat($('#book_audio_current_pos').val());
+  /**
+   * Actually set the player source, loading the file,
+   * and load all bookmarks etc.
+   */
+  let load_player_source = function() {
     const book_id = $('#book_id').val();
+    // console.log('setting source to ' + `/useraudio/stream/${book_id}`);
+    player.src = `/useraudio/stream/${book_id}`;
+
+    t = parseFloat($('#book_audio_current_pos').val());
     player.currentTime = t;
     timeline.value = t;
 
@@ -260,7 +275,6 @@
       bookmarksArray.push(b);
     }
 
-    player.src = `/useraudio/stream/${book_id}`;
     start_player_post_loop();
   };
 
@@ -320,8 +334,16 @@
   };
 
 
-  // Go to page relative to that stored in page_num input.
-  function goto_relative_page(p) {
+  /**
+   * Go to page relative to that stored in page_num input.
+   *
+   * On first load of page, load_source_file is set to true.
+   * It appears that for Firefox the player source can't be set
+   * while the page content is being ajax'd in.  This makes
+   * _NO SENSE AT ALL_ but moving the player source loading
+   * to the ajax "success" function worked.  ???
+   */
+  function goto_relative_page(p, load_source_file = false) {
     const bookid = $('#book_id').val();
     const pagenum = parseInt($('#page_num').val());
     const maxpage = parseInt($('#page_count').val());
@@ -344,6 +366,12 @@
         set_page_fraction();
         set_footer_control_visibility();
         show_hide_title(relpage);
+
+        // Magic hack for player source to load consistently
+        // in Firefox.
+        if (load_source_file) {
+          load_player_source();
+        }
       }
     );
   }
