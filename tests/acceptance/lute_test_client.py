@@ -44,6 +44,8 @@ class LuteTestClient:
     def load_demo_stories(self):
         "Load the demo stories."
         self.visit("dev_api/load_demo_stories")
+        self.visit("/")
+        self.clear_book_filter()
 
     def change_parser_registry_key(self, key, replacement):
         """
@@ -66,6 +68,11 @@ class LuteTestClient:
     def index(self):
         "Go to home page."
         self.browser.visit("")
+
+    def clear_book_filter(self):
+        "Clear all state.  Normally state is saved."
+        self.browser.execute_script("clear_datatable_state()")
+        time.sleep(0.1)
 
     def click_link(self, linktext):
         self.browser.links.find_by_text(linktext).click()
