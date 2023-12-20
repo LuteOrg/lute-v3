@@ -1,4 +1,4 @@
-#read_grid_container {
+#read_pane_container {
   --player-height: 130px;
   /*compact*/
   /* --player-height: 92px;  */
@@ -337,7 +337,7 @@
 }
 
 /* long selector for higher specificity */
-/* #read_grid_container.sticky-player { */
+/* #read_pane_container.sticky-player { */
   /* /~ margin-bottom: 140px; ~/ */
   /* /~ height: calc(100% + 120px); ~/ */
   /* grid-template-rows: max(calc(100% - var(--player-height)), calc(100vh - var(--player-height))); */

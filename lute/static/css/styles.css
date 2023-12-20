@@ -800,9 +800,9 @@ when font is very small */
 /* read page layout*/
 /* *********** */
 
-#read_grid_container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+#read_pane_container {
+    /* display: grid; */
+    /* grid-template-columns: 1fr 1fr; */
     /* height: 100vh; */
     /* height: calc(100vh + 160px); */
     /* grid-template-rows: unset; */
@@ -810,8 +810,10 @@ when font is very small */
 
     /* --read-grid-width: 95%;  */
     --read-grid-margin: 2.5%; /*(100 - 95) / 2 -> do not use calc here. does not work*/
-    width: var(--read-grid-width);
-    margin: 0 auto;
+    /* width: var(--read-grid-width); */
+    /* margin: 0 auto; */
+
+    width: 100%;
 }
 
 #reading-header,
@@ -827,7 +829,7 @@ when font is very small */
 }
 
 div#read_pane_left {
-    width: 100%;
+    width: 50%;
 }
 
 div#read_pane_right {

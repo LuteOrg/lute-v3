@@ -54,7 +54,7 @@ div#read_pane_right > * {
 
 div#read_pane_left {
   margin-top: 1.4rem;
-  width: 96%;
+  /* width: 96%; */
 }
 
 div#reading-header {
