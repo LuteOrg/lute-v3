@@ -16,8 +16,7 @@
   --button-size-small: 28px;
   --button-size-big: 64px;
 
-  position: relative; 
-  z-index: 999;
+  position: relative;
 }
 
 .audio-player-top-container {
