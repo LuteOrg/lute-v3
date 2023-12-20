@@ -444,7 +444,7 @@ let show_translation = function(e) {
 
 
 /* Change to the next theme, and reload the page. */
-let next_theme = function(e) {
+function next_theme() {
   $.ajax({
     url: '/theme/next',
     type: 'post',
@@ -467,7 +467,7 @@ let next_theme = function(e) {
 
 
 /* Toggle highlighting, and reload the page. */
-let toggle_highlight = function(e) {
+function toggle_highlight() {
   $.ajax({
     url: '/theme/toggle_highlight',
     type: 'post',
@@ -523,12 +523,12 @@ function handle_keydown (e) {
   map[kEND] = () => set_cursor(maxindex);
   map[kLEFT] = () => move_cursor(-1, e);
   map[kRIGHT] = () => move_cursor(+1, e);
-  map[kUP] = () => increment_status_for_marked_elements(+1);
-  map[kDOWN] = () => increment_status_for_marked_elements(-1);
+  map[kUP] = () => increment_status_for_selected_elements(e, +1);
+  map[kDOWN] = () => increment_status_for_selected_elements(e, -1);
   map[kC] = () => handle_copy(e);
   map[kT] = () => show_translation(e);
-  map[kM] = () => next_theme(e);
-  map[kH] = () => toggle_highlight(e);
+  map[kM] = () => next_theme();
+  map[kH] = () => toggle_highlight();
   map[k1] = () => update_status_for_marked_elements(1);
   map[k2] = () => update_status_for_marked_elements(2);
   map[k3] = () => update_status_for_marked_elements(3);
@@ -629,9 +629,27 @@ function update_status_for_elements(new_status, elements) {
 
 }
 
-function increment_status_for_marked_elements(shiftBy) {
+
+/**
+ * Change status using arrow keys for *select* (clicked) elements only,
+ * *not* hovered elements.
+ *
+ * When hovering, clicking an arrow should just scroll the screen, because
+ * the user is *kind of passively* viewing content.
+ * If the user has clicked on an element (or used arrow keys), they're actively
+ * focused on it.
+ */
+function increment_status_for_selected_elements(e, shiftBy) {
+  const elements = Array.from(document.querySelectorAll('span.kwordmarked'));
+  if (elements.length == 0)
+    return;
+
+  // Don't scroll screen.  If screen scrolling happens, then pressing
+  // "up" will both scroll up *and* change the status the selected term,
+  // which is odd.
+  e.preventDefault();
+
   const validStatuses = ['status0', 'status1', 'status2', 'status3', 'status4', 'status5', 'status99'];
-  const elements = Array.from(document.querySelectorAll('span.kwordmarked, span.wordhover'));
 
   // Build payloads to update for each unique status that will be changing
   let payloads = {};

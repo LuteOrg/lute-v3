@@ -3,6 +3,8 @@ body {
   color: #c4c8ce; /* light grey font */
 }
 
+#reading_menu { background-color: #48484a; }
+
 .flash-notice {
   background-color: #b46b7a;
 }
