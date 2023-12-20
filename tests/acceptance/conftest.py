@@ -195,6 +195,13 @@ def given_demo_stories_loaded(luteclient):
     luteclient.clear_book_filter()
 
 
+@given("I clear the book filter")
+def given_clear_book_filter(luteclient):
+    "clear filter."
+    luteclient.visit("/")
+    luteclient.clear_book_filter()
+
+
 @given(parsers.parse("I update the {lang} language:\n{content}"))
 def given_update_language(luteclient, lang, content):
     "Content is assumed to be yaml."

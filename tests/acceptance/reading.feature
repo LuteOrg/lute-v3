@@ -105,6 +105,7 @@ Feature: User can actually read and stuff.
         When I click the "Tutorial" link
         And I click the footer next page
         Given I visit "/"
+        And I clear the book filter
         And the book table loads "Tutorial"
         Then the page contains "Tutorial (2/"
 
