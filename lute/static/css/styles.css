@@ -58,9 +58,6 @@ a.home-link:hover {
     flex: 1; /* Allow the title to take up remaining space */
 }
 
-#luteTitle {
-}
-
 p.version {
     margin: 0px;
     font-size: 0.6em;
@@ -193,6 +190,7 @@ div#read_pane_left {
     width: 50%;
 }
 
+/* TODO verify change. -- overridden below */
 div#read_pane_right {
     width: 50%;
     position: fixed;
@@ -200,6 +198,23 @@ div#read_pane_right {
     right: 0;
     height: 95%;
 }
+
+/* TODO verify change. */
+div#read_pane_right {
+    display: grid;
+    grid-template-rows: 18rem 1fr;
+    position: static;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    position: fixed;
+    /* different width and right values because #container width=95% */
+    right: var(--read-grid-margin);
+    width: calc(50% - var(--read-grid-margin));
+    height: 100%;
+    top: 0;
+}
+
 
 div#reading-header {
     display: flex;
@@ -343,15 +358,26 @@ input[type=text]
     opacity: 1; /* Firefox */
 }
 
+/* TODO verify change. */
+div#thetexttitle {
+    padding-right: 2rem;
+}
+
 div#thetext {
     margin-left: 20px;
     margin-right: 20px;
+    /* TODO verify change - this was in a new #thetext {} entry in the branch. */
+    padding-right: 2rem;
 }
 
 div#thetext p {
     line-height: 1.25;
     margin-top: 1em;
     margin-bottom: 1em;
+
+    /* TODO verify change. */
+    /* remove all whitespace that gets left when font is very small */
+    font-size: 0;
 }
 
 table#text
@@ -528,23 +554,7 @@ span.status5
     color: #000000;
 }
 
-span.status99
-{
-   /* no styling, just regular text.
-   background-color: #F8F8F8;
-   border-bottom: solid 2px #CCFFCC;
-   color: #000000;
-   */
-}
- 
-span.status98
-{
-   /* no styling, just regular text.
-   background-color: #F8F8F8;
-   border-bottom: dashed 1px #000000;
-   color: #000000;
-   */
-}
+/* span.status99, span.status98 have no styles, just regular text. */
 
 span.hasflash:after {
     content: "*";
@@ -793,3 +803,165 @@ div.code pre {
 /* Stats. */
 
 table.statsWordsRead th, td { padding: 5px; }
+
+
+/********************************
+ * Type controls menu
+ */
+
+#text-options-btn img {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+#text-options-container.hide-text-options {
+    opacity: 0;
+    user-select: none;
+    pointer-events: none;
+}
+
+#text-options-btn {
+    position: relative;
+}
+
+#text-options-container {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translate(-50%, 40px);
+    display: grid;
+    background-color: #a6c4dc;
+    padding: 0.7rem;
+    padding-top: 1.3rem;
+    row-gap: 0.3rem;
+    border-radius: 5px;
+
+    transition: all .2s;
+    z-index: 9999;
+    /* opacity: 0.95; */
+}
+
+.text-options-triangle {
+    width: 0;
+    height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-bottom: 20px solid #a6c4dc;
+
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+#text-options-container .row-elem {
+    width: 32px;
+    height: 32px;
+}
+
+#text-options-container .btn {
+    border-radius: 5px;
+    border: 2px solid aliceblue;
+    font-weight: bold;
+
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#text-options-container .row {
+    display: grid;
+    grid-template-columns: 1fr 4.7rem 1fr;
+    column-gap: .5rem;
+}
+
+#text-options-container div.text-options-column {
+    display: flex;
+    justify-content: center;
+    gap: 0.2rem;
+}
+
+.text-options-width {
+    margin-bottom: 0.3rem;
+}
+
+.column-btn {
+    width: max(40px, 100%);
+    height: 2rem;
+
+    border: 2px solid aliceblue;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+#text-options-container input {
+    border-radius: 2px;
+    border: none;
+    background-color: aliceblue;
+    font-size: 1rem;
+    font-family: inherit;
+    text-align: center;
+}
+
+.font-plus {
+    background-image: url("/static/icn/font-increase.svg");
+}
+
+.font-minus {
+    background-image: url("/static/icn/font-decrease.svg");
+}
+
+.lh-plus {
+    background-image: url("/static/icn/line-spacing-increase.svg");
+}
+
+.lh-minus {
+    background-image: url("/static/icn/line-spacing-decrease.svg");
+}
+
+.width-plus {
+    background-image: url("/static/icn/caret-right.svg");
+}
+
+.width-minus {
+    background-image: url("/static/icn/caret-left.svg");
+}
+
+/*********************************
+ * read page layout
+ */
+
+#read_pane_container {
+    /* TODO verify change: removed commented out cruft. */
+    --read-grid-margin: 2.5%; /*(100 - 95) / 2 -> do not use calc here. does not work*/
+    width: 100%;
+}
+
+#reading-header,
+#reading-header-left {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-items: baseline;
+}
+
+#reading-header-left {
+    width: 200px;
+}
+
+#wordframeid {
+    height: 100% !important;
+}
+
+#dictframeid {
+    /* calc for crawlbar */
+    /* height: calc(100% - 20px) !important; */
+    height: 100% !important;
+    align-self: end;
+}
+
+/* move the image left instead of right */
+.zoomableTermImage:hover {
+    transform: scale(10) translate(-10px) !important;
+}
