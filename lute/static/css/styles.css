@@ -190,16 +190,6 @@ div#read_pane_left {
     width: 50%;
 }
 
-/* TODO verify change. -- overridden below */
-div#read_pane_right {
-    width: 50%;
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 95%;
-}
-
-/* TODO verify change. */
 div#read_pane_right {
     display: grid;
     grid-template-rows: 18rem 1fr;
@@ -358,15 +348,13 @@ input[type=text]
     opacity: 1; /* Firefox */
 }
 
-/* TODO verify change. */
-div#thetexttitle {
+#thetexttitle {
     padding-right: 2rem;
 }
 
 div#thetext {
     margin-left: 20px;
     margin-right: 20px;
-    /* TODO verify change - this was in a new #thetext {} entry in the branch. */
     padding-right: 2rem;
 }
 
@@ -374,9 +362,6 @@ div#thetext p {
     line-height: 1.25;
     margin-top: 1em;
     margin-bottom: 1em;
-
-    /* TODO verify change. */
-    /* remove all whitespace that gets left when font is very small */
     font-size: 0;
 }
 
@@ -943,7 +928,6 @@ table.statsWordsRead th, td { padding: 5px; }
  */
 
 #read_pane_container {
-    /* TODO verify change: removed commented out cruft. */
     --read-grid-margin: 2.5%; /*(100 - 95) / 2 -> do not use calc here. does not work*/
     width: 100%;
 }
