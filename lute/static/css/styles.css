@@ -923,6 +923,14 @@ table.statsWordsRead th, td { padding: 5px; }
     background-image: url("/static/icn/caret-left.svg");
 }
 
+.column-one {
+    background-image: url("/static/icn/text-column-one.svg");
+}
+
+.column-two {
+    background-image: url("/static/icn/text-column-two.svg");
+}
+
 /*********************************
  * read page layout
  */
