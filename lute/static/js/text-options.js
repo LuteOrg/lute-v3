@@ -44,8 +44,6 @@ const domObserver = new MutationObserver((mutationList, observer) => {
   readPaneLeft.style.width = `${width}%`;
   readPaneRight.style.width = `${(100 - width) * getReadPaneWidthRatio()}%`;
   theText.style.columnCount = columnCount;
-
-  observer.disconnect();
 });
 
 domObserver.observe(theText, {childList: true, subtree: true});
