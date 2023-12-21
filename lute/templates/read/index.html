@@ -27,7 +27,7 @@
   <div id="reading-header">
 
     <div id="menuToggle" class="reading_header_left">
-      <input name="hamburger_check" type="checkbox" />
+      <input id="menu_hamburger_check" name="hamburger_check" type="checkbox" />
       <span class="hamburger"></span>
       <span class="hamburger"></span>
       <span class="hamburger"></span>
@@ -253,6 +253,17 @@
       $('div.audio-player-container').show();
     }
     goto_relative_page(0, true);
+
+    // If the css slide-in menu is open, clicking away from it closes the menu.
+    // The menu is handled via css, so we have to update the checkbox state.
+    $(document).click(function(event) {
+      const target = $(event.target);
+      const menu_clicked = (target.closest('#menuToggle').length != 0);
+      const menu_open = $('#menu_hamburger_check').is(':checked');
+      if(menu_open && !menu_clicked) {
+        $('#menu_hamburger_check').prop("checked", false);
+      }
+    });
   });
 
 
