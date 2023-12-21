@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 23.0.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 800 800" style="enable-background:new 0 0 800 800;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#212121;}
+</style>
+<g id="SVGRepo_bgCarrier">
+</g>
+<g id="SVGRepo_tracerCarrier">
+</g>
+<title>ic_fluent_text_line_spacing_24_regular</title>
+<desc>Created with Sketch.</desc>
+<g>
+	<g id="ic_fluent_text_line_spacing_24_regular">
+		<path class="st0" d="M608.3,675V518.7l-24,24c-9.8,9.8-25.6,9.8-35.4,0c-9.8-9.8-9.8-25.6,0-35.4l66.7-66.7
+			c2.4-2.4,5.2-4.2,8.1-5.4c2.9-1.2,6.2-1.9,9.6-1.9l0,0l1.3,0c2.9,0.1,5.7,0.8,8.3,1.9c2.9,1.2,5.7,3,8.1,5.4l66.7,66.7
+			c9.8,9.8,9.8,25.6,0,35.4c-9.8,9.8-25.6,9.8-35.4,0l-24-24V675c0,13.8-11.2,25-25,25S608.3,688.8,608.3,675z"/>
+		<path class="st0" d="M375,540c13.8,0,25,11.2,25,25c0,12.7-9.4,23.1-21.6,24.8L375,590H91.7c-13.8,0-25-11.2-25-25
+			c0-12.7,9.4-23.1,21.6-24.8l3.4-0.2H375z"/>
+		<path class="st0" d="M475,383.3c13.8,0,25,11.2,25,25c0,13.8-11.2,25-25,25H91.7c-13.8,0-25-11.2-25-25c0-13.8,11.2-25,25-25H475z
+			"/>
+		<path class="st0" d="M629.4,366.4c-5-0.8-9.9-3.1-13.8-7L549,292.7c-9.8-9.8-9.8-25.6,0-35.4c9.8-9.8,25.6-9.8,35.4,0l24,24V125
+			c0-13.8,11.2-25,25-25s25,11.2,25,25v156.3l24-24c9.8-9.8,25.6-9.8,35.4,0c9.8,9.8,9.8,25.6,0,35.4L651,359.3
+			c-2.4,2.4-5.2,4.2-8.1,5.4c-2.9,1.2-6.1,1.9-9.5,1.9L629.4,366.4z"/>
+		<path class="st0" d="M375,226.7c13.8,0,25,11.2,25,25s-11.2,25-25,25H91.7c-13.8,0-25-11.2-25-25s11.2-25,25-25H375z"/>
+	</g>
+</g>
+</svg>
