@@ -10,7 +10,6 @@ body
     font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
     margin: 0;
     padding: 0;
-    overflow: hidden;
 }
 
 /* Main container div for Lute site content. */
@@ -57,9 +56,6 @@ a.home-link:hover {
 
 .title-container {
     flex: 1; /* Allow the title to take up remaining space */
-}
-
-#luteTitle {
 }
 
 p.version {
@@ -195,12 +191,20 @@ div#read_pane_left {
 }
 
 div#read_pane_right {
-    width: 50%;
+    display: grid;
+    grid-template-rows: 18rem 1fr;
+    position: static;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
     position: fixed;
+    /* different width and right values because #container width=95% */
+    right: var(--read-grid-margin);
+    width: calc(50% - var(--read-grid-margin));
+    height: 100%;
     top: 0;
-    right: 0;
-    height: 95%;
 }
+
 
 div#reading-header {
     display: flex;
@@ -266,11 +270,10 @@ div#reading-header {
 
 #reading_menu {
   position: absolute;
-  margin: 10px 0 0 -50px;
   height: 100%;
   padding: 15px;
   padding-left: 50px;
-  z-index: 1;
+  z-index: 1000;
   border-right: 1px solid grey;
   background-color: #FFFFFF;
 
@@ -280,6 +283,8 @@ div#reading-header {
   transform-origin: 0% 0%;
   transform: translate(-100%, 0);
   transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+  left: 0;
+  top: 50px;
 }
 
 #reading_menu li {
@@ -344,15 +349,21 @@ input[type=text]
     opacity: 1; /* Firefox */
 }
 
+#thetexttitle {
+    padding-right: 2rem;
+}
+
 div#thetext {
     margin-left: 20px;
     margin-right: 20px;
+    padding-right: 2rem;
 }
 
 div#thetext p {
     line-height: 1.25;
     margin-top: 1em;
     margin-bottom: 1em;
+    font-size: 0;
 }
 
 table#text
@@ -529,23 +540,7 @@ span.status5
     color: #000000;
 }
 
-span.status99
-{
-   /* no styling, just regular text.
-   background-color: #F8F8F8;
-   border-bottom: solid 2px #CCFFCC;
-   color: #000000;
-   */
-}
- 
-span.status98
-{
-   /* no styling, just regular text.
-   background-color: #F8F8F8;
-   border-bottom: dashed 1px #000000;
-   color: #000000;
-   */
-}
+/* span.status99, span.status98 have no styles, just regular text. */
 
 span.hasflash:after {
     content: "*";
@@ -794,3 +789,82 @@ div.code pre {
 /* Stats. */
 
 table.statsWordsRead th, td { padding: 5px; }
+
+
+/********************************
+ * Type controls menu
+ */
+
+.text-options-button {
+    border-radius: 5px;
+    border: 2px solid aliceblue;
+    width: 28px;
+    height: 28px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.font-plus {
+    background-image: url("/static/icn/font-increase.svg");
+}
+
+.font-minus {
+    background-image: url("/static/icn/font-decrease.svg");
+}
+
+.lh-plus {
+    background-image: url("/static/icn/line-spacing-increase.svg");
+}
+
+.lh-minus {
+    background-image: url("/static/icn/line-spacing-decrease.svg");
+}
+
+.width-plus {
+    background-image: url("/static/icn/caret-right.svg");
+}
+
+.width-minus {
+    background-image: url("/static/icn/caret-left.svg");
+}
+
+.column-one {
+    background-image: url("/static/icn/text-column-one.svg");
+}
+
+.column-two {
+    background-image: url("/static/icn/text-column-two.svg");
+}
+
+/*********************************
+ * read page layout
+ */
+
+#read_pane_container {
+    --read-grid-margin: 2.5%; /*(100 - 95) / 2 -> do not use calc here. does not work*/
+    width: 100%;
+}
+
+#reading-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-items: baseline;
+}
+
+#wordframeid {
+    height: 100% !important;
+}
+
+#dictframeid {
+    /* calc for crawlbar */
+    /* height: calc(100% - 20px) !important; */
+    height: 100% !important;
+    align-self: end;
+}
+
+/* move the image left instead of right */
+.zoomableTermImage:hover {
+    transform: scale(10) translate(-10px) !important;
+}
