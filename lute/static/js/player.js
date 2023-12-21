@@ -1,10 +1,9 @@
-const readPaneLeft = document.querySelector("#read_pane_left")
+const readPaneContainer = document.querySelector("#read_pane_container");
+const readPaneLeft = document.querySelector("#read_pane_left");
 const player = document.querySelector("#player");
 const timeline = document.querySelector(".timeline");
 const volumeLine = document.querySelector(".volume");
 const playBtn = document.querySelector("#play-btn");
-const playBtnIcon = document.querySelector("#play-btn span");
-const durationContainer = document.querySelector(".duration-container");
 const durationElement = document.querySelector(".duration-container .duration");
 const currentTimeElement = document.querySelector(
   ".duration-container .current-time"
@@ -20,7 +19,7 @@ const pinButton = document.querySelector("#pin");
 
 const playerContainer = document.querySelector(".audio-player-container");
 const bookmarkContainer = document.querySelector(".bookmark-markers-container");
-const timelineContainer = document.querySelector("#timeline-container");
+// const timelineContainer = document.querySelector("#timeline-container");
 const bookmarkSaveDeleteBtn = document.querySelector("#bkm-save-btn");
 const bookmarkPrevBtn = document.querySelector("#bkm-prev-btn");
 const bookmarkNextBtn = document.querySelector("#bkm-next-btn");
@@ -28,7 +27,7 @@ const bookmarkNextBtn = document.querySelector("#bkm-next-btn");
 var bookmarksArray = [];
 let lastPlayTime = null;
 let playerSticky = localStorage.getItem("player-sticky") ?? 0;
-if (playerSticky != 0) readPaneLeft.classList.add("sticky-player");
+if (playerSticky != 0) readPaneContainer.classList.add("sticky-player");
 
 let jumpTimeBy = Number(rewindAmountOption.value);
 
@@ -222,16 +221,27 @@ function resetPlaybackRate() {
  */
 
 
-pin.addEventListener("click", function() {
+pinButton.addEventListener("click", function() {
   // add the class to readpaneleft and not the player itself 
   // so that we can get it's sibling (paneright) to add a bottom margin in css
-  readPaneLeft.classList.toggle("sticky-player");
+  // readPaneLeft.classList.toggle("sticky-player");
+  readPaneContainer.classList.toggle("sticky-player");
   // save sticky state to local storage
-  localStorage.setItem("player-sticky", 1 - Number(playerSticky))
+  localStorage.setItem("player-sticky", 1 - Number(playerSticky));
   // remove focus off the button so it doesn't accidentally get activated by spacebar
-  pin.blur();
+  pinButton.blur();
 });
 
+// remove the sticky if player is not used 
+// (to reset added bottom margin to left and right containers)
+document.addEventListener("DOMContentLoaded", () => {
+  if (playerContainer.getAttribute("style") == "display: none") {
+    // const mc = document.querySelector(".right-btm-margin-container");
+    // mc.style.marginTop = 0;
+    readPaneContainer.classList.remove("sticky-player");
+    // readPaneLeft.style.gridTemplateRows = "unset";
+  }
+});
 
 /* ****************************
  * Bookmark management.
@@ -385,7 +395,7 @@ window.addEventListener("keydown", function (e) {
     // prevent scrolling when space is pressed
     // and it seems this fixes the issue where there's flashing
     // where one keydown event continiously makes the button play and pause
-    e.preventDefault()
+    e.preventDefault();
     togglePlayPause();
     // if (e.target == document.body) {
     //   // prevent scrolling when space is pressed
@@ -393,3 +403,12 @@ window.addEventListener("keydown", function (e) {
     // };
   }
 });
+
+// make player sticky when container width is too small
+const resizeObserver = new ResizeObserver(([change]) => {
+  if ((change.contentRect.width < 530) && (playerContainer.getAttribute("style") !== "display: none")) {
+    readPaneContainer.classList.add("sticky-player");
+  }
+});
+
+resizeObserver.observe(readPaneLeft);
