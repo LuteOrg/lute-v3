@@ -5,6 +5,7 @@
 {% block body %}
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
   <pre>
@@ -18,6 +19,8 @@
     sentence translation url: <span id="translateURL" style="display: none">{{ dictionary_url }}</span>
   </pre>
 </div>
+
+<div id="read_pane_container">
 
 <div id="read_pane_left">
 
@@ -71,6 +74,35 @@
           id="navNext10"
           onclick="goto_relative_page(10)"
           >&#187;</span>
+
+        <a id="text-options-btn">
+          <img
+            src="{{ url_for('static', filename='icn/text.svg') }}"
+            title="Text Options" />
+          <div id="text-options-container" class="hide-text-options">
+            <div class="text-options-triangle"></div>
+            <div class="text-options-size row">
+              <button class="btn row-elem font-minus" title="Decrease font size"></button>
+              <input id="font-size">
+              <button class="btn row-elem font-plus" title="Increase font size"></button>
+            </div>
+            <div class="text-options-lh row">
+              <button class="btn row-elem lh-minus" title="Decrease line height"></button>
+              <input id="line-height">
+              <button class="btn row-elem lh-plus" title="Increase line height"></button>
+            </div>
+            <div class="text-options-width row">
+              <button class="btn row-elem width-minus" title="Decrease content width"></button>
+              <input id="content-width">
+              <button class="btn row-elem width-plus" title="Increase content width"></button>
+            </div>
+            <div class="text-options-column row">
+              <button class="column-one column-btn" title="One column text">&#124;</button>
+              <button class="column-two column-btn" title="Two column text">&#124;&#124;</button>
+              <button class="column-three column-btn" title="Three column text">&#124;&#124;&#124;</button>
+            </div>
+          </div>
+        </a>
       </h2>
     </div>
 
@@ -204,6 +236,7 @@
     </div>
 
   </div>
+  <div class="btm-margin-container"></div>
 </div>
 
 <div id="read_pane_right">
@@ -230,6 +263,8 @@
   >
     Frame support required.
   </iframe>
+</div>
+
 </div>
 
 <script>
