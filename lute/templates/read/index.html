@@ -31,8 +31,24 @@
       <span class="hamburger"></span>
       <span class="hamburger"></span>
       <span class="hamburger"></span>
-
       <ul id="reading_menu">
+        <li>
+          <button class="text-options-button font-minus" title="Decrease font size"></button>
+          <button class="text-options-button font-plus" title="Increase font size"></button>
+        </li>
+        <li>
+          <button class="text-options-button lh-minus" title="Decrease line height"></button>
+          <button class="text-options-button lh-plus" title="Increase line height"></button>
+        </li>
+        <li>
+          <button class="text-options-button width-minus" title="Decrease content width"></button>
+          <button class="text-options-button width-plus" title="Increase content width"></button>
+        </li>
+        <li>
+          <button class="text-options-button column-one" title="One column text">&#124;</button>
+          <button class="text-options-button column-two" title="Two column text">&#124;&#124;</button>
+          <button class="text-options-button column-three" title="Three column text">&#124;&#124;&#124;</button>
+        </li>
         {% if book.source_uri %}
         <li><a href="{{ book.source_uri }}" target="_blank" tabindex="-1">Show source URL</a></li>
         {% endif %}
@@ -74,35 +90,6 @@
           id="navNext10"
           onclick="goto_relative_page(10)"
           >&#187;</span>
-
-        <a id="text-options-btn">
-          <img
-            src="{{ url_for('static', filename='icn/text.svg') }}"
-            title="Text Options" />
-          <div id="text-options-container" class="hide-text-options">
-            <div class="text-options-triangle"></div>
-            <div class="text-options-size row">
-              <button class="btn row-elem font-minus" title="Decrease font size"></button>
-              <input id="font-size">
-              <button class="btn row-elem font-plus" title="Increase font size"></button>
-            </div>
-            <div class="text-options-lh row">
-              <button class="btn row-elem lh-minus" title="Decrease line height"></button>
-              <input id="line-height">
-              <button class="btn row-elem lh-plus" title="Increase line height"></button>
-            </div>
-            <div class="text-options-width row">
-              <button class="btn row-elem width-minus" title="Decrease content width"></button>
-              <input id="content-width">
-              <button class="btn row-elem width-plus" title="Increase content width"></button>
-            </div>
-            <div class="text-options-column row">
-              <button class="column-one column-btn" title="One column text">&#124;</button>
-              <button class="column-two column-btn" title="Two column text">&#124;&#124;</button>
-              <button class="column-three column-btn" title="Three column text">&#124;&#124;&#124;</button>
-            </div>
-          </div>
-        </a>
       </h2>
     </div>
 

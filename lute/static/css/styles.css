@@ -860,6 +860,16 @@ table.statsWordsRead th, td { padding: 5px; }
     height: 32px;
 }
 
+.text-options-button {
+    border-radius: 5px;
+    border: 2px solid aliceblue;
+    width: 28px;
+    height: 28px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
 #text-options-container .btn {
     border-radius: 5px;
     border: 2px solid aliceblue;
