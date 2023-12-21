@@ -17,7 +17,6 @@ const widthMinusButton = document.querySelector(".width-minus");
 
 const oneColButton = document.querySelector(".column-one");
 const twoColButton = document.querySelector(".column-two");
-const threeColButton = document.querySelector(".column-three");
 
 const theText = document.querySelector("#thetext");
 const readPaneRight = document.querySelector("#read_pane_right");
@@ -78,10 +77,6 @@ oneColButton.addEventListener("click", () => {
 
 twoColButton.addEventListener("click", () => {
   changeColumnCount(2);
-});
-
-threeColButton.addEventListener("click", () => {
-  changeColumnCount(3);
 });
 
 function changeColumnCount(num) {
