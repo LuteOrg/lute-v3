@@ -1,3 +1,14 @@
+# 3.0.7 (2023-12-21)
+
+Feature changes:
+
+* Add slide-in menu for reading pane (issue [60](https://github.com/jzohrab/lute-v3/issues/60)).
+* Add font/line spacing etc to slide-in menu (issue [45](https://github.com/jzohrab/lute-v3/issues/45)).
+* Fix audio not loading reliably in Firefox.
+* Keep book listing filter state on refresh (issue [46](https://github.com/jzohrab/lute-v3/issues/46)).
+* Arrow keys only change status for clicked words, not hovered.
+* Remove 'mark known' check on all pages, add 'make done' check on final page (issue [58](https://github.com/jzohrab/lute-v3/issues/58)).
+
 
 # 3.0.6 (2023-12-13)
 
