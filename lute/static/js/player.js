@@ -35,7 +35,7 @@ let jumpTimeBy = Number(rewindAmountOption.value);
 player.onloadedmetadata = function () {
   durationElement.textContent = timeToDisplayString(player.duration);
   timeline.max = player.duration;
-  for (b of bookmarksArray) {
+  for (let b of bookmarksArray) {
     addBookmarkMarker(b);
   }
   playBtn.style.backgroundImage = 'url("/static/icn/play.svg")';
@@ -73,7 +73,7 @@ function timeToPercent(t) {
 playBtn.addEventListener("click", function () {
   if ((player.duration ?? 0) == 0 || isNaN(player.duration))
     return;
-  togglePlayPause()
+  togglePlayPause();
 });
 
 player.addEventListener("pause", function () {
@@ -118,7 +118,7 @@ function post_player_data() {
   const bookmarks = $('#book_audio_bookmarks').val();
   var currentPosition = player.currentTime;
   // console.log(`posting curr pos = ${currentPosition}`);
-  data = {
+  const data = {
     bookid: bookid,
     position: currentPosition,
     bookmarks: bookmarks,
@@ -185,8 +185,8 @@ skipbackButton.addEventListener("click", function () {
  */
 
 playbackRateButton.addEventListener("mouseover", function() {
-  scrollLeft = document.documentElement.scrollLeft;
-  scrollTop = document.documentElement.scrollTop;
+  const scrollLeft = document.documentElement.scrollLeft;
+  const scrollTop = document.documentElement.scrollTop;
   window.onscroll = function () {
     window.scrollTo(scrollLeft, scrollTop);
   };
@@ -206,7 +206,7 @@ playbackRateButton.addEventListener("wheel", function (e) {
     r = 0.1;
   if (r > 10)
     r = 10;
-  player.playbackRate = r
+  player.playbackRate = r;
   playbackRateIndicator.textContent = player.playbackRate.toFixed(1);
 });
 
@@ -254,10 +254,10 @@ let addBookmarkMarker = function(currtime) {
      border-radius: 1px;
      user-select: none;
      pointer-events: none;`;
-}
+};
 
 let _update_bookmarks_control = function() {
-  bs = bookmarksArray.map(b => `${b}`).join(';');
+  const bs = bookmarksArray.map(b => `${b}`).join(';');
   $('#book_audio_bookmarks').val(bs);
 };
 
@@ -348,6 +348,8 @@ function jumpToBookmark(oper) {
   if (lastPlayTime == null)
     lastPlayTime = 0;
   // console.log(`jumpToBookmark from time ${lastPlayTime}, currently have ${bookmarksArray}`);
+
+  let ind;
 
   // Note for the findIndex, we have to use Number(d), as it
   // appears that javascript can sometimes do string comparisons.
