@@ -137,9 +137,26 @@ div#divbooktable {
     margin-left: auto;
 }
 
-a.completed_book:after {
+/* blank space to hang completed_book bullets while maintaining proper justification on the whole column */
+a.book-title:before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    vertical-align: baseline;
+    margin-right: 8px;
+}
+
+/* show a check mark for completed books */
+a.completed_book:before {
     content: url('/static/icn/tick.png');
-    margin-left: 5px;
+}
+
+/**
+  *  when the books list contains NO completed books, get rid of the awkward indent
+  */
+table#booktable:not(:has(a.completed_book)) a.book-title:before {
+    display: none;
 }
 
 /* End book listing */
