@@ -149,6 +149,7 @@ jobs:
   # Slightly wasteful in that it re-runs the tests, but it's fastest.
   coverage:
     needs: base-ci
+    if: github.repository_owner == 'jzohrab'
     continue-on-error: true
     runs-on: ubuntu-latest
     timeout-minutes: 30
