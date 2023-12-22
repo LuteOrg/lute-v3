@@ -141,11 +141,10 @@ div#divbooktable {
 a.book-title:before {
     content: '';
     display: inline-block;
-    offset-anchor: right;
     width: 16px;
     height: 16px;
     vertical-align: baseline;
-    margin-right: 0.5rem;
+    margin-right: 8px;
 }
 
 /* show a check mark for completed books */
