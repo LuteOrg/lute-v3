@@ -47,15 +47,15 @@
             let pgfraction = '';
 
             const completed = (parseInt(row[11]) == 1);
-            let completed_style = '';
+            let book_title_classes = ['book-title'];
             if (completed) {
-              completed_style = 'class="completed_book"';
+              book_title_classes.push('completed_book');
             }
             else if (pgnum > 1) {
               pgfraction = ` (${pgnum}/${pgcount})`;
             }
 
-            return `<a ${completed_style} href="/read/${bkid}">${row[0]}${pgfraction}</a>`;
+            return `<a class="${book_title_classes.join(' ')}" href="/read/${bkid}">${row[0]}${pgfraction}</a>`;
           }
         },
         { "name": "LgName", "targets": 1 },
