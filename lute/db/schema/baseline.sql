@@ -66,6 +66,7 @@ INSERT INTO languages VALUES(8,'Japanese','https://jisho.org/search/###','https:
 INSERT INTO languages VALUES(9,'Russian','https://www.dict.com/Russian-English/###','https://en.openrussian.org/?search=###','*https://www.deepl.com/translator#ru/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','А-Яа-яЁё',0,0,0,0,'spacedel');
 INSERT INTO languages VALUES(10,'Spanish','https://es.thefreedictionary.com/###','https://www.wordreference.com/es/en/translation.asp?spen=###','*https://www.deepl.com/translator#es/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
 INSERT INTO languages VALUES(11,'Turkish','https://www.wordreference.com/tren/###','https://tr.wiktionary.org/###','*https://www.deepl.com/translator#tr/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑğĞıİöÖüÜşŞçÇ',0,0,0,1,'turkish');
+INSERT INTO languages VALUES(12,'Modern Chinese','https://chinese.yabla.com/chinese-english-pinyin-dictionary.php?define=###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#ch/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。！？','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','一-龥',0,0,0,1,'modernchinese');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
@@ -184,6 +185,7 @@ INSERT INTO books VALUES(9,11,'Büyük ağaç',NULL,0,0,110,NULL,NULL,NULL);
 INSERT INTO books VALUES(10,6,'Die Bremer Stadtmusikanten',NULL,0,0,175,NULL,NULL,NULL);
 INSERT INTO books VALUES(11,5,'Boucles d’or et les trois ours',NULL,0,0,69,NULL,NULL,NULL);
 INSERT INTO books VALUES(12,8,'北風と太陽 - きたかぜたいよう',NULL,0,0,64,NULL,NULL,NULL);
+INSERT INTO books VALUES(13,12,'散步','',0,21,400,NULL,NULL,NULL);
 CREATE TABLE IF NOT EXISTS "wordparents" (
 	"WpWoID" INTEGER NOT NULL  ,
 	"WpParentWoID" INTEGER NOT NULL  ,
@@ -219,6 +221,8 @@ INSERT INTO texts VALUES(17,9,1,replace('Büyük ağaç eskiden aşılanmış ve
 INSERT INTO texts VALUES(18,10,1,replace('Es hatte ein Mann einen Esel, der schon lange Jahre die Säcke unverdrossen zur Mühle getragen hatte, dessen Kräfte aber nun zu Ende gingen, so daß er zur Arbeit immer untauglicher ward. Da dachte der Herr daran, ihn aus dem Futter zu schaffen, aber der Esel merkte, daß kein guter Wind wehte, lief fort und machte sich auf den Weg nach Bremen; dort, meinte er, könnte er ja Stadtmusikant werden.\n\nAls er ein Weilchen fortgegangen war, fand er einen Jagdhund auf dem Wege liegen, der jappte wie einer, der sich müde gelaufen hat. "Nun, was jappst du so, Packan?" fragte der Esel. "Ach," sagte der Hund, "weil ich alt bin und jeden Tag schwächer werde, auch auf der Jagd nicht mehr fort kann, hat mich mein Herr wollen totschlagen, da hab ich Reißaus genommen; aber womit soll ich nun mein Brot verdienen?" - "Weißt du was?" sprach der Esel, "ich gehe nach Bremen und werde dort Stadtmusikant, geh mit und laß dich auch bei der Musik annehmen. Ich spiele die Laute und du schlägst die Pauken."','\n',char(10)),NULL,NULL);
 INSERT INTO texts VALUES(19,11,1,replace('Il était une fois trois ours: un papa ours, une maman ours et un bébé ours. Ils habitaient tous ensemble dans une maison jaune au milieu d''une grande forêt.\n\nUn jour, Maman Ours prépara une grande marmite de porridge délicieux et fumant pour le petit déjeuner. Il était trop chaud pour pouvoir être mangé, alors les ours décidèrent d''aller se promener en attendant que le porridge refroidisse.','\n',char(10)),NULL,NULL);
 INSERT INTO texts VALUES(20,12,1,replace('北風と太陽\n\n「おれの方が強い。」「いいや、ぼくの方が強い。」\n北風と太陽の声が聞こえます。二人はどちらの力が強いかでケンカをしているようです。\n「太陽が毎日元気だから、暑くてみんな困っているよ。おれが涼しい風を吹くと、みんな嬉しそうだ。」','\n',char(10)),NULL,NULL);
+INSERT INTO texts VALUES(21,13,1,replace('我们在田野散步：我，我的母亲，我的妻子和儿子。\n\n母亲本不愿出来的。她老了，身体不好，走远一点就觉得很累。我说，正因为如此，才应该多走走。母亲信服地点点头，便去拿外套。她现在很听我和话，就象小时候我很听她的话一样。\n\n天气很好。今年的春天来的太迟，太迟了，有一些老人挺不住。但春天总算来了。我的母亲又熬过了一个严冬。\n\n这南方初春的田野，大块小块的新绿随意地铺着，有的浓，有的淡；树上的绿芽也密了；田野里的冬水也咕咕地起着水泡。这一切使人想起一样东西——生命。\n\n我和母亲走在前面，我的妻子和儿子走在后面。小家伙突然叫起来：“前面也是妈妈和儿子，后面也是妈妈和儿子。”我们都笑了。','\n',char(10)),NULL,NULL);
+INSERT INTO texts VALUES(22,13,2,replace('后来发生了分歧：母亲要走大路，大路平顺；我的儿子要走小路，小路有意思。不过，一切都取决于我。我的母亲老了，她早已习惯听从她强壮的儿子；我的儿子还小，他还习惯听从他高大的父亲；妻子呢，在外边，她总是听我的。一霎时我感到了责任的重大。我想一个两全的办法，找不出；我想拆散一家人，分成两路，各得其所，终不愿意。我决定委屈儿子，因为我伴同他的时日还长。我说：“走大路。”\n\n但是母亲摸摸孙儿的小脑瓜，变了主意：“还是走小路吧。”她的眼随小路望去：那里有金色的菜花，两行整齐的桑树，尽头一口水波粼粼的鱼塘。“我走不过去的地方你就背着我。”母亲对我说。\n\n这样，我们在阳光下，向着那菜花、桑树和鱼塘走去。到了一处，我蹲下来，背起了母亲，妻子也蹲下来，背起了儿子。我的母亲虽然高大，然而很瘦，自然不算重；儿子虽然很胖，毕竟幼小，自然也轻：但我和妻子都是慢慢地，稳稳地，走得很仔细，好像我背上的同她背上的加起来，就是整个世界。','\n',char(10)),NULL,NULL);
 CREATE TABLE IF NOT EXISTS "settings" (
 	"StKey" VARCHAR(40) NOT NULL,
         "StKeyType" TEXT NOT NULL,
@@ -226,6 +230,16 @@ CREATE TABLE IF NOT EXISTS "settings" (
 	PRIMARY KEY ("StKey")
 );
 INSERT INTO settings VALUES('IsDemoData','system','1');
+INSERT INTO settings VALUES('backup_enabled','user','1');
+INSERT INTO settings VALUES('backup_auto','user','1');
+INSERT INTO settings VALUES('backup_warn','user','1');
+INSERT INTO settings VALUES('backup_dir','user','/home/fan/.local/share/test_lute/backups');
+INSERT INTO settings VALUES('backup_count','user','5');
+INSERT INTO settings VALUES('mecab_path','user','/lib/x86_64-linux-gnu/libmecab.so.2');
+INSERT INTO settings VALUES('japanese_reading','user','katakana');
+INSERT INTO settings VALUES('current_theme','user','-');
+INSERT INTO settings VALUES('custom_styles','user','/* Custom css to modify Lute''s appearance. */');
+INSERT INTO settings VALUES('show_highlights','user','1');
 CREATE UNIQUE INDEX "LgName" ON "languages" ("LgName");
 CREATE UNIQUE INDEX "TgText" ON "tags" ("TgText");
 CREATE UNIQUE INDEX "T2Text" ON "tags2" ("T2Text");

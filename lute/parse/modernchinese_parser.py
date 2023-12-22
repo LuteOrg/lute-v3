@@ -4,12 +4,15 @@ which requires PyTorch、TensorFlow, so it's not supported by default until inst
 https://github.com/hankcs/HanLP/tree/master
 about the model path configuration
 https://hanlp.hankcs.com/docs/configure.html
+
+If hanlp is not installed, using pkuseg instead
 """
 from typing import List
 from functools import lru_cache
 
 from lute.parse.base import AbstractParser
 from lute.parse.base import ParsedToken
+import pkuseg
 
 CHINESE_PUNCTUATIONS = (
     r"！？｡。＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏.\n"
@@ -32,17 +35,19 @@ class ModernChineseParser(AbstractParser):
         Using lru_cache to make the test execution run fast,
         otherwise the test execution will run very slowly,
         the process of checking whether the hanlp package is installed can be slow.
+        If hanlp is not installed, using pkuseg as default chinese parser.
         """
-        _res = False
+        _res = True
         try:
             import hanlp
 
             ModernChineseParser._seg = hanlp.load(
                 hanlp.pretrained.tok.FINE_ELECTRA_SMALL_ZH
             )
-            _res = True
         except ImportError as _:
-            pass
+            _pkuseg = pkuseg.pkuseg()
+            ModernChineseParser._seg = _pkuseg.cut
+
         return _res
 
     @classmethod
