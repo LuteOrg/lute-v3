@@ -55,18 +55,18 @@ CREATE TABLE IF NOT EXISTS "languages" (
 	"LgParserType" VARCHAR(20) NOT NULL DEFAULT 'spacedel' ,
 	PRIMARY KEY ("LgID")
 );
-INSERT INTO languages VALUES(1,'Arabic','/dev_api/dummy_dict/Arabic/###','*https://translate.google.com/?hl=es&sl=ar&tl=en&text=###&op=translate','*https://translate.google.com/?hl=es&sl=ar&tl=en&text=###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?؟۔‎','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','\u0600-\u06FF\uFE70-\uFEFC',0,0,1,1,'spacedel');
-INSERT INTO languages VALUES(2,'Classical Chinese','/dev_api/dummy_dict/Classical Chinese/###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#ch/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。！？','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','一-龥',0,0,0,1,'classicalchinese');
-INSERT INTO languages VALUES(3,'Czech','/dev_api/dummy_dict/Czech/###','https://slovnik.seznam.cz/preklad/cesky_anglicky/###','https://www.deepl.com/translator#cs/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,1,'spacedel');
-INSERT INTO languages VALUES(4,'English','/dev_api/dummy_dict/English/###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#en/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
-INSERT INTO languages VALUES(5,'French','/dev_api/dummy_dict/French/###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#fr/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
-INSERT INTO languages VALUES(6,'German','/dev_api/dummy_dict/German/###','https://www.wordreference.com/deen/###','*https://www.deepl.com/translator#de/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
-INSERT INTO languages VALUES(7,'Greek','/dev_api/dummy_dict/Greek/###','https://en.wiktionary.org/wiki/###','*https://www.deepl.com/translator#el/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?;','Mr.|Mrs.|Dr.|[A-Z].|κτλ.|κλπ.|π.χ.|λ.χ.|κ.ά|δηλ.|Κος.|Κ.|Κα.|μ.Χ.|ΥΓ.|μ.μ.|π.μ.|σελ.|κεφ.|βλ.|αι.','α-ωΑ-ΩάόήέώύίΊΏΈΉΌΆΎϊΪϋΫΐΰ',0,0,0,1,'spacedel');
-INSERT INTO languages VALUES(8,'Japanese','/dev_api/dummy_dict/Japanese/###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#jp/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。？！','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','\p{Han}\p{Katakana}\p{Hiragana}',0,0,0,1,'japanese');
-INSERT INTO languages VALUES(9,'Modern Chinese','/dev_api/dummy_dict/Modern Chinese/###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#ch/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。！？','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','一-龥',0,0,0,1,'modernchinese');
-INSERT INTO languages VALUES(10,'Russian','/dev_api/dummy_dict/Russian/###','https://en.openrussian.org/?search=###','*https://www.deepl.com/translator#ru/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','А-Яа-яЁё',0,0,0,0,'spacedel');
-INSERT INTO languages VALUES(11,'Spanish','/dev_api/dummy_dict/Spanish/###','https://www.wordreference.com/es/en/translation.asp?spen=###','*https://www.deepl.com/translator#es/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
-INSERT INTO languages VALUES(12,'Turkish','/dev_api/dummy_dict/Turkish/###','https://tr.wiktionary.org/###','*https://www.deepl.com/translator#tr/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑğĞıİöÖüÜşŞçÇ',0,0,0,1,'turkish');
+INSERT INTO languages VALUES(1,'Arabic','https://www.arabicstudentsdictionary.com/search?q=###','*https://translate.google.com/?hl=es&sl=ar&tl=en&text=###&op=translate','*https://translate.google.com/?hl=es&sl=ar&tl=en&text=###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?؟۔‎','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','\u0600-\u06FF\uFE70-\uFEFC',0,0,1,1,'spacedel');
+INSERT INTO languages VALUES(2,'Classical Chinese','https://ctext.org/dictionary.pl?if=en&char=###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#ch/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。！？','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','一-龥',0,0,0,1,'classicalchinese');
+INSERT INTO languages VALUES(3,'Czech','https://slovniky.lingea.cz/Anglicko-cesky/###','https://slovnik.seznam.cz/preklad/cesky_anglicky/###','https://www.deepl.com/translator#cs/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,1,'spacedel');
+INSERT INTO languages VALUES(4,'English','https://en.thefreedictionary.com/###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#en/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
+INSERT INTO languages VALUES(5,'French','https://fr.thefreedictionary.com/###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#fr/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
+INSERT INTO languages VALUES(6,'German','https://de.thefreedictionary.com/###','https://www.wordreference.com/deen/###','*https://www.deepl.com/translator#de/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
+INSERT INTO languages VALUES(7,'Greek','https://www.wordreference.com/gren/###','https://en.wiktionary.org/wiki/###','*https://www.deepl.com/translator#el/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?;','Mr.|Mrs.|Dr.|[A-Z].|κτλ.|κλπ.|π.χ.|λ.χ.|κ.ά|δηλ.|Κος.|Κ.|Κα.|μ.Χ.|ΥΓ.|μ.μ.|π.μ.|σελ.|κεφ.|βλ.|αι.','α-ωΑ-ΩάόήέώύίΊΏΈΉΌΆΎϊΪϋΫΐΰ',0,0,0,1,'spacedel');
+INSERT INTO languages VALUES(8,'Japanese','https://jisho.org/search/###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#jp/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。？！','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','\p{Han}\p{Katakana}\p{Hiragana}',0,0,0,1,'japanese');
+INSERT INTO languages VALUES(9,'Modern Chinese','https://chinese.yabla.com/chinese-english-pinyin-dictionary.php?define=###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#ch/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。！？','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','一-龥',0,0,0,1,'modernchinese');
+INSERT INTO languages VALUES(10,'Russian','https://www.dict.com/Russian-English/###','https://en.openrussian.org/?search=###','*https://www.deepl.com/translator#ru/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','А-Яа-яЁё',0,0,0,0,'spacedel');
+INSERT INTO languages VALUES(11,'Spanish','https://es.thefreedictionary.com/###','https://www.wordreference.com/es/en/translation.asp?spen=###','*https://www.deepl.com/translator#es/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
+INSERT INTO languages VALUES(12,'Turkish','https://www.wordreference.com/tren/###','https://tr.wiktionary.org/###','*https://www.deepl.com/translator#tr/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑğĞıİöÖüÜşŞçÇ',0,0,0,1,'turkish');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
@@ -137,8 +137,6 @@ INSERT INTO bookstats VALUES(10,115,100,100,100);
 INSERT INTO bookstats VALUES(11,64,41,41,100);
 INSERT INTO bookstats VALUES(12,1242,371,371,100);
 INSERT INTO bookstats VALUES(13,67,57,57,100);
-INSERT INTO bookstats VALUES(14,4,4,3,75);
-INSERT INTO bookstats VALUES(15,1,1,1,100);
 CREATE TABLE IF NOT EXISTS "wordimages" (
 	"WiID" INTEGER NOT NULL  ,
 	"WiWoID" INTEGER NOT NULL  ,
@@ -146,8 +144,6 @@ CREATE TABLE IF NOT EXISTS "wordimages" (
 	PRIMARY KEY ("WiID"),
 	FOREIGN KEY("WiWoID") REFERENCES "words" ("WoID") ON UPDATE NO ACTION ON DELETE CASCADE
 );
-INSERT INTO wordimages VALUES(1,1,'');
-INSERT INTO wordimages VALUES(2,2,'');
 CREATE TABLE IF NOT EXISTS "wordflashmessages" (
   "WfID" INTEGER NOT NULL,
   "WfWoID" INTEGER NOT NULL,
@@ -168,8 +164,6 @@ CREATE TABLE IF NOT EXISTS "words" (
 	"WoStatusChanged" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY("WoLgID") REFERENCES "languages" ("LgID") ON UPDATE NO ACTION ON DELETE CASCADE
 );
-INSERT INTO words VALUES(1,11,'gato','gato',1,'cat','',1,'2023-12-22 00:32:56','2023-12-22 00:32:56');
-INSERT INTO words VALUES(2,8,'gato','gato',1,'cat','',1,'2023-12-22 00:32:58','2023-12-22 00:32:58');
 CREATE TABLE IF NOT EXISTS "books" (
 	"BkID" INTEGER NOT NULL  ,
 	"BkLgID" INTEGER NOT NULL  ,
@@ -193,9 +187,6 @@ INSERT INTO books VALUES(10,1,'Examples',NULL,0,0,115,NULL,NULL,NULL);
 INSERT INTO books VALUES(11,8,'北風と太陽 - きたかぜたいよう',NULL,0,0,64,NULL,NULL,NULL);
 INSERT INTO books VALUES(12,4,'Tutorial',NULL,0,0,1242,NULL,NULL,NULL);
 INSERT INTO books VALUES(13,3,'Hrad Cimburk – Jak vzal vítr pasáčkovi čepici',NULL,0,0,67,NULL,NULL,NULL);
-INSERT INTO books VALUES(14,11,'Hola','',0,24,4,NULL,NULL,NULL);
-INSERT INTO books VALUES(15,8,'Hola','',0,25,1,NULL,NULL,NULL);
-INSERT INTO books VALUES(16,9,'珍珠鸟','',0,26,600,NULL,NULL,NULL);
 CREATE TABLE IF NOT EXISTS "wordparents" (
 	"WpWoID" INTEGER NOT NULL  ,
 	"WpParentWoID" INTEGER NOT NULL  ,
@@ -234,27 +225,12 @@ INSERT INTO texts VALUES(20,12,4,replace('Try that now to see what happens, and 
 INSERT INTO texts VALUES(21,12,5,replace('Hovering the mouse over other words won''t underline them in blue anymore, and hitting status update hotkeys (1 - 5, w, i) will only update the active word. To "un-click" a word underlined in red, click it again, or hit Escape or Return. Then you''ll be back in "Hover mode". In "Hover mode", the hotkeys 1-5, w, and i still update the status, but the arrow keys just scroll the window. Try clicking and un-clicking or Escaping any word in this paragraph to get a feel for it.\n\nNote that for the keyboard shortcuts to work, the reading pane (where the text is) must have the "focus". Click anywhere on the reading pane to re-establish focus.\n\n5.1 Bulk updates\n\nIf you hold down Shift and click a bunch of words, you can bulk update their statuses. This works for the up and down arrow keys as well.\n\n5.2 Arrow keys\n\nThe Right and Left arrow keys click the next and previous words. Hit Escape or Return to get back to "hover mode".\n\n5.3 Copying text\n\nWhen a word is hovered over or clicked, hit "c" to copy that word''s sentence to your clipboard. Hit "C" to copy the word''s full paragraph (multiple sentences). You can also copy arbitrary sections of text by holding down the Shift key while highlighting the text with your mouse.\n\n6. Next steps\n\nAll done this text!','\n',char(10)),NULL,NULL);
 INSERT INTO texts VALUES(22,12,6,replace('Lute keeps track of all of this in your database, so any time you create or import a new Book, all the info you''ve created is carried forward.\n\nThere''s a tutorial follow-up: go to the Home screen, and click the "Tutorial follow-up" in the table.','\n',char(10)),NULL,NULL);
 INSERT INTO texts VALUES(23,13,1,'V jedné rozpadlé chaloupce žil tatínek, maminka a jejich chlapec Tonda. Byli velmi chudí, do střechy jim teklo a často neměli ani na jídlo. Tonda, aby rodičům pomohl, pracoval jako pasáček ovcí. Ale i tak neměl ani na pořádné oblečení, chodil v roztrhaných kalhotách, do kabátku mu táhlo a jeho čepice vypadala stejně otrhaně jako zbytek oděvu. I přesto si každé ráno cestou na pastvu vesele pohvizdoval.',NULL,NULL);
-INSERT INTO texts VALUES(24,14,1,'Hola. Tengo un gato.',NULL,NULL);
-INSERT INTO texts VALUES(25,15,1,'こんにちは',NULL,NULL);
-INSERT INTO texts VALUES(26,16,1,replace('珍珠鸟\n冯骥才\n\n真好！朋友送我一对珍珠鸟，我把它们养在一个竹条编的笼子里。笼子里有一团干草，那是小鸟又舒适又温暖的巢。\n\n有人说，这是一种害怕人的鸟。\n\n我把笼子挂在窗前。那儿有一盆茂盛的法国吊兰。我让吊兰的长满绿叶的藤蔓覆盖在鸟笼上，珍珠鸟就像躲进幽深的丛林一样安全，从中传出的笛儿般又细又亮的叫声，也就格外轻松自在了。\n\n阳光射进窗来，把吊兰的一串串小叶照得如同碧玉。小鸟的影子就在这中间隐约闪动，看不完整，有时连笼子也看不出，却见它们可爱的鲜红小嘴儿从绿叶中伸出来。\n\n我很少扒开叶蔓瞧它们，它们便渐渐敢伸出小脑袋瞅瞅我。我们就这样一点点熟悉了。\n\n三个月后，那一团愈发繁茂的藤蔓里边，发出一种尖细又娇嫩的叫声。我猜到，是它们有了雏儿。我呢？决不掀开叶片往里看，连添食加水时也不睁大好奇的眼睛去惊动它们。过不多久，忽然有一个小脑袋从叶间探出来。正是它们的雏儿！','\n',char(10)),NULL,NULL);
-INSERT INTO texts VALUES(27,16,2,replace('这个小家伙能轻易地由笼子里钻出身。瞧，多么像它的母亲：红嘴红脚，灰蓝色的毛，只是后背还没有生出珍珠似的圆圆的白点。它好肥，整个身子好像一个蓬松的球儿。\n\n起先，这小家伙只在笼子四周活动，随后就在屋里飞来飞去，一会儿落在柜顶上，一会儿神气十足地站在书架上，啄着书背上那些大文豪的名字；一会儿把灯绳撞得来回摇动，跟着又跳到画框上去了。只要大鸟在笼子里叫一声，它立即飞回笼里去。\n\n我不管它。就是打开窗子，它最多只在窗框上站一会儿，决不飞出去。\n\n渐渐地，它胆子大了，有时落在我的书桌上。\n\n它先是离我较远，见我不去伤害它，便一点点挨近，然后蹦到我的杯子上，低下头来喝茶，再偏过脸瞧瞧我的反应。我只是微微一笑，依旧写东西，它就放开胆子跑到稿纸上，绕着我的笔尖蹦来蹦去，跳动的小红爪子在纸上发出嚓嚓的响声。','\n',char(10)),NULL,NULL);
-INSERT INTO texts VALUES(28,16,3,replace('我不动声色地写，默默享受着这小家伙亲近的情意。这样，它完全放心了。索性用那涂了蜡似的、角质的小红嘴，“嗒嗒”啄着我颤动的笔尖。我用手摸一摸它细腻的绒毛，它也不怕，反而友好地啄两下我的手指。\n\n白天，它这样淘气地陪伴我；天色暗下来，它就在父母的再三呼唤中，飞向笼子，扭动滚圆的身子，挤开那些绿叶钻进去。\n\n有一天，我伏案写作时，它居然落到我的肩上。我手中的笔不觉停了，生怕吓跑它。过了一会儿，扭头看看，这小家伙竟扒在我的肩头上睡着了，银灰色的眼皮盖住眼睛，小红脚刚好给胸脯上长长的绒毛盖住。我轻轻抬一抬肩，它没醒，睡得好熟！还咂咂嘴，难道在做梦？\n\n我笔尖一动，写下一时的感受：\n\n信赖，往往创造出美好的境界。','\n',char(10)),NULL,NULL);
 CREATE TABLE IF NOT EXISTS "settings" (
 	"StKey" VARCHAR(40) NOT NULL,
         "StKeyType" TEXT NOT NULL,
 	"StValue" TEXT NULL,
 	PRIMARY KEY ("StKey")
 );
-INSERT INTO settings VALUES('backup_enabled','user','0');
-INSERT INTO settings VALUES('backup_auto','user','1');
-INSERT INTO settings VALUES('backup_warn','user','1');
-INSERT INTO settings VALUES('backup_dir','user','/home/fan/.local/share/test_lute/backups');
-INSERT INTO settings VALUES('backup_count','user','5');
-INSERT INTO settings VALUES('mecab_path','user','/lib/x86_64-linux-gnu/libmecab.so.2');
-INSERT INTO settings VALUES('japanese_reading','user','katakana');
-INSERT INTO settings VALUES('current_theme','user','-');
-INSERT INTO settings VALUES('custom_styles','user','/* Custom css to modify Lute''s appearance. */');
-INSERT INTO settings VALUES('show_highlights','user','1');
 INSERT INTO settings VALUES('IsDemoData','system','1');
 CREATE UNIQUE INDEX "LgName" ON "languages" ("LgName");
 CREATE UNIQUE INDEX "TgText" ON "tags" ("TgText");
