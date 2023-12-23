@@ -117,6 +117,15 @@ class LuteTestClient:
         self.browser.select("language_id", int(self.language_ids[langname]))
         self.browser.find_by_css("#save").first.click()
 
+    def make_book_from_url(self, url, langname):
+        "Create a book with title, content from url, and languagename."
+        self.visit("book/import_webpage")
+        self.browser.find_by_css("#importurl").fill(url)
+        self.browser.find_by_css("#import").first.click()
+        time.sleep(0.1)  # hack
+        self.browser.select("language_id", int(self.language_ids[langname]))
+        self.browser.find_by_css("#save").first.click()
+
     def get_book_table_content(self):
         "Get book table content."
         css = "#booktable tbody tr"
