@@ -3,11 +3,11 @@ Flask-wtf forms.
 """
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, SelectField, FormField, FieldList
+from wtforms import StringField, BooleanField, SelectField, FormField, FieldList, Form
 from wtforms.validators import DataRequired
 
 
-class BForm(FlaskForm):
+class BForm(Form):
     name = StringField("Name")
 
 
