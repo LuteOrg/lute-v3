@@ -225,9 +225,12 @@ div#read_pane_right {
 
 div#reading-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     margin-top: 10px;
     margin-bottom: 50px;
+
+    padding: 0 1.5rem 0.4rem 1.5rem;
 }
 
 .reading_header_left {
@@ -237,7 +240,6 @@ div#reading-header {
 
 .reading_header_right {
     width: fit-content;
-    margin-right: 10px;
 }
 
 .reading_header_middle {
@@ -247,99 +249,132 @@ div#reading-header {
 /* End layouts *****************************************/
 
 /* Reader slide-in hamburger menu. *********************/
-/* Borrowed from code by Erik Terwan, MIT License. */
-
-#menuToggle
-{
-  z-index: 1;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* The menu checkbox, hidden but on top of the hamburger to intercept clicks. */
-#menuToggle input {
-  position: absolute;
-  display: block;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  opacity: 0; /* hide this */
-  z-index: 2; /* and place it over the hamburger */
-  -webkit-touch-callout: none;
-}
 
 /* The hamburger slices. */
-#menuToggle span.hamburger {
+span.hamburger {
   width: 20px;
   height: 4px;
-  margin-left: 3px;
   margin-bottom: 3px;
-  background: grey;
+  background: #575757;
   border-radius: 3px;
-  z-index: 1;
-  position: relative;
   display: block;
-  transform-origin: 0px 0px;
-  transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
-              background 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
-              opacity 0.55s ease;
+}
+
+.hamburger-btn {
+    cursor: pointer;
+}
+
+#reading_menu.open-menu {
+  transform: translateX(0);
 }
 
 #reading_menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+    
+  padding: 0;
+  margin: 0;
   position: absolute;
-  height: 100%;
-  padding: 15px;
-  padding-left: 50px;
+  left: 0;
+  top: 0;
   z-index: 1000;
-  border-right: 1px solid grey;
+  height: 100%;
+  border-right: 4px solid #a9cfef;
+  box-shadow: 1px 0 3px 2px #9393933d;
+  box-sizing: border-box;
   background-color: #FFFFFF;
 
-  list-style-type: none;
-  -webkit-font-smoothing: antialiased;
-  
   transform-origin: 0% 0%;
   transform: translate(-100%, 0);
-  transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
-  left: 0;
-  top: 50px;
+  transition: transform 0.3s cubic-bezier(0.77,0.2,0.05,1.0);
 }
 
-#reading_menu li {
-  padding: 5px 0;
+#reading_menu ul {
+  margin: 0;
+  list-style: none;
+  padding: 0 1.6rem 0 1rem;
 }
 
-/* Slide in menu when toggle clicked. */
-#menuToggle input:checked ~ ul {
-  transform: none;
+#reading_menu li a {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  color: inherit;
+  box-sizing: border-box;
+  text-decoration: none;
 }
 
-#menuToggle span.hamburger:first-child {
-  transform-origin: 0% 0%;
+#reading_menu .menu-list-item-text {
+  padding: 0.5rem 0.6rem;
+  border-radius: 5px;
 }
 
-#menuToggle span.hamburger:nth-last-child(2) {
-  transform-origin: 0% 100%;
+#reading_menu .menu-list-item-text:hover,
+.reading-menu-close-btn:hover,
+.text-options-button:hover {
+    background-color: #d5e9fa;
+    cursor: pointer;
 }
 
-/* Top slice rotates down. */
-#menuToggle input:checked ~ span.hamburger {
-  opacity: 1;
-  transform: rotate(45deg) translate(0px, 0px);
+.menu-icon{
+  width: 18px;
+  height: 18px;
 }
 
-/* Hide middle slice. */
-#menuToggle input:checked ~ span.hamburger:nth-last-child(3) {
-  opacity: 0;
-  transform: rotate(0deg) scale(0, 0);
+.reading-menu-close-btn {
+  background-image: url("/static/icn/close.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  padding: 0.9rem;
+  border-radius: 5px;
+  border: none;
+  background-size: 42.4%;
+  margin-left: 5.4rem;
+  background-color: transparent;
+  cursor: pointer;
 }
 
-/* Bottom slice rotates up. */
-#menuToggle input:checked ~ span.hamburger:nth-last-child(2) {
-  transform: rotate(-45deg) translate(0px, -1px);
+#reading_menu .text-options-container {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 0;
+  margin-bottom: 1rem;
 }
 
+.text-options-btn-container {
+  /* background-color: #d3ebffc9; */
+  padding: 0.2rem;
+  border-radius: 5px;
+}
+
+.reading_header_left {
+  display: flex;
+  align-items: center;
+  gap: 1.3rem;
+  /* margin: 0; */
+}
+
+.reading_menu_logo_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.2rem;
+  background-color: aliceblue;
+  padding: 0.9rem 1.5rem;
+}
+
+.reading_menu_logo_container > h2 {
+  margin: 0;
+  padding: 0;
+}
 /* End reader slide-in hamburger menu. *********************/
-
 
 span.read_page_nav {
     color: #0000FF;
@@ -813,13 +848,15 @@ table.statsWordsRead th, td { padding: 5px; }
  */
 
 .text-options-button {
+    width: 36px;
+    height: 36px;
     border-radius: 5px;
-    border: 2px solid aliceblue;
-    width: 28px;
-    height: 28px;
+    border: 2px solid #d5e9fa;
+    background-color: white;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    cursor: pointer;
 }
 
 .font-plus {
@@ -861,13 +898,6 @@ table.statsWordsRead th, td { padding: 5px; }
 #read_pane_container {
     --read-grid-margin: 2.5%; /*(100 - 95) / 2 -> do not use calc here. does not work*/
     width: 100%;
-}
-
-#reading-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    align-items: baseline;
 }
 
 #wordframeid {

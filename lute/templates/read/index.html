@@ -26,45 +26,17 @@
 
   <div id="reading-header">
 
-    <div id="menuToggle" class="reading_header_left">
-      <input id="menu_hamburger_check" name="hamburger_check" type="checkbox" />
-      <span class="hamburger"></span>
-      <span class="hamburger"></span>
-      <span class="hamburger"></span>
-      <ul id="reading_menu">
-        <li>
-          <button class="text-options-button font-minus" title="Decrease font size"></button>
-          <button class="text-options-button font-plus" title="Increase font size"></button>
-          &nbsp;
-          <button class="text-options-button lh-minus" title="Decrease line height"></button>
-          <button class="text-options-button lh-plus" title="Increase line height"></button>
-        </li>
-        <li>
-          <button class="text-options-button width-minus" title="Decrease content width"></button>
-          <button class="text-options-button width-plus" title="Increase content width"></button>
-          &nbsp;
-          <button class="text-options-button column-one" title="One column text"></button>
-          <button class="text-options-button column-two" title="Two column text"></button>
-        </li>
-        {% if book.source_uri %}
-        <li><a href="{{ book.source_uri }}" target="_blank" tabindex="-1">Show source URL</a></li>
-        {% endif %}
-        <li><a id="editText" href="" onclick="edit_current_page(); return false;">Edit page</a></li>
-        <li><a id="next_theme" onclick="next_theme(); return false;" title="Next theme">Next theme (m)</a></li>
-        <li><a id="toggle_highlights" onclick="toggle_highlight(); return false;" title="Toggle highlights">Toggle highlights (h)</a></li>
-        <li><a id="keyboard_shortcuts" title="Keyboard shortcuts">Keyboard shortcuts</a></li>
-      </ul>
-    </div>
-
-    <div id="menuToggle" class="reading_header_left">
+    <div class="reading_header_left">
+      <div class="hamburger-btn" onclick="toggleMenu()">
+        <span class="hamburger"></span>
+        <span class="hamburger"></span>
+        <span class="hamburger"></span>
+      </div>
       <img
-        src="{{ url_for('static', filename='img/lute.png') }}"
-        class="lutelogo_small"
-        style="cursor: pointer"
-        onclick="window.location='/'" />
-    </div>
-
-    <div class="reading_header_middle">
+      src="{{ url_for('static', filename='img/lute.png') }}"
+      class="lutelogo_small"
+      style="cursor: pointer"
+      onclick="window.location='/'" />
       <h2 style="margin: 0px">
         <span
           class="read_page_nav read_page_disabled"
@@ -88,6 +60,44 @@
           onclick="goto_relative_page(10)"
           >&#187;</span>
       </h2>
+      <div id="reading_menu">
+        <div class="reading_menu_logo_container">
+          <img
+          src="{{ url_for('static', filename='img/lute.png') }}"
+          class="lutelogo_small"
+          style="cursor: pointer"
+          onclick="window.location='/'" />
+          <!-- <h2>Lute</h2> -->
+          <button class="reading-menu-close-btn" onclick="closeMenu()"></button>
+        </div>
+        <div class="text-options-container">
+          <div class="text-options-btn-container">
+            <button class="text-options-button font-minus" title="Decrease font size"></button>
+            <button class="text-options-button font-plus" title="Increase font size"></button>
+          </div>
+          <div class="text-options-btn-container">
+            <button class="text-options-button lh-minus" title="Decrease line height"></button>
+            <button class="text-options-button lh-plus" title="Increase line height"></button>
+          </div>
+          <div class="text-options-btn-container">
+            <button class="text-options-button width-minus" title="Decrease content width"></button>
+            <button class="text-options-button width-plus" title="Increase content width"></button>
+          </div>
+          <div class="text-options-btn-container">
+            <button class="text-options-button column-one" title="One column text"></button>
+            <button class="text-options-button column-two" title="Two column text"></button>
+          </div>
+        </div>
+        <ul>
+          {% if book.source_uri %}
+          <li class="menu-list-item-text"><a href="{{ book.source_uri }}" target="_blank" tabindex="-1"><img class="menu-icon" src="/static/icn/open.svg" alt=""><span>Show source URL</span></a></li>
+          {% endif %}
+          <li class="menu-list-item-text"><a id="editText" href="" onclick="edit_current_page(); return false;"><img class="menu-icon" src="/static/icn/edit.svg" alt=""><span>Edit page</span></a></li>
+          <li class="menu-list-item-text"><a id="next_theme" onclick="next_theme(); return false;" title="Next theme"><img class="menu-icon" src="/static/icn/color.svg" alt=""><span>Next theme (m)</span></a></li>
+          <li class="menu-list-item-text"><a id="toggle_highlights" onclick="toggle_highlight(); return false;" title="Toggle highlights"><img class="menu-icon" src="/static/icn/highlight.svg" alt=""><span>Toggle highlights (h)</span></a></li>
+          <li class="menu-list-item-text"><a id="keyboard_shortcuts" title="Keyboard shortcuts"><img class="menu-icon" src="/static/icn/keyboard.svg" alt=""><span>Keyboard shortcuts</span></a></li>
+        </ul>
+      </div>
     </div>
 
     <div class="reading_header_right">
@@ -257,11 +267,11 @@
     // If the css slide-in menu is open, clicking away from it closes the menu.
     // The menu is handled via css, so we have to update the checkbox state.
     $(document).click(function(event) {
-      const target = $(event.target);
-      const menu_clicked = (target.closest('#menuToggle').length != 0);
-      const menu_open = $('#menu_hamburger_check').is(':checked');
-      if(menu_open && !menu_clicked) {
-        $('#menu_hamburger_check').prop("checked", false);
+      const menu_clicked = event.target.closest('.reading_header_left');
+      const menu = document.getElementById("reading_menu");
+      if(!menu_clicked) {
+        menu.classList.remove("open-menu");
+        disableScroll(false);
       }
     });
   });
@@ -416,13 +426,37 @@
     },
   });
 
+  function closeMenu() {
+    const menu = document.getElementById("reading_menu");
+    menu.classList.remove("open-menu");
+
+    disableScroll(false);
+  }
+
+  function toggleMenu() {
+    const menu = document.getElementById("reading_menu");
+    menu.classList.toggle("open-menu");
+
+    disableScroll(true);
+  }
+
+  function disableScroll(disable) {
+    if (disable) {
+      document.body.style.margin = 0;
+      document.body.style.height = "100%";
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.margin = "unset";
+      document.body.style.height = "unset";
+      document.body.style.overflow = "unset";
+    }
+  }
 
   function edit_current_page() {
     const bookid = $('#book_id').val();
     const pagenum = parseInt($('#page_num').val());
     location.href = `/read/editpage/${bookid}/${pagenum}`;
   }
-
 
   // Handle green checkmark in footer.
   function handle_page_done(mark_rest_known = false, next_relative_page = 0) {
