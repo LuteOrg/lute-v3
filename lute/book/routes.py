@@ -3,21 +3,17 @@
 """
 
 import os
-from datetime import datetime
-import requests
-from bs4 import BeautifulSoup
 
 from flask import (
     Blueprint,
-    current_app,
     request,
     jsonify,
     render_template,
     redirect,
     flash,
 )
-from werkzeug.utils import secure_filename
 from lute.utils.data_tables import DataTablesFlaskParamParser
+from lute.book import service
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm
 import lute.utils.formutils
@@ -56,16 +52,6 @@ def datatables_archived_source():
     return datatables_source(True)
 
 
-def _secure_unique_fname(filefielddata):
-    """
-    Return secure name pre-pended with datetime string.
-    """
-    current_datetime = datetime.now()
-    formatted_datetime = current_datetime.strftime("%Y%m%d_%H%M%S")
-    f = "_".join([formatted_datetime, secure_filename(filefielddata.filename)])
-    return f
-
-
 def _get_file_content(filefielddata):
     """
     Get the content of the file.
@@ -77,7 +63,8 @@ def _get_file_content(filefielddata):
         return str(content, "utf-8")
 
     if ext == ".epub":
-        raise ValueError("TODO")
+        content = service.get_epub_content(filefielddata)
+        return str(content, "utf-8")
 
     raise ValueError(f'Unknown file extension "{ext}"')
 
@@ -96,18 +83,14 @@ def new():
             b.text = _get_file_content(form.textfile.data)
         f = form.audiofile.data
         if f:
-            filename = _secure_unique_fname(f)
-            b.audio_filename = filename
-            fp = os.path.join(current_app.env_config.useraudiopath, filename)
-            f.save(fp)
+            b.audio_filename = service.save_audio_file(f)
         book = repo.add(b)
         repo.commit()
         return redirect(f"/read/{book.id}/page/1", 302)
 
-    parameters = request.args
-    import_url = parameters.get("importurl", "").strip()
+    import_url = request.args.get("importurl", "").strip()
     if import_url != "":
-        b = load_book(import_url)
+        b = service.book_from_url(import_url)
         form = NewBookForm(obj=b)
         form.language_id.choices = lute.utils.formutils.language_choices()
 
@@ -118,41 +101,6 @@ def new():
         tags=repo.get_book_tags(),
         show_language_selector=True,
     )
-
-
-def load_book(url):
-    "Parse the url and load a new Book."
-    s = None
-    try:
-        timeout = 20  # seconds
-        response = requests.get(url, timeout=timeout)
-        response.raise_for_status()
-        s = response.text
-    except requests.exceptions.RequestException as e:
-        msg = f"Could not parse {url} (error: {str(e)})"
-        flash(msg, "notice")
-        return Book()
-
-    soup = BeautifulSoup(s, "html.parser")
-    extracted_text = []
-
-    # Add elements in order found.
-    for element in soup.descendants:
-        if element.name in ("h1", "h2", "h3", "h4", "p"):
-            extracted_text.append(element.text)
-
-    title_node = soup.find("title")
-    orig_title = title_node.string if title_node else url
-
-    short_title = orig_title[:150]
-    if len(orig_title) > 150:
-        short_title += " ..."
-
-    b = Book()
-    b.title = short_title
-    b.source_uri = url
-    b.text = "\n\n".join(extracted_text)
-    return b
 
 
 @bp.route("/edit/<int:bookid>", methods=["GET", "POST"])
@@ -166,12 +114,9 @@ def edit(bookid):
         form.populate_obj(b)
         f = form.audiofile.data
         if f:
-            filename = _secure_unique_fname(f)
-            b.audio_filename = filename
+            b.audio_filename = service.save_audio_file(f)
             b.audio_bookmarks = None
             b.audio_current_pos = None
-            fp = os.path.join(current_app.env_config.useraudiopath, filename)
-            f.save(fp)
         repo.add(b)
         repo.commit()
         flash(f"{b.title} updated.")
