@@ -19,6 +19,8 @@ authors = [
   {name = "Jeff Zohrab", email = "jzohrab@gmail.com"}
 ]
 readme = "README_PyPi.md"
+
+# TODO epub: add epub parsing library to dependencies
 dependencies = [
   "Flask-SQLAlchemy>=3.1.1,<4",
   "Flask-WTF>=1.2.1,<2",
