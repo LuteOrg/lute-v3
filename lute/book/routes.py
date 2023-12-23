@@ -66,6 +66,22 @@ def _secure_unique_fname(filefielddata):
     return f
 
 
+def _get_file_content(filefielddata):
+    """
+    Get the content of the file.
+    """
+    _, ext = os.path.splitext(filefielddata.filename)
+    ext = (ext or "").lower()
+    if ext == ".txt":
+        content = filefielddata.read()
+        return str(content, "utf-8")
+
+    if ext == ".epub":
+        raise ValueError("TODO")
+
+    raise ValueError(f'Unknown file extension "{ext}"')
+
+
 @bp.route("/new", methods=["GET", "POST"])
 def new():
     "Create a new book, either from text or from a file."
@@ -77,8 +93,7 @@ def new():
     if form.validate_on_submit():
         form.populate_obj(b)
         if form.textfile.data:
-            content = form.textfile.data.read()
-            b.text = str(content, "utf-8")
+            b.text = _get_file_content(form.textfile.data)
         f = form.audiofile.data
         if f:
             filename = _secure_unique_fname(f)
