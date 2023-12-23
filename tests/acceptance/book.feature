@@ -4,6 +4,13 @@ Feature: Books and stats are available
         Given a running site
         And demo languages
 
+    Scenario: I can import a text file.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file Hola.txt
+        Then the page title is Reading "Hola"
+        And the reading pane shows:
+            Tengo/ /un/ /amigo/.
+
     Scenario: Books and stats are shown on the first page.
         Given I visit "/"
         Given a Spanish book "Hola" with content:
