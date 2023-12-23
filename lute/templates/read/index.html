@@ -95,7 +95,14 @@
           <li class="menu-list-item-text"><a id="editText" href="" onclick="edit_current_page(); return false;"><img class="menu-icon" src="/static/icn/edit.svg" alt=""><span>Edit page</span></a></li>
           <li class="menu-list-item-text"><a id="next_theme" onclick="next_theme(); return false;" title="Next theme"><img class="menu-icon" src="/static/icn/color.svg" alt=""><span>Next theme (m)</span></a></li>
           <li class="menu-list-item-text"><a id="toggle_highlights" onclick="toggle_highlight(); return false;" title="Toggle highlights"><img class="menu-icon" src="/static/icn/highlight.svg" alt=""><span>Toggle highlights (h)</span></a></li>
-          <li class="menu-list-item-text"><a id="keyboard_shortcuts" title="Keyboard shortcuts"><img class="menu-icon" src="/static/icn/keyboard.svg" alt=""><span>Keyboard shortcuts</span></a></li>
+          <li class="menu-list-item-text">
+            <a id="keyboard_shortcuts" title="Keyboard shortcuts"
+               href="https://jzohrab.github.io/lute-manual/usage/keyboard-bindings.html"
+               target="_blank">
+              <img class="menu-icon" src="/static/icn/keyboard.svg" alt="">
+              <span>Keyboard shortcuts</span>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -403,28 +410,6 @@
       }
     );
   }
-
-  let tooltip_help_hover_content = function (setContent) {
-    $.ajax({
-      url: `/read/keyboard_shortcuts`,
-      type: "get",
-      success: function (response) {
-        setContent(response);
-      },
-    });
-  };
-
-  $("#keyboard_shortcuts").tooltip({
-    position: {
-      my: "left top+10",
-      at: "left bottom",
-      collision: "flipfit flip",
-    },
-    show: { easing: "easeOutCirc" },
-    content: function (setContent) {
-      tooltip_help_hover_content(setContent);
-    },
-  });
 
   function closeMenu() {
     const menu = document.getElementById("reading_menu");
