@@ -226,6 +226,12 @@ def given_book_from_file(luteclient, lang, title, filename):
     luteclient.make_book_from_file(title, fullpath, lang)
 
 
+@given(parsers.parse("a {lang} book from url {url}"))
+def given_book_from_url(luteclient, lang, url):
+    "Book is made from url in dev_api."
+    luteclient.make_book_from_url(url, lang)
+
+
 @given(parsers.parse('the book table loads "{title}"'))
 def given_book_table_wait(luteclient, title):
     "The book table is loaded via ajax, so there's a delay."
