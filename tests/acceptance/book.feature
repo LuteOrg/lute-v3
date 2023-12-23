@@ -4,6 +4,36 @@ Feature: Books and stats are available
         Given a running site
         And demo languages
 
+    Scenario: I can import text.
+        Given I visit "/"
+        Given a Spanish book "Hola" with content:
+            Hola. Tengo un gato.
+        Then the page title is Reading "Hola"
+        And the reading pane shows:
+            Hola/. /Tengo/ /un/ /gato/.
+
+    Scenario: I can import a text file.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file Hola.txt
+        Then the page title is Reading "Hola"
+        And the reading pane shows:
+            Tengo/ /un/ /amigo/.
+
+    Scenario: I can import a url.
+        Given I visit "/"
+        Given a Spanish book from url http://localhost:5000/dev_api/fake_story.html
+        Then the page title is Reading "Mi perro."
+        And the reading pane shows:
+            Hola/. /Tengo/ /un/ /perro/.
+
+    # TODO epub: add an epub file to sample_files, activate this test.
+    ### Scenario: I can import an epub file.
+    ###     Given I visit "/"
+    ###     Given a Spanish book "Hola" from file Hola.epub
+    ###     Then the page title is Reading "Hola"
+    ###     And the reading pane shows:
+    ###         Tengo/ /un/ /amigo/.
+
     Scenario: Books and stats are shown on the first page.
         Given I visit "/"
         Given a Spanish book "Hola" with content:
