@@ -42,7 +42,8 @@ class RenderableCalculator:
         "Dump all to debug test failures."
         print("All tokens: -----------------------")
         for tok in texttokens:
-            print("  " + "; ".join([tok.token, tok.order]))
+            arr = map(str, [tok.token, tok.order])
+            print("  " + ": ".join(arr))
         print("End all tokens: -------------------")
 
     def _assert_texttokens_are_contiguous(self, texttokens):
