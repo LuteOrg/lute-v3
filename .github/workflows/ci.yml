@@ -57,17 +57,19 @@ jobs:
     # Playwright tests were hanging far too often on github ci,
     # but not consistently.  No idea what was going wrong.
     # TODO github ci: fix playwright hanging.
-    ## - name: Playwright install
-    ##   run: playwright install
+    - name: Playwright install
+      run: playwright install
 
-    ## - name: Playwright smoke test
-    ##   run: |
-    ##     set -x
-    ##     inv playwright
+    - name: Playwright smoke test
+      run: |
+        set -x
+        set -e
+        inv playwright
 
     - name: Test
       run: |
         # Have to explicitly set MECAB_PATH for natto-py.
+        set -e
         export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
         pytest
 
@@ -76,6 +78,7 @@ jobs:
     # because everything passes/fails correctly locally.
     - name: Acceptance testing
       run: |
+        set -e
         export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
         inv accept --headless -s
 
