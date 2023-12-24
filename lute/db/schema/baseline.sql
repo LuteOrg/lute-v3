@@ -62,10 +62,11 @@ INSERT INTO languages VALUES(4,'English','https://en.thefreedictionary.com/###',
 INSERT INTO languages VALUES(5,'French','https://fr.thefreedictionary.com/###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#fr/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
 INSERT INTO languages VALUES(6,'German','https://de.thefreedictionary.com/###','https://www.wordreference.com/deen/###','*https://www.deepl.com/translator#de/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
 INSERT INTO languages VALUES(7,'Greek','https://www.wordreference.com/gren/###','https://en.wiktionary.org/wiki/###','*https://www.deepl.com/translator#el/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?;','Mr.|Mrs.|Dr.|[A-Z].|κτλ.|κλπ.|π.χ.|λ.χ.|κ.ά|δηλ.|Κος.|Κ.|Κα.|μ.Χ.|ΥΓ.|μ.μ.|π.μ.|σελ.|κεφ.|βλ.|αι.','α-ωΑ-ΩάόήέώύίΊΏΈΉΌΆΎϊΪϋΫΐΰ',0,0,0,1,'spacedel');
-INSERT INTO languages VALUES(8,'Japanese','https://jisho.org/search/###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#jp/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。？！','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','\p{Han}\p{Katakana}\p{Hiragana}',0,0,0,1,'japanese');
-INSERT INTO languages VALUES(9,'Russian','https://www.dict.com/Russian-English/###','https://en.openrussian.org/?search=###','*https://www.deepl.com/translator#ru/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','А-Яа-яЁё',0,0,0,0,'spacedel');
-INSERT INTO languages VALUES(10,'Spanish','https://es.thefreedictionary.com/###','https://www.wordreference.com/es/en/translation.asp?spen=###','*https://www.deepl.com/translator#es/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
-INSERT INTO languages VALUES(11,'Turkish','https://www.wordreference.com/tren/###','https://tr.wiktionary.org/###','*https://www.deepl.com/translator#tr/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑğĞıİöÖüÜşŞçÇ',0,0,0,1,'turkish');
+INSERT INTO languages VALUES(8,'Hindi','https://www.boltidictionary.com/en/search?s=###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','https://www.bing.com/translator/?from=hi&to=en&text=###','´=''|`=''|’=''|‘=''|...=…|..=‥','.?!|।॥','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-Z\u0900-\u0963\u0966-\u097F',0,0,0,1,'spacedel');
+INSERT INTO languages VALUES(9,'Japanese','https://jisho.org/search/###','https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle','*https://www.deepl.com/translator#jp/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。？！','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','\p{Han}\p{Katakana}\p{Hiragana}',0,0,0,1,'japanese');
+INSERT INTO languages VALUES(10,'Russian','https://www.dict.com/Russian-English/###','https://en.openrussian.org/?search=###','*https://www.deepl.com/translator#ru/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','А-Яа-яЁё',0,0,0,0,'spacedel');
+INSERT INTO languages VALUES(11,'Spanish','https://es.thefreedictionary.com/###','https://www.wordreference.com/es/en/translation.asp?spen=###','*https://www.deepl.com/translator#es/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,0,0,'spacedel');
+INSERT INTO languages VALUES(12,'Turkish','https://www.wordreference.com/tren/###','https://tr.wiktionary.org/###','*https://www.deepl.com/translator#tr/en/###','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑğĞıİöÖüÜşŞçÇ',0,0,0,1,'turkish');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
@@ -135,6 +136,7 @@ INSERT INTO bookstats VALUES(9,110,85,85,100);
 INSERT INTO bookstats VALUES(10,175,120,120,100);
 INSERT INTO bookstats VALUES(11,69,49,49,100);
 INSERT INTO bookstats VALUES(12,64,41,41,100);
+INSERT INTO bookstats VALUES(13,35,30,30,100);
 CREATE TABLE IF NOT EXISTS "wordimages" (
 	"WiID" INTEGER NOT NULL  ,
 	"WiWoID" INTEGER NOT NULL  ,
@@ -174,16 +176,17 @@ CREATE TABLE IF NOT EXISTS "books" (
 );
 INSERT INTO books VALUES(1,3,'Hrad Cimburk – Jak vzal vítr pasáčkovi čepici',NULL,0,0,67,NULL,NULL,NULL);
 INSERT INTO books VALUES(2,2,'逍遙遊',NULL,0,0,382,NULL,NULL,NULL);
-INSERT INTO books VALUES(3,10,'Aladino y la lámpara maravillosa',NULL,0,0,83,NULL,NULL,NULL);
-INSERT INTO books VALUES(4,9,'медведь',NULL,0,0,48,NULL,NULL,NULL);
+INSERT INTO books VALUES(3,11,'Aladino y la lámpara maravillosa',NULL,0,0,83,NULL,NULL,NULL);
+INSERT INTO books VALUES(4,10,'медведь',NULL,0,0,48,NULL,NULL,NULL);
 INSERT INTO books VALUES(5,4,'Tutorial',NULL,0,0,1242,NULL,NULL,NULL);
 INSERT INTO books VALUES(6,4,'Tutorial follow-up',NULL,0,0,646,NULL,NULL,NULL);
 INSERT INTO books VALUES(7,7,'Γεια σου, Νίκη. Ο Πέτρος είμαι.',NULL,0,0,157,NULL,NULL,NULL);
 INSERT INTO books VALUES(8,1,'Examples',NULL,0,0,115,NULL,NULL,NULL);
-INSERT INTO books VALUES(9,11,'Büyük ağaç',NULL,0,0,110,NULL,NULL,NULL);
+INSERT INTO books VALUES(9,12,'Büyük ağaç',NULL,0,0,110,NULL,NULL,NULL);
 INSERT INTO books VALUES(10,6,'Die Bremer Stadtmusikanten',NULL,0,0,175,NULL,NULL,NULL);
 INSERT INTO books VALUES(11,5,'Boucles d’or et les trois ours',NULL,0,0,69,NULL,NULL,NULL);
-INSERT INTO books VALUES(12,8,'北風と太陽 - きたかぜたいよう',NULL,0,0,64,NULL,NULL,NULL);
+INSERT INTO books VALUES(12,9,'北風と太陽 - きたかぜたいよう',NULL,0,0,64,NULL,NULL,NULL);
+INSERT INTO books VALUES(13,8,'Universal Declaration of Human Rights',NULL,0,0,35,NULL,NULL,NULL);
 CREATE TABLE IF NOT EXISTS "wordparents" (
 	"WpWoID" INTEGER NOT NULL  ,
 	"WpParentWoID" INTEGER NOT NULL  ,
@@ -219,6 +222,7 @@ INSERT INTO texts VALUES(17,9,1,replace('Büyük ağaç eskiden aşılanmış ve
 INSERT INTO texts VALUES(18,10,1,replace('Es hatte ein Mann einen Esel, der schon lange Jahre die Säcke unverdrossen zur Mühle getragen hatte, dessen Kräfte aber nun zu Ende gingen, so daß er zur Arbeit immer untauglicher ward. Da dachte der Herr daran, ihn aus dem Futter zu schaffen, aber der Esel merkte, daß kein guter Wind wehte, lief fort und machte sich auf den Weg nach Bremen; dort, meinte er, könnte er ja Stadtmusikant werden.\n\nAls er ein Weilchen fortgegangen war, fand er einen Jagdhund auf dem Wege liegen, der jappte wie einer, der sich müde gelaufen hat. "Nun, was jappst du so, Packan?" fragte der Esel. "Ach," sagte der Hund, "weil ich alt bin und jeden Tag schwächer werde, auch auf der Jagd nicht mehr fort kann, hat mich mein Herr wollen totschlagen, da hab ich Reißaus genommen; aber womit soll ich nun mein Brot verdienen?" - "Weißt du was?" sprach der Esel, "ich gehe nach Bremen und werde dort Stadtmusikant, geh mit und laß dich auch bei der Musik annehmen. Ich spiele die Laute und du schlägst die Pauken."','\n',char(10)),NULL,NULL);
 INSERT INTO texts VALUES(19,11,1,replace('Il était une fois trois ours: un papa ours, une maman ours et un bébé ours. Ils habitaient tous ensemble dans une maison jaune au milieu d''une grande forêt.\n\nUn jour, Maman Ours prépara une grande marmite de porridge délicieux et fumant pour le petit déjeuner. Il était trop chaud pour pouvoir être mangé, alors les ours décidèrent d''aller se promener en attendant que le porridge refroidisse.','\n',char(10)),NULL,NULL);
 INSERT INTO texts VALUES(20,12,1,replace('北風と太陽\n\n「おれの方が強い。」「いいや、ぼくの方が強い。」\n北風と太陽の声が聞こえます。二人はどちらの力が強いかでケンカをしているようです。\n「太陽が毎日元気だから、暑くてみんな困っているよ。おれが涼しい風を吹くと、みんな嬉しそうだ。」','\n',char(10)),NULL,NULL);
+INSERT INTO texts VALUES(21,13,1,'अनुच्छेद १(एक): सभी मनुष्य जन्म से स्वतन्त्र तथा मर्यादा और अधिकारों में समान होते हैं। वे तर्क और विवेक से सम्पन्न हैं तथा उन्हें भ्रातृत्व की भावना से परस्पर के प्रति कार्य करना चाहिए।',NULL,NULL);
 CREATE TABLE IF NOT EXISTS "settings" (
 	"StKey" VARCHAR(40) NOT NULL,
         "StKeyType" TEXT NOT NULL,
