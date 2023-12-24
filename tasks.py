@@ -167,10 +167,7 @@ def playwright(c):
 
     If Lute's not running on specified port, start a server.
     """
-    run_test = [
-        "pytest",
-        "tests/playwright/playwright.py",
-    ]
+    run_test = ["pytest", "tests/playwright/playwright.py", "-s"]
 
     tests_failed = False
     port = 5000
