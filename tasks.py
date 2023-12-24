@@ -151,6 +151,7 @@ def accept(  # pylint: disable=too-many-arguments
                 pass
             finally:
                 app_process.terminate()
+                raise RuntimeError("tests failed")
 
 
 @task(pre=[_ensure_test_db])
@@ -181,6 +182,7 @@ def playwright(c):
                 pass
             finally:
                 app_process.terminate()
+                raise RuntimeError("tests failed")
 
 
 @task(pre=[_ensure_test_db], help={"html": "open html report"})
