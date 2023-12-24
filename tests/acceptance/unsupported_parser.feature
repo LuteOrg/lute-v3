@@ -5,11 +5,11 @@ Feature: Unsupported language data is hidden
         And demo languages
         And the demo stories are loaded
 
-        Given a Spanish book "Hola" with content:
-            Hola. Tengo un gato.
-        And a new Spanish term:
+        Given a new Spanish term:
             text: gato
             translation: cat
+        And a Spanish book "Hola" with content:
+            Hola. Tengo un gato.
         And a Japanese book "Hola" with content:
             こんにちは
         And a new Japanese term:
