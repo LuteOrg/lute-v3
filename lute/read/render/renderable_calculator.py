@@ -40,8 +40,8 @@ class RenderableCalculator:
 
     def _tokens_to_string(self, texttokens):
         "Convert array of tokens to string for debugging."
-        arr = [": ".join(map(str, [tok.order, tok.token])) for tok in texttokens]
-        return ", ".join(arr)
+        arr = [f"{tok.order}: '{tok.token}'" for tok in texttokens]
+        return "\n".join(arr)
 
     def _assert_texttokens_are_contiguous(self, texttokens):
         "Check ordering."
@@ -49,7 +49,7 @@ class RenderableCalculator:
         for tok in texttokens:
             if prevtok is not None and prevtok.order != (tok.order - 1):
                 toks = self._tokens_to_string(texttokens)
-                msg = f"Order error at pos {prevtok.token}: {toks}"
+                msg = f"Order error at pos {prevtok.order}:\n{toks}"
                 raise RuntimeError(msg)
             prevtok = tok
 
