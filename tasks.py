@@ -126,6 +126,7 @@ def accept(  # pylint: disable=too-many-arguments
         "--splinter-screenshot-dir=tests/acceptance/failure_screenshots",
         "--splinter-webdriver=chrome",
         f"--port={port}",
+        "-vv",
     ]
 
     if show:
