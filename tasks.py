@@ -108,10 +108,11 @@ def _site_is_running(useport=None):
         "headless": "run as headless",
         "kflag": "optional -k flag argument",
         "exitfirst": "exit on first failure",
+        "verbose": "make verbose",
     },
 )
 def accept(  # pylint: disable=too-many-arguments
-    c, port=5000, show=False, headless=False, kflag=None, exitfirst=False
+    c, port=5000, show=False, headless=False, kflag=None, exitfirst=False, verbose=False
 ):
     """
     Start lute, run tests/acceptance tests, screenshot fails.
@@ -137,7 +138,10 @@ def accept(  # pylint: disable=too-many-arguments
         run_test.append(kflag)
     if exitfirst:
         run_test.append("--exitfirst")
+    if verbose:
+        run_test.append("-vv")
 
+    tests_failed = False
     if _site_is_running(port):
         c.run(" ".join(run_test))
     else:
@@ -148,9 +152,12 @@ def accept(  # pylint: disable=too-many-arguments
             except subprocess.CalledProcessError:
                 # This just means a test failed.  We don't need to see
                 # a stack trace, the assert failures are already displayed.
-                pass
+                tests_failed = True
             finally:
                 app_process.terminate()
+
+    if tests_failed:
+        raise RuntimeError("tests failed")
 
 
 @task(pre=[_ensure_test_db])
@@ -162,11 +169,9 @@ def playwright(c):
 
     If Lute's not running on specified port, start a server.
     """
-    run_test = [
-        "pytest",
-        "tests/playwright/playwright.py",
-    ]
+    run_test = ["pytest", "tests/playwright/playwright.py", "-s"]
 
+    tests_failed = False
     port = 5000
     if _site_is_running(port):
         c.run(" ".join(run_test))
@@ -178,9 +183,12 @@ def playwright(c):
             except subprocess.CalledProcessError:
                 # This just means a test failed.  We don't need to see
                 # a stack trace, the assert failures are already displayed.
-                pass
+                tests_failed = True
             finally:
                 app_process.terminate()
+
+    if tests_failed:
+        raise RuntimeError("tests failed")
 
 
 @task(pre=[_ensure_test_db], help={"html": "open html report"})

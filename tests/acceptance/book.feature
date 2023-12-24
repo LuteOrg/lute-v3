@@ -14,7 +14,7 @@ Feature: Books and stats are available
 
     Scenario: I can import a text file.
         Given I visit "/"
-        Given a Spanish book "Hola" from file Hola.txt
+        Given a Spanish book "Hola" from file hola.txt
         Then the page title is Reading "Hola"
         And the reading pane shows:
             Tengo/ /un/ /amigo/.
