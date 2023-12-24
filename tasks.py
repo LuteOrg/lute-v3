@@ -186,7 +186,6 @@ def playwright(c):
                 tests_failed = True
             finally:
                 app_process.terminate()
-                raise RuntimeError("tests failed")
 
     if tests_failed:
         raise RuntimeError("tests failed")
