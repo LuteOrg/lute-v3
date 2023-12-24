@@ -38,10 +38,19 @@ class RenderableCalculator:
     - M is _not_ contained by anything else, so it should be rendered.
     """
 
+    def _dump_all_tokens(self, texttokens):
+        "Dump all to debug test failures."
+        print("All tokens: -----------------------")
+        for tok in texttokens:
+            print("  " + "; ".join([tok.token, tok.order]))
+        print("End all tokens: -------------------")
+
     def _assert_texttokens_are_contiguous(self, texttokens):
+        "Check ordering."
         prevtok = None
         for tok in texttokens:
             if prevtok is not None and prevtok.order != (tok.order - 1):
+                self._dump_all_tokens(texttokens)
                 mparts = [prevtok.token, prevtok.order, tok.token, tok.order]
                 msg = "; ".join(map(str, mparts))
                 raise RuntimeError(f"bad token ordering: {msg}")
