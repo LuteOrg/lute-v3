@@ -108,10 +108,11 @@ def _site_is_running(useport=None):
         "headless": "run as headless",
         "kflag": "optional -k flag argument",
         "exitfirst": "exit on first failure",
+        "verbose": "make verbose",
     },
 )
 def accept(  # pylint: disable=too-many-arguments
-    c, port=5000, show=False, headless=False, kflag=None, exitfirst=False
+    c, port=5000, show=False, headless=False, kflag=None, exitfirst=False, verbose=False
 ):
     """
     Start lute, run tests/acceptance tests, screenshot fails.
@@ -126,7 +127,6 @@ def accept(  # pylint: disable=too-many-arguments
         "--splinter-screenshot-dir=tests/acceptance/failure_screenshots",
         "--splinter-webdriver=chrome",
         f"--port={port}",
-        "-vv",
     ]
 
     if show:
@@ -138,6 +138,8 @@ def accept(  # pylint: disable=too-many-arguments
         run_test.append(kflag)
     if exitfirst:
         run_test.append("--exitfirst")
+    if verbose:
+        run_test.append("-vv")
 
     tests_failed = False
     if _site_is_running(port):
