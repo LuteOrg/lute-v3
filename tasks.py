@@ -138,6 +138,7 @@ def accept(  # pylint: disable=too-many-arguments
     if exitfirst:
         run_test.append("--exitfirst")
 
+    tests_failed = False
     if _site_is_running(port):
         c.run(" ".join(run_test))
     else:
@@ -148,10 +149,12 @@ def accept(  # pylint: disable=too-many-arguments
             except subprocess.CalledProcessError:
                 # This just means a test failed.  We don't need to see
                 # a stack trace, the assert failures are already displayed.
-                pass
+                tests_failed = True
             finally:
                 app_process.terminate()
-                raise RuntimeError("tests failed")
+
+    if tests_failed:
+        raise RuntimeError("tests failed")
 
 
 @task(pre=[_ensure_test_db])
@@ -168,6 +171,7 @@ def playwright(c):
         "tests/playwright/playwright.py",
     ]
 
+    tests_failed = False
     port = 5000
     if _site_is_running(port):
         c.run(" ".join(run_test))
@@ -179,10 +183,13 @@ def playwright(c):
             except subprocess.CalledProcessError:
                 # This just means a test failed.  We don't need to see
                 # a stack trace, the assert failures are already displayed.
-                pass
+                tests_failed = True
             finally:
                 app_process.terminate()
                 raise RuntimeError("tests failed")
+
+    if tests_failed:
+        raise RuntimeError("tests failed")
 
 
 @task(pre=[_ensure_test_db], help={"html": "open html report"})
