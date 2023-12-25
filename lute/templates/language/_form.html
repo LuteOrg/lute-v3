@@ -51,17 +51,10 @@
 
         // Add a new entity
         $("#add-b-entity").click(function() {
-            var index = $("#b-entities").children().length;
-
-            var template = `
-                <div>
-                    <span class="drag-handle">☰</span>
-                    <input type="text" id="b_entities-${index}-name" name="b_entities-${index}-name">
-                    <button type="button" class="remove-b-entity">Remove</button>
-                </div>
-            `;
-
-            $("#b-entities").append(template);
+          var index = $("#b-entities").children().length;
+          let template = $("#b-entities").children()[0].innerHTML;
+          template = template.replaceAll('-0', `-${index}`);
+          $("#b-entities").append(template);
         });
 
         // Remove an entity

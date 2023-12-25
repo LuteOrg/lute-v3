@@ -99,6 +99,7 @@ def edit(langid):
 
     form = LanguageForm(obj=language)
 
+    form.b_entities.append_entry({})
     form.b_entities.append_entry({"name": "apple", "protocol": "aim"})
     form.b_entities.append_entry({"name": "blah", "protocol": "msn"})
     form.parser_type.choices = supported_parsers()
