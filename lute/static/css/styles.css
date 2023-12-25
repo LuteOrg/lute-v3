@@ -915,3 +915,37 @@ table.statsWordsRead th, td { padding: 5px; }
 .zoomableTermImage:hover {
     transform: scale(10) translate(-10px) !important;
 }
+
+/* resize */
+
+/* border */
+#read_pane_right::after {
+    content: '';
+    background-color: #dbefff;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 100%;
+    cursor: col-resize;
+}
+
+/* border */
+.dictframecontainer::after {
+    content: '';
+    background-color: #dbefff;
+    /* background-image: linear-gradient(to right, #dbefff 50%, #dbefff 50%); */
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    cursor: row-resize;
+}
+
+.dictframecontainer {
+    position: relative;
+    overflow: hidden; /* contents overflow (over audio player) if height is too small*/
+    opacity: 0; /*to hide the after element. easier this way */
+}
