@@ -50,20 +50,26 @@
         numberInput.val(index + 1);
       });
     };
-      
-    $("#b-entities").sortable({
-      handle: ".drag-handle",
-      update: function(event, ui) {
-        sort_entities();
-      }
-    });
+
+    let apply_sortable = function() {
+      $("#b-entities").sortable({
+        handle: ".drag-handle",
+        update: function(event, ui) {
+          sort_entities();
+        }
+      });
+    };
+
+    apply_sortable();
 
     // Add a new entity
     $("#add-b-entity").click(function() {
       var index = $("#b-entities").children().length;
-      let template = $("#b-entities").children()[0].innerHTML;
+      let template = "<div>" + $("#b-entities div").html() + "</div>";
+      // console.log(template);
       template = template.replaceAll('-0', `-${index}`);
       $("#b-entities").append(template);
+      apply_sortable();
     });
 
     // Remove an entity
