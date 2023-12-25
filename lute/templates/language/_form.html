@@ -28,7 +28,7 @@
 
   <div id="b-entities">
     {% for b_entity in form.b_entities %}
-    <div>
+    <div {% if loop.first %}style="display: none;"{% endif %}>
       {{ b_entity() }}
       <button type="button" class="remove-b-entity">Remove</button>
     </div>

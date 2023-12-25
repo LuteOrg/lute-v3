@@ -98,14 +98,15 @@ def edit(langid):
         return redirect(url_for("language.index"))
 
     form = LanguageForm(obj=language)
-
-    form.b_entities.append_entry({})
-    form.b_entities.append_entry({"name": "apple", "protocol": "aim"})
-    form.b_entities.append_entry({"name": "blah", "protocol": "msn"})
     form.parser_type.choices = supported_parsers()
 
     if _handle_form(language, form):
         return redirect("/")
+
+    form.b_entities.append_entry({})
+    form.b_entities.append_entry({"name": "apple", "protocol": "aim"})
+    form.b_entities.append_entry({"name": "blah", "protocol": "msn"})
+
     return render_template("language/edit.html", form=form, language=language)
 
 
