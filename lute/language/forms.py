@@ -11,6 +11,7 @@ from wtforms import (
     FormField,
     FieldList,
     Form,
+    ValidationError,
 )
 from wtforms.validators import DataRequired
 from lute.models.language import LanguageDictionary
@@ -29,6 +30,11 @@ class LanguageDictionaryForm(Form):
     )
     dicturi = StringField("URL", validators=[DataRequired()])
     sort_order = IntegerField("Sort", render_kw={"style": "display: none"})
+
+    def validate_dicturi(self, field):  # pylint: disable=unused-argument
+        "Language must be set."
+        if "###" not in field.data and "<TERM>" not in field.data:
+            raise ValidationError("Dictionary URI must contain ### or <TERM>")
 
 
 class LanguageForm(FlaskForm):

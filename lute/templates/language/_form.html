@@ -2,7 +2,9 @@
 <p>{{ field_name }}
   <ul>
     {% for error in field_errors %}
+    {% if error != {} %}
     <li>{{ error }}</li>
+    {% endif %}
     {% endfor %}
   </ul>
 </p>
