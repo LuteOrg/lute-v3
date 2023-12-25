@@ -14,9 +14,9 @@ from wtforms import (
 from wtforms.validators import DataRequired
 
 
-class BForm(Form):
-    dicturl = StringField("URL")
+class LanguageDictionaryForm(Form):
     dicttype = SelectField(choices=[("popuphtml", "Pop-up window"), ("inlinehtml", "Show in Lute")])
+    dicturl = StringField("URL")
 
 
 class LanguageForm(FlaskForm):
@@ -27,7 +27,7 @@ class LanguageForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     dict_1_uri = StringField("Dictionary 1", validators=[DataRequired()])
     dict_2_uri = StringField("Dictionary 2")
-    b_entities = FieldList(FormField(BForm))
+    dictionaries = FieldList(FormField(LanguageDictionaryForm))
     sentence_translate_uri = StringField(
         "Sentence translation", validators=[DataRequired()]
     )

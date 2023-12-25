@@ -22,23 +22,23 @@
     <tr>
       <td>Dictionaries</td>
       <td>
-        <div id="b-entities">
-          {% for b_entity in form.b_entities %}
+        <div id="dictionary_entities">
+          {% for dictionary in form.dictionaries %}
           <div class="valign" {% if loop.first %}style="display: none;"{% endif %}>
-            <span class="drag-handle">☰</span> {{ b_entity.dicttype }}
-            {{ b_entity.dicturl(class="form-control-narrower") }}
-            <span class="remove-b-entity">
+            <span class="drag-handle">☰</span> {{ dictionary.dicttype }}
+            {{ dictionary.dicturl(class="form-control-narrower") }}
+            <span class="remove-dict-entity">
               <img src="{{ url_for('static', filename='icn/minus-button.png') }}">
             </span>
           </div>
           {% endfor %}
         </div>
-        <span id="add-b-entity"><img src="{{ url_for('static', filename='icn/plus-button.png') }}"</span>
+        <span id="add-dict-entity"><img src="{{ url_for('static', filename='icn/plus-button.png') }}"</span>
       </td>
     </tr>
 
     {% for field in form %}
-    {% if field.name not in ('csrf_token', 'b_entities') %}
+    {% if field.name not in ('csrf_token', 'dictionaries') %}
     <tr>
       <td>{{ field.label(class="form-control-label") }}</td>
       <td>{{ field(class="form-control") }}</td>
@@ -60,7 +60,7 @@
       // I don't think there's any need to re-index
       // the dicts, they're posted with the index number
       // as part of the field name.
-      $("#b-entities > div").each(function(index) {
+      $("#dictionary-entities > div").each(function(index) {
       var numberInput = $(this).find('input[type="number"]');
       numberInput.val(index + 1);
       });
@@ -68,7 +68,7 @@
     };
 
     let apply_sortable = function() {
-      $("#b-entities").sortable({
+      $("#dictionary_entities").sortable({
         handle: ".drag-handle",
         update: function(event, ui) {
           sort_entities();
@@ -79,17 +79,17 @@
     apply_sortable();
 
     // Add a new entity
-    $("#add-b-entity").click(function() {
-      var index = $("#b-entities").children().length;
-      let template = "<div>" + $("#b-entities div").html() + "</div>";
+    $("#add-dict-entity").click(function() {
+      var index = $("#dictionary_entities").children().length;
+      let template = "<div>" + $("#dictionary_entities div").html() + "</div>";
       // console.log(template);
       template = template.replaceAll('-0', `-${index}`);
-      $("#b-entities").append(template);
+      $("#dictionary_entities").append(template);
       apply_sortable();
     });
 
     // Remove an entity
-    $(document).on("click", ".remove-b-entity", function() {
+    $(document).on("click", ".remove-dict-entity", function() {
       $(this).closest("div").remove();
     });
   });
