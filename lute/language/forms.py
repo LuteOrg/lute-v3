@@ -15,8 +15,8 @@ from wtforms.validators import DataRequired
 
 
 class BForm(Form):
-    dictname = StringField("Name")
-    protocol = SelectField(choices=[("aim", "AIM"), ("msn", "MSN")])
+    dicturl = StringField("URL")
+    dicttype = SelectField(choices=[("popuphtml", "Pop-up window"), ("inlinehtml", "Show in Lute")])
 
 
 class LanguageForm(FlaskForm):

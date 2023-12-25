@@ -104,8 +104,8 @@ def edit(langid):
         return redirect("/")
 
     form.b_entities.append_entry({})
-    form.b_entities.append_entry({"dictname": "apple", "protocol": "aim"})
-    form.b_entities.append_entry({"dictname": "blah", "protocol": "msn"})
+    form.b_entities.append_entry({"dicturl": "apple/###", "dicttype": "inlinehtml"})
+    form.b_entities.append_entry({"dicturl": "blah?###", "dicttype": "popuphtml"})
 
     return render_template("language/edit.html", form=form, language=language)
 

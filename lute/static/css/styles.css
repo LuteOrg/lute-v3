@@ -489,6 +489,23 @@ div#thetext p {
     font-size: 0;
 }
 
+span.drag-handle {
+    cursor: pointer;
+    color: grey;
+}
+
+.valign {
+    align-items: center;
+}
+
+input[type=text].form-control-narrower
+{
+    width: 70%;
+    /* padding: 5px 5px; */
+    margin: 2px 0;
+    box-sizing: border-box;
+}
+
 .nomarginblock {
     margin-block-start: 0px;
     margin-block-end: 0px;

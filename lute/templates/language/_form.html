@@ -14,6 +14,29 @@
   <table id="language">
   <tbody>
 
+    <tr>
+      <td>{{ form.name.label(class="form-control-label") }}</td>
+      <td>{{ form.name(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>Dictionaries</td>
+      <td>
+        <div id="b-entities">
+          {% for b_entity in form.b_entities %}
+          <div class="valign" {% if loop.first %}style="display: none;"{% endif %}>
+            <span class="drag-handle">☰</span> {{ b_entity.dicttype }}
+            {{ b_entity.dicturl(class="form-control-narrower") }}
+            <span class="remove-b-entity">
+              <img src="{{ url_for('static', filename='icn/minus-button.png') }}">
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+        <span id="add-b-entity"><img src="{{ url_for('static', filename='icn/plus-button.png') }}"</span>
+      </td>
+    </tr>
+
     {% for field in form %}
     {% if field.name not in ('csrf_token', 'b_entities') %}
     <tr>
@@ -25,16 +48,6 @@
 
   </tbody>
   </table>
-
-  <div id="b-entities">
-    {% for b_entity in form.b_entities %}
-    <div {% if loop.first %}style="display: none;"{% endif %}>
-      <span class="drag-handle">☰</span>{{ b_entity.dictname }} {{ b_entity.protocol }}
-      <button type="button" class="remove-b-entity">Remove</button>
-    </div>
-    {% endfor %}
-  </div>
-  <button type="button" id="add-b-entity">Add B Entity</button>
 
   <button id="submit" type="submit" class="btn btn-primary">Save</button>
 </form>
