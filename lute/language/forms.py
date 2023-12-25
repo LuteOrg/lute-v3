@@ -5,19 +5,30 @@ Flask-wtf forms.
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField,
+    IntegerField,
     BooleanField,
     SelectField,
     FormField,
     FieldList,
-    Form
+    Form,
 )
 from wtforms.validators import DataRequired
 from lute.models.language import LanguageDictionary
 
 
 class LanguageDictionaryForm(Form):
-    dicttype = SelectField(choices=[("popuphtml", "Pop-up window"), ("inlinehtml", "Show in Lute")])
+    """
+    Language dictionary form, nested in Language form.
+    """
+
+    dicttype = SelectField(
+        choices=[
+            ("inlinehtml", "Show in Lute"),
+            ("popuphtml", "Pop-up window"),
+        ]
+    )
     dicturi = StringField("URL")
+    sort_order = IntegerField("Sort", render_kw={"style": "display: none"})
 
 
 class LanguageForm(FlaskForm):
@@ -29,7 +40,9 @@ class LanguageForm(FlaskForm):
     dict_1_uri = StringField("Dictionary 1", validators=[DataRequired()])
     dict_2_uri = StringField("Dictionary 2")
 
-    dictionaries = FieldList(FormField(LanguageDictionaryForm, default=LanguageDictionary))
+    dictionaries = FieldList(
+        FormField(LanguageDictionaryForm, default=LanguageDictionary)
+    )
 
     sentence_translate_uri = StringField(
         "Sentence translation", validators=[DataRequired()]

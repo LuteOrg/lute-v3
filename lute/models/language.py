@@ -12,6 +12,7 @@ class LanguageDictionary(db.Model):
     """
     Language dictionary.
     """
+
     __tablename__ = "languagedicts"
 
     id = db.Column("LdID", db.SmallInteger, primary_key=True)
@@ -21,6 +22,7 @@ class LanguageDictionary(db.Model):
     language = db.relationship("Language", back_populates="dictionaries")
     dicttype = db.Column("LdType", db.String(20), nullable=False)
     dicturi = db.Column("LdDictURI", db.String(200), nullable=False)
+    sort_order = db.Column("LdSortOrder", db.SmallInteger, nullable=False)
 
 
 class Language(
@@ -38,7 +40,7 @@ class Language(
     dictionaries = db.relationship(
         "LanguageDictionary",
         back_populates="language",
-        order_by="LanguageDictionary.id",
+        order_by="LanguageDictionary.sort_order",
         lazy="subquery",
         cascade="all, delete-orphan",
     )

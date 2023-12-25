@@ -21,14 +21,16 @@ def test_save_new_language(empty_db):
     lang.name = "abc"
     lang.dict_1_uri = "something"
     lang.sentence_translate_uri = "sentence_uri"
-    
+
     ld = LanguageDictionary()
     ld.dicttype = "inlinehtml"
     ld.dicturi = "something?###"
+    ld.sort_order = 1
     lang.dictionaries.append(ld)
     ld2 = LanguageDictionary()
     ld2.dicttype = "popuphtml"
     ld2.dicturi = "pop?###"
+    ld2.sort_order = 2
     lang.dictionaries.append(ld2)
 
     db.session.add(lang)
@@ -38,12 +40,16 @@ def test_save_new_language(empty_db):
     sqldicts = """select LgName, LdType, LdDictURI
     from languages
     inner join languagedicts on LdLgID = LgID
-    order by LdType"""
-    assert_sql_result(sqldicts, [
-        "abc; inlinehtml; something?###",
-        "abc; popuphtml; pop?###",
-    ], "dict saved")
-    
+    order by LdSortOrder"""
+    assert_sql_result(
+        sqldicts,
+        [
+            "abc; inlinehtml; something?###",
+            "abc; popuphtml; pop?###",
+        ],
+        "dict saved",
+    )
+
     lang.right_to_left = True
     db.session.add(lang)
     db.session.commit()

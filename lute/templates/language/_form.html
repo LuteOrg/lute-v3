@@ -25,10 +25,14 @@
         <div id="dictionary_entities">
           {% for dictionary in form.dictionaries %}
           <div class="dict_entry valign"
-               {% if dictionary.dicturi.data == '__TEMPLATEx__' %} style="display: none" {% endif %}
+               {% if dictionary.dicturi.data == '__TEMPLATE__' %}
+               style="display: none"
+               {% endif %}
                >
-            <span class="drag-handle">☰</span> {{ dictionary.dicttype }}
+            <span class="drag-handle">☰</span>
+            {{ dictionary.dicttype }}
             {{ dictionary.dicturi(class="form-control-narrower") }}
+            {{ dictionary.sort_order }}
             <span class="remove-dict-entity">
               <img src="{{ url_for('static', filename='icn/minus-button.png') }}">
             </span>
@@ -57,23 +61,19 @@
 <script>
   $(document).ready(function() {
     // Make the list of entities sortable
-    let sort_entities = function() {
-      /*
-      // I don't think there's any need to re-index
-      // the dicts, they're posted with the index number
-      // as part of the field name.
-      $("#dictionary-entities > div").each(function(index) {
-      var numberInput = $(this).find('input[type="number"]');
-      numberInput.val(index + 1);
+    let add_sort_values = function() {
+      console.log('sort called');
+      $("div.dict_entry").each(function(index) {
+        var numberInput = $(this).find('input[type="number"]');
+        numberInput.val(index + 1);
       });
-      */
     };
 
     let apply_sortable = function() {
       $("#dictionary_entities").sortable({
         handle: ".drag-handle",
         update: function(event, ui) {
-          sort_entities();
+          add_sort_values();
         }
       });
     };
@@ -99,18 +99,31 @@
       }
       const idToReplace = idParts[1];
       var index = $("#dictionary_entities").children().length;
-      let template = "<div>" + templateInput.closest('div.dict_entry').html() + "</div>";
+      // Couldn't figure out how to get the enclosing div and its
+      // classes, adding manually.
+      let template = `<div class="dict_entry valign">` + templateInput.closest('div.dict_entry').html() + "</div>";
       template = template.replaceAll(`-${idToReplace}-`, `-${index}-`);
       template = template.replaceAll('__TEMPLATE__', '');
       console.log(template);
       $("#dictionary_entities").append(template);
       apply_sortable();
+      add_sort_values();
     });
 
     // Remove an entity
     $(document).on("click", ".remove-dict-entity", function() {
       $(this).closest("div").remove();
     });
+
+    $(document).on("click", "#submit", function() {
+      const templateInput = $('.dict_entry input[type="text"][value="__TEMPLATE__"]');
+      if (templateInput == null) {
+        console.log('template not found ... weird, but can submit.');
+        return;
+      }
+      templateInput.closest('div.dict_entry').remove();
+    });
+
   });
 </script>
 
