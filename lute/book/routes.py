@@ -63,8 +63,7 @@ def _get_file_content(filefielddata):
         return str(content, "utf-8")
 
     if ext == ".epub":
-        content = service.get_epub_content(filefielddata)
-        return str(content, "utf-8")
+        return service.get_epub_content(filefielddata)
 
     raise ValueError(f'Unknown file extension "{ext}"')
 
