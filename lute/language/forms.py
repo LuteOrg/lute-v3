@@ -9,6 +9,7 @@ from wtforms.validators import DataRequired
 
 class BForm(Form):
     name = StringField("Name")
+    protocol = SelectField(choices=[("aim", "AIM"), ("msn", "MSN")])
 
 
 class LanguageForm(FlaskForm):
