@@ -9,16 +9,14 @@ from wtforms import (
     SelectField,
     FormField,
     FieldList,
-    Form,
-    IntegerField,
+    Form
 )
 from wtforms.validators import DataRequired
 
 
 class BForm(Form):
-    name = StringField("Name")
+    dictname = StringField("Name")
     protocol = SelectField(choices=[("aim", "AIM"), ("msn", "MSN")])
-    order = IntegerField("SortOrder")
 
 
 class LanguageForm(FlaskForm):

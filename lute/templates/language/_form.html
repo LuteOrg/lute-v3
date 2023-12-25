@@ -29,8 +29,7 @@
   <div id="b-entities">
     {% for b_entity in form.b_entities %}
     <div {% if loop.first %}style="display: none;"{% endif %}>
-      <span class="drag-handle">☰</span>
-      {{ b_entity() }}
+      <span class="drag-handle">☰</span>{{ b_entity.dictname }} {{ b_entity.protocol }}
       <button type="button" class="remove-b-entity">Remove</button>
     </div>
     {% endfor %}
@@ -44,11 +43,15 @@
   $(document).ready(function() {
     // Make the list of entities sortable
     let sort_entities = function() {
-      // Loop through each child div
+      /*
+      // I don't think there's any need to re-index
+      // the dicts, they're posted with the index number
+      // as part of the field name.
       $("#b-entities > div").each(function(index) {
-        var numberInput = $(this).find('input[type="number"]');
-        numberInput.val(index + 1);
+      var numberInput = $(this).find('input[type="number"]');
+      numberInput.val(index + 1);
       });
+      */
     };
 
     let apply_sortable = function() {
