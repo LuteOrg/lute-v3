@@ -29,6 +29,7 @@
   <div id="b-entities">
     {% for b_entity in form.b_entities %}
     <div {% if loop.first %}style="display: none;"{% endif %}>
+      <span class="drag-handle">☰</span>
       {{ b_entity() }}
       <button type="button" class="remove-b-entity">Remove</button>
     </div>
@@ -40,28 +41,36 @@
 </form>
 
 <script>
-    $(document).ready(function() {
-        // Make the list of entities sortable
-        $("#b-entities").sortable({
-            handle: ".drag-handle",
-            update: function(event, ui) {
-                // Handle the update event if needed
-            }
-        });
-
-        // Add a new entity
-        $("#add-b-entity").click(function() {
-          var index = $("#b-entities").children().length;
-          let template = $("#b-entities").children()[0].innerHTML;
-          template = template.replaceAll('-0', `-${index}`);
-          $("#b-entities").append(template);
-        });
-
-        // Remove an entity
-        $(document).on("click", ".remove-b-entity", function() {
-            $(this).closest("div").remove();
-        });
+  $(document).ready(function() {
+    // Make the list of entities sortable
+    let sort_entities = function() {
+      // Loop through each child div
+      $("#b-entities > div").each(function(index) {
+        var numberInput = $(this).find('input[type="number"]');
+        numberInput.val(index + 1);
+      });
+    };
+      
+    $("#b-entities").sortable({
+      handle: ".drag-handle",
+      update: function(event, ui) {
+        sort_entities();
+      }
     });
+
+    // Add a new entity
+    $("#add-b-entity").click(function() {
+      var index = $("#b-entities").children().length;
+      let template = $("#b-entities").children()[0].innerHTML;
+      template = template.replaceAll('-0', `-${index}`);
+      $("#b-entities").append(template);
+    });
+
+    // Remove an entity
+    $(document).on("click", ".remove-b-entity", function() {
+      $(this).closest("div").remove();
+    });
+  });
 </script>
 
 {% if language.id %}

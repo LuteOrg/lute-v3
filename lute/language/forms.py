@@ -3,13 +3,14 @@ Flask-wtf forms.
 """
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, SelectField, FormField, FieldList, Form
+from wtforms import StringField, BooleanField, SelectField, FormField, FieldList, Form, IntegerField
 from wtforms.validators import DataRequired
 
 
 class BForm(Form):
     name = StringField("Name")
     protocol = SelectField(choices=[("aim", "AIM"), ("msn", "MSN")])
+    order = IntegerField("SortOrder")
 
 
 class LanguageForm(FlaskForm):
