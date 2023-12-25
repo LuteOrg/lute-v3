@@ -20,7 +20,8 @@ def test_save_new_language(empty_db):
     lang = Language()
     lang.name = "abc"
     lang.dict_1_uri = "something"
-
+    lang.sentence_translate_uri = "sentence_uri"
+    
     ld = LanguageDictionary()
     ld.dicttype = "inlinehtml"
     ld.dicturi = "something?###"

@@ -24,9 +24,11 @@
       <td>
         <div id="dictionary_entities">
           {% for dictionary in form.dictionaries %}
-          <div class="valign" {% if loop.first %}style="display: none;"{% endif %}>
+          <div class="dict_entry valign"
+               {% if dictionary.dicturi.data == '__TEMPLATEx__' %} style="display: none" {% endif %}
+               >
             <span class="drag-handle">☰</span> {{ dictionary.dicttype }}
-            {{ dictionary.dicturl(class="form-control-narrower") }}
+            {{ dictionary.dicturi(class="form-control-narrower") }}
             <span class="remove-dict-entity">
               <img src="{{ url_for('static', filename='icn/minus-button.png') }}">
             </span>
@@ -78,12 +80,29 @@
 
     apply_sortable();
 
-    // Add a new entity
+    // Add a new entity, using the __TEMPLATE__ entry as the template.
     $("#add-dict-entity").click(function() {
+      const templateInput = $('.dict_entry input[type="text"][value="__TEMPLATE__"]');
+      if (templateInput == null) {
+        alert("Can't find __TEMPLATE__ input to create dictionary ...");
+        return;
+      }
+      const templateInputId = templateInput.attr('id');
+      const idParts = templateInputId.split('-');
+      if (idParts.length != 3) {
+        alert(`Bad template id ${templateInputId}`);
+        return;
+      }
+      if (idParts[0] != 'dictionaries' || idParts[2] != 'dicturi') {
+        alert(`Non-conformant template id ${templateInputId}`);
+        return;
+      }
+      const idToReplace = idParts[1];
       var index = $("#dictionary_entities").children().length;
-      let template = "<div>" + $("#dictionary_entities div").html() + "</div>";
-      // console.log(template);
-      template = template.replaceAll('-0', `-${index}`);
+      let template = "<div>" + templateInput.closest('div.dict_entry').html() + "</div>";
+      template = template.replaceAll(`-${idToReplace}-`, `-${index}-`);
+      template = template.replaceAll('__TEMPLATE__', '');
+      console.log(template);
       $("#dictionary_entities").append(template);
       apply_sortable();
     });

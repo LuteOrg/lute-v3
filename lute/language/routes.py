@@ -103,9 +103,7 @@ def edit(langid):
     if _handle_form(language, form):
         return redirect("/")
 
-    form.dictionaries.append_entry({})
-    form.dictionaries.append_entry({"dicturl": "apple/###", "dicttype": "inlinehtml"})
-    form.dictionaries.append_entry({"dicturl": "blah?###", "dicttype": "popuphtml"})
+    form.dictionaries.append_entry({"dicturi": "__TEMPLATE__"})
 
     return render_template("language/edit.html", form=form, language=language)
 
