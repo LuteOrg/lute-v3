@@ -1,0 +1,10 @@
+-- Language dict table
+
+CREATE TABLE languagedicts (
+  "LdID" INTEGER NOT NULL,
+  "LdLgID" INTEGER NOT NULL,
+  "LdType" VARCHAR(20) NOT NULL,
+  "LdDictURI" VARCHAR(200) NOT NULL,
+  PRIMARY KEY ("LdID"),
+  FOREIGN KEY("LdLgID") REFERENCES "languages" ("LgID") ON UPDATE NO ACTION ON DELETE CASCADE
+);

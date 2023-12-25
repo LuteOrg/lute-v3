@@ -8,6 +8,19 @@ from lute.db import db
 from lute.parse.registry import get_parser, is_supported
 
 
+class LanguageDictionary(db.Model):
+    """
+    Language dictionary.
+    """
+    id = db.Column("LdID", db.SmallInteger, primary_key=True)
+    language_id = db.Column(
+        "LdLgID", db.Integer, db.ForeignKey("languages.LgID"), nullable=False
+    )
+    language = db.relationship("Language", back_populates="dictionaries")
+    dicttype = db.Column("LdType", db.String(20), nullable=False)
+    dicturi = db.Column("LdDictURI", db.String(200), nullable=False)
+
+
 class Language(
     db.Model
 ):  # pylint: disable=too-few-public-methods, too-many-instance-attributes
@@ -19,6 +32,14 @@ class Language(
 
     id = db.Column("LgID", db.SmallInteger, primary_key=True)
     name = db.Column("LgName", db.String(40))
+
+    dictionaries = db.relationship(
+        "LanguageDictionary",
+        back_populates="language",
+        lazy="subquery",
+        cascade="all, delete-orphan",
+    )
+
     dict_1_uri = db.Column("LgDict1URI", db.String(200))
     dict_2_uri = db.Column("LgDict2URI", db.String(200))
     sentence_translate_uri = db.Column("LgGoogleTranslateURI", db.String(200))
@@ -42,6 +63,7 @@ class Language(
         self.right_to_left = False
         self.show_romanization = False
         self.parser_type = "spacedel"
+        self.dictionaries = []
 
     def __repr__(self):
         return f"<Language {self.id} '{self.name}'>"
@@ -93,7 +115,7 @@ class Language(
     @staticmethod
     def delete(language):
         """
-        Hacky method to delete language and all terms and books
+        Hacky method to delete language and all terms, books, and dicts
         associated with it.
 
         There is _certainly_ a better way to do this using
