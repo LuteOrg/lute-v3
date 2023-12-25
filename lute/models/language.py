@@ -12,6 +12,8 @@ class LanguageDictionary(db.Model):
     """
     Language dictionary.
     """
+    __tablename__ = "languagedicts"
+
     id = db.Column("LdID", db.SmallInteger, primary_key=True)
     language_id = db.Column(
         "LdLgID", db.Integer, db.ForeignKey("languages.LgID"), nullable=False
@@ -36,6 +38,7 @@ class Language(
     dictionaries = db.relationship(
         "LanguageDictionary",
         back_populates="language",
+        order_by="LanguageDictionary.id",
         lazy="subquery",
         cascade="all, delete-orphan",
     )

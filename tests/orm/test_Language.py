@@ -25,6 +25,10 @@ def test_save_new_language(empty_db):
     ld.dicttype = "inlinehtml"
     ld.dicturi = "something?###"
     lang.dictionaries.append(ld)
+    ld2 = LanguageDictionary()
+    ld2.dicttype = "popuphtml"
+    ld2.dicturi = "pop?###"
+    lang.dictionaries.append(ld2)
 
     db.session.add(lang)
     db.session.commit()
@@ -32,8 +36,12 @@ def test_save_new_language(empty_db):
 
     sqldicts = """select LgName, LdType, LdDictURI
     from languages
-    inner join languagedicts on LdLgID = LgID"""
-    assert_sql_result(["abc; inlinehtml; someurl"], "dict saved")
+    inner join languagedicts on LdLgID = LgID
+    order by LdType"""
+    assert_sql_result(sqldicts, [
+        "abc; inlinehtml; something?###",
+        "abc; popuphtml; pop?###",
+    ], "dict saved")
     
     lang.right_to_left = True
     db.session.add(lang)
@@ -46,7 +54,7 @@ def test_save_new_language(empty_db):
     assert retrieved.right_to_left is True, "retrieved is RTL"
     assert retrieved.show_romanization is False, "retrieved no roman"
 
-    assert len(retrieved.dictionaries) == 1, "have dicts"
+    assert len(retrieved.dictionaries) == 2, "have dicts"
     ld = retrieved.dictionaries[0]
     assert ld.dicttype == "inlinehtml", "type"
     assert ld.dicturi == "something?###", "uri"
