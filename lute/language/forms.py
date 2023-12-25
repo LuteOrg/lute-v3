@@ -27,7 +27,7 @@ class LanguageDictionaryForm(Form):
             ("popuphtml", "Pop-up window"),
         ]
     )
-    dicturi = StringField("URL")
+    dicturi = StringField("URL", validators=[DataRequired()])
     sort_order = IntegerField("Sort", render_kw={"style": "display: none"})
 
 
