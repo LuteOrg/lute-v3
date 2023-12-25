@@ -25,9 +25,12 @@ class NewBookForm(FlaskForm):
     text = TextAreaField("Text", description=desc)
     textfile = FileField(
         "Text file",
-        # TODO epub: add epub to the list, change prompt.
-        # "Please upload a valid .txt or .epub file"
-        validators=[FileAllowed(["txt"], "Please upload a valid text document")],
+        validators=[
+            FileAllowed(
+                ["txt", "epub"],
+                "Please upload a valid .txt or .epub file.",
+            )
+        ],
     )
     source_uri = StringField("Text source", validators=[Length(max=255)])
     audiofile = FileField(
