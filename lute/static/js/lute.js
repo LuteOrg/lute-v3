@@ -329,15 +329,10 @@ let get_textitems_spans = function(e) {
   if (w == null)
     return null;
 
-  let attr_name = 'seid';
-  let attr_value = w.attr('seid');
+  const attr_name = !e.shiftKey ? 'sentence-id' : 'paragraph-id';
+  const attr_value = w.data(attr_name);
 
-  if (e.shiftKey) {
-    attr_name = 'paraid';
-    attr_value = w.attr('paraid');
-  }
-
-  return $('span.textitem').toArray().filter(x => x.getAttribute(attr_name) === attr_value);
+  return $(`span.textitem[data-${attr_name}="${attr_value}"]`).toArray();
 };
 
 /** Copy the text of the textitemspans to the clipboard, and add a
