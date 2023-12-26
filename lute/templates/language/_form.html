@@ -25,6 +25,7 @@
       <td>Dictionaries</td>
       <td>
         <div id="dictionary_entities">
+          {# Render all the dictionaries, but don't show the template. #}
           {% for dictionary in form.dictionaries %}
           <div class="dict_entry valign"
                {% if dictionary.dicturi.data == '__TEMPLATE__' %}
@@ -87,7 +88,8 @@
 
     apply_sortable();
 
-    // Add a new entity, using the __TEMPLATE__ entry as the template.
+    /** Add a new entity, using the __TEMPLATE__ entry as the template. */
+    /** The TEMPLATE is added in language/routes.py. */
     $("#add-dict-entity").click(function() {
       const templateInput = $('.dict_entry input[type="text"][value="__TEMPLATE__"]');
       if (templateInput == null) {

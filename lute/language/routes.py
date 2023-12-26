@@ -103,6 +103,12 @@ def edit(langid):
     if _handle_form(language, form):
         return redirect("/")
 
+    # Add a dummy dictionary entry with dicturi __TEMPLATE__.
+    # This entry is used as a "template" when adding a new dictionary
+    # to the list of dictionaries (see templates/language/_form.html).
+    # This is the easiest way to ensure that new dictionary entries
+    # have the correct controls.
+    # This dummy entry is not rendered on the form.
     form.dictionaries.append_entry({"dicturi": "__TEMPLATE__"})
 
     return render_template("language/edit.html", form=form, language=language)
