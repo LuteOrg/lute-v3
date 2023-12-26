@@ -32,8 +32,8 @@
                {% endif %}
                >
             <span class="drag-handle">☰</span>
-            {{ dictionary.dicttype }}
-            {{ dictionary.dicturi(class="form-control-narrower") }}
+            {{ dictionary.dicttype(class="dict-type") }}
+            {{ dictionary.dicturi(class="dict-uri form-control-narrower") }}
             {{ dictionary.sort_order }}
             <span class="test-dict-entity" title="Test dictionary">
               <img src="{{ url_for('static', filename='icn/external.png') }}">
@@ -122,16 +122,9 @@
       $(this).closest("div").remove();
     });
 
-    // Remove an entity
-    $(document).on("click", ".test-dict-entity", function() {
-      const div = $(this).closest("div");
-
+    let test_inline_dict_lookup = function(testurl) {
       // Open a new window
       var popup = window.open('', '_blank', 'width=600,height=600,top=50,left=50');
-
-      let testurl = `https://www.wordreference.com/es/en/translation.asp?spen=test`
-      testurl = `https://www.google.com`
-
       const content = `<html>
 <head>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
@@ -161,6 +154,30 @@ if not, change the type to "Pop-up window".</p>
       const doc = popup.document;
       doc.write(content);
       doc.close();
+    };
+
+    // Test the dict entry.
+    $(document).on("click", ".test-dict-entity", function() {
+      const div = $(this).closest("div");
+
+      const dicturi = div.find(".dict-uri").val();
+      const dict_type = div.find(".dict-type").val();
+      console.log(dicturi);
+      console.log(dict_type);
+
+      const testurl = dicturi.replace('###', 'test').replace('<TERM>', 'test');
+      console.log(testurl);
+
+      switch (dict_type) {
+      case 'popuphtml':
+        window.open(testurl, '_blank', 'width=600,height=600,top=50,left=50');
+        break;
+      case 'inlinehtml':
+        test_inline_dict_lookup(testurl);
+        break;
+      default:
+        alert(`Unhandled dict type ${dict_type}, don't know how to test!`);
+      }
     });
 
     $(document).on("click", "#submit", function() {
