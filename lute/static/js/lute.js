@@ -107,7 +107,7 @@ let tooltip_textitem_hover_content = function (el, setContent) {
 function showEditFrame(el, extra_args = {}) {
   const lid = parseInt(el.data('lang-id'));
 
-  let text = extra_args.textparts ?? [ el.attr('data_text') ];
+  let text = extra_args.textparts ?? [ el.data('text') ];
   const sendtext = text.join('');
 
   let extras = Object.entries(extra_args).
