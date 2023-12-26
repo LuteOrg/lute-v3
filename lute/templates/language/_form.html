@@ -124,7 +124,7 @@
       $(this).closest("div").remove();
     });
 
-    let test_inline_dict_lookup = function(testurl) {
+    let test_embedded_dict_lookup = function(testurl) {
       // Open a new window
       var popup = window.open('', '_blank', 'width=600,height=600,top=50,left=50');
       const content = `<html>
@@ -173,8 +173,8 @@ if not, change the type to "Pop-up window".</p>
       case 'popuphtml':
         window.open(testurl, '_blank', 'width=600,height=600,top=50,left=50');
         break;
-      case 'inlinehtml':
-        test_inline_dict_lookup(testurl);
+      case 'embeddedhtml':
+        test_embedded_dict_lookup(testurl);
         break;
       default:
         alert(`Unhandled dict type ${dict_type}, don't know how to test!`);

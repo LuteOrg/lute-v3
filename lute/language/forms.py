@@ -24,7 +24,7 @@ class LanguageDictionaryForm(Form):
 
     dicttype = SelectField(
         choices=[
-            ("inlinehtml", "Embedded"),
+            ("embeddedhtml", "Embedded"),
             ("popuphtml", "Pop-up window"),
         ]
     )

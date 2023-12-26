@@ -23,7 +23,7 @@ def test_save_new_language(empty_db):
     lang.sentence_translate_uri = "sentence_uri"
 
     ld = LanguageDictionary()
-    ld.dicttype = "inlinehtml"
+    ld.dicttype = "embeddedhtml"
     ld.dicturi = "something?###"
     ld.sort_order = 1
     lang.dictionaries.append(ld)
@@ -44,7 +44,7 @@ def test_save_new_language(empty_db):
     assert_sql_result(
         sqldicts,
         [
-            "abc; inlinehtml; something?###",
+            "abc; embeddedhtml; something?###",
             "abc; popuphtml; pop?###",
         ],
         "dict saved",
@@ -63,7 +63,7 @@ def test_save_new_language(empty_db):
 
     assert len(retrieved.dictionaries) == 2, "have dicts"
     ld = retrieved.dictionaries[0]
-    assert ld.dicttype == "inlinehtml", "type"
+    assert ld.dicttype == "embeddedhtml", "type"
     assert ld.dicturi == "something?###", "uri"
 
 
