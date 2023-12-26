@@ -93,7 +93,7 @@ function prepareTextInteractions(textid) {
  * Build the html content for jquery-ui tooltip.
  */
 let tooltip_textitem_hover_content = function (el, setContent) {
-  elid = parseInt(el.attr('data_wid'));
+  elid = parseInt(el.data('wid'));
   $.ajax({
     url: `/read/termpopup/${elid}`,
     type: 'get',
@@ -419,7 +419,6 @@ let show_translation = function(e) {
   if (tis == null)
     return;
   const sentence = tis.map(s => $(s).text()).join('');
-  // console.log(sentence);
 
   const userdict = $('#translateURL').text();
   if (userdict == null || userdict == '')
