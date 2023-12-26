@@ -105,7 +105,7 @@ let tooltip_textitem_hover_content = function (el, setContent) {
 
 
 function showEditFrame(el, extra_args = {}) {
-  const lid = parseInt(el.attr('lid'));
+  const lid = parseInt(el.data('lang-id'));
 
   let text = extra_args.textparts ?? [ el.attr('data_text') ];
   const sendtext = text.join('');
@@ -596,7 +596,7 @@ function update_status_for_elements(new_status, elements) {
   if (elements.length == 0)
     return;
   const firstel = $(elements[0]);
-  const langid = firstel.attr('lid');
+  const langid = firstel.data('lang-id');
   const texts = elements.map(el => $(el).text());
 
   data = JSON.stringify({
