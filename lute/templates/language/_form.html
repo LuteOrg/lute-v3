@@ -69,7 +69,7 @@
   $(document).ready(function() {
     // Make the list of entities sortable
     let add_sort_values = function() {
-      console.log('sort called');
+      // console.log('sort called');
       $("div.dict_entry").each(function(index) {
         var numberInput = $(this).find('input[type="number"]');
         numberInput.val(index + 1);
@@ -111,7 +111,7 @@
       let template = `<div class="dict_entry valign">` + templateInput.closest('div.dict_entry').html() + "</div>";
       template = template.replaceAll(`-${idToReplace}-`, `-${index}-`);
       template = template.replaceAll('__TEMPLATE__', '');
-      console.log(template);
+      // console.log(template);
       $("#dictionary_entities").append(template);
       apply_sortable();
       add_sort_values();
@@ -162,11 +162,10 @@ if not, change the type to "Pop-up window".</p>
 
       const dicturi = div.find(".dict-uri").val();
       const dict_type = div.find(".dict-type").val();
-      console.log(dicturi);
-      console.log(dict_type);
-
       const testurl = dicturi.replace('###', 'test').replace('<TERM>', 'test');
-      console.log(testurl);
+      // console.log(dicturi);
+      // console.log(dict_type);
+      // console.log(testurl);
 
       switch (dict_type) {
       case 'popuphtml':
@@ -180,6 +179,8 @@ if not, change the type to "Pop-up window".</p>
       }
     });
 
+
+    /** Remove the TEMPLATE dict entry on submit, so it's not saved to the db! */
     $(document).on("click", "#submit", function() {
       const templateInput = $('.dict_entry input[type="text"][value="__TEMPLATE__"]');
       if (templateInput == null) {
