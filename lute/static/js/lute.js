@@ -122,7 +122,7 @@ function showEditFrame(el, extra_args = {}) {
 
 
 let save_curr_data_order = function(el) {
-  LUTE_CURR_TERM_DATA_ORDER = parseInt(el.attr('data_order'));
+  LUTE_CURR_TERM_DATA_ORDER = parseInt(el.data('order'));
 }
 
 
@@ -214,8 +214,8 @@ function select_started(e) {
 }
 
 let get_selected_in_range = function(start_el, end_el, selector) {
-  const first = parseInt(start_el.attr('data_order'))
-  const last = parseInt(end_el.attr('data_order'));
+  const first = parseInt(start_el.data('order'))
+  const last = parseInt(end_el.data('order'));
 
   let startord = first;
   let endord = last;
@@ -226,7 +226,7 @@ let get_selected_in_range = function(start_el, end_el, selector) {
   }
 
   const selected = $(selector).filter(function() {
-    const ord = $(this).attr("data_order");
+    const ord = $(this).data("order");
     return ord >= startord && ord <= endord;
   });
   return selected;
@@ -301,7 +301,7 @@ var maxindex = null;
 
 function load_reading_pane_globals() {
   words = $('span.word').sort(function(a, b) {
-    return $(a).attr('data_order') - $(b).attr('data_order');
+    return $(a).data('order') - $(b).data('order');
   });
   // console.log('have ' + words.size() + ' words');
   maxindex = words.size() - 1;
@@ -310,7 +310,7 @@ function load_reading_pane_globals() {
 $(document).ready(load_reading_pane_globals);
 
 let current_word_index = function() {
-  const i = words.toArray().findIndex(x => parseInt(x.getAttribute('data_order')) === LUTE_CURR_TERM_DATA_ORDER);
+  const i = words.toArray().findIndex(x => parseInt(x.dataset.order) === LUTE_CURR_TERM_DATA_ORDER);
   // console.log(`found index = ${i}`);
   return i;
 };
