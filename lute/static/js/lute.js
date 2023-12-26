@@ -141,7 +141,7 @@ let _show_highlights = function() {
 }
 
 /**
- * Terms have data_status_class attribute.  If highlights should be shown,
+ * Terms have data-status-class attribute.  If highlights should be shown,
  * then add that value to the actual span. */
 function add_status_classes() {
   if (!_show_highlights())
@@ -151,9 +151,9 @@ function add_status_classes() {
   });
 }
 
-/** Add the data_status_class to the term's classes. */
+/** Add the data-status-class to the term's classes. */
 let apply_status_class = function(el) {
-  el.addClass(el.attr("data_status_class"));
+  el.addClass(el.data("status-class"));
 }
 
 /** Remove the status from elements, if not showing highlights. */
@@ -164,7 +164,7 @@ let remove_status_highlights = function() {
   }
   $('span.word').toArray().forEach(function (m) {
     el = $(m);
-    el.removeClass(el.attr("data_status_class"));
+    el.removeClass(el.data("status-class"));
   });
 }
 
@@ -394,7 +394,7 @@ let find_non_Ign_or_Wkn = function(currindex, shiftby) {
   let newindex = currindex + shiftby;
   while (newindex >= 0 && newindex <= maxindex) {
     const nextword = words.eq(newindex);
-    const st = nextword.attr('data_status_class');
+    const st = nextword.data('status-class');
     if (st != 'status99' && st != 'status98') {
       break;
     }
@@ -558,7 +558,7 @@ function update_selected_statuses(newStatus, elements) {
     matches.forEach(function (m) {
       $(m).removeClass('status98 status99 status0 status1 status2 status3 status4 status5 shiftClicked')
         .addClass(newClass)
-        .attr('data_status_class',`${newClass}`);
+        .attr('data-status-class',`${newClass}`);
     });
   };
   $(elements).each(update_data_status_class)
@@ -650,7 +650,7 @@ function increment_status_for_selected_elements(e, shiftBy) {
   let payloads = {};
 
   elements.forEach((element) => {
-    let statusClass = element.getAttribute('data_status_class');
+    let statusClass = element.dataset.statusClass;
     
     if (!statusClass || !validStatuses.includes(statusClass)) return;
 
