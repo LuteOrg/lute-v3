@@ -52,7 +52,7 @@
     </tr>
 
     {% for field in form %}
-    {% if field.name not in ('csrf_token', 'dictionaries') %}
+    {% if field.name not in ('name', 'csrf_token', 'dictionaries', 'dict_1_uri', 'dict_2_uri') %}
     <tr>
       <td>{{ field.label(class="form-control-label") }}</td>
       <td>{{ field(class="form-control") }}</td>
