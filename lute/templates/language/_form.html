@@ -35,13 +35,18 @@
             {{ dictionary.dicttype }}
             {{ dictionary.dicturi(class="form-control-narrower") }}
             {{ dictionary.sort_order }}
-            <span class="remove-dict-entity">
+            <span class="test-dict-entity" title="Test dictionary">
+              <img src="{{ url_for('static', filename='icn/external.png') }}">
+            </span>
+            <span class="remove-dict-entity" title="Remove dictionary">
               <img src="{{ url_for('static', filename='icn/minus-button.png') }}">
             </span>
           </div>
           {% endfor %}
         </div>
-        <span id="add-dict-entity"><img src="{{ url_for('static', filename='icn/plus-button.png') }}"</span>
+        <span id="add-dict-entity" title="Add dictionary">
+          <img src="{{ url_for('static', filename='icn/plus-button.png') }}">
+        </span>
       </td>
     </tr>
 
