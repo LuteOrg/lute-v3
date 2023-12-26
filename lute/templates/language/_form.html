@@ -122,6 +122,40 @@
       $(this).closest("div").remove();
     });
 
+    // Remove an entity
+    $(document).on("click", ".test-dict-entity", function() {
+      const div = $(this).closest("div");
+
+      // Open a new window
+      var popup = window.open('', '_blank', 'width=500,height=400');
+
+      const content = `
+
+`;
+      const doc = popup.document;
+      // Write HTML content to the new window
+      doc.write(`<html><head <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" /><title>Dictionary test</title></head><body>`);
+      doc.write('<h2>Embedded dictionary test.</h2>');
+      doc.write('<p>If you see the expected content, this dictionary can be embedded;');
+      doc.write('if not, change the type to "Pop-up window".</p>');
+      doc.write('<hr />');
+      doc.write(`<iframe
+    name="dictframe"
+    id="dictframeid"
+    class="rightreadingframe"
+    src="https://www.wordreference.com/es/en/translation.asp?spen=perro"
+    scrolling="auto"
+    style="height: 100%; width: 100%"
+    frameborder="0"
+  >
+    Frame support required.
+  </iframe>`);
+      doc.write('</body></html>');
+
+      // Close the document for writing
+      doc.close();
+    });
+
     $(document).on("click", "#submit", function() {
       const templateInput = $('.dict_entry input[type="text"][value="__TEMPLATE__"]');
       if (templateInput == null) {
