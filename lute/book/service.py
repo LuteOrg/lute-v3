@@ -42,7 +42,6 @@ def get_epub_content(epub_file_field_data):
         if hasattr(epub_file_field_data.stream, "seekable"):
             epub = Epub(stream=epub_file_field_data.stream)
             content = epub.get_text()
-            print("No Rewriting to Temp File.")
         else:
             # We get a SpooledTemporaryFile from the form but this doesn't
             # implement all file-like methods until python 3.11. So we need
