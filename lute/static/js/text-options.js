@@ -3,7 +3,6 @@
 let textItems;
 let fontDefault;
 let lhDefault;
-let widthDefault;
 let columnDefault;
 
 const fontPlusButton = document.querySelector(".font-plus");
@@ -19,20 +18,16 @@ const oneColButton = document.querySelector(".column-one");
 const twoColButton = document.querySelector(".column-two");
 
 const theText = document.querySelector("#thetext");
-const readPaneRight = document.querySelector("#read_pane_right");
-// const readPaneLeft = document.querySelector("#read_pane_left");
 
 const domObserver = new MutationObserver((mutationList, observer) => {
   textItems = document.querySelectorAll("span.textitem");
 
   fontDefault = getFontSize(textItems[0]);
   lhDefault = getLineHeight(textItems[0]);
-  widthDefault = getTextWidthPercentage();
   columnDefault = getColumnCount();
 
   const fontSize = getFromLocalStorage("fontSize", fontDefault);
   const lhSize = getFromLocalStorage("lineHeight", lhDefault);
-  const width = getFromLocalStorage("textWidth", widthDefault);
   const columnCount = getFromLocalStorage("columnCount", columnDefault);
 
   textItems.forEach((item) => {
@@ -40,8 +35,6 @@ const domObserver = new MutationObserver((mutationList, observer) => {
     setLineHeight(item, Number(lhSize.toPrecision(2)));
   });
 
-  readPaneLeft.style.width = `${width}%`;
-  readPaneRight.style.width = `${(100 - width) * getReadPaneWidthRatio()}%`;
   theText.style.columnCount = columnCount;
 });
 
@@ -95,13 +88,6 @@ function getLineHeight(element) {
   // return parseFloat(elementComputedStyle.marginBottom);
 }
 
-function getTextWidthPercentage() {
-  // returns percentage value
-  const elementComputedStyle = window.getComputedStyle(readPaneLeft);
-  return (parseFloat(elementComputedStyle.getPropertyValue("width")) / parseFloat(window.getComputedStyle(readPaneContainer).getPropertyValue("width"))) * 100;
-  // return parseFloat(elementComputedStyle.width);
-}
-
 function getColumnCount() {
   const elementComputedStyle = window.getComputedStyle(theText);
   return elementComputedStyle.columnCount;
@@ -148,7 +134,7 @@ function changeTextWidth(operation) {
 
   let newWidth = add ? currentWidth + currentWidth * 0.05 : currentWidth - currentWidth * 0.05;
 
-  newWidth = clamp(newWidth, 25, 75);
+  newWidth = clamp(newWidth, 25, 95);
 
   readPaneLeft.style.width = `${newWidth}%`;
   readPaneRight.style.width = `${(100 - newWidth) * getReadPaneWidthRatio()}%`;
@@ -160,26 +146,4 @@ function convertPixelsToRem(sizePx) {
   const bodyFontSize =  window.getComputedStyle(document.querySelector("body")).fontSize;
   const sizeRem = sizePx / parseFloat(bodyFontSize);
   return sizeRem;
-}
-
-function getFromLocalStorage(item, defaultVal) {
-  // return Number(localStorage.getItem(item) ?? defaultVal);
-  const storageVal = localStorage.getItem(item);
-  
-  if ((!storageVal) || isNaN(storageVal)) {
-    return Number(defaultVal);
-  } else {
-    return Number(storageVal);
-  }
-}
-
-function clamp (num, min, max) {
-  return Math.min(Math.max(num, min), max);
-}
-
-// because right side is fixed. it's width value is different. need to find ratio
-// basically: when gridContainer width is 100%, this doesn't mean that it takes the whole 
-// viewport width. it can be less than that. but for the right side it's an absolute percentage value
-function getReadPaneWidthRatio() {
-  return parseFloat(window.getComputedStyle(readPaneContainer).getPropertyValue("width")) / parseFloat(document.documentElement.clientWidth);
 }
