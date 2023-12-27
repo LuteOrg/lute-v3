@@ -150,7 +150,7 @@ def _add_base_routes(app, app_config):
             change your <a href="/settings/index">Settings</a> as needed.)</i>
             """
             flash(msg)
-        return redirect("/", 302)\
+        return redirect("/", 302)
 
     @app.route("/remove_demo_flag")
     def remove_demo():
