@@ -214,7 +214,22 @@ def given_update_language(luteclient, lang, content):
 
 @given(parsers.parse('a {lang} book "{title}" with content:\n{c}'))
 def given_book(luteclient, lang, title, c):
+    "Make a book."
     luteclient.make_book(title, c, lang)
+
+
+@given(parsers.parse('a {lang} book "{title}" from file {filename}'))
+def given_book_from_file(luteclient, lang, title, filename):
+    "Book is made from file in sample_files dir."
+    thisdir = os.path.dirname(os.path.realpath(__file__))
+    fullpath = os.path.join(thisdir, "sample_files", filename)
+    luteclient.make_book_from_file(title, fullpath, lang)
+
+
+@given(parsers.parse("a {lang} book from url {url}"))
+def given_book_from_url(luteclient, lang, url):
+    "Book is made from url in dev_api."
+    luteclient.make_book_from_url(url, lang)
 
 
 @given(parsers.parse('the book table loads "{title}"'))
@@ -290,7 +305,7 @@ def when_change_content(luteclient, content):
     "Change the content."
     assert "Reading" in luteclient.browser.title, "sanity check"
     b = luteclient.browser
-    b.check("hamburger_check")
+    b.find_by_css("div.hamburger-btn").first.click()
     b.find_by_id("editText").click()
     b.find_by_id("text").fill(content)
     b.find_by_id("submit").click()

@@ -20,12 +20,13 @@ class NewBookForm(FlaskForm):
 
     desc = (
         "Use for short texts, e.g. up to a few thousand words. "
-        + 'For longer texts, use the "Text File" below.'
+        + 'For longer texts, use the "Text file" below.'
     )
     text = TextAreaField("Text", description=desc)
     textfile = FileField(
         "Text file",
-        description="Max file size 2048K",
+        # TODO epub: add epub to the list, change prompt.
+        # "Please upload a valid .txt or .epub file"
         validators=[FileAllowed(["txt"], "Please upload a valid text document")],
     )
     source_uri = StringField("Text source", validators=[Length(max=255)])

@@ -1,0 +1,12 @@
+name: Hindi
+dict_1: https://www.boltidictionary.com/en/search?s=###
+dict_2: https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle
+sentence_translation: https://www.bing.com/translator/?from=hi&to=en&text=###
+show_romanization: true
+# right_to_left: 
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+split_sentences: .?!|।॥
+split_sentence_exceptions: Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.
+word_chars: a-zA-Z\u0900-\u0963\u0966-\u097F

@@ -204,11 +204,6 @@ def term_popup(termid):
     )
 
 
-@bp.route("/keyboard_shortcuts", methods=["GET"])
-def keyboard_shortcuts():
-    return render_template("read/keyboard_shortcuts.html")
-
-
 @bp.route("/flashcopied", methods=["GET"])
 def flashcopied():
     return render_template("read/flashcopied.html")

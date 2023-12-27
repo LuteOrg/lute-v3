@@ -133,9 +133,7 @@ function resizeFont(operation) {
   const currentSize = getFromLocalStorage("fontSize", fontDefault);
   const add = (operation === "+");
   let newSize = add ? currentSize + 1 : currentSize - 1;
-  console.log(newSize);
   newSize = clamp(newSize, 1, 50);
-  console.log(newSize);
 
   textItems.forEach((item) => {
     setFontSize(item, `${convertPixelsToRem(newSize)}rem`);

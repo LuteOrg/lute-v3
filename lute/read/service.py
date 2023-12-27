@@ -94,6 +94,21 @@ def get_paragraphs(text):
     tokens = language.get_parsed_tokens(text.text)
     tokens = [t for t in tokens if t.token != "¶"]
 
+    # Brutal hack ... the RenderableCalculator requires the
+    # ParsedTokens to be in contiguous order, but the above list
+    # comprehension can cause some tokens to get removed.  In addition
+    # (and this is the worst part), for some reason the tests fail in
+    # CI, but _inconsistently_, with the token order numbers.  The
+    # order sometimes jumps by 2 ... I really can't explain it.  So,
+    # as a _complete hack_, I'm re-numbering the tokens now, to ensure
+    # they're in order.
+    tokens.sort(key=lambda x: x.order)
+    if len(tokens) > 0:
+        n = tokens[0].order
+        for t in tokens:
+            t.order = n
+            n += 1
+
     terms = find_all_Terms_in_string(text.text, language)
 
     def make_RenderableSentence(pnum, sentence_num, tokens, terms):
