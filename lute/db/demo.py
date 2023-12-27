@@ -36,6 +36,9 @@ def remove_flag():
     """
     Remove IsDemoData setting.
     """
+    if not contains_demo_data():
+        raise RuntimeError("Can't delete non-demo data.")
+
     SystemSetting.delete_key("IsDemoData")
     db.session.commit()
 
