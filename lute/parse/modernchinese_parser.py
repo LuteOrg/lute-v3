@@ -9,10 +9,10 @@ If hanlp is not installed, using pkuseg instead
 """
 from typing import List
 from functools import lru_cache
-
+import importlib
+import pkuseg
 from lute.parse.base import AbstractParser
 from lute.parse.base import ParsedToken
-import pkuseg
 
 CHINESE_PUNCTUATIONS = (
     r"！？｡。＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏.\n"
@@ -37,18 +37,16 @@ class ModernChineseParser(AbstractParser):
         the process of checking whether the hanlp package is installed can be slow.
         If hanlp is not installed, using pkuseg as default chinese parser.
         """
-        _res = True
-        try:
-            import hanlp
-
+        if importlib.util.find_spec("hanlp"):
+            hanlp = importlib.import_module('hanlp')
             ModernChineseParser._seg = hanlp.load(
                 hanlp.pretrained.tok.FINE_ELECTRA_SMALL_ZH
             )
-        except ImportError as _:
+        else:
             _pkuseg = pkuseg.pkuseg()
             ModernChineseParser._seg = _pkuseg.cut
 
-        return _res
+        return True
 
     @classmethod
     def name(cls):
