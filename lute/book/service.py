@@ -8,7 +8,7 @@ import requests
 from tempfile import TemporaryFile, SpooledTemporaryFile
 from bs4 import BeautifulSoup
 from flask import current_app, flash
-from openepub import Epub
+from openepub import Epub, EpubError
 from werkzeug.utils import secure_filename
 from lute.book.model import Book
 
@@ -38,14 +38,24 @@ def get_epub_content(epub_file_field_data):
     Get the content of the epub as a single string.
     """
     content = ""
-    with TemporaryFile() as tf:
-        # We get a SpooledTemporaryFile from the form but this doesn't
-        # implement all file-like methods until python 3.11. So we need
-        # to rewrite it into a TemporaryFile
-        epub_file_field_data.stream.seek(0)
-        tf.write(epub_file_field_data.stream.read())
-        epub = Epub(stream=tf)
-        content = epub.get_text()
+    try:
+        if hasattr(epub_file_field_data.stream, "seekable"):
+            epub = Epub(stream=epub_file_field_data.stream)
+            content = epub.get_text()
+            print("No Rewriting to Temp File.")
+        else:
+            # We get a SpooledTemporaryFile from the form but this doesn't
+            # implement all file-like methods until python 3.11. So we need
+            # to rewrite it into a TemporaryFile
+            with TemporaryFile() as tf:
+                epub_file_field_data.stream.seek(0)
+                tf.write(epub_file_field_data.stream.read())
+                epub = Epub(stream=tf)
+                content = epub.get_text()
+    except EpubError as e:
+        msg = f"Could not parse {epub_file_field_data.filename} (error: {str(e)})"
+        flash(msg, "notice")
+        content = ""
     return content
 
 
