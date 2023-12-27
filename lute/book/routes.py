@@ -81,7 +81,7 @@ def new():
         if form.textfile.data:
             content = _get_file_content(form.textfile.data)
             if not content:
-                return redirect(f"/")
+                return redirect("/")
             b.text = content
         f = form.audiofile.data
         if f:
