@@ -79,7 +79,10 @@ def new():
     if form.validate_on_submit():
         form.populate_obj(b)
         if form.textfile.data:
-            b.text = _get_file_content(form.textfile.data)
+            content = _get_file_content(form.textfile.data)
+            if not content:
+                return redirect(f"/")
+            b.text = content
         f = form.audiofile.data
         if f:
             b.audio_filename = service.save_audio_file(f)
