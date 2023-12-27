@@ -31,7 +31,8 @@ dependencies = [
   "beautifulsoup4>=4.12.2,<5",
   "PyYAML>=6.0.1,<7",
   "toml>=0.10.2,<1",
-  "waitress>=2.1.2,<3"
+  "waitress>=2.1.2,<3",
+  "pkuseg>=0.0.25,<1"
 ]
 
 [project.scripts]
