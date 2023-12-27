@@ -26,13 +26,12 @@ Feature: Books and stats are available
         And the reading pane shows:
             Hola/. /Tengo/ /un/ /perro/.
 
-    # TODO epub: add an epub file to sample_files, activate this test.
-    ### Scenario: I can import an epub file.
-    ###     Given I visit "/"
-    ###     Given a Spanish book "Hola" from file Hola.epub
-    ###     Then the page title is Reading "Hola"
-    ###     And the reading pane shows:
-    ###         Tengo/ /un/ /amigo/.
+    Scenario: I can import an epub file.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file Hola.epub
+        Then the page title is Reading "Hola"
+        And the reading pane shows:
+            Tengo/ /un/ /amigo/.
 
     Scenario: Books and stats are shown on the first page.
         Given I visit "/"
