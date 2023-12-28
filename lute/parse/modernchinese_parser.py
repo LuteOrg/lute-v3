@@ -1,16 +1,18 @@
 """
-Parsing modern chinese with hanlp,
-which requires PyTorch、TensorFlow, so it's not supported by default until installed hanlp by pip.
+Default using jieba to parse Chinese.
+https://github.com/fxsjy/jieba
+
+User can also use hanlp to replace jieba, which is more accurate than jieba and the dictionary is up-to-date,
+It requires PyTorch、TensorFlow, so it's not supported by default until installed hanlp by pip.
 https://github.com/hankcs/HanLP/tree/master
 about the model path configuration
 https://hanlp.hankcs.com/docs/configure.html
 
-If hanlp is not installed, using pkuseg instead
 """
 from typing import List
 from functools import lru_cache
 import importlib
-import pkuseg
+import jieba
 from lute.parse.base import AbstractParser
 from lute.parse.base import ParsedToken
 
@@ -35,7 +37,7 @@ class ModernChineseParser(AbstractParser):
         Using lru_cache to make the test execution run fast,
         otherwise the test execution will run very slowly,
         the process of checking whether the hanlp package is installed can be slow.
-        If hanlp is not installed, using pkuseg as default chinese parser.
+        If hanlp is not installed, using jieba as default chinese parser.
         """
         if importlib.util.find_spec("hanlp"):
             hanlp = importlib.import_module('hanlp')
@@ -43,8 +45,7 @@ class ModernChineseParser(AbstractParser):
                 hanlp.pretrained.tok.FINE_ELECTRA_SMALL_ZH
             )
         else:
-            _pkuseg = pkuseg.pkuseg()
-            ModernChineseParser._seg = _pkuseg.cut
+            ModernChineseParser._seg = lambda text: jieba.cut(text,cut_all=False)
 
         return True
 
