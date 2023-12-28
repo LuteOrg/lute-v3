@@ -63,8 +63,7 @@ def _get_file_content(filefielddata):
         return str(content, "utf-8")
 
     if ext == ".epub":
-        content = service.get_epub_content(filefielddata)
-        return str(content, "utf-8")
+        return service.get_epub_content(filefielddata)
 
     raise ValueError(f'Unknown file extension "{ext}"')
 
@@ -80,7 +79,10 @@ def new():
     if form.validate_on_submit():
         form.populate_obj(b)
         if form.textfile.data:
-            b.text = _get_file_content(form.textfile.data)
+            content = _get_file_content(form.textfile.data)
+            if not content:
+                return redirect("/")
+            b.text = content
         f = form.audiofile.data
         if f:
             b.audio_filename = service.save_audio_file(f)
