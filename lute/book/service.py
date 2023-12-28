@@ -4,8 +4,10 @@ book helper routines.
 
 import os
 from datetime import datetime
-import requests
+
+# pylint: disable=unused-import
 from tempfile import TemporaryFile, SpooledTemporaryFile
+import requests
 from bs4 import BeautifulSoup
 from flask import current_app, flash
 from openepub import Epub, EpubError
