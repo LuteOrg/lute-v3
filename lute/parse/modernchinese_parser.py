@@ -2,8 +2,10 @@
 Default using jieba to parse Chinese.
 https://github.com/fxsjy/jieba
 
-User can also use hanlp to replace jieba, which is more accurate than jieba and the dictionary is up-to-date,
-It requires PyTorch、TensorFlow, so it's not supported by default until installed hanlp by pip.
+User can also use hanlp to replace jieba, which is
+more accurate than jieba and the dictionary is up-to-date,
+It requires PyTorch、TensorFlow, so it's not supported
+until installed hanlp by pip.
 https://github.com/hankcs/HanLP/tree/master
 about the model path configuration
 https://hanlp.hankcs.com/docs/configure.html
@@ -12,9 +14,12 @@ https://hanlp.hankcs.com/docs/configure.html
 from typing import List
 from functools import lru_cache
 import importlib
+import logging
 import jieba
 from lute.parse.base import AbstractParser
 from lute.parse.base import ParsedToken
+
+jieba.setLogLevel(logging.INFO)
 
 CHINESE_PUNCTUATIONS = (
     r"！？｡。＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏.\n"
