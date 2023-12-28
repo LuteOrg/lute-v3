@@ -1,0 +1,82 @@
+on:
+  schedule:
+    # 每天 05:00 执行（北京时间 13：00）
+    - cron:  '0 5 * * *'
+  # 允许手动执行
+  workflow_dispatch:
+    inputs:
+      targetVersion:
+        # 目标版本。不提供时会自动检查、更新代码版本、发布 latest release，提供了则不会更新代码版本，release 也不会 latest
+        description: 'lute version'
+        required: false
+        default: ''
+jobs:
+  check-update:
+    runs-on: ubuntu-latest
+    outputs:
+      build: ${{ steps.post.outputs.build }}
+      update: ${{ steps.post.outputs.update }}
+      version: ${{ steps.post.outputs.version }}
+    steps:
+      - name: fetch all tags
+        uses: actions/checkout@v4
+        if: ${{ inputs.targetVersion != '' }}
+        with:
+          fetch-depth: 0
+      - name: fetch latest tag
+        uses: actions/checkout@v4
+        if: ${{ inputs.targetVersion == '' }}
+      - name: Pre-check
+        id: pre
+        if: ${{ inputs.targetVersion != '' }}
+        run: |
+            if [ ! $(git tag -l "v${{ inputs.targetVersion }}") ]; then
+              echo "Target version check OK"
+              echo "build=1"                   >> $GITHUB_OUTPUT
+              echo "update=0"                  >> $GITHUB_OUTPUT
+              echo "version=${{ inputs.targetVersion }}"  >> $GITHUB_OUTPUT
+            else
+              # 本仓库 Tag 已存在
+              echo "Tag exists"
+              echo "::error title=Tag exists::Perhaps a patch for v${{ inputs.targetVersion }} has been created"
+              echo "build=0"                   >> $GITHUB_OUTPUT
+              echo "update=0"                  >> $GITHUB_OUTPUT
+            fi
+            cat $GITHUB_OUTPUT
+      - name: Post-check
+        id: post
+        run: |
+          if [ "${{ inputs.targetVersion }}" = '' ]; then
+            echo "build=${{ steps.check.outputs.build }}"      >> $GITHUB_OUTPUT
+            echo "update=${{ steps.check.outputs.update }}"    >> $GITHUB_OUTPUT
+            echo "version=${{ steps.check.outputs.version }}"  >> $GITHUB_OUTPUT
+          else
+            echo "build=${{ steps.pre.outputs.build }}"        >> $GITHUB_OUTPUT
+            echo "update=${{ steps.pre.outputs.update }}"      >> $GITHUB_OUTPUT
+            echo "version=${{ steps.pre.outputs.version }}"    >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    runs-on: ubuntu-latest
+    needs: check-update
+    if: needs.check-update.outputs.build == '1'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: |
+            python -m pip install --upgrade pip
+            pip install flit
+      - name: Build package
+        run: |
+            flit build
+      - name: Create Release
+        uses: softprops/action-gh-release@v0.1.15
+        with:
+          body: lute v${{ needs.check-update.outputs.version }}
+          draft: false
+          tag_name: v${{ needs.check-update.outputs.version }}
+          # 因为 softprops/action-gh-releas 还没加 make_latest 选项，所以先用 prerelease 标记
+          # 相关 PR：https://github.com/softprops/action-gh-release/pull/304
+          prerelease: ${{ !needs.check-update.outputs.update }}
+          files: |
+            dist/*.whl
