@@ -200,7 +200,7 @@ def bulk_set_parent():
     return jsonify("ok")
 
 
-@bp.route("/delete/<int:termid>", methods=["POST"])
+@bp.route("/delete/<int:termid>", methods=["GET"])
 def delete(termid):
     """
     Delete a term.
