@@ -57,6 +57,60 @@ def get_status_distribution(book):
     return stats
 
 
+def get_status_distribution2(book):
+    """
+    Return statuses and count of unique words per status.
+
+    Does a full render of the next 20 pages in a book
+    to calculate the distribution.
+    """
+    txindex = 0
+    words = {}
+    stats = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}
+
+    if (book.current_tx_id or 0) != 0:
+        for t in book.texts:
+            if t.id == book.current_tx_id:
+                break
+            txindex += 1
+
+    for text in book.texts[txindex : txindex + 20]:
+        for paragraph in get_paragraphs(text):
+            for sentence in paragraph:
+                for word in sentence.textitems:
+                    if word.is_word:
+                        words.update({word.text_lc: word.wo_status})
+
+    unique_words = list(set(list(words.keys())))
+    for word in unique_words:
+        stats[words[word] or 0] += 1
+
+    return stats, unique_words
+
+
+def get_book_status_fractions(book):
+    status_distribution, unique_words = get_status_distribution2(book)
+    # unique_words = len(unique_words) - status_distribution[99]
+    # "ignored" regarded as "well known"
+    # print(len(unique_words))
+    # print("before", status_distribution[99])
+    # print("before", status_distribution)
+    status_distribution[99] = status_distribution[98] + status_distribution[99]
+
+    # print("after", status_distribution[99])
+    # print("after", status_distribution)
+    status_distribution.pop(98)
+
+    fractions = {}
+    for status in status_distribution:
+        fr = status_distribution[status] / len(unique_words)
+        fractions.update({status: fr})
+
+    # return [book.word_count or 0, unique_words, status_distribution[0], fractions]
+
+    return {book.id: fractions}
+
+
 ##################################################
 # Stats table refresh.
 

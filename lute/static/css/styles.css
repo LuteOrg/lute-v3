@@ -949,3 +949,52 @@ table.statsWordsRead th, td { padding: 5px; }
     overflow: hidden; /* contents overflow (over audio player) if height is too small*/
     opacity: 0; /*to hide the after element. easier this way */
 }
+
+/* status stats */
+
+.show-pct.status-pct-icon-container {
+    display: inline-flex;
+  }
+  
+  .status-pct-icon-container {
+    display: none;
+    width: 80%;
+    /* text-align: right */
+  }
+  
+  .status-pct-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    /* border-radius: 50%; */
+  }
+  
+  .status-pct0 {
+    background-color: #38aaf1;
+  }
+  .status-pct1 {
+    background-color: #e0873e;
+  }
+  .status-pct2 {
+    background-color: #1aa721;
+  }
+  .status-pct3 {
+    background-color: #485add;
+  }
+  .status-pct4 {
+    background-color: rgb(183, 122, 56);
+  }
+  .status-pct5 {
+    background-color: rgb(183, 147, 56);
+  }
+  .status-pct98 {
+    background-color: #17ec77;
+  }
+  .status-pct99 {
+    background-color: #17ec77;
+  }
+  
+  #booktable tr > td:nth-child(4) {
+    display: flex;
+    justify-content: space-between;
+  }

@@ -28,6 +28,7 @@ from lute.models.book import Book
 from lute.models.language import Language
 from lute.models.setting import BackupSettings, UserSetting
 from lute.book.stats import refresh_stats
+from lute.book.stats import get_book_status_fractions
 
 from lute.book.routes import bp as book_bp
 from lute.language.routes import bp as language_bp
@@ -126,6 +127,12 @@ def _add_base_routes(app, app_config):
             and warning_msg != ""
         )
 
+        fraction_dict = {}
+        bks = db.session.query(Book)
+        for bk in bks:
+            st = get_book_status_fractions(bk)
+            fraction_dict.update(st)
+
         return render_template(
             "index.html",
             hide_homelink=True,
@@ -138,6 +145,7 @@ def _add_base_routes(app, app_config):
             # Backup stats
             backup_show_warning=backup_show_warning,
             backup_warning_msg=warning_msg,
+            distrib=fraction_dict,
         )
 
     @app.route("/wipe_database")
