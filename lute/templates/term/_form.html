@@ -81,6 +81,13 @@
         <a href="" onclick="show_term_sentences(); return false;">Sentences</a>
         <button id="submit" type="submit" class="btn btn-primary">Save</button>
       </td>
+      {% if term.id %}
+    <tr>
+      <td align="right">
+        <button id="delete" type="button" class="btn" onclick="deleteTerm()">Delete</button>
+      </td>
+    </tr>
+      {% endif %}
     </tr>
 
   </tbody>
@@ -397,5 +404,26 @@
     const url = `/term/sentences/${langid}/${t}`;
     top.frames.dictframe.location.href = url;
   }
+
+  function deleteTerm() {
+        // Ask for confirmation
+        var isConfirmed = confirm('Are you sure you want to delete this term?\n\nThis action cannot be undone, and if this term has children, they will be orphaned.');
+
+        // Check if the user confirmed
+        if (isConfirmed) {
+            // Delete term
+            fetch("/term/delete/{{ term.id }}")
+
+            if ("{{ embedded_in_reading_frame }}" == "True") {
+              // If on reading page, reload page
+              parent.location.reload();
+            }
+            else {
+              // If on term page, go to term listing
+              window.location.href = '/term/index';
+            }
+        }
+   }
+
 
 </script>
