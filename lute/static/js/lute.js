@@ -93,7 +93,7 @@ function prepareTextInteractions(textid) {
  * Build the html content for jquery-ui tooltip.
  */
 let tooltip_textitem_hover_content = function (el, setContent) {
-  elid = parseInt(el.attr('data_wid'));
+  elid = parseInt(el.data('wid'));
   $.ajax({
     url: `/read/termpopup/${elid}`,
     type: 'get',
@@ -105,9 +105,9 @@ let tooltip_textitem_hover_content = function (el, setContent) {
 
 
 function showEditFrame(el, extra_args = {}) {
-  const lid = parseInt(el.attr('lid'));
+  const lid = parseInt(el.data('lang-id'));
 
-  let text = extra_args.textparts ?? [ el.attr('data_text') ];
+  let text = extra_args.textparts ?? [ el.data('text') ];
   const sendtext = text.join('');
 
   let extras = Object.entries(extra_args).
@@ -122,7 +122,7 @@ function showEditFrame(el, extra_args = {}) {
 
 
 let save_curr_data_order = function(el) {
-  LUTE_CURR_TERM_DATA_ORDER = parseInt(el.attr('data_order'));
+  LUTE_CURR_TERM_DATA_ORDER = parseInt(el.data('order'));
 }
 
 
@@ -141,7 +141,7 @@ let _show_highlights = function() {
 }
 
 /**
- * Terms have data_status_class attribute.  If highlights should be shown,
+ * Terms have data-status-class attribute.  If highlights should be shown,
  * then add that value to the actual span. */
 function add_status_classes() {
   if (!_show_highlights())
@@ -151,9 +151,9 @@ function add_status_classes() {
   });
 }
 
-/** Add the data_status_class to the term's classes. */
+/** Add the data-status-class to the term's classes. */
 let apply_status_class = function(el) {
-  el.addClass(el.attr("data_status_class"));
+  el.addClass(el.data("status-class"));
 }
 
 /** Remove the status from elements, if not showing highlights. */
@@ -164,7 +164,7 @@ let remove_status_highlights = function() {
   }
   $('span.word').toArray().forEach(function (m) {
     el = $(m);
-    el.removeClass(el.attr("data_status_class"));
+    el.removeClass(el.data("status-class"));
   });
 }
 
@@ -214,8 +214,8 @@ function select_started(e) {
 }
 
 let get_selected_in_range = function(start_el, end_el, selector) {
-  const first = parseInt(start_el.attr('data_order'))
-  const last = parseInt(end_el.attr('data_order'));
+  const first = parseInt(start_el.data('order'))
+  const last = parseInt(end_el.data('order'));
 
   let startord = first;
   let endord = last;
@@ -226,7 +226,7 @@ let get_selected_in_range = function(start_el, end_el, selector) {
   }
 
   const selected = $(selector).filter(function() {
-    const ord = $(this).attr("data_order");
+    const ord = $(this).data("order");
     return ord >= startord && ord <= endord;
   });
   return selected;
@@ -301,7 +301,7 @@ var maxindex = null;
 
 function load_reading_pane_globals() {
   words = $('span.word').sort(function(a, b) {
-    return $(a).attr('data_order') - $(b).attr('data_order');
+    return $(a).data('order') - $(b).data('order');
   });
   // console.log('have ' + words.size() + ' words');
   maxindex = words.size() - 1;
@@ -310,7 +310,7 @@ function load_reading_pane_globals() {
 $(document).ready(load_reading_pane_globals);
 
 let current_word_index = function() {
-  const i = words.toArray().findIndex(x => parseInt(x.getAttribute('data_order')) === LUTE_CURR_TERM_DATA_ORDER);
+  const i = words.toArray().findIndex(x => parseInt(x.dataset.order) === LUTE_CURR_TERM_DATA_ORDER);
   // console.log(`found index = ${i}`);
   return i;
 };
@@ -329,15 +329,10 @@ let get_textitems_spans = function(e) {
   if (w == null)
     return null;
 
-  let attr_name = 'seid';
-  let attr_value = w.attr('seid');
+  const attr_name = !e.shiftKey ? 'sentence-id' : 'paragraph-id';
+  const attr_value = w.data(attr_name);
 
-  if (e.shiftKey) {
-    attr_name = 'paraid';
-    attr_value = w.attr('paraid');
-  }
-
-  return $('span.textitem').toArray().filter(x => x.getAttribute(attr_name) === attr_value);
+  return $(`span.textitem[data-${attr_name}="${attr_value}"]`).toArray();
 };
 
 /** Copy the text of the textitemspans to the clipboard, and add a
@@ -399,7 +394,7 @@ let find_non_Ign_or_Wkn = function(currindex, shiftby) {
   let newindex = currindex + shiftby;
   while (newindex >= 0 && newindex <= maxindex) {
     const nextword = words.eq(newindex);
-    const st = nextword.attr('data_status_class');
+    const st = nextword.data('status-class');
     if (st != 'status99' && st != 'status98') {
       break;
     }
@@ -424,7 +419,6 @@ let show_translation = function(e) {
   if (tis == null)
     return;
   const sentence = tis.map(s => $(s).text()).join('');
-  // console.log(sentence);
 
   const userdict = $('#translateURL').text();
   if (userdict == null || userdict == '')
@@ -563,7 +557,7 @@ function update_selected_statuses(newStatus, elements) {
     matches.forEach(function (m) {
       $(m).removeClass('status98 status99 status0 status1 status2 status3 status4 status5 shiftClicked')
         .addClass(newClass)
-        .attr('data_status_class',`${newClass}`);
+        .attr('data-status-class',`${newClass}`);
     });
   };
   $(elements).each(update_data_status_class)
@@ -596,7 +590,7 @@ function update_status_for_elements(new_status, elements) {
   if (elements.length == 0)
     return;
   const firstel = $(elements[0]);
-  const langid = firstel.attr('lid');
+  const langid = firstel.data('lang-id');
   const texts = elements.map(el => $(el).text());
 
   data = JSON.stringify({
@@ -655,7 +649,7 @@ function increment_status_for_selected_elements(e, shiftBy) {
   let payloads = {};
 
   elements.forEach((element) => {
-    let statusClass = element.getAttribute('data_status_class');
+    let statusClass = element.dataset.statusClass;
     
     if (!statusClass || !validStatuses.includes(statusClass)) return;
 

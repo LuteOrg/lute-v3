@@ -1,13 +1,13 @@
 {# Render a read.render.renderable_calculator.TextItem #}
 <span id="{{ item.span_id }}"
       class="{{ item.html_class_string }}"
-      tid="{{ item.text_id }}"
-      lid="{{ item.lang_id }}"
-      paraid="{{ item.para_id }}"
-      seid="{{ item.se_id }}"
-      data_text="{{ item.text }}"
-      data_status_class="{{ item.status_class }}"
-      data_order="{{ item.order }}"
+      data-text-id="{{ item.text_id }}"
+      data-lang-id="{{ item.lang_id }}"
+      data-paragraph-id="{{ item.para_id }}"
+      data-sentence-id="{{ item.se_id }}"
+      data-text="{{ item.text }}"
+      data-status-class="{{ item.status_class }}"
+      data-order="{{ item.order }}"
 {% if item.wo_id is not none %}
-      data_wid="{{ item.wo_id }}"
+      data-wid="{{ item.wo_id }}"
 {% endif %}>{{ item.html_display_text | safe }}</span>

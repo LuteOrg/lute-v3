@@ -152,6 +152,18 @@ def _add_base_routes(app, app_config):
             flash(msg)
         return redirect("/", 302)
 
+    @app.route("/remove_demo_flag")
+    def remove_demo():
+        if lute.db.demo.contains_demo_data():
+            lute.db.demo.remove_flag()
+            msg = """
+            Demo mode deactivated. Have fun! <br /><br />
+            <i>(Lute has automatically enabled backups --
+            change your <a href="/settings/index">Settings</a> as needed.)</i>
+                        """
+            flash(msg)
+        return redirect("/", 302)
+
     @app.route("/version")
     def show_version():
         ac = current_app.env_config
