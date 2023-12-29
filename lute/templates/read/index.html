@@ -39,16 +39,6 @@
           class="lutelogo_small"
           style="cursor: pointer"
           onclick="window.location='/'" />
-              <!-- <span -->
-                <!-- class="read_page_nav read_page_disabled" -->
-                <!-- id="navPrev10" -->
-                <!-- onclick="goto_relative_page(-10)" -->
-                <!-- >&#171;</span> -->
-            <!-- <span -->
-              <!-- class="read_page_nav read_page_disabled" -->
-              <!-- id="navNext10" -->
-              <!-- onclick="goto_relative_page(10)" -->
-              <!-- >&#187;</span> -->
           <div id="reading_menu">
             <div class="reading_menu_logo_container">
               <img
@@ -289,7 +279,6 @@
     goto_relative_page(0, true);
 
     // If the css slide-in menu is open, clicking away from it closes the menu.
-    // The menu is handled via css, so we have to update the checkbox state.
     $(document).click(function(event) {
       const menu_clicked = event.target.closest('.reading_header_left');
       const menu = document.getElementById("reading_menu");
@@ -395,7 +384,6 @@
    * to the ajax "success" function worked.  ???
    */
   const readSlider = document.getElementById("read-slider");
-  
   //input instead of change so bg color moves with the "thumb", not after mouse release
   readSlider.addEventListener("input", function() {
     const pagenum = parseInt($('#page_num').val());
