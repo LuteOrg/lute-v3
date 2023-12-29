@@ -102,20 +102,13 @@
     </div>
 
     <div class="read-slide-container">
-      <!-- <span class="read-bkm-btn">≪</span> -->
-      <!-- <div class="read-bkm-btn"><span>◀</span><span>◀</span></div> -->
-      <!-- <div class="read-bkm-btn"><span>˂</span></div> -->
       <div class="read_page_nav read_page_disabled"
         id="navPrev"
-        onclick="goto_relative_page(-1)"
-        ><span>◀</span></div>
-      <input type="range" id="read-slider" max="{{ page_count - 1 }}" value="{{ page_num }}"
-        step="1" />
+        onclick="goto_relative_page(-1)">◀</div>
+      <input type="range" id="read-slider" max="{{ page_count - 1 }}" value="{{ page_num }}" step="1">
       <div class="read_page_nav read_page_disabled"
         id="navNext"
-        onclick="goto_relative_page(1)"
-        ><span>▶</span></div>
-        <!-- <div class="read-bkm-btn"><span>▶</span><span>▶</span></div> -->
+        onclick="goto_relative_page(1)">▶</div>
     </div>
   </div>
 
