@@ -83,3 +83,4 @@ wsproto==1.2.0
 WTForms==3.0.1
 zipp==3.17.0
 openepub==0.0.6
+jieba==0.42.1

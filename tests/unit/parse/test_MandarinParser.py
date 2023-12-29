@@ -1,5 +1,5 @@
 """
-Testing the ModernChineseParser
+Testing the MandarinParser
 """
 from lute.parse.base import ParsedToken
 
@@ -19,15 +19,15 @@ def assert_tokens_equals(text, lang, expected):
     assert [str(a) for a in actual] == [str(e) for e in expected]
 
 
-def test_sample_1(modern_chinese):
+def test_sample_1(mandarin):
     "Sample text parsed."
     s = "我爱北京天安门。"
 
     expected = [["我", True], ["爱", True], ["北京", True], ["天安门", True], ["。", False]]
-    assert_tokens_equals(s, modern_chinese, expected)
+    assert_tokens_equals(s, mandarin, expected)
 
 
-def test_sample_2(modern_chinese):
+def test_sample_2(mandarin):
     "Sample text parsed."
     s = "我爱北京天安门。\n"
 
@@ -39,4 +39,4 @@ def test_sample_2(modern_chinese):
         ["。", False],
         ["¶", False, True],
     ]
-    assert_tokens_equals(s, modern_chinese, expected)
+    assert_tokens_equals(s, mandarin, expected)

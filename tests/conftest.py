@@ -126,7 +126,7 @@ def fixture_test_languages(app_context, demo_yaml_folder):
         "japanese",
         "turkish",
         "classical_chinese",
-        "modern_chinese",
+        "mandarin",
     ]
     ret = {}
     for lang in langs:
@@ -160,6 +160,6 @@ def fixture_cl_chinese(test_languages):
     return test_languages["classical_chinese"]
 
 
-@pytest.fixture(name="modern_chinese")
+@pytest.fixture(name="mandarin")
 def fixture_mc_chinese(test_languages):
-    return test_languages["modern_chinese"]
+    return test_languages["mandarin"]

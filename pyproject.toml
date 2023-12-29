@@ -31,7 +31,8 @@ dependencies = [
   "PyYAML>=6.0.1,<7",
   "toml>=0.10.2,<1",
   "waitress>=2.1.2,<3",
-  "openepub>=0.0.6,<1"
+  "openepub>=0.0.6,<1",
+  "jieba>=0.42.1,<1"
 ]
 
 [project.scripts]
