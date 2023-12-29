@@ -80,14 +80,10 @@
       <td align="right">
         <a href="" onclick="show_term_sentences(); return false;">Sentences</a>
         <button id="submit" type="submit" class="btn btn-primary">Save</button>
-      </td>
-      {% if term.id %}
-    <tr>
-      <td align="right">
+        {% if term.id %}
         <button id="delete" type="button" class="btn" onclick="deleteTerm()">Delete</button>
+        {% endif %}
       </td>
-    </tr>
-      {% endif %}
     </tr>
 
   </tbody>
