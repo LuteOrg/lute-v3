@@ -108,7 +108,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     page.get_by_role("link", name="Terms", exact=True).click()
     page.get_by_role("link", name="Hello").click()
     page.get_by_role("link", name="Sentences").click()
-    page.get_by_role("link", name="back to list").click()
+    page.get_by_role("link", name="Back to list").click()
 
     # Edit language.
     _print("Edit language.")
