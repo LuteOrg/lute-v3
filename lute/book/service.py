@@ -4,9 +4,13 @@ book helper routines.
 
 import os
 from datetime import datetime
+
+# pylint: disable=unused-import
+from tempfile import TemporaryFile, SpooledTemporaryFile
 import requests
 from bs4 import BeautifulSoup
 from flask import current_app, flash
+from openepub import Epub, EpubError
 from werkzeug.utils import secure_filename
 from lute.book.model import Book
 
@@ -35,7 +39,25 @@ def get_epub_content(epub_file_field_data):
     """
     Get the content of the epub as a single string.
     """
-    raise ValueError("TODO epub: to be implemented.")
+    content = ""
+    try:
+        if hasattr(epub_file_field_data.stream, "seekable"):
+            epub = Epub(stream=epub_file_field_data.stream)
+            content = epub.get_text()
+        else:
+            # We get a SpooledTemporaryFile from the form but this doesn't
+            # implement all file-like methods until python 3.11. So we need
+            # to rewrite it into a TemporaryFile
+            with TemporaryFile() as tf:
+                epub_file_field_data.stream.seek(0)
+                tf.write(epub_file_field_data.stream.read())
+                epub = Epub(stream=tf)
+                content = epub.get_text()
+    except EpubError as e:
+        msg = f"Could not parse {epub_file_field_data.filename} (error: {str(e)})"
+        flash(msg, "notice")
+        content = ""
+    return content
 
 
 def book_from_url(url):

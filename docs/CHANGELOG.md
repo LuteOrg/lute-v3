@@ -1,3 +1,22 @@
+
+# 3.0.8 (2023-12-28)
+
+Feature changes:
+
+* Add .epub import (feature [19](https://github.com/jzohrab/lute-v3/issues/19)).  By @sakolkar in #82.
+* Add resize frame option in reading pane.  By @webofpies in #77.
+* Add "dismiss" demo option, for users who don't want to wipe the db.  By @dgc08 in #80.
+* Nicer styling for the reading menu.  By @webofpies in #72.
+* Add Hindi and example to baseline.  By @mzraly in #76.
+* Update German sample story to new orthography.  By @dgc08 in #81.
+
+Back end changes:
+
+* Fix javascript attribute names to standard.  By @robby1066 in #79.
+* Fix GitHub CI to really fail when things fail.
+* Restructure book service to support epub import.
+
+
 # 3.0.7 (2023-12-21)
 
 Feature changes:
