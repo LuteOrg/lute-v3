@@ -1,5 +1,5 @@
 # title: 珍珠鸟
-# language: Modern Chinese
+# language: Mandarin
 #
 珍珠鸟
 冯骥才

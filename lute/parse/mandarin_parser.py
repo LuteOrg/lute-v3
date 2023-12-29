@@ -2,18 +2,9 @@
 Default using jieba to parse Chinese.
 https://github.com/fxsjy/jieba
 
-User can also use hanlp to replace jieba, which is
-more accurate than jieba and the dictionary is up-to-date,
-It requires PyTorch、TensorFlow, so it's not supported
-until installed hanlp by pip.
-https://github.com/hankcs/HanLP/tree/master
-about the model path configuration
-https://hanlp.hankcs.com/docs/configure.html
-
 """
 from typing import List
 from functools import lru_cache
-import importlib
 import logging
 import jieba
 from lute.parse.base import AbstractParser
@@ -26,45 +17,29 @@ CHINESE_PUNCTUATIONS = (
 )
 
 
-class ModernChineseParser(AbstractParser):
+class MandarinParser(AbstractParser):
     """
-    Using hanlp for parsing modern Chinese,
-    if the user don't install hanlp, the parser is not supported.
-    https://github.com/hankcs/HanLP/blob/doc-zh/plugins/hanlp_demo/hanlp_demo/zh/tok_stl.ipynb
+    Using jieba to parse the Mandarin
     """
 
-    _seg = None
+    _seg = lambda text: jieba.cut(text, cut_all=False)
 
     @classmethod
-    @lru_cache()
     def is_supported(cls):
-        """
-        Using lru_cache to make the test execution run fast,
-        otherwise the test execution will run very slowly,
-        the process of checking whether the hanlp package is installed can be slow.
-        If hanlp is not installed, using jieba as default chinese parser.
-        """
-        if importlib.util.find_spec("hanlp"):
-            hanlp = importlib.import_module('hanlp')
-            ModernChineseParser._seg = hanlp.load(
-                hanlp.pretrained.tok.FINE_ELECTRA_SMALL_ZH
-            )
-        else:
-            ModernChineseParser._seg = lambda text: jieba.cut(text,cut_all=False)
 
         return True
 
     @classmethod
     def name(cls):
-        return "ModernChinese"
+        return "Mandarin"
 
     @lru_cache()
     def parse_para(self, para_text):
         """
-        Parsing the paragraph using hanlp
+        Parsing the paragraph
         """
         para_result = []
-        for tok in ModernChineseParser._seg(para_text):
+        for tok in MandarinParser._seg(para_text):
             is_word = tok not in CHINESE_PUNCTUATIONS
             para_result.append((tok, is_word))
         return para_result
