@@ -402,24 +402,21 @@
   }
 
   function deleteTerm() {
-        // Ask for confirmation
-        var isConfirmed = confirm('Are you sure you want to delete this term?\n\nThis action cannot be undone, and if this term has children, they will be orphaned.');
+    const msg = "Are you sure you want to delete this term?\n\n" +
+          "This action cannot be undone, and if this term has children, they will be orphaned.";
+    if (!confirm(msg))
+      return;
 
-        // Check if the user confirmed
-        if (isConfirmed) {
-            // Delete term
-            fetch("/term/delete/{{ term.id }}")
-
-            if ("{{ embedded_in_reading_frame }}" == "True") {
-              // If on reading page, reload page
-              parent.location.reload();
-            }
-            else {
-              // If on term page, go to term listing
-              window.location.href = '/term/index';
-            }
-        }
-   }
-
+    $.post("/term/delete/{{ term.id }}", function( data ) {
+      if ("{{ embedded_in_reading_frame }}" == "True") {
+        // If on reading page, reload page
+        parent.location.reload();
+      }
+      else {
+        // If on term page, go to term listing
+        window.location.href = '/term/index';
+      }
+    });
+  }
 
 </script>
