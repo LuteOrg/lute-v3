@@ -17,9 +17,6 @@ function  showFractionStats() {
       const icon = document.querySelector(`.status-pct${status}-${book}`);
       const iconPct = statusPct[book][status];
       icon.style.flex = `${iconPct}`;
-      // console.log(iconPct);
-      icon.style.fontSize = "0.8rem";
-      icon.style.color = "white";
       if (iconPct > 0.1) icon.textContent = `\xa0${(iconPct * 100).toFixed(0)}%`;
     }
   }

@@ -954,47 +954,48 @@ table.statsWordsRead th, td { padding: 5px; }
 
 .show-pct.status-pct-icon-container {
     display: inline-flex;
-  }
+}
   
-  .status-pct-icon-container {
+.status-pct-icon-container {
     display: none;
     width: 80%;
-    /* text-align: right */
-  }
-  
-  .status-pct-icon {
+/* text-align: right */
+}
+
+.status-pct-icon {
     display: inline-block;
     width: 16px;
     height: 16px;
-    /* border-radius: 50%; */
-  }
+    font-size: 0.8rem;
+    color: #fff;
+}
   
-  .status-pct0 {
+.status-pct0 {
     background-color: #38aaf1;
-  }
-  .status-pct1 {
+}
+.status-pct1 {
     background-color: #e0873e;
-  }
-  .status-pct2 {
+}
+.status-pct2 {
     background-color: #1aa721;
-  }
-  .status-pct3 {
+}
+.status-pct3 {
     background-color: #485add;
-  }
-  .status-pct4 {
+}
+.status-pct4 {
     background-color: rgb(183, 122, 56);
-  }
-  .status-pct5 {
+}
+.status-pct5 {
     background-color: rgb(183, 147, 56);
-  }
-  .status-pct98 {
+}
+.status-pct98 {
     background-color: #17ec77;
-  }
-  .status-pct99 {
+}
+.status-pct99 {
     background-color: #17ec77;
-  }
-  
-  #booktable tr > td:nth-child(4) {
+}
+
+#booktable tr > td:nth-child(4) {
     display: flex;
     justify-content: space-between;
-  }
+}
