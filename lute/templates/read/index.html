@@ -85,31 +85,35 @@
             </ul>
           </div>
         </div>
-        <div class="texttitlecontainer">
-          <h2 id="thetexttitle">{{ book.title }}</h2>
-        </div>
-        <div class="reading_header_right">
-          <!-- <a id="reading_home_link" class="home-link" href="/">Home</a> -->
-          <div class="read-bookmark-buttons-container">
-            <button id="read-bkm-save-btn" class="read-bkm-btn"></button>
-            <!-- <div class="read-bookmark-jump-container"> -->
-              <!-- <button id="read-bkm-prev-btn" class="read-bkm-btn"></button> -->
-              <!-- <button id="read-bkm-next-btn" class="read-bkm-btn"></button> -->
-            <!-- </div> -->
+        <div class="reading_header_mid">
+        <div class="reading_header_mid_top">
+          <div class="texttitlecontainer">
+            <h1 id="thetexttitle">{{ book.title }}</h1>
           </div>
-          <div id="page_indicator">{{ page_num }}/{{ page_count }}</div>
+          <div class="reading_header_page">
+            <!-- <a id="reading_home_link" class="home-link" href="/">Home</a> -->
+            <div class="read-bookmark-buttons-container">
+              <button id="read-bkm-save-btn" class="read-bkm-btn"></button>
+              <!-- <div class="read-bookmark-jump-container"> -->
+                <!-- <button id="read-bkm-prev-btn" class="read-bkm-btn"></button> -->
+                <!-- <button id="read-bkm-next-btn" class="read-bkm-btn"></button> -->
+              <!-- </div> -->
+            </div>
+            <div id="page_indicator">{{ page_num }}/{{ page_count }}</div>
+          </div>
+          </div>
+          <div class="read-slide-container">
+            <div class="read_page_nav read_page_disabled"
+              id="navPrev"
+              onclick="goto_relative_page(-1)">◀</div>
+            <input type="range" id="read-slider" class="read_page_disabled" max="{{ page_count - 1 }}" value="{{ page_num }}" step="1">
+            <div class="read_page_nav read_page_disabled"
+              id="navNext"
+              onclick="goto_relative_page(1)">▶</div>
+          </div>
         </div>
     </div>
 
-    <div class="read-slide-container">
-      <div class="read_page_nav read_page_disabled"
-        id="navPrev"
-        onclick="goto_relative_page(-1)">◀</div>
-      <input type="range" id="read-slider" max="{{ page_count - 1 }}" value="{{ page_num }}" step="1">
-      <div class="read_page_nav read_page_disabled"
-        id="navNext"
-        onclick="goto_relative_page(1)">▶</div>
-    </div>
   </div>
 
   <div class="audio-player-container" style="display: none">
@@ -339,6 +343,7 @@
       $('#navNext').addClass('read_page_disabled');
       $('#navNext10').addClass('read_page_disabled');
     }
+    //toggleSliderStatus();
   };
 
 
@@ -367,38 +372,59 @@
       t.addClass('hide');
   };
 
-  /**
-   * Go to page relative to that stored in page_num input.
-   *
-   * On first load of page, load_source_file is set to true.
-   * It appears that for Firefox the player source can't be set
-   * while the page content is being ajax'd in.  This makes
-   * _NO SENSE AT ALL_ but moving the player source loading
-   * to the ajax "success" function worked.  ???
-   */
+  // for the reading page return the main container to full width
+  document.querySelector(".container").style.cssText = `width: 100%; margin: 0;`;
+  
   const readSlider = document.getElementById("read-slider");
-  //input instead of change so bg color moves with the "thumb", not after mouse release
+  const maxpage = parseInt($('#page_count').val());
+  // disable read slider if there's only 1 page
+  if (maxpage > 1) document.getElementById("read-slider").classList.remove("read_page_disabled");
+
   readSlider.addEventListener("input", function() {
     const pagenum = parseInt($('#page_num').val());
-
+    const p = Number(readSlider.value) + 1 - pagenum;
+    const finalPage = getFinalPage(p);
+    updateReadSlider(finalPage);
+    document.getElementById("page_indicator").textContent = `${finalPage}/${maxpage}`;
+  })
+  
+  readSlider.addEventListener("change", function() { 
+    const pagenum = parseInt($('#page_num').val());
     const p = Number(readSlider.value) + 1 - pagenum;
     goto_relative_page(p);
   })
 
+  function updateReadSlider(p) {
+    readSlider.value = p - 1;
+    readSlider.style.backgroundSize = `${100 / (maxpage - 1) * readSlider.value}% 100%`;
+  }
+  
+  function getFinalPage(p) {
+    const pagenum = parseInt($('#page_num').val());
+    let finalPage = pagenum + p;
+    if (finalPage < 1)
+      finalPage = 1;
+    if (finalPage > maxpage)
+      finalPage = maxpage;
+
+    return finalPage;
+}
+/**
+ * Go to page relative to that stored in page_num input.
+ *
+ * On first load of page, load_source_file is set to true.
+ * It appears that for Firefox the player source can't be set
+ * while the page content is being ajax'd in.  This makes
+ * _NO SENSE AT ALL_ but moving the player source loading
+ * to the ajax "success" function worked.  ???
+ */
   function goto_relative_page(p, load_source_file = false) {
     const bookid = $('#book_id').val();
-    const pagenum = parseInt($('#page_num').val());
-    const maxpage = parseInt($('#page_count').val());
-    let relpage = pagenum + p;
-    if (relpage < 1)
-      relpage = 1;
-    if (relpage > maxpage)
-      relpage = maxpage;
+    const finalPage = getFinalPage(p);
 
-    readSlider.value = relpage - 1;
-    readSlider.style.backgroundSize = `${100 / (maxpage - 1) * (relpage - 1)}% 100%`;
+    updateReadSlider(finalPage);
 
-    const url = `/read/renderpage/${bookid}/${relpage}`;
+    const url = `/read/renderpage/${bookid}/${finalPage}`;
     $.get(
       url,
       function(data, status) {
@@ -406,11 +432,11 @@
         prepareTextInteractions();
         add_status_classes();
         start_hover_mode(false);
-        $('#page_num').val(relpage);
+        $('#page_num').val(finalPage);
         enable_page_nav_links();
         set_page_fraction();
         set_footer_control_visibility();
-        //show_hide_title(relpage);
+        // show_hide_title(finalPage);
 
         // Magic hack for player source to load consistently
         // in Firefox.
