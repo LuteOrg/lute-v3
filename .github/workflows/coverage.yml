@@ -1,0 +1,77 @@
+name: coverage
+
+on:
+  push:
+    # A branch coverage can be created and used for ci
+    # experiments and tweaks.
+    branches: [ "master", "coverage" ]
+
+permissions:
+  contents: read
+
+jobs:
+
+  # Generate a coverage badge, don't worry if it fails.
+  # Uses https://github.com/Schneegans/dynamic-badges-action to update a secret gist
+  # (ID a15001ec2ff889f7be0b553df9881566) and an API token, per notes at
+  # https://nedbatchelder.com/blog/202209/making_a_coverage_badge.html.
+  # Slightly wasteful in that it re-runs the tests, but it's fastest.
+  coverage:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y mecab mecab-ipadic-utf8
+        # Helper checks to find the mecab library path,
+        # so it can be exported before running tests.
+        # Without the export, natto-py fails on github.
+        # echo FIND THE LIB:
+        # which mecab
+        # actual=`readlink -f /usr/bin/mecab`
+        # ldd $actual
+
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+        cache: 'pip' # caching pip dependencies
+
+    - run: pip install -r requirements.txt
+
+    - name: Setup config
+      run: |
+        mkdir ${{ github.workspace }}/data
+        echo "ENV: dev" > ${{ github.workspace }}/lute/config/config.yml
+        echo "DATAPATH: ${{ github.workspace }}/data" >> ${{ github.workspace }}/lute/config/config.yml
+        echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/lute/config/config.yml
+        ls ${{ github.workspace }}
+        cat ${{ github.workspace }}/lute/config/config.yml
+
+    - name: Generate coverage
+      run: |
+        # Have to explicitly set MECAB_PATH for natto-py.
+        export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
+        coverage run -m pytest tests/
+        coverage json --omit="tests/*"
+        export TOTAL=$(python -c "import json;print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
+        echo "total=$TOTAL" >> $GITHUB_ENV
+        echo "### Total coverage: ${TOTAL}%" >> $GITHUB_STEP_SUMMARY
+
+    - name: "Make badge"
+      uses: schneegans/dynamic-badges-action@v1.4.0
+      with:
+        # GIST_TOKEN is a GitHub personal access token with scope "gist".
+        auth: ${{ secrets.GIST_TOKEN }}
+        gistID: a15001ec2ff889f7be0b553df9881566
+        filename: covbadge.json
+        label: coverage
+        message: ${{ env.total }}%
+        valColorRange: ${{ env.total }}
+        minColorRange: 50
+        maxColorRange: 80
