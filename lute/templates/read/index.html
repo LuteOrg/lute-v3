@@ -27,89 +27,91 @@
 
   <div id="reading-header">
 
-    <div class="reading_header_left">
-      <div class="hamburger-btn" onclick="toggleMenu()">
-        <span class="hamburger"></span>
-        <span class="hamburger"></span>
-        <span class="hamburger"></span>
-      </div>
-      <img
-      src="{{ url_for('static', filename='img/lute.png') }}"
-      class="lutelogo_small"
-      style="cursor: pointer"
-      onclick="window.location='/'" />
-      <h2 style="margin: 0px">
-        <span
-          class="read_page_nav read_page_disabled"
-          id="navPrev10"
-          onclick="goto_relative_page(-10)"
-          >&#171;</span>
-        <span
-          class="read_page_nav read_page_disabled"
-          id="navPrev"
-          onclick="goto_relative_page(-1)"
-          >&#8249;</span>
-        <span id="page_indicator">{{ page_num }}/{{ page_count }}</span>
-        <span
-          class="read_page_nav read_page_disabled"
-          id="navNext"
-          onclick="goto_relative_page(1)"
-          >&#8250;</span>
-        <span
-          class="read_page_nav read_page_disabled"
-          id="navNext10"
-          onclick="goto_relative_page(10)"
-          >&#187;</span>
-      </h2>
-      <div id="reading_menu">
-        <div class="reading_menu_logo_container">
+    <div class="reading_header_container">
+        <div class="reading_header_left">
+          <div class="hamburger-btn" onclick="toggleMenu()">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+          </div>
           <img
           src="{{ url_for('static', filename='img/lute.png') }}"
           class="lutelogo_small"
           style="cursor: pointer"
           onclick="window.location='/'" />
-          <!-- <h2>Lute</h2> -->
-          <button class="reading-menu-close-btn" onclick="closeMenu()"></button>
+          <div id="reading_menu">
+            <div class="reading_menu_logo_container">
+              <img
+              src="{{ url_for('static', filename='img/lute.png') }}"
+              class="lutelogo_small"
+              style="cursor: pointer"
+              onclick="window.location='/'" />
+              <!-- <h2>Lute</h2> -->
+              <button class="reading-menu-close-btn" onclick="closeMenu()"></button>
+            </div>
+            <div class="text-options-container">
+              <div class="text-options-btn-container">
+                <button class="text-options-button font-minus" title="Decrease font size"></button>
+                <button class="text-options-button font-plus" title="Increase font size"></button>
+              </div>
+              <div class="text-options-btn-container">
+                <button class="text-options-button lh-minus" title="Decrease line height"></button>
+                <button class="text-options-button lh-plus" title="Increase line height"></button>
+              </div>
+              <div class="text-options-btn-container">
+                <button class="text-options-button width-minus" title="Decrease content width"></button>
+                <button class="text-options-button width-plus" title="Increase content width"></button>
+              </div>
+              <div class="text-options-btn-container">
+                <button class="text-options-button column-one" title="One column text"></button>
+                <button class="text-options-button column-two" title="Two column text"></button>
+              </div>
+            </div>
+            <ul>
+              {% if book.source_uri %}
+              <li class="menu-list-item-text"><a href="{{ book.source_uri }}" target="_blank" tabindex="-1"><img class="menu-icon" src="/static/icn/open.svg" alt=""><span>Show source URL</span></a></li>
+              {% endif %}
+              <li class="menu-list-item-text"><a id="editText" href="" onclick="edit_current_page(); return false;"><img class="menu-icon" src="/static/icn/edit.svg" alt=""><span>Edit page</span></a></li>
+              <li class="menu-list-item-text"><a id="next_theme" onclick="next_theme(); return false;" title="Next theme"><img class="menu-icon" src="/static/icn/color.svg" alt=""><span>Next theme (m)</span></a></li>
+              <li class="menu-list-item-text"><a id="toggle_highlights" onclick="toggle_highlight(); return false;" title="Toggle highlights"><img class="menu-icon" src="/static/icn/highlight.svg" alt=""><span>Toggle highlights (h)</span></a></li>
+              <li class="menu-list-item-text">
+                <a id="keyboard_shortcuts" title="Keyboard shortcuts"
+                  href="https://jzohrab.github.io/lute-manual/usage/keyboard-bindings.html"
+                  target="_blank">
+                  <img class="menu-icon" src="/static/icn/keyboard.svg" alt="">
+                  <span>Keyboard shortcuts</span>
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="text-options-container">
-          <div class="text-options-btn-container">
-            <button class="text-options-button font-minus" title="Decrease font size"></button>
-            <button class="text-options-button font-plus" title="Increase font size"></button>
+        <div class="reading_header_mid">
+        <div class="reading_header_mid_top">
+          <div class="texttitlecontainer">
+            <h1 id="thetexttitle">{{ book.title }}</h1>
           </div>
-          <div class="text-options-btn-container">
-            <button class="text-options-button lh-minus" title="Decrease line height"></button>
-            <button class="text-options-button lh-plus" title="Increase line height"></button>
+          <div class="reading_header_page">
+            <!-- <a id="reading_home_link" class="home-link" href="/">Home</a> -->
+            <div class="read-bookmark-buttons-container">
+              <button id="read-bkm-save-btn" class="read-bkm-btn"></button>
+              <!-- <div class="read-bookmark-jump-container"> -->
+                <!-- <button id="read-bkm-prev-btn" class="read-bkm-btn"></button> -->
+                <!-- <button id="read-bkm-next-btn" class="read-bkm-btn"></button> -->
+              <!-- </div> -->
+            </div>
+            <div id="page_indicator">{{ page_num }}/{{ page_count }}</div>
           </div>
-          <div class="text-options-btn-container">
-            <button class="text-options-button width-minus" title="Decrease content width"></button>
-            <button class="text-options-button width-plus" title="Increase content width"></button>
           </div>
-          <div class="text-options-btn-container">
-            <button class="text-options-button column-one" title="One column text"></button>
-            <button class="text-options-button column-two" title="Two column text"></button>
+          <div class="read-slide-container">
+            <div class="read_page_nav read_page_disabled"
+              id="navPrev"
+              onclick="goto_relative_page(-1)">◀</div>
+            <input type="range" id="read-slider" class="read_page_disabled" max="{{ page_count - 1 }}" value="{{ page_num }}" step="1">
+            <div class="read_page_nav read_page_disabled"
+              id="navNext"
+              onclick="goto_relative_page(1)">▶</div>
           </div>
         </div>
-        <ul>
-          {% if book.source_uri %}
-          <li class="menu-list-item-text"><a href="{{ book.source_uri }}" target="_blank" tabindex="-1"><img class="menu-icon" src="/static/icn/open.svg" alt=""><span>Show source URL</span></a></li>
-          {% endif %}
-          <li class="menu-list-item-text"><a id="editText" href="" onclick="edit_current_page(); return false;"><img class="menu-icon" src="/static/icn/edit.svg" alt=""><span>Edit page</span></a></li>
-          <li class="menu-list-item-text"><a id="next_theme" onclick="next_theme(); return false;" title="Next theme"><img class="menu-icon" src="/static/icn/color.svg" alt=""><span>Next theme (m)</span></a></li>
-          <li class="menu-list-item-text"><a id="toggle_highlights" onclick="toggle_highlight(); return false;" title="Toggle highlights"><img class="menu-icon" src="/static/icn/highlight.svg" alt=""><span>Toggle highlights (h)</span></a></li>
-          <li class="menu-list-item-text">
-            <a id="keyboard_shortcuts" title="Keyboard shortcuts"
-               href="https://jzohrab.github.io/lute-manual/usage/keyboard-bindings.html"
-               target="_blank">
-              <img class="menu-icon" src="/static/icn/keyboard.svg" alt="">
-              <span>Keyboard shortcuts</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="reading_header_right">
-      <a id="reading_home_link" class="home-link" href="/">Home</a>
     </div>
 
   </div>
@@ -166,8 +168,6 @@
       <button id="pin" class="audio-button"></button>
     </div>
   </div>
-
-  <h2 id="thetexttitle" class="hide">{{ book.title }}</h2>
 
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
     ...
@@ -276,7 +276,6 @@
     goto_relative_page(0, true);
 
     // If the css slide-in menu is open, clicking away from it closes the menu.
-    // The menu is handled via css, so we have to update the checkbox state.
     $(document).click(function(event) {
       const menu_clicked = event.target.closest('.reading_header_left');
       const menu = document.getElementById("reading_menu");
@@ -344,6 +343,7 @@
       $('#navNext').addClass('read_page_disabled');
       $('#navNext10').addClass('read_page_disabled');
     }
+    //toggleSliderStatus();
   };
 
 
@@ -372,27 +372,59 @@
       t.addClass('hide');
   };
 
+  // for the reading page return the main container to full width
+  document.querySelector(".container").style.cssText = `width: 100%; margin: 0;`;
+  
+  const readSlider = document.getElementById("read-slider");
+  const maxpage = parseInt($('#page_count').val());
+  // disable read slider if there's only 1 page
+  if (maxpage > 1) document.getElementById("read-slider").classList.remove("read_page_disabled");
 
-  /**
-   * Go to page relative to that stored in page_num input.
-   *
-   * On first load of page, load_source_file is set to true.
-   * It appears that for Firefox the player source can't be set
-   * while the page content is being ajax'd in.  This makes
-   * _NO SENSE AT ALL_ but moving the player source loading
-   * to the ajax "success" function worked.  ???
-   */
+  readSlider.addEventListener("input", function() {
+    const pagenum = parseInt($('#page_num').val());
+    const p = Number(readSlider.value) + 1 - pagenum;
+    const finalPage = getFinalPage(p);
+    updateReadSlider(finalPage);
+    document.getElementById("page_indicator").textContent = `${finalPage}/${maxpage}`;
+  })
+  
+  readSlider.addEventListener("change", function() { 
+    const pagenum = parseInt($('#page_num').val());
+    const p = Number(readSlider.value) + 1 - pagenum;
+    goto_relative_page(p);
+  })
+
+  function updateReadSlider(p) {
+    readSlider.value = p - 1;
+    readSlider.style.backgroundSize = `${100 / (maxpage - 1) * readSlider.value}% 100%`;
+  }
+  
+  function getFinalPage(p) {
+    const pagenum = parseInt($('#page_num').val());
+    let finalPage = pagenum + p;
+    if (finalPage < 1)
+      finalPage = 1;
+    if (finalPage > maxpage)
+      finalPage = maxpage;
+
+    return finalPage;
+}
+/**
+ * Go to page relative to that stored in page_num input.
+ *
+ * On first load of page, load_source_file is set to true.
+ * It appears that for Firefox the player source can't be set
+ * while the page content is being ajax'd in.  This makes
+ * _NO SENSE AT ALL_ but moving the player source loading
+ * to the ajax "success" function worked.  ???
+ */
   function goto_relative_page(p, load_source_file = false) {
     const bookid = $('#book_id').val();
-    const pagenum = parseInt($('#page_num').val());
-    const maxpage = parseInt($('#page_count').val());
-    let relpage = pagenum + p;
-    if (relpage < 1)
-      relpage = 1;
-    if (relpage > maxpage)
-      relpage = maxpage;
+    const finalPage = getFinalPage(p);
 
-    const url = `/read/renderpage/${bookid}/${relpage}`;
+    updateReadSlider(finalPage);
+
+    const url = `/read/renderpage/${bookid}/${finalPage}`;
     $.get(
       url,
       function(data, status) {
@@ -400,11 +432,11 @@
         prepareTextInteractions();
         add_status_classes();
         start_hover_mode(false);
-        $('#page_num').val(relpage);
+        $('#page_num').val(finalPage);
         enable_page_nav_links();
         set_page_fraction();
         set_footer_control_visibility();
-        show_hide_title(relpage);
+        // show_hide_title(finalPage);
 
         // Magic hack for player source to load consistently
         // in Firefox.
