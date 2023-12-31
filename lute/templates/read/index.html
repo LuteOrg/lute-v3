@@ -40,49 +40,7 @@
           style="cursor: pointer"
           onclick="window.location='/'" />
           <div id="reading_menu">
-            <div class="reading_menu_logo_container">
-              <img
-              src="{{ url_for('static', filename='img/lute.png') }}"
-              class="lutelogo_small"
-              style="cursor: pointer"
-              onclick="window.location='/'" />
-              <!-- <h2>Lute</h2> -->
-              <button class="reading-menu-close-btn" onclick="closeMenu()"></button>
-            </div>
-            <div class="text-options-container">
-              <div class="text-options-btn-container">
-                <button class="text-options-button font-minus" title="Decrease font size"></button>
-                <button class="text-options-button font-plus" title="Increase font size"></button>
-              </div>
-              <div class="text-options-btn-container">
-                <button class="text-options-button lh-minus" title="Decrease line height"></button>
-                <button class="text-options-button lh-plus" title="Increase line height"></button>
-              </div>
-              <div class="text-options-btn-container">
-                <button class="text-options-button width-minus" title="Decrease content width"></button>
-                <button class="text-options-button width-plus" title="Increase content width"></button>
-              </div>
-              <div class="text-options-btn-container">
-                <button class="text-options-button column-one" title="One column text"></button>
-                <button class="text-options-button column-two" title="Two column text"></button>
-              </div>
-            </div>
-            <ul>
-              {% if book.source_uri %}
-              <li class="menu-list-item-text"><a href="{{ book.source_uri }}" target="_blank" tabindex="-1"><img class="menu-icon" src="/static/icn/open.svg" alt=""><span>Show source URL</span></a></li>
-              {% endif %}
-              <li class="menu-list-item-text"><a id="editText" href="" onclick="edit_current_page(); return false;"><img class="menu-icon" src="/static/icn/edit.svg" alt=""><span>Edit page</span></a></li>
-              <li class="menu-list-item-text"><a id="next_theme" onclick="next_theme(); return false;" title="Next theme"><img class="menu-icon" src="/static/icn/color.svg" alt=""><span>Next theme (m)</span></a></li>
-              <li class="menu-list-item-text"><a id="toggle_highlights" onclick="toggle_highlight(); return false;" title="Toggle highlights"><img class="menu-icon" src="/static/icn/highlight.svg" alt=""><span>Toggle highlights (h)</span></a></li>
-              <li class="menu-list-item-text">
-                <a id="keyboard_shortcuts" title="Keyboard shortcuts"
-                  href="https://jzohrab.github.io/lute-manual/usage/keyboard-bindings.html"
-                  target="_blank">
-                  <img class="menu-icon" src="/static/icn/keyboard.svg" alt="">
-                  <span>Keyboard shortcuts</span>
-                </a>
-              </li>
-            </ul>
+            {% include "read/reading_menu.html" %}
           </div>
         </div>
         <div class="reading_header_mid">
