@@ -107,6 +107,7 @@ Feature: User can actually read and stuff.
         Given I visit "/"
         And I clear the book filter
         And the book table loads "Tutorial"
+        When sleep for 2
         Then the page contains "Tutorial (2/"
 
 
