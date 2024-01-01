@@ -1,0 +1,7 @@
+name: Sanskrit
+dict_1: https://dsal.uchicago.edu/cgi-bin/app/sanskrit_query.py?qs=###&searchhws=yes&matchtype=default
+dict_2: https://www.learnsanskrit.cc/translate?search=###&dir=se
+sentence_translation: https://translate.google.com/?hl=en&sl=sa&tl=en&text=###&op=translate
+show_romanization: true
+split_sentences: .?!।॥
+word_chars: a-zA-Z\u0900-\u0963\u0966-\u097F
