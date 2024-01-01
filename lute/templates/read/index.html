@@ -371,13 +371,14 @@
 /**
  * Go to page relative to that stored in page_num input.
  *
- * On first load of page, load_source_file is set to true.
+ * On first load of page, initial_page_load is set to true.
+ *
  * It appears that for Firefox the player source can't be set
  * while the page content is being ajax'd in.  This makes
  * _NO SENSE AT ALL_ but moving the player source loading
  * to the ajax "success" function worked.  ???
  */
-  function goto_relative_page(p, load_source_file = false) {
+  function goto_relative_page(p, initial_page_load = false) {
     const bookid = $('#book_id').val();
     const finalPage = getFinalPage(p);
 
@@ -388,8 +389,8 @@
       url,
       function(data, status) {
         $('#thetext').html(data);
-        prepareTextInteractions();
         add_status_classes();
+        reset_cursor();
         start_hover_mode(false);
         $('#page_num').val(finalPage);
         enable_page_nav_links();
@@ -397,9 +398,13 @@
         set_footer_control_visibility();
         // show_hide_title(finalPage);
 
+        if (initial_page_load) {
+          prepareTextInteractions();
+        }
+
         // Magic hack for player source to load consistently
         // in Firefox.
-        if (load_source_file && have_audio_file()) {
+        if (initial_page_load && have_audio_file()) {
           load_player_source();
         }
       }
