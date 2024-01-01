@@ -68,13 +68,24 @@ def _get_file_content(filefielddata):
     raise ValueError(f'Unknown file extension "{ext}"')
 
 
+def _book_from_url(url):
+    "Create a new book, or flash an error if can't parse."
+    b = Book()
+    try:
+        b = service.book_from_url(url)
+    except service.BookImportException as e:
+        flash(e.message, "notice")
+        b = Book()
+    return b
+
+
 @bp.route("/new", methods=["GET", "POST"])
 def new():
     "Create a new book, either from text or from a file."
     b = Book()
     import_url = request.args.get("importurl", "").strip()
     if import_url != "":
-        b = service.book_from_url(import_url)
+        b = _book_from_url(import_url)
 
     form = NewBookForm(obj=b)
     form.language_id.choices = lute.utils.formutils.language_choices()
