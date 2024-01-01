@@ -104,6 +104,7 @@ Feature: User can actually read and stuff.
         Given the demo stories are loaded
         When I click the "Tutorial" link
         And I click the footer next page
+        And sleep for 2
         Given I visit "/"
         And I clear the book filter
         And the book table loads "Tutorial"
