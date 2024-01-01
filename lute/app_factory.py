@@ -25,6 +25,7 @@ import lute.backup.service as backupservice
 import lute.db.demo
 
 from lute.models.book import Book
+from lute.book.stats import BookStats
 from lute.models.language import Language
 from lute.models.setting import BackupSettings, UserSetting
 from lute.book.stats import refresh_stats
@@ -128,10 +129,24 @@ def _add_base_routes(app, app_config):
         )
 
         fraction_dict = {}
-        bks = db.session.query(Book)
-        for bk in bks:
-            st = get_book_status_fractions(bk)
-            fraction_dict.update(st)
+        # bks = db.session.query(Book)
+        # for bk in bks:
+        #     w = db.session.query(BookStats).filter_by(BkID=bk.id).all()
+        #     print(w)
+        # st = get_book_status_fractions(bk)
+        # fraction_dict.update(st)
+
+        # fraction_dict = {}
+        # bookstats = db.session.query(BookStats)
+        # bks = db.session.query(Book)
+        # # print(bks)
+        # # for bk in bks:
+        # #     # print(bookstats.bk.id)
+        # #     print(bk.id)
+        #     # fraction_dict.update({bk.BkID: bk.status_distribution})
+        # print(bookstats)
+        # for st in bookstats:
+        #     print(st.db.session.query(BookStats)status_distribution)
 
         return render_template(
             "index.html",
