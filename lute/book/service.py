@@ -15,6 +15,17 @@ from werkzeug.utils import secure_filename
 from lute.book.model import Book
 
 
+class BookImportException(Exception):
+    """
+    Exception to throw on book import error.
+    """
+
+    def __init__(self, message="A custom error occurred", cause=None):
+        self.cause = cause
+        self.message = message
+        super().__init__(message)
+
+
 def _secure_unique_fname(filename):
     """
     Return secure name pre-pended with datetime string.
@@ -70,8 +81,7 @@ def book_from_url(url):
         s = response.text
     except requests.exceptions.RequestException as e:
         msg = f"Could not parse {url} (error: {str(e)})"
-        flash(msg, "notice")
-        return Book()
+        raise BookImportException(message=msg, cause=e) from e
 
     soup = BeautifulSoup(s, "html.parser")
     extracted_text = []
