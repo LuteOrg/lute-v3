@@ -4,9 +4,9 @@ Term tests.
 
 import pytest
 from sqlalchemy import text
-from lute.models.term import Term
+from lute.models.term import Term, TermImage
 from lute.db import db
-from tests.dbasserts import assert_record_count_equals
+from tests.dbasserts import assert_record_count_equals, assert_sql_result
 
 
 def test_cruft_stripped_on_set_word(spanish):
@@ -180,3 +180,46 @@ def test_update_status_via_sql_updates_date(app_context, _saved_term):
     db.session.execute(text("update words set WoStatus = 2"))
     db.session.commit()
     assert_record_count_equals(sql, 0, "updated WoStatusChanged")
+
+
+def test_save_new_image_all_existing_images_replaced(app_context, spanish):
+    "All existing terms removed."
+    t = Term(spanish, "hola")
+    ti1 = TermImage()
+    ti1.term = t
+    ti1.source = "1.png"
+    t.images.append(ti1)
+
+    ti2 = TermImage()
+    ti2.term = t
+    ti2.source = "2.png"
+    t.images.append(ti2)
+    db.session.add(t)
+    db.session.commit()
+
+    assert_record_count_equals("select * from wordimages", 2, "image count")
+
+    t.set_current_image("3.png")
+    db.session.add(t)
+    db.session.commit()
+    assert_record_count_equals("select * from wordimages", 1, "new image count")
+    assert_record_count_equals(
+        "select * from wordimages where wisource='3.png'", 1, "new image count"
+    )
+
+
+def test_delete_empty_image_records(app_context, spanish):
+    "Check cleanup."
+    t = Term(spanish, "hola")
+    for s in ["", "   ", "3.png"]:
+        ti = TermImage()
+        ti.term = t
+        ti.source = s
+        t.images.append(ti)
+    db.session.add(t)
+    db.session.commit()
+
+    assert_sql_result("select wisource from wordimages", ["", "   ", "3.png"], "images")
+
+    Term.delete_empty_images()
+    assert_sql_result("select wisource from wordimages", ["3.png"], "cleaned images")

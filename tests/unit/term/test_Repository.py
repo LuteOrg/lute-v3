@@ -181,6 +181,41 @@ def test_delete_leaves_parent(app_context, repo, hello_term):
     assert_sql_result(sql, ["parent"], "parent stays")
 
 
+## Saving and images.
+
+
+def test_save_term_image_saved_and_replaced(app_context, repo, hello_term):
+    "Saving puts record in image table."
+    sql = "select WiSource from wordimages"
+    assert_sql_result(sql, [], "nothing present")
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result(sql, ["hello.png"], "image saved")
+
+
+def test_save_term_image_set_to_blank_removes_record(app_context, repo, hello_term):
+    "Saving puts record in image table."
+    sql = "select WiSource from wordimages"
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result(sql, ["hello.png"], "image saved")
+
+    hello_term.current_image = ""
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result(sql, [], "record removed")
+
+    hello_term.current_image = "new.png"
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result(sql, ["new.png"], "image saved")
+
+    hello_term.current_image = None
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result(sql, [], "record removed again")
+
+
 ## Saving and parents.
 
 
