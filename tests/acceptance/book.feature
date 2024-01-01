@@ -19,6 +19,11 @@ Feature: Books and stats are available
         And the reading pane shows:
             Tengo/ /un/ /amigo/.
 
+    Scenario: Non-utf-8 text files are rejected.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file non_utf_8.txt
+        Then the page contains "non_utf_8.txt is not utf-8 encoding"
+
     Scenario: I can import a url.
         Given I visit "/"
         Given a Spanish book from url http://localhost:5000/dev_api/fake_story.html
@@ -32,6 +37,11 @@ Feature: Books and stats are available
         Then the page title is Reading "Hola"
         And the reading pane shows:
             Tengo/ /un/ /amigo/.
+
+    Scenario: Invalid epub files are rejected.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file invalid.epub
+        Then the page contains "Could not parse invalid.epub"
 
     Scenario: Books and stats are shown on the first page.
         Given I visit "/"
