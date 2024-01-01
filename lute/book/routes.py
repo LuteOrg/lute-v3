@@ -72,6 +72,10 @@ def _get_file_content(filefielddata):
 def new():
     "Create a new book, either from text or from a file."
     b = Book()
+    import_url = request.args.get("importurl", "").strip()
+    if import_url != "":
+        b = service.book_from_url(import_url)
+
     form = NewBookForm(obj=b)
     form.language_id.choices = lute.utils.formutils.language_choices()
     repo = Repository(db)
@@ -89,12 +93,6 @@ def new():
         book = repo.add(b)
         repo.commit()
         return redirect(f"/read/{book.id}/page/1", 302)
-
-    import_url = request.args.get("importurl", "").strip()
-    if import_url != "":
-        b = service.book_from_url(import_url)
-        form = NewBookForm(obj=b)
-        form.language_id.choices = lute.utils.formutils.language_choices()
 
     return render_template(
         "book/create_new.html",
