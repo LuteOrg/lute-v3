@@ -107,9 +107,8 @@ Feature: User can actually read and stuff.
         And sleep for 2
         Given I visit "/"
         And I clear the book filter
-        And the book table loads "Tutorial"
-        When sleep for 2
-        Then the page contains "Tutorial (2/"
+        And the book table loads "Tutorial (2/6)"
+        # .... nothing more to check ...
 
 
      Scenario: Language split sentence exceptions are respected
