@@ -83,6 +83,8 @@
               <div class="status-pct99 status-pct99-${bookId} status-pct-icon" title="Well known"><span></span></span>
               <div>`;
             }
+            // TODO issue 102 status graph: render graph of distribution.
+            ret += `<div style="display: none">${row[12]}</div>`;
             return ret;
           }
         },
@@ -119,6 +121,7 @@
         { "name": "DistinctCount", "targets": 11, "data": null, "visible": false },
         { "name": "PageNum", "targets": 12, "data": null, "visible": false },
         { "name": "IsCompleted", "targets": 13, "data": null, "visible": false },
+        { "name": "StatusDistribution", "targets": 14, "data": null, "visible": false },
       ],
 
       // Ajax call
