@@ -46,6 +46,18 @@ def save_audio_file(audio_file_field_data):
     return filename
 
 
+def get_textfile_content(filefielddata):
+    "Get content as a single string."
+    content = ""
+    try:
+        content = filefielddata.read()
+        return str(content, "utf-8")
+    except UnicodeDecodeError as e:
+        f = filefielddata.filename
+        msg = f"{f} is not utf-8 encoding, please convert it to utf-8 first (error: {str(e)})"
+        raise BookImportException(message=msg, cause=e) from e
+
+
 def get_epub_content(epub_file_field_data):
     """
     Get the content of the epub as a single string.
@@ -66,8 +78,7 @@ def get_epub_content(epub_file_field_data):
                 content = epub.get_text()
     except EpubError as e:
         msg = f"Could not parse {epub_file_field_data.filename} (error: {str(e)})"
-        flash(msg, "notice")
-        content = ""
+        raise BookImportException(message=msg, cause=e) from e
     return content
 
 

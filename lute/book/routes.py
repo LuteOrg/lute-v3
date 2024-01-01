@@ -59,12 +59,9 @@ def _get_file_content(filefielddata):
     _, ext = os.path.splitext(filefielddata.filename)
     ext = (ext or "").lower()
     if ext == ".txt":
-        content = filefielddata.read()
-        return str(content, "utf-8")
-
+        return service.get_textfile_content(filefielddata)
     if ext == ".epub":
         return service.get_epub_content(filefielddata)
-
     raise ValueError(f'Unknown file extension "{ext}"')
 
 
@@ -92,18 +89,18 @@ def new():
     repo = Repository(db)
 
     if form.validate_on_submit():
-        form.populate_obj(b)
-        if form.textfile.data:
-            content = _get_file_content(form.textfile.data)
-            if not content:
-                return redirect("/")
-            b.text = content
-        f = form.audiofile.data
-        if f:
-            b.audio_filename = service.save_audio_file(f)
-        book = repo.add(b)
-        repo.commit()
-        return redirect(f"/read/{book.id}/page/1", 302)
+        try:
+            form.populate_obj(b)
+            if form.textfile.data:
+                b.text = _get_file_content(form.textfile.data)
+            f = form.audiofile.data
+            if f:
+                b.audio_filename = service.save_audio_file(f)
+            book = repo.add(b)
+            repo.commit()
+            return redirect(f"/read/{book.id}/page/1", 302)
+        except service.BookImportException as e:
+            flash(e.message, "notice")
 
     return render_template(
         "book/create_new.html",
