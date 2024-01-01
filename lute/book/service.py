@@ -15,6 +15,17 @@ from werkzeug.utils import secure_filename
 from lute.book.model import Book
 
 
+class BookImportException(Exception):
+    """
+    Exception to throw on book import error.
+    """
+
+    def __init__(self, message="A custom error occurred", cause=None):
+        self.cause = cause
+        self.message = message
+        super().__init__(message)
+
+
 def _secure_unique_fname(filename):
     """
     Return secure name pre-pended with datetime string.
@@ -33,6 +44,18 @@ def save_audio_file(audio_file_field_data):
     fp = os.path.join(current_app.env_config.useraudiopath, filename)
     audio_file_field_data.save(fp)
     return filename
+
+
+def get_textfile_content(filefielddata):
+    "Get content as a single string."
+    content = ""
+    try:
+        content = filefielddata.read()
+        return str(content, "utf-8")
+    except UnicodeDecodeError as e:
+        f = filefielddata.filename
+        msg = f"{f} is not utf-8 encoding, please convert it to utf-8 first (error: {str(e)})"
+        raise BookImportException(message=msg, cause=e) from e
 
 
 def get_epub_content(epub_file_field_data):
@@ -55,8 +78,7 @@ def get_epub_content(epub_file_field_data):
                 content = epub.get_text()
     except EpubError as e:
         msg = f"Could not parse {epub_file_field_data.filename} (error: {str(e)})"
-        flash(msg, "notice")
-        content = ""
+        raise BookImportException(message=msg, cause=e) from e
     return content
 
 
@@ -70,8 +92,7 @@ def book_from_url(url):
         s = response.text
     except requests.exceptions.RequestException as e:
         msg = f"Could not parse {url} (error: {str(e)})"
-        flash(msg, "notice")
-        return Book()
+        raise BookImportException(message=msg, cause=e) from e
 
     soup = BeautifulSoup(s, "html.parser")
     extracted_text = []
