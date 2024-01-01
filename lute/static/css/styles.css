@@ -10,6 +10,15 @@ body
     font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
     margin: 0;
     padding: 0;
+
+    --status-0-color: #D5FFFF;
+    --status-1-color: #F5B8A9;
+    --status-2-color: #F5CCA9;
+    --status-3-color: #F5E1A9;
+    --status-4-color: #F5F3A9;
+    --status-5-color: #DDFFDD;
+
+    --status-99-color: #6ae8a3;
 }
 
 /* Main container div for Lute site content. */
@@ -558,37 +567,37 @@ span.flashtextcopy {
 
 span.status0
 {
-    background-color: #D5FFFF;
+    background-color: var(--status-0-color);
     color: #000000;
 }
 
 span.status1
 {
-    background-color: #F5B8A9;
+    background-color: var(--status-1-color);
     color: #000000;
 }
 
 span.status2
 {
-    background-color: #F5CCA9;
+    background-color: var(--status-2-color);
     color: #000000;
 }
 
 span.status3
 {
-    background-color: #F5E1A9;
+    background-color: var(--status-3-color);
     color: #000000;
 }
 
 span.status4
 {
-    background-color: #F5F3A9;
+    background-color: var(--status-4-color);
     color: #000000;
 }
 
 span.status5
 {
-    background-color: #DDFFDD;
+    background-color: var(--status-5-color);
     color: #000000;
 }
 
@@ -954,48 +963,57 @@ table.statsWordsRead th, td { padding: 5px; }
 
 .show-pct.status-pct-icon-container {
     display: inline-flex;
+    align-items: center;
 }
   
 .status-pct-icon-container {
     display: none;
     width: 80%;
-/* text-align: right */
+    border: 1px solid #5b5a5a;
+    box-sizing: border-box;
+    /* border-radius: 3px; */
 }
 
 .status-pct-icon {
-    display: inline-block;
+    display: flex;
+    align-items: center;
     width: 16px;
-    height: 16px;
+    height: 20px;
     font-size: 0.8rem;
-    color: #fff;
+    /* color: #fff; */
+    box-sizing: border-box;
 }
   
 .status-pct0 {
-    background-color: #38aaf1;
+    background-color: var(--status-0-color);
 }
+
 .status-pct1 {
-    background-color: #e0873e;
+    background-color: var(--status-1-color);
 }
+
 .status-pct2 {
-    background-color: #1aa721;
+    background-color: var(--status-2-color);
 }
+
 .status-pct3 {
-    background-color: #485add;
+    background-color: var(--status-3-color);
 }
+
 .status-pct4 {
-    background-color: rgb(183, 122, 56);
+    background-color: var(--status-4-color);
 }
+
 .status-pct5 {
-    background-color: rgb(183, 147, 56);
+    background-color: var(--status-5-color);
 }
-.status-pct98 {
-    background-color: #17ec77;
-}
+
 .status-pct99 {
-    background-color: #17ec77;
+    background-color: var(--status-99-color);
 }
 
 #booktable tr > td:nth-child(4) {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }

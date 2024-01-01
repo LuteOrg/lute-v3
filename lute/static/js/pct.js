@@ -15,9 +15,10 @@ function  showFractionStats() {
   for (const book in statusPct) {
     for (const status in statusPct[book]){
       const icon = document.querySelector(`.status-pct${status}-${book}`);
+      const iconSpan = icon.children[0];
       const iconPct = statusPct[book][status];
       icon.style.flex = `${iconPct}`;
-      if (iconPct > 0.1) icon.textContent = `\xa0${(iconPct * 100).toFixed(0)}%`;
+      if (iconPct > 0.1) iconSpan.textContent = `\xa0${(iconPct * 100).toFixed(0)}%`;
     }
   }
 
