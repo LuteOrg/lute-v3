@@ -64,7 +64,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
         "Mark rest as known, mark page as read, then go to next page"
     ).click()
     page.get_by_title("Mark page as read, then go to next page", exact=True).click()
-    page.get_by_role("link", name="Home").click()
+    page.get_by_title("Home").click()
 
     # Open and archive book.
     _print("Archive.")
@@ -108,7 +108,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     page.get_by_role("link", name="Terms", exact=True).click()
     page.get_by_role("link", name="Hello").click()
     page.get_by_role("link", name="Sentences").click()
-    page.get_by_role("link", name="back to list").click()
+    page.get_by_role("link", name="Back to list").click()
 
     # Edit language.
     _print("Edit language.")
@@ -175,7 +175,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     # Page is imported, form shown, so save it.
     page.get_by_role("button", name="Save").click()
     page.get_by_text("Tengo").click()  # Quick hacky check if exists.
-    page.locator("#reading_home_link").click()
+    page.get_by_title("Home").click()
     expect(page.get_by_role("link", name="Mi perro.")).to_be_visible()
 
     # Check version.

@@ -104,10 +104,11 @@ Feature: User can actually read and stuff.
         Given the demo stories are loaded
         When I click the "Tutorial" link
         And I click the footer next page
+        And sleep for 2
         Given I visit "/"
         And I clear the book filter
-        And the book table loads "Tutorial"
-        Then the page contains "Tutorial (2/"
+        And the book table loads "Tutorial (2/6)"
+        # .... nothing more to check ...
 
 
      Scenario: Language split sentence exceptions are respected

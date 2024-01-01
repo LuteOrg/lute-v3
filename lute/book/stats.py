@@ -2,6 +2,7 @@
 Book statistics.
 """
 
+import json
 from lute.read.service import get_paragraphs
 from lute.db import db
 from lute.models.book import Book
@@ -125,6 +126,7 @@ class BookStats(db.Model):
     distinctterms = db.Column(db.Integer)
     distinctunknowns = db.Column(db.Integer)
     unknownpercent = db.Column(db.Integer)
+    status_distribution = db.Column(db.String, nullable=True)
 
 
 def refresh_stats():
@@ -157,9 +159,12 @@ def _get_stats(book):
     if allunique > 0:  # In case not parsed.
         percent = round(100.0 * unknowns / allunique)
 
+    sd = json.dumps(status_distribution)
+    sd = sd.replace('"', "")
+
     # Any change in the below fields requires a change to
     # update_stats as well, query insert doesn't check field order.
-    return [book.word_count or 0, allunique, unknowns, percent]
+    return [book.word_count or 0, allunique, unknowns, percent, sd]
 
 
 def _update_stats(book, stats):
@@ -170,6 +175,7 @@ def _update_stats(book, stats):
         distinctterms=stats[1],
         distinctunknowns=stats[2],
         unknownpercent=stats[3],
+        status_distribution=stats[4],
     )
     db.session.add(new_stats)
     db.session.commit()
