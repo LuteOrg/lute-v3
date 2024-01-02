@@ -4,7 +4,7 @@ on:
   push:
     # A branch github-ci-updates can be created and used for ci
     # experiments and tweaks.
-    branches: [ "develop", "master", "github-ci-updates" ]
+    branches: [ "develop", "master", "github-ci-updates", "windows" ]
   pull_request:
     branches: [ "develop", "master" ]
 
@@ -181,9 +181,11 @@ jobs:
 
     - run: pip install -r requirements.txt
 
-    # Run one particular sanity check.
-    - name: Smoke test no mecab
-      run: inv accept --headless -s -k test_unsupported_language_not_shown
+    # Run specific sanity check.
+    - name: Smoke tests
+      run: |
+        inv accept --headless -s -k test_unsupported_language_not_shown
+        inv accept --headless -s -k import_a_valid_term_file
 
     - name: Remove config to force using prod config
       run: del ${{ github.workspace }}\lute\config\config.yml
