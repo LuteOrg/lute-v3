@@ -47,7 +47,7 @@
         <div class="reading_header_mid">
         <div class="reading_header_mid_top">
           <div class="texttitlecontainer">
-            <h1 id="headertexttitle">{{ book.title }}</h1>
+            <h1 id="headertexttitle" class="hide">{{ book.title }}</h1>
           </div>
           <div class="reading_header_page">
             <!-- <a id="reading_home_link" class="home-link" href="/">Home</a> -->
@@ -275,10 +275,15 @@
 
   let show_hide_title = function(p) {
     const t = $('#thetexttitle');
-    if (p == 1)
+    const h = $('#headertexttitle');
+    if (p == 1) {
       t.removeClass('hide');
-    else
+      h.addClass('hide');
+    }
+    else {
       t.addClass('hide');
+      h.removeClass('hide');
+    }
   };
 
   // for the reading page return the main container to full width
