@@ -428,15 +428,18 @@ input[type=text]
     white-space: nowrap;
 }
 
-#thetexttitle { 
+#headertexttitle {
     font-size: 0.9rem;
     font-weight: normal;
     margin: 0;
 }
 
-/* #thetexttitle.h1 { */
-    /* font-size: 1.5rem; */
-/* } */
+#thetexttitle {
+    /* margin-left: 20px; */
+    /* margin-right: 20px; */
+    /* padding-right: 2rem; */
+    padding: 0 2.2rem;
+}
 
 div#thetext {
     /* margin-left: 20px; */
