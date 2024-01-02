@@ -292,9 +292,9 @@
   readSlider.addEventListener("input", function() {
     const pagenum = parseInt($('#page_num').val());
     const p = Number(readSlider.value) + 1 - pagenum;
-    const finalPage = getFinalPage(p);
-    updateReadSlider(finalPage);
-    document.getElementById("page_indicator").textContent = `${finalPage}/${maxpage}`;
+    const actualPage = getActualPage(p);
+    updateReadSlider(actualPage);
+    document.getElementById("page_indicator").textContent = `${actualPage}/${maxpage}`;
   })
   
   readSlider.addEventListener("change", function() { 
@@ -308,15 +308,15 @@
     readSlider.style.backgroundSize = `${100 / (maxpage - 1) * readSlider.value}% 100%`;
   }
   
-  function getFinalPage(p) {
+  function getActualPage(p) {
     const pagenum = parseInt($('#page_num').val());
-    let finalPage = pagenum + p;
-    if (finalPage < 1)
-      finalPage = 1;
-    if (finalPage > maxpage)
-      finalPage = maxpage;
+    let actualPage = pagenum + p;
+    if (actualPage < 1)
+      actualPage = 1;
+    if (actualPage > maxpage)
+      actualPage = maxpage;
 
-    return finalPage;
+    return actualPage;
 }
 /**
  * Go to page relative to that stored in page_num input.
@@ -330,11 +330,11 @@
  */
   function goto_relative_page(p, initial_page_load = false) {
     const bookid = $('#book_id').val();
-    const finalPage = getFinalPage(p);
+    const actualPage = getActualPage(p);
 
-    updateReadSlider(finalPage);
+    updateReadSlider(actualPage);
 
-    const url = `/read/renderpage/${bookid}/${finalPage}`;
+    const url = `/read/renderpage/${bookid}/${actualPage}`;
     $.get(
       url,
       function(data, status) {
@@ -342,11 +342,11 @@
         add_status_classes();
         reset_cursor();
         start_hover_mode(false);
-        $('#page_num').val(finalPage);
+        $('#page_num').val(actualPage);
         enable_page_nav_links();
         set_page_fraction();
         set_footer_control_visibility();
-        show_hide_title(finalPage);
+        show_hide_title(actualPage);
 
         if (initial_page_load) {
           prepareTextInteractions();
