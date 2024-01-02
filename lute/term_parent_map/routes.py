@@ -48,7 +48,11 @@ def index():
         text_file = form.text_file.data
         language = db.session.get(Language, form.language_id.data)
         if text_file:
-            temp_file_name = tempfile.mkstemp()[1]
+            # Track the file descriptor to close it later,
+            # avoiding problems on Windows.
+            # (https://stackoverflow.com/questions/34716996/
+            #  cant-remove-a-file-which-created-by-tempfile-mkstemp-on-windows)
+            fd, temp_file_name = tempfile.mkstemp()
             try:
                 text_file.save(temp_file_name)
                 stats = import_file(language, temp_file_name)
@@ -61,7 +65,8 @@ def index():
             except BadImportFileError as e:
                 flash(f"Error on import: {str(e)}", "notice")
             finally:
-                os.unlink(temp_file_name)
+                os.close(fd)
+                os.remove(temp_file_name)
 
     # sqlalchemy _requires_ "== False" for the comparison!
     # pylint: disable=singleton-comparison
