@@ -85,20 +85,30 @@ def index():
 @bp.route("/export_book/<int:bookid>", methods=["GET"])
 def export_book(bookid):
     "Generate a file and return it."
-    temp_file_name = tempfile.mkstemp()[1]
-    book = db.session.get(Book, bookid)
-    export_unknown_terms(book, temp_file_name)
-    return send_file(
-        temp_file_name, as_attachment=True, download_name="unknown_terms.txt"
-    )
+    fd, temp_file_name = tempfile.mkstemp()
+    try:
+        book = db.session.get(Book, bookid)
+        export_unknown_terms(book, temp_file_name)
+        return send_file(
+            temp_file_name, as_attachment=True, download_name="unknown_terms.txt"
+        )
+    finally:
+        os.close(fd)
+        os.remove(temp_file_name)
 
 
 @bp.route("/export_language/<int:languageid>", methods=["GET"])
 def export_language(languageid):
     "Generate a file and return it."
-    temp_file_name = tempfile.mkstemp()[1]
-    lang = db.session.get(Language, languageid)
-    export_terms_without_parents(lang, temp_file_name)
-    return send_file(
-        temp_file_name, as_attachment=True, download_name="terms_without_parents.txt"
-    )
+    fd, temp_file_name = tempfile.mkstemp()
+    try:
+        lang = db.session.get(Language, languageid)
+        export_terms_without_parents(lang, temp_file_name)
+        return send_file(
+            temp_file_name,
+            as_attachment=True,
+            download_name="terms_without_parents.txt",
+        )
+    finally:
+        os.close(fd)
+        os.remove(temp_file_name)
