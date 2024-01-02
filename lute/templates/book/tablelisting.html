@@ -1,10 +1,11 @@
 <table id="booktable" class="table dataTable stripe">
   <thead>
     <tr>
-      <th width="40%">Title</th>
+      <th>Title</th>
       <th>Language</th>
       <th>Tags</th>
-      <th id="wcnt">Word count (% known)</th>
+      <th>Word count</th>
+      <th>Status stats</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -39,7 +40,7 @@
       search: { search: initial_search },
       columnDefs: [
         {
-          "name": "BkTitle", "targets": 0,
+          "name": "BkTitle", "targets": 0, "width": "40%",
           "render": function ( data, type, row, meta ) {
             const bkid = parseInt(row[3]);
             const pgnum = parseInt(row[10]);
@@ -58,38 +59,57 @@
             return `<a class="${book_title_classes.join(' ')}" href="/read/${bkid}">${row[0]}${pgfraction}</a>`;
           }
         },
-        { "name": "LgName", "targets": 1 },
-        { "name": "TagList", "targets": 2 },
+        { "name": "LgName", "targets": 1, },
+        { "name": "TagList", "targets": 2, },
 
         { "targets": 3,
           "data": null,
           "searchable": false,
           "orderable": false,
+          "width": "10%",
           "render": function ( data, type, row, meta ) {
-            let ret = row[5];
+            //let ret = row[5];
             const pct = row[7];
             const bookId = row[3];
+            //console.log("sd js is", row[12]);
+            
+            //console.log(sd);
             //const unkcount = row[6];
-            if (pct != null) {
+            let ret = `<span>${row[5]}</span>`;
+            return ret;
+          }
+        },
+        { "targets": 4,
+          "data": null,
+          "searchable": false,
+          "orderable": false,
+          "width": "25%",
+          "render": function ( data, type, row, meta ) {
+            let ret;
+            const pct = row[7];
+            const bookId = row[3];
+            //console.log("sd js is", row[12]);
+            const sd = JSON.parse(`${row[12]}`);
+            //console.log(sd);
+            //const unkcount = row[6];
+            if (sd != null) {
               //const termcount = row[9];
               //const knownpct = 100 - parseInt(pct);
-              ret += `<div class="status-pct-icon-container">
-              <div class="status-pct0 status-pct0-${bookId} status-pct-icon" title="Unknown"><span></span></div>
-              <div class="status-pct1 status-pct1-${bookId} status-pct-icon" title="New"><span></span></div>
-              <div class="status-pct2 status-pct2-${bookId} status-pct-icon" title="st2"><span></span></div>
-              <div class="status-pct3 status-pct3-${bookId} status-pct-icon" title="st3"><span></span></div>
-              <div class="status-pct4 status-pct4-${bookId} status-pct-icon" title="st4"><span></span></div>
-              <div class="status-pct5 status-pct5-${bookId} status-pct-icon" title="st5"><span></span></div>
-              <div class="status-pct99 status-pct99-${bookId} status-pct-icon" title="Well known"><span></span></span>
+              ret = `<div class="status-pct-icon-container">
+              <div class="status-pct0 status-pct-icon" title="Unknown${sd[0] <= 10 ? ": " + sd[0] + "%": ""}" style="flex: ${sd[0]}; display:${sd[0] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[0]}%</span></div>
+              <div class="status-pct1 status-pct-icon" title="New${sd[1] <= 10 ? ": " + sd[1] + "%": ""}" style="flex: ${sd[1]}; display:${sd[1] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[1] > 10 ? sd[1] + '%': ""}</span></div>
+              <div class="status-pct2 status-pct-icon" title="Status 2${sd[2] <= 10 ? ": " + sd[2] + "%": ""}" style="flex: ${sd[2]}; display:${sd[2] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[2] > 10 ? sd[2] + '%': ""}</span></div>
+              <div class="status-pct3 status-pct-icon" title="Status 3${sd[3] <= 10 ? ": " + sd[3] + "%": ""}" style="flex: ${sd[3]}; display:${sd[3] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[3] > 10 ? sd[3] + '%': ""}</span></div>
+              <div class="status-pct4 status-pct-icon" title="Status 4${sd[4] <= 10 ? ": " + sd[4] + "%": ""}" style="flex: ${sd[4]}; display:${sd[4] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[4] > 10 ? sd[4] + '%': ""}</span></div>
+              <div class="status-pct5 status-pct-icon" title="Status 5${sd[5] <= 10 ? ": " + sd[5] + "%": ""}" style="flex: ${sd[5]}; display:${sd[5] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[5] > 10 ? sd[5] + '%': ""}</span></div>
+              <div class="status-pct99 status-pct-icon" title="Well known${sd[99] <= 10 ? ": " + sd[99] + "%": ""}" style="flex: ${sd[99]}; display:${sd[99] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[99] > 10 ? sd[99] + '%': ""}</span></span>
               <div>`;
             }
-            // TODO issue 102 status graph: render graph of distribution.
-            ret += `<div style="display: none">${row[12]}</div>`;
             return ret;
           }
         },
         {
-          "targets": 4,
+          "targets": 5,
           "data": null,
           "searchable": false,
           "orderable": false,
@@ -112,16 +132,16 @@
         },
 
         /* Extra data that is returned in the row for rendering, but not shown. */
-        { "name": "BkID", "targets": 5, "data": null, "visible": false },
-        { "name": "BkArchived", "targets": 6, "data": null, "visible": false },
-        { "name": "WordCount", "targets": 7, "data": null, "visible": false },
-        { "name": "UnknownCount", "targets": 8, "data": null, "visible": false },
-        { "name": "UnknownPercent", "targets": 9, "data": null, "visible": false },
-        { "name": "PageCount", "targets": 10, "data": null, "visible": false },
-        { "name": "DistinctCount", "targets": 11, "data": null, "visible": false },
-        { "name": "PageNum", "targets": 12, "data": null, "visible": false },
-        { "name": "IsCompleted", "targets": 13, "data": null, "visible": false },
-        { "name": "StatusDistribution", "targets": 14, "data": null, "visible": false },
+        { "name": "BkID", "targets": 6, "data": null, "visible": false },
+        { "name": "BkArchived", "targets": 7, "data": null, "visible": false },
+        { "name": "WordCount", "targets": 8, "data": null, "visible": false },
+        { "name": "UnknownCount", "targets": 9, "data": null, "visible": false },
+        { "name": "UnknownPercent", "targets": 10, "data": null, "visible": false },
+        { "name": "PageCount", "targets": 11, "data": null, "visible": false },
+        { "name": "DistinctCount", "targets": 12, "data": null, "visible": false },
+        { "name": "PageNum", "targets": 13, "data": null, "visible": false },
+        { "name": "IsCompleted", "targets": 14, "data": null, "visible": false },
+        { "name": "StatusDistribution", "targets": 15, "data": null, "visible": false },
       ],
 
       // Ajax call
@@ -185,4 +205,3 @@
     book_listing_table.state.clear();
   }
 </script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/pct.js') }}" charset="utf-8" defer></script>

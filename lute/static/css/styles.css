@@ -994,18 +994,16 @@ table.statsWordsRead th, td { padding: 5px; }
 }
 
 /* status stats */
-
-.show-pct.status-pct-icon-container {
-    display: inline-flex;
-    align-items: center;
-}
   
 .status-pct-icon-container {
-    display: none;
-    width: 80%;
-    border: 1px solid #5b5a5a;
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    width: 95%;
+    background-color: #787878;
+    border: 1px solid #787878;
+    border-radius: 3px;
     box-sizing: border-box;
-    /* border-radius: 3px; */
 }
 
 .status-pct-icon {
@@ -1016,6 +1014,7 @@ table.statsWordsRead th, td { padding: 5px; }
     font-size: 0.8rem;
     /* color: #fff; */
     box-sizing: border-box;
+    filter: saturate(3) brightness(0.95);
 }
   
 .status-pct0 {

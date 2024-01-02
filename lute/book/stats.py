@@ -89,29 +89,6 @@ def get_status_distribution2(book):
     return stats, unique_words
 
 
-def get_book_status_fractions(book):
-    status_distribution, unique_words = get_status_distribution2(book)
-    # unique_words = len(unique_words) - status_distribution[99]
-    # "ignored" regarded as "well known"
-    # print(len(unique_words))
-    # print("before", status_distribution[99])
-    # print("before", status_distribution)
-    status_distribution[99] = status_distribution[98] + status_distribution[99]
-
-    # print("after", status_distribution[99])
-    # print("after", status_distribution)
-    status_distribution.pop(98)
-
-    fractions = {}
-    for status in status_distribution:
-        fr = status_distribution[status] / len(unique_words)
-        fractions.update({status: fr})
-
-    # return [book.word_count or 0, unique_words, status_distribution[0], fractions]
-
-    return {book.id: fractions}
-
-
 ##################################################
 # Stats table refresh.
 
@@ -149,46 +126,59 @@ def mark_stale(book):
     db.session.commit()
 
 
-# def _get_stats(book):
-#     "Calc stats for the book using the status distribution."
-#     status_distribution = get_status_distribution(book)
-#     unknowns = status_distribution[0]
-#     allunique = sum(status_distribution.values())
-
-#     percent = 0
-#     if allunique > 0:  # In case not parsed.
-#         percent = round(100.0 * unknowns / allunique)
-
-#     sd = json.dumps(status_distribution)
-#     sd = sd.replace('"', "")
-
-#     # Any change in the below fields requires a change to
-#     # update_stats as well, query insert doesn't check field order.
-#     return [book.word_count or 0, allunique, unknowns, percent, sd]
-
-
 def _get_stats(book):
     "Calc stats for the book using the status distribution."
     status_distribution, unique_words = get_status_distribution2(book)
     unknowns = status_distribution[0]
+    # allunique = sum(status_distribution.values())
+
+    print(book)
+    print(unique_words)
+    print(status_distribution)
+
+    percent = 0
+    if len(unique_words) > 0:  # In case not parsed.
+        percent = round(100.0 * unknowns / len(unique_words))
+
     status_distribution[99] = status_distribution[98] + status_distribution[99]
     status_distribution.pop(98)
 
-    percent = 0
-    if unique_words > 0:  # In case not parsed.
-        percent = round(100.0 * unknowns / unique_words)
-
     fractions = {}
     for status in status_distribution:
-        fr = status_distribution[status] / len(unique_words)
-        fractions.update({status: fr})
+        fr = (status_distribution[status] / len(unique_words)) * 100
+        fractions.update({status: round(fr)})
 
-    sd = json.dumps(status_distribution)
-    sd = sd.replace('"', "")
+    sd = json.dumps(fractions)
+    # sd = sd.replace('"', "")
+    print(sd)
 
     # Any change in the below fields requires a change to
     # update_stats as well, query insert doesn't check field order.
-    return [book.word_count or 0, unique_words, unknowns, percent, sd]
+    return [book.word_count or 0, len(unique_words), unknowns, percent, sd]
+
+
+# def _get_stats(book):
+#     "Calc stats for the book using the status distribution."
+#     status_distribution, unique_words = get_status_distribution2(book)
+#     unknowns = status_distribution[0]
+#     status_distribution[99] = status_distribution[98] + status_distribution[99]
+#     status_distribution.pop(98)
+
+#     percent = 0
+#     if len(unique_words) > 0:  # In case not parsed.
+#         percent = round(100.0 * unknowns / len(unique_words))
+
+#     fractions = {}
+#     for status in status_distribution:
+#         fr = status_distribution[status] / len(unique_words)
+#         fractions.update({status: fr})
+
+#     sd = json.dumps(fractions)
+#     sd = sd.replace('"', "")
+
+#     # Any change in the below fields requires a change to
+#     # update_stats as well, query insert doesn't check field order.
+#     return [book.word_count or 0, unique_words, unknowns, percent, sd]
 
 
 def _update_stats(book, stats):
