@@ -35,10 +35,10 @@
      box-sizing: border-box;
  }
 
- .textarea
+ textarea
  {
    font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
-   border: 1px solid #C6C6C6;
+   border: 1px solid #C6C6C6 !important;
    padding: 3px;
  }
 

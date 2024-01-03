@@ -77,12 +77,16 @@
     </tr>
 
     <tr>
-      <td align="right">
-        <a href="" onclick="show_term_sentences(); return false;">Sentences</a>
-        <button id="submit" type="submit" class="btn btn-primary">Save</button>
-        {% if term.id %}
-        <button id="delete" type="button" class="btn" onclick="deleteTerm()">Delete</button>
-        {% endif %}
+      <td>
+        <div style="float: left">
+          <a href="" onclick="show_term_sentences(); return false;">Sentences</a>
+        </div>
+        <div style="float: right">
+          {% if term.id %}
+          <button id="delete" type="button" class="btn" onclick="deleteTerm()" style="margin-right: 5px;">Delete</button>
+          {% endif %}
+          <button id="submit" type="submit" class="btn btn-primary">Save</button>
+        </div>
       </td>
     </tr>
 
