@@ -4,6 +4,7 @@ Lute settings, in settings key-value table.
 
 import os
 import datetime
+import time
 from flask import current_app
 from lute.db import db
 
@@ -225,3 +226,48 @@ class BackupSettings:
     def get_backup_settings():
         "Get BackupSettings."
         return BackupSettings()
+
+    @property
+    def time_since_last_backup(self):
+        """
+        Return the time since the last backup, or None if not set.
+        Eg. "3 days ago" or "40 seconds from now"
+        """
+        SECONDS_IN_MINUTE = 60
+        SECONDS_IN_HOUR = SECONDS_IN_MINUTE * 60
+        SECONDS_IN_DAY = SECONDS_IN_HOUR * 24
+        SECONDS_IN_WEEK = SECONDS_IN_DAY * 7
+
+        t = self.last_backup_datetime
+        if t is None:
+            return None
+
+        delta = int(time.time() - t)
+
+        if abs(delta // SECONDS_IN_WEEK) > 1:
+            message = f"{abs(delta // SECONDS_IN_WEEK)} weeks"
+        elif abs(delta // SECONDS_IN_WEEK) == 1:
+            message = f"{abs(delta // SECONDS_IN_WEEK)} week"
+        elif abs(delta // SECONDS_IN_DAY) > 1:
+            message = f"{abs(delta // SECONDS_IN_DAY)} days"
+        elif abs(delta // SECONDS_IN_DAY) == 1:
+            message = f"{abs(delta // SECONDS_IN_DAY)} day"
+        elif abs(delta // SECONDS_IN_HOUR) > 1:
+            message = f"{abs(delta // SECONDS_IN_HOUR)} hours"
+        elif abs(delta // SECONDS_IN_HOUR) == 1:
+            message = f"{abs(delta // SECONDS_IN_HOUR)} hour"
+        elif abs(delta // SECONDS_IN_MINUTE) > 1:
+            message = f"{abs(delta // SECONDS_IN_MINUTE)} minutes"
+        elif abs(delta // SECONDS_IN_MINUTE) == 1:
+            message = f"{abs(delta // SECONDS_IN_MINUTE)} minute"
+        elif abs(delta) == 1:
+            message = f"{abs(delta)} second"
+        else:
+            message = f"{abs(delta)} seconds"
+
+        if delta >= 0:
+            message += " ago"
+        else:
+            message += " from now"
+
+        return message

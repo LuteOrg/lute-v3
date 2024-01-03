@@ -102,9 +102,11 @@
         <span>Backup</span>
         <ul class="sub-menu last-sub-menu">
           {% if backup_last_display_date is not none %}
-          <li>last backup: {{ backup_last_display_date }}</li>
+          <li>Last backup was {{ backup_time_since }}.</li>
+          <li>{{ backup_last_display_date | format }}</li>
           {% endif %}
-          <li><a href="/backup/backup?type=manual">Create backup</a></li>
+          <hr>
+          <li><a href="/backup/backup?type=manual">Create new backup</a></li>
         </ul>
       </div>
       {% endif %}
