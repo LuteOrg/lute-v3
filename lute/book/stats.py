@@ -8,14 +8,12 @@ from lute.db import db
 from lute.models.book import Book
 
 
-def get_status_distribution(book):
+def get_unique_words(book, numpages):
     """
-    Return statuses and count of unique words per status.
-
-    Does a full render of the next 20 pages in a book
-    to calculate the distribution.
+    Return count of unique words with statuses for the next numpages
     """
     txindex = 0
+    words_dict = {}
 
     if (book.current_tx_id or 0) != 0:
         for t in book.texts:
@@ -23,70 +21,27 @@ def get_status_distribution(book):
                 break
             txindex += 1
 
-    paras = [
-        get_paragraphs(t)
-        for t in
-        # Next 20 pages, a good enough sample.
-        book.texts[txindex : txindex + 20]
-    ]
-
-    def flatten_list(nested_list):
-        result = []
-        for item in nested_list:
-            if isinstance(item, list):
-                result.extend(flatten_list(item))
-            else:
-                result.append(item)
-        return result
-
-    text_items = []
-    for s in flatten_list(paras):
-        text_items.extend(s.textitems)
-    text_items = [ti for ti in text_items if ti.is_word]
-
-    statterms = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 98: [], 99: []}
-
-    for ti in text_items:
-        statterms[ti.wo_status or 0].append(ti.text_lc)
-
-    stats = {}
-    for statusval, allterms in statterms.items():
-        uniques = list(set(allterms))
-        statterms[statusval] = uniques
-        stats[statusval] = len(uniques)
-
-    return stats
-
-
-def get_status_distribution2(book):
-    """
-    Return statuses and count of unique words per status.
-
-    Does a full render of the next 20 pages in a book
-    to calculate the distribution.
-    """
-    txindex = 0
-    words = {}
-    stats = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}
-
-    if (book.current_tx_id or 0) != 0:
-        for t in book.texts:
-            if t.id == book.current_tx_id:
-                break
-            txindex += 1
-
-    for text in book.texts[txindex : txindex + 20]:
+    for text in book.texts[txindex : txindex + numpages]:
         for paragraph in get_paragraphs(text):
             for sentence in paragraph:
                 for word in sentence.textitems:
                     if word.is_word:
-                        words.update({word.text_lc: word.wo_status})
+                        word_lc = word.text_lc
+                        if word_lc not in words_dict.keys():
+                            words_dict.update({word_lc: word.wo_status})
 
-    unique_words = list(set(list(words.keys())))
-    for word in unique_words:
-        stats[words[word] or 0] += 1
+    return words_dict
 
-    return stats, unique_words
+
+def get_status_distribution(words_dict):
+    """
+    Return the status distribution for given unique words
+    """
+    stats = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}
+    for word in words_dict:
+        stats[words_dict[word] or 0] += 1
+
+    return stats
 
 
 ##################################################
@@ -127,58 +82,34 @@ def mark_stale(book):
 
 
 def _get_stats(book):
-    "Calc stats for the book using the status distribution."
-    status_distribution, unique_words = get_status_distribution2(book)
+    """
+    Calc stats for the book using the status distribution.
+    Do a full render of the next 20 pages in a book
+    to calculate the distribution.
+    """
+    words_dict = get_unique_words(book, 20)
+    unique_words = words_dict.keys()
+    status_distribution = get_status_distribution(words_dict)
     unknowns = status_distribution[0]
-    # allunique = sum(status_distribution.values())
-
-    print(book)
-    print(unique_words)
-    print(status_distribution)
+    unique_words_count = len(unique_words)
 
     percent = 0
-    if len(unique_words) > 0:  # In case not parsed.
-        percent = round(100.0 * unknowns / len(unique_words))
+    if unique_words_count > 0:  # In case not parsed.
+        percent = round(100.0 * unknowns / unique_words_count)
 
     status_distribution[99] = status_distribution[98] + status_distribution[99]
     status_distribution.pop(98)
 
-    fractions = {}
+    percentages = {}
     for status in status_distribution:
-        fr = (status_distribution[status] / len(unique_words)) * 100
-        fractions.update({status: round(fr)})
+        pct = (status_distribution[status] / unique_words_count) * 100
+        percentages.update({status: pct})
 
-    sd = json.dumps(fractions)
-    # sd = sd.replace('"', "")
-    print(sd)
+    sd = json.dumps(percentages)
 
     # Any change in the below fields requires a change to
     # update_stats as well, query insert doesn't check field order.
-    return [book.word_count or 0, len(unique_words), unknowns, percent, sd]
-
-
-# def _get_stats(book):
-#     "Calc stats for the book using the status distribution."
-#     status_distribution, unique_words = get_status_distribution2(book)
-#     unknowns = status_distribution[0]
-#     status_distribution[99] = status_distribution[98] + status_distribution[99]
-#     status_distribution.pop(98)
-
-#     percent = 0
-#     if len(unique_words) > 0:  # In case not parsed.
-#         percent = round(100.0 * unknowns / len(unique_words))
-
-#     fractions = {}
-#     for status in status_distribution:
-#         fr = status_distribution[status] / len(unique_words)
-#         fractions.update({status: fr})
-
-#     sd = json.dumps(fractions)
-#     sd = sd.replace('"', "")
-
-#     # Any change in the below fields requires a change to
-#     # update_stats as well, query insert doesn't check field order.
-#     return [book.word_count or 0, unique_words, unknowns, percent, sd]
+    return [book.word_count or 0, unique_words_count, unknowns, percent, sd]
 
 
 def _update_stats(book, stats):

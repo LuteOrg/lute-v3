@@ -68,13 +68,7 @@
           "orderable": false,
           "width": "10%",
           "render": function ( data, type, row, meta ) {
-            //let ret = row[5];
-            const pct = row[7];
             const bookId = row[3];
-            //console.log("sd js is", row[12]);
-            
-            //console.log(sd);
-            //const unkcount = row[6];
             let ret = `<span>${row[5]}</span>`;
             return ret;
           }
@@ -86,23 +80,17 @@
           "width": "25%",
           "render": function ( data, type, row, meta ) {
             let ret;
-            const pct = row[7];
             const bookId = row[3];
-            //console.log("sd js is", row[12]);
             const sd = JSON.parse(`${row[12]}`);
-            //console.log(sd);
-            //const unkcount = row[6];
             if (sd != null) {
-              //const termcount = row[9];
-              //const knownpct = 100 - parseInt(pct);
-              ret = `<div class="status-pct-icon-container">
-              <div class="status-pct0 status-pct-icon" title="Unknown${sd[0] <= 10 ? ": " + sd[0] + "%": ""}" style="flex: ${sd[0]}; display:${sd[0] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[0]}%</span></div>
-              <div class="status-pct1 status-pct-icon" title="New${sd[1] <= 10 ? ": " + sd[1] + "%": ""}" style="flex: ${sd[1]}; display:${sd[1] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[1] > 10 ? sd[1] + '%': ""}</span></div>
-              <div class="status-pct2 status-pct-icon" title="Status 2${sd[2] <= 10 ? ": " + sd[2] + "%": ""}" style="flex: ${sd[2]}; display:${sd[2] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[2] > 10 ? sd[2] + '%': ""}</span></div>
-              <div class="status-pct3 status-pct-icon" title="Status 3${sd[3] <= 10 ? ": " + sd[3] + "%": ""}" style="flex: ${sd[3]}; display:${sd[3] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[3] > 10 ? sd[3] + '%': ""}</span></div>
-              <div class="status-pct4 status-pct-icon" title="Status 4${sd[4] <= 10 ? ": " + sd[4] + "%": ""}" style="flex: ${sd[4]}; display:${sd[4] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[4] > 10 ? sd[4] + '%': ""}</span></div>
-              <div class="status-pct5 status-pct-icon" title="Status 5${sd[5] <= 10 ? ": " + sd[5] + "%": ""}" style="flex: ${sd[5]}; display:${sd[5] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[5] > 10 ? sd[5] + '%': ""}</span></div>
-              <div class="status-pct99 status-pct-icon" title="Well known${sd[99] <= 10 ? ": " + sd[99] + "%": ""}" style="flex: ${sd[99]}; display:${sd[99] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[99] > 10 ? sd[99] + '%': ""}</span></span>
+              ret = `<div class="status-pct-container">
+              <div class="status-pct0 status-pct" title="Unknown: ${sd[0].toFixed(2)}%" style="flex: ${sd[0].toFixed(2)}; display:${sd[0] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[0] > 10 ? Math.round(sd[0]) + '%': ""}</span></div>
+              <div class="status-pct1 status-pct" title="New: ${sd[1].toFixed(2)}%" style="flex: ${sd[1].toFixed(2)}; display:${sd[1] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[1] > 10 ? Math.round(sd[1]) + '%': ""}</span></div>
+              <div class="status-pct2 status-pct" title="Status 2: ${sd[2].toFixed(2)}%" style="flex: ${sd[2].toFixed(2)}; display:${sd[2] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[2] > 10 ? Math.round(sd[2]) + '%': ""}</span></div>
+              <div class="status-pct3 status-pct" title="Status 3: ${sd[3].toFixed(2)}%" style="flex: ${sd[3].toFixed(2)}; display:${sd[3] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[3] > 10 ? Math.round(sd[3]) + '%': ""}</span></div>
+              <div class="status-pct4 status-pct" title="Status 4: ${sd[4].toFixed(2)}%" style="flex: ${sd[4].toFixed(2)}; display:${sd[4] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[4] > 10 ? Math.round(sd[4]) + '%': ""}</span></div>
+              <div class="status-pct5 status-pct" title="Status 5: ${sd[5].toFixed(2)}%" style="flex: ${sd[5].toFixed(2)}; display:${sd[5] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[5] > 10 ? Math.round(sd[5]) + '%': ""}</span></div>
+              <div class="status-pct99 status-pct" title="Well known: ${sd[99].toFixed(2)}%" style="flex: ${sd[99].toFixed(2)}; display:${sd[99] < 2 ? "none": "inline-flex"}"><span>\xa0${sd[99] > 10 ? Math.round(sd[99]) + '%': ""}</span></span>
               <div>`;
             }
             return ret;

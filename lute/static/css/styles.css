@@ -998,7 +998,7 @@ table.statsWordsRead th, td { padding: 5px; }
 
 /* status stats */
   
-.status-pct-icon-container {
+.status-pct-container {
     display: inline-flex;
     align-items: center;
     gap: 1px;
@@ -1009,7 +1009,7 @@ table.statsWordsRead th, td { padding: 5px; }
     box-sizing: border-box;
 }
 
-.status-pct-icon {
+.status-pct {
     display: flex;
     align-items: center;
     width: 16px;

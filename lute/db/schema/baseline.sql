@@ -126,20 +126,20 @@ CREATE TABLE IF NOT EXISTS "bookstats" (
 	PRIMARY KEY ("BkID"),
 	FOREIGN KEY("BkID") REFERENCES "books" ("BkID") ON UPDATE NO ACTION ON DELETE CASCADE
 );
-INSERT INTO bookstats VALUES(1,67,57,57,100,'{0: 57, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(2,45,33,33,100,'{0: 33, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(3,382,170,170,100,'{0: 170, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(4,83,63,63,100,'{0: 63, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(5,48,40,40,100,'{0: 40, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(6,1241,370,370,100,'{0: 370, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(7,646,246,246,100,'{0: 246, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(8,157,99,99,100,'{0: 99, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(9,115,100,100,100,'{0: 100, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(10,110,85,85,100,'{0: 85, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(11,174,120,120,100,'{0: 120, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(12,69,49,49,100,'{0: 49, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(13,64,41,41,100,'{0: 41, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
-INSERT INTO bookstats VALUES(14,35,30,30,100,'{0: 30, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}');
+INSERT INTO bookstats VALUES(1,67,57,57,100,'{"0": 57, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(2,45,33,33,100,'{"0": 33, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(3,382,170,170,100,'{"0": 170, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(4,83,63,63,100,'{"0": 63, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(5,48,40,40,100,'{"0": 40, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(6,1241,370,370,100,'{"0": 370, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(7,646,246,246,100,'{"0": 246, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(8,157,99,99,100,'{"0": 99, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(9,115,100,100,100,'{"0": 100, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(10,110,85,85,100,'{"0": 85, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(11,174,120,120,100,'{"0": 120, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(12,69,49,49,100,'{"0": 49, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(13,64,41,41,100,'{"0": 41, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(14,35,30,30,100,'{"0": 30, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
 CREATE TABLE IF NOT EXISTS "wordimages" (
 	"WiID" INTEGER NOT NULL  ,
 	"WiWoID" INTEGER NOT NULL  ,
