@@ -10,7 +10,7 @@ from lute.models.book import Book
 
 def get_unique_words(book, numpages):
     """
-    Return count of unique words with statuses for the next numpages
+    Return count of unique words with corresponding statuses for the next numpages
     """
     txindex = 0
     words_dict = {}
@@ -35,7 +35,9 @@ def get_unique_words(book, numpages):
 
 def get_status_distribution(words_dict):
     """
-    Return the status distribution for given unique words
+    Return the status distribution for given unique words dictionary
+    Receives: {word: status}
+    Returns: {status: number of words}
     """
     stats = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}
     for word in words_dict:
