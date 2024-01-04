@@ -12,6 +12,7 @@
   margin-bottom: 1.6rem;
   min-width: 520px;
   box-sizing: border-box;
+  z-index: 999;
 
   --audio-color-1: #6da9e9;
   --audio-color-2: #ff5252;

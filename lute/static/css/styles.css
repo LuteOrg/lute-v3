@@ -298,11 +298,11 @@ span.hamburger {
     
   padding: 0;
   margin: 0;
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
-  z-index: 1000;
-  height: 100%;
+  z-index: 1001; /* higher than audio and header */
+  height: 100vh;
   border-right: 4px solid #a9cfef;
   box-shadow: 1px 0 3px 2px #9393933d;
   box-sizing: border-box;
@@ -762,6 +762,7 @@ img
 /* Widening the tooltip. */
 div.ui-tooltip {
     max-width: 400px !important;
+    z-index: 888; /*less than audio, header and side menu */
 }
 
 .tooltip-image {
@@ -983,7 +984,7 @@ table.statsWordsRead th, td { padding: 5px; }
 
 .dictframecontainer {
     position: relative;
-    overflow: hidden; /* contents overflow (over audio player) if height is too small*/
+    /* overflow: hidden; contents overflow (over audio player) if height is too small */
     opacity: 0; /*to hide the after element. easier this way */
 }
 
@@ -1141,3 +1142,68 @@ table.statsWordsRead th, td { padding: 5px; }
 /* #booktable_wrapper { */
     /* margin-top: 1.8rem; */
 /* } */
+
+
+@media screen and (max-width: 900px) {
+
+    #reading-header {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #fff;
+        height: 90px;
+        z-index: 1000;
+    }
+
+    #read_pane_left {
+        width: unset !important;
+        /* padding-bottom: 1rem;
+        border-bottom: 2px solid aliceblue; */
+        margin-top: 90px;
+    }
+
+    /* .btm-margin-container {
+        margin: 0 !important;
+    } */
+
+    #read_pane_right {
+        /* display: block;
+        position: unset !important;
+        width: unset !important;
+        grid-template-rows: max-content 1fr !important; */
+        /* width: 75% !important; */
+        /* width: unset !important; */
+        background-color: white;
+        z-index: 1002;
+        transform: translateX(100%);
+        transition: transform 0.2s cubic-bezier(0.77,0.2,0.05,1.0);
+        /* border-left: 4px solid #dbefff; */
+        height: 100vh !important; /* unset height set when player is sticky */
+    }
+
+    #read_pane_right.open-dict {
+        transform: translateX(0)
+    }
+
+    /* #read_pane_right::after {
+        display: none;
+    } */
+
+    /* .wordframecontainer {
+        height: 220px;
+    } */
+
+    /* .dictframecontainer { */
+        /* height: 800px; */
+        /* margin-bottom: var(--player-height); */
+    /* } */
+
+    .text-options-btn-container:nth-child(3) {
+        display: none;
+    }
+
+    .text-options-container {
+        grid-template-columns: max-content !important;
+    }
+}
