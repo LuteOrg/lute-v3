@@ -109,7 +109,7 @@ def add_terms(lang, terms):
 def assert_stats(expected, msg=""):
     "helper."
     sql = """select wordcount, distinctterms, distinctunknowns,
-      unknownpercent, status_distribution from bookstats"""
+      unknownpercent, replace(status_distribution, '"', "'") from bookstats"""
     assert_sql_result(sql, expected, msg)
 
 
@@ -124,31 +124,48 @@ def test_stats_smoke_test(_test_book, spanish):
     "Terms are rendered to count stats."
     add_terms(spanish, ["gato", "TENGO"])
     refresh_stats()
-    assert_stats(["4; 4; 2; 50; {0: 2, 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}"])
+    assert_stats(
+        [
+            "4; 4; 2; 50; {'0': 2, '1': 2, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+        ]
+    )
 
 
 def test_stats_calculates_rendered_text(_test_book, spanish):
     "Multiword term counted as one term."
     add_terms(spanish, ["tengo un"])
     refresh_stats()
-    assert_stats(["4; 3; 2; 67; {0: 2, 1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}"])
+    assert_stats(
+        [
+            "4; 3; 2; 67; {'0': 2, '1': 1, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+        ]
+    )
 
 
 def test_stats_only_update_books_marked_stale(_test_book, spanish):
     "Have to mark book as stale, too expensive otherwise."
     add_terms(spanish, ["gato", "TENGO"])
     refresh_stats()
-    assert_stats(["4; 4; 2; 50; {0: 2, 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}"])
+    assert_stats(
+        [
+            "4; 4; 2; 50; {'0': 2, '1': 2, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+        ]
+    )
 
     add_terms(spanish, ["hola"])
     refresh_stats()
     assert_stats(
-        ["4; 4; 2; 50; {0: 2, 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}"],
+        [
+            "4; 4; 2; 50; {'0': 2, '1': 2, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+        ],
         "not updated",
     )
 
     mark_stale(_test_book)
     refresh_stats()
     assert_stats(
-        ["4; 4; 1; 25; {0: 1, 1: 3, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0}"], "updated"
+        [
+            "4; 4; 1; 25; {'0': 1, '1': 3, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+        ],
+        "updated",
     )
