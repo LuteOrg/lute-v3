@@ -23,7 +23,7 @@ For more information on building and developing, please see [Development](../../
 
 ## Contributing
 
-If you'd like to contribute code to Lute (hooray!), check out the [Contribution Guidelines](./docs/contributing.md).  And with every repo star, an angel gets its wings.
+If you'd like to contribute code to Lute (hooray!), check out the [Contribution Guidelines](../../wiki/Contributing).  And with every repo star, an angel gets its wings.
 
 # License
 
