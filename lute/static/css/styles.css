@@ -997,56 +997,68 @@ table.statsWordsRead th, td { padding: 5px; }
 }
 
 /* status stats */
-  
-.status-pct-container {
+
+.status-bar-container {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 1px;
     width: 95%;
-    background-color: #787878;
-    border: 1px solid #787878;
     border-radius: 3px;
     box-sizing: border-box;
+    background-color: #787878;
+    border: 1px solid #787878;
 }
 
-.status-pct {
+.status-bar-container-empty {
+    border-color: #e6e6e6;
+    background-color: #fff;
+}
+
+.status-bar {
     display: flex;
     align-items: center;
     width: 16px;
-    height: 20px;
+    height: 21px;
     font-size: 0.8rem;
     box-sizing: border-box;
-    filter: saturate(3) brightness(0.95);
+    /* saturate the colors  */
+    filter: saturate(2.4) brightness(0.95); 
 }
   
-.status-pct0 {
+.status-bar0 {
     background-color: var(--status-0-color);
 }
 
-.status-pct1 {
+.status-bar1 {
     background-color: var(--status-1-color);
 }
 
-.status-pct2 {
+.status-bar2 {
     background-color: var(--status-2-color);
 }
 
-.status-pct3 {
+.status-bar3 {
     background-color: var(--status-3-color);
 }
 
-.status-pct4 {
+.status-bar4 {
     background-color: var(--status-4-color);
 }
 
-.status-pct5 {
+.status-bar5 {
     background-color: var(--status-5-color);
 }
 
-.status-pct99 {
+.status-bar99 {
     background-color: var(--status-99-color);
 }
 
+/* remove top and bottom padding to be able to increase the stats bar height */
+#booktable tr td:nth-child(5) {
+    padding-bottom: 0 !important;
+    padding-top: 0 !important;
+}
 
 /* read slider */
 #read-slider {

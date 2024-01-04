@@ -1,32 +1,42 @@
 body {
-  background-color: #121212; /* black paper */
+  --status-0-color: #59c7fa;
+  --status-1-color: #7a3d58;
+  --status-2-color: #82621a;
+  --status-3-color: #3c6621;
+  --status-4-color: #325192;
+  --status-5-color: #5e4583;
+
+  --background-color: #121212; /* black paper */
+  --light-grey: #c4c8ce;
+
+  background-color: var(--background-color);
   color: #F3F4F4; /* grey font */
 }
 
-#reading_menu { background-color: #121212; }
+#reading_menu { background-color: var(--background-color); }
 
 .flash-notice {
   background-color: #7a3d58; /* pink highlight */
 }
 
 .menu-item > span {
-    color: #c4c8ce !important; /* light grey font */
+    color: var(--light-grey) !important; /* light grey font */
 }
 
 a.home-link {
-    color: #c4c8ce !important; /* light grey font */
+    color: var(--light-grey) !important; /* light grey font */
 }
 
 a {
-  color: #59c7fa; /* ice blue */
+  color: var(--status-0-color); /* ice blue */
 }
 
 a:link {
-  color: #59c7fa; /* ice blue */
+  color: var(--status-0-color); /* ice blue */
 }
 
 a:visited {
-  color: #59c7fa; /* ice blue */
+  color: var(--status-0-color); /* ice blue */
 }
 
 a:hover {
@@ -34,36 +44,59 @@ a:hover {
 }
 
 input[type="text"] {
-    border-color: #c4c8ce; /* light grey */
-    background-color: #121212; /* black */
-    color: #c4c8ce; /* light grey font */
+    border-color: var(--light-grey); /* light grey */
+    background-color: var(--background-color); /* black */
+    color: var(--light-grey); /* light grey font */
 }
 
 .ui-widget-content {
-    border-color: #c4c8ce; /* light grey */
-    background-color: #121212; /* black */
-    color: #c4c8ce; /* light grey font */
+    border-color: var(--light-grey); /* light grey */
+    background-color: var(--background-color); /* black */
+    color: var(--light-grey); /* light grey font */
 }
 
 textarea {
-    border-color: #c4c8ce; /* light grey */
-    background-color: #121212; /* black */
-    color: #c4c8ce; /* light grey font */
+    border-color: var(--light-grey); /* light grey */
+    background-color: var(--background-color); /* black */
+    color: var(--light-grey); /* light grey font */
 }
 
 .sub-menu {
-    border-color: #c4c8ce; /* light grey */
-    background-color: #121212; /* black */
-    color: #c4c8ce; /* light grey font */
+    border-color: var(--light-grey); /* light grey */
+    background-color: var(--background-color); /* black */
+    color: var(--light-grey); /* light grey font */
 }
 
- div#thetext p { line-height: 1.5; }
- span.textitem { font-family: Georgia; color: #F3F4F4;}
- span.status0 { background-color: transparent; color: #59c7fa; } /* ice blue */
- span.status1 { background-color: #7a3d58; } /* pink highlight */
- span.status2 { background-color: #82621a; } /* yellow highlight */
- span.status3 { background-color: #3c6621; } /* green highlight */
- span.status4 { background-color: #325192; } /* blue highlight */
- span.status5 { background-color: #5e4583; } /* purple highlight */
- span.status98 { background-color: transparent; } /* transparent */
- span.status99 { background-color: transparent; } /* transparent */
+div#thetext p { line-height: 1.5; }
+span.textitem { font-family: Georgia; color: #F3F4F4;}
+span.status0 { background-color: transparent; color: var(--status-0-color); } /* ice blue */
+span.status1 { background-color: var(--status-1-color); } /* pink highlight */
+span.status2 { background-color: var(--status-2-color); } /* yellow highlight */
+span.status3 { background-color: var(--status-3-color); } /* green highlight */
+span.status4 { background-color: var(--status-4-color); } /* blue highlight */
+span.status5 { background-color: var(--status-5-color); } /* purple highlight */
+span.status98 { background-color: transparent; } /* transparent */
+span.status99 { background-color: transparent; } /* transparent */
+
+.status-bar-container {
+  background-color: #fff;
+  border-color: var(--light-grey);
+}
+
+.status-bar-container-empty {
+  background-color: var(--background-color);
+  border-color: #686868;
+}
+
+.status-bar-container span {
+  color: var(--background-color);
+}
+
+#read-slider {
+  -webkit-appearence: none;
+  background-color: #5e5e5e;
+}
+
+span.hamburger {
+  background-color: #F3F4F4;
+}

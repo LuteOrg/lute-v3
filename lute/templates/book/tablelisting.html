@@ -69,7 +69,7 @@
           "width": "8%",
           "render": function ( data, type, row, meta ) {
             const bookId = row[3];
-            let ret = `<span title="${row[9]} unique words">${row[5]}</span>`;
+            let ret = `<span title="${row[9]} unique words on the current page">${row[5]}</span>`;
             return ret;
           }
         },
@@ -83,26 +83,21 @@
             const bookId = row[3];
             const sd = JSON.parse(`${row[12]}`);
             if (sd == null) {
-              ret = `<div class="status-pct-container" title="stats calculated after opening the book" 
-                                                        style="display: flex; 
-                                                        justify-content: center;
-                                                        align-items: center;
-                                                        border-color: #bebebe;
-                                                        background: repeating-linear-gradient(-45deg, 
-                                                                                              #d6d6d6, 
-                                                                                              #d6d6d6 10px, 
-                                                                                              #bebebe 10px, 
-                                                                                              #bebebe 20px);"><em>N/A</em></div>`
+              ret = `<div class="status-bar-container status-bar-container-empty" title="Stats calculated after opening the book"><em>N/A</em></div>`
             }
+            // hide individual percent bars if the value is less than 1 percent
+            // hide the percentage label if the value is less than 6 percent (because of less space)
+            // show rounded value on the label, use truncated version for flex value
+            // show the actual value in the tooltip
             else {
-              ret = `<div class="status-pct-container">
-              <div class="status-pct0 status-pct" title="Unknown: ${sd[0].toFixed(2)}%" style="flex: ${sd[0].toFixed(2)}; display:${sd[0] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[0] > 6 ? Math.round(sd[0]) + '%': ""}</span></div>
-              <div class="status-pct1 status-pct" title="New: ${sd[1].toFixed(2)}%" style="flex: ${sd[1].toFixed(2)}; display:${sd[1] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[1] > 6 ? Math.round(sd[1]) + '%': ""}</span></div>
-              <div class="status-pct2 status-pct" title="Status 2: ${sd[2].toFixed(2)}%" style="flex: ${sd[2].toFixed(2)}; display:${sd[2] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[2] > 6 ? Math.round(sd[2]) + '%': ""}</span></div>
-              <div class="status-pct3 status-pct" title="Status 3: ${sd[3].toFixed(2)}%" style="flex: ${sd[3].toFixed(2)}; display:${sd[3] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[3] > 6 ? Math.round(sd[3]) + '%': ""}</span></div>
-              <div class="status-pct4 status-pct" title="Status 4: ${sd[4].toFixed(2)}%" style="flex: ${sd[4].toFixed(2)}; display:${sd[4] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[4] > 6 ? Math.round(sd[4]) + '%': ""}</span></div>
-              <div class="status-pct5 status-pct" title="Status 5: ${sd[5].toFixed(2)}%" style="flex: ${sd[5].toFixed(2)}; display:${sd[5] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[5] > 6 ? Math.round(sd[5]) + '%': ""}</span></div>
-              <div class="status-pct99 status-pct" title="Well known: ${sd[99].toFixed(2)}%" style="flex: ${sd[99].toFixed(2)}; display:${sd[99] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[99] > 6 ? Math.round(sd[99]) + '%': ""}</span></span>
+              ret = `<div class="status-bar-container">
+              <div class="status-bar0 status-bar" title="Unknown: ${sd[0].toFixed(2)}%" style="flex: ${sd[0].toFixed(2)}; display:${sd[0] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[0] > 6 ? Math.round(sd[0]) + '%': ""}</span></div>
+              <div class="status-bar1 status-bar" title="New: ${sd[1].toFixed(2)}%" style="flex: ${sd[1].toFixed(2)}; display:${sd[1] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[1] > 6 ? Math.round(sd[1]) + '%': ""}</span></div>
+              <div class="status-bar2 status-bar" title="Status 2: ${sd[2].toFixed(2)}%" style="flex: ${sd[2].toFixed(2)}; display:${sd[2] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[2] > 6 ? Math.round(sd[2]) + '%': ""}</span></div>
+              <div class="status-bar3 status-bar" title="Status 3: ${sd[3].toFixed(2)}%" style="flex: ${sd[3].toFixed(2)}; display:${sd[3] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[3] > 6 ? Math.round(sd[3]) + '%': ""}</span></div>
+              <div class="status-bar4 status-bar" title="Status 4: ${sd[4].toFixed(2)}%" style="flex: ${sd[4].toFixed(2)}; display:${sd[4] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[4] > 6 ? Math.round(sd[4]) + '%': ""}</span></div>
+              <div class="status-bar5 status-bar" title="Status 5: ${sd[5].toFixed(2)}%" style="flex: ${sd[5].toFixed(2)}; display:${sd[5] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[5] > 6 ? Math.round(sd[5]) + '%': ""}</span></div>
+              <div class="status-bar99 status-bar" title="Well known (+ Ignored): ${sd[99].toFixed(2)}%" style="flex: ${sd[99].toFixed(2)}; display:${sd[99] < 1 ? "none": "inline-flex"}"><span>\xa0${sd[99] > 6 ? Math.round(sd[99]) + '%': ""}</span></span>
               <div>`;
             }
             return ret;
