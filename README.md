@@ -19,7 +19,7 @@ To learn more about Lute v3, or to install it for your own use and study, please
 
 ## Developing
 
-For more information on building and developing, please see [Development](./docs/development.md).
+For more information on building and developing, please see [Development](../../wiki/Development).
 
 ## Contributing
 
