@@ -2,7 +2,7 @@
 Term entity.
 """
 
-from sqlalchemy import and_
+from sqlalchemy import text as sqltext, and_
 from lute.db import db
 
 wordparents = db.Table(
@@ -265,13 +265,25 @@ class Term(
 
     def set_current_image(self, s):
         "Set the current image for this term."
-        if self.images:
+        while len(self.images) > 0:
             self.images.pop(0)
-        if s is not None:
+        if (s or "").strip() != "":
             ti = TermImage()
             ti.term = self
-            ti.source = s
+            ti.source = s.strip()
             self.images.append(ti)
+
+    @staticmethod
+    def delete_empty_images():
+        """
+        Data clean-up: delete empty images.
+
+        The code was leaving empty images in the db, which are obviously no good.
+        This is a hack to clean up the data.
+        """
+        sql = "delete from wordimages where trim(WiSource) = ''"
+        db.session.execute(sqltext(sql))
+        db.session.commit()
 
     def get_flash_message(self):
         "Get the flash message."

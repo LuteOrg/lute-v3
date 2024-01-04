@@ -59,40 +59,48 @@ def _get_file_content(filefielddata):
     _, ext = os.path.splitext(filefielddata.filename)
     ext = (ext or "").lower()
     if ext == ".txt":
-        content = filefielddata.read()
-        return str(content, "utf-8")
-
+        return service.get_textfile_content(filefielddata)
     if ext == ".epub":
-        content = service.get_epub_content(filefielddata)
-        return str(content, "utf-8")
-
+        return service.get_epub_content(filefielddata)
     raise ValueError(f'Unknown file extension "{ext}"')
+
+
+def _book_from_url(url):
+    "Create a new book, or flash an error if can't parse."
+    b = Book()
+    try:
+        b = service.book_from_url(url)
+    except service.BookImportException as e:
+        flash(e.message, "notice")
+        b = Book()
+    return b
 
 
 @bp.route("/new", methods=["GET", "POST"])
 def new():
     "Create a new book, either from text or from a file."
     b = Book()
+    import_url = request.args.get("importurl", "").strip()
+    if import_url != "":
+        b = _book_from_url(import_url)
+
     form = NewBookForm(obj=b)
     form.language_id.choices = lute.utils.formutils.language_choices()
     repo = Repository(db)
 
     if form.validate_on_submit():
-        form.populate_obj(b)
-        if form.textfile.data:
-            b.text = _get_file_content(form.textfile.data)
-        f = form.audiofile.data
-        if f:
-            b.audio_filename = service.save_audio_file(f)
-        book = repo.add(b)
-        repo.commit()
-        return redirect(f"/read/{book.id}/page/1", 302)
-
-    import_url = request.args.get("importurl", "").strip()
-    if import_url != "":
-        b = service.book_from_url(import_url)
-        form = NewBookForm(obj=b)
-        form.language_id.choices = lute.utils.formutils.language_choices()
+        try:
+            form.populate_obj(b)
+            if form.textfile.data:
+                b.text = _get_file_content(form.textfile.data)
+            f = form.audiofile.data
+            if f:
+                b.audio_filename = service.save_audio_file(f)
+            book = repo.add(b)
+            repo.commit()
+            return redirect(f"/read/{book.id}/page/1", 302)
+        except service.BookImportException as e:
+            flash(e.message, "notice")
 
     return render_template(
         "book/create_new.html",

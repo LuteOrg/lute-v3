@@ -74,6 +74,8 @@
               const knownpct = 100 - parseInt(pct);
               ret += `&nbsp;<span title="${unkcount} unknowns in next ${termcount} unique terms">(${knownpct}%)</span>`;
             }
+            // TODO issue 102 status graph: render graph of distribution.
+            ret += `<div style="display: none">${row[12]}</div>`;
             return ret;
           }
         },
@@ -110,6 +112,7 @@
         { "name": "DistinctCount", "targets": 11, "data": null, "visible": false },
         { "name": "PageNum", "targets": 12, "data": null, "visible": false },
         { "name": "IsCompleted", "targets": 13, "data": null, "visible": false },
+        { "name": "StatusDistribution", "targets": 14, "data": null, "visible": false },
       ],
 
       // Ajax call

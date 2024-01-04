@@ -5,12 +5,16 @@ Notes:
 
 - the db must be reset to the baseline with demo stories
 - site must be running (currently hardcoded to port 5000)
+- start code gen in another window with `python codegen`,
+  then go to http://localhost:5000/ in the new window
+- click through etc etc, then stop the code gen, copy-paste
+  code here, fix as needed, _then_ shut down
 
 More notes:
 
 This is _just a smoke test_, it doesn't do any assertions.
 The actions were _recorded_ using playwright's supertastic
-code generation.  https://playwright.dev/docs/codegen
+code generation.  https://playwright.dev/python/docs/codegen
 
 Then I added some tweaks:
 
@@ -20,6 +24,7 @@ Menu sub-items are only visible after hovering over the menu, e.g.:
 """
 
 import os
+import time
 from playwright.sync_api import Playwright, sync_playwright, expect
 
 
@@ -64,7 +69,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
         "Mark rest as known, mark page as read, then go to next page"
     ).click()
     page.get_by_title("Mark page as read, then go to next page", exact=True).click()
-    page.get_by_role("link", name="Home").click()
+    page.get_by_title("Home").click()
 
     # Open and archive book.
     _print("Archive.")
@@ -108,7 +113,15 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     page.get_by_role("link", name="Terms", exact=True).click()
     page.get_by_role("link", name="Hello").click()
     page.get_by_role("link", name="Sentences").click()
-    page.get_by_role("link", name="back to list").click()
+    page.get_by_role("link", name="Back to list").click()
+
+    _print("Export parent term mapping files.")
+    page.locator("#menu_terms").hover()
+    page.get_by_role("link", name="Parent Term mapping").click()
+    with page.expect_download(timeout=30000) as _:
+        page.get_by_role("link", name="Tutorial", exact=True).click()
+    with page.expect_download(timeout=30000) as _:
+        page.get_by_role("link", name="English").click()
 
     # Edit language.
     _print("Edit language.")
@@ -172,10 +185,11 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
         "http://localhost:5000/dev_api/fake_story.html"
     )
     page.get_by_role("button", name="Import").click()
+    time.sleep(2)
     # Page is imported, form shown, so save it.
     page.get_by_role("button", name="Save").click()
     page.get_by_text("Tengo").click()  # Quick hacky check if exists.
-    page.locator("#reading_home_link").click()
+    page.get_by_title("Home").click()
     expect(page.get_by_role("link", name="Mi perro.")).to_be_visible()
 
     # Check version.

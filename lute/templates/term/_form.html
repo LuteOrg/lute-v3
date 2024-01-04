@@ -77,9 +77,16 @@
     </tr>
 
     <tr>
-      <td align="right">
-        <a href="" onclick="show_term_sentences(); return false;">Sentences</a>
-        <button id="submit" type="submit" class="btn btn-primary">Save</button>
+      <td>
+        <div style="float: left">
+          <a href="" onclick="show_term_sentences(); return false;">Sentences</a>
+        </div>
+        <div style="float: right">
+          {% if term.id %}
+          <button id="delete" type="button" class="btn" onclick="deleteTerm()" style="margin-right: 5px;">Delete</button>
+          {% endif %}
+          <button id="submit" type="submit" class="btn btn-primary">Save</button>
+        </div>
       </td>
     </tr>
 
@@ -396,6 +403,24 @@
       return;
     const url = `/term/sentences/${langid}/${t}`;
     top.frames.dictframe.location.href = url;
+  }
+
+  function deleteTerm() {
+    const msg = "Are you sure you want to delete this term?\n\n" +
+          "This action cannot be undone, and if this term has children, they will be orphaned.";
+    if (!confirm(msg))
+      return;
+
+    $.post("/term/delete/{{ term.id }}", function( data ) {
+      if ("{{ embedded_in_reading_frame }}" == "True") {
+        // If on reading page, reload page
+        parent.location.reload();
+      }
+      else {
+        // If on term page, go to term listing
+        window.location.href = '/term/index';
+      }
+    });
   }
 
 </script>

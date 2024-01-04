@@ -23,6 +23,7 @@ def get_data_tables_list(parameters, is_archived):
         c.distinctterms as DistinctCount,
         c.distinctunknowns as UnknownCount,
         c.unknownpercent as UnknownPercent,
+        c.status_distribution as StatusDistribution,
         case when completed_books.BkID is null then 0 else 1 end as IsCompleted
 
     FROM books b
