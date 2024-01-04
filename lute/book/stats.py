@@ -106,7 +106,6 @@ def _get_stats(book):
         percent = round(100.0 * unknowns / allunique)
 
     sd = json.dumps(status_distribution)
-    sd = sd.replace('"', "")
 
     # Any change in the below fields requires a change to
     # update_stats as well, query insert doesn't check field order.
