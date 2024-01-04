@@ -181,11 +181,17 @@ jobs:
 
     - run: pip install -r requirements.txt
 
+    # Can't get playwright to run reliably on Windows.
+    # - name: Playwright install
+    #   run: playwright install
+    # - name: Playwright smoke test
+    #   run: inv playwright || exit /b
+
     # Run specific sanity check.
     - name: Smoke tests
       run: |
-        inv accept --headless -s -k test_unsupported_language_not_shown
-        inv accept --headless -s -k import_a_valid_term_file
+        inv accept --headless -s -k test_unsupported_language_not_shown || exit /b
+        inv accept --headless -s -k import_a_valid_term_file || exit /b
 
     - name: Remove config to force using prod config
       run: del ${{ github.workspace }}\lute\config\config.yml
