@@ -5,7 +5,7 @@ Welcome to Lute!  This short guide should get you going.
 
 Navigation
 
-This tutorial has multiple pages.  Above the title are some arrows to navigate forwards and backwards.  In longer texts, you can jump forward or back ten pages at a time as well.
+This tutorial has multiple pages.  At the top of the page is a slider to navigate forwards and backwards, or you can click the arrows at either end of the slider.
 
 1. The Basics
 

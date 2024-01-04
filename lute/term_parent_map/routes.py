@@ -48,7 +48,11 @@ def index():
         text_file = form.text_file.data
         language = db.session.get(Language, form.language_id.data)
         if text_file:
-            temp_file_name = tempfile.mkstemp()[1]
+            # Track the file descriptor to close it later,
+            # avoiding problems on Windows.
+            # (https://stackoverflow.com/questions/34716996/
+            #  cant-remove-a-file-which-created-by-tempfile-mkstemp-on-windows)
+            fd, temp_file_name = tempfile.mkstemp()
             try:
                 text_file.save(temp_file_name)
                 stats = import_file(language, temp_file_name)
@@ -61,7 +65,8 @@ def index():
             except BadImportFileError as e:
                 flash(f"Error on import: {str(e)}", "notice")
             finally:
-                os.unlink(temp_file_name)
+                os.close(fd)
+                os.remove(temp_file_name)
 
     # sqlalchemy _requires_ "== False" for the comparison!
     # pylint: disable=singleton-comparison
@@ -80,20 +85,30 @@ def index():
 @bp.route("/export_book/<int:bookid>", methods=["GET"])
 def export_book(bookid):
     "Generate a file and return it."
-    temp_file_name = tempfile.mkstemp()[1]
-    book = db.session.get(Book, bookid)
-    export_unknown_terms(book, temp_file_name)
-    return send_file(
-        temp_file_name, as_attachment=True, download_name="unknown_terms.txt"
-    )
+    with tempfile.NamedTemporaryFile(delete=True) as temp_file:
+        try:
+            book = db.session.get(Book, bookid)
+            export_unknown_terms(book, temp_file.name)
+            return send_file(
+                temp_file.name, as_attachment=True, download_name="unknown_terms.txt"
+            )
+        finally:
+            # temp_file will be deleted.
+            pass
 
 
 @bp.route("/export_language/<int:languageid>", methods=["GET"])
 def export_language(languageid):
     "Generate a file and return it."
-    temp_file_name = tempfile.mkstemp()[1]
-    lang = db.session.get(Language, languageid)
-    export_terms_without_parents(lang, temp_file_name)
-    return send_file(
-        temp_file_name, as_attachment=True, download_name="terms_without_parents.txt"
-    )
+    with tempfile.NamedTemporaryFile(delete=True) as temp_file:
+        try:
+            lang = db.session.get(Language, languageid)
+            export_terms_without_parents(lang, temp_file.name)
+            return send_file(
+                temp_file.name,
+                as_attachment=True,
+                download_name="terms_without_parents.txt",
+            )
+        finally:
+            # temp_file will be deleted.
+            pass
