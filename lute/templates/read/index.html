@@ -25,6 +25,10 @@
 
 <div id="read_pane_left">
 
+  <div id="reading_menu">
+    {% include "read/reading_menu.html" %}
+  </div>
+
   <div id="reading-header">
 
     <div class="reading_header_container">
@@ -40,9 +44,6 @@
           style="cursor: pointer"
           title="Home"
           onclick="window.location='/'" />
-          <div id="reading_menu">
-            {% include "read/reading_menu.html" %}
-          </div>
         </div>
         <div class="reading_header_mid">
         <div class="reading_header_mid_top">
@@ -186,15 +187,30 @@
 
     // If the css slide-in menu is open, clicking away from it closes the menu.
     $(document).click(function(event) {
-      const menu_clicked = event.target.closest('.reading_header_left');
       const menu = document.getElementById("reading_menu");
-      if(!menu_clicked) {
+      // const menuBtn = document.querySelector(".hamburger-btn");
+      const menu_clicked = event.target.closest("#reading_menu");
+      const menuBtn_clicked = event.target.closest(".hamburger-btn");
+      const rightPaneClicked = event.target.closest("#read_pane_right");
+      // const rightPaneClicked = event.target.closest(".dictframecontainer");
+      // console.log(event.target);
+      // console.log(event.target.parentNode);
+      // if (event.target != menuBtn || event.target.parentNode != menuBtn) 
+      if(!menu_clicked && !menuBtn_clicked)
         menu.classList.remove("open-menu");
-        disableScroll(false);
-      }
+      if(!rightPaneClicked && 
+        event.target.parentNode != readPaneRight && 
+        !event.target.classList.contains("textitem"))
+
+        readPaneRight.classList.remove("open-dict");
     });
   });
 
+  window.addEventListener("message", function(event) {
+    if (event.data.event === "LuteTermFormOpened") {
+      readPaneRight.classList.add("open-dict");
+    }
+  });
 
   let have_audio_file = function() {
     return ($('#book_audio_file').val() != '');
@@ -370,27 +386,27 @@
     const menu = document.getElementById("reading_menu");
     menu.classList.remove("open-menu");
 
-    disableScroll(false);
+    // disableScroll(false);
   }
 
   function toggleMenu() {
     const menu = document.getElementById("reading_menu");
-    menu.classList.toggle("open-menu");
+    menu.classList.add("open-menu");
 
-    disableScroll(true);
+    // disableScroll(true);
   }
 
-  function disableScroll(disable) {
-    if (disable) {
-      document.body.style.margin = 0;
-      document.body.style.height = "100%";
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.margin = "unset";
-      document.body.style.height = "unset";
-      document.body.style.overflow = "unset";
-    }
-  }
+  // function disableScroll(disable) {
+  //   if (disable) {
+  //     document.body.style.margin = 0;
+  //     document.body.style.height = "100%";
+  //     document.body.style.overflow = "hidden";
+  //   } else {
+  //     document.body.style.margin = "unset";
+  //     document.body.style.height = "unset";
+  //     document.body.style.overflow = "unset";
+  //   }
+  // }
 
   function edit_current_page() {
     const bookid = $('#book_id').val();
