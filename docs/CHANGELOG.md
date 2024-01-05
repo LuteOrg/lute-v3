@@ -1,4 +1,24 @@
 
+# 3.0.9 (2024-01-04)
+
+Feature changes:
+
+* [#29](https://github.com/jzohrab/lute-v3/issues/29): Add reading screen slider to navigate pages.  By @webofpies in #88.
+* [#13](https://github.com/jzohrab/lute-v3/issues/13): Allow term deletion from reading screen.  By @disfated in #85.
+* [#90](https://github.com/jzohrab/lute-v3/issues/90): Add Sanskrit.
+
+Bug fixes:
+
+* Remove duplicate terms from list (multiple image records) (addresses [#105](https://github.com/jzohrab/lute-v3/issues/105)).
+* Graceful failure for non-utf-8 files (addresses [#67](https://github.com/jzohrab/lute-v3/issues/67)).
+* Fix arrow key increment (addresses [#96](https://github.com/jzohrab/lute-v3/issues/96)).
+
+Back end changes:
+
+* Fix/disable flaky CI tests for reliability.
+* Stats distribution field in db.
+
+
 # 3.0.8 (2023-12-28)
 
 Feature changes:
