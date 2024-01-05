@@ -70,6 +70,10 @@ def _setup_app_dirs(app_config):
             "d": app_config.useraudiopath,
             "readme": "User audio.  Each file is a book's audio.",
         },
+        {
+            "d": app_config.temppath,
+            "readme": "Temp directory for export file writes, to avoid permissions issues.",
+        },
     ]
     for rec in required_dirs:
         d = rec["d"]

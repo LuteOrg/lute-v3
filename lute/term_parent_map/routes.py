@@ -4,7 +4,7 @@ Mapping parents.
 
 import os
 import tempfile
-from flask import Blueprint, render_template, flash, redirect, send_file
+from flask import Blueprint, current_app, render_template, flash, redirect, send_file
 from wtforms import SelectField, ValidationError
 from wtforms.validators import DataRequired
 from flask_wtf import FlaskForm
@@ -85,30 +85,20 @@ def index():
 @bp.route("/export_book/<int:bookid>", methods=["GET"])
 def export_book(bookid):
     "Generate a file and return it."
-    with tempfile.NamedTemporaryFile(delete=True) as temp_file:
-        try:
-            book = db.session.get(Book, bookid)
-            export_unknown_terms(book, temp_file.name)
-            return send_file(
-                temp_file.name, as_attachment=True, download_name="unknown_terms.txt"
-            )
-        finally:
-            # temp_file will be deleted.
-            pass
+    outfile = os.path.join(current_app.env_config.temppath, "export_book.txt")
+    book = db.session.get(Book, bookid)
+    export_unknown_terms(book, outfile)
+    return send_file(outfile, as_attachment=True, download_name="unknown_terms.txt")
 
 
 @bp.route("/export_language/<int:languageid>", methods=["GET"])
 def export_language(languageid):
     "Generate a file and return it."
-    with tempfile.NamedTemporaryFile(delete=True) as temp_file:
-        try:
-            lang = db.session.get(Language, languageid)
-            export_terms_without_parents(lang, temp_file.name)
-            return send_file(
-                temp_file.name,
-                as_attachment=True,
-                download_name="terms_without_parents.txt",
-            )
-        finally:
-            # temp_file will be deleted.
-            pass
+    outfile = os.path.join(current_app.env_config.temppath, "export_lang.txt")
+    lang = db.session.get(Language, languageid)
+    export_terms_without_parents(lang, outfile)
+    return send_file(
+        outfile,
+        as_attachment=True,
+        download_name="terms_without_parents.txt",
+    )
