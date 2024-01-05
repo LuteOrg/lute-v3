@@ -74,6 +74,8 @@
         </div>
     </div>
 
+    <!-- <div class="definition-container"></div> -->
+
   </div>
 
   {% include "read/audio_player.html" %}
@@ -175,6 +177,17 @@
 </div>
 
 <script>
+  // function getTermDefinition(el) {
+  //   // elid = parseInt(el.data('wid'));
+  //   return $.ajax({
+  //     url: `/read/termpopup/${el}`,
+  //     type: 'get',
+  //     success: function(response) {
+  //       return response;
+  //     }
+  //   });
+  // }
+
   $(document).ready(function () {
     if (have_audio_file()) {
       // Don't actually load the source -- for some reason,
@@ -203,12 +216,70 @@
         !event.target.classList.contains("textitem"))
 
         readPaneRight.classList.remove("open-dict");
+        document.querySelector(".btm-margin-container").classList.remove("open-dict");
     });
+    
+
+    
+    // document.querySelectorAll(".textitem").forEach((texitem) => {
+    //   // textitem.addEventListener("click", function() {
+    //     const id = texitem.data('wid');
+    //     console.log(id);
+    //     const defText = getTermDefinition(id).then(response => {
+    //       console.log(response);
+    //       const textDefEl = document.createElement("div");
+    //       document.querySelector(".definition-container").appendChild(textDefEl);
+    //       textDefEl.innerHTML = response;
+    //     });
+    //     // tooltip_textitem_hover_content($(this), setContent);
+    //   // }
+    //   // )
+    // })
+
+    // const domObserver = new MutationObserver((mutationList, observer) => {
+    //   textItems = document.querySelectorAll("span.textitem");
+    //   const textDefElements = [];
+
+    //   textItems.forEach((item) => {
+    //     const id = parseInt(item.dataset.wid);
+    //     console.log(id);
+    //     const textDefEl = document.createElement("div");
+    //     textDefEl.style.display = "none";
+    //     document.querySelector(".definition-container").appendChild(textDefEl);
+    //     textDefEl.dataset.id = item.dataset.wid;
+    //     console.log(textDefEl);
+    //     const defText = getTermDefinition(id).then(response => {
+    //       // console.log(response);
+    //       // textDefElements.push(textDefEl);
+
+    //       textDefEl.innerHTML = response;
+
+    //     });
+
+    //     item.addEventListener("click", (e) => {
+    //       const idString = `div[data-id="${parseInt(item.dataset.wid)}"]`;
+    //       console.log(idString);
+    //       document.querySelector(idString).style.display = "block";
+    //     })
+    //   });
+
+    // });
+
+    // domObserver.observe(document.querySelector("#thetext"), {childList: true, subtree: true});
+
   });
+
+
+  // getTermDefinition(132).then(response => {
+  //   // response contains the full data
+  //   console.log(response); 
+  //   document.querySelector(".definition-container").innerHTML = response;
+  // });
 
   window.addEventListener("message", function(event) {
     if (event.data.event === "LuteTermFormOpened") {
       readPaneRight.classList.add("open-dict");
+      document.querySelector(".btm-margin-container").classList.add("open-dict")
     }
   });
 
@@ -371,6 +442,31 @@
 
         if (initial_page_load) {
           prepareTextInteractions();
+          // textItems = document.querySelectorAll("span.textitem");
+          // // const textDefElements = [];
+
+          // textItems.forEach((item) => {
+          //   const id = parseInt(item.dataset.wid);
+          //   // console.log(id);
+          //   const textDefEl = document.createElement("div");
+          //   textDefEl.style.display = "none";
+          //   document.querySelector(".definition-container").appendChild(textDefEl);
+          //   textDefEl.dataset.id = item.dataset.wid;
+          //   // console.log(textDefEl);
+          //   const defText = getTermDefinition(id).then(response => {
+          //     // console.log(response);
+          //     // textDefElements.push(textDefEl);
+
+          //     textDefEl.innerHTML = response;
+
+          //   });
+
+          //   item.addEventListener("click", (e) => {
+          //     const idString = `div[data-id="${parseInt(item.dataset.wid)}"]`;
+          //     // console.log(idString);
+          //     document.querySelector(idString).style.display = "block";
+          //   })
+          // });
         }
 
         // Magic hack for player source to load consistently

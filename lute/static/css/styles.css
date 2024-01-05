@@ -1152,7 +1152,7 @@ table.statsWordsRead th, td { padding: 5px; }
         top: 0;
         width: 100%;
         background: #fff;
-        height: 90px;
+        height: 5rem;
         z-index: 1000;
     }
 
@@ -1160,12 +1160,21 @@ table.statsWordsRead th, td { padding: 5px; }
         width: unset !important;
         /* padding-bottom: 1rem;
         border-bottom: 2px solid aliceblue; */
-        margin-top: 90px;
+        margin-top: 10rem;
     }
 
-    /* .btm-margin-container {
-        margin: 0 !important;
-    } */
+    .open-dict.btm-margin-container {
+        margin-top: calc(var(--player-height) + 50%) !important;
+    }
+
+    /* .definition-container { */
+        /* height: 5rem; */
+        /* /~ border-top: 2px solid aliceblue; ~/ */
+        /* border-bottom: 2px solid aliceblue; */
+        /* padding: 0.3rem 2.2rem; */
+        /* background-color: #fff; */
+        /* margin-top: 1rem; */
+    /* } */
 
     #read_pane_right {
         /* display: block;
@@ -1176,14 +1185,23 @@ table.statsWordsRead th, td { padding: 5px; }
         /* width: unset !important; */
         background-color: white;
         z-index: 1002;
-        transform: translateX(100%);
+        /* transform: translateX(100%); */
+        transform: translateY(100%);
         transition: transform 0.2s cubic-bezier(0.77,0.2,0.05,1.0);
         /* border-left: 4px solid #dbefff; */
+        width: 100% !important;
         height: 100vh !important; /* unset height set when player is sticky */
+        bottom: 0;
+        left: 0;
+        border-top: 4px solid #1c7bcf;
+    }
+
+    #read_pane_right::after {
+        display: none;
     }
 
     #read_pane_right.open-dict {
-        transform: translateX(0)
+        transform: translateY(50%)
     }
 
     /* #read_pane_right::after {
