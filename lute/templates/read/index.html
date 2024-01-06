@@ -177,16 +177,15 @@
 </div>
 
 <script>
-  // function getTermDefinition(el) {
-  //   // elid = parseInt(el.data('wid'));
-  //   return $.ajax({
-  //     url: `/read/termpopup/${el}`,
-  //     type: 'get',
-  //     success: function(response) {
-  //       return response;
-  //     }
-  //   });
-  // }
+  let mouseY;
+  let scrollY;
+  const mediaTablet = window.matchMedia("(max-width: 980px)");
+  const btmMarginCont = document.querySelector(".btm-margin-container");
+
+  document.addEventListener("click", (event) => {
+    mouseY = event.clientY;
+    scrollY = window.scrollY;
+  });
 
   $(document).ready(function () {
     if (have_audio_file()) {
@@ -206,80 +205,38 @@
       const menuBtn_clicked = event.target.closest(".hamburger-btn");
       const rightPaneClicked = event.target.closest("#read_pane_right");
       // const rightPaneClicked = event.target.closest(".dictframecontainer");
-      // console.log(event.target);
-      // console.log(event.target.parentNode);
+      //console.log(rightPaneClicked);
+      //console.log(event.target);
+      //console.log(event.target.parentNode);
       // if (event.target != menuBtn || event.target.parentNode != menuBtn) 
       if(!menu_clicked && !menuBtn_clicked)
         menu.classList.remove("open-menu");
-      if(!rightPaneClicked && 
-        event.target.parentNode != readPaneRight && 
-        !event.target.classList.contains("textitem"))
 
-        readPaneRight.classList.remove("open-dict");
-        document.querySelector(".btm-margin-container").classList.remove("open-dict");
+      // close rightPane if it's not click, it's children not clicked or a word is not clicked
+      if(!rightPaneClicked && event.target.parentNode != readPaneRight && !event.target.classList.contains("textitem")) {
+          //readPaneRight.style.transform = `translateY(100%)`; 
+          readPaneRight.classList.remove("open-dict");
+          btmMarginCont.classList.remove("open-dict");
+          readPaneRight.style.removeProperty("transform");
+          btmMarginCont.style.removeProperty("margin-top");
+          //document.querySelector(".btm-margin-container").style.marginTop = "calc(var(--player-height) + 30px)";
+        }
     });
-    
-
-    
-    // document.querySelectorAll(".textitem").forEach((texitem) => {
-    //   // textitem.addEventListener("click", function() {
-    //     const id = texitem.data('wid');
-    //     console.log(id);
-    //     const defText = getTermDefinition(id).then(response => {
-    //       console.log(response);
-    //       const textDefEl = document.createElement("div");
-    //       document.querySelector(".definition-container").appendChild(textDefEl);
-    //       textDefEl.innerHTML = response;
-    //     });
-    //     // tooltip_textitem_hover_content($(this), setContent);
-    //   // }
-    //   // )
-    // })
-
-    // const domObserver = new MutationObserver((mutationList, observer) => {
-    //   textItems = document.querySelectorAll("span.textitem");
-    //   const textDefElements = [];
-
-    //   textItems.forEach((item) => {
-    //     const id = parseInt(item.dataset.wid);
-    //     console.log(id);
-    //     const textDefEl = document.createElement("div");
-    //     textDefEl.style.display = "none";
-    //     document.querySelector(".definition-container").appendChild(textDefEl);
-    //     textDefEl.dataset.id = item.dataset.wid;
-    //     console.log(textDefEl);
-    //     const defText = getTermDefinition(id).then(response => {
-    //       // console.log(response);
-    //       // textDefElements.push(textDefEl);
-
-    //       textDefEl.innerHTML = response;
-
-    //     });
-
-    //     item.addEventListener("click", (e) => {
-    //       const idString = `div[data-id="${parseInt(item.dataset.wid)}"]`;
-    //       console.log(idString);
-    //       document.querySelector(idString).style.display = "block";
-    //     })
-    //   });
-
-    // });
-
-    // domObserver.observe(document.querySelector("#thetext"), {childList: true, subtree: true});
-
   });
 
-
-  // getTermDefinition(132).then(response => {
-  //   // response contains the full data
-  //   console.log(response); 
-  //   document.querySelector(".definition-container").innerHTML = response;
-  // });
-
+  // mobile view
   window.addEventListener("message", function(event) {
-    if (event.data.event === "LuteTermFormOpened") {
-      readPaneRight.classList.add("open-dict");
-      document.querySelector(".btm-margin-container").classList.add("open-dict")
+    if (event.data.event === "LuteTermFormOpened" && mediaTablet.matches) {
+        const viewportHeight = document.documentElement.clientHeight;
+        const mousePosPercent = mouseY / viewportHeight * 100;
+        readPaneRight.classList.add("open-dict");
+        btmMarginCont.classList.add("open-dict")
+        // move the rightPane to the mouse position + some offset
+        document.querySelector("#read_pane_right.open-dict").style.transform = `translateY(${Math.round(mousePosPercent) + 10}%)`;
+        // add margin to the bottom of readLeft so it's fully scrollable to the bottom when the dict is over text
+        document.querySelector(".open-dict.btm-margin-container").style.marginTop = `calc(${viewportHeight - mouseY + 30}px - var(--player-height))`;
+        // sometimes there's an unnecessary text scroll when clicking on a word. return to the previous scroll position
+        window.scrollTo(0, scrollY);
     }
   });
 
@@ -442,31 +399,6 @@
 
         if (initial_page_load) {
           prepareTextInteractions();
-          // textItems = document.querySelectorAll("span.textitem");
-          // // const textDefElements = [];
-
-          // textItems.forEach((item) => {
-          //   const id = parseInt(item.dataset.wid);
-          //   // console.log(id);
-          //   const textDefEl = document.createElement("div");
-          //   textDefEl.style.display = "none";
-          //   document.querySelector(".definition-container").appendChild(textDefEl);
-          //   textDefEl.dataset.id = item.dataset.wid;
-          //   // console.log(textDefEl);
-          //   const defText = getTermDefinition(id).then(response => {
-          //     // console.log(response);
-          //     // textDefElements.push(textDefEl);
-
-          //     textDefEl.innerHTML = response;
-
-          //   });
-
-          //   item.addEventListener("click", (e) => {
-          //     const idString = `div[data-id="${parseInt(item.dataset.wid)}"]`;
-          //     // console.log(idString);
-          //     document.querySelector(idString).style.display = "block";
-          //   })
-          // });
         }
 
         // Magic hack for player source to load consistently

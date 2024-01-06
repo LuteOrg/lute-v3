@@ -1,4 +1,3 @@
-const media900 = window.matchMedia("(max-width: 900px)");
 const readPaneContainer = document.querySelector("#read_pane_container");
 const readPaneLeft = document.querySelector("#read_pane_left");
 const player = document.querySelector("#player");
@@ -28,8 +27,8 @@ const bookmarkNextBtn = document.querySelector("#bkm-next-btn");
 var bookmarksArray = [];
 let lastPlayTime = null;
 let playerSticky = localStorage.getItem("player-sticky") ?? 0;
-// make player sticky on the bottom if option is set OR window width < 900px
-if (playerSticky != 0 || media900.matches) readPaneContainer.classList.add("sticky-player");
+// make player sticky on the bottom if option is set OR window width is tablet width
+if (playerSticky != 0 || mediaTablet.matches) readPaneContainer.classList.add("sticky-player");
 
 let jumpTimeBy = Number(rewindAmountOption.value);
 
