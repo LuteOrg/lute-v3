@@ -3,7 +3,7 @@
 let mouse_pos;
 let widthDefault;
 let trHeightDefault;
-const borderWidth = 4;
+const borderWidth = 30; // drag click area is actually dependent on the pseudo element width. this is arbitrary high value
 const wordFrame = document.getElementById("wordframeid");
 const dictFrame = document.getElementById("dictframeid");
 const dictFrameCont = document.querySelector(".dictframecontainer");
@@ -51,6 +51,29 @@ function resizeRow(e){
   localStorage.setItem("trHeight", wordFrameHeight);
 }
 
+function resizePaneRight(e) {
+  const dy = mouse_pos - e.y;
+  mouse_pos = e.y;
+
+  const currentTy = parseFloat(readPaneRight.style.transform.split("(")[1].split(")")[0]);
+  readPaneRight.style.transform = `translateY(${currentTy - (dy / document.documentElement.clientHeight * 100)}%)`;
+  e.preventDefault();
+}
+
+if (mediaTablet.matches) {
+  readPaneRight.addEventListener("mousedown", function(e){
+  if (e.offsetY < borderWidth) {
+    // if there's transition animation dragging is not smooth.
+    // get's reverted back on document.mouseup below
+    readPaneRight.style.transition = "unset";
+    setIFrameStatus("none");
+    mouse_pos = e.y;
+    document.addEventListener("mousemove", resizePaneRight);
+    e.preventDefault();
+  }
+});
+}
+
 readPaneRight.addEventListener("mousedown", function(e){
   if (e.offsetX < borderWidth) {
     setIFrameStatus("none");
@@ -76,8 +99,12 @@ readPaneRight.addEventListener("dblclick", function(e){
 });
 
 dictFrameCont.addEventListener("mousedown", function(e){
+  //if not stopPropagation resizing dictcontainer triggers parent event which resizes
+  //readPaneRight at the same time (for @media 900)
+  e.stopPropagation(); 
+  setIFrameStatus("none");
+  // if (mediaTablet.matches) {}
   if (e.offsetY < borderWidth) {
-    setIFrameStatus("none");
     mouse_pos = e.y;
     document.addEventListener("mousemove", resizeRow);
     e.preventDefault();
@@ -98,6 +125,11 @@ document.addEventListener("mouseup", function(){
   document.removeEventListener("mousemove", resizeCol);
   document.removeEventListener("mousemove", resizeRow);
   setIFrameStatus("unset");
+
+  if (mediaTablet.matches) {
+    document.removeEventListener("mousemove", resizePaneRight);
+    readPaneRight.style.removeProperty("transition");
+  }
 });
 
 // hide horizontal line
