@@ -60,8 +60,10 @@ def _get_file_content(filefielddata):
     ext = (ext or "").lower()
     if ext == ".txt":
         return service.get_textfile_content(filefielddata)
-    if ext == ".epub":
+    elif ext == ".epub":
         return service.get_epub_content(filefielddata)
+    elif ext == ".pdf":
+        return service.get_pdf_content_from_form(filefielddata)
     raise ValueError(f'Unknown file extension "{ext}"')
 
 

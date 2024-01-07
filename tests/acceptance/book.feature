@@ -43,6 +43,18 @@ Feature: Books and stats are available
         Given a Spanish book "Hola" from file invalid.epub
         Then the page contains "Could not parse invalid.epub"
 
+    Scenario: I can import a PDF file.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file Hola.pdf
+        Then the page title is Reading "Hola"
+        And the reading pane shows:
+            Tengo/ /un/ /amigo/.
+
+    Scenario: Invalid PDF files are rejected.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file invalid.pdf
+        Then the page contains "Could not parse invalid.pdf"
+
     Scenario: Books and stats are shown on the first page.
         Given I visit "/"
         Given a Spanish book "Hola" with content:
