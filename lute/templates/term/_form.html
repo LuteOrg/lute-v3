@@ -4,96 +4,76 @@
 {% endfor %}
 {% endfor %}
 
-<form name="term_form" method="POST">
-  {{ form.hidden_tag() }}
-
-  <table id="term">
-  <tbody>
-
-    <tr id="languageSel"
+<div id="term-form-container">
+  <form id="term-form" name="term_form" method="POST">
+    {{ form.hidden_tag() }}
+    <div id="term">
+      <div id="languageSel"
         {% if term.language_id is none and term.language is none %}
         {# show the language select box. #}
         {% else %}
         style="display:none;"
         {% endif %}>
-      <td>{{ form.language_id(class="form-control") }}</td>
-    </tr>
+        {{ form.language_id(class="form-control") }}
+      </div>
+  
+      {{ form.original_text }}
 
-    {{ form.original_text }}
-
-    <tr>
-      <td>
+      <div id="def-container">
         {{ form.text(class="form-control", value=(form.original_text.data or '')) }}
-      </td>
-      <td style="white-space: nowrap;">
-        <img src="{{ url_for('static', filename='icn/external.png') }}" title="Lookup" onclick="do_term_lookup()" />
-        <img src="{{ url_for('static', filename='icn/eye.png') }}" title="Images" onclick="do_image_lookup()" />
-      </td>
-    </tr>
+        <div class="term-element-box">
+          <img src="{{ url_for('static', filename='icn/eye.png') }}" title="Images" onclick="do_image_lookup()" />
+          <img src="{{ url_for('static', filename='icn/external.png') }}" title="Lookup" onclick="do_term_lookup()" />
+        </div>
+      </div>
 
-    {# Parents.  During setup this is replaced by tag-it. #}
-    <tr>
-      <td>
+      {# Parents.  During setup this is replaced by tag-it. #}
+      <div>
         <ul id="parentslist" class="tags nomarginblock shorttaglist">
           {% for p in form.parents %}
           <li>{{ p.object_data }}</li>
           {% endfor %}
         </ul>
-      </td>
-    </tr>
-
-    <tr {% if hide_pronunciation %}style="display:none;"{% endif %}>
-      <td>
+      </div>
+  
+      <div {% if hide_pronunciation %}style="display:none;"{% endif %}>
         {{ form.romanization(class="form-control") }}
-      </td>
-    </tr>
+      </div>
 
-    <tr>
-      <td>{{ form.translation }}</td>
-      <td><img class="zoomableTermImage" id="term_image" src="{{ form.current_image.object_data or '' }}" width="50px"/></td>
-    </tr>
+      <div id="translation-container">
+        <div>{{ form.translation }}</div>
+        <div>
+          {% if term.current_image %}
+          <img class="zoomableTermImage" id="term_image" src="{{ form.current_image.object_data or '' }}"/>
+          {% endif %}
+        </div>
+      </div>
 
-    <tr>
-      <td>
-        {{ form.status(class="form-control") }}
-      </td>
-    </tr>
+      <div>{{ form.status(class="form-control") }}</div>
 
-    <tr>
-      <td>
-        {{ form.current_image(class="form-control") }}
-      </td>
-    </tr>
+      <div style="display:none;">{{ form.current_image(class="form-control") }}</div>
 
-    {# Tags li entries are managed by tagit. #}
-    <tr>
-      <td>
+      {# Tags li entries are managed by tagit. #}
+      <div>
         <ul id="termtagslist" class="tags nomarginblock shorttaglist">
           {% for t in form.term_tags %}
           <li>{{ t.object_data }}</li>
           {% endfor %}
         </ul>
-      </td>
-    </tr>
+      </div>
 
-    <tr>
-      <td>
-        <div style="float: left">
-          <a href="" onclick="show_term_sentences(); return false;">Sentences</a>
-        </div>
-        <div style="float: right">
+      <div id="term-button-container">
+        <a href="" onclick="show_term_sentences(); return false;">Sentences</a>
+        <div class="term-element-box">
           {% if term.id %}
-          <button id="delete" type="button" class="btn" onclick="deleteTerm()" style="margin-right: 5px;">Delete</button>
+          <button id="delete" type="button" class="btn" onclick="deleteTerm()">Delete</button>
           {% endif %}
           <button id="submit" type="submit" class="btn btn-primary">Save</button>
         </div>
-      </td>
-    </tr>
-
-  </tbody>
-  </table>
-
-</form>
+      </div>
+    </div>
+  </form>
+</div>
 
 
 <script type="text/javascript">
@@ -253,9 +233,6 @@
     setup_parent_Tagit();
     setup_term_tags_Tagit();
 
-    // Approx good size for the text area:
-    $('#translation').css({'width': '500px', 'height': '43px'});
-
     // Setup complete, can now start monitoring form.
     monitor_form = true;
 
@@ -281,7 +258,7 @@
     window.open(
       url,
       'otherwin',
-      'width=800, height=400, scrollbars=yes, menubar=no, resizable=yes, status=no'
+      //'width=800, height=400, scrollbars=yes, menubar=no, resizable=yes, status=no'
     );
   };
 
