@@ -112,7 +112,9 @@ def _main():
         help="Path to override config file.  Uses lute/config/config.yml if not set.",
     )
     parser.add_argument(
-        "--upgrade", action="store_true", help="Upgrade to latest version"
+        "--upgrade",
+        action="store_true",
+        help="Upgrade to latest version (doesn't work with docker)",
     )
 
     try:
