@@ -8,10 +8,13 @@ e.g.
 python -m lute.main --port 5001
 """
 
-import os
 import argparse
-import shutil
 import logging
+import os
+import shutil
+import subprocess
+import sys
+
 from waitress import serve
 from lute.app_factory import create_app
 from lute.config.app_config import AppConfig
@@ -99,7 +102,7 @@ def _start(args):
     serve(app, host="0.0.0.0", port=args.port)
 
 
-if __name__ == "__main__":
+def _main():
     parser = argparse.ArgumentParser(description="Start lute.")
     parser.add_argument(
         "--port", type=int, default=5000, help="Port number (default: 5000)"
@@ -108,8 +111,24 @@ if __name__ == "__main__":
         "--config",
         help="Path to override config file.  Uses lute/config/config.yml if not set.",
     )
+    parser.add_argument(
+        "--upgrade", action="store_true", help="Upgrade to latest version"
+    )
+
     try:
-        _start(parser.parse_args())
+        args = parser.parse_args()
+        if args.upgrade:
+            update_command = [
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "--upgrade",
+                "lute3",
+            ]
+            subprocess.run(update_command, check=True)
+        else:
+            _start(parser.parse_args())
     except Exception as e:  # pylint: disable=broad-exception-caught
         print("\n")
         print("-" * 50)
@@ -117,3 +136,7 @@ if __name__ == "__main__":
         print(e)
         print("Please try again, or report an issue on GitHub.")
         print("-" * 50)
+
+
+if __name__ == "__main__":
+    _main()
