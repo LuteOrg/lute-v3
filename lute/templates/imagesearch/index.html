@@ -44,6 +44,9 @@
       var el = fr.document.getElementById('current_image');
       el.value = filename;
       const img = fr.document.getElementById('term_image');
+      // image block initially has no size to not take up space
+      img.style.width = "40px";
+      img.style.gridColumn = "-1";
 
       // Ugly hack: we have to remove the .jpeg at the end, because
       // Symfony doesn't handle params with periods.
