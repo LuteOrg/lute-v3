@@ -1,9 +1,8 @@
 body {
-  background-color: #121212; /* black paper */
+  --background-color: #121212;
+  background-color: var(--background-color); /* black paper */
   color: #F3F4F4; /* grey font */
 }
-
-#reading_menu { background-color: #121212; }
 
 .flash-notice {
   background-color: #7a3d58; /* pink highlight */
@@ -35,25 +34,25 @@ a:hover {
 
 input[type="text"] {
     border-color: #c4c8ce; /* light grey */
-    background-color: #121212; /* black */
+    background-color: var(--background-color); /* black */
     color: #c4c8ce; /* light grey font */
 }
 
 .ui-widget-content {
     border-color: #c4c8ce; /* light grey */
-    background-color: #121212; /* black */
+    background-color: var(--background-color); /* black */
     color: #c4c8ce; /* light grey font */
 }
 
 textarea {
     border-color: #c4c8ce; /* light grey */
-    background-color: #121212; /* black */
+    background-color: var(--background-color); /* black */
     color: #c4c8ce; /* light grey font */
 }
 
 .sub-menu {
     border-color: #c4c8ce; /* light grey */
-    background-color: #121212; /* black */
+    background-color: var(--background-color); /* black */
     color: #c4c8ce; /* light grey font */
 }
 

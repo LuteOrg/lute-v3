@@ -1,9 +1,8 @@
 body {
-  background-color: #48484a; /* dark grey paper */
+  --background-color: #48484a;
+  background-color: var(--background-color); /* dark grey paper */
   color: #c4c8ce; /* light grey font */
 }
-
-#reading_menu { background-color: #48484a; }
 
 .flash-notice {
   background-color: #b46b7a;
@@ -35,7 +34,7 @@ a:hover {
 
 div#thetext p { line-height: 1.5; }
 span.textitem { font-family: Georgia; color: #c4c8ce;}
-span.status0 { background-color: #48484a; color: #D5FFFF; }
+span.status0 { background-color: var(--background-color); color: #D5FFFF; }
 span.status1 { background-color: #b46b7a; color: #eff1f2; } /* pink highlight */
 span.status2 { background-color: #988542; color: #eff1f2; } /* yellow highlight */
 span.status3 { background-color: #699859; color: #eff1f2; } /* green highlight */
