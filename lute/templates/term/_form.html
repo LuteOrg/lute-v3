@@ -42,16 +42,15 @@
 
       <div id="translation-container">
         <div>{{ form.translation }}</div>
-        <div>
-          {% if term.current_image %}
-          <img class="zoomableTermImage" id="term_image" src="{{ form.current_image.object_data or '' }}"/>
-          {% endif %}
-        </div>
+        <img {% if term.current_image %}style="grid-column: -1; width: 40px"{% endif %} 
+        class="zoomableTermImage" 
+        id="term_image" 
+        src="{{ form.current_image.object_data or '' }}"/>
       </div>
 
       <div>{{ form.status(class="form-control") }}</div>
 
-      <div style="display:none;">{{ form.current_image(class="form-control") }}</div>
+      <div>{{ form.current_image(class="form-control") }}</div>
 
       {# Tags li entries are managed by tagit. #}
       <div>
