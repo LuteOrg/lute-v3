@@ -146,6 +146,7 @@
 </div>
 
 <div id="read_pane_right">
+  <button class="close-btn read-pane-right-close-btn" onclick="closeRightPane()"></button>
   <div class="wordframecontainer">
   <iframe
     name="wordframe"
@@ -180,12 +181,23 @@
   let mouseY;
   let scrollY;
   const mediaTablet = window.matchMedia("(max-width: 980px)");
+  const readPaneRight = document.getElementById("read_pane_right");
   const btmMarginCont = document.querySelector(".btm-margin-container");
 
   document.addEventListener("click", (event) => {
     mouseY = event.clientY;
     scrollY = window.scrollY;
   });
+
+  // fixes the "bug" where if right pane is opened in mobile view and after the screen is resized up,
+  // right pane doesn't translate up to 0 because of inline transform property
+  // this one is not super important
+  // because the mobile size won't be resized to a desktop size in a real use case
+  mediaTablet.addEventListener("change", function() {
+    if (!mediaTablet.matches) {
+      readPaneRight.style.removeProperty("transform");
+    }
+  })
 
   $(document).ready(function () {
     if (have_audio_file()) {
@@ -214,12 +226,7 @@
 
       // close rightPane if it's not click, it's children not clicked or a word is not clicked
       if(!rightPaneClicked && event.target.parentNode != readPaneRight && !event.target.classList.contains("textitem")) {
-          //readPaneRight.style.transform = `translateY(100%)`; 
-          readPaneRight.classList.remove("open-dict");
-          btmMarginCont.classList.remove("open-dict");
-          readPaneRight.style.removeProperty("transform");
-          btmMarginCont.style.removeProperty("margin-top");
-          //document.querySelector(".btm-margin-container").style.marginTop = "calc(var(--player-height) + 30px)";
+          closeRightPane();
         }
     });
   });
@@ -229,12 +236,13 @@
     if (event.data.event === "LuteTermFormOpened" && mediaTablet.matches) {
         const viewportHeight = document.documentElement.clientHeight;
         const mousePosPercent = mouseY / viewportHeight * 100;
-        readPaneRight.classList.add("open-dict");
-        btmMarginCont.classList.add("open-dict")
         // move the rightPane to the mouse position + some offset
+        readPaneRight.classList.add("open-dict");
+        btmMarginCont.classList.add("open-dict");
         document.querySelector("#read_pane_right.open-dict").style.transform = `translateY(${Math.round(mousePosPercent) + 10}%)`;
+        readPaneRight.style.opacity = "1";
         // add margin to the bottom of readLeft so it's fully scrollable to the bottom when the dict is over text
-        document.querySelector(".open-dict.btm-margin-container").style.marginTop = `calc(${viewportHeight - mouseY + 30}px - var(--player-height))`;
+        document.querySelector(".open-dict.btm-margin-container").style.marginTop = `calc(${viewportHeight - mouseY + 70}px - var(--player-height))`;
         // sometimes there's an unnecessary text scroll when clicking on a word. return to the previous scroll position
         window.scrollTo(0, scrollY);
     }
@@ -422,6 +430,14 @@
     menu.classList.add("open-menu");
 
     // disableScroll(true);
+  }
+
+  function closeRightPane() {
+      readPaneRight.classList.remove("open-dict");
+      btmMarginCont.classList.remove("open-dict");
+      btmMarginCont.style.removeProperty("margin-top");
+      readPaneRight.style.removeProperty("transform");
+      readPaneRight.style.removeProperty("opacity");
   }
 
   // function disableScroll(disable) {
