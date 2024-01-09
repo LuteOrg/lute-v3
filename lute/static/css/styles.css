@@ -1136,3 +1136,24 @@ ul.form-control label {
 .btn {
     padding: 0.3rem 0.8rem;
 }
+
+/* SETTINGS TABLE */
+#backup_dir, 
+#mecab_path, 
+#custom_styles {
+    width: 100%;
+}
+
+#custom_styles {
+    resize: vertical;
+    height: 100px;
+    font-size: 1rem;
+}
+
+#current_theme, 
+#japanese_reading, 
+#backup_count, 
+#test_mecab_btn {
+    width: 8rem;
+    box-sizing: border-box;
+}
