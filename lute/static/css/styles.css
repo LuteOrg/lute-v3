@@ -4,8 +4,10 @@
  */
 
 body
-{
-    background-color: #FFFFFF;
+{   
+    --background-color: #fff;
+    
+    background-color: var(--background-color);
     color: #000000;
     font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
     margin: 0;
@@ -232,6 +234,10 @@ div#read_pane_right {
     top: 0;
 }
 
+.read-pane-right-close-btn {
+    display: none;
+}
+
 .reading_header_container {
     display: grid;
     grid-template-columns: min-content 1fr;
@@ -250,7 +256,7 @@ div#read_pane_right {
 }
 
 #reading-header {
-    /* background-color: aliceblue; */
+    background-color: var(--background-color);
     /* padding: 0 1.5rem 1.5rem 1.5rem; */
     margin-bottom: 2rem;
 }
@@ -307,15 +313,15 @@ span.hamburger {
     
   padding: 0;
   margin: 0;
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
-  z-index: 1000;
-  height: 100%;
+  z-index: 1001; /* higher than audio and header */
+  height: 100vh;
   border-right: 4px solid #a9cfef;
   box-shadow: 1px 0 3px 2px #9393933d;
   box-sizing: border-box;
-  background-color: #FFFFFF;
+  background-color: var(--background-color);
 
   transform-origin: 0% 0%;
   transform: translate(-100%, 0);
@@ -344,7 +350,7 @@ span.hamburger {
 }
 
 #reading_menu .menu-list-item-text:hover,
-.reading-menu-close-btn:hover,
+.close-btn:hover,
 .text-options-button:hover {
     background-color: #d5e9fa;
     cursor: pointer;
@@ -355,7 +361,7 @@ span.hamburger {
   height: 18px;
 }
 
-.reading-menu-close-btn {
+.close-btn {
   background-image: url("/static/icn/close.svg");
   background-position: center;
   background-repeat: no-repeat;
@@ -365,9 +371,12 @@ span.hamburger {
   border-radius: 5px;
   border: none;
   background-size: 42.4%;
-  margin-left: 5.4rem;
   background-color: transparent;
   cursor: pointer;
+}
+
+.reading-menu-close-btn {
+  margin-left: 5.4rem;
 }
 
 #reading_menu .text-options-container {
@@ -443,17 +452,9 @@ input[type=text]
     margin: 0;
 }
 
-#thetexttitle {
-    /* margin-left: 20px; */
-    /* margin-right: 20px; */
-    /* padding-right: 2rem; */
-    padding: 0 2.2rem;
-}
-
+#thetexttitle,
 div#thetext {
-    /* margin-left: 20px; */
-    /* margin-right: 20px; */
-    /* padding-right: 2rem; */
+    padding: 0 2.2rem;
     padding: 0 2.2rem;
 }
 
@@ -771,6 +772,7 @@ img
 /* Widening the tooltip. */
 div.ui-tooltip {
     max-width: 400px !important;
+    z-index: 888; /*less than audio, header and side menu */
 }
 
 .tooltip-image {
@@ -992,8 +994,10 @@ table.statsWordsRead th, td { padding: 5px; }
 
 .dictframecontainer {
     position: relative;
-    overflow: hidden; /* contents overflow (over audio player) if height is too small*/
-    opacity: 0; /*to hide the after element. easier this way */
+    /* overflow: hidden; contents overflow (over audio player) if height is too small */
+    /* there's no much point in hiding it. because after first term save it doesn't get hidden again anyway */
+    /* disabling it for now. */
+    /*opacity: 0; to hide the after element. easier this way */
 }
 
 /* status stats */
@@ -1213,3 +1217,195 @@ table.statsWordsRead th, td { padding: 5px; }
 /* #booktable_wrapper { */
     /* margin-top: 1.8rem; */
 /* } */
+
+@media screen and (max-width: 980px) {
+
+    #thetexttitle,
+    div#thetext {
+        padding: 0 3.2rem;
+        padding: 0 3.2rem;
+    }
+
+    #reading_menu li a {
+        font-size: 1.6rem;
+        gap: 0.9rem;
+    }
+
+    .reading_menu_logo_container {
+        margin-bottom: 2.2rem;
+    }
+
+    .menu-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .text-options-button {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    .text-options-btn-container:nth-child(3),
+    .text-options-btn-container:nth-child(4) {
+        display: none;
+    }
+
+    .text-options-container {
+        gap: 0.3rem !important;
+        grid-template-columns: max-content max-content !important;
+    }
+
+    .close-btn {
+        padding: 1.3rem;
+    }
+
+    .read-pane-right-close-btn {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 50px;
+        transform: translateY(-100%);
+        background-image: url("/static/icn/close-white.svg");
+        background-color: #79b7e7;
+        border-top-left-radius: 0;
+        
+        display: block;
+    }
+
+    .read-pane-right-close-btn:hover {
+        background-color: #79b7e7;
+    }
+
+    #reading-header {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: var(--background-color);
+        height: 7.5rem;
+        z-index: 1000;
+        box-shadow: 0 0 12px 0 #dfdfdf;
+    }
+
+    #read_pane_left {
+        width: unset !important;
+        margin-top: 10rem;
+    }
+
+    .reading_header_container {
+        align-items: end;
+    }
+
+    .reading_header_left {
+        align-items: flex-end;
+    }
+
+    div#read_pane_right {
+        background-color: white;
+        z-index: 1002;
+        transform: translateY(100%);
+        /* transition: all creates issues for drag resizing (laggy, slow)*/
+        transition: transform 0.2s cubic-bezier(0.77,0.2,0.05,1.0), 
+                    opacity 0.2s cubic-bezier(0.77,0.2,0.05,1.0);
+        width: 100% !important;
+        height: 100vh !important; /* unset height set when player is sticky */
+        bottom: 0;
+        left: 0;
+        opacity: 0;
+    }
+
+    #read_pane_right::after {
+        content: '';
+        background-color: #79b7e7;
+        position: absolute;
+        left: 0;
+        top: 0;
+        transform: translateY(-50%);
+        width: 100%;
+        height: 6px;
+        cursor: row-resize;
+    }
+
+    /*drag button*/
+    #read_pane_right::before {
+        content: '';
+        background-color: #79b7e7;
+        position: absolute;
+        right: 0;
+        top: 0;
+        transform: translateY(-100%);
+        width: 50px;
+        height: 42px;
+        cursor: row-resize;
+        border-top-left-radius: 5px;
+        background-image: url("/static/icn/drag-handle.svg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 91%;
+    }
+
+    .dictframecontainer::after {
+        background-color: #79b7e7;
+        height: 6px;
+    }
+
+    #read-slider {
+        height: 1.7rem;
+    }
+
+    #read-slider::-moz-range-thumb {
+        width: 2.2rem;
+        height: 2rem;
+    }
+
+    #read-slider::-webkit-slider-thumb {
+        width: 2.2rem;
+        height: 2rem;
+    }
+
+    .reading_header_mid_top {
+        margin-left: 2.3rem;
+        margin-right: 2.3rem;
+    }
+
+    .read_page_nav {
+        font-size: 2.2rem;
+    }
+
+    #page_indicator,
+    #headertexttitle {
+        font-size: 1.1rem;
+    }
+
+    span.hamburger {
+        width: 24px;
+        height: 5px;
+    }
+
+    .lutelogo_small {
+        width: 70px;
+    }
+
+    #booktable td:nth-child(2),
+    #booktable th:nth-child(2),
+    #booktable td:nth-child(3),
+    #booktable th:nth-child(3) {
+        display: none;
+    }
+
+    table#term {
+        width: 100% !important;
+    }
+
+    /* form[name="term_form"] { */
+        /* font-size: 1.6rem; */
+    /* } */
+
+    #termtagslist {
+        margin-bottom: 1rem;
+    }
+
+    .btn {
+        font-size: inherit;
+    }
+}

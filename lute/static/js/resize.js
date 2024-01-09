@@ -3,11 +3,11 @@
 let mouse_pos;
 let widthDefault;
 let trHeightDefault;
-const borderWidth = 4;
+const borderWidth = 30; // drag click area is actually dependent on the pseudo element width. this is arbitrary high value
 const wordFrame = document.getElementById("wordframeid");
 const dictFrame = document.getElementById("dictframeid");
 const dictFrameCont = document.querySelector(".dictframecontainer");
-const readPaneRight = document.querySelector("#read_pane_right");
+// const readPaneRight = document.querySelector("#read_pane_right");
 
 applyInitialPaneSizes();
 
@@ -51,6 +51,29 @@ function resizeRow(e){
   localStorage.setItem("trHeight", wordFrameHeight);
 }
 
+function resizePaneRight(e) {
+  const dy = mouse_pos - e.y;
+  mouse_pos = e.y;
+
+  const currentTy = parseFloat(readPaneRight.style.transform.split("(")[1].split(")")[0]);
+  let resultTy = currentTy - (dy / document.documentElement.clientHeight * 100);
+  resultTy = clamp(resultTy, 5, 95);
+  readPaneRight.style.transform = `translateY(${resultTy}%)`;
+  e.preventDefault();
+}
+
+readPaneRight.addEventListener("mousedown", function(e){
+if (e.offsetY < borderWidth) {
+  // if there's transition animation dragging is not smooth.
+  // get's reverted back on document.mouseup below
+  readPaneRight.style.transition = "unset";
+  setIFrameStatus("none");
+  mouse_pos = e.y;
+  document.addEventListener("mousemove", resizePaneRight);
+  e.preventDefault();
+}
+});
+
 readPaneRight.addEventListener("mousedown", function(e){
   if (e.offsetX < borderWidth) {
     setIFrameStatus("none");
@@ -76,8 +99,11 @@ readPaneRight.addEventListener("dblclick", function(e){
 });
 
 dictFrameCont.addEventListener("mousedown", function(e){
+  //if not stopPropagation resizing dictcontainer triggers parent event which resizes
+  //readPaneRight at the same time (for @media 900)
+  e.stopPropagation(); 
+  setIFrameStatus("none");
   if (e.offsetY < borderWidth) {
-    setIFrameStatus("none");
     mouse_pos = e.y;
     document.addEventListener("mousemove", resizeRow);
     e.preventDefault();
@@ -98,14 +124,17 @@ document.addEventListener("mouseup", function(){
   document.removeEventListener("mousemove", resizeCol);
   document.removeEventListener("mousemove", resizeRow);
   setIFrameStatus("unset");
+
+  document.removeEventListener("mousemove", resizePaneRight);
+  readPaneRight.style.removeProperty("transition");
 });
 
-// hide horizontal line
-window.addEventListener("message", function(event) {
-  if (event.data.event === "LuteTermFormOpened") {
-    dictFrameCont.style.opacity = "1";
-  }
-});
+// hide horizontal line (turned off opacity=0 in the css for now. comments over there)
+// window.addEventListener("message", function(event) {
+//   if (event.data.event === "LuteTermFormOpened") {
+//     dictFrameCont.style.opacity = "1";
+//   }
+// });
 
 // if the iframes are clickable mousemove doesn't work correctly
 function setIFrameStatus(status) {

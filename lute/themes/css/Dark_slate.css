@@ -14,8 +14,6 @@ body {
   color: var(--light-grey); /* light grey font */
 }
 
-#reading_menu { background-color: var(--background-color); }
-
 .flash-notice {
   background-color: #b46b7a;
 }

@@ -11,8 +11,6 @@ body {
   color: #262523; /* dark grey font */
 }
 
- #reading_menu { background-color: var(--background-color); }
-
  div#thetext p { line-height: 1.5; }
  span.textitem { font-family: Georgia; color: #262523; }
  /* span.status0 { background-color: transparent; } */

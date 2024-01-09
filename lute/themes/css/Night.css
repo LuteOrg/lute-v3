@@ -13,8 +13,6 @@ body {
   color: #F3F4F4; /* grey font */
 }
 
-#reading_menu { background-color: var(--background-color); }
-
 .flash-notice {
   background-color: #7a3d58; /* pink highlight */
 }
