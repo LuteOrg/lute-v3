@@ -13,8 +13,6 @@ body
     background-color: #FFFFFF;
     color: #000000;
     font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
-    /* margin: 0; */
-    /* padding: 0; */
 }
 
 /* Main container div for Lute site content. */
@@ -246,8 +244,6 @@ div#read_pane_right {
 }
 
 #reading-header {
-    /* background-color: aliceblue; */
-    /* padding: 0 1.5rem 1.5rem 1.5rem; */
     margin-bottom: 2rem;
 }
 
@@ -415,18 +411,6 @@ span.hamburger {
 div#reading-footer span {
     margin: 5px;
 }
-
-/* input[type=text] */
-/* { */
-    /* font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu; */
-    /* border: 1px solid #C6C6C6; */
-    /* padding: 3px; */
-/* } */
-
-/* ::placeholder { /~ Chrome, Firefox, Opera, Safari 10.1+ ~/ */
-    /* color: #D8D8D8; */
-    /* opacity: 1; /~ Firefox ~/ */
-/* } */
 
 .texttitlecontainer {
     overflow: hidden;
@@ -993,28 +977,6 @@ table.statsWordsRead th, td { padding: 5px; }
 /* .read-bookmark-buttons-container {
     display: flex;
 } */
-
-/* thead th:nth-child(1), */
-/* tbody td:nth-child(1), */
-/* #booktable_length, */
-/* #booktable_info { */
-    /* padding-left: 3rem !important; */
-/* } */
-
-/* #booktable_paginate, */
-/* #booktable_filter { */
-    /* padding-right: 3rem !important; */
-/* } */
-
-/* #booktable { */
-    /* /~ margin doesn't work ~/ */
-    /* padding-top: 1rem; */
-/* } */
-
-/* #booktable_wrapper { */
-    /* margin-top: 1.8rem; */
-/* } */
-
 
 /* TERM FORM STYLES */
 
