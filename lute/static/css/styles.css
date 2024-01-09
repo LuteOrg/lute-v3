@@ -985,6 +985,19 @@ table.statsWordsRead th, td { padding: 5px; }
     padding-bottom: 1rem;
 }
 
+#text,
+#translation,
+#romanization,
+ul.tagit {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+    padding: 0.2rem 0.2rem;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    font-size: .9rem;
+}
+
 #translation-container {
     display: grid;
     grid-template-columns: 1fr;
@@ -993,12 +1006,7 @@ table.statsWordsRead th, td { padding: 5px; }
 
 #translation {
     resize: vertical;
-    border: 1px solid rgb(221, 221, 221);
     height: 80px;
-    width: 100%;
-    box-sizing: border-box;
-    font: inherit;
-    padding: 0.2rem 0.2rem;
 }
 
 #term {
@@ -1019,18 +1027,7 @@ table.statsWordsRead th, td { padding: 5px; }
 }
 
 #text {
-    padding: 0.2rem 0.2rem;
-    border: 1px solid #dddddd;
     flex: 1;
-    font: inherit;
-    width: 100%;
-}
-
-#text,
-#translation,
-ul.tagit {
-    border-radius: 3px;
-    font-family: inherit;
 }
 
 ::placeholder {
@@ -1055,12 +1052,21 @@ ul.tagit li.tagit-new {
     padding: 0;
 }
 
+ul.tagit li.tagit-choice {
+  display: flex;
+  align-items: center;
+}
+
+ul.tagit .tagit-label {
+  font-size: 0.8rem;
+}
+
 ul.tagit li.tagit-choice-editable {
     flex-shrink: 0;
 }
 
-#term input[placeholder] {
-    padding: 0.3rem 0.3rem;
+#term .ui-autocomplete-input {
+    padding: 0.2rem 0.2rem;
     width: 70px;
 }
 
