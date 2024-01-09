@@ -22,8 +22,8 @@
       <div id="def-container">
         {{ form.text(class="form-control", value=(form.original_text.data or '')) }}
         <div class="term-element-box">
-          <img src="{{ url_for('static', filename='icn/eye.png') }}" title="Images" onclick="do_image_lookup()" />
           <img src="{{ url_for('static', filename='icn/external.png') }}" title="Lookup" onclick="do_term_lookup()" />
+          <img src="{{ url_for('static', filename='icn/eye.png') }}" title="Images" onclick="do_image_lookup()" />
         </div>
       </div>
 
