@@ -434,6 +434,10 @@ div#reading-footer span {
     margin: 0;
 }
 
+#thetexttitle {
+    margin-bottom: 1rem;
+}
+
 #thetexttitle,
 div#thetext {
     padding: 0 2.2rem;
@@ -989,7 +993,7 @@ table.statsWordsRead th, td { padding: 5px; }
 /* TERM FORM STYLES */
 
 #term-form-container {
-    padding: 1.6rem;
+    padding: 1.5rem;
     padding-bottom: 1rem;
 }
 
@@ -1014,13 +1018,14 @@ ul.tagit {
 
 #translation {
     resize: vertical;
-    height: 80px;
+    height: 50px;
+    min-height: 50px;
 }
 
 #term {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.2rem;
 }
 
 #def-container {
@@ -1112,7 +1117,8 @@ ul.form-control label {
 }
 
 .btn {
-    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.7rem;
 }
 
 /* SETTINGS TABLE */
@@ -1313,17 +1319,5 @@ ul.form-control label {
 
     table#term {
         width: 100% !important;
-    }
-
-    /* form[name="term_form"] { */
-        /* font-size: 1.6rem; */
-    /* } */
-
-    #termtagslist {
-        margin-bottom: 1rem;
-    }
-
-    .btn {
-        font-size: inherit;
     }
 }
