@@ -27,7 +27,8 @@ const bookmarkNextBtn = document.querySelector("#bkm-next-btn");
 var bookmarksArray = [];
 let lastPlayTime = null;
 let playerSticky = localStorage.getItem("player-sticky") ?? 0;
-if (playerSticky != 0) readPaneContainer.classList.add("sticky-player");
+// make player sticky on the bottom if option is set OR window width is tablet width
+if (playerSticky != 0 || mediaTablet.matches) readPaneContainer.classList.add("sticky-player");
 
 let jumpTimeBy = Number(rewindAmountOption.value);
 
