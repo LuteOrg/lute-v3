@@ -42,7 +42,7 @@
 
       <div id="translation-container">
         <div>{{ form.translation }}</div>
-        <img {% if term.current_image %}style="grid-column: -1; width: 40px"{% endif %} 
+        <img {% if term.current_image %}style="grid-column: -1; display: block"{% endif %} 
         class="zoomableTermImage" 
         id="term_image" 
         src="{{ form.current_image.object_data or '' }}"/>
