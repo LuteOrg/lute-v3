@@ -3,6 +3,11 @@
  * \brief Main stylesheet for the default theme.
  */
 
+* {
+    margin: 0;
+    padding: 0;
+}
+
 body
 {   
     --background-color: #fff;
@@ -10,8 +15,6 @@ body
     background-color: var(--background-color);
     color: #000000;
     font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
-    margin: 0;
-    padding: 0;
 }
 
 /* Main container div for Lute site content. */
@@ -72,7 +75,7 @@ p.version {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+    padding: 1.7rem 0;
 }
 
 .title {
@@ -420,18 +423,6 @@ div#reading-footer span {
     margin: 5px;
 }
 
-input[type=text]
-{
-    font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
-    border: 1px solid #C6C6C6;
-    padding: 3px;
-}
-
-::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-    color: #D8D8D8;
-    opacity: 1; /* Firefox */
-}
-
 .texttitlecontainer {
     overflow: hidden;
     white-space: nowrap;
@@ -441,6 +432,11 @@ input[type=text]
     font-size: 0.9rem;
     font-weight: normal;
     margin: 0;
+}
+
+#thetexttitle {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 #thetexttitle,
@@ -456,20 +452,8 @@ div#thetext p {
     font-size: 0;
 }
 
-table#text
-{
-    width: 70%;
-}
-
 th, td {
     padding: 2px;
-}
-
-table#text thead, table#text tr, table#text th:first-child, table#text tbody, table#text tr, table#text td:first-child {
-    width: 20%;
-    min-width: 20%;
-    max-width: 20%;
-    vertical-align: top;
 }
 
 table#book
@@ -511,54 +495,6 @@ table.settingstable thead, table.settingstable tr, table.settingstable th:first-
     min-width: 30%;
     max-width: 30%;
     vertical-align: top;
-}
-
-table#language
-{
-    width: 80%;
-}
-
-table#language thead, table#language tr, table#language th:first-child, table#language tbody, table#language tr, table#language td:first-child {
-    width: 30%;
-    min-width: 30%;
-    max-width: 30%;
-    vertical-align: top;
-}
-
-table#language ul
-{
-    color: red;
-    list-style-type: none;
-    margin-block-start: 0em;
-    margin-block-end: 0em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    padding-inline-start: 0px;
-}
-
-input[type=text].form-control
-{
-    width: 100%;
-    /* padding: 5px 5px; */
-    margin: 2px 0;
-    box-sizing: border-box;
-}
-
-textarea.form-largetextarea
-{
-    /*
-      1em is /supposedly/ = the current font size, roughly
-     (ref https://stackoverflow.com/questions/2034544/
-     textareas-rows-and-cols-attribute-in-css),
-     but on my machine at least it doesn't appear to be so!
-     */
-    width:50em;
-    height:20em;
-    padding: 5px 5px;
-    margin: 2px 0;
-    box-sizing: border-box;
-    font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
-    border: 1px solid #C6C6C6;
 }
 
 div.help-text {
@@ -784,71 +720,6 @@ ul.sentencelist {
     border: 1px solid darkgrey;
 }
 
-/* */
-
-ul.shorttaglist {
-    margin: 0;
-    padding: 0;
-    font-size: 1em;
-    margin-block-start: 0em;
-    margin-block-end: 0em;
-}
-
-ul.shorttaglist li {
-    padding: 0 18px 0 0.5em;
-    padding-left: 3px !important;
-    margin: 0 5px 0 0;
-    font-size: 85%;
-}
-
-
-ul.shorttaglist li.tagit-new {
-    padding: 0 18px 0 0.5em;
-    margin: 0 5px 0 0;
-    font-size: 85%;
-}
-
-ul.shorttaglist li.tagit-choice {
-    padding: 0 18px 0 0.5em;
-    margin: 0 5px 0 0;
-    font-size: 85%;
-}
-
-ul.shorttaglist li.tagit-choice-editable {
-    padding: 0 18px 0 0.5em;
-    margin: 0 5px 0 0;
-    font-size: 85%;
-}
-
-/* Term form, status elements */
-
-ul.form-control {
-    list-style: none; /* Remove the marker */
-    padding: 0; /* Remove default padding */
-    display: flex; /* Display items in a row */
-    
-    /* Adjust spacing between items as needed */
-    margin: 0;
-}
-
-ul.form-control li {
-    margin-right: 8px; /* Adjust the spacing between items */
-}
-
-/* Style radio buttons */
-ul.form-control input[type="radio"] {
-    margin: 0;
-    padding: 0;
-    width: auto; /* Allow the content to determine the width */
-}
-
-/* Style labels */
-ul.form-control label {
-    margin: 0;
-    padding: 0;
-    cursor: pointer; /* Add pointer cursor for better UX */
-}
-
 /* error handler */
 
 div.bug_report {
@@ -948,11 +819,6 @@ table.statsWordsRead th, td { padding: 5px; }
     /* height: calc(100% - 20px) !important; */
     height: 100% !important;
     align-self: end;
-}
-
-/* move the image left instead of right */
-.zoomableTermImage:hover {
-    transform: scale(10) translate(-10px) !important;
 }
 
 /* resize */
@@ -1125,26 +991,157 @@ table.statsWordsRead th, td { padding: 5px; }
     display: flex;
 } */
 
-/* thead th:nth-child(1), */
-/* tbody td:nth-child(1), */
-/* #booktable_length, */
-/* #booktable_info { */
-    /* padding-left: 3rem !important; */
-/* } */
+/* TERM FORM STYLES */
 
-/* #booktable_paginate, */
-/* #booktable_filter { */
-    /* padding-right: 3rem !important; */
-/* } */
+#term-form-container {
+    padding: 1.5rem;
+    padding-bottom: 1rem;
+}
 
-/* #booktable { */
-    /* /~ margin doesn't work ~/ */
-    /* padding-top: 1rem; */
-/* } */
+#text,
+#translation,
+#romanization,
+ul.tagit {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+    padding: 0.2rem 0.2rem;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    font-size: .9rem;
+}
 
-/* #booktable_wrapper { */
-    /* margin-top: 1.8rem; */
-/* } */
+#translation-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 0.6rem;
+}
+
+#translation {
+    resize: vertical;
+    height: 50px;
+    min-height: 50px;
+}
+
+#term {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+#def-container {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.term-element-box {
+    display: flex;
+    gap: 0.5rem;
+}
+
+#text {
+    flex: 1;
+}
+
+::placeholder {
+    font-family: inherit;
+}
+
+ul.tagit {
+    box-sizing: border-box;
+    display: flex;
+    /* align-items: center; */
+    flex-wrap: wrap;
+    gap: 0.1rem;
+    padding: 0;
+}
+
+ul.tagit li {
+    margin: 0;
+    padding: 0.2rem 1.3rem 0.2rem 0.5rem;
+}
+
+ul.tagit li.tagit-new {
+    padding: 0;
+}
+
+ul.tagit li.tagit-choice {
+  display: flex;
+  align-items: center;
+}
+
+ul.tagit .tagit-label {
+  font-size: 0.8rem;
+}
+
+ul.tagit li.tagit-choice-editable {
+    flex-shrink: 0;
+}
+
+#term .ui-autocomplete-input {
+    padding: 0.25rem 0.2rem;
+    width: 70px;
+}
+
+#status {
+    display: flex;
+    list-style: none;
+    gap: 0.8rem;
+}
+
+#term-button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#term-button-container .term-element-box {
+    gap: 0.2rem;
+}
+
+.zoomableTermImage {
+    transition: transform 0.2s; /* Animation */
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    width: 40px;
+    display: none;
+}
+
+.zoomableTermImage:hover {
+    transform: scale(4) translate(-17px, 5px);
+}
+
+ul.form-control label {
+    cursor: pointer; /* Add pointer cursor for better UX */
+}
+
+.btn {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.7rem;
+}
+
+/* SETTINGS TABLE */
+#backup_dir, 
+#mecab_path, 
+#custom_styles {
+    width: 100%;
+}
+
+#custom_styles {
+    resize: vertical;
+    height: 100px;
+    font-size: 1rem;
+}
+
+#current_theme, 
+#japanese_reading, 
+#backup_count, 
+#test_mecab_btn {
+    width: 8rem;
+    box-sizing: border-box;
+}
 
 @media screen and (max-width: 980px) {
 
@@ -1221,6 +1218,8 @@ table.statsWordsRead th, td { padding: 5px; }
     }
 
     .reading_header_container {
+        padding-right: 3.2em;
+        padding-left: 3.2em;
         align-items: end;
     }
 
@@ -1323,17 +1322,5 @@ table.statsWordsRead th, td { padding: 5px; }
 
     table#term {
         width: 100% !important;
-    }
-
-    /* form[name="term_form"] { */
-        /* font-size: 1.6rem; */
-    /* } */
-
-    #termtagslist {
-        margin-bottom: 1rem;
-    }
-
-    .btn {
-        font-size: inherit;
     }
 }
