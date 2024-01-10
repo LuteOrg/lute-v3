@@ -1218,6 +1218,8 @@ ul.form-control label {
     }
 
     .reading_header_container {
+        padding-right: 3.2em;
+        padding-left: 3.2em;
         align-items: end;
     }
 
