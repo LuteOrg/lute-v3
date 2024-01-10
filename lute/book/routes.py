@@ -62,6 +62,13 @@ def _get_file_content(filefielddata):
         return service.get_textfile_content(filefielddata)
     if ext == ".epub":
         return service.get_epub_content(filefielddata)
+    if ext == ".pdf":
+        msg = """
+        Note: pdf imports can be inaccurate, due to how PDFs are encoded.
+        Please be aware of this while reading.
+        """
+        flash(msg, "notice")
+        return service.get_pdf_content_from_form(filefielddata)
     raise ValueError(f'Unknown file extension "{ext}"')
 
 
