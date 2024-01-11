@@ -3,6 +3,11 @@
  * \brief Main stylesheet for the default theme.
  */
 
+* {
+    margin: 0;
+    padding: 0;
+}
+
 body
 {   
     --background-color: #fff;
@@ -10,8 +15,6 @@ body
     background-color: var(--background-color);
     color: #000000;
     font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
-    margin: 0;
-    padding: 0;
 
     --status-0-color: #D5FFFF;
     --status-1-color: #F5B8A9;
@@ -28,13 +31,6 @@ body
     width: 95%;
     margin: 0 auto;
     box-sizing: border-box;
-}
-
-/* Media query for smaller screens */
-@media screen and (max-width: 600px) {
-    .container {
-        width: 95%; /* Adjust as needed */
-    }
 }
 
  .lutelogo_small
@@ -81,7 +77,7 @@ p.version {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+    padding: 1.7rem 0;
 }
 
 .title {
@@ -429,18 +425,6 @@ div#reading-footer span {
     margin: 5px;
 }
 
-input[type=text]
-{
-    font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
-    border: 1px solid #C6C6C6;
-    padding: 3px;
-}
-
-::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-    color: #D8D8D8;
-    opacity: 1; /* Firefox */
-}
-
 .texttitlecontainer {
     overflow: hidden;
     white-space: nowrap;
@@ -450,6 +434,11 @@ input[type=text]
     font-size: 0.9rem;
     font-weight: normal;
     margin: 0;
+}
+
+#thetexttitle {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 #thetexttitle,
@@ -465,117 +454,6 @@ div#thetext p {
     font-size: 0;
 }
 
-table#text
-{
-    width: 70%;
-}
-
-th, td {
-    padding: 2px;
-}
-
-table#text thead, table#text tr, table#text th:first-child, table#text tbody, table#text tr, table#text td:first-child {
-    width: 20%;
-    min-width: 20%;
-    max-width: 20%;
-    vertical-align: top;
-}
-
-table#book
-{
-    width: 70%;
-}
-
-table#book thead, table#book tr, table#book th:first-child, table#book tbody, table#book tr, table#book td:first-child {
-    width: 20%;
-    min-width: 20%;
-    max-width: 20%;
-    vertical-align: top;
-}
-
-.smallfilename {
-    font-size: 0.8em;
-    font-style: italic;
-}
-
-table#termimport
-{
-    width: 70%;
-}
-
-table#termimport thead, table#termimport tr, table#termimport th:first-child, table#termimport tbody, table#termimport tr, table#termimport td:first-child {
-    width: 10%;
-    min-width: 10%;
-    max-width: 10%;
-    vertical-align: top;
-}
-
-table.settingstable
-{
-    width: 80%;
-}
-
-table.settingstable thead, table.settingstable tr, table.settingstable th:first-child, table.settingstable tbody, table.settingstable tr, table.settingstable td:first-child {
-    width: 30%;
-    min-width: 30%;
-    max-width: 30%;
-    vertical-align: top;
-}
-
-table#language
-{
-    width: 80%;
-}
-
-table#language thead, table#language tr, table#language th:first-child, table#language tbody, table#language tr, table#language td:first-child {
-    width: 30%;
-    min-width: 30%;
-    max-width: 30%;
-    vertical-align: top;
-}
-
-table#language ul
-{
-    color: red;
-    list-style-type: none;
-    margin-block-start: 0em;
-    margin-block-end: 0em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    padding-inline-start: 0px;
-}
-
-input[type=text].form-control
-{
-    width: 100%;
-    /* padding: 5px 5px; */
-    margin: 2px 0;
-    box-sizing: border-box;
-}
-
-textarea.form-largetextarea
-{
-    /*
-      1em is /supposedly/ = the current font size, roughly
-     (ref https://stackoverflow.com/questions/2034544/
-     textareas-rows-and-cols-attribute-in-css),
-     but on my machine at least it doesn't appear to be so!
-     */
-    width:50em;
-    height:20em;
-    padding: 5px 5px;
-    margin: 2px 0;
-    box-sizing: border-box;
-    font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
-    border: 1px solid #C6C6C6;
-}
-
-div.help-text {
-    font-size: 0.8em;
-    font-style: italic;
-    color: gray !important;
-}
-
 .nomarginblock {
     margin-block-start: 0px;
     margin-block-end: 0px;
@@ -586,7 +464,15 @@ p
     margin: 5px 0 5px 0;
     padding: 0;
 }
- 
+
+h1 {
+    margin: 1rem 0;
+}
+
+h2 {
+    margin: 0.8rem 0;
+}
+
 h3
 {
     margin: 0px 0 0px 0;
@@ -671,13 +557,6 @@ span.textitem
     /* Add a transparent border so that when the .wordhover or .kwordmarked
    style is added, things don't get pushed around. */
     border-bottom: 1px solid transparent;
-}
- 
-.textarea
-{
-    font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
-    border: 1px solid #C6C6C6;
-    padding: 3px;
 }
 
 .click
@@ -793,71 +672,6 @@ ul.sentencelist {
     border: 1px solid darkgrey;
 }
 
-/* */
-
-ul.shorttaglist {
-    margin: 0;
-    padding: 0;
-    font-size: 1em;
-    margin-block-start: 0em;
-    margin-block-end: 0em;
-}
-
-ul.shorttaglist li {
-    padding: 0 18px 0 0.5em;
-    padding-left: 3px !important;
-    margin: 0 5px 0 0;
-    font-size: 85%;
-}
-
-
-ul.shorttaglist li.tagit-new {
-    padding: 0 18px 0 0.5em;
-    margin: 0 5px 0 0;
-    font-size: 85%;
-}
-
-ul.shorttaglist li.tagit-choice {
-    padding: 0 18px 0 0.5em;
-    margin: 0 5px 0 0;
-    font-size: 85%;
-}
-
-ul.shorttaglist li.tagit-choice-editable {
-    padding: 0 18px 0 0.5em;
-    margin: 0 5px 0 0;
-    font-size: 85%;
-}
-
-/* Term form, status elements */
-
-ul.form-control {
-    list-style: none; /* Remove the marker */
-    padding: 0; /* Remove default padding */
-    display: flex; /* Display items in a row */
-    
-    /* Adjust spacing between items as needed */
-    margin: 0;
-}
-
-ul.form-control li {
-    margin-right: 8px; /* Adjust the spacing between items */
-}
-
-/* Style radio buttons */
-ul.form-control input[type="radio"] {
-    margin: 0;
-    padding: 0;
-    width: auto; /* Allow the content to determine the width */
-}
-
-/* Style labels */
-ul.form-control label {
-    margin: 0;
-    padding: 0;
-    cursor: pointer; /* Add pointer cursor for better UX */
-}
-
 /* error handler */
 
 div.bug_report {
@@ -884,11 +698,6 @@ div.code pre {
     font-size: 14px;
     color: #212529;
 }
-
-
-/* Stats. */
-
-table.statsWordsRead th, td { padding: 5px; }
 
 
 /********************************
@@ -957,11 +766,6 @@ table.statsWordsRead th, td { padding: 5px; }
     /* height: calc(100% - 20px) !important; */
     height: 100% !important;
     align-self: end;
-}
-
-/* move the image left instead of right */
-.zoomableTermImage:hover {
-    transform: scale(10) translate(-10px) !important;
 }
 
 /* resize */
@@ -1138,9 +942,27 @@ table.statsWordsRead th, td { padding: 5px; }
     --read-slider-color: #79b7e7;
 }
 
+
+/* STYLES FOR PAGE BOOKMARKS */
 .read-bkm-btn {
     font-size: 1.6rem;
     color: var(--read-slider-color);
+}
+
+.read-bkm-btn {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: none;
+    padding: 0;
+    border-radius: 50%;
+  
+    background-color: white;
+    cursor: pointer;
+    user-select: none;
+    --webkit-user-select: none;
+
+    display: none; /*temporarily*/
 }
 
 /* .read-bookmark-buttons-container { */
@@ -1171,22 +993,6 @@ table.statsWordsRead th, td { padding: 5px; }
     width: 28px;
 } */
 
-.read-bkm-btn {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    border: none;
-    padding: 0;
-    border-radius: 50%;
-  
-    background-color: white;
-    cursor: pointer;
-    user-select: none;
-    --webkit-user-select: none;
-
-    display: none; /*temporarily*/
-}
-
 /* .read-bookmark-jump-container {
     display: flex;
     align-items: center;
@@ -1197,26 +1003,238 @@ table.statsWordsRead th, td { padding: 5px; }
     display: flex;
 } */
 
-/* thead th:nth-child(1), */
-/* tbody td:nth-child(1), */
-/* #booktable_length, */
-/* #booktable_info { */
-    /* padding-left: 3rem !important; */
-/* } */
 
-/* #booktable_paginate, */
-/* #booktable_filter { */
-    /* padding-right: 3rem !important; */
-/* } */
+/* COMMON FORM STYLES */
+#text,
+#translation,
+#romanization,
+#book #title, 
+#book #source_uri,
+#backup_dir, 
+#mecab_path, 
+#custom_styles,
+#language input {
+    /* width: 100%; */
+    font-size: 0.9rem;
+    font-family: inherit;
+    padding: 0.2rem 0.2rem;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
 
-/* #booktable { */
-    /* /~ margin doesn't work ~/ */
-    /* padding-top: 1rem; */
-/* } */
 
-/* #booktable_wrapper { */
-    /* margin-top: 1.8rem; */
-/* } */
+/* GENERAL FORM STYLES */
+textarea {
+    width: 100%;
+    resize: vertical;
+}
+
+ul.shorttaglist {
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem;
+    padding: 0;
+}
+
+ul.tagit input.ui-autocomplete-input {
+    padding: 0.25rem 0.2rem;
+    width: 70px;
+}
+
+::placeholder {
+    font-family: inherit;
+}
+
+ul.tagit li {
+    margin: 0;
+    padding: 0.2rem 1.3rem 0.2rem 0.5rem;
+}
+
+ul.tagit li.tagit-new {
+    padding: 0;
+}
+
+ul.tagit li.tagit-choice {
+  display: flex;
+  align-items: center;
+}
+
+ul.tagit .tagit-label {
+  font-size: 0.8rem;
+}
+
+ul.tagit li.tagit-choice-editable {
+    flex-shrink: 0;
+}
+
+ul.form-control label {
+    cursor: pointer; /* Add pointer cursor for better UX */
+}
+
+.btn {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.7rem;
+}
+
+/* TABLE STYLES */
+th, td {
+    padding: 2px;
+}
+
+tbody {
+    vertical-align: top;
+}
+
+table input:not([type="checkbox"]) {
+    width: 100%;
+}
+
+.statsWordsRead th, 
+.statsWordsRead td { 
+    padding: 5px; 
+}
+
+#book,
+#termimport,
+#language,
+.settingstable {
+    width: 80%;
+}
+
+#edit-page-table {
+    width: 50%;
+}
+
+#edit-page-table textarea {
+    height: 18rem;
+}
+
+#termimport td:first-child,
+.settingstable td:first-child {
+    width: 20rem;
+}
+
+#book td:first-child,
+#language td:first-child {
+    width: 15rem;
+}
+
+#predefined-lang-container {
+    margin-left: 0.3rem;
+    margin-bottom: 0.4rem;
+}
+
+#predefined {
+    margin-left: 5.3rem;
+}
+
+.smallfilename {
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+div.help-text {
+    font-size: 0.8em;
+    font-style: italic;
+    color: gray !important;
+}
+
+
+/* TERM FORM STYLES */
+#term-form-container {
+    padding: 1.5rem;
+    padding-bottom: 1rem;
+}
+
+#translation-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 0.6rem;
+}
+
+#romanization {
+    width: 100%;
+}
+
+#translation {
+    height: 50px;
+    min-height: 50px;
+}
+
+#term {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+#term-form #text {
+    flex: 1;
+}
+
+#def-container {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.term-element-box {
+    display: flex;
+    gap: 0.5rem;
+}
+
+#status {
+    display: flex;
+    list-style: none;
+    gap: 0.8rem;
+}
+
+#term-button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#term-button-container .term-element-box {
+    gap: 0.2rem;
+}
+
+.zoomableTermImage {
+    transition: transform 0.2s; /* Animation */
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    width: 40px;
+    display: none;
+}
+
+.zoomableTermImage:hover {
+    transform: scale(4) translate(-17px, 5px);
+}
+
+
+/* SETTINGS TABLE */
+#custom_styles {
+    height: 100px;
+    font-size: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#current_theme, 
+#japanese_reading, 
+#backup_count, 
+#test_mecab_btn {
+    width: 8rem;
+    box-sizing: border-box;
+}
+
+
+/* CREATE BOOK TABLE */
+#book #text {
+    height: 420px;
+}
+
 
 @media screen and (max-width: 980px) {
 
@@ -1293,6 +1311,8 @@ table.statsWordsRead th, td { padding: 5px; }
     }
 
     .reading_header_container {
+        padding-right: 3.2em;
+        padding-left: 3.2em;
         align-items: end;
     }
 
@@ -1395,17 +1415,5 @@ table.statsWordsRead th, td { padding: 5px; }
 
     table#term {
         width: 100% !important;
-    }
-
-    /* form[name="term_form"] { */
-        /* font-size: 1.6rem; */
-    /* } */
-
-    #termtagslist {
-        margin-bottom: 1rem;
-    }
-
-    .btn {
-        font-size: inherit;
     }
 }

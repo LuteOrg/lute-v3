@@ -21,7 +21,6 @@
       <td>
         <h2>Backup</h2>
       </td>
-      <td />
     </tr>
 
     {% for f in [
@@ -41,7 +40,6 @@
       <td>
         <h2>Appearance</h2>
       </td>
-      <td />
     </tr>
 
     <tr>
@@ -87,7 +85,6 @@
       <td>
         <h2>Japanese</h2>
       </td>
-      <td />
     </tr>
 
     <tr>
@@ -121,7 +118,7 @@
       <td>
       </td>
       <td>
-        <button onclick="test_mecab_setup(); return false;">
+        <button id="test_mecab_btn" onclick="test_mecab_setup(); return false;">
           Test my MeCab configuration
         </button>
         <div style="margin-top: 5px" id="parse_result"></div>
@@ -136,10 +133,10 @@
 
   <div style="margin-top:40px;">
     <button type="submit" class="btn btn-primary">Save</button>
+    <button class="btn" onclick="window.location = '/'">Cancel</button>
   </div>
 </form>
 
-<button onclick="window.location = '/'">Cancel</button>
 
 <script>
   function test_mecab_setup() {

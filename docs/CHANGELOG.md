@@ -1,4 +1,18 @@
 
+# 3.0.11 (2024-01-11)
+
+* rework/optimize form and table styles
+
+
+# 3.0.10 (2024-01-10)
+
+Feature changes:
+
+* Make reading screen responsive, handles smaller viewports.  By @webofpies in #118.
+* [#93](https://github.com/jzohrab/lute-v3/issues/93): add PDF imports.  By @dgc08 in #119.
+* [#107](https://github.com/jzohrab/lute-v3/issues/107): fix Windows file locking on imports.
+
+
 # 3.0.9 (2024-01-04)
 
 Feature changes:
