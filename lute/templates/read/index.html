@@ -180,6 +180,8 @@
 <script>
   let mouseY;
   let scrollY;
+  let scrollYBeforeReload;
+  let tooltipPos = {my: 'left top+10', at: 'left bottom', collision: 'flipfit flip'};
   const mediaTablet = window.matchMedia("(max-width: 980px)");
   const readPaneRight = document.getElementById("read_pane_right");
   const btmMarginCont = document.querySelector(".btm-margin-container");
@@ -200,6 +202,16 @@
   })
 
   $(document).ready(function () {
+    const theTextReloadObs = new MutationObserver((mutationList, observer) => {
+      if (scrollYBeforeReload) window.scrollTo(0, scrollYBeforeReload);
+    });
+    
+    theTextReloadObs.observe(theText, {childList: true, subtree: true});
+
+    if (mediaTablet.matches) {
+      tooltipPos = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
+    }
+    
     if (have_audio_file()) {
       // Don't actually load the source -- for some reason,
       // the ajax page load was causing the audio src to
@@ -406,7 +418,7 @@
         show_hide_title(actualPage);
 
         if (initial_page_load) {
-          prepareTextInteractions();
+          prepareTextInteractions(tooltipPos);
         }
 
         // Magic hack for player source to load consistently

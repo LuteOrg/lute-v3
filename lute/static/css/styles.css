@@ -303,7 +303,7 @@ span.hamburger {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 1003; /* higher than audio, header and right_pane (for mobile view) */
+  z-index: 1004; /* higher than audio, header and right_pane (for mobile view) */
   height: 100vh;
   border-right: 4px solid #a9cfef;
   box-shadow: 1px 0 3px 2px #9393933d;
@@ -1233,6 +1233,10 @@ div.help-text {
         box-shadow: 0 0 12px 0 #dfdfdf;
     }
 
+    div.ui-tooltip {
+        z-index: 1002;
+    }
+
     #read_pane_left {
         width: unset !important;
         margin-top: 10rem;
@@ -1250,7 +1254,7 @@ div.help-text {
 
     div#read_pane_right {
         background-color: white;
-        z-index: 1002;
+        z-index: 1003;
         transform: translateY(100%);
         /* transition: all creates issues for drag resizing (laggy, slow)*/
         transition: transform 0.2s cubic-bezier(0.77,0.2,0.05,1.0), 
