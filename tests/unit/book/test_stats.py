@@ -6,7 +6,12 @@ import pytest
 
 from lute.db import db
 from lute.term.model import Term, Repository
-from lute.book.stats import get_status_distribution, refresh_stats, mark_stale
+from lute.book.stats import (
+    get_status_distribution,
+    get_unique_words,
+    refresh_stats,
+    mark_stale,
+)
 
 from tests.utils import make_text, make_book
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
@@ -35,7 +40,8 @@ def scenario(language, fulltext, terms_and_statuses, expected):
     for ts in terms_and_statuses:
         add_term(language, ts[0], ts[1])
 
-    stats = get_status_distribution(b)
+    words_dict = get_unique_words(b, 20)
+    stats = get_status_distribution(words_dict)
 
     assert stats == expected
 
@@ -109,7 +115,7 @@ def add_terms(lang, terms):
 def assert_stats(expected, msg=""):
     "helper."
     sql = """select wordcount, distinctterms, distinctunknowns,
-      unknownpercent, replace(status_distribution, '"', "'") from bookstats"""
+      unknownpercent, status_distribution from bookstats"""
     assert_sql_result(sql, expected, msg)
 
 
@@ -126,7 +132,7 @@ def test_stats_smoke_test(_test_book, spanish):
     refresh_stats()
     assert_stats(
         [
-            "4; 4; 2; 50; {'0': 2, '1': 2, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+            "4; 4; 2; 50; {'0': 50.0, '1': 50.0, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
         ]
     )
 
@@ -137,7 +143,7 @@ def test_stats_calculates_rendered_text(_test_book, spanish):
     refresh_stats()
     assert_stats(
         [
-            "4; 3; 2; 67; {'0': 2, '1': 1, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+            "4; 3; 2; 67; {'0': 66.66666666666666, '1': 33.33333333333333, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
         ]
     )
 
@@ -148,7 +154,7 @@ def test_stats_only_update_books_marked_stale(_test_book, spanish):
     refresh_stats()
     assert_stats(
         [
-            "4; 4; 2; 50; {'0': 2, '1': 2, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+            "4; 4; 2; 50; {'0': 50.0, '1': 50.0, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
         ]
     )
 
