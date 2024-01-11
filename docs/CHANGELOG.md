@@ -1,4 +1,9 @@
 
+# 3.0.11 (2024-01-11)
+
+* rework/optimize form and table styles
+
+
 # 3.0.10 (2024-01-10)
 
 Feature changes:

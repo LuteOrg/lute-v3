@@ -24,13 +24,6 @@ body
     box-sizing: border-box;
 }
 
-/* Media query for smaller screens */
-@media screen and (max-width: 600px) {
-    .container {
-        width: 95%; /* Adjust as needed */
-    }
-}
-
  .lutelogo_small
  {
      margin-right: 2px;
@@ -452,57 +445,6 @@ div#thetext p {
     font-size: 0;
 }
 
-th, td {
-    padding: 2px;
-}
-
-table#book
-{
-    width: 70%;
-}
-
-table#book thead, table#book tr, table#book th:first-child, table#book tbody, table#book tr, table#book td:first-child {
-    width: 20%;
-    min-width: 20%;
-    max-width: 20%;
-    vertical-align: top;
-}
-
-.smallfilename {
-    font-size: 0.8em;
-    font-style: italic;
-}
-
-table#termimport
-{
-    width: 70%;
-}
-
-table#termimport thead, table#termimport tr, table#termimport th:first-child, table#termimport tbody, table#termimport tr, table#termimport td:first-child {
-    width: 10%;
-    min-width: 10%;
-    max-width: 10%;
-    vertical-align: top;
-}
-
-table.settingstable
-{
-    width: 80%;
-}
-
-table.settingstable thead, table.settingstable tr, table.settingstable th:first-child, table.settingstable tbody, table.settingstable tr, table.settingstable td:first-child {
-    width: 30%;
-    min-width: 30%;
-    max-width: 30%;
-    vertical-align: top;
-}
-
-div.help-text {
-    font-size: 0.8em;
-    font-style: italic;
-    color: gray !important;
-}
-
 .nomarginblock {
     margin-block-start: 0px;
     margin-block-end: 0px;
@@ -513,7 +455,15 @@ p
     margin: 5px 0 5px 0;
     padding: 0;
 }
- 
+
+h1 {
+    margin: 1rem 0;
+}
+
+h2 {
+    margin: 0.8rem 0;
+}
+
 h3
 {
     margin: 0px 0 0px 0;
@@ -598,13 +548,6 @@ span.textitem
     /* Add a transparent border so that when the .wordhover or .kwordmarked
    style is added, things don't get pushed around. */
     border-bottom: 1px solid transparent;
-}
- 
-.textarea
-{
-    font: 85% "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
-    border: 1px solid #C6C6C6;
-    padding: 3px;
 }
 
 .click
@@ -746,11 +689,6 @@ div.code pre {
     font-size: 14px;
     color: #212529;
 }
-
-
-/* Stats. */
-
-table.statsWordsRead th, td { padding: 5px; }
 
 
 /********************************
@@ -932,9 +870,27 @@ table.statsWordsRead th, td { padding: 5px; }
     --read-slider-color: #79b7e7;
 }
 
+
+/* STYLES FOR PAGE BOOKMARKS */
 .read-bkm-btn {
     font-size: 1.6rem;
     color: var(--read-slider-color);
+}
+
+.read-bkm-btn {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: none;
+    padding: 0;
+    border-radius: 50%;
+  
+    background-color: white;
+    cursor: pointer;
+    user-select: none;
+    --webkit-user-select: none;
+
+    display: none; /*temporarily*/
 }
 
 /* .read-bookmark-buttons-container { */
@@ -965,22 +921,6 @@ table.statsWordsRead th, td { padding: 5px; }
     width: 28px;
 } */
 
-.read-bkm-btn {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    border: none;
-    padding: 0;
-    border-radius: 50%;
-  
-    background-color: white;
-    cursor: pointer;
-    user-select: none;
-    --webkit-user-select: none;
-
-    display: none; /*temporarily*/
-}
-
 /* .read-bookmark-jump-container {
     display: flex;
     align-items: center;
@@ -991,70 +931,48 @@ table.statsWordsRead th, td { padding: 5px; }
     display: flex;
 } */
 
-/* TERM FORM STYLES */
 
-#term-form-container {
-    padding: 1.5rem;
-    padding-bottom: 1rem;
-}
-
+/* COMMON FORM STYLES */
 #text,
 #translation,
 #romanization,
-ul.tagit {
-    width: 100%;
-    box-sizing: border-box;
+#book #title, 
+#book #source_uri,
+#backup_dir, 
+#mecab_path, 
+#custom_styles,
+#language input {
+    /* width: 100%; */
+    font-size: 0.9rem;
     font-family: inherit;
     padding: 0.2rem 0.2rem;
-    border: 1px solid #dddddd;
+    border: 1px solid #ddd;
     border-radius: 3px;
-    font-size: .9rem;
+    box-sizing: border-box;
 }
 
-#translation-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0 0.6rem;
-}
 
-#translation {
+/* GENERAL FORM STYLES */
+textarea {
+    width: 100%;
     resize: vertical;
-    height: 50px;
-    min-height: 50px;
 }
 
-#term {
+ul.shorttaglist {
+    box-sizing: border-box;
     display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
+    flex-wrap: wrap;
+    gap: 0.1rem;
+    padding: 0;
 }
 
-#def-container {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-
-.term-element-box {
-    display: flex;
-    gap: 0.5rem;
-}
-
-#text {
-    flex: 1;
+ul.tagit input.ui-autocomplete-input {
+    padding: 0.25rem 0.2rem;
+    width: 70px;
 }
 
 ::placeholder {
     font-family: inherit;
-}
-
-ul.tagit {
-    box-sizing: border-box;
-    display: flex;
-    /* align-items: center; */
-    flex-wrap: wrap;
-    gap: 0.1rem;
-    padding: 0;
 }
 
 ul.tagit li {
@@ -1079,9 +997,119 @@ ul.tagit li.tagit-choice-editable {
     flex-shrink: 0;
 }
 
-#term .ui-autocomplete-input {
-    padding: 0.25rem 0.2rem;
-    width: 70px;
+ul.form-control label {
+    cursor: pointer; /* Add pointer cursor for better UX */
+}
+
+.btn {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.7rem;
+}
+
+/* TABLE STYLES */
+th, td {
+    padding: 2px;
+}
+
+tbody {
+    vertical-align: top;
+}
+
+table input:not([type="checkbox"]) {
+    width: 100%;
+}
+
+.statsWordsRead th, 
+.statsWordsRead td { 
+    padding: 5px; 
+}
+
+#book,
+#termimport,
+#language,
+.settingstable {
+    width: 80%;
+}
+
+#edit-page-table {
+    width: 50%;
+}
+
+#edit-page-table textarea {
+    height: 18rem;
+}
+
+#termimport td:first-child,
+.settingstable td:first-child {
+    width: 20rem;
+}
+
+#book td:first-child,
+#language td:first-child {
+    width: 15rem;
+}
+
+#predefined-lang-container {
+    margin-left: 0.3rem;
+    margin-bottom: 0.4rem;
+}
+
+#predefined {
+    margin-left: 5.3rem;
+}
+
+.smallfilename {
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+div.help-text {
+    font-size: 0.8em;
+    font-style: italic;
+    color: gray !important;
+}
+
+
+/* TERM FORM STYLES */
+#term-form-container {
+    padding: 1.5rem;
+    padding-bottom: 1rem;
+}
+
+#translation-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 0.6rem;
+}
+
+#romanization {
+    width: 100%;
+}
+
+#translation {
+    height: 50px;
+    min-height: 50px;
+}
+
+#term {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+#term-form #text {
+    flex: 1;
+}
+
+#def-container {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.term-element-box {
+    display: flex;
+    gap: 0.5rem;
 }
 
 #status {
@@ -1113,26 +1141,12 @@ ul.tagit li.tagit-choice-editable {
     transform: scale(4) translate(-17px, 5px);
 }
 
-ul.form-control label {
-    cursor: pointer; /* Add pointer cursor for better UX */
-}
-
-.btn {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.7rem;
-}
 
 /* SETTINGS TABLE */
-#backup_dir, 
-#mecab_path, 
 #custom_styles {
-    width: 100%;
-}
-
-#custom_styles {
-    resize: vertical;
     height: 100px;
     font-size: 1rem;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 #current_theme, 
@@ -1142,6 +1156,13 @@ ul.form-control label {
     width: 8rem;
     box-sizing: border-box;
 }
+
+
+/* CREATE BOOK TABLE */
+#book #text {
+    height: 420px;
+}
+
 
 @media screen and (max-width: 980px) {
 
