@@ -114,8 +114,7 @@ def add_terms(lang, terms):
 
 def assert_stats(expected, msg=""):
     "helper."
-    sql = """select wordcount, distinctterms, distinctunknowns,
-      unknownpercent, status_distribution from bookstats"""
+    sql = """select wordcount, distinctterms, distinctunknowns, unknownpercent, status_distribution from bookstats"""
     assert_sql_result(sql, expected, msg)
 
 
@@ -162,7 +161,7 @@ def test_stats_only_update_books_marked_stale(_test_book, spanish):
     refresh_stats()
     assert_stats(
         [
-            '4; 4; 2; 50; {"0": 2, "1": 2, "2": 0.0, "3": 0.0, "4": 0.0, "5": 0.0, "99": 0.0}'
+            '4; 4; 2; 50; {"0": 50.0, "1": 50.0, "2": 0.0, "3": 0.0, "4": 0.0, "5": 0.0, "99": 0.0}'
         ],
         "not updated",
     )
@@ -171,7 +170,7 @@ def test_stats_only_update_books_marked_stale(_test_book, spanish):
     refresh_stats()
     assert_stats(
         [
-            '4; 4; 1; 25; {"0": 1, "1": 3, "2": 0.0, "3": 0.0, "4": 0.0, "5": 0.0, "99": 0.0}'
+            '4; 4; 1; 25; {"0": 25.0, "1": 75.0, "2": 0.0, "3": 0.0, "4": 0.0, "5": 0.0, "99": 0.0}'
         ],
         "updated",
     )
