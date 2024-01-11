@@ -203,14 +203,11 @@
 
   window.addEventListener("scrollend", function(e) {
     scrollYBeforeReload = window.scrollY;
-    console.log(scrollYBeforeReload);
   });
 
   $(document).ready(function () {
     const theTextReloadObs = new MutationObserver((mutationList, observer) => {
-      console.log(scrollYBeforeReload);
       if (scrollYBeforeReload) window.scrollTo(0, scrollYBeforeReload);
-      console.log("ADASD");
     });
     
     theTextReloadObs.observe(theText, {childList: true, subtree: true});
