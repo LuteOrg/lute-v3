@@ -17,7 +17,7 @@ const widthMinusButton = document.querySelector(".width-minus");
 const oneColButton = document.querySelector(".column-one");
 const twoColButton = document.querySelector(".column-two");
 
-const theText = document.querySelector("#thetext");
+// const theText = document.querySelector("#thetext");
 
 const domObserver = new MutationObserver((mutationList, observer) => {
   textItems = document.querySelectorAll("span.textitem");
