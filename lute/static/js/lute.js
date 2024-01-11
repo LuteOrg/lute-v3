@@ -73,7 +73,7 @@ let clear_frames = function() {
 /** 
  * Prepare the interaction events with the text.
  */
-function prepareTextInteractions(textid) {
+function prepareTextInteractions(pos) {
   const t = $('#thetext');
   // Using "t.on" here because .word elements
   // are added and removed dynamically, and "t.on"
@@ -92,7 +92,7 @@ function prepareTextInteractions(textid) {
   $(document).on('keydown', handle_keydown);
 
   $('#thetext').tooltip({
-    position: { my: 'left top+10', at: 'left bottom', collision: 'flipfit flip' },
+    position: pos,
     items: '.word.showtooltip',
     show: { easing: 'easeOutCirc' },
     content: function (setContent) { tooltip_textitem_hover_content($(this), setContent); }
