@@ -51,7 +51,7 @@ def test_two_words(spanish):
         spanish,
         "Tengo un gato.  Tengo un perro.",
         [["gato", 1], ["perro", 2]],
-        {"0": 2, "1": 1, "2": 1, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0},
+        {0: 2, 1: 1, 2: 1, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0},
     )
 
 
@@ -60,7 +60,7 @@ def test_single_word(spanish):
         spanish,
         "Tengo un gato.  Tengo un perro.",
         [["gato", 3]],
-        {"0": 3, "1": 0, "2": 0, "3": 1, "4": 0, "5": 0, "98": 0, "99": 0},
+        {0: 3, 1: 0, 2: 0, 3: 1, 4: 0, 5: 0, 98: 0, 99: 0},
     )
 
 
@@ -69,7 +69,7 @@ def test_with_multiword(spanish):
         spanish,
         "Tengo un gato.  Tengo un perro.",
         [["tengo un", 3]],
-        {"0": 2, "1": 0, "2": 0, "3": 1, "4": 0, "5": 0, "98": 0, "99": 0},
+        {0: 2, 1: 0, 2: 0, 3: 1, 4: 0, 5: 0, 98: 0, 99: 0},
     )
 
 
@@ -78,7 +78,7 @@ def test_chinese_no_term_stats(classical_chinese):
         classical_chinese,
         "這是東西",
         [],
-        {"0": 4, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0},
+        {0: 4, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0},
     )
 
 
@@ -87,7 +87,7 @@ def test_chinese_with_terms(classical_chinese):
         classical_chinese,
         "這是東西",
         [["東西", 1]],
-        {"0": 2, "1": 1, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0},
+        {0: 2, 1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0},
     )
 
 
