@@ -51,7 +51,7 @@ def test_two_words(spanish):
         spanish,
         "Tengo un gato.  Tengo un perro.",
         [["gato", 1], ["perro", 2]],
-        {0: 2, 1: 1, 2: 1, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0},
+        {"0": 2, "1": 1, "2": 1, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0},
     )
 
 
@@ -60,7 +60,7 @@ def test_single_word(spanish):
         spanish,
         "Tengo un gato.  Tengo un perro.",
         [["gato", 3]],
-        {0: 3, 1: 0, 2: 0, 3: 1, 4: 0, 5: 0, 98: 0, 99: 0},
+        {"0": 3, "1": 0, "2": 0, "3": 1, "4": 0, "5": 0, "98": 0, "99": 0},
     )
 
 
@@ -69,7 +69,7 @@ def test_with_multiword(spanish):
         spanish,
         "Tengo un gato.  Tengo un perro.",
         [["tengo un", 3]],
-        {0: 2, 1: 0, 2: 0, 3: 1, 4: 0, 5: 0, 98: 0, 99: 0},
+        {"0": 2, "1": 0, "2": 0, "3": 1, "4": 0, "5": 0, "98": 0, "99": 0},
     )
 
 
@@ -78,7 +78,7 @@ def test_chinese_no_term_stats(classical_chinese):
         classical_chinese,
         "這是東西",
         [],
-        {0: 4, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0},
+        {"0": 4, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0},
     )
 
 
@@ -87,7 +87,7 @@ def test_chinese_with_terms(classical_chinese):
         classical_chinese,
         "這是東西",
         [["東西", 1]],
-        {0: 2, 1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 98: 0, 99: 0},
+        {"0": 2, "1": 1, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0},
     )
 
 
@@ -132,7 +132,7 @@ def test_stats_smoke_test(_test_book, spanish):
     refresh_stats()
     assert_stats(
         [
-            "4; 4; 2; 50; {'0': 50.0, '1': 50.0, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+            '4; 4; 2; 50; {"0": 50.0, "1": 50.0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}'
         ]
     )
 
@@ -143,7 +143,7 @@ def test_stats_calculates_rendered_text(_test_book, spanish):
     refresh_stats()
     assert_stats(
         [
-            "4; 3; 2; 67; {'0': 66.66666666666666, '1': 33.33333333333333, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+            '4; 3; 2; 67; {"0": 66.66666666666666, "1": 33.33333333333333, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}'
         ]
     )
 
@@ -154,7 +154,7 @@ def test_stats_only_update_books_marked_stale(_test_book, spanish):
     refresh_stats()
     assert_stats(
         [
-            "4; 4; 2; 50; {'0': 50.0, '1': 50.0, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+            '4; 4; 2; 50; {"0": 50.0, "1": 50.0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}'
         ]
     )
 
@@ -162,7 +162,7 @@ def test_stats_only_update_books_marked_stale(_test_book, spanish):
     refresh_stats()
     assert_stats(
         [
-            "4; 4; 2; 50; {'0': 2, '1': 2, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+            '4; 4; 2; 50; {"0": 2, "1": 2, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}'
         ],
         "not updated",
     )
@@ -171,7 +171,7 @@ def test_stats_only_update_books_marked_stale(_test_book, spanish):
     refresh_stats()
     assert_stats(
         [
-            "4; 4; 1; 25; {'0': 1, '1': 3, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
+            '4; 4; 1; 25; {"0": 1, "1": 3, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}'
         ],
         "updated",
     )
