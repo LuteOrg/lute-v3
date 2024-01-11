@@ -5,7 +5,8 @@
 {% block body %}
 <h2>Create new Language</h2>
 
-<p><i>Load from predefined:</i>
+<div id="predefined-lang-container">
+  <em>Load from predefined:</em>
   <select id="predefined">
     <option value="-">-</option>
     {% for p in predefined %}
@@ -13,7 +14,7 @@
     {% endfor %}
   </select>
   <button onclick="location.href='/language/new/' + document.getElementById('predefined').value;">go</button>
-</p>
+</div>
 
 {% include "language/_form.html" %}
 
