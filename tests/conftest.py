@@ -78,8 +78,8 @@ def fixture_app_context(app):
     """
     Yields the app context so that tests using the db will work.
     """
-    with app.app_context():
-        yield
+    with app.app_context() as c:
+        yield c
 
 
 @pytest.fixture(name="empty_db")

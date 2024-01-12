@@ -159,12 +159,17 @@ class LuteTestClient:
                 b.find_by_css(f"#{k}").fill(v)
             elif k == "parents":
                 for p in updates["parents"]:
-                    xp = "ul#parentslist li.tagit-new > input.ui-autocomplete-input"
-                    tagitbox = b.find_by_css(xp)
-                    assert len(tagitbox) == 1, "have parent input"
-                    box = tagitbox.first
-                    box.type(p, slowly=False)
-                    box.type(Keys.RETURN)
+                    xpath = [
+                        # input w/ id
+                        '//input[@id="parentslist"]',
+                        # <tags> before it.
+                        "/preceding-sibling::tags",
+                        # <span> within the <tags> with class.
+                        '/span[@class="tagify__input"]',
+                    ]
+                    span = b.find_by_xpath("".join(xpath))
+                    span.type(p, slowly=False)
+                    span.type(Keys.RETURN)
                     time.sleep(0.1)  # seconds
             else:
                 raise RuntimeError(f"unhandled key {k}")

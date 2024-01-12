@@ -2,11 +2,12 @@
 Flask-wtf forms.
 """
 
+import json
+from flask import request
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField,
     SelectField,
-    FieldList,
     RadioField,
     TextAreaField,
     HiddenField,
@@ -29,7 +30,8 @@ class TermForm(FlaskForm):
     text = StringField(
         "Text", validators=[DataRequired()], render_kw={"placeholder": "Term"}
     )
-    parents = FieldList(StringField("parent"))
+    parentslist = StringField("Parents")
+
     translation = TextAreaField("Translation", render_kw={"placeholder": "Translation"})
     romanization = StringField(
         "Romanization", render_kw={"placeholder": "Pronunciation"}
@@ -38,9 +40,39 @@ class TermForm(FlaskForm):
     status_choices = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (99, "Wkn"), (98, "Ign")]
     status = RadioField("Status", choices=status_choices)
 
-    term_tags = FieldList(StringField("term_tags"))
+    termtagslist = StringField("term_tags")
 
     current_image = HiddenField("current_image")
+
+    def __init__(self, *args, **kwargs):
+        "Call the constructor of the superclass (FlaskForm)"
+        super().__init__(*args, **kwargs)
+        term = kwargs.get("obj")
+
+        def _data(arr):
+            "Get data in proper format for tagify."
+            return json.dumps([{"value": p} for p in arr])
+
+        self.parentslist.data = _data(term.parents)
+        self.termtagslist.data = _data(term.term_tags)
+
+        if request.method == "POST":
+            self.parentslist.data = request.form.get("parentslist", "")
+            self.termtagslist.data = request.form.get("termtagslist", "")
+
+    def populate_obj(self, obj):
+        "Call the populate_obj method from the parent class, then mine."
+        super().populate_obj(obj)
+
+        def _values(field_data):
+            "Convert field data to array."
+            ret = []
+            if field_data:
+                ret = [h["value"] for h in json.loads(field_data)]
+            return ret
+
+        obj.parents = _values(self.parentslist.data)
+        obj.term_tags = _values(self.termtagslist.data)
 
     def validate_language_id(self, field):  # pylint: disable=unused-argument
         "Language must be set."

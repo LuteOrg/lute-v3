@@ -11,17 +11,18 @@ from lute.term.model import Term, Repository
 from lute.term.forms import TermForm
 
 
-def test_validate(app_context, english):
+def test_validate(app, app_context, english):
     "A new term is valid."
     repo = Repository(db)
     t = repo.find_or_new(english.id, "CAT")
-    f = TermForm(obj=t)
+    with app.test_request_context():
+        f = TermForm(obj=t)
     f.language_id.choices = [(english.id, "english")]
 
     assert f.validate() is True, "no change = valid"
 
 
-def test_text_change_not_valid(app_context, english):
+def test_text_change_not_valid(app, app_context, english):
     "Text change raises error."
     dbt = DBTerm(english, "CAT")
     db.session.add(dbt)
@@ -30,7 +31,8 @@ def test_text_change_not_valid(app_context, english):
     repo = Repository(db)
     t = repo.find_or_new(english.id, "CAT")
     t.text = "dog"
-    f = TermForm(obj=t)
+    with app.test_request_context():
+        f = TermForm(obj=t)
     f.language_id.choices = [(english.id, "english")]
 
     is_valid = f.validate()
@@ -38,7 +40,7 @@ def test_text_change_not_valid(app_context, english):
     assert f.errors == {"text": ["Can only change term case"]}
 
 
-def test_duplicate_text_not_valid(app_context, english):
+def test_duplicate_text_not_valid(app, app_context, english):
     "Duplicate term throws."
     dbt = DBTerm(english, "CAT")
     db.session.add(dbt)
@@ -47,7 +49,8 @@ def test_duplicate_text_not_valid(app_context, english):
     t = Term()
     t.language_id = english.id
     t.text = "cat"
-    f = TermForm(obj=t)
+    with app.test_request_context():
+        f = TermForm(obj=t)
     f.language_id.choices = [(english.id, "english")]
 
     is_valid = f.validate()
@@ -55,7 +58,7 @@ def test_duplicate_text_not_valid(app_context, english):
     assert f.errors == {"text": ["Term already exists"]}
 
 
-def test_update_existing_term_is_valid(app_context, english):
+def test_update_existing_term_is_valid(app, app_context, english):
     "Can update an existing term."
     dbt = DBTerm(english, "CAT")
     db.session.add(dbt)
@@ -64,7 +67,8 @@ def test_update_existing_term_is_valid(app_context, english):
     repo = Repository(db)
     t = repo.find_or_new(english.id, "cat")
     t.text = "cat"
-    f = TermForm(obj=t)
+    with app.test_request_context():
+        f = TermForm(obj=t)
     f.language_id.choices = [(english.id, "english")]
 
     is_valid = f.validate()

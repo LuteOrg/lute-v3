@@ -2,7 +2,9 @@
 Book create/edit forms.
 """
 
-from wtforms import StringField, SelectField, FieldList, TextAreaField
+import json
+from flask import request
+from wtforms import StringField, SelectField, TextAreaField
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length
 from flask_wtf import FlaskForm
@@ -42,7 +44,33 @@ class NewBookForm(FlaskForm):
             )
         ],
     )
-    book_tags = FieldList(StringField("book_tags"))
+    book_tags = StringField("Tags")
+
+    def __init__(self, *args, **kwargs):
+        "Call the constructor of the superclass (FlaskForm)"
+        super().__init__(*args, **kwargs)
+        book = kwargs.get("obj")
+
+        def _data(arr):
+            "Get data in proper format for tagify."
+            return json.dumps([{"value": p} for p in arr])
+
+        self.book_tags.data = _data(book.book_tags)
+        if request.method == "POST":
+            self.book_tags.data = request.form.get("book_tags", "")
+
+    def populate_obj(self, obj):
+        "Call the populate_obj method from the parent class, then mine."
+        super().populate_obj(obj)
+
+        def _values(field_data):
+            "Convert field data to array."
+            ret = []
+            if field_data:
+                ret = [h["value"] for h in json.loads(field_data)]
+            return ret
+
+        obj.book_tags = _values(self.book_tags.data)
 
     def validate_language_id(self, field):  # pylint: disable=unused-argument
         "Language must be set."
@@ -68,7 +96,7 @@ class EditBookForm(FlaskForm):
 
     title = StringField("Title", validators=[DataRequired(), Length(max=255)])
     source_uri = StringField("Source URI", validators=[Length(max=255)])
-    book_tags = FieldList(StringField("book_tags"))
+    book_tags = StringField("Tags")
     audiofile = FileField(
         "Audio file",
         validators=[
@@ -78,3 +106,29 @@ class EditBookForm(FlaskForm):
             )
         ],
     )
+
+    def __init__(self, *args, **kwargs):
+        "Call the constructor of the superclass (FlaskForm)"
+        super().__init__(*args, **kwargs)
+        book = kwargs.get("obj")
+
+        def _data(arr):
+            "Get data in proper format for tagify."
+            return json.dumps([{"value": p} for p in arr])
+
+        self.book_tags.data = _data(book.book_tags)
+        if request.method == "POST":
+            self.book_tags.data = request.form.get("book_tags", "")
+
+    def populate_obj(self, obj):
+        "Call the populate_obj method from the parent class, then mine."
+        super().populate_obj(obj)
+
+        def _values(field_data):
+            "Convert field data to array."
+            ret = []
+            if field_data:
+                ret = [h["value"] for h in json.loads(field_data)]
+            return ret
+
+        obj.book_tags = _values(self.book_tags.data)
