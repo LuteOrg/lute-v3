@@ -72,6 +72,9 @@ let clear_frames = function() {
 
 /** 
  * Prepare the interaction events with the text.
+ *
+ * pos = position hash, e.g.
+ * {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'}
  */
 function prepareTextInteractions(pos) {
   const t = $('#thetext');

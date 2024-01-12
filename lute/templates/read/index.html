@@ -301,20 +301,16 @@
     const pagenum = parseInt($('#page_num').val());
     const maxpage = parseInt($('#page_count').val());
     if (pagenum > 1) {
-      $('#navPrev10').removeClass('read_page_disabled');
       $('#navPrev').removeClass('read_page_disabled');
     }
     else {
-      $('#navPrev10').addClass('read_page_disabled');
       $('#navPrev').addClass('read_page_disabled');
     }
     if (pagenum < maxpage) {
       $('#navNext').removeClass('read_page_disabled');
-      $('#navNext10').removeClass('read_page_disabled');
     }
     else {
       $('#navNext').addClass('read_page_disabled');
-      $('#navNext10').addClass('read_page_disabled');
     }
     //toggleSliderStatus();
   };
