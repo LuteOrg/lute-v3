@@ -47,16 +47,9 @@
       <td>{{ form.audiofile() }}</td>
     </tr>
 
-    {# Tags li entries are managed by tagit. #}
     <tr>
-      <td>Tags</td>
-      <td>
-        <ul id="booktagslist" class="tags nomarginblock shorttaglist">
-          {% for t in form.book_tags %}
-          <li>{{ t.object_data }}</li>
-          {% endfor %}
-        </ul>
-      </td>
+      <td>{{ form.book_tags.label }}</td>
+      <td>{{ form.book_tags(class="form-control") }}</td>
     </tr>
 
   </tbody>
@@ -70,33 +63,21 @@
 <script type="text/javascript">
   var TAGS = {{ tags | safe }};
 
-  let setup_book_tags_Tagit = function() {
-    // Note that Flask_WTF uses <fieldname>-{index}
-    // for mapping to and from FieldLists!
-    var prototypeFieldName = 'book_tags-__name__';
-    var fieldIndex = 0;
-
-    let invalidChar = function(s) { return /[\uD800-\uDFFF]/.test(s); };
-
-    $('#booktagslist').tagit(
-      {
-        beforeTagAdded: function (_event, ui) {
-          if (invalidChar(ui.tag.text())) {
-            return;
-          }
-          fieldIndex++;
-          $(this).tagit({fieldName: prototypeFieldName.replace('__name__', fieldIndex)});
-        },
-        availableTags: TAGS,
-        fieldName: prototypeFieldName.replace('__name__', 0)
-      });
-
+  let setup_book_tags_tagify = function(input) {
+    const tagify = new Tagify(input, {
+      placeholder: 'Tags',
+      editTags: false,
+      autoComplete: { rightKey: true },
+      enforceWhitelist: false,
+      whitelist: TAGS
+    });  // end tagify
+    return tagify;
   };
 
   $(document).ready(function () {
-    setup_book_tags_Tagit();
+    var tagslist = document.getElementById('book_tags');
+    var tags_tagify = setup_book_tags_tagify(tagslist);
   });
-
 </script>
 
 {% endblock %}

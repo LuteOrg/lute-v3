@@ -6,6 +6,8 @@
     
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-ui.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery.tagit.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tagify.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tagify_overrides.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
 
     <link rel="stylesheet" type="text/css" href="/theme/current">
@@ -16,6 +18,8 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"  charset="utf-8"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.jeditable.mini.js') }}" charset="utf-8"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/tag-it.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/tagify.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/tagify.polyfills.min.js') }}" charset="utf-8"></script>
 
     <script type="text/javascript">
       var temp_tags = '{{ tags | tojson }}';

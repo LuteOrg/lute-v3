@@ -27,14 +27,7 @@
         </div>
       </div>
 
-      {# Parents.  During setup this is replaced by tag-it. #}
-      <div>
-        <ul id="parentslist" class="tags nomarginblock shorttaglist">
-          {% for p in form.parents %}
-          <li>{{ p.object_data }}</li>
-          {% endfor %}
-        </ul>
-      </div>
+      <div>{{ form.parentslist(class="form-control") }}</div>
   
       <div {% if hide_pronunciation %}style="display:none;"{% endif %}>
         {{ form.romanization(class="form-control") }}
@@ -52,14 +45,7 @@
 
       <div>{{ form.current_image(class="form-control") }}</div>
 
-      {# Tags li entries are managed by tagit. #}
-      <div>
-        <ul id="termtagslist" class="tags nomarginblock shorttaglist">
-          {% for t in form.term_tags %}
-          <li>{{ t.object_data }}</li>
-          {% endfor %}
-        </ul>
-      </div>
+      <div>{{ form.termtagslist(class="form-control") }}</div>
 
       <div id="term-button-container">
         <a href="" onclick="show_term_sentences(); return false;">Sentences</a>
@@ -96,120 +82,91 @@
       form_changed = true;
   });
 
+  let setup_parent_tagify = function(input) {
+    const tagify = new Tagify(input, {
+      placeholder: 'Parents',
+      editTags: false,
+      autoComplete: { rightKey: true },
+      enforceWhitelist: false,
+      whitelist: [],
+      dropdown: { mapValueTo: 'suggestion' },
+    });  // end tagify
 
-  let setup_parent_Tagit = function() {
-    // Note that Flask_WTF uses <fieldname>-{index}
-    // for mapping to and from FieldLists!
-    var prototypeFieldName = 'parents-__name__';
-    var fieldIndex = 0;
-
-    $('#parentslist').tagit(
-      {
-        placeholderText: 'Parents',
-        beforeTagAdded: function (_event, ui) {
-          fieldIndex++;
-          $(this).tagit({fieldName: prototypeFieldName.replace('__name__', fieldIndex)});
-        },
-        afterTagAdded: function (_event, ui) {
-          if (monitor_form) {
-            form_changed = true;
-          }
-        },
-        afterTagRemoved: function (_event, ui) {
-          if (monitor_form) {
-            form_changed = true;
-          }
-        },
-        onTagClicked: function (evt, ui) {
-          // Exit early if language not set - can't handle, too complicated.
-          if ($("#language_id").val() == "0") {
-            return;
-          }
-
-          if (form_changed) {
-            choice = confirm('You have unsaved changes, going to the parent will lose them.  Continue?');
-            if (! choice) {
-              return;
-            }
-          }
-
-          let clickedtagtext = $('#parentslist').tagit('tagLabel', ui.tag);
-          if (clickedtagtext == '')
-            return;
-
-          // alert("You clicked me: " + clickedtagtext);
-          // We should never reach this point if the lang is not set.
-          const langid = $("#language_id").val();
-          let url = '';
-          {% if embedded_in_reading_frame %}
-          url = `/read/termform/${langid}/${clickedtagtext}`;
-          {% else %}
-          url = `/term/editbytext/${langid}/${clickedtagtext}`;
-          {% endif %}
-          // alert('go to url ' + url);
-
-          window.location = url;
-        },
-
-        fieldName: prototypeFieldName.replace('__name__', 0),
-        allowSpaces: true,
-        autocomplete: {
-          source: function(request, response) {
-            const s = encodeURIComponent(request.term);
-            const langid = parseInt($('#language_id').val());
-            $.ajax({
-              url: `/term/search/${s}/${langid}`,
-              type: 'GET',
-              dataType: 'json',
-              minLength: 2,
-              success: function(data) {
-                arr = data.map(function(word) {
-                  let label = word.text;
-                  if (word.translation != null && word.translation != '') {
-                    label = `${label} (${word.translation})`;
-                  }
-                  const obj = {
-                    label: label,
-                    value: word.text,
-                    word: word.text,
-                    translation: word.translation
-                  };
-                  return obj;
-                });
-                response(arr, data);
-              } // end success
-            }) // end ajax
-          } // end source
-        } // end autocomplete
+    tagify.on('click', function (e) {
+      // Exit early if language not set - will not handle, too complicated.
+      const langid = document.getElementById("language_id").value;
+      const clickedTagText = e.detail.data.value;
+      if (langid === "0" || clickedTagText === '') {
+        return;
       }
-    );  // end tagit
+
+      if (form_changed) {
+        const msg = 'You have unsaved changes, going to the parent will lose them.  Continue?';
+        if (!confirm(msg))
+          return;
+      }
+
+      let url = '';
+      if ("{{ embedded_in_reading_frame }}" == "True") {
+        url = `/read/termform/${langid}/${clickedTagText}`;
+      } else {
+        url = `/term/editbytext/${langid}/${clickedTagText}`;
+      }
+      window.location.href = url;
+    });
+
+    // Autocomplete
+    var controller;
+    tagify.on('input', onInput);
+    function onInput(e) {
+      tagify.whitelist = null;  // Reset whitelist.
+      if (e.detail.value == '') {
+        return;
+      }
+      const s = encodeURIComponent(e.detail.value);
+      const langid = parseInt(document.getElementById('language_id').value);
+
+      // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
+      controller && controller.abort()
+      controller = new AbortController()
+
+      // show loading animation and hide the suggestions dropdown
+      tagify.loading(true).dropdown.hide()
+
+      let make_dropdown = function(hsh) {
+        t = hsh.translation ?? '';
+        if (t == '') {
+          return hsh.text;
+        }
+        return `${hsh.text} (${hsh.translation})`;
+      };
+
+      fetch(`/term/search/${s}/${langid}`, {signal:controller.signal})
+        .then(RES => RES.json())
+        .then(function(data) {
+          const newWhitelist = data.map((a) => ({
+            "value": a.text,
+            "suggestion": make_dropdown(a)
+          }));
+          tagify.whitelist = newWhitelist; // update whitelist Array in-place
+          tagify.loading(false).dropdown.show(s); // render the suggestions dropdown
+      });
+    };  // end function onInput
+
+    return tagify;
   }
 
 
   var TAGS = {{ tags | safe }};
 
-  let setup_term_tags_Tagit = function() {
-    // Note that Flask_WTF uses <fieldname>-{index}
-    // for mapping to and from FieldLists!
-    var prototypeFieldName = 'term_tags-__name__';
-    var fieldIndex = 0;
-    
-    let invalidChar = function(s) { return /[\uD800-\uDFFF]/.test(s); };
-
-    $('#termtagslist').tagit(
-      {
-        placeholderText: 'Tags',
-        beforeTagAdded: function (_event, ui) {
-          if (invalidChar(ui.tag.text())) {
-            return;
-          }
-          fieldIndex++;
-          $(this).tagit({fieldName: prototypeFieldName.replace('__name__', fieldIndex)});
-        },
-        availableTags: TAGS,
-        fieldName: prototypeFieldName.replace('__name__', 0)
-      });
-
+  let setup_term_tags_tagify = function(input) {
+    const tagify = new Tagify(input, {
+      placeholder: 'Tags',
+      editTags: false,
+      autoComplete: { rightKey: true },
+      enforceWhitelist: false,
+      whitelist: TAGS
+    });  // end tagify
   };
 
   // TODO zzfuture fix: check term autofocus
@@ -226,11 +183,13 @@
         wordfield.focus();
       }
     }
+  };
 
-  }
   $(document).ready(function () {
-    setup_parent_Tagit();
-    setup_term_tags_Tagit();
+    var parentslist = document.getElementById('parentslist');
+    var parents_tagify = setup_parent_tagify(parentslist);
+    var termtagslist = document.getElementById('termtagslist');
+    var termtags_tagify = setup_term_tags_tagify(termtagslist);
 
     // Setup complete, can now start monitoring form.
     monitor_form = true;
