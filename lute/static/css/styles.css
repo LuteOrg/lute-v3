@@ -303,7 +303,7 @@ span.hamburger {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 1001; /* higher than audio and header */
+  z-index: 1004; /* higher than audio, header and right_pane (for mobile view) */
   height: 100vh;
   border-right: 4px solid #a9cfef;
   box-shadow: 1px 0 3px 2px #9393933d;
@@ -642,7 +642,7 @@ img
 /* Widening the tooltip. */
 div.ui-tooltip {
     max-width: 400px !important;
-    z-index: 888; /*less than audio, header and side menu */
+    z-index: 1000; /*higher than audio because of words on the bottom, but lower than header and side menu */
 }
 
 .tooltip-image {
@@ -1229,8 +1229,12 @@ div.help-text {
         width: 100%;
         background: var(--background-color);
         height: 7.5rem;
-        z-index: 1000;
+        z-index: 1001;
         box-shadow: 0 0 12px 0 #dfdfdf;
+    }
+
+    div.ui-tooltip {
+        z-index: 1002;
     }
 
     #read_pane_left {
@@ -1250,7 +1254,7 @@ div.help-text {
 
     div#read_pane_right {
         background-color: white;
-        z-index: 1002;
+        z-index: 1003;
         transform: translateY(100%);
         /* transition: all creates issues for drag resizing (laggy, slow)*/
         transition: transform 0.2s cubic-bezier(0.77,0.2,0.05,1.0), 

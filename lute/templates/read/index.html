@@ -181,6 +181,7 @@
   let mouseY;
   let scrollY;
   let scrollYBeforeReload;
+  let tooltipPos = {my: 'left top+10', at: 'left bottom', collision: 'flipfit flip'};
   const mediaTablet = window.matchMedia("(max-width: 980px)");
   const readPaneRight = document.getElementById("read_pane_right");
   const btmMarginCont = document.querySelector(".btm-margin-container");
@@ -211,6 +212,10 @@
     });
     
     theTextReloadObs.observe(theText, {childList: true, subtree: true});
+
+    if (mediaTablet.matches) {
+      tooltipPos = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
+    }
     
     if (have_audio_file()) {
       // Don't actually load the source -- for some reason,
@@ -301,20 +306,16 @@
     const pagenum = parseInt($('#page_num').val());
     const maxpage = parseInt($('#page_count').val());
     if (pagenum > 1) {
-      $('#navPrev10').removeClass('read_page_disabled');
       $('#navPrev').removeClass('read_page_disabled');
     }
     else {
-      $('#navPrev10').addClass('read_page_disabled');
       $('#navPrev').addClass('read_page_disabled');
     }
     if (pagenum < maxpage) {
       $('#navNext').removeClass('read_page_disabled');
-      $('#navNext10').removeClass('read_page_disabled');
     }
     else {
       $('#navNext').addClass('read_page_disabled');
-      $('#navNext10').addClass('read_page_disabled');
     }
     //toggleSliderStatus();
   };
@@ -418,7 +419,7 @@
         show_hide_title(actualPage);
 
         if (initial_page_load) {
-          prepareTextInteractions();
+          prepareTextInteractions(tooltipPos);
         }
 
         // Magic hack for player source to load consistently
