@@ -185,11 +185,7 @@
   const mediaTablet = window.matchMedia("(max-width: 980px)");
   const readPaneRight = document.getElementById("read_pane_right");
   const btmMarginCont = document.querySelector(".btm-margin-container");
-
-  document.addEventListener("click", (event) => {
-    mouseY = event.clientY;
-    scrollY = window.scrollY;
-  });
+  const theText = document.getElementById("thetext");
 
   // fixes the "bug" where if right pane is opened in mobile view and after the screen is resized up,
   // right pane doesn't translate up to 0 because of inline transform property
@@ -200,6 +196,15 @@
       readPaneRight.style.removeProperty("transform");
     }
   })
+
+  document.addEventListener("click", (event) => {
+      mouseY = event.clientY;
+      scrollY = window.scrollY;
+  });
+
+  window.addEventListener("scrollend", function(e) {
+    scrollYBeforeReload = window.scrollY;
+  });
 
   $(document).ready(function () {
     const theTextReloadObs = new MutationObserver((mutationList, observer) => {
