@@ -88,6 +88,7 @@
             // TODO zzfuture fix: security - add CSRF token
             const ret = [];
             const bkid = row[3];
+            const bktitle = encodeURIComponent(row[0]);
             if (row[4] == 0) {
               // not archived
               ret.push(`<img src="{{ url_for('static', filename='icn/document--pencil.png') }}" title="Edit" onclick="edit_book(${bkid})" />`);
@@ -96,8 +97,7 @@
             else {
               ret.push(`<img src="{{ url_for('static', filename='icn/inbox-upload.png') }}" title="Unarchive" onclick="confirm_unarchive(${bkid})" />`);
             }
-            ret.push(`<img src="{{ url_for('static', filename='icn/minus-button.png') }}" title="Delete" onclick="confirm_delete(${bkid})" />`);
-
+            ret.push(`<img src="{{ url_for('static', filename='icn/minus-button.png') }}" title="Delete" data-bktitle="${bktitle}" data-bkid="${bkid}" onclick="confirm_delete(this)" />`);
             return ret.join('&nbsp;');
           }
         },
@@ -156,8 +156,10 @@
     document.location = `/book/edit/${bookid}`;
   }
 
-  function confirm_delete(bookid) {
-    if (!confirm(`Deleting a book.  Click OK to proceed, or Cancel.`)) {
+  function confirm_delete(el) {
+    const booktitle = decodeURIComponent($(el).data('bktitle'));
+    const bookid = $(el).data('bkid');
+    if (!confirm(`Deleting "${booktitle}".  Click OK to proceed, or Cancel.`)) {
       return;
     }
     do_action_post('delete', bookid);
