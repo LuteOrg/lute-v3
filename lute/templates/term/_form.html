@@ -80,7 +80,12 @@
       autoComplete: { rightKey: true },
       enforceWhitelist: false,
       whitelist: [],
-      dropdown: { mapValueTo: 'suggestion' },
+      dropdown: {
+        enabled: 2,  // Min 2 chars - this doesn't seem to work.
+        maxItems: 20,
+        mapValueTo: 'suggestion',  // Field to display
+        placeAbove: false,  // Always put the dropdown below the textbox
+      },
     });  // end tagify
 
     tagify.on('click', function (e) {
@@ -111,7 +116,7 @@
     tagify.on('input', onInput);
     function onInput(e) {
       tagify.whitelist = null;  // Reset whitelist.
-      if (e.detail.value == '') {
+      if (e.detail.value == '' || e.detail.value.length < 2) {
         controller && controller.abort();
         tagify.whitelist = [];
         tagify.loading(false).dropdown.hide();
@@ -128,11 +133,16 @@
       tagify.loading(true).dropdown.hide()
 
       let make_dropdown = function(hsh) {
-        t = hsh.translation ?? '';
+        let t = hsh.translation ?? '';
         if (t == '') {
           return hsh.text;
         }
-        return `${hsh.text} (${hsh.translation})`;
+        t = t.replaceAll("\n", "; ").replaceAll("\r", "");
+        const maxlen = 70
+        if (t.length > maxlen) {
+          t = t.substring(0, maxlen) + "...";
+        }
+        return `${hsh.text} (${t})`;
       };
 
       fetch(`/term/search/${s}/${langid}`, {signal:controller.signal})
