@@ -811,7 +811,7 @@ div.code pre {
     align-items: center;
     justify-content: center;
     gap: 1px;
-    width: 95%;
+    width: 100%;
     border-radius: 3px;
     box-sizing: border-box;
     background-color: #787878;
@@ -862,10 +862,15 @@ div.code pre {
     background-color: var(--status-99-color);
 }
 
+#booktable td {
+    vertical-align: middle;
+}
+
 /* remove top and bottom padding to be able to increase the stats bar height */
-#booktable tr td:nth-child(5) {
+.status-bar-td {
     padding-bottom: 0 !important;
     padding-top: 0 !important;
+    padding-right: 1.3rem !important;
 }
 
 /* read slider */

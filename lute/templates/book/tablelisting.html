@@ -78,6 +78,7 @@
           "searchable": false,
           "orderable": false,
           "width": "30%",
+          "createdCell": (td, cellData, rowData, row, col) => $(td).addClass("status-bar-td"),
           "render": function ( data, type, row, meta ) {
             let ret;
             const bookId = row[3];
