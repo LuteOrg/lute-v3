@@ -153,7 +153,12 @@
           }));
           tagify.whitelist = newWhitelist; // update whitelist Array in-place
           tagify.loading(false).dropdown.show(s); // render the suggestions dropdown
-      });
+        }).catch(err => {
+          if (err.name === 'AbortError') {
+            // Do nothing, fetch was aborted due to another fetch.
+            // console.log('AbortError: Fetch request aborted');
+          }
+        });
     };  // end function onInput
 
     return tagify;
