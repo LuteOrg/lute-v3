@@ -180,14 +180,12 @@
 <script>
   let mouseY;
   let scrollY;
+  let scrollYBeforeReload;
+  let tooltipPos = {my: 'left top+10', at: 'left bottom', collision: 'flipfit flip'};
   const mediaTablet = window.matchMedia("(max-width: 980px)");
   const readPaneRight = document.getElementById("read_pane_right");
   const btmMarginCont = document.querySelector(".btm-margin-container");
-
-  document.addEventListener("click", (event) => {
-    mouseY = event.clientY;
-    scrollY = window.scrollY;
-  });
+  const theText = document.getElementById("thetext");
 
   // fixes the "bug" where if right pane is opened in mobile view and after the screen is resized up,
   // right pane doesn't translate up to 0 because of inline transform property
@@ -199,7 +197,26 @@
     }
   })
 
+  document.addEventListener("click", (event) => {
+      mouseY = event.clientY;
+      scrollY = window.scrollY;
+  });
+
+  window.addEventListener("scrollend", function(e) {
+    scrollYBeforeReload = window.scrollY;
+  });
+
   $(document).ready(function () {
+    const theTextReloadObs = new MutationObserver((mutationList, observer) => {
+      if (scrollYBeforeReload) window.scrollTo(0, scrollYBeforeReload);
+    });
+    
+    theTextReloadObs.observe(theText, {childList: true, subtree: true});
+
+    if (mediaTablet.matches) {
+      tooltipPos = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
+    }
+    
     if (have_audio_file()) {
       // Don't actually load the source -- for some reason,
       // the ajax page load was causing the audio src to
@@ -289,20 +306,16 @@
     const pagenum = parseInt($('#page_num').val());
     const maxpage = parseInt($('#page_count').val());
     if (pagenum > 1) {
-      $('#navPrev10').removeClass('read_page_disabled');
       $('#navPrev').removeClass('read_page_disabled');
     }
     else {
-      $('#navPrev10').addClass('read_page_disabled');
       $('#navPrev').addClass('read_page_disabled');
     }
     if (pagenum < maxpage) {
       $('#navNext').removeClass('read_page_disabled');
-      $('#navNext10').removeClass('read_page_disabled');
     }
     else {
       $('#navNext').addClass('read_page_disabled');
-      $('#navNext10').addClass('read_page_disabled');
     }
     //toggleSliderStatus();
   };
@@ -406,7 +419,7 @@
         show_hide_title(actualPage);
 
         if (initial_page_load) {
-          prepareTextInteractions();
+          prepareTextInteractions(tooltipPos);
         }
 
         // Magic hack for player source to load consistently
