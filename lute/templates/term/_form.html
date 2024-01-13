@@ -63,19 +63,13 @@
 
 <script type="text/javascript">
 
-  // Preventing user navigating away by clicking on form parent tags.
-  // Done with monitor_form and form_changed vars.
-  // Only start monitoring the form for changes after everything has
-  // been initialized.
   // TODO zzfuture fix: acceptance tests for all interactions
-  let monitor_form = false;
 
   // Monitor state of form change (hacky, but seems to work).
   let form_changed = false;
 
   // This takes care of most controls, but not the tagit managed lists.
   $("form :input").change(function() {
-    if (monitor_form)
       form_changed = true;
   });
 
@@ -187,9 +181,6 @@
     var parents_tagify = setup_parent_tagify(parentslist);
     var termtagslist = document.getElementById('termtagslist');
     var termtags_tagify = setup_term_tags_tagify(termtagslist);
-
-    // Setup complete, can now start monitoring form.
-    monitor_form = true;
 
     if (($('#text').val() ?? '') != '') {
       do_term_lookup(false);
