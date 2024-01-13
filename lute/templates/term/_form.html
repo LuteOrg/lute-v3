@@ -65,10 +65,9 @@
 
   // TODO zzfuture fix: acceptance tests for all interactions
 
-  // Monitor state of form change (hacky, but seems to work).
+  // Monitor state of form change.
   let form_changed = false;
 
-  // This takes care of most controls, but not the tagit managed lists.
   $("form :input").change(function() {
       form_changed = true;
   });
