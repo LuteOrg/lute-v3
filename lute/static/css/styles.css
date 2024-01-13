@@ -966,39 +966,8 @@ ul.shorttaglist {
     padding: 0;
 }
 
-ul.tagit input.ui-autocomplete-input {
-    padding: 0.25rem 0.2rem;
-    width: 70px;
-}
-
 ::placeholder {
     font-family: inherit;
-}
-
-ul.tagit li {
-    margin: 0;
-    padding: 0.2rem 1.3rem 0.2rem 0.5rem;
-}
-
-ul.tagit li.tagit-new {
-    padding: 0;
-}
-
-ul.tagit li.tagit-choice {
-  display: flex;
-  align-items: center;
-}
-
-ul.tagit .tagit-label {
-  font-size: 0.8rem;
-}
-
-ul.tagit li.tagit-choice-editable {
-    flex-shrink: 0;
-}
-
-ul.form-control label {
-    cursor: pointer; /* Add pointer cursor for better UX */
 }
 
 .btn {
