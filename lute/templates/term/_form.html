@@ -112,6 +112,9 @@
     function onInput(e) {
       tagify.whitelist = null;  // Reset whitelist.
       if (e.detail.value == '') {
+        controller && controller.abort();
+        tagify.whitelist = [];
+        tagify.loading(false).dropdown.hide();
         return;
       }
       const s = encodeURIComponent(e.detail.value);
