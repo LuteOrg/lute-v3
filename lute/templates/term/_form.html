@@ -65,12 +65,9 @@
 
   // Preventing user navigating away by clicking on form parent tags.
   // Done with monitor_form and form_changed vars.
-  // TODO zzfuture fix: acceptance tests for all interactions
-
   // Only start monitoring the form for changes after everything has
-  // been initialized.  Tagit calls before/afterTagAdded etc during
-  // initialization of the form, and we don't want those changes to
-  // be treated as user-activated changes.
+  // been initialized.
+  // TODO zzfuture fix: acceptance tests for all interactions
   let monitor_form = false;
 
   // Monitor state of form change (hacky, but seems to work).
@@ -238,6 +235,18 @@
   };
 
 
+  /** Parents are in the tagify-managed #parentslist input box. */
+  let get_parents = function() {
+    const pdata = $('#parentslist').val();
+    if ((pdata ?? '') == '') {
+      return [];
+    }
+    const j = JSON.parse(pdata)
+    const parents = j.map(e => e.value);
+    return parents;
+  };
+
+
   let do_image_lookup = function() {
     const langid = $('#language_id').val();
     const text = $('#text').val();
@@ -250,22 +259,9 @@
     let use_text = text;
 
     // If there is a single parent, use that as the basis of the lookup.
-    // Get text for all parent tags.
-    // There is **likely** an easier way to get this with jquery!
-    let parentTags = [];
-    $('form input').each(
-      function(index) {
-        var input = $(this);
-        let n = input.attr('name');
-        // The parent tag inputs are created in setup_parent_Tagit,
-        // with name parents-{index}
-        if (typeof n !== "undefined" && n != null && n.startsWith('parents-')) {
-           parentTags.push(input.val());
-        }
-    });
-    let parent_text = null;
-    if (parentTags.length == 1)
-      use_text = parentTags[0];
+    const parents = get_parents();
+    if (parents.length == 1)
+      use_text = parents[0];
 
     const raw_bing_url = 'https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle';
     const binghash = raw_bing_url.replace('https://www.bing.com/images/search?', '');
