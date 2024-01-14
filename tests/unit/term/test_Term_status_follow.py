@@ -30,21 +30,21 @@ def fixture_term_family(app_context, english):
             "Set up terms."
             # pylint: disable=invalid-name
             A = DBTerm(english, "A")
-            B = DBTerm(english, "B")
+            B = DBTerm(english, "Byes")
             B.add_parent(A)
             B.follow_parent = True
-            b1 = DBTerm(english, "b1")
+            b1 = DBTerm(english, "b1yes")
             b1.add_parent(B)
             b1.follow_parent = True
-            b2 = DBTerm(english, "b2")
+            b2 = DBTerm(english, "b2no")
             b2.add_parent(B)
 
-            C = DBTerm(english, "C")
+            C = DBTerm(english, "Cno")
             C.add_parent(A)
-            c1 = DBTerm(english, "c1")
+            c1 = DBTerm(english, "c1yes")
             c1.add_parent(C)
             c1.follow_parent = True
-            c2 = DBTerm(english, "c2")
+            c2 = DBTerm(english, "c2no")
             c2.add_parent(C)
 
             db.session.add(A)
@@ -68,12 +68,12 @@ def fixture_term_family(app_context, english):
 
     expected_initial_state = """
     A: 1
-    B: 1
-    b/1: 1
-    b/2: 1
-    C: 1
-    c/1: 1
-    c/2: 1
+    Byes: 1
+    b/1/yes: 1
+    b/2/no: 1
+    Cno: 1
+    c/1/yes: 1
+    c/2/no: 1
     """
     assert_statuses(expected_initial_state, "initial state")
 
@@ -89,7 +89,7 @@ def assert_statuses(expected, msg):
     assert_sql_result(sql, lines, msg)
 
 
-def test_term_follows_parent_status(term_family, app_context):
+def test_parent_status_propagates_down(term_family, app_context):
     "Changing status should propagate down the tree."
     f = term_family
     f.A.status = 4
@@ -98,12 +98,119 @@ def test_term_follows_parent_status(term_family, app_context):
 
     expected = """
     A: 4
-    B: 4
-    b/1: 4
-    b/2: 1
-    C: 1
-    c/1: 1
-    c/2: 1
+    Byes: 4
+    b/1/yes: 4
+    b/2/no: 1
+    Cno: 1
+    c/1/yes: 1
+    c/2/no: 1
     """
-
     assert_statuses(expected, "updated")
+
+
+def test_term_propagates_up_and_down(term_family, app_context):
+    "Parent and child also updated."
+    f = term_family
+    f.B.status = 4
+    db.session.add(f.B)
+    db.session.commit()
+
+    expected = """
+    A: 4
+    Byes: 4
+    b/1/yes: 4
+    b/2/no: 1
+    Cno: 1
+    c/1/yes: 1
+    c/2/no: 1
+    """
+    assert_statuses(expected, "updated")
+
+
+def test_term_stops_propagating_to_top(term_family, app_context):
+    "Goes up the tree until it stops."
+    f = term_family
+    f.c1.status = 4
+    db.session.add(f.c1)
+    db.session.commit()
+
+    expected = """
+    A: 1
+    Byes: 1
+    b/1/yes: 1
+    b/2/no: 1
+    Cno: 4
+    c/1/yes: 4
+    c/2/no: 1
+    """
+    assert_statuses(expected, "updated")
+
+
+def test_term_not_following_parent(term_family, app_context):
+    "Doesn't update parent."
+    f = term_family
+    f.b2.status = 4
+    db.session.add(f.b2)
+    db.session.commit()
+
+    expected = """
+    A: 1
+    Byes: 1
+    b/1/yes: 1
+    b/2/no: 4
+    Cno: 1
+    c/1/yes: 1
+    c/2/no: 1
+    """
+    assert_statuses(expected, "updated")
+
+
+def test_parent_not_updated_if_term_has_multiple_parents(term_family, app_context):
+    "Doesn't update parent."
+    f = term_family
+    f.c1.add_parent(f.B)
+    db.session.add(f.c1)
+    db.session.commit()
+
+    f.c1.status = 4
+    db.session.add(f.c1)
+    db.session.commit()
+
+    expected = """
+    A: 1
+    Byes: 1
+    b/1/yes: 1
+    b/2/no: 1
+    Cno: 1
+    c/1/yes: 4
+    c/2/no: 1
+    """
+    assert_statuses(expected, "updated")
+
+
+def test_adding_new_term_changes_family_if_added(english, term_family, app_context):
+    "Doesn't update parent."
+    f = term_family
+
+    b3 = DBTerm(english, "b3yes")
+    b3.add_parent(f.B)
+    b3.status = 3
+    b3.follow_parent = True
+    db.session.add(b3)
+    db.session.commit()
+
+    expected = """
+    A: 3
+    Byes: 3
+    b/1/yes: 3
+    b/2/no: 1
+    b/3/yes: 3
+    Cno: 1
+    c/1/yes: 1
+    c/2/no: 1
+    """
+    assert_statuses(expected, "updated")
+
+
+# add multiple parents
+# changing to follow the parent - updates
