@@ -270,7 +270,3 @@ def test_adding_new_term_does_not_change_family_if_multiple_parents(
     c/2/no: 1
     """
     assert_statuses(expected, "updated")
-
-
-# add multiple parents
-# changing to follow the parent - updates
