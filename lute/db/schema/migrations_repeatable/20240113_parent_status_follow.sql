@@ -36,7 +36,6 @@ DROP TRIGGER IF EXISTS trig_wordparents_update_WoStatusChanged_parent_follow;
 
 CREATE TRIGGER trig_wordparents_update_WoStatusChanged_parent_follow
 AFTER INSERT ON wordparents
-FOR EACH ROW
 BEGIN
     UPDATE words
     SET WoStatus = (
