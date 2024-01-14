@@ -34,14 +34,18 @@ def fixture_term_family(app_context, english):
             B.add_parent(A)
             B.follow_parent = True
             b1 = DBTerm(english, "b1")
+            b1.add_parent(B)
             b1.follow_parent = True
             b2 = DBTerm(english, "b2")
+            b2.add_parent(B)
 
             C = DBTerm(english, "C")
             C.add_parent(A)
             c1 = DBTerm(english, "c1")
+            c1.add_parent(C)
             c1.follow_parent = True
             c2 = DBTerm(english, "c2")
+            c2.add_parent(C)
 
             db.session.add(A)
             db.session.add(B)
