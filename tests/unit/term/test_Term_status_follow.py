@@ -212,5 +212,32 @@ def test_adding_new_term_changes_family_if_added(english, term_family, app_conte
     assert_statuses(expected, "updated")
 
 
+def test_adding_new_term_does_not_change_family_if_multiple_parents(
+    english, term_family, app_context
+):
+    "Doesn't update parent."
+    f = term_family
+
+    b3 = DBTerm(english, "b3yes")
+    b3.parents.append(f.B)
+    b3.parents.append(f.C)
+    b3.status = 3
+    b3.follow_parent = True
+    db.session.add(b3)
+    db.session.commit()
+
+    expected = """
+    A: 1
+    Byes: 1
+    b/1/yes: 1
+    b/2/no: 1
+    b/3/yes: 3
+    Cno: 1
+    c/1/yes: 1
+    c/2/no: 1
+    """
+    assert_statuses(expected, "updated")
+
+
 # add multiple parents
 # changing to follow the parent - updates
