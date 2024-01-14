@@ -222,7 +222,6 @@ def test_adding_new_term_does_not_change_family_if_multiple_parents(
     b3.parents.append(f.B)
     b3.parents.append(f.C)
     b3.status = 3
-    b3.follow_parent = True
     db.session.add(b3)
     db.session.commit()
 
