@@ -1,9 +1,9 @@
 DROP TRIGGER IF EXISTS trig_words_update_WoStatusChanged_parent_follow;
 
 CREATE TRIGGER trig_words_update_WoStatusChanged_parent_follow
-AFTER UPDATE OF WoStatus ON words
+AFTER UPDATE OF WoStatus, WoFollowParent ON words
 FOR EACH ROW
-WHEN old.WoStatus <> new.WoStatus
+WHEN (old.WoStatus <> new.WoStatus or (old.WoFollowParent = 0 and new.WoFollowParent = 1))
 BEGIN
     UPDATE words
     SET WoStatus = new.WoStatus
