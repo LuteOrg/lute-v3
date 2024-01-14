@@ -18,6 +18,9 @@ from flask import (
     send_from_directory,
     jsonify,
 )
+from sqlalchemy.event import listens_for
+from sqlalchemy.pool import Pool
+
 from lute.config.app_config import AppConfig
 from lute.db import db
 from lute.db.setup.main import setup_db
@@ -270,6 +273,11 @@ def _create_app(app_config, extra_config):
     app.env_config = app_config
 
     db.init_app(app)
+
+    @listens_for(Pool, "connect")
+    def _pragmas_on_connect(dbapi_con, con_record):  # pylint: disable=unused-argument
+        dbapi_con.execute("pragma recursive_triggers = on;")
+
     with app.app_context():
         db.create_all()
         UserSetting.load()
