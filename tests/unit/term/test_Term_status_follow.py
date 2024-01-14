@@ -165,6 +165,40 @@ def test_term_not_following_parent(term_family, app_context):
     assert_statuses(expected, "updated")
 
 
+def test_changing_follow_parent_propagates_status(term_family, app_context):
+    "Doesn't update parent."
+    f = term_family
+    f.b2.status = 4
+    db.session.add(f.b2)
+    db.session.commit()
+
+    expected = """
+    A: 1
+    Byes: 1
+    b/1/yes: 1
+    b/2/no: 4
+    Cno: 1
+    c/1/yes: 1
+    c/2/no: 1
+    """
+    assert_statuses(expected, "not following, not updated")
+
+    f.b2.follow_parent = True
+    db.session.add(f.b2)
+    db.session.commit()
+
+    expected = """
+    A: 4
+    Byes: 4
+    b/1/yes: 4
+    b/2/no: 4
+    Cno: 1
+    c/1/yes: 1
+    c/2/no: 1
+    """
+    assert_statuses(expected, "updated")
+
+
 def test_parent_not_updated_if_term_has_multiple_parents(term_family, app_context):
     "Doesn't update parent."
     f = term_family
