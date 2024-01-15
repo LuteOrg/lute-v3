@@ -122,6 +122,7 @@
         return;
       }
       const s = encodeURIComponent(e.detail.value);
+      // console.log(s);
       const langid = parseInt(document.getElementById('language_id').value);
 
       // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
@@ -129,16 +130,18 @@
       controller = new AbortController()
 
       let make_dropdown = function(hsh) {
+        // console.log(`text: ${hsh.text}`);
+        const txt = decodeURIComponent(hsh.text);
         let t = hsh.translation ?? '';
         if (t == '') {
-          return hsh.text;
+          return txt;
         }
         t = t.replaceAll("\n", "; ").replaceAll("\r", "");
         const maxlen = 70
         if (t.length > maxlen) {
           t = t.substring(0, maxlen) + "...";
         }
-        return `${hsh.text} (${t})`;
+        return `${txt} (${t})`;
       };
 
       tagify.loading(true);  // spinning animation during fetch.
@@ -150,11 +153,15 @@
             "suggestion": make_dropdown(a)
           }));
           tagify.whitelist = newWhitelist; // update whitelist Array in-place
-          tagify.loading(false).dropdown.show(s); // render the suggestions dropdown
+          const sdecode = decodeURIComponent(s);
+          tagify.loading(false).dropdown.show(sdecode); // render the suggestions dropdown
         }).catch(err => {
           if (err.name === 'AbortError') {
             // Do nothing, fetch was aborted due to another fetch.
             // console.log('AbortError: Fetch request aborted');
+          }
+          else {
+            console.log(`error: ${err}`);
           }
         });
     };  // end function onInput

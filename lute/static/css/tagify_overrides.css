@@ -41,4 +41,5 @@ tags.tagify {
 .tagify__dropdown__item {
     margin: 2px;
     padding: 0px;
+    font-size: 85%;
 }
