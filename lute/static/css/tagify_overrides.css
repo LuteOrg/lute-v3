@@ -1,0 +1,45 @@
+:root {
+  --tagify__tag-bg: #3498db;
+  --tagify__tag-color: #ffffff;
+  --tagify__tag-hover: #2980b9;
+  /* Add more custom variables as needed */
+}
+
+.tagify {
+  --tag-pad: 0.2em 0.2em;
+}
+
+.tagify__input {
+    margin: 0px;
+}
+
+ 
+tags.tagify {
+    font-size: 85%;
+    width: 100%;
+}
+
+.tagify__input::placeholder {
+    color: #D8D8D8;
+    opacity: 1; /* Firefox */
+}
+
+.tagify__input:empty:before {
+    content: attr(data-placeholder);
+    color: #D8D8D8;
+    opacity: 1;
+}
+ 
+.tagify__tag {
+    margin: 0px;
+    margin-inline: 0.2em;
+    margin-block: 0.2em;
+    font-size: 85%;
+    border: 1px solid #c5c5c5;
+}
+
+.tagify__dropdown__item {
+    margin: 2px;
+    padding: 0px;
+    font-size: 85%;
+}
