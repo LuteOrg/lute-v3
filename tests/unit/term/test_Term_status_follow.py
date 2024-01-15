@@ -108,7 +108,7 @@ def test_parent_status_propagates_down(term_family, app_context):
     assert_statuses(expected, "updated")
 
 
-def test_term_propagates_up_and_down(term_family, app_context):
+def test_status_propagates_up_and_down(term_family, app_context):
     "Parent and child also updated."
     f = term_family
     f.B.status = 4
@@ -127,7 +127,7 @@ def test_term_propagates_up_and_down(term_family, app_context):
     assert_statuses(expected, "updated")
 
 
-def test_term_stops_propagating_to_top(term_family, app_context):
+def test_status_stops_propagating_to_top(term_family, app_context):
     "Goes up the tree until it stops."
     f = term_family
     f.c1.status = 4
@@ -256,6 +256,7 @@ def test_adding_new_term_does_not_change_family_if_multiple_parents(
     b3.parents.append(f.B)
     b3.parents.append(f.C)
     b3.status = 3
+    # NOTE: setting "follow parent" causes weird propagation ...
     db.session.add(b3)
     db.session.commit()
 
@@ -270,3 +271,16 @@ def test_adding_new_term_does_not_change_family_if_multiple_parents(
     c/2/no: 1
     """
     assert_statuses(expected, "updated")
+
+
+def test_deleting_parent_deactivates_follow_parent(term_family, app_context):
+    "No more parent = no more follow."
+
+    sql = "select WoText from words where WoFollowParent = 1"
+    assert_sql_result(sql, ["Byes", "b/1/yes", "c/1/yes"], "before delete")
+
+    f = term_family
+    db.session.delete(f.A)
+    db.session.commit()
+
+    assert_sql_result(sql, ["b/1/yes", "c/1/yes"], "only direct children changed")
