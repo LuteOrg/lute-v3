@@ -128,9 +128,6 @@
       controller && controller.abort()
       controller = new AbortController()
 
-      // show loading animation and hide the suggestions dropdown
-      tagify.loading(true).dropdown.hide()
-
       let make_dropdown = function(hsh) {
         let t = hsh.translation ?? '';
         if (t == '') {
@@ -144,6 +141,7 @@
         return `${hsh.text} (${t})`;
       };
 
+      tagify.loading(true);  // spinning animation during fetch.
       fetch(`/term/search/${s}/${langid}`, {signal:controller.signal})
         .then(RES => RES.json())
         .then(function(data) {
