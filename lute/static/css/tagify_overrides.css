@@ -37,3 +37,8 @@ tags.tagify {
     font-size: 85%;
     border: 1px solid #c5c5c5;
 }
+
+.tagify__dropdown__item {
+    margin: 2px;
+    padding: 0px;
+}
