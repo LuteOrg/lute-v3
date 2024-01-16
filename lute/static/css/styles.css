@@ -1081,6 +1081,16 @@ div.help-text {
     gap: 0.5rem;
 }
 
+#status-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#follow-parent-container {
+    text-align: right;
+}
+
 #status {
     display: flex;
     list-style: none;

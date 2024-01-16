@@ -41,9 +41,12 @@
         src="{{ form.current_image.object_data or '' }}"/>
       </div>
 
-      <div>
+      <div id="status-container">
         {{ form.status(class="form-control") }}
-        {{ form.follow_parent(class="form-control", disabled=True) }} <label for="follow_parent">Follow parent</label>
+        <div id="follow-parent-container">
+          {{ form.follow_parent(class="form-control", disabled=True) }}
+          <label for="follow_parent">Follow parent</label>
+        </div>
       </div>
 
       <div>{{ form.current_image(class="form-control") }}</div>
