@@ -66,6 +66,10 @@
 
 <script type="text/javascript">
 
+  // The parent tag list, managed by tagify.
+  // Global reference needed for runtime inspection of tag list.
+  var parents_tagify = null;
+
   // TODO zzfuture fix: acceptance tests for all interactions
 
   // Monitor state of form change.
@@ -120,6 +124,19 @@
         url = `/term/editbytext/${langid}/${clickedTagText}`;
       }
       window.location.href = url;
+    });
+
+    tagify.on('add remove', function (e) {
+      // The #parents_list text box isn't updated consistently
+      // during events, so we have to check the tagify var
+      // itself, which has an accurate list of current tags.
+      const single_parent = (parents_tagify.value.length == 1);
+      const cb = $("#follow_parent");
+      cb.prop("checked", single_parent);
+      if (single_parent)
+        cb.removeAttr("disabled");
+      else
+        cb.attr("disabled", true);
     });
 
     // Autocomplete
@@ -184,6 +201,10 @@
 
   /** Parents are in the tagify-managed #parentslist input box. */
   let get_parents = function() {
+    // During form load, and in "steady state" (i.e., after the tags
+    // have been added or removed, and the focus has switched to
+    // another control) the #follow_parent text box is loaded with the
+    // values.
     const pdata = $('#parentslist').val();
     if ((pdata ?? '') == '') {
       return [];
@@ -193,6 +214,13 @@
     return parents;
   };
 
+  let enable_disable_follow_parent_checkbox = function() {
+    const cb = $("#follow_parent");
+    if (get_parents().length == 1)
+      cb.removeAttr("disabled");
+    else
+      cb.attr("disabled", true);
+  };
 
   var TAGS = {{ tags | safe }};
 
@@ -222,10 +250,9 @@
     }
   };
 
-
   $(document).ready(function () {
     var parentslist = document.getElementById('parentslist');
-    var parents_tagify = setup_parent_tagify(parentslist);
+    parents_tagify = setup_parent_tagify(parentslist);
     var termtagslist = document.getElementById('termtagslist');
     var termtags_tagify = setup_term_tags_tagify(termtagslist);
 
@@ -239,11 +266,7 @@
     // because this form is opened in a frame.
     window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
 
-    // $("#follow_parent").attr("disabled", true);
-    if (get_parents().length == 1) {
-      $("#follow_parent").removeAttr("disabled");
-    }
-
+    enable_disable_follow_parent_checkbox();
   });
 
   /** LOOKUPS */
