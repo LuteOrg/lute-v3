@@ -323,6 +323,9 @@ class Repository:
         for tp in termparents:
             t.add_parent(tp)
 
+        if len(termparents) != 1:
+            t.follow_parent = False
+
         return t
 
     def _find_or_create_parent(self, pt, language, term, termtags) -> DBTerm:
