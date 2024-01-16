@@ -178,35 +178,58 @@ class Repository:
         matches = (
             self.db.session.query(DBTerm)
             .filter(
-                and_(DBTerm.language_id == langid, DBTerm.text_lc.like(search + "%"))
+                and_(
+                    DBTerm.language_id == langid,
+                    DBTerm.text_lc.like("%" + search + "%"),
+                )
             )
             .all()
         )
 
         exact = [t for t in matches if t.text_lc == text_lc]
+        remaining = [t for t in matches if t.text_lc != text_lc]
 
+        # Split remaining into things that start with the search term
+        # and the rest.
+        def partition(arr, pred):
+            meets = []
+            notmeets = []
+            for x in arr:
+                if pred(x):
+                    meets.append(x)
+                else:
+                    notmeets.append(x)
+            return (meets, notmeets)
+
+        remain_starts_with, remain_rest = partition(
+            remaining, lambda t: t.text_lc.startswith(search)
+        )
+
+        # Sort terms with children to top,
+        # then alphabetically.
         def compare(item1, item2):
+            # More children sort to top.
             c1 = len(item1.children)
             c2 = len(item2.children)
             if c1 > c2:
                 return -1
             if c1 < c2:
                 return 1
+
+            # Equal children sort alphabetically.
             t1 = item1.text_lc
             t2 = item2.text_lc
             if t1 < t2:
                 return -1
             if t1 > t2:
                 return 1
+
+            # Failsafe, should never get here.
             return 0
 
-        remaining = [t for t in matches if t.text_lc != text_lc]
-        # for t in remaining:
-        #     print(f'term: {t.text}; child count = {len(t.children)}')
-        remaining.sort(key=functools.cmp_to_key(compare))
-        # print('remaining = ')
-        # print(remaining)
-        ret = exact + remaining
+        remain_starts_with.sort(key=functools.cmp_to_key(compare))
+        remain_rest.sort(key=functools.cmp_to_key(compare))
+        ret = exact + remain_starts_with + remain_rest
         ret = ret[:max_results]
         return [self._build_business_term(t) for t in ret]
 
