@@ -41,7 +41,10 @@
         src="{{ form.current_image.object_data or '' }}"/>
       </div>
 
-      <div>{{ form.status(class="form-control") }}</div>
+      <div>
+        {{ form.status(class="form-control") }}
+        {{ form.follow_parent(class="form-control", disabled=True) }} <label for="follow_parent">Follow parent</label>
+      </div>
 
       <div>{{ form.current_image(class="form-control") }}</div>
 
@@ -176,7 +179,19 @@
     };  // end function onInput
 
     return tagify;
-  }
+  }  // end setup_parent_tagify
+
+
+  /** Parents are in the tagify-managed #parentslist input box. */
+  let get_parents = function() {
+    const pdata = $('#parentslist').val();
+    if ((pdata ?? '') == '') {
+      return [];
+    }
+    const j = JSON.parse(pdata)
+    const parents = j.map(e => e.value);
+    return parents;
+  };
 
 
   var TAGS = {{ tags | safe }};
@@ -207,6 +222,7 @@
     }
   };
 
+
   $(document).ready(function () {
     var parentslist = document.getElementById('parentslist');
     var parents_tagify = setup_parent_tagify(parentslist);
@@ -222,6 +238,12 @@
     // this.dispatchEvent(new Event("termFormOpened"));
     // because this form is opened in a frame.
     window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
+
+    // $("#follow_parent").attr("disabled", true);
+    if (get_parents().length == 1) {
+      $("#follow_parent").removeAttr("disabled");
+    }
+
   });
 
   /** LOOKUPS */
@@ -254,18 +276,6 @@
     ret = ret.replace('###', searchterm);
     // console.log(ret);
     return ret;
-  };
-
-
-  /** Parents are in the tagify-managed #parentslist input box. */
-  let get_parents = function() {
-    const pdata = $('#parentslist').val();
-    if ((pdata ?? '') == '') {
-      return [];
-    }
-    const j = JSON.parse(pdata)
-    const parents = j.map(e => e.value);
-    return parents;
   };
 
 
