@@ -85,6 +85,15 @@
         mapValueTo: 'suggestion',  // Field to display
         placeAbove: false,  // Always put the dropdown below the textbox
       },
+      templates: {
+        dropdownFooter(suggestions) {
+          var hasMore = suggestions.length - this.settings.dropdown.maxItems;
+          if (hasMore <= 0)
+            return '';
+          return `<footer data-selector='tagify-suggestions-footer' class="${this.settings.classNames.dropdownFooter}">
+            (more items available, please refine your search.)</footer>`;
+        }
+      }
     });  // end tagify
 
     tagify.on('click', function (e) {
