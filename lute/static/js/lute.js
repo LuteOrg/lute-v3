@@ -555,27 +555,16 @@ function handle_keydown (e) {
 }
 
 
-/**
- * post update ajax call, fix the UI.
- */
-function update_selected_statuses(newStatus, elements) {
-  if (!elements) {
-    console.error('Expecting argument `elements` to exist');
-    return;
-  }
-  const newClass = `status${newStatus}`;
-  let update_data_status_class = function (e) {
-    const curr = $(this);
-    ltext = curr.text().toLowerCase();
-    matches = $('span.word').toArray().filter(el => $(el).text().toLowerCase() == ltext);
-    matches.forEach(function (m) {
-      $(m).removeClass('status98 status99 status0 status1 status2 status3 status4 status5 shiftClicked')
-        .addClass(newClass)
-        .attr('data-status-class',`${newClass}`);
-    });
-  };
-  $(elements).each(update_data_status_class)
-}
+
+/** Reload the current page. */
+let reload_text_div = function() {
+  const bookid = $('#book_id').val();
+  const pagenum = $('#page_num').val();
+  const url = `/read/renderpage/${bookid}/${pagenum}`;
+  const repel = $('#thetext');
+  repel.load(url);
+};
+
 
 /**
  * If the term editing form is visible when reading, and a hotkey is hit,
@@ -620,7 +609,7 @@ function update_status_for_elements(new_status, elements) {
     dataType: 'JSON',
     contentType: 'application/json',
     success: function(response) {
-      update_selected_statuses(new_status, elements);
+      reload_text_div();
       if (texts.length == 1) {
         update_term_form(firstel, new_status);
       }
