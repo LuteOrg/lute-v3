@@ -1087,6 +1087,10 @@ div.help-text {
     gap: 0.8rem;
 }
 
+input[type="checkbox"][disabled] + label {
+  color: #ccc;
+}
+
 #term-button-container {
     display: flex;
     justify-content: space-between;
