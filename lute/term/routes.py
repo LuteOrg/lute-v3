@@ -147,9 +147,16 @@ def search_by_text_in_language(text, langid):
         return []
     repo = Repository(db)
     matches = repo.find_matches(langid, text)
-    result = []
-    for t in matches:
-        result.append({"id": t.id, "text": t.text, "translation": t.translation})
+
+    def _make_entry(t):
+        return {
+            "id": t.id,
+            "text": t.text,
+            "translation": t.translation,
+            "status": t.status,
+        }
+
+    result = [_make_entry(t) for t in matches]
     return jsonify(result)
 
 
