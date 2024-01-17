@@ -11,6 +11,16 @@
 body
 {   
     --background-color: #fff;
+
+    --status-0-color: #D5FFFF;
+    --status-1-color: #F5B8A9;
+    --status-2-color: #F5CCA9;
+    --status-3-color: #F5E1A9;
+    --status-4-color: #F5F3A9;
+    --status-5-color: #DDFFDD;
+
+    --status-98-color: #fb7373;
+    --status-99-color: #73ce83;
     
     background-color: var(--background-color);
     color: #000000;
@@ -482,37 +492,37 @@ span.flashtextcopy {
 
 span.status0
 {
-    background-color: #D5FFFF;
+    background-color: var(--status-0-color);
     color: #000000;
 }
 
 span.status1
 {
-    background-color: #F5B8A9;
+    background-color: var(--status-1-color);
     color: #000000;
 }
 
 span.status2
 {
-    background-color: #F5CCA9;
+    background-color: var(--status-2-color);
     color: #000000;
 }
 
 span.status3
 {
-    background-color: #F5E1A9;
+    background-color: var(--status-3-color);
     color: #000000;
 }
 
 span.status4
 {
-    background-color: #F5F3A9;
+    background-color: var(--status-4-color);
     color: #000000;
 }
 
 span.status5
 {
-    background-color: #DDFFDD;
+    background-color: var(--status-5-color);
     color: #000000;
 }
 
@@ -1058,6 +1068,7 @@ div.help-text {
 #translation {
     height: 50px;
     min-height: 50px;
+    vertical-align: top /* removes annoying extra space below */
 }
 
 #term {
@@ -1079,12 +1090,6 @@ div.help-text {
 .term-element-box {
     display: flex;
     gap: 0.5rem;
-}
-
-#status {
-    display: flex;
-    list-style: none;
-    gap: 0.8rem;
 }
 
 #term-button-container {
@@ -1110,6 +1115,122 @@ div.help-text {
     transform: scale(4) translate(-17px, 5px);
 }
 
+
+/* STATUS RADIO */
+
+#status input[type="radio"] {
+    display: none;
+}
+
+#status {
+    --status-border-color: #828e904d;
+    --status-border-radius: 3px;
+
+    display: flex;
+    align-items: center;
+    list-style: none;
+}
+
+#status label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--status-border-color);
+    color: #474747;
+    width: 30px;
+    height: 30px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+#status input[type="radio"]:checked+label {
+    font-weight: 700;
+    color: #3c3c3c;
+    box-shadow: inset 0 0 0 2px #4e4f51c4;
+    border: none;
+}
+
+#status input[type="radio"]#status-5:checked+label,
+#status input[type="radio"]#status-6:checked+label {
+    color: #fff;
+    font-weight: normal;
+}
+
+/* move label back border width amount*/
+#status input[type="radio"]#status-0:checked + label {
+    padding-left: 1px;
+}
+
+#status input[type="radio"]#status-5:checked + label {
+    padding-right: 1px;
+}
+
+#status label[for="status-0"] {
+    background-color: var(--status-1-color);
+
+    border-top-left-radius: var(--status-border-radius);
+    border-bottom-left-radius: var(--status-border-radius);
+
+    border-right: none;
+}
+
+#status label[for="status-1"],
+#status label[for="status-2"],
+#status label[for="status-3"],
+#status label[for="status-4"] {
+    border-right: none;
+    border-left: none;
+}
+
+#status label[for="status-1"] {
+    background-color: var(--status-2-color);
+}
+
+#status label[for="status-2"] {
+    background-color: var(--status-3-color);
+}
+
+#status label[for="status-3"] {
+    background-color: var(--status-4-color);
+}
+
+#status label[for="status-4"] {
+    background-color: var(--status-5-color);
+}
+
+#status label[for="status-5"] {
+    background-color: var(--status-99-color);
+
+    border-top-right-radius: var(--status-border-radius);
+    border-bottom-right-radius: var(--status-border-radius);
+
+    border-left: none;
+}
+
+#status label[for="status-6"] {
+    background-color: var(--status-98-color);
+
+    border-radius: var(--status-border-radius);
+
+    margin-left: 10px;
+}
+
+/* replace Wkn and Ign */
+#status label[for="status-5"],
+#status label[for="status-6"] {
+    color: #fff;
+    font-size: 0;
+}
+
+#status label[for="status-5"]::after {
+    content: "✔";
+    font-size: 1rem;
+}
+
+#status label[for="status-6"]::after {
+    content: "✖";
+    font-size: 1rem;
+}
 
 /* SETTINGS TABLE */
 #custom_styles {
