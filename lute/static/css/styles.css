@@ -1092,6 +1092,20 @@ div.help-text {
     gap: 0.5rem;
 }
 
+#status-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#follow-parent-container {
+    text-align: right;
+}
+
+input[type="checkbox"][disabled] + label {
+  color: #ccc;
+}
+
 #term-button-container {
     display: flex;
     justify-content: space-between;
