@@ -1,5 +1,12 @@
 body {
+  --status-1-color: #f2a2a9;
+  --status-2-color: #f2d35d;
+  --status-3-color: #a7d287;
+  --status-4-color: #a5bbe2;
+  --status-5-color: #c7b1dd;
+
   --background-color: #f8f1e2;
+
   background-color: var(--background-color); /* beige paper */
   color: #262523; /* dark grey font */
 }
@@ -7,8 +14,8 @@ body {
  div#thetext p { line-height: 1.5; }
  span.textitem { font-family: Georgia; color: #262523; }
  /* span.status0 { background-color: transparent; } */
- span.status1 { background-color: #f2a2a9; } /* pink highlight */
- span.status2 { background-color: #f2d35d; } /* yellow highlight */
- span.status3 { background-color: #a7d287; } /* green highlight */
- span.status4 { background-color: #a5bbe2; } /* blue highlight */
- span.status5 { background-color: #c7b1dd; } /* purple highlight */
+ span.status1 { background-color: var(--status-1-color); } /* pink highlight */
+ span.status2 { background-color: var(--status-2-color); } /* yellow highlight */
+ span.status3 { background-color: var(--status-3-color); } /* green highlight */
+ span.status4 { background-color: var(--status-4-color); } /* blue highlight */
+ span.status5 { background-color: var(--status-5-color); } /* purple highlight */

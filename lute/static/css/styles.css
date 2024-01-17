@@ -20,7 +20,10 @@ body
     --status-5-color: #DDFFDD;
 
     --status-98-color: #fb7373;
-    --status-99-color: #73ce83;
+    --status-99-color: #8ce99a;
+
+    --form-border-color: #ddd;
+    --form-border-radius: 3px;
     
     background-color: var(--background-color);
     color: #000000;
@@ -956,8 +959,8 @@ div.code pre {
     font-size: 0.9rem;
     font-family: inherit;
     padding: 0.2rem 0.2rem;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+    border: 1px solid var(--form-border-color);
+    border-radius: var(--form-border-radius);
     box-sizing: border-box;
 }
 
@@ -1118,8 +1121,8 @@ input[type="checkbox"][disabled] + label {
 
 .zoomableTermImage {
     transition: transform 0.2s; /* Animation */
-    border-radius: 3px;
-    border: 1px solid #ddd;
+    border-radius: var(--form-border-radius);
+    border: 1px solid var(--form-border-color);
     box-sizing: border-box;
     width: 40px;
     display: none;
@@ -1137,9 +1140,6 @@ input[type="checkbox"][disabled] + label {
 }
 
 #status {
-    --status-border-color: #828e904d;
-    --status-border-radius: 3px;
-
     display: flex;
     align-items: center;
     list-style: none;
@@ -1149,7 +1149,7 @@ input[type="checkbox"][disabled] + label {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--status-border-color);
+    border: 1px solid var(--form-border-color);
     color: #474747;
     width: 30px;
     height: 30px;
@@ -1157,18 +1157,47 @@ input[type="checkbox"][disabled] + label {
     cursor: pointer;
 }
 
-#status input[type="radio"]:checked+label {
+#status label[for="status-6"] {
+    border: 2px solid var(--form-border-color);
+}
+
+#status label[for="status-5"],
+#status label[for="status-6"] {
+    font-weight: bold;
+}
+
+#status label:hover {
+    /* font-weight: 700; */
+    /* color: #3c3c3c; */
+    /* box-shadow: inset 0 0 0 2px #4e4f5156; */
+    border: none;
+    filter: brightness(0.9);
+}
+
+#status input[type="radio"]:checked + label {
     font-weight: 700;
-    color: #3c3c3c;
+    /* color: #3c3c3c; */
     box-shadow: inset 0 0 0 2px #4e4f51c4;
     border: none;
 }
 
-#status input[type="radio"]#status-5:checked+label,
-#status input[type="radio"]#status-6:checked+label {
-    color: #fff;
-    font-weight: normal;
+#status label[for="status-5"]:hover {
+    padding-right: 1px;
 }
+
+#status label[for="status-0"]:hover {
+    padding-left: 1px;
+}
+
+/* #status input[type="radio"]#status-5:checked+label, */
+/* #status input[type="radio"]#status-6:checked+label { */
+    /* /~ color: #fff; ~/ */
+    /* font-weight: bold; */
+/* } */
+
+/* #status input[type="radio"]#status-6:checked+label { */
+    /* background-color: #7a7a7a; */
+/* } */
 
 /* move label back border width amount*/
 #status input[type="radio"]#status-0:checked + label {
@@ -1182,8 +1211,8 @@ input[type="checkbox"][disabled] + label {
 #status label[for="status-0"] {
     background-color: var(--status-1-color);
 
-    border-top-left-radius: var(--status-border-radius);
-    border-bottom-left-radius: var(--status-border-radius);
+    border-top-left-radius: var(--form-border-radius);
+    border-bottom-left-radius: var(--form-border-radius);
 
     border-right: none;
 }
@@ -1215,35 +1244,20 @@ input[type="checkbox"][disabled] + label {
 #status label[for="status-5"] {
     background-color: var(--status-99-color);
 
-    border-top-right-radius: var(--status-border-radius);
-    border-bottom-right-radius: var(--status-border-radius);
+    border-top-right-radius: var(--form-border-radius);
+    border-bottom-right-radius: var(--form-border-radius);
 
     border-left: none;
 }
 
 #status label[for="status-6"] {
-    background-color: var(--status-98-color);
+    /* background-color: var(--status-98-color); */
+    background-color: var(--background-color);
+    /* font-weight: 700; */
 
-    border-radius: var(--status-border-radius);
+    border-radius: var(--form-border-radius);
 
     margin-left: 10px;
-}
-
-/* replace Wkn and Ign */
-#status label[for="status-5"],
-#status label[for="status-6"] {
-    color: #fff;
-    font-size: 0;
-}
-
-#status label[for="status-5"]::after {
-    content: "✔";
-    font-size: 1rem;
-}
-
-#status label[for="status-6"]::after {
-    content: "✖";
-    font-size: 1rem;
 }
 
 /* SETTINGS TABLE */

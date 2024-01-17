@@ -38,7 +38,7 @@ class TermForm(FlaskForm):
         "Romanization", render_kw={"placeholder": "Pronunciation"}
     )
 
-    status_choices = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (99, "Wkn"), (98, "Ign")]
+    status_choices = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (99, "✓"), (98, "🛇")]
     status = RadioField("Status", choices=status_choices)
     follow_parent = BooleanField("Follow parent")
 
