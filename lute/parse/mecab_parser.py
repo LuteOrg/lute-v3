@@ -16,6 +16,7 @@ import os
 import re
 from typing import List
 from natto import MeCab
+from natto.api import MeCabError
 import jaconv
 from lute.parse.base import ParsedToken, AbstractParser
 from lute.models.setting import UserSetting
@@ -44,7 +45,7 @@ class JapaneseParser(AbstractParser):
         """
         mecab_path = os.environ.get("MECAB_PATH", "<NOTSET>")
         if (
-            mecab_path == JapaneseParser._old_mecab_path
+                mecab_path == JapaneseParser._old_mecab_path
         ) and JapaneseParser._is_supported is not None:
             return JapaneseParser._is_supported
 
@@ -129,6 +130,16 @@ class JapaneseParser(AbstractParser):
             return None
 
         flags = r"-O yomi"
+        try:
+            MeCab(flags)
+        except MeCabError:
+            # For supporting get reading from UniDic
+            # Because UniDic doesn't support -Oyomi flags
+            # if user change default IPADic to Unidic will get MeCabError
+            # change the flags that can get reading from Unidic
+            # The flags get from https://hydrocul.github.io/wiki/blog/2015/0720-mecab-unidic-furigana.html
+            flags = r"-O '' -F '%f[9]' -U '%m' -E '\n'"
+
         readings = []
         with MeCab(flags) as nm:
             for n in nm.parse(text, as_nodes=True):
