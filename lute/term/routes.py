@@ -99,7 +99,7 @@ def export_terms():
             ]
             csv_writer.writerow(filtered_row)
 
-    return send_file(outfile, as_attachment=True, download_name="export_terms.csv")
+    return send_file(outfile, as_attachment=True, download_name="Terms.csv")
 
 
 def handle_term_form(
