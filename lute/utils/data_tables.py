@@ -160,7 +160,7 @@ class DataTablesSqliteQuery:
         searchable = [c["name"] for c in columns if c["searchable"] is True]
         [where, params] = DataTablesSqliteQuery.where_and_params(searchable, parameters)
 
-        realbase = f"({base_sql}) realbase"
+        realbase = f"({base_sql}) realbase".replace("\n", " ")
         select_field_list = ", ".join([c["name"] for c in columns if c["name"] != ""])
         # pylint: disable=line-too-long
         data_sql = f"SELECT {select_field_list} FROM (select * from {realbase} {where} {orderby} LIMIT {start}, {length}) src {orderby}"
@@ -180,15 +180,14 @@ class DataTablesSqliteQuery:
         recordsFiltered = None
 
         try:
-            sqla = DataTablesSqliteQuery.get_sql(base_sql, parameters)
+            sql_dict = DataTablesSqliteQuery.get_sql(base_sql, parameters)
 
             def runqry(name, use_params=True):
                 "Run the given query from the datatables list of queries."
                 prms = None
                 if use_params:
-                    prms = sqla["params"]
-                sql = sqla[name].replace("\n", " ")
-                return conn.execute(text(sql), prms)
+                    prms = sql_dict["params"]
+                return conn.execute(text(sql_dict[name]), prms)
 
             recordsTotal = runqry("recordsTotal", False).fetchone()[0]
             recordsFiltered = runqry("recordsFiltered").fetchone()[0]
