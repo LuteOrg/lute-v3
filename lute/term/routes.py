@@ -73,6 +73,7 @@ def export_terms():
     data = get_data_tables_list(parameters)
     render_data = data["data"]
 
+    # Fields as returned from the datatables query.
     headings = [
         "OMIT_Checkbox",
         "term",
@@ -80,10 +81,11 @@ def export_terms():
         "translation",
         "language",
         "tags",
-        "status",
+        "OMIT_status_text",
         "OMIT_WoID",
         "OMIT_LgID",
         "OMIT_ImageSource",
+        "status",
     ]
     columns_to_exclude = []
     for i, h in enumerate(headings):
