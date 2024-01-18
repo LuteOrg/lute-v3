@@ -1,4 +1,23 @@
 
+# 3.0.12 (2024-01-18)
+
+Feature changes:
+
+* Improve term export: export all terms, change headings to be immediately importable.
+* Add hotkeys to reading menu (pulled from manual).
+
+Bugfixes:
+
+* Fix sentences link.
+* Fix spelling of "dismiss" in anchor tag for remove_demo_flag
+* Fix scrolling bug on update.  By @webofpies.
+* Fix z-index of player and popup.  By @webofpies in #127.
+
+Back end changes:
+
+* Change tagging library to tagify
+
+
 # 3.0.11 (2024-01-11)
 
 * rework/optimize form and table styles
