@@ -101,6 +101,10 @@
       lengthMenu: [ 25, 50, 100, 500, 1000 ],
       buttons: [
          {
+           extend: 'download',
+           url: '/term/export_terms'
+         },
+         {
            extend: 'csvHtml5',
            text: 'Export CSV',
            exportOptions: {
@@ -311,7 +315,7 @@
 
   let load_filters_from_storage = function() {
     fs = sessionStorage.getItem('termtable_filters');
-    console.log(fs);
+    // console.log(fs);
     if (fs == null)
       return;
     store = JSON.parse(fs);
