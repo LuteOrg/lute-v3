@@ -102,24 +102,9 @@
       buttons: [
          {
            extend: 'download',
-           url: '/term/export_terms'
-         },
-         {
-           extend: 'csvHtml5',
+           url: '/term/export_terms',
            text: 'Export CSV',
-           exportOptions: {
-             columns: [
-               'WoText:name',
-               'ParentText:name',
-               'WoTranslation:name',
-               'LgName:name',
-               'TagList:name',
-               'StText:name',
-               'WoID:name',
-               'LgID:name',
-             ], visible: false
-           },
-         }
+         },
       ],
       paging: true,
       info: true,
