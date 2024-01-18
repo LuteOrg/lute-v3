@@ -14,7 +14,8 @@ def get_data_tables_list(parameters):
     replace(wi.WiSource, '.jpeg', '') as WiSource,
     ifnull(tags.taglist, '') as TagList,
     StText,
-    StID
+    StID,
+    StAbbreviation
     FROM
     words w
     INNER JOIN languages L on L.LgID = w.WoLgID
