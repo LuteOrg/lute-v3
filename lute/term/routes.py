@@ -2,7 +2,17 @@
 /term routes.
 """
 
-from flask import Blueprint, request, jsonify, render_template, redirect
+import os
+import csv
+from flask import (
+    Blueprint,
+    request,
+    jsonify,
+    render_template,
+    redirect,
+    current_app,
+    send_file,
+)
 from lute.models.language import Language
 from lute.models.term import Term as DBTerm
 from lute.utils.data_tables import DataTablesFlaskParamParser
@@ -28,13 +38,8 @@ def index(search):
     )
 
 
-@bp.route("/datatables", methods=["POST"])
-def datatables_active_source():
-    "Datatables data for terms."
-    parameters = DataTablesFlaskParamParser.parse_params(request.form)
-
-    # The DataTablesFlaskParamParser doesn't know about term-specific filters,
-    # add those manually.
+def _load_term_custom_filters(request_form, parameters):
+    "Manually add filters that the DataTablesFlaskParamParser doesn't know about."
     filter_param_names = [
         "filtLanguage",
         "filtParentsOnly",
@@ -44,12 +49,59 @@ def datatables_active_source():
         "filtStatusMax",
         "filtIncludeIgnored",
     ]
-    request_params = request.form.to_dict(flat=True)
+    request_params = request_form.to_dict(flat=True)
     for p in filter_param_names:
         parameters[p] = request_params.get(p)
 
+
+@bp.route("/datatables", methods=["POST"])
+def datatables_active_source():
+    "Datatables data for terms."
+    parameters = DataTablesFlaskParamParser.parse_params(request.form)
+    _load_term_custom_filters(request.form, parameters)
     data = get_data_tables_list(parameters)
     return jsonify(data)
+
+
+@bp.route("/export_terms", methods=["POST"])
+def export_terms():
+    "Generate export file of terms."
+    parameters = DataTablesFlaskParamParser.parse_params(request.form)
+    _load_term_custom_filters(request.form, parameters)
+    parameters["length"] = 1000000
+    outfile = os.path.join(current_app.env_config.temppath, "export_terms.csv")
+    data = get_data_tables_list(parameters)
+    render_data = data["data"]
+
+    # Fields as returned from the datatables query.
+    headings = [
+        "OMIT_Checkbox",
+        "term",
+        "parent",
+        "translation",
+        "language",
+        "tags",
+        "OMIT_status_text",
+        "OMIT_WoID",
+        "OMIT_LgID",
+        "OMIT_ImageSource",
+        "status",
+    ]
+    columns_to_exclude = []
+    for i, h in enumerate(headings):
+        if h.startswith("OMIT_"):
+            columns_to_exclude.append(i)
+
+    output_data = [headings] + render_data
+    with open(outfile, "w", encoding="utf-8", newline="") as f:
+        csv_writer = csv.writer(f)
+        for row in output_data:
+            filtered_row = [
+                value for i, value in enumerate(row) if i not in columns_to_exclude
+            ]
+            csv_writer.writerow(filtered_row)
+
+    return send_file(outfile, as_attachment=True, download_name="Terms.csv")
 
 
 def handle_term_form(
