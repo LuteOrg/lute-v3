@@ -69,7 +69,7 @@ def export_terms():
     parameters = DataTablesFlaskParamParser.parse_params(request.form)
     _load_term_custom_filters(request.form, parameters)
     parameters["length"] = 1000000
-    outfile = os.path.join(current_app.env_config.temppath, "export_terms.txt")
+    outfile = os.path.join(current_app.env_config.temppath, "export_terms.csv")
     data = get_data_tables_list(parameters)
     render_data = data["data"]
 
@@ -99,7 +99,7 @@ def export_terms():
             ]
             csv_writer.writerow(filtered_row)
 
-    return send_file(outfile, as_attachment=True, download_name="export_terms.txt")
+    return send_file(outfile, as_attachment=True, download_name="export_terms.csv")
 
 
 def handle_term_form(
