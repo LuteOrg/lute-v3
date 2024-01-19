@@ -4,6 +4,17 @@ Feature: Term import
     Background:
         Given demo data
 
+
+    Scenario: Smoke test with no create or update
+        Given import file:
+            language,term,translation,parent,status,tags,pronunciation
+            Spanish,gato,cat,,1,"animal, noun",GA-toh
+        When import with create false, update false
+        Then import should succeed with 0 created, 0 updated, 1 skipped
+        And words table should contain:
+            -
+
+
     Scenario: Smoke test with create only
         Given import file:
             language,term,translation,parent,status,tags,pronunciation
