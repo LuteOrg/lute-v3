@@ -9,7 +9,7 @@ Feature: Term import
             language,term,translation,parent,status,tags,pronunciation
             Spanish,gato,cat,,1,"animal, noun",GA-toh
         When import with create true, update false
-        Then import should succeed with 1 created, 0 skipped
+        Then import should succeed with 1 created, 0 updated, 0 skipped
         And words table should contain:
             gato
         And Spanish term "gato" should be:
