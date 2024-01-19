@@ -20,7 +20,7 @@ class BadImportFileError(Exception):
     """
 
 
-def import_file(filename):
+def import_file(filename, create_terms=True, update_terms=True):
     """
     Validate and import file.
 
@@ -28,7 +28,7 @@ def import_file(filename):
     """
     import_data = _load_import_file(filename)
     _validate_data(import_data)
-    return _do_import(import_data)
+    return _do_import(import_data, create_terms, update_terms)
 
 
 def _load_import_file(filename, encoding="utf-8-sig"):
