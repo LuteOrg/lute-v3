@@ -51,7 +51,7 @@ def import_with_settings(create, update):
         tmp.write(content)
 
     global stats  # pylint: disable=global-statement
-    stats = import_file(path)
+    stats = import_file(path, create.lower() == "true", update.lower() == "true")
     os.remove(path)
 
 
@@ -79,7 +79,9 @@ def fail_with_message(message):
 
 @then(parsers.parse("words table should contain:\n{text_lc_content}"))
 def then_words_table_contains_WoTextLC(text_lc_content):
-    expected = text_lc_content.split("\n")
+    expected = []
+    if text_lc_content != "-":
+        expected = text_lc_content.split("\n")
     sql = "select WoTextLC from words order by WoTextLC"
     assert_sql_result(sql, expected)
 
