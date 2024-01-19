@@ -4,10 +4,11 @@ Feature: Term import
     Background:
         Given demo data
 
-    Scenario: Smoke test
+    Scenario: Smoke test with create only
         Given import file:
             language,term,translation,parent,status,tags,pronunciation
             Spanish,gato,cat,,1,"animal, noun",GA-toh
+        When import with create true, update false
         Then import should succeed with 1 created, 0 skipped
         And words table should contain:
             gato
@@ -17,6 +18,36 @@ Feature: Term import
             status: 1
             parents: -
             tags: animal, noun
+
+
+    Scenario: Smoke test with update only
+        Given import file:
+            language,term,translation,parent,status,tags,pronunciation
+            Spanish,gato,cat,,1,"animal, noun",GA-toh
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+        And words table should contain:
+            gato
+        And Spanish term "gato" should be:
+            translation: cat
+            pronunciation: GA-toh
+            status: 1
+            parents: -
+            tags: animal, noun
+
+        Given import file:
+            language,term,translation,parent,status,tags
+            Spanish,gato,cat,,3,fuzzy
+        When import with create true, update true
+        Then import should succeed with 0 created, 1 updated, 0 skipped
+        And words table should contain:
+            gato
+        And Spanish term "gato" should be:
+            translation: cat
+            pronunciation: GA-toh
+            status: 3
+            parents: -
+            tags: fuzzy
 
 
     Scenario: Translation field can contain a return
