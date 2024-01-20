@@ -31,7 +31,7 @@ Feature: Term import
             tags: animal, noun
 
 
-    Scenario: Smoke test with update only
+    Scenario: Smoke test updates ignored if not updating
         Given import file:
             language,term,translation,parent,status,tags,pronunciation
             Spanish,gato,cat,,1,"animal, noun",GA-toh
@@ -47,10 +47,33 @@ Feature: Term import
             tags: animal, noun
 
         Given import file:
-            language,term,translation,parent,status,tags
-            Spanish,gato,cat,,3,fuzzy
-        When import with create true, update true
-        Then import should succeed with 0 created, 1 updated, 0 skipped
+            language,term,translation,parent,status,tags,pronunciation
+            Spanish,gato,NEW,,1,NEW,NEW
+        When import with create true, update false
+        Then import should succeed with 0 created, 0 updated, 1 skipped
+        And words table should contain:
+            gato
+        And Spanish term "gato" should be:
+            translation: cat
+            pronunciation: GA-toh
+            status: 1
+            parents: -
+            tags: animal, noun
+
+
+    Scenario: Smoke test with update only
+        Given import file:
+            language,term,translation,status,tags,pronunciation
+            Spanish,gato,cat,1,"animal, noun",GA-toh
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+
+        Given import file:
+            language,term,translation,status,tags
+            Spanish,gato,cat,3,fuzzy
+            Spanish,perro,dog,3,fuzzy
+        When import with create false, update true
+        Then import should succeed with 0 created, 1 updated, 1 skipped
         And words table should contain:
             gato
         And Spanish term "gato" should be:
@@ -61,12 +84,43 @@ Feature: Term import
             tags: fuzzy
 
 
+    Scenario: Smoke test with both create and update
+        Given import file:
+            language,term,translation,status,tags,pronunciation
+            Spanish,gato,cat,1,"animal, noun",GA-toh
+        When import with create true, update true
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+
+        Given import file:
+            language,term,translation,status,tags
+            Spanish,gato,cat,3,fuzzy
+            Spanish,perro,dog,2,fuzzy
+        When import with create true, update true
+        Then import should succeed with 1 created, 1 updated, 0 skipped
+        And words table should contain:
+            gato
+            perro
+        And Spanish term "gato" should be:
+            translation: cat
+            pronunciation: GA-toh
+            status: 3
+            parents: -
+            tags: fuzzy
+        And Spanish term "perro" should be:
+            translation: dog
+            pronunciation: -
+            status: 2
+            parents: -
+            tags: fuzzy
+
+
     Scenario: Translation field can contain a return
         Given import file:
             language,term,translation,parent,status,tags,pronunciation
             Spanish,gato,"A cat.
             A house cat.",,1,"animal, noun",GA-toh
-        Then import should succeed with 1 created, 0 skipped
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
         And words table should contain:
             gato
         And Spanish term "gato" should be:
@@ -89,7 +143,8 @@ Feature: Term import
             1. blah
             2. ""you know""",,3,,TEE-2
             Spanish,third,,,W,?,
-        Then import should succeed with 3 created, 0 skipped
+        When import with create true, update false
+        Then import should succeed with 3 created, 0 updated, 0 skipped
         And words table should contain:
             other
             term
@@ -101,7 +156,8 @@ Feature: Term import
             language,term,translation,parent,status,tags,pronunciation
             Spanish,gato,cat,,1,"animal, noun",GA-toh
             Spanish,perro,dog,,1,"animal, noun",PERR-oh
-        Then import should succeed with 2 created, 0 skipped
+        When import with create true, update false
+        Then import should succeed with 2 created, 0 updated, 0 skipped
         And words table should contain:
             gato
             perro
@@ -111,7 +167,8 @@ Feature: Term import
         Given import file:
             language,term,translation,parent,status,tags,pronunciation
             Spanish,gato,cat,,1,"animal, noun",GA-toh
-        Then import should succeed with 1 created, 0 skipped
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
         And words table should contain:
             gato
         And Spanish term "gato" should be:
@@ -123,7 +180,8 @@ Feature: Term import
         Given import file:
             language,term,translation,parent,status,tags,pronunciation
             Spanish,gato,UPDATED,,1,"animal, noun",GA-toh
-        Then import should succeed with 0 created, 1 skipped
+        When import with create true, update false
+        Then import should succeed with 0 created, 0 updated, 1 skipped
         And Spanish term "gato" should be:
             translation: cat
             pronunciation: GA-toh
@@ -136,7 +194,8 @@ Feature: Term import
         Given import file:
             language,term,translation,parent,status,tags,pronunciation
             Spanish,gato,cat,,1,"animal, noun",GA-toh
-        Then import should succeed with 1 created, 0 skipped
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
         And words table should contain:
             gato
         And Spanish term "gato" should be:
@@ -148,7 +207,8 @@ Feature: Term import
         Given import file:
             language,term,translation,parent,status,tags,pronunciation
             Spanish,GATO,UPDATED,,1,"animal, noun",GA-toh
-        Then import should succeed with 0 created, 1 skipped
+        When import with create true, update false
+        Then import should succeed with 0 created, 0 updated, 1 skipped
 
 
     Scenario: Import is case-insensitive
@@ -161,7 +221,8 @@ Feature: Term import
             Spanish,e,5
             Spanish,f,W
             Spanish,g,I
-        Then import should succeed with 7 created, 0 skipped
+        When import with create true, update false
+        Then import should succeed with 7 created, 0 updated, 0 skipped
         And words table should contain:
             a
             b
@@ -184,7 +245,8 @@ Feature: Term import
         Given import file:
             language,term,translation,parent,status,tags,pronunciation
             Spanish,gatos,cat,gato,1,"animal, noun",GA-toh
-        Then import should succeed with 1 created, 0 skipped
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
         And words table should contain:
             gato
             gatos
@@ -201,7 +263,8 @@ Feature: Term import
             language,term,parent
             Spanish,gatos,gato
             English,gato,
-        Then import should succeed with 2 created, 0 skipped
+        When import with create true, update false
+        Then import should succeed with 2 created, 0 updated, 0 skipped
         And words table should contain:
             gato
             gato
@@ -219,7 +282,8 @@ Feature: Term import
             language,term,translation,parent,status,tags,pronunciation
             Spanish,gatos,,gato,1,,
             Spanish,gato,CAT,,1,animal,GAH-toh
-        Then import should succeed with 2 created, 0 skipped
+        When import with create true, update false
+        Then import should succeed with 2 created, 0 updated, 0 skipped
         And words table should contain:
             gato
             gatos
@@ -242,7 +306,8 @@ Feature: Term import
             language,translation,term,parent,status,tags,pronunciation
             Spanish,,gatos,gato,1,,
             Spanish,CAT,gato,,1,animal,GAH-toh
-        Then import should succeed with 2 created, 0 skipped
+        When import with create true, update false
+        Then import should succeed with 2 created, 0 updated, 0 skipped
         And words table should contain:
             gato
             gatos
@@ -252,7 +317,8 @@ Feature: Term import
         Given import file:
             language,translation,term,parent,status,tags,pronunciation
             Spanish,,gatos,"gato, cat",1,,
-        Then import should succeed with 1 created, 0 skipped
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
         And words table should contain:
             cat
             gato
@@ -264,7 +330,8 @@ Feature: Term import
             language,term
             Spanish,gato
             spanish,gatos
-        Then import should succeed with 2 created, 0 skipped
+        When import with create true, update false
+        Then import should succeed with 2 created, 0 updated, 0 skipped
         And words table should contain:
             gato
             gatos
