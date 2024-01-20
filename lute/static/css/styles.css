@@ -174,8 +174,7 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
 
 /* End book listing */
 
-/* Term listing CSV export. */
-button.buttons-csv {
+div.dt-buttons>.dt-button {
     padding: 3px !important;
     margin: 5px 0 0 10px !important;
 }
