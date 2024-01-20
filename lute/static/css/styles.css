@@ -1145,11 +1145,6 @@ input[type="checkbox"][disabled] + label {
     border-width: 2px;
     /* border-color: #a5a5a5; */
 }
-/* default symbols are too thin */
-#status label[for="status-5"],
-#status label[for="status-6"] {
-    font-weight: 700;
-}
 /* same as checked, but more transparent */
 #status label:hover {
     box-shadow: inset 0 0 0 2px var(--status-hover-color);
@@ -1171,9 +1166,9 @@ input[type="checkbox"][disabled] + label {
     background-color: var(--status-98-color);
 }
 
-#status #status-5:checked + label,
-#status #status-6:checked + label {
-    color: #fff;
+#status #status-5:checked + label::after,
+#status #status-6:checked + label::after {
+    filter: invert(1);
 }
 
 /* move label back(border width amount) */
@@ -1241,6 +1236,31 @@ input[type="checkbox"][disabled] + label {
     border-radius: var(--form-border-radius);
 
     margin-left: 10px;
+}
+
+/* hide Wkn and Ign */
+#status label[for="status-5"],
+#status label[for="status-6"] {
+    font-size: 0;
+}
+
+#status label[for="status-5"]::after,
+#status label[for="status-6"]::after {
+    content: "";
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 1.2rem;
+    height: 1.2rem;
+    /* color black */
+    filter: invert(0);
+}
+
+#status label[for="status-5"]::after {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>');
+}
+
+#status label[for="status-6"]::after {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" /></svg>');
 }
 
 /* SETTINGS TABLE */
