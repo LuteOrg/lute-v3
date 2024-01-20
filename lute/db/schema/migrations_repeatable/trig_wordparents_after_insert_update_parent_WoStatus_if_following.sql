@@ -12,7 +12,7 @@ BEGIN
       SELECT COUNT(*)
       FROM wordparents
       INNER JOIN words ON WoID = WpWoID
-      WHERE WoFollowParent = 1
+      WHERE WoSyncStatus = 1
       AND WoID = new.WpWoID
     );
 END;

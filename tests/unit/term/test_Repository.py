@@ -280,20 +280,20 @@ def test_save_change_parent_breaks_old_link(app_context, repo, hello_term):
     assert_sql_result(sqlparent, ["hello; new"], "changed")
 
 
-def test_save_term_with_multiple_parents_unsets_follow_parent(
+def test_save_term_with_multiple_parents_unsets_sync_status(
     app_context, repo, hello_term
 ):
     "Ensure DB data is good on save."
     hello_term.parents.append("parent")
-    hello_term.follow_parent = True
+    hello_term.sync_status = True
     repo.add(hello_term)
     repo.commit()
 
-    sql = "select WoTextLC, WoFollowParent from words where WoTextLC = 'hello'"
+    sql = "select WoTextLC, WoSyncStatus from words where WoTextLC = 'hello'"
     assert_sql_result(sql, ["hello; 1"], "link set")
 
     hello_term.parents.append("parent2")
-    hello_term.follow_parent = True
+    hello_term.sync_status = True
     repo.add(hello_term)
     repo.commit()
     assert_sql_result(sql, ["hello; 0"], "link UN-set")
