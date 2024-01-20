@@ -4,9 +4,10 @@ Term import.
 
 import os
 from flask import Blueprint, current_app, render_template, flash, redirect
+from wtforms import BooleanField
+from wtforms.validators import DataRequired
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
-from wtforms.validators import DataRequired
 from lute.termimport.service import import_file, BadImportFileError
 
 
@@ -16,6 +17,8 @@ bp = Blueprint("termimport", __name__, url_prefix="/termimport")
 class TermImportForm(FlaskForm):
     "Form for imports."
     text_file = FileField("Text File", validators=[DataRequired()])
+    create_terms = BooleanField("Create new Terms")
+    update_terms = BooleanField("Update existing Terms")
 
 
 @bp.route("/index", methods=["GET", "POST"])
@@ -31,9 +34,14 @@ def term_import_index():
             )
             text_file.save(temp_file_name)
             try:
-                stats = import_file(temp_file_name)
+                stats = import_file(
+                    temp_file_name, form.create_terms.data, form.update_terms.data
+                )
+                c = stats["created"]
+                u = stats["updated"]
+                s = stats["skipped"]
                 flash(
-                    f"Imported {stats['created']} terms (skipped {stats['skipped']})",
+                    f"Imported {c} terms, updated {u} (skipped {s})",
                     "notice",
                 )
                 return redirect("/term/index", 302)
