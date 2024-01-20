@@ -127,6 +127,42 @@ def test_status_propagates_up_and_down(term_family, app_context):
     assert_statuses(expected, "updated")
 
 
+def test_status_propagates_even_if_circular_reference(term_family, app_context):
+    "B-b1-B circular reference, is all ok."
+    f = term_family
+    # f.b1.parents.append(f.B)
+    f.B.parents.append(f.b1)
+    db.session.add(f.B)
+    # db.session.add(f.b1)
+    db.session.commit()
+
+    zws = "\u200B"
+    sql = f"""
+    select p.WoText, c.WoText
+    from words p
+    inner join wordparents on p.WoID = WpParentWoID
+    inner join words c on c.WoID = WpWoID
+    where p.WoText in ('Byes', 'b{zws}1{zws}yes')
+    """
+    assert_sql_result(
+        sql, ["Byes; b/1/yes", "Byes; b/2/no", "b/1/yes; Byes"], "parent set"
+    )
+
+    f.B.status = 4
+    db.session.add(f.B)
+    db.session.commit()
+    expected = """
+    A: 1
+    Byes: 4
+    b/1/yes: 4
+    b/2/no: 1
+    Cno: 1
+    c/1/yes: 1
+    c/2/no: 1
+    """
+    assert_statuses(expected, "updated")
+
+
 def test_status_stops_propagating_to_top(term_family, app_context):
     "Goes up the tree until it stops."
     f = term_family
