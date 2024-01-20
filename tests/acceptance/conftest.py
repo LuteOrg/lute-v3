@@ -275,6 +275,8 @@ def import_term_file(luteclient, content):
         # do stuff with temp file
         tmp.write(content)
     luteclient.browser.attach_file("text_file", path)
+    luteclient.browser.find_by_id("create_terms").click()
+    luteclient.browser.find_by_id("update_terms").click()
     luteclient.browser.find_by_id("btnSubmit").click()
 
 
