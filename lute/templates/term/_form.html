@@ -43,9 +43,9 @@
 
       <div id="status-container">
         {{ form.status(class="form-control") }}
-        <div id="follow-parent-container">
-          {{ form.follow_parent(class="form-control", disabled=True) }}
-          <label for="follow_parent">Follow parent</label>
+        <div id="sync-status-container">
+          {{ form.sync_status(class="form-control", disabled=True) }}
+          <label for="sync_status">Sync status</label>
         </div>
       </div>
 
@@ -136,7 +136,7 @@
       // console.log(e);
       // console.log(e.detail);
       const single_parent = (parents_tagify.value.length == 1);
-      const cb = $("#follow_parent");
+      const cb = $("#sync_status");
       cb.prop("checked", single_parent);
       if (single_parent)
         cb.removeAttr("disabled");
@@ -224,7 +224,7 @@
   let get_parents = function() {
     // During form load, and in "steady state" (i.e., after the tags
     // have been added or removed, and the focus has switched to
-    // another control) the #follow_parent text box is loaded with the
+    // another control) the #sync_status text box is loaded with the
     // values.
     const pdata = $('#parentslist').val();
     if ((pdata ?? '') == '') {
@@ -235,8 +235,8 @@
     return parents;
   };
 
-  let enable_disable_follow_parent_checkbox = function() {
-    const cb = $("#follow_parent");
+  let enable_disable_sync_status_checkbox = function() {
+    const cb = $("#sync_status");
     if (get_parents().length == 1)
       cb.removeAttr("disabled");
     else
@@ -287,7 +287,7 @@
     // because this form is opened in a frame.
     window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
 
-    enable_disable_follow_parent_checkbox();
+    enable_disable_sync_status_checkbox();
   });
 
   /** LOOKUPS */

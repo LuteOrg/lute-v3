@@ -1,11 +1,11 @@
-DROP TRIGGER IF EXISTS trig_wordparents_after_delete_change_WoFollowParent;
+DROP TRIGGER IF EXISTS trig_wordparents_after_delete_change_WoSyncStatus;
 
-CREATE TRIGGER trig_wordparents_after_delete_change_WoFollowParent
+CREATE TRIGGER trig_wordparents_after_delete_change_WoSyncStatus
 BEFORE DELETE ON wordparents
 FOR EACH ROW
 BEGIN
     UPDATE words
-    SET WoFollowParent = 0
+    SET WoSyncStatus = 0
     WHERE WoID IN
     (
       select WpWoID from wordparents

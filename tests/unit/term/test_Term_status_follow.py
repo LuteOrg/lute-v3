@@ -32,10 +32,10 @@ def fixture_term_family(app_context, english):
             A = DBTerm(english, "A")
             B = DBTerm(english, "Byes")
             B.add_parent(A)
-            B.follow_parent = True
+            B.sync_status = True
             b1 = DBTerm(english, "b1yes")
             b1.add_parent(B)
-            b1.follow_parent = True
+            b1.sync_status = True
             b2 = DBTerm(english, "b2no")
             b2.add_parent(B)
 
@@ -43,7 +43,7 @@ def fixture_term_family(app_context, english):
             C.add_parent(A)
             c1 = DBTerm(english, "c1yes")
             c1.add_parent(C)
-            c1.follow_parent = True
+            c1.sync_status = True
             c2 = DBTerm(english, "c2no")
             c2.add_parent(C)
 
@@ -201,7 +201,7 @@ def test_term_not_following_parent(term_family, app_context):
     assert_statuses(expected, "updated")
 
 
-def test_changing_follow_parent_propagates_status(term_family, app_context):
+def test_changing_sync_status_propagates_status(term_family, app_context):
     "Doesn't update parent."
     f = term_family
     f.b2.status = 4
@@ -219,7 +219,7 @@ def test_changing_follow_parent_propagates_status(term_family, app_context):
     """
     assert_statuses(expected, "not following, not updated")
 
-    f.b2.follow_parent = True
+    f.b2.sync_status = True
     db.session.add(f.b2)
     db.session.commit()
 
@@ -265,7 +265,7 @@ def test_adding_new_term_changes_family_if_added(english, term_family, app_conte
     b3 = DBTerm(english, "b3yes")
     b3.add_parent(f.B)
     b3.status = 3
-    b3.follow_parent = True
+    b3.sync_status = True
     db.session.add(b3)
     db.session.commit()
 
@@ -309,10 +309,10 @@ def test_adding_new_term_does_not_change_family_if_multiple_parents(
     assert_statuses(expected, "updated")
 
 
-def test_deleting_parent_deactivates_follow_parent(term_family, app_context):
+def test_deleting_parent_deactivates_sync_status(term_family, app_context):
     "No more parent = no more follow."
 
-    sql = "select WoText from words where WoFollowParent = 1"
+    sql = "select WoText from words where WoSyncStatus = 1"
     assert_sql_result(sql, ["Byes", "b/1/yes", "c/1/yes"], "before delete")
 
     f = term_family

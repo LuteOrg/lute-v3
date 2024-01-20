@@ -171,11 +171,11 @@ class LuteTestClient:
                     span.type(p, slowly=False)
                     span.type(Keys.RETURN)
                     time.sleep(0.1)  # seconds
-            elif k == "follow_parent":
+            elif k == "sync_status":
                 if v:
-                    b.check("follow_parent")
+                    b.check("sync_status")
                 else:
-                    b.uncheck("follow_parent")
+                    b.uncheck("sync_status")
             else:
                 raise RuntimeError(f"unhandled key {k}")
 

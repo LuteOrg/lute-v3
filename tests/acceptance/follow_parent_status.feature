@@ -16,7 +16,7 @@ Feature: User can link child and parent term statuses.
 
         When I click "gatos" and edit the form:
             parents: [ 'Gato' ]
-            follow_parent: true
+            sync_status: true
             status: 4
         Then the reading pane shows:
             Gato (4)/ /gatos (4)/ /gatito/ /perro/.
@@ -44,14 +44,14 @@ Feature: User can link child and parent term statuses.
 
         When I click "gatos" and edit the form:
             parents: [ 'Gato' ]
-            follow_parent: true
+            sync_status: true
             status: 4
         Then the reading pane shows:
             Gato (4)/ /gatos (4)/ /gatito/ /perro/.
 
         When I click "gatos" and edit the form:
             parents: [ 'Gato', 'perro' ]
-            follow_parent: true
+            sync_status: true
             status: 2
         Then the reading pane shows:
             Gato (4)/ /gatos (2)/ /gatito/ /perro (2)/.
