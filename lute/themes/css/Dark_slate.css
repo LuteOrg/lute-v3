@@ -6,14 +6,17 @@ body {
   --status-4-color: #5692AE;
   --status-5-color: #877aad;
 
+  --status-99-color: #419252;
+
   --background-color: #48484a;
   --light-grey: #c4c8ce;
+  --font-color: #c4c8ce;
   --dark-grey: #333333;
 
   --form-border-color: var(--light-grey);
 
   background-color: var(--background-color); /* dark grey paper */
-  color: var(--light-grey); /* light grey font */
+  color: var(--font-color); /* light grey font */
 }
 
 .flash-notice {
@@ -21,11 +24,11 @@ body {
 }
 
 .menu-item > span {
-    color: var(--light-grey) !important;
+    color: var(--font-color) !important;
 }
 
 a.home-link {
-    color: var(--light-grey) !important;
+    color: var(--font-color) !important;
 }
 
 a {
@@ -45,7 +48,7 @@ a:hover {
 }
 
 div#thetext p { line-height: 1.5; }
-span.textitem { font-family: Georgia; color: var(--light-grey);}
+span.textitem { font-family: Georgia; }
 span.status0 { background-color: transparent; color: var(--status-0-color); }
 span.status1 { background-color: var(--status-1-color); color: #eff1f2; } /* pink highlight */
 span.status2 { background-color: var(--status-2-color); color: #eff1f2; } /* yellow highlight */
@@ -75,4 +78,13 @@ textarea {
     border-color: var(--light-grey); /* light grey font */
     background-color: var(--dark-grey); /* dark grey */
     color: var(--light-grey); /* light grey font */
+}
+
+#status {
+  --status-select-color: var(--light-grey);
+  --status-hover-color: #a2a2a2;
+}
+
+#status label[for="status-6"]:hover {
+  background-color: #bc6b60;
 }
