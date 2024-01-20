@@ -43,3 +43,14 @@ tags.tagify {
     padding: 0px;
     font-size: 85%;
 }
+
+/** Hard code colors to prevent theme issues. */
+
+.tagify__dropdown__wrapper {
+    background: transparent !important;
+}
+
+.tagify__dropdown {
+    background: white !important;
+    color: black !important;
+}
