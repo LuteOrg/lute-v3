@@ -85,6 +85,13 @@ textarea {
   --status-hover-color: #a2a2a2;
 }
 
+#status label[for="status-5"]::after,
+#status label[for="status-6"]::after,
+#status #status-5:checked + label::after,
+#status #status-6:checked + label::after {
+    filter: invert(0.85);
+}
+
 #status label[for="status-6"]:hover {
   background-color: #bc6b60;
 }

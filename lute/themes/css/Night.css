@@ -84,6 +84,13 @@ span.status99 { background-color: transparent; } /* transparent */
   --status-hover-color: var(--light-grey);
 }
 
+#status label[for="status-5"]::after,
+#status label[for="status-6"]::after,
+#status #status-5:checked + label::after,
+#status #status-6:checked + label::after {
+    filter: invert(1);
+}
+
 #status label[for="status-6"]:hover {
   background-color: #bc6b60;
 }
