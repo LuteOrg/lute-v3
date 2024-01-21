@@ -150,11 +150,17 @@ class LuteTestClient:
                 # This line didn't work:
                 # iframe.choose('status', updates['status'])
                 s = updates["status"]
-                xp = f"//input[@type='radio'][@name='status'][@value='{s}']"
-                radios = b.find_by_xpath(xp)
-                assert len(radios) == 1, "have matching radio button"
-                radio = radios[0]
-                radio.click()
+                xp = "".join(
+                    [
+                        "//input[@type='radio'][@name='status']",
+                        f"[@value='{s}']",
+                        "/following-sibling::label",
+                    ]
+                )
+                labels = b.find_by_xpath(xp)
+                assert len(labels) == 1, "have matching radio button"
+                label = labels[0]
+                label.click()
             elif k in ("translation", "text"):
                 b.find_by_css(f"#{k}").fill(v)
             elif k == "parents":
