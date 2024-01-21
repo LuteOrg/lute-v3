@@ -261,11 +261,15 @@ def bulk_set_parent():
     data = request.get_json()
     termids = data.get("wordids")
     parenttext = data.get("parenttext")
+    parent = None
     repo = Repository(db)
     for tid in termids:
         term = repo.load(int(tid))
+        if parent is None:
+            parent = repo.find(term.language_id, parenttext)
         if term.parents != [parenttext]:
             term.parents = [parenttext]
+            term.status = parent.status
             term.sync_status = True
         repo.add(term)
     repo.commit()
