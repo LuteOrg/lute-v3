@@ -41,9 +41,15 @@
         src="{{ form.current_image.object_data or '' }}"/>
       </div>
 
-      <div>{{ form.status(class="form-control") }}</div>
+      <div id="status-container">
+        {{ form.status(class="form-control") }}
+        <div id="sync-status-container">
+          {{ form.sync_status(class="form-control", disabled=True) }}
+          <label for="sync_status">Sync status</label>
+        </div>
+      </div>
 
-      <div>{{ form.current_image(class="form-control") }}</div>
+      <div style="display: none">{{ form.current_image(class="form-control") }}</div>
 
       <div>{{ form.termtagslist(class="form-control") }}</div>
 
@@ -62,6 +68,10 @@
 
 
 <script type="text/javascript">
+
+  // The parent tag list, managed by tagify.
+  // Global reference needed for runtime inspection of tag list.
+  var parents_tagify = null;
 
   // TODO zzfuture fix: acceptance tests for all interactions
 
@@ -119,6 +129,36 @@
       window.location.href = url;
     });
 
+    tagify.on('add remove', function (e) {
+      // The #parents_list text box isn't changed consistently
+      // during events, so we have to check the tagify var
+      // itself, which has an accurate list of current tags.
+      // console.log(e);
+      // console.log(e.detail);
+      const single_parent = (parents_tagify.value.length == 1);
+      const cb = $("#sync_status");
+      cb.prop("checked", single_parent);
+      if (single_parent)
+        cb.removeAttr("disabled");
+      else
+        cb.attr("disabled", true);
+
+      // If adding a single parent, inherit its status.
+      if (e.type == 'add' && single_parent) {
+        if (e.detail && e.detail.data && e.detail.data.status) {
+          const targetValue = e.detail.data.status;
+          var radioButtons = document.getElementsByName('status');
+          for (var i = 0; i < radioButtons.length; i++) {
+            if (radioButtons[i].value == targetValue) {
+              // console.log(`found at i = ${i}`);
+              radioButtons[i].checked = true;
+              break;
+            }
+          }
+        }
+      }
+    });
+
     // Autocomplete
     var controller;
     tagify.on('input', onInput);
@@ -159,7 +199,8 @@
         .then(function(data) {
           const newWhitelist = data.map((a) => ({
             "value": a.text,
-            "suggestion": make_dropdown(a)
+            "suggestion": make_dropdown(a),
+            "status": a.status,
           }));
           tagify.whitelist = newWhitelist; // update whitelist Array in-place
           const sdecode = decodeURIComponent(s);
@@ -176,8 +217,31 @@
     };  // end function onInput
 
     return tagify;
-  }
+  }  // end setup_parent_tagify
 
+
+  /** Parents are in the tagify-managed #parentslist input box. */
+  let get_parents = function() {
+    // During form load, and in "steady state" (i.e., after the tags
+    // have been added or removed, and the focus has switched to
+    // another control) the #sync_status text box is loaded with the
+    // values.
+    const pdata = $('#parentslist').val();
+    if ((pdata ?? '') == '') {
+      return [];
+    }
+    const j = JSON.parse(pdata)
+    const parents = j.map(e => e.value);
+    return parents;
+  };
+
+  let enable_disable_sync_status_checkbox = function() {
+    const cb = $("#sync_status");
+    if (get_parents().length == 1)
+      cb.removeAttr("disabled");
+    else
+      cb.attr("disabled", true);
+  };
 
   var TAGS = {{ tags | safe }};
 
@@ -209,7 +273,7 @@
 
   $(document).ready(function () {
     var parentslist = document.getElementById('parentslist');
-    var parents_tagify = setup_parent_tagify(parentslist);
+    parents_tagify = setup_parent_tagify(parentslist);
     var termtagslist = document.getElementById('termtagslist');
     var termtags_tagify = setup_term_tags_tagify(termtagslist);
 
@@ -222,6 +286,8 @@
     // this.dispatchEvent(new Event("termFormOpened"));
     // because this form is opened in a frame.
     window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
+
+    enable_disable_sync_status_checkbox();
   });
 
   /** LOOKUPS */
@@ -254,18 +320,6 @@
     ret = ret.replace('###', searchterm);
     // console.log(ret);
     return ret;
-  };
-
-
-  /** Parents are in the tagify-managed #parentslist input box. */
-  let get_parents = function() {
-    const pdata = $('#parentslist').val();
-    if ((pdata ?? '') == '') {
-      return [];
-    }
-    const j = JSON.parse(pdata)
-    const parents = j.map(e => e.value);
-    return parents;
   };
 
 

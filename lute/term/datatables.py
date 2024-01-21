@@ -15,7 +15,8 @@ def get_data_tables_list(parameters):
     ifnull(tags.taglist, '') as TagList,
     StText,
     StID,
-    StAbbreviation
+    StAbbreviation,
+    case w.WoSyncStatus when 1 then 'y' else '' end as SyncStatus
     FROM
     words w
     INNER JOIN languages L on L.LgID = w.WoLgID

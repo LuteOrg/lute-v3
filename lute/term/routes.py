@@ -86,6 +86,7 @@ def export_terms():
         "OMIT_LgID",
         "OMIT_ImageSource",
         "status",
+        "sync_status",
     ]
     columns_to_exclude = []
     for i, h in enumerate(headings):
@@ -199,9 +200,16 @@ def search_by_text_in_language(text, langid):
         return []
     repo = Repository(db)
     matches = repo.find_matches(langid, text)
-    result = []
-    for t in matches:
-        result.append({"id": t.id, "text": t.text, "translation": t.translation})
+
+    def _make_entry(t):
+        return {
+            "id": t.id,
+            "text": t.text,
+            "translation": t.translation,
+            "status": t.status,
+        }
+
+    result = [_make_entry(t) for t in matches]
     return jsonify(result)
 
 
@@ -253,10 +261,16 @@ def bulk_set_parent():
     data = request.get_json()
     termids = data.get("wordids")
     parenttext = data.get("parenttext")
+    parent = None
     repo = Repository(db)
     for tid in termids:
         term = repo.load(int(tid))
-        term.parents = [parenttext]
+        if parent is None:
+            parent = repo.find(term.language_id, parenttext)
+        if term.parents != [parenttext]:
+            term.parents = [parenttext]
+            term.status = parent.status
+            term.sync_status = True
         repo.add(term)
     repo.commit()
     return jsonify("ok")
