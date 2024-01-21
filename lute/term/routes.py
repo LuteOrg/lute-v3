@@ -264,7 +264,9 @@ def bulk_set_parent():
     repo = Repository(db)
     for tid in termids:
         term = repo.load(int(tid))
-        term.parents = [parenttext]
+        if term.parents != [parenttext]:
+            term.parents = [parenttext]
+            term.sync_status = True
         repo.add(term)
     repo.commit()
     return jsonify("ok")
