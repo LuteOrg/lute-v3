@@ -301,6 +301,36 @@ Feature: Term import
             tags: animal
 
 
+    Scenario: Import can sync parent and children statuses
+        Given import file:
+            language,term,parent,status
+            Spanish,a,,1
+            Spanish,b,a,2
+            Spanish,c,a,3
+            Spanish,d,a,4
+        When import with create true, update false
+        Then import should succeed with 4 created, 0 updated, 0 skipped
+        And sql "select WoText, WoStatus, WoSyncStatus from words order by WoText" should return:
+            a; 1; 0
+            b; 2; 0
+            c; 3; 0
+            d; 4; 0
+
+        Given import file:
+            language,term,parent,status,sync_status
+            Spanish,a,,1,
+            Spanish,b,a,2,y
+            Spanish,c,a,3,y
+            Spanish,d,a,4
+        When import with create false, update true
+        Then import should succeed with 0 created, 4 updated, 0 skipped
+        And sql "select WoText, WoStatus, WoSyncStatus from words order by WoText" should return:
+            a; 3; 0
+            b; 3; 1
+            c; 3; 1
+            d; 4; 0
+
+
     Scenario: Import file fields can be in any order
         Given import file:
             language,translation,term,parent,status,tags,pronunciation

@@ -58,7 +58,14 @@ def _validate_data_fields(field_list):
         if k not in field_list:
             raise BadImportFileError(f"Missing required field '{k}'")
 
-    allowed = required + ["translation", "parent", "status", "tags", "pronunciation"]
+    allowed = required + [
+        "translation",
+        "parent",
+        "status",
+        "tags",
+        "pronunciation",
+        "sync_status",
+    ]
     for k in field_list:
         if k not in allowed:
             raise BadImportFileError(f"Unknown field '{k}'")
@@ -190,6 +197,11 @@ def _set_term_parents(repo, rec, lang):
     t = repo.find(lang.id, rec["term"])
     parents = list(map(str.strip, rec["parent"].split(",")))
     t.parents = [p for p in parents if p != ""]
+    if "sync_status" in rec and len(parents) == 1:
+        sync_status = rec["sync_status"] or ""
+        t.sync_status = sync_status.strip().lower() == "y"
+    if len(parents) != 1:
+        t.sync_status = False
     repo.add(t)
 
 

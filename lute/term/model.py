@@ -36,6 +36,7 @@ class Term:  # pylint: disable=too-many-instance-attributes
         self.status = 1
         self.translation = None
         self.romanization = None
+        self.sync_status = False
         self.term_tags = []
         self.flash_message = None
         self.parents = []
@@ -291,6 +292,7 @@ class Repository:
         t.status = term.status
         t.translation = term.translation
         t.romanization = term.romanization
+        t.sync_status = term.sync_status
         t.set_current_image(term.current_image)
 
         if term.flash_message is not None:
@@ -320,6 +322,9 @@ class Repository:
         t.remove_all_parents()
         for tp in termparents:
             t.add_parent(tp)
+
+        if len(termparents) != 1:
+            t.sync_status = False
 
         return t
 
@@ -361,6 +366,7 @@ class Repository:
         term.status = dbterm.status
         term.translation = dbterm.translation
         term.romanization = dbterm.romanization
+        term.sync_status = dbterm.sync_status
         term.current_image = dbterm.get_current_image()
         term.flash_message = dbterm.get_flash_message()
         term.parents = [p.text for p in dbterm.parents]
