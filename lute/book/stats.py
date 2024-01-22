@@ -6,6 +6,7 @@ import json
 from lute.read.service import get_paragraphs
 from lute.db import db
 from lute.models.book import Book
+from lute.utils.debug_helpers import DebugTimer
 
 
 def get_status_distribution(book):
@@ -17,11 +18,13 @@ def get_status_distribution(book):
     """
     txindex = 0
 
+    dt = DebugTimer("get_status_distribution()")
     if (book.current_tx_id or 0) != 0:
         for t in book.texts:
             if t.id == book.current_tx_id:
                 break
             txindex += 1
+    dt.step("get current tx")
 
     paras = [
         get_paragraphs(t)
@@ -29,6 +32,7 @@ def get_status_distribution(book):
         # Next 20 pages, a good enough sample.
         book.texts[txindex : txindex + 20]
     ]
+    dt.step("get_paragraphs")
 
     def flatten_list(nested_list):
         result = []
@@ -42,18 +46,22 @@ def get_status_distribution(book):
     text_items = []
     for s in flatten_list(paras):
         text_items.extend(s.textitems)
+    dt.step("get all text items for sentences")
     text_items = [ti for ti in text_items if ti.is_word]
+    dt.step("text_items")
 
     statterms = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 98: [], 99: []}
 
     for ti in text_items:
         statterms[ti.wo_status or 0].append(ti.text_lc)
+    dt.step("build list of terms")
 
     stats = {}
     for statusval, allterms in statterms.items():
         uniques = list(set(allterms))
         statterms[statusval] = uniques
         stats[statusval] = len(uniques)
+    dt.step("get uniques")
 
     return stats
 
@@ -84,8 +92,11 @@ def refresh_stats():
     )
     books = [b for b in books_to_update if b.is_supported]
     for book in books:
+        dt = DebugTimer(book.title)
         stats = _get_stats(book)
+        dt.step("_get_stats")
         _update_stats(book, stats)
+        dt.step("_update_stats")
 
 
 def mark_stale(book):
@@ -97,9 +108,12 @@ def mark_stale(book):
 
 def _get_stats(book):
     "Calc stats for the book using the status distribution."
+    dt = DebugTimer("_get_stats")
     status_distribution = get_status_distribution(book)
+    dt.step("get_status_distribution")
     unknowns = status_distribution[0]
     allunique = sum(status_distribution.values())
+    dt.step("calc allunique")
 
     percent = 0
     if allunique > 0:  # In case not parsed.
