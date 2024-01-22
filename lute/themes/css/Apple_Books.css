@@ -6,21 +6,17 @@ body {
   --status-5-color: #c7b1dd;
 
   --background-color: #f8f1e2;
+  --font-color: #262523;
 
   background-color: var(--background-color); /* beige paper */
-  color: #262523; /* dark grey font */
+  color: var(--font-color); /* dark grey font */
 }
 
  div#thetext p { line-height: 1.5; }
- span.textitem { font-family: Georgia; color: #262523; }
+ span.textitem { font-family: Georgia;}
  /* span.status0 { background-color: transparent; } */
  span.status1 { background-color: var(--status-1-color); } /* pink highlight */
  span.status2 { background-color: var(--status-2-color); } /* yellow highlight */
  span.status3 { background-color: var(--status-3-color); } /* green highlight */
  span.status4 { background-color: var(--status-4-color); } /* blue highlight */
  span.status5 { background-color: var(--status-5-color); } /* purple highlight */
-
-.status-bar-container-empty {
-  background-color: var(--background-color);
-  border-color: #686868;
-}

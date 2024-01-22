@@ -101,21 +101,10 @@
       lengthMenu: [ 25, 50, 100, 500, 1000 ],
       buttons: [
          {
-           extend: 'csvHtml5',
+           extend: 'download',
+           url: '/term/export_terms',
            text: 'Export CSV',
-           exportOptions: {
-             columns: [
-               'WoText:name',
-               'ParentText:name',
-               'WoTranslation:name',
-               'LgName:name',
-               'TagList:name',
-               'StText:name',
-               'WoID:name',
-               'LgID:name',
-             ], visible: false
-           },
-         }
+         },
       ],
       paging: true,
       info: true,
@@ -160,6 +149,8 @@
         { "name": "WoID", "targets": 7, "visible": false },
         { "name": "LgID", "targets": 8, "visible": false },
         { "name": "WiSource", "targets": 9, "visible": false },
+        { "name": "StAbbreviation", "targets": 10, "visible": false },
+        { "name": "SyncStatus", "targets": 11, "visible": false },
       ],
 
       // Ajax call
@@ -311,7 +302,7 @@
 
   let load_filters_from_storage = function() {
     fs = sessionStorage.getItem('termtable_filters');
-    console.log(fs);
+    // console.log(fs);
     if (fs == null)
       return;
     store = JSON.parse(fs);

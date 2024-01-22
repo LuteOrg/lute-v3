@@ -39,6 +39,7 @@ INSERT INTO _migrations VALUES('20231101_203811_modify_settings_schema.sql');
 INSERT INTO _migrations VALUES('20231130_141236_add_TxWordCount.sql');
 INSERT INTO _migrations VALUES('20231210_103924_add_book_audio_fields.sql');
 INSERT INTO _migrations VALUES('20240101_122610_add_bookstats_status_distribution.sql');
+INSERT INTO _migrations VALUES('20240118_154258_change_status_abbrev.sql');
 CREATE TABLE IF NOT EXISTS "languages" (
 	"LgID" INTEGER NOT NULL  ,
 	"LgName" VARCHAR(40) NOT NULL  ,
@@ -81,8 +82,8 @@ INSERT INTO statuses VALUES(2,'New (2)','2');
 INSERT INTO statuses VALUES(3,'Learning (3)','3');
 INSERT INTO statuses VALUES(4,'Learning (4)','4');
 INSERT INTO statuses VALUES(5,'Learned','5');
-INSERT INTO statuses VALUES(98,'Ignored','Ign');
-INSERT INTO statuses VALUES(99,'Well Known','WKn');
+INSERT INTO statuses VALUES(98,'Ignored','I');
+INSERT INTO statuses VALUES(99,'Well Known','W');
 CREATE TABLE IF NOT EXISTS "tags" (
 	"TgID" INTEGER NOT NULL  ,
 	"TgText" VARCHAR(20) NOT NULL  ,

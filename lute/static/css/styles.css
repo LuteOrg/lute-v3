@@ -8,13 +8,9 @@
     padding: 0;
 }
 
-body
-{   
+body {
     --background-color: #fff;
-    
-    background-color: var(--background-color);
-    color: #000000;
-    font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
+    --font-color: #000;
 
     --status-0-color: #D5FFFF;
     --status-1-color: #F5B8A9;
@@ -23,7 +19,16 @@ body
     --status-4-color: #F5F3A9;
     --status-5-color: #DDFFDD;
 
-    --status-99-color: #b0fad1;
+    --status-98-color: #ee8577;
+    --status-99-color: #72da88;
+
+    --form-border-color: #ddd;
+    --form-border-radius: 3px;
+
+    background-color: var(--background-color);
+    color: var(--font-color);
+
+    font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
 }
 
 /* Main container div for Lute site content. */
@@ -169,8 +174,7 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
 
 /* End book listing */
 
-/* Term listing CSV export. */
-button.buttons-csv {
+div.dt-buttons>.dt-button {
     padding: 3px !important;
     margin: 5px 0 0 10px !important;
 }
@@ -489,40 +493,28 @@ span.flashtextcopy {
     background-color: yellow !important;
 }
 
-span.status0
-{
+span.status0 {
     background-color: var(--status-0-color);
-    color: #000000;
 }
 
-span.status1
-{
+span.status1 {
     background-color: var(--status-1-color);
-    color: #000000;
 }
 
-span.status2
-{
+span.status2 {
     background-color: var(--status-2-color);
-    color: #000000;
 }
 
-span.status3
-{
+span.status3 {
     background-color: var(--status-3-color);
-    color: #000000;
 }
 
-span.status4
-{
+span.status4 {
     background-color: var(--status-4-color);
-    color: #000000;
 }
 
-span.status5
-{
+span.status5 {
     background-color: var(--status-5-color);
-    color: #000000;
 }
 
 /* span.status99, span.status98 have no styles, just regular text. */
@@ -543,11 +535,10 @@ span.textsentence {
     font-size: 0%;
 }
 
-/** A word shown in the reading pane. */
-span.textitem
-{
+/* A word shown in the reading pane. */
+span.textitem {
     font-size: 16px;
-    color: #000000;
+    color: var(--font-color);
     display:inline-block;
 
     /* disallow select, only allow mouse-down-drag-up to define multiword
@@ -559,11 +550,11 @@ span.textitem
     border-bottom: 1px solid transparent;
 }
 
-.click
-{
-    cursor: pointer;
-    color: #C00000;
-}
+/* .click */
+/* { */
+    /* cursor: pointer; */
+    /* color: #C00000; */
+/* } */
 
 .hide
 {
@@ -600,15 +591,6 @@ a:active {
 img
 {
     border: 0pt none;
-}
-
-.uwordmarked
-{
-    font-weight: bold;
-    border-top: 3px solid red;
-    border-bottom: 3px solid red;
-    border-right: 3px solid red;
-    border-left: 3px solid red;
 }
 
 .wordhover
@@ -860,6 +842,7 @@ div.code pre {
 
 .status-bar99 {
     background-color: var(--status-99-color);
+    filter: saturate(1.4);
 }
 
 #booktable td {
@@ -1018,64 +1001,32 @@ div.code pre {
 #backup_dir, 
 #mecab_path, 
 #custom_styles,
-#language input {
+#language input,
+#importurl {
     /* width: 100%; */
     font-size: 0.9rem;
     font-family: inherit;
     padding: 0.2rem 0.2rem;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+    border: 1px solid var(--form-border-color);
+    border-radius: var(--form-border-radius);
     box-sizing: border-box;
 }
 
 
 /* GENERAL FORM STYLES */
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
 textarea {
     width: 100%;
     resize: vertical;
 }
 
-ul.shorttaglist {
-    box-sizing: border-box;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.1rem;
-    padding: 0;
-}
-
-ul.tagit input.ui-autocomplete-input {
-    padding: 0.25rem 0.2rem;
-    width: 70px;
-}
-
 ::placeholder {
     font-family: inherit;
-}
-
-ul.tagit li {
-    margin: 0;
-    padding: 0.2rem 1.3rem 0.2rem 0.5rem;
-}
-
-ul.tagit li.tagit-new {
-    padding: 0;
-}
-
-ul.tagit li.tagit-choice {
-  display: flex;
-  align-items: center;
-}
-
-ul.tagit .tagit-label {
-  font-size: 0.8rem;
-}
-
-ul.tagit li.tagit-choice-editable {
-    flex-shrink: 0;
-}
-
-ul.form-control label {
-    cursor: pointer; /* Add pointer cursor for better UX */
 }
 
 .btn {
@@ -1166,6 +1117,7 @@ div.help-text {
 #translation {
     height: 50px;
     min-height: 50px;
+    vertical-align: top /* removes annoying extra space below */
 }
 
 #term {
@@ -1189,10 +1141,18 @@ div.help-text {
     gap: 0.5rem;
 }
 
-#status {
+#status-container {
     display: flex;
-    list-style: none;
-    gap: 0.8rem;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#sync-status-container {
+    text-align: right;
+}
+
+input[type="checkbox"][disabled] + label {
+  color: #ccc;
 }
 
 #term-button-container {
@@ -1207,8 +1167,8 @@ div.help-text {
 
 .zoomableTermImage {
     transition: transform 0.2s; /* Animation */
-    border-radius: 3px;
-    border: 1px solid #ddd;
+    border-radius: var(--form-border-radius);
+    border: 1px solid var(--form-border-color);
     box-sizing: border-box;
     width: 40px;
     display: none;
@@ -1218,6 +1178,159 @@ div.help-text {
     transform: scale(4) translate(-17px, 5px);
 }
 
+
+/* STATUS RADIO */
+
+#status input {
+    display: none;
+}
+
+#status {
+    display: flex;
+    align-items: center;
+    list-style: none;
+
+    --status-select-color: #4e4f51c4;
+    --status-hover-color: #4e4f5156;
+}
+
+#status label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 30px;
+    height: 30px;
+    border: 1px solid #a5a5a5;
+    color: var(--font-color);
+
+    box-sizing: border-box;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* thicker border for Ign */
+#status label[for="status-6"] {
+    border-width: 2px;
+    /* border-color: #a5a5a5; */
+}
+/* same as checked, but more transparent */
+#status label:hover {
+    box-shadow: inset 0 0 0 2px var(--status-hover-color);
+    border: none;
+}
+
+#status label[for="status-6"]:hover {
+    background-color: #f5c6c0;
+}
+
+#status input:checked + label {
+    /* background-color: #6da8e8; */
+    font-weight: 700;
+    box-shadow: inset 0 0 0 2px var(--status-select-color);
+    border: none;
+}
+
+#status #status-6:checked + label {
+    background-color: var(--status-98-color);
+}
+
+#status #status-5:checked + label::after,
+#status #status-6:checked + label::after {
+    filter: invert(1);
+}
+
+/* move label back(border width amount) */
+#status label[for="status-5"]:hover {
+    padding-right: 1px;
+}
+
+#status label[for="status-0"]:hover {
+    padding-left: 1px;
+}
+
+#status-0:checked + label {
+    padding-left: 1px;
+}
+
+#status-5:checked + label {
+    padding-right: 1px;
+}
+
+#status label[for="status-0"] {
+    background-color: var(--status-1-color);
+
+    border-top-left-radius: var(--form-border-radius);
+    border-bottom-left-radius: var(--form-border-radius);
+
+    border-right: none;
+}
+
+#status label[for="status-1"],
+#status label[for="status-2"],
+#status label[for="status-3"],
+#status label[for="status-4"] {
+    border-right: none;
+    border-left: none;
+}
+
+#status label[for="status-1"] {
+    background-color: var(--status-2-color);
+}
+
+#status label[for="status-2"] {
+    background-color: var(--status-3-color);
+}
+
+#status label[for="status-3"] {
+    background-color: var(--status-4-color);
+}
+
+#status label[for="status-4"] {
+    background-color: var(--status-5-color);
+}
+
+#status label[for="status-5"] {
+    background-color: var(--status-99-color);
+
+    border-top-right-radius: var(--form-border-radius);
+    border-bottom-right-radius: var(--form-border-radius);
+
+    border-left: none;
+}
+
+#status label[for="status-6"] {
+    background-color: var(--background-color);
+
+    border-radius: var(--form-border-radius);
+
+    margin-left: 10px;
+}
+
+/* hide Wkn and Ign */
+#status label[for="status-5"],
+#status label[for="status-6"] {
+    font-size: 0;
+}
+
+#status label[for="status-5"]::after,
+#status label[for="status-6"]::after {
+    content: "";
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 1.2rem;
+    height: 1.2rem;
+    /* color black */
+    filter: invert(0);
+}
+
+#status label[for="status-5"]::after {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>');
+}
+
+#status label[for="status-6"]::after {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" /></svg>');
+}
 
 /* SETTINGS TABLE */
 #custom_styles {
@@ -1229,9 +1342,16 @@ div.help-text {
 #current_theme, 
 #japanese_reading, 
 #backup_count, 
-#test_mecab_btn {
+#test_mecab_btn,
+#parser_type,
+#language_id,
+#txtSetParent,
+#predefined {
     width: 8rem;
     box-sizing: border-box;
+    border: 1px solid var(--form-border-color);
+    border-radius: 3px;
+    padding: 0.2rem 0.2rem;
 }
 
 

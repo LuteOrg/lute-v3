@@ -280,6 +280,25 @@ def test_save_change_parent_breaks_old_link(app_context, repo, hello_term):
     assert_sql_result(sqlparent, ["hello; new"], "changed")
 
 
+def test_save_term_with_multiple_parents_unsets_sync_status(
+    app_context, repo, hello_term
+):
+    "Ensure DB data is good on save."
+    hello_term.parents.append("parent")
+    hello_term.sync_status = True
+    repo.add(hello_term)
+    repo.commit()
+
+    sql = "select WoTextLC, WoSyncStatus from words where WoTextLC = 'hello'"
+    assert_sql_result(sql, ["hello; 1"], "link set")
+
+    hello_term.parents.append("parent2")
+    hello_term.sync_status = True
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result(sql, ["hello; 0"], "link UN-set")
+
+
 def test_cant_set_term_as_its_own_parent(app_context, repo, hello_term):
     """
     Would create obvious circular ref
@@ -494,19 +513,28 @@ def test_find_matches_multiword_respects_zws(spanish, repo, _multiple_terms):
 def assert_find_matches_returns(term_repo, spanish, s, expected):
     "Helper, assert returns expected content."
     matches = term_repo.find_matches(spanish.id, s)
-    assert len(matches) == len(expected)
     actual = ", ".join([t.text for t in matches])
     assert ", ".join(expected) == actual
 
 
+def test_find_matches_starting_matches_sort_to_top(spanish, repo):
+    "All matches return, but words that start with the same thing sort to top."
+    add_terms(spanish, ["tener", "contener", "sostener", "ten", "contengo", "xxx"])
+    assert_find_matches_returns(
+        repo, spanish, "ten", ["ten", "tener", "contener", "contengo", "sostener"]
+    )
+    assert_find_matches_returns(repo, spanish, "ene", ["contener", "sostener", "tener"])
+    assert_find_matches_returns(repo, spanish, "x", ["xxx"])
+
+
 @pytest.mark.find_match
 def test_findLikeSpecification_initial_check(spanish, repo):
-    "Searches match the start of string."
+    "Searches match any part of string."
     add_terms(spanish, ["abc", "abcd", "bcd"])
 
     assert_find_matches_returns(repo, spanish, "ab", ["abc", "abcd"])
     assert_find_matches_returns(repo, spanish, "abcd", ["abcd"])
-    assert_find_matches_returns(repo, spanish, "bc", ["bcd"])
+    assert_find_matches_returns(repo, spanish, "bcd", ["bcd", "abcd"])
     assert_find_matches_returns(repo, spanish, "yy", [])
 
 

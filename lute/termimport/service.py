@@ -20,7 +20,7 @@ class BadImportFileError(Exception):
     """
 
 
-def import_file(filename):
+def import_file(filename, create_terms=True, update_terms=True):
     """
     Validate and import file.
 
@@ -28,7 +28,7 @@ def import_file(filename):
     """
     import_data = _load_import_file(filename)
     _validate_data(import_data)
-    return _do_import(import_data)
+    return _do_import(import_data, create_terms, update_terms)
 
 
 def _load_import_file(filename, encoding="utf-8-sig"):
@@ -58,7 +58,14 @@ def _validate_data_fields(field_list):
         if k not in field_list:
             raise BadImportFileError(f"Missing required field '{k}'")
 
-    allowed = required + ["translation", "parent", "status", "tags", "pronunciation"]
+    allowed = required + [
+        "translation",
+        "parent",
+        "status",
+        "tags",
+        "pronunciation",
+        "sync_status",
+    ]
     for k in field_list:
         if k not in allowed:
             raise BadImportFileError(f"Unknown field '{k}'")
@@ -165,17 +172,45 @@ def _import_term_skip_parents(repo, rec, lang):
     repo.add(t)
 
 
+def _update_term_skip_parents(t, repo, rec):
+    "Update a term in the repo."
+    # Don't change the lang or text of the term
+    # t.language = lang
+    # t.language_id = lang.id
+    # t.text = rec["term"]
+    if "translation" in rec:
+        t.translation = rec["translation"]
+    if "status" in rec:
+        status = _get_status(rec["status"])
+        if status is not None:
+            t.status = int(status)
+    if "pronunciation" in rec:
+        t.romanization = rec["pronunciation"]
+    if "tags" in rec:
+        tags = list(map(str.strip, rec["tags"].split(",")))
+        t.term_tags = [t for t in tags if t != ""]
+    repo.add(t)
+
+
 def _set_term_parents(repo, rec, lang):
     "Set the term parents."
     t = repo.find(lang.id, rec["term"])
     parents = list(map(str.strip, rec["parent"].split(",")))
     t.parents = [p for p in parents if p != ""]
+    if "sync_status" in rec and len(parents) == 1:
+        sync_status = rec["sync_status"] or ""
+        t.sync_status = sync_status.strip().lower() == "y"
+    if len(parents) != 1:
+        t.sync_status = False
     repo.add(t)
 
 
-def _do_import(import_data):
+def _do_import(import_data, create_terms=True, update_terms=True):
     """
     Import records.
+
+    If create_terms is True, create new terms.
+    If update_terms is True, update existing terms.
 
     The import is done in two passes:
     1. import the basic terms, without setting their parents
@@ -185,13 +220,16 @@ def _do_import(import_data):
     contain a parent in its own row, and we want that to be
     imported first to get its own specified data.
     """
+    # pylint: disable=too-many-locals
+
     repo = Repository(db)
 
     skipped = 0
 
-    # Keep track of the created terms: we only want to update
-    # these ones in pass #2.
+    # Keep track of the created and updated terms: we only want to
+    # update these ones in pass #2.
     created_terms = []
+    updated_terms = []
 
     def term_string(lang, term):
         return f"{lang.id}-{term}"
@@ -200,9 +238,14 @@ def _do_import(import_data):
         langs_dict = _create_langs_dict(batch)
         for hsh in batch:
             lang = langs_dict[hsh["language"]]
-            if repo.find(lang.id, hsh["term"]) is None:
+            t = repo.find(lang.id, hsh["term"])
+            ts = term_string(lang, hsh["term"])
+            if t is None and create_terms:
                 _import_term_skip_parents(repo, hsh, lang)
-                created_terms.append(term_string(lang, hsh["term"]))
+                created_terms.append(ts)
+            elif t is not None and update_terms:
+                _update_term_skip_parents(t, repo, hsh)
+                updated_terms.append(ts)
             else:
                 skipped += 1
         repo.commit()
@@ -211,12 +254,16 @@ def _do_import(import_data):
     for batch in [pass_2[i : i + 100] for i in range(0, len(pass_2), 100)]:
         langs_dict = _create_langs_dict(batch)
         for hsh in batch:
-            lang_name = hsh["language"]
-            lang = langs_dict[lang_name]
-            if term_string(lang, hsh["term"]) in created_terms:
+            lang = langs_dict[hsh["language"]]
+            ts = term_string(lang, hsh["term"])
+            if ts in created_terms or ts in updated_terms:
                 _set_term_parents(repo, hsh, lang)
         repo.commit()
 
-    stats = {"created": len(created_terms), "skipped": skipped}
+    stats = {
+        "created": len(created_terms),
+        "updated": len(updated_terms),
+        "skipped": skipped,
+    }
 
     return stats

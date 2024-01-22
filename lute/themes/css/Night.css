@@ -6,11 +6,14 @@ body {
   --status-4-color: #325192;
   --status-5-color: #5e4583;
 
+  --status-99-color: #38924c;
+
   --background-color: #121212; /* black paper */
+  --font-color: #F3F4F4;
   --light-grey: #c4c8ce;
 
   background-color: var(--background-color);
-  color: #F3F4F4; /* grey font */
+  color: var(--font-color); /* grey font */
 }
 
 .flash-notice {
@@ -66,7 +69,7 @@ textarea {
 }
 
 div#thetext p { line-height: 1.5; }
-span.textitem { font-family: Georgia; color: #F3F4F4;}
+span.textitem { font-family: Georgia;}
 span.status0 { background-color: transparent; color: var(--status-0-color); } /* ice blue */
 span.status1 { background-color: var(--status-1-color); } /* pink highlight */
 span.status2 { background-color: var(--status-2-color); } /* yellow highlight */
@@ -75,6 +78,22 @@ span.status4 { background-color: var(--status-4-color); } /* blue highlight */
 span.status5 { background-color: var(--status-5-color); } /* purple highlight */
 span.status98 { background-color: transparent; } /* transparent */
 span.status99 { background-color: transparent; } /* transparent */
+
+#status {
+  --status-select-color: #d7dce2;
+  --status-hover-color: var(--light-grey);
+}
+
+#status label[for="status-5"]::after,
+#status label[for="status-6"]::after,
+#status #status-5:checked + label::after,
+#status #status-6:checked + label::after {
+    filter: invert(1);
+}
+
+#status label[for="status-6"]:hover {
+  background-color: #bc6b60;
+}
 
 .status-bar-container {
   background-color: #fff;

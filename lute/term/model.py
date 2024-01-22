@@ -36,6 +36,7 @@ class Term:  # pylint: disable=too-many-instance-attributes
         self.status = 1
         self.translation = None
         self.romanization = None
+        self.sync_status = False
         self.term_tags = []
         self.flash_message = None
         self.parents = []
@@ -178,35 +179,58 @@ class Repository:
         matches = (
             self.db.session.query(DBTerm)
             .filter(
-                and_(DBTerm.language_id == langid, DBTerm.text_lc.like(search + "%"))
+                and_(
+                    DBTerm.language_id == langid,
+                    DBTerm.text_lc.like("%" + search + "%"),
+                )
             )
             .all()
         )
 
         exact = [t for t in matches if t.text_lc == text_lc]
+        remaining = [t for t in matches if t.text_lc != text_lc]
 
+        # Split remaining into things that start with the search term
+        # and the rest.
+        def partition(arr, pred):
+            meets = []
+            notmeets = []
+            for x in arr:
+                if pred(x):
+                    meets.append(x)
+                else:
+                    notmeets.append(x)
+            return (meets, notmeets)
+
+        remain_starts_with, remain_rest = partition(
+            remaining, lambda t: t.text_lc.startswith(search)
+        )
+
+        # Sort terms with children to top,
+        # then alphabetically.
         def compare(item1, item2):
+            # More children sort to top.
             c1 = len(item1.children)
             c2 = len(item2.children)
             if c1 > c2:
                 return -1
             if c1 < c2:
                 return 1
+
+            # Equal children sort alphabetically.
             t1 = item1.text_lc
             t2 = item2.text_lc
             if t1 < t2:
                 return -1
             if t1 > t2:
                 return 1
+
+            # Failsafe, should never get here.
             return 0
 
-        remaining = [t for t in matches if t.text_lc != text_lc]
-        # for t in remaining:
-        #     print(f'term: {t.text}; child count = {len(t.children)}')
-        remaining.sort(key=functools.cmp_to_key(compare))
-        # print('remaining = ')
-        # print(remaining)
-        ret = exact + remaining
+        remain_starts_with.sort(key=functools.cmp_to_key(compare))
+        remain_rest.sort(key=functools.cmp_to_key(compare))
+        ret = exact + remain_starts_with + remain_rest
         ret = ret[:max_results]
         return [self._build_business_term(t) for t in ret]
 
@@ -268,6 +292,7 @@ class Repository:
         t.status = term.status
         t.translation = term.translation
         t.romanization = term.romanization
+        t.sync_status = term.sync_status
         t.set_current_image(term.current_image)
 
         if term.flash_message is not None:
@@ -297,6 +322,9 @@ class Repository:
         t.remove_all_parents()
         for tp in termparents:
             t.add_parent(tp)
+
+        if len(termparents) != 1:
+            t.sync_status = False
 
         return t
 
@@ -338,6 +366,7 @@ class Repository:
         term.status = dbterm.status
         term.translation = dbterm.translation
         term.romanization = dbterm.romanization
+        term.sync_status = dbterm.sync_status
         term.current_image = dbterm.get_current_image()
         term.flash_message = dbterm.get_flash_message()
         term.parents = [p.text for p in dbterm.parents]
