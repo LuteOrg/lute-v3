@@ -40,6 +40,7 @@ INSERT INTO _migrations VALUES('20231130_141236_add_TxWordCount.sql');
 INSERT INTO _migrations VALUES('20231210_103924_add_book_audio_fields.sql');
 INSERT INTO _migrations VALUES('20240101_122610_add_bookstats_status_distribution.sql');
 INSERT INTO _migrations VALUES('20240118_154258_change_status_abbrev.sql');
+INSERT INTO _migrations VALUES('20240113_215142_add_term_follow_parent_bool.sql');
 CREATE TABLE IF NOT EXISTS "languages" (
 	"LgID" INTEGER NOT NULL  ,
 	"LgName" VARCHAR(40) NOT NULL  ,
@@ -165,7 +166,7 @@ CREATE TABLE IF NOT EXISTS "words" (
 	"WoRomanization" VARCHAR(100) NULL  ,
 	"WoTokenCount" TINYINT NOT NULL DEFAULT '0' ,
 	"WoCreated" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-	"WoStatusChanged" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	"WoStatusChanged" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, WoSyncStatus INTEGER NOT NULL DEFAULT 0,
 	FOREIGN KEY("WoLgID") REFERENCES "languages" ("LgID") ON UPDATE NO ACTION ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "books" (
@@ -252,6 +253,34 @@ CREATE UNIQUE INDEX "WoTextLCLgID" ON "words" ("WoTextLC", "WoLgID");
 CREATE INDEX "WoTokenCount" ON "words" ("WoTokenCount");
 CREATE INDEX "BkLgID" ON "books" ("BkLgID");
 CREATE UNIQUE INDEX "wordparent_pair" ON "wordparents" ("WpWoID", "WpParentWoID");
+CREATE TRIGGER trig_wordparents_after_insert_update_parent_WoStatus_if_following
+AFTER INSERT ON wordparents
+BEGIN
+    UPDATE words
+    SET WoStatus = (
+      select WoStatus from words where WoID = new.WpWoID
+    )
+    WHERE WoID = new.WpParentWoID
+    AND 1 = (
+      SELECT COUNT(*)
+      FROM wordparents
+      INNER JOIN words ON WoID = WpWoID
+      WHERE WoSyncStatus = 1
+      AND WoID = new.WpWoID
+    );
+END;
+CREATE TRIGGER trig_wordparents_after_delete_change_WoSyncStatus
+BEFORE DELETE ON wordparents
+FOR EACH ROW
+BEGIN
+    UPDATE words
+    SET WoSyncStatus = 0
+    WHERE WoID IN
+    (
+      select WpWoID from wordparents
+      where WpParentWoID = old.WpParentWoID
+    );
+END;
 CREATE TRIGGER trig_words_update_WoStatusChanged
 AFTER UPDATE OF WoStatus ON words
 FOR EACH ROW
@@ -261,4 +290,35 @@ BEGIN
     SET WoStatusChanged = CURRENT_TIMESTAMP
     WHERE WoID = NEW.WoID;
 END;
+CREATE TRIGGER trig_words_after_update_WoStatus_if_following_parent
+AFTER UPDATE OF WoStatus, WoSyncStatus ON words
+FOR EACH ROW
+WHEN (old.WoStatus <> new.WoStatus or (old.WoSyncStatus = 0 and new.WoSyncStatus = 1))
+BEGIN
+    UPDATE words
+    SET WoStatus = new.WoStatus
+    WHERE WoID in (
+      -- single parent children that are following this term.
+      select WpWoID
+      from wordparents
+      inner join words on WoID = WpWoID
+      where WoSyncStatus = 1
+      and WpParentWoID = old.WoID
+      group by WpWoID
+      having count(*) = 1
+
+      UNION
+
+      -- The parent of this term,
+      -- if this term has a single parent and has "follow parent"
+      select WpParentWoID
+      from wordparents
+      inner join words on WoID = WpWoID
+      where WoSyncStatus = 1
+      and WoID = old.WoID
+      group by WpWoID
+      having count(*) = 1
+    );
+END
+;
 COMMIT;
