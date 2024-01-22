@@ -1,4 +1,16 @@
 
+# 3.1.0 (2024-01-22)
+
+Feature changes:
+
+* [#66](https://github.com/jzohrab/lute-v3/issues/66): add "Link to parent" checkbox for child terms to follow/change parent status
+* Restyle radio buttons for nicer layout.  By @webofpies.
+
+Back end changes:
+
+* db schema and test changes for feature
+
+
 # 3.0.12 (2024-01-18)
 
 Feature changes:
