@@ -317,7 +317,7 @@ Feature: Term import
             d; 4; 0
 
         Given import file:
-            language,term,parent,status,sync_status
+            language,term,parent,status,link_status
             Spanish,a,,1,
             Spanish,b,a,2,y
             Spanish,c,a,3,y
