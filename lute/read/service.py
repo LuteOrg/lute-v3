@@ -10,6 +10,7 @@ from lute.models.book import Text
 from lute.parse.base import ParsedToken
 from lute.read.render.renderable_calculator import RenderableCalculator
 from lute.term.model import Repository
+from lute.utils.debug_helpers import DebugTimer
 
 from lute.db import db
 
@@ -83,6 +84,7 @@ def get_paragraphs(text):
     """
     Get array of arrays of RenderableSentences for the given Text.
     """
+    dt = DebugTimer(f"get_paragraphs(text id={text.id})")
     if text.id is None:
         return []
 
@@ -92,6 +94,7 @@ def get_paragraphs(text):
     # _Shouldn't_ matter ... :-(
     ParsedToken.reset_counters()
     tokens = language.get_parsed_tokens(text.text)
+    dt.step("get_parsed_tokens")
     tokens = [t for t in tokens if t.token != "¶"]
 
     # Brutal hack ... the RenderableCalculator requires the
@@ -108,8 +111,9 @@ def get_paragraphs(text):
         for t in tokens:
             t.order = n
             n += 1
-
+    dt.step("sort and renumber")
     terms = find_all_Terms_in_string(text.text, language)
+    dt.step("find_all_Terms_in_string")
 
     def make_RenderableSentence(pnum, sentence_num, tokens, terms):
         """
@@ -131,7 +135,9 @@ def get_paragraphs(text):
 
     renderable_paragraphs = []
     paranums = sorted(unique([t.paragraph_number for t in tokens]))
+    dt.step("get paranums")
     for pnum in paranums:
+        dt.step(f"para {pnum}")
         paratokens = [t for t in tokens if t.paragraph_number == pnum]
         senums = sorted(unique([t.sentence_number for t in paratokens]))
 
@@ -140,6 +146,7 @@ def get_paragraphs(text):
         renderable_sentences = [
             make_RenderableSentence(pnum, senum, paratokens, terms) for senum in senums
         ]
+        dt.step("renderable_sentences")
         renderable_paragraphs.append(renderable_sentences)
 
     return renderable_paragraphs

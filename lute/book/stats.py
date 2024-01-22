@@ -30,7 +30,7 @@ def get_status_distribution(book):
         get_paragraphs(t)
         for t in
         # Next 20 pages, a good enough sample.
-        book.texts[txindex : txindex + 20]
+        book.texts[txindex : txindex + 5]
     ]
     dt.step("get_paragraphs")
 
