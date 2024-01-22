@@ -1074,7 +1074,8 @@ div.help-text {
 
 #status-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 1rem;
     align-items: center;
 }
 
