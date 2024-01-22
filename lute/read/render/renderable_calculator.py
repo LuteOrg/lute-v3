@@ -6,6 +6,7 @@ import re
 import functools
 from lute.models.language import Language
 from lute.models.term import Term, Status
+from lute.utils.debug_helpers import DebugTimer
 
 
 class RenderableCalculator:
@@ -53,7 +54,9 @@ class RenderableCalculator:
                 raise RuntimeError(msg)
             prevtok = tok
 
-    def _get_renderable(self, tokenlocator, terms, texttokens):
+    def _get_renderable(
+        self, tokenlocator, terms, texttokens
+    ):  # pylint: disable=too-many-locals
         """
         Return RenderableCandidates that will **actually be rendered**.
 
@@ -119,6 +122,7 @@ class RenderableCalculator:
         then "E F G H I":
           => "A [B-C][C-D-E][E-F-G-H-I]"
         """
+        dt = DebugTimer("rc._get_renderable()")
 
         # All the candidates to be considered for rendering.
         candidates = {}
@@ -136,10 +140,12 @@ class RenderableCalculator:
             rc.is_word = tok.is_word
             candidates[rc.id] = rc
             rendered[rc.pos] = rc.id
+        dt.step("step 2, load with original texttokens")
 
         # 3.  Create candidates for all the terms.
         termcandidates = []
 
+        print(f"Looking at {len(terms)} terms for string", flush=True)
         for term in terms:
             for loc in tokenlocator.locate_string(term.text_lc):
                 rc = RenderableCandidate()
@@ -152,6 +158,7 @@ class RenderableCalculator:
 
                 termcandidates.append(rc)
                 candidates[rc.id] = rc
+        dt.step("step 3, use tokenlocator to find terms")
 
         # 4a.  Sort the term candidates: first by length, then by position.
         def compare(a, b):
@@ -162,6 +169,7 @@ class RenderableCalculator:
             return -1 if (a.pos < b.pos) else 1
 
         termcandidates.sort(key=functools.cmp_to_key(compare))
+        dt.step("step 4a, sort")
 
         # The termcandidates should now be sorted such that longest
         # are first, with items of equal length being sorted by
@@ -172,8 +180,11 @@ class RenderableCalculator:
         for tc in termcandidates:
             for i in range(tc.length):
                 rendered[tc.pos + i] = tc.id
+        dt.step("reverse and render")
 
         rcids = list(set(rendered.values()))
+        dt.step("final set")
+        dt.summary()
         return [candidates[rcid] for rcid in rcids]
 
     def _sort_by_order_and_tokencount(self, items):
@@ -203,15 +214,20 @@ class RenderableCalculator:
         Given a language and some terms and texttokens,
         return the RenderableCandidates to be rendered.
         """
+        dt = DebugTimer("rc.main")
         texttokens.sort(key=lambda x: x.order)
         self._assert_texttokens_are_contiguous(texttokens)
+        dt.step("sort and contig check")
 
         subject = TokenLocator.make_string([t.token for t in texttokens])
         tocloc = TokenLocator(language, subject)
 
         renderable = self._get_renderable(tocloc, words, texttokens)
+        dt.step("call _get_renderable")
         items = self._sort_by_order_and_tokencount(renderable)
+        dt.step("_sort_by_order_and_tokencount")
         items = self._calc_overlaps(items)
+        dt.step("_calc_overlaps")
         return items
 
     @staticmethod
