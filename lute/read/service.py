@@ -99,20 +99,16 @@ class RenderableSentence:
         return f'<RendSent {self.sentence_id}, {len(self.textitems)} items, "{s}">'
 
 
-def get_paragraphs(text):
+def get_paragraphs(s, language):
     """
-    Get array of arrays of RenderableSentences for the given Text.
+    Get array of arrays of RenderableSentences for the given string s.
     """
     dt = DebugTimer("get_paragraphs(text)")
-    if text.id is None:
-        return []
-
-    language = text.book.language
 
     # Hacky reset of state of ParsedToken state.
     # _Shouldn't_ matter ... :-(
     ParsedToken.reset_counters()
-    tokens = language.get_parsed_tokens(text.text)
+    tokens = language.get_parsed_tokens(s)
     dt.step("get_parsed_tokens")
     tokens = [t for t in tokens if t.token != "¶"]
 
@@ -131,7 +127,7 @@ def get_paragraphs(text):
             t.order = n
             n += 1
     dt.step("sort and renumber")
-    terms = find_all_Terms_in_string(text.text, language)
+    terms = find_all_Terms_in_string(s, language)
     dt.step("find_all_Terms_in_string")
 
     def make_RenderableSentence(pnum, sentence_num, tokens, terms):
@@ -182,7 +178,7 @@ def set_unknowns_to_known(text: Text):
     """
     language = text.book.language
 
-    sentences = sum(get_paragraphs(text), [])
+    sentences = sum(get_paragraphs(text.text, text.book.language), [])
 
     tis = []
     for sentence in sentences:

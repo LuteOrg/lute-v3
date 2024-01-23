@@ -130,7 +130,7 @@ def render_page(bookid, pagenum):
     db.session.add(book)
     db.session.commit()
 
-    paragraphs = get_paragraphs(text)
+    paragraphs = get_paragraphs(text.text, text.book.language)
     return render_template("read/page_content.html", paragraphs=paragraphs)
 
 

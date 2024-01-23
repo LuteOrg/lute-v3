@@ -84,7 +84,7 @@ def _assert_stringized_equals(stringizer, joiner, expected):
     Get paragraphs and stringize all textitems,
     join and assert equals expected.
     """
-    paras = get_paragraphs(text)
+    paras = get_paragraphs(text.text, text.book.language)
     ret = []
     for p in paras:
         tis = [t for s in p for t in s.textitems]

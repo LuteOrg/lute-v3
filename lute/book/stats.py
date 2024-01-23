@@ -26,12 +26,15 @@ def get_status_distribution(book):
             txindex += 1
     dt.step("get current tx")
 
-    paras = [
-        get_paragraphs(t)
+    text_sample = [
+        t.text
         for t in
         # Next 20 pages, a good enough sample.
         book.texts[txindex : txindex + 20]
     ]
+    text_sample = "\n".join(text_sample)
+
+    paras = get_paragraphs(text_sample, book.language)
     dt.step("get_paragraphs")
 
     def flatten_list(nested_list):
