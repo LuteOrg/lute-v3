@@ -286,14 +286,13 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
     def order_end(self) -> int:
         return self.pos + self.length - 1
 
-    def make_text_item(self, p_num: int, se_id: int, text_id: int, lang: Language):
+    def make_text_item(self, p_num: int, se_id: int, lang: Language):
         """
         Create a TextItem for final rendering.
         """
         dt = DebugTimer("make_text_item")
         t = TextItem(self.term)
         t.order = self.pos
-        t.text_id = text_id
         t.lang_id = lang.id
         t.display_text = self.display_text
         t.text = self.text
@@ -421,7 +420,6 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
     """
 
     def __init__(self, term=None):
-        self.text_id: int
         self.lang_id: int
         self.order: int
         self.text: str  # The original, un-overlapped text.
