@@ -122,7 +122,7 @@ class RenderableCalculator:
         then "E F G H I":
           => "A [B-C][C-D-E][E-F-G-H-I]"
         """
-        dt = DebugTimer("rc._get_renderable()")
+        dt = DebugTimer("rc._get_renderable()", False)
 
         # All the candidates to be considered for rendering.
         candidates = {}
@@ -145,8 +145,16 @@ class RenderableCalculator:
         # 3.  Create candidates for all the terms.
         termcandidates = []
 
-        print(f"Looking at {len(terms)} terms for string", flush=True)
-        for term in terms:
+        foundterms = [
+            t
+            for t in terms
+            if TokenLocator.make_string(t.text_lc) in tokenlocator.subjLC
+        ]
+        print(
+            f"Looking at {len(foundterms)} out of {len(terms)} terms for string",
+            flush=True,
+        )
+        for term in foundterms:
             for loc in tokenlocator.locate_string(term.text_lc):
                 rc = RenderableCandidate()
                 rc.term = term
@@ -328,6 +336,7 @@ class TokenLocator:
     def __init__(self, language, subject):
         self.language = language
         self.subject = subject
+        self.subjLC = self.language.get_lowercase(self.subject)
 
     def locate_string(self, s):
         """
@@ -336,9 +345,7 @@ class TokenLocator:
         find_lc = self.language.get_lowercase(s)
         find_lc = TokenLocator.make_string(find_lc)
 
-        subjLC = self.language.get_lowercase(self.subject)
-
-        matches = self.preg_match_capture(find_lc, subjLC)
+        matches = self.preg_match_capture(find_lc, self.subjLC)
 
         # The matches were performed with the lowercased subject,
         # because some languages (Turkish!) have funny cases.

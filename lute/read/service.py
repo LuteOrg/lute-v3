@@ -84,7 +84,7 @@ def get_paragraphs(text):
     """
     Get array of arrays of RenderableSentences for the given Text.
     """
-    dt = DebugTimer(f"get_paragraphs(text id={text.id})")
+    dt = DebugTimer("get_paragraphs(text)")
     if text.id is None:
         return []
 
@@ -121,14 +121,20 @@ def get_paragraphs(text):
         that sentence.  The current text and language are pulled
         into the function from the closure.
         """
+        dt = DebugTimer("make_RenderableSentence", False)
         sentence_tokens = [t for t in tokens if t.sentence_number == sentence_num]
+        dt.step("sentence_tokens")
         renderable = RenderableCalculator.get_renderable(
             language, terms, sentence_tokens
         )
+        dt.step("get_renderable")
         textitems = [
             i.make_text_item(pnum, sentence_num, text.id, language) for i in renderable
         ]
-        return RenderableSentence(sentence_num, textitems)
+        dt.step("textitems")
+        ret = RenderableSentence(sentence_num, textitems)
+        dt.step("make RenderableSentence")
+        return ret
 
     def unique(arr):
         return list(set(arr))
