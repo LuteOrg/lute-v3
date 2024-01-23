@@ -86,7 +86,7 @@ def test_smoke_get_paragraphs(spanish, app_context):
     db.session.commit()
 
     ParsedToken.reset_counters()
-    paras = get_paragraphs(t)
+    paras = get_paragraphs(t.text, t.book.language)
     assert len(paras) == 2
 
     def stringize(t):

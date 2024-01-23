@@ -3,7 +3,7 @@ Reading helpers.
 """
 
 import re
-from sqlalchemy import func
+from sqlalchemy import text as sqltext
 
 from lute.models.term import Term, Status
 from lute.models.book import Text
@@ -14,7 +14,7 @@ from lute.term.model import Repository
 from lute.db import db
 
 
-def find_all_Terms_in_string(s, language):
+def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     """
     Find all terms contained in the string s.
 
@@ -36,6 +36,9 @@ def find_all_Terms_in_string(s, language):
 
     parser = language.parser
 
+    # fyi - Manually searching for terms was slow (i.e., querying for
+    # all terms, and checking if the strings were in the string s).
+
     # Query for terms with a single token that match the unique word tokens
     word_tokens = filter(lambda t: t.is_word, tokens)
     tok_strings = [parser.get_lowercase(t.token) for t in word_tokens]
@@ -55,12 +58,27 @@ def find_all_Terms_in_string(s, language):
     zws = "\u200B"  # zero-width space
     lctokens = [parser.get_lowercase(t.token) for t in tokens]
     content = zws + zws.join(lctokens) + zws
-    contained_term_query = db.session.query(Term).filter(
-        Term.language == language,
-        Term.token_count > 1,
-        func.instr(content, Term.text_lc) > 0,
+
+    sql = sqltext(
+        """
+        SELECT WoID FROM words
+        WHERE WoLgID=:language_id and WoTokenCount>1
+        AND :content LIKE '%' || WoTextLC || '%'
+        """
     )
-    contained_terms = contained_term_query.all()
+    sql = sql.bindparams(language_id=language.id, content=content)
+    idlist = db.session.execute(sql).all()
+    woids = [int(p[0]) for p in idlist]
+    contained_terms = db.session.query(Term).filter(Term.id.in_(woids)).all()
+
+    # Note that the above method (querying for ids, then getting terms)
+    # is faster than using the model as shown below!
+    ### contained_term_query = db.session.query(Term).filter(
+    ###     Term.language == language,
+    ###     Term.token_count > 1,
+    ###     func.instr(content, Term.text_lc) > 0,
+    ### )
+    ### contained_terms = contained_term_query.all()
 
     return terms_matching_tokens + contained_terms
 
@@ -79,19 +97,15 @@ class RenderableSentence:
         return f'<RendSent {self.sentence_id}, {len(self.textitems)} items, "{s}">'
 
 
-def get_paragraphs(text):
+def get_paragraphs(s, language):
     """
-    Get array of arrays of RenderableSentences for the given Text.
+    Get array of arrays of RenderableSentences for the given string s.
     """
-    if text.id is None:
-        return []
-
-    language = text.book.language
 
     # Hacky reset of state of ParsedToken state.
     # _Shouldn't_ matter ... :-(
     ParsedToken.reset_counters()
-    tokens = language.get_parsed_tokens(text.text)
+    tokens = language.get_parsed_tokens(s)
     tokens = [t for t in tokens if t.token != "¶"]
 
     # Brutal hack ... the RenderableCalculator requires the
@@ -108,8 +122,7 @@ def get_paragraphs(text):
         for t in tokens:
             t.order = n
             n += 1
-
-    terms = find_all_Terms_in_string(text.text, language)
+    terms = find_all_Terms_in_string(s, language)
 
     def make_RenderableSentence(pnum, sentence_num, tokens, terms):
         """
@@ -121,10 +134,9 @@ def get_paragraphs(text):
         renderable = RenderableCalculator.get_renderable(
             language, terms, sentence_tokens
         )
-        textitems = [
-            i.make_text_item(pnum, sentence_num, text.id, language) for i in renderable
-        ]
-        return RenderableSentence(sentence_num, textitems)
+        textitems = [i.make_text_item(pnum, sentence_num, language) for i in renderable]
+        ret = RenderableSentence(sentence_num, textitems)
+        return ret
 
     def unique(arr):
         return list(set(arr))
@@ -152,7 +164,7 @@ def set_unknowns_to_known(text: Text):
     """
     language = text.book.language
 
-    sentences = sum(get_paragraphs(text), [])
+    sentences = sum(get_paragraphs(text.text, text.book.language), [])
 
     tis = []
     for sentence in sentences:

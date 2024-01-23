@@ -12,7 +12,7 @@ def get_status_distribution(book):
     """
     Return statuses and count of unique words per status.
 
-    Does a full render of the next 20 pages in a book
+    Does a full render of a small number of pages
     to calculate the distribution.
     """
     txindex = 0
@@ -23,12 +23,15 @@ def get_status_distribution(book):
                 break
             txindex += 1
 
-    paras = [
-        get_paragraphs(t)
+    text_sample = [
+        t.text
         for t in
-        # Next 20 pages, a good enough sample.
-        book.texts[txindex : txindex + 20]
+        # Next 5 pages, a good enough sample.
+        book.texts[txindex : txindex + 5]
     ]
+    text_sample = "\n".join(text_sample)
+
+    paras = get_paragraphs(text_sample, book.language)
 
     def flatten_list(nested_list):
         result = []
