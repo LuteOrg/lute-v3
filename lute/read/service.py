@@ -147,9 +147,7 @@ def get_paragraphs(text):
             language, terms, sentence_tokens
         )
         dt.step("get_renderable")
-        textitems = [
-            i.make_text_item(pnum, sentence_num, text.id, language) for i in renderable
-        ]
+        textitems = [i.make_text_item(pnum, sentence_num, language) for i in renderable]
         dt.step("textitems")
         ret = RenderableSentence(sentence_num, textitems)
         dt.step("make RenderableSentence")
