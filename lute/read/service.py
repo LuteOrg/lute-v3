@@ -143,9 +143,9 @@ def get_paragraphs(text):
     paranums = sorted(unique([t.paragraph_number for t in tokens]))
     dt.step("get paranums")
     for pnum in paranums:
-        dt.step(f"para {pnum}")
         paratokens = [t for t in tokens if t.paragraph_number == pnum]
         senums = sorted(unique([t.sentence_number for t in paratokens]))
+        dt.step("paratokens and senums")
 
         # A renderable paragraph is a collection of
         # RenderableSentences.
