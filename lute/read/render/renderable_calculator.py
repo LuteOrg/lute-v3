@@ -7,8 +7,6 @@ import functools
 from lute.models.language import Language
 from lute.models.term import Term, Status
 
-# from lute.utils.debug_helpers import DebugTimer
-
 
 class RenderableCalculator:
     """
@@ -123,7 +121,6 @@ class RenderableCalculator:
         then "E F G H I":
           => "A [B-C][C-D-E][E-F-G-H-I]"
         """
-        # dt = DebugTimer("      rc._get_renderable()", False)
 
         # All the candidates to be considered for rendering.
         candidates = {}
@@ -145,9 +142,7 @@ class RenderableCalculator:
         # 3.  Create candidates for all the terms.
         termcandidates = []
 
-        # dt.step("initial_setup")
         foundterms = [t for t in terms if t.text_lc in tokenlocator.subjLC]
-        # dt.step("1 found terms")
         for term in foundterms:
             for loc in tokenlocator.locate_string(term.text_lc):
                 rc = RenderableCandidate()
@@ -160,7 +155,6 @@ class RenderableCalculator:
 
                 termcandidates.append(rc)
                 candidates[rc.id] = rc
-        # dt.step("2 tokenlocator.locate_string")
 
         # 4a.  Sort the term candidates: first by length, then by position.
         def compare(a, b):
@@ -183,8 +177,6 @@ class RenderableCalculator:
                 rendered[tc.pos + i] = tc.id
 
         rcids = list(set(rendered.values()))
-        # dt.step("remaining work")
-        # dt.summary()
         return [candidates[rcid] for rcid in rcids]
 
     def _sort_by_order_and_tokencount(self, items):
@@ -214,16 +206,13 @@ class RenderableCalculator:
         Given a language and some terms and texttokens,
         return the RenderableCandidates to be rendered.
         """
-        # dt = DebugTimer("rc.main")
         texttokens.sort(key=lambda x: x.order)
         self._assert_texttokens_are_contiguous(texttokens)
 
         subject = TokenLocator.make_string([t.token for t in texttokens])
         tocloc = TokenLocator(language, subject)
 
-        # dt.step("")
         renderable = self._get_renderable(tocloc, words, texttokens)
-        # dt.step("_get_renderable")
         items = self._sort_by_order_and_tokencount(renderable)
         items = self._calc_overlaps(items)
         return items
@@ -281,7 +270,6 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
         """
         Create a TextItem for final rendering.
         """
-        # dt = DebugTimer("make_text_item")
         t = TextItem(self.term)
         t.order = self.pos
         t.lang_id = lang.id
@@ -293,8 +281,6 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
         t.se_id = se_id
         t.is_word = self.is_word
         t.text_length = len(self.text)
-        # dt.step("created")
-
         return t
 
 

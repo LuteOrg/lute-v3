@@ -11,8 +11,6 @@ from lute.parse.base import ParsedToken
 from lute.read.render.renderable_calculator import RenderableCalculator
 from lute.term.model import Repository
 
-# from lute.utils.debug_helpers import DebugTimer
-
 from lute.db import db
 
 
@@ -31,12 +29,10 @@ def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     than querying for everthing at once.  (This may no longer
     be true, can change it later.)
     """
-    # dt = DebugTimer("    find_all_Terms_in_string()")
 
     # Extract word tokens from the input string
     cleaned = re.sub(r"\s+", " ", s)
     tokens = language.get_parsed_tokens(cleaned)
-    # dt.step("get_parsed_tokens()")
 
     parser = language.parser
 
@@ -56,7 +52,6 @@ def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
         )
         .all()
     )
-    # dt.step("single token")
 
     # Multiword terms have zws between all tokens.
     # Create content string with zws between all tokens for the match.
@@ -74,9 +69,7 @@ def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     sql = sql.bindparams(language_id=language.id, content=content)
     idlist = db.session.execute(sql).all()
     woids = [int(p[0]) for p in idlist]
-    # dt.step("multiword_sql_query get ids")
     contained_terms = db.session.query(Term).filter(Term.id.in_(woids)).all()
-    # dt.step("multiword_sql_query load ids")
 
     # Note that the above method (querying for ids, then getting terms)
     # is faster than using the model as shown below!
@@ -108,13 +101,11 @@ def get_paragraphs(s, language):
     """
     Get array of arrays of RenderableSentences for the given string s.
     """
-    # dt = DebugTimer("  get_paragraphs(text)")
 
     # Hacky reset of state of ParsedToken state.
     # _Shouldn't_ matter ... :-(
     ParsedToken.reset_counters()
     tokens = language.get_parsed_tokens(s)
-    # dt.step("get_parsed_tokens")
     tokens = [t for t in tokens if t.token != "¶"]
 
     # Brutal hack ... the RenderableCalculator requires the
@@ -131,9 +122,7 @@ def get_paragraphs(s, language):
         for t in tokens:
             t.order = n
             n += 1
-    # dt.step("find_all_Terms_in_string pre")
     terms = find_all_Terms_in_string(s, language)
-    # dt.step("find_all_Terms_in_string")
 
     def make_RenderableSentence(pnum, sentence_num, tokens, terms):
         """
@@ -141,15 +130,11 @@ def get_paragraphs(s, language):
         that sentence.  The current text and language are pulled
         into the function from the closure.
         """
-        # dt = DebugTimer("      make_RenderableSentence", False)
         sentence_tokens = [t for t in tokens if t.sentence_number == sentence_num]
-        # dt.step("get_renderable pre")
         renderable = RenderableCalculator.get_renderable(
             language, terms, sentence_tokens
         )
-        # dt.step("get_renderable")
         textitems = [i.make_text_item(pnum, sentence_num, language) for i in renderable]
-        # dt.step("textitems")
         ret = RenderableSentence(sentence_num, textitems)
         return ret
 
@@ -159,17 +144,14 @@ def get_paragraphs(s, language):
     renderable_paragraphs = []
     paranums = sorted(unique([t.paragraph_number for t in tokens]))
     for pnum in paranums:
-        # dt.step("")
         paratokens = [t for t in tokens if t.paragraph_number == pnum]
         senums = sorted(unique([t.sentence_number for t in paratokens]))
-        # dt.step("paratokens and senums")
 
         # A renderable paragraph is a collection of
         # RenderableSentences.
         renderable_sentences = [
             make_RenderableSentence(pnum, senum, paratokens, terms) for senum in senums
         ]
-        # dt.step("renderable_sentences")
         renderable_paragraphs.append(renderable_sentences)
 
     return renderable_paragraphs

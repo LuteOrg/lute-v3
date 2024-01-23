@@ -7,8 +7,6 @@ from lute.read.service import get_paragraphs
 from lute.db import db
 from lute.models.book import Book
 
-# from lute.utils.debug_helpers import DebugTimer
-
 
 def get_status_distribution(book):
     """
@@ -19,13 +17,11 @@ def get_status_distribution(book):
     """
     txindex = 0
 
-    # dt = DebugTimer("get_status_distribution()")
     if (book.current_tx_id or 0) != 0:
         for t in book.texts:
             if t.id == book.current_tx_id:
                 break
             txindex += 1
-    # dt.step("get current tx")
 
     text_sample = [
         t.text
@@ -36,7 +32,6 @@ def get_status_distribution(book):
     text_sample = "\n".join(text_sample)
 
     paras = get_paragraphs(text_sample, book.language)
-    # dt.step("get_paragraphs")
 
     def flatten_list(nested_list):
         result = []
@@ -91,14 +86,9 @@ def refresh_stats():
         .all()
     )
     books = [b for b in books_to_update if b.is_supported]
-    # DebugTimer.clear_total_summary()
     for book in books:
-        # dt = DebugTimer(book.title)
         stats = _get_stats(book)
-        # dt.step("_get_stats")
         _update_stats(book, stats)
-        # dt.step("_update_stats")
-    # DebugTimer.total_summary()
 
 
 def mark_stale(book):
