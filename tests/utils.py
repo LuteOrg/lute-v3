@@ -46,7 +46,7 @@ def get_rendered_string(text, imploder="/", overridestringize=None):
 
     usestringize = overridestringize or stringize
     ret = []
-    paras = get_paragraphs(text)
+    paras = get_paragraphs(text.text, text.book.language)
     for p in paras:
         tis = [t for s in p for t in s.textitems]
         ss = [usestringize(ti) for ti in tis]
