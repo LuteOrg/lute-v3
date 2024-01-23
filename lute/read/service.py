@@ -30,7 +30,7 @@ def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     than querying for everthing at once.  (This may no longer
     be true, can change it later.)
     """
-    dt = DebugTimer("find_all_Terms_in_string()")
+    dt = DebugTimer("    find_all_Terms_in_string()")
 
     # Extract word tokens from the input string
     cleaned = re.sub(r"\s+", " ", s)
@@ -119,7 +119,7 @@ def get_paragraphs(s, language):
     """
     Get array of arrays of RenderableSentences for the given string s.
     """
-    dt = DebugTimer("get_paragraphs(text)")
+    dt = DebugTimer("  get_paragraphs(text)")
 
     # Hacky reset of state of ParsedToken state.
     # _Shouldn't_ matter ... :-(
@@ -152,7 +152,7 @@ def get_paragraphs(s, language):
         that sentence.  The current text and language are pulled
         into the function from the closure.
         """
-        dt = DebugTimer("make_RenderableSentence", False)
+        dt = DebugTimer("      make_RenderableSentence", False)
         sentence_tokens = [t for t in tokens if t.sentence_number == sentence_num]
         dt.step("get_renderable pre")
         renderable = RenderableCalculator.get_renderable(
