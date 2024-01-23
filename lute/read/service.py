@@ -39,6 +39,21 @@ def find_all_Terms_in_string(s, language):
 
     parser = language.parser
 
+    # Manually searching for terms was slow.
+    ### lc_token_strings = [parser.get_lowercase(t.token) for t in tokens]
+    ### subject_search = TokenLocator.make_string(lc_token_strings)
+    ### dt.step("make subject_search")
+    ### sql = f"SELECT WoID, WoTextLC FROM words WHERE WoLgID={language.id}"
+    ### pairs = db.session.execute(text(sql)).all()
+    ### woids = [
+    ###     int(p[0]) for p in pairs
+    ###     if p[1] in subject_search
+    ### ]
+    ### print(f"found {len(woids)} IDs")
+    ### dt.step("manual term search")
+    ### foundterms = db.session.query(Term).filter(Term.id.in_(woids)).all()
+    ### dt.step("term query search")
+
     # Query for terms with a single token that match the unique word tokens
     word_tokens = filter(lambda t: t.is_word, tokens)
     tok_strings = [parser.get_lowercase(t.token) for t in word_tokens]

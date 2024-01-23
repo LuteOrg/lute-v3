@@ -407,7 +407,7 @@ class TokenLocator:
         zws = "\u200B"
         if isinstance(t, list):
             t = zws.join(t)
-        return zws + t + zws
+        return f"{zws}{t}{zws}"
 
 
 class TextItem:  # pylint: disable=too-many-instance-attributes
