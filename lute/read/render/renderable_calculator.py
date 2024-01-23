@@ -290,8 +290,8 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
         """
         Create a TextItem for final rendering.
         """
-        dt = DebugTimer("  make_text_item")
-        t = TextItem()
+        dt = DebugTimer("make_text_item")
+        t = TextItem(self.term)
         t.order = self.pos
         t.text_id = text_id
         t.lang_id = lang.id
@@ -303,9 +303,7 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
         t.se_id = se_id
         t.is_word = self.is_word
         t.text_length = len(self.text)
-        dt.step("initial steps")
-        t.load_term_data(self.term)
-        dt.step("t.load_term_data(self.term)")
+        dt.step("created")
 
         return t
 
@@ -417,9 +415,12 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
     Unit to be rendered.
 
     Data structure for template read/textitem.html
+
+    Some elements are lazy loaded, because they're only needed in
+    certain situations.
     """
 
-    def __init__(self):
+    def __init__(self, term=None):
         self.text_id: int
         self.lang_id: int
         self.order: int
@@ -433,29 +434,33 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         self.se_id: int
         self.is_word: int
         self.text_length: int
+
+        self.term = term
+        self.wo_id = term.id if term is not None else None
+        self.wo_status = term.status if term is not None else None
+
         # The tooltip should be shown for well-known/ignored TextItems
         # that merit a tooltip. e.g., if there isn't any actual Term
         # entity associated with this TextItem, nothing more is needed.
         # Also, if there is a Term entity but it's mostly empty, a
         # tooltip isn't useful.
-        self.show_tooltip: bool = False
-        self.wo_id: int = None
-        self.wo_status: int = None
-        self.flash_message: str = None
+        self._show_tooltip: bool = None
 
-    def load_term_data(self, term):
-        """
-        Load extra term data, if any.
-        """
-        if term is None:
-            return
+        # The flash message can be None, so we need an extra flag
+        # to determine if it has been loaded or not.
+        self._flash_message_loaded: bool = False
+        self._flash_message: str = None
 
-        dt = DebugTimer("load_term_data")
-        self.wo_id = term.id
-        self.wo_status = term.status
-        dt.step("init")
-        self.flash_message = term.get_flash_message()
-        dt.step("flash_message")
+    @property
+    def show_tooltip(self):
+        """
+        Show the tooltip if there is anything to show.
+        Lazy loaded as needed.
+        """
+        if self._show_tooltip is not None:
+            return self._show_tooltip
+        if self.term is None:
+            return False
 
         def has_extra(cterm):
             if cterm is None:
@@ -467,12 +472,25 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
             )
             return not no_extra
 
-        show_tooltip = has_extra(term)
-        dt.step("show_tooltip has_extra")
-        for p in term.parents:
-            show_tooltip = show_tooltip or has_extra(p)
-        dt.step("show_tooltip all parents")
-        self.show_tooltip = show_tooltip
+        self._show_tooltip = has_extra(self.term)
+        for p in self.term.parents:
+            self._show_tooltip = self._show_tooltip or has_extra(p)
+        return self._show_tooltip
+
+    @property
+    def flash_message(self):
+        """
+        Return flash message if anything present.
+        Lazy loaded as needed.
+        """
+        if self._flash_message_loaded:
+            return self._flash_message
+        if self.term is None:
+            return None
+
+        self._flash_message = self.term.get_flash_message()
+        self._flash_message_loaded = True
+        return self._flash_message
 
     @property
     def html_display_text(self):
