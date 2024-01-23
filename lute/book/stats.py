@@ -30,7 +30,7 @@ def get_status_distribution(book):
         get_paragraphs(t)
         for t in
         # Next 20 pages, a good enough sample.
-        book.texts[txindex : txindex + 5]
+        book.texts[txindex : txindex + 20]
     ]
     dt.step("get_paragraphs")
 
@@ -91,12 +91,14 @@ def refresh_stats():
         .all()
     )
     books = [b for b in books_to_update if b.is_supported]
+    DebugTimer.clear_total_summary()
     for book in books:
         dt = DebugTimer(book.title)
         stats = _get_stats(book)
         dt.step("_get_stats")
         _update_stats(book, stats)
         dt.step("_update_stats")
+    DebugTimer.total_summary()
 
 
 def mark_stale(book):
