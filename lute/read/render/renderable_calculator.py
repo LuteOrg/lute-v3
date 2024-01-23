@@ -122,7 +122,7 @@ class RenderableCalculator:
         then "E F G H I":
           => "A [B-C][C-D-E][E-F-G-H-I]"
         """
-        dt = DebugTimer("rc._get_renderable()", False)
+        dt = DebugTimer("      rc._get_renderable()", False)
 
         # All the candidates to be considered for rendering.
         candidates = {}
@@ -145,11 +145,7 @@ class RenderableCalculator:
         termcandidates = []
 
         dt.step("initial_setup")
-        foundterms = [
-            t
-            for t in terms
-            if TokenLocator.make_string(t.text_lc) in tokenlocator.subjLC
-        ]
+        foundterms = [t for t in terms if t.text_lc in tokenlocator.subjLC]
         print(
             f"Looking at {len(foundterms)} out of {len(terms)} terms for string",
             flush=True,
@@ -224,17 +220,15 @@ class RenderableCalculator:
         dt = DebugTimer("rc.main")
         texttokens.sort(key=lambda x: x.order)
         self._assert_texttokens_are_contiguous(texttokens)
-        dt.step("sort and contig check")
 
         subject = TokenLocator.make_string([t.token for t in texttokens])
         tocloc = TokenLocator(language, subject)
 
+        dt.step("")
         renderable = self._get_renderable(tocloc, words, texttokens)
-        dt.step("call _get_renderable")
+        dt.step("_get_renderable")
         items = self._sort_by_order_and_tokencount(renderable)
-        dt.step("_sort_by_order_and_tokencount")
         items = self._calc_overlaps(items)
-        dt.step("_calc_overlaps")
         return items
 
     @staticmethod
@@ -265,11 +259,12 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
 
         self.id: int = RenderableCandidate.class_id
         self.term: Term = None
-        self.display_text: str  # Text to show, if there is any overlap
-        self.text: str  # Actual text of the term
-        self.pos: int
+        self.display_text: str = None  # Text to show, if there is any overlap
+        self.text: str = None  # Actual text of the term
+        self.text_lc: str = None
+        self.pos: int = None
         self.length: int = 1
-        self.is_word: int
+        self.is_word: int = None
         self.render: bool = True
 
     def __repr__(self):
@@ -295,8 +290,8 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
         t.lang_id = lang.id
         t.display_text = self.display_text
         t.text = self.text
-        t.token_count = self.length
         t.text_lc = lang.get_lowercase(self.text)
+        t.token_count = self.length
         t.para_id = p_num
         t.se_id = se_id
         t.is_word = self.is_word

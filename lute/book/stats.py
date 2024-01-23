@@ -13,7 +13,7 @@ def get_status_distribution(book):
     """
     Return statuses and count of unique words per status.
 
-    Does a full render of the next 20 pages in a book
+    Does a full render of a small number of pages
     to calculate the distribution.
     """
     txindex = 0
@@ -29,8 +29,8 @@ def get_status_distribution(book):
     text_sample = [
         t.text
         for t in
-        # Next 20 pages, a good enough sample.
-        book.texts[txindex : txindex + 20]
+        # Next 5 pages, a good enough sample.
+        book.texts[txindex : txindex + 5]
     ]
     text_sample = "\n".join(text_sample)
 
@@ -61,7 +61,6 @@ def get_status_distribution(book):
         uniques = list(set(allterms))
         statterms[statusval] = uniques
         stats[statusval] = len(uniques)
-    dt.step("finish")
 
     return stats
 
@@ -110,12 +109,9 @@ def mark_stale(book):
 
 def _get_stats(book):
     "Calc stats for the book using the status distribution."
-    dt = DebugTimer("_get_stats")
     status_distribution = get_status_distribution(book)
-    dt.step("get_status_distribution")
     unknowns = status_distribution[0]
     allunique = sum(status_distribution.values())
-    dt.step("calc allunique")
 
     percent = 0
     if allunique > 0:  # In case not parsed.
