@@ -3,7 +3,7 @@ Reading helpers.
 """
 
 import re
-from sqlalchemy import func
+from sqlalchemy import text as sqltext
 
 from lute.models.term import Term, Status
 from lute.models.book import Text
@@ -15,7 +15,7 @@ from lute.utils.debug_helpers import DebugTimer
 from lute.db import db
 
 
-def find_all_Terms_in_string(s, language):
+def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     """
     Find all terms contained in the string s.
 
@@ -74,13 +74,29 @@ def find_all_Terms_in_string(s, language):
     zws = "\u200B"  # zero-width space
     lctokens = [parser.get_lowercase(t.token) for t in tokens]
     content = zws + zws.join(lctokens) + zws
-    contained_term_query = db.session.query(Term).filter(
-        Term.language == language,
-        Term.token_count > 1,
-        func.instr(content, Term.text_lc) > 0,
+
+    sql = sqltext(
+        """
+        SELECT WoID FROM words
+        WHERE WoLgID=:language_id and WoTokenCount>1
+        AND :content LIKE '%' || WoTextLC || '%'
+        """
     )
-    contained_terms = contained_term_query.all()
-    dt.step("multiword")
+    sql = sql.bindparams(language_id=language.id, content=content)
+    idlist = db.session.execute(sql).all()
+    woids = [int(p[0]) for p in idlist]
+    print(f"found {len(woids)} IDs")
+    dt.step("multiword_sql_query get ids")
+    contained_terms = db.session.query(Term).filter(Term.id.in_(woids)).all()
+    dt.step("multiword_sql_query load ids")
+
+    ### contained_term_query = db.session.query(Term).filter(
+    ###     Term.language == language,
+    ###     Term.token_count > 1,
+    ###     func.instr(content, Term.text_lc) > 0,
+    ### )
+    ### contained_terms = contained_term_query.all()
+    ### dt.step("multiword search with model")
 
     return terms_matching_tokens + contained_terms
 
