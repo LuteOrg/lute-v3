@@ -147,10 +147,6 @@ class RenderableCalculator:
 
         # dt.step("initial_setup")
         foundterms = [t for t in terms if t.text_lc in tokenlocator.subjLC]
-        print(
-            f"Looking at {len(foundterms)} out of {len(terms)} terms for string",
-            flush=True,
-        )
         # dt.step("1 found terms")
         for term in foundterms:
             for loc in tokenlocator.locate_string(term.text_lc):
