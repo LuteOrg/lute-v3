@@ -290,6 +290,7 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
         """
         Create a TextItem for final rendering.
         """
+        dt = DebugTimer("  make_text_item")
         t = TextItem()
         t.order = self.pos
         t.text_id = text_id
@@ -302,8 +303,9 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
         t.se_id = se_id
         t.is_word = self.is_word
         t.text_length = len(self.text)
-
+        dt.step("initial steps")
         t.load_term_data(self.term)
+        dt.step("t.load_term_data(self.term)")
 
         return t
 
@@ -448,9 +450,12 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         if term is None:
             return
 
+        dt = DebugTimer("load_term_data")
         self.wo_id = term.id
         self.wo_status = term.status
+        dt.step("init")
         self.flash_message = term.get_flash_message()
+        dt.step("flash_message")
 
         def has_extra(cterm):
             if cterm is None:
@@ -463,8 +468,10 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
             return not no_extra
 
         show_tooltip = has_extra(term)
+        dt.step("show_tooltip has_extra")
         for p in term.parents:
             show_tooltip = show_tooltip or has_extra(p)
+        dt.step("show_tooltip all parents")
         self.show_tooltip = show_tooltip
 
     @property
