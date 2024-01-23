@@ -30,10 +30,12 @@ def find_all_Terms_in_string(s, language):
     than querying for everthing at once.  (This may no longer
     be true, can change it later.)
     """
+    dt = DebugTimer("find_all_Terms_in_string()")
 
     # Extract word tokens from the input string
     cleaned = re.sub(r"\s+", " ", s)
     tokens = language.get_parsed_tokens(cleaned)
+    dt.step("get_parsed_tokens()")
 
     parser = language.parser
 
@@ -50,6 +52,7 @@ def find_all_Terms_in_string(s, language):
         )
         .all()
     )
+    dt.step("single token")
 
     # Multiword terms have zws between all tokens.
     # Create content string with zws between all tokens for the match.
@@ -62,6 +65,7 @@ def find_all_Terms_in_string(s, language):
         func.instr(content, Term.text_lc) > 0,
     )
     contained_terms = contained_term_query.all()
+    dt.step("multiword")
 
     return terms_matching_tokens + contained_terms
 
