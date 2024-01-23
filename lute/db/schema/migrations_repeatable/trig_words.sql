@@ -1,6 +1,7 @@
 DROP TRIGGER IF EXISTS trig_words_after_update_WoStatus_if_following_parent;
 
 CREATE TRIGGER trig_words_after_update_WoStatus_if_following_parent
+-- created by db/schema/migrations_repeatable/trig_words.sql
 AFTER UPDATE OF WoStatus, WoSyncStatus ON words
 FOR EACH ROW
 WHEN (old.WoStatus <> new.WoStatus or (old.WoSyncStatus = 0 and new.WoSyncStatus = 1))
@@ -35,6 +36,7 @@ END;
 DROP TRIGGER IF EXISTS trig_words_update_WoStatusChanged;
 
 CREATE TRIGGER trig_words_update_WoStatusChanged
+-- created by db/schema/migrations_repeatable/trig_words.sql
 AFTER UPDATE OF WoStatus ON words
 FOR EACH ROW
 WHEN old.WoStatus <> new.WoStatus
