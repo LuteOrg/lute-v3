@@ -49,22 +49,19 @@ def get_status_distribution(book):
     text_items = []
     for s in flatten_list(paras):
         text_items.extend(s.textitems)
-    dt.step("get all text items for sentences")
     text_items = [ti for ti in text_items if ti.is_word]
-    dt.step("text_items")
 
     statterms = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 98: [], 99: []}
 
     for ti in text_items:
         statterms[ti.wo_status or 0].append(ti.text_lc)
-    dt.step("build list of terms")
 
     stats = {}
     for statusval, allterms in statterms.items():
         uniques = list(set(allterms))
         statterms[statusval] = uniques
         stats[statusval] = len(uniques)
-    dt.step("get uniques")
+    dt.step("finish")
 
     return stats
 

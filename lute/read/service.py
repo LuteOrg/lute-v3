@@ -142,7 +142,7 @@ def get_paragraphs(s, language):
         for t in tokens:
             t.order = n
             n += 1
-    dt.step("sort and renumber")
+    dt.step("find_all_Terms_in_string pre")
     terms = find_all_Terms_in_string(s, language)
     dt.step("find_all_Terms_in_string")
 
@@ -154,7 +154,7 @@ def get_paragraphs(s, language):
         """
         dt = DebugTimer("make_RenderableSentence", False)
         sentence_tokens = [t for t in tokens if t.sentence_number == sentence_num]
-        dt.step("sentence_tokens")
+        dt.step("get_renderable pre")
         renderable = RenderableCalculator.get_renderable(
             language, terms, sentence_tokens
         )
@@ -162,7 +162,6 @@ def get_paragraphs(s, language):
         textitems = [i.make_text_item(pnum, sentence_num, language) for i in renderable]
         dt.step("textitems")
         ret = RenderableSentence(sentence_num, textitems)
-        dt.step("make RenderableSentence")
         return ret
 
     def unique(arr):
@@ -170,8 +169,8 @@ def get_paragraphs(s, language):
 
     renderable_paragraphs = []
     paranums = sorted(unique([t.paragraph_number for t in tokens]))
-    dt.step("get paranums")
     for pnum in paranums:
+        dt.step("")
         paratokens = [t for t in tokens if t.paragraph_number == pnum]
         senums = sorted(unique([t.sentence_number for t in paratokens]))
         dt.step("paratokens and senums")

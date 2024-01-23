@@ -140,11 +140,11 @@ class RenderableCalculator:
             rc.is_word = tok.is_word
             candidates[rc.id] = rc
             rendered[rc.pos] = rc.id
-        dt.step("step 2, load with original texttokens")
 
         # 3.  Create candidates for all the terms.
         termcandidates = []
 
+        dt.step("initial_setup")
         foundterms = [
             t
             for t in terms
@@ -154,6 +154,7 @@ class RenderableCalculator:
             f"Looking at {len(foundterms)} out of {len(terms)} terms for string",
             flush=True,
         )
+        dt.step("1 found terms")
         for term in foundterms:
             for loc in tokenlocator.locate_string(term.text_lc):
                 rc = RenderableCandidate()
@@ -166,7 +167,7 @@ class RenderableCalculator:
 
                 termcandidates.append(rc)
                 candidates[rc.id] = rc
-        dt.step("step 3, use tokenlocator to find terms")
+        dt.step("2 tokenlocator.locate_string")
 
         # 4a.  Sort the term candidates: first by length, then by position.
         def compare(a, b):
@@ -177,7 +178,6 @@ class RenderableCalculator:
             return -1 if (a.pos < b.pos) else 1
 
         termcandidates.sort(key=functools.cmp_to_key(compare))
-        dt.step("step 4a, sort")
 
         # The termcandidates should now be sorted such that longest
         # are first, with items of equal length being sorted by
@@ -188,10 +188,9 @@ class RenderableCalculator:
         for tc in termcandidates:
             for i in range(tc.length):
                 rendered[tc.pos + i] = tc.id
-        dt.step("reverse and render")
 
         rcids = list(set(rendered.values()))
-        dt.step("final set")
+        dt.step("remaining work")
         dt.summary()
         return [candidates[rcid] for rcid in rcids]
 

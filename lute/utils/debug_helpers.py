@@ -26,10 +26,13 @@ class DebugTimer:
         total_step_elapsed += step_elapsed
         self.step_map[s] = total_step_elapsed
 
-        full_step_map_string = f"{self.name} {s}"
-        global_step_elapsed = DebugTimer.global_step_map.get(full_step_map_string, 0)
-        global_step_elapsed += step_elapsed
-        DebugTimer.global_step_map[full_step_map_string] = global_step_elapsed
+        if s != "":
+            full_step_map_string = f"{self.name} {s}"
+            global_step_elapsed = DebugTimer.global_step_map.get(
+                full_step_map_string, 0
+            )
+            global_step_elapsed += step_elapsed
+            DebugTimer.global_step_map[full_step_map_string] = global_step_elapsed
 
         total_elapsed = n - self.start
         self.curr_start = n
