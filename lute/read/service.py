@@ -74,7 +74,6 @@ def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     sql = sql.bindparams(language_id=language.id, content=content)
     idlist = db.session.execute(sql).all()
     woids = [int(p[0]) for p in idlist]
-    print(f"found {len(woids)} IDs")
     # dt.step("multiword_sql_query get ids")
     contained_terms = db.session.query(Term).filter(Term.id.in_(woids)).all()
     # dt.step("multiword_sql_query load ids")
