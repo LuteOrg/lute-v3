@@ -354,7 +354,7 @@ def db_newscript(c, suffix):  # pylint: disable=unused-argument
     Create a new migration, <datetime>_suffix.sql
     """
     now = datetime.now()
-    fnow = now.strftime("%Y%m%d_%H%M%S")
+    fnow = now.strftime("%Y%m%d")
     filename = f"{fnow}_{suffix}.sql"
     destfile = os.path.join(_schema_dir(), "migrations", filename)
     with open(destfile, "w", encoding="utf-8") as f:
