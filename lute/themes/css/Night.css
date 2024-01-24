@@ -94,3 +94,26 @@ span.status99 { background-color: transparent; } /* transparent */
 #status label[for="status-6"]:hover {
   background-color: #bc6b60;
 }
+
+.status-bar-container {
+  background-color: #fff;
+  border-color: var(--light-grey);
+}
+
+.status-bar-container-empty {
+  background-color: var(--background-color);
+  border-color: #686868;
+}
+
+.status-bar-container span {
+  color: var(--background-color);
+}
+
+#read-slider {
+  -webkit-appearence: none;
+  background-color: #5e5e5e;
+}
+
+span.hamburger {
+  background-color: #F3F4F4;
+}
