@@ -39,73 +39,12 @@
       stateSave: true,
       search: { search: initial_search },
       columnDefs: [
-        {
-          "name": "BkTitle", "targets": 0,
-          "render": function ( data, type, row, meta ) {
-            const bkid = parseInt(row[3]);
-            const pgnum = parseInt(row[10]);
-            const pgcount = parseInt(row[8]);
-            let pgfraction = '';
-
-            const completed = (parseInt(row[11]) == 1);
-            let book_title_classes = ['book-title'];
-            if (completed) {
-              book_title_classes.push('completed_book');
-            }
-            else if (pgnum > 1) {
-              pgfraction = ` (${pgnum}/${pgcount})`;
-            }
-
-            return `<a class="${book_title_classes.join(' ')}" href="/read/${bkid}">${row[0]}${pgfraction}</a>`;
-          }
-        },
+        { "name": "BkTitle", "targets": 0, "render": render_book_title },
         { "name": "LgName", "targets": 1 },
         { "name": "TagList", "targets": 2 },
-
-        { "targets": 3,
-          "data": null,
-          "searchable": false,
-          "orderable": false,
-          "render": function ( data, type, row, meta ) {
-            let ret = row[5];
-            const pct = row[7];
-            const unkcount = row[6];
-            if (pct != null) {
-              const termcount = row[9];
-              const knownpct = 100 - parseInt(pct);
-              ret += `&nbsp;<span title="${unkcount} unknowns in next ${termcount} unique terms">(${knownpct}%)</span>`;
-            }
-            // TODO issue 102 status graph: render graph of distribution.
-            ret += `<div style="display: none">${row[12]}</div>`;
-            return ret;
-          }
-        },
-        {
-          "targets": 4, "data": null, "searchable": false, "orderable": false,
-          "render": render_book_stats_graph
-        },
-        {
-          "targets": 5,
-          "data": null,
-          "searchable": false,
-          "orderable": false,
-          "render": function ( data, type, row, meta ) {
-            // TODO zzfuture fix: security - add CSRF token
-            const ret = [];
-            const bkid = row[3];
-            const bktitle = encodeURIComponent(row[0]);
-            if (row[4] == 0) {
-              // not archived
-              ret.push(`<img src="{{ url_for('static', filename='icn/document--pencil.png') }}" title="Edit" onclick="edit_book(${bkid})" />`);
-              ret.push(`<img src="{{ url_for('static', filename='icn/inbox-download.png') }}" title="Archive" onclick="confirm_archive(${bkid})" />`);
-            }
-            else {
-              ret.push(`<img src="{{ url_for('static', filename='icn/inbox-upload.png') }}" title="Unarchive" onclick="confirm_unarchive(${bkid})" />`);
-            }
-            ret.push(`<img src="{{ url_for('static', filename='icn/minus-button.png') }}" title="Delete" data-bktitle="${bktitle}" data-bkid="${bkid}" onclick="confirm_delete(this)" />`);
-            return ret.join('&nbsp;');
-          }
-        },
+        { "targets": 3, "data": null, "searchable": false, "orderable": false, "render": render_book_word_count },
+        { "targets": 4, "data": null, "searchable": false, "orderable": false, "render": render_book_stats_graph },
+        { "targets": 5, "data": null, "searchable": false, "orderable": false, "render": render_book_actions },
 
         /* Extra data that is returned in the row for rendering, but not shown. */
         { "name": "BkID", "targets": 6, "data": null, "visible": false },
@@ -170,6 +109,39 @@
     do_action_post('delete', bookid);
   }
 
+
+  let render_book_title = function ( data, type, row, meta ) {
+    const bkid = parseInt(row[3]);
+    const pgnum = parseInt(row[10]);
+    const pgcount = parseInt(row[8]);
+    let pgfraction = '';
+
+    const completed = (parseInt(row[11]) == 1);
+    let book_title_classes = ['book-title'];
+    if (completed) {
+      book_title_classes.push('completed_book');
+    }
+    else if (pgnum > 1) {
+      pgfraction = ` (${pgnum}/${pgcount})`;
+    }
+
+    return `<a class="${book_title_classes.join(' ')}" href="/read/${bkid}">${row[0]}${pgfraction}</a>`;
+  };
+
+
+  let render_book_word_count = function ( data, type, row, meta ) {
+    let ret = row[5];
+    const pct = row[7];
+    const unkcount = row[6];
+    if (pct != null) {
+      const termcount = row[9];
+      const knownpct = 100 - parseInt(pct);
+      ret += `&nbsp;<span title="${unkcount} unknowns in next ${termcount} unique terms">(${knownpct}%)</span>`;
+    }
+    return ret;
+  };
+
+
   let render_book_stats_graph = function(data, type, row, meta) {
     let statuscounts = row[12];
     if (statuscounts == '') {
@@ -209,6 +181,24 @@
     });
     ret += `</div>`;
     return ret;
+  };
+
+
+  let render_book_actions = function ( data, type, row, meta ) {
+    // TODO zzfuture fix: security - add CSRF token
+    const ret = [];
+    const bkid = row[3];
+    const bktitle = encodeURIComponent(row[0]);
+    if (row[4] == 0) {
+      // not archived
+      ret.push(`<img src="{{ url_for('static', filename='icn/document--pencil.png') }}" title="Edit" onclick="edit_book(${bkid})" />`);
+      ret.push(`<img src="{{ url_for('static', filename='icn/inbox-download.png') }}" title="Archive" onclick="confirm_archive(${bkid})" />`);
+    }
+    else {
+      ret.push(`<img src="{{ url_for('static', filename='icn/inbox-upload.png') }}" title="Unarchive" onclick="confirm_unarchive(${bkid})" />`);
+    }
+    ret.push(`<img src="{{ url_for('static', filename='icn/minus-button.png') }}" title="Delete" data-bktitle="${bktitle}" data-bkid="${bkid}" onclick="confirm_delete(this)" />`);
+    return ret.join('&nbsp;');
   };
 
 
