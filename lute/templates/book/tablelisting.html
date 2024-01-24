@@ -1,7 +1,7 @@
 <table id="booktable" class="table dataTable stripe">
   <thead>
     <tr>
-      <th width="40%">Title</th>
+      <th>Title</th>
       <th>Language</th>
       <th>Tags</th>
       <th>Word count (% known)</th>
@@ -39,10 +39,10 @@
       stateSave: true,
       search: { search: initial_search },
       columnDefs: [
-        { "name": "BkTitle", "targets": 0, "render": render_book_title },
+        { "name": "BkTitle", "targets": 0, "width": "40%", "render": render_book_title },
         { "name": "LgName", "targets": 1 },
         { "name": "TagList", "targets": 2 },
-        { "targets": 3, "data": null, "searchable": false, "orderable": false, "render": render_book_word_count },
+        { "targets": 3, "data": null, "width": "15%", "searchable": false, "orderable": false, "render": render_book_word_count },
         { "targets": 4, "data": null, "searchable": false, "orderable": false, "render": render_book_stats_graph },
         { "targets": 5, "data": null, "searchable": false, "orderable": false, "render": render_book_actions },
 
