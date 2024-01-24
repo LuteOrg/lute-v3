@@ -40,11 +40,11 @@
       search: { search: initial_search },
       columnDefs: [
         { "name": "BkTitle", "targets": 0, "width": "40%", "render": render_book_title },
-        { "name": "LgName", "targets": 1 },
-        { "name": "TagList", "targets": 2 },
+        { "name": "LgName", "targets": 1, "width": "10%" },
+        { "name": "TagList", "targets": 2, "width": "10%" },
         { "targets": 3, "data": null, "width": "15%", "searchable": false, "orderable": false, "render": render_book_word_count },
         { "targets": 4, "data": null, "searchable": false, "orderable": false, "render": render_book_stats_graph },
-        { "targets": 5, "data": null, "searchable": false, "orderable": false, "render": render_book_actions },
+        { "targets": 5, "data": null, "width": "8%", "searchable": false, "orderable": false, "render": render_book_actions },
 
         /* Extra data that is returned in the row for rendering, but not shown. */
         { "name": "BkID", "targets": 6, "data": null, "visible": false },
