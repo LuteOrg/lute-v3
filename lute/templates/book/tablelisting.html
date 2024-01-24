@@ -5,6 +5,7 @@
       <th>Language</th>
       <th>Tags</th>
       <th>Word count (% known)</th>
+      <th>Statuses</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -80,7 +81,51 @@
           }
         },
         {
-          "targets": 4,
+          "targets": 4, "data": null, "searchable": false, "orderable": false,
+          "render": function(data, type, row, meta) {
+            let statuscounts = row[12];
+            if (statuscounts == '') {
+              return "n/a"; // TODO
+            }
+            statuscounts = JSON.parse(statuscounts);
+            statuscounts["99"] = statuscounts["98"] + statuscounts["99"];
+            delete statuscounts['98'];
+            const totalcount = Object.values(statuscounts).reduce((acc, val) => acc + val, 0);
+            if (totalcount == 0) {
+              return "n/a"; // TODO
+            }
+            const statuspct = {};
+            Object.entries(statuscounts).forEach(([key, value]) => {
+              let pct = (value * 100.0) / totalcount;
+              statuspct[key] = pct.toFixed(0);
+            });
+            // return JSON.stringify(statuspct);
+
+            let make_bar = function(stid, title) {
+              const p = statuspct[stid];
+              return `<div
+                class="status-bar${stid} status-bar"
+                title="${title}: ${p}%"
+                style="flex: ${p}; display:${p < 1 ? "none": "inline-flex"}"
+                ></div>`;
+            };
+
+            const bar_titles = {
+              "0": "Unknown",
+              "1": 1, "2": 2, "3": 3, "4": 4, "5": 5,
+              "99": "Well Known or Ignored"
+            };
+            ret = `<div class="status-bar-container">`;
+            Object.entries(bar_titles).forEach(([key, title]) => {
+              ret += make_bar(key, title);
+            });
+            ret += `</div>`;
+            return ret;
+            // return row[12];
+          }
+        },
+        {
+          "targets": 5,
           "data": null,
           "searchable": false,
           "orderable": false,
@@ -103,16 +148,16 @@
         },
 
         /* Extra data that is returned in the row for rendering, but not shown. */
-        { "name": "BkID", "targets": 5, "data": null, "visible": false },
-        { "name": "BkArchived", "targets": 6, "data": null, "visible": false },
-        { "name": "WordCount", "targets": 7, "data": null, "visible": false },
-        { "name": "UnknownCount", "targets": 8, "data": null, "visible": false },
-        { "name": "UnknownPercent", "targets": 9, "data": null, "visible": false },
-        { "name": "PageCount", "targets": 10, "data": null, "visible": false },
-        { "name": "DistinctCount", "targets": 11, "data": null, "visible": false },
-        { "name": "PageNum", "targets": 12, "data": null, "visible": false },
-        { "name": "IsCompleted", "targets": 13, "data": null, "visible": false },
-        { "name": "StatusDistribution", "targets": 14, "data": null, "visible": false },
+        { "name": "BkID", "targets": 6, "data": null, "visible": false },
+        { "name": "BkArchived", "targets": 7, "data": null, "visible": false },
+        { "name": "WordCount", "targets": 8, "data": null, "visible": false },
+        { "name": "UnknownCount", "targets": 9, "data": null, "visible": false },
+        { "name": "UnknownPercent", "targets": 10, "data": null, "visible": false },
+        { "name": "PageCount", "targets": 11, "data": null, "visible": false },
+        { "name": "DistinctCount", "targets": 12, "data": null, "visible": false },
+        { "name": "PageNum", "targets": 13, "data": null, "visible": false },
+        { "name": "IsCompleted", "targets": 14, "data": null, "visible": false },
+        { "name": "StatusDistribution", "targets": 15, "data": null, "visible": false },
       ],
 
       // Ajax call
