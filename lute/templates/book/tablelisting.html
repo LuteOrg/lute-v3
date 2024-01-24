@@ -146,12 +146,13 @@
 
     let make_bar = function(stid, title) {
       const p = statuspct[stid];
+      let display = "inline-flex"
       if (p < 1)
-        return '';
+        display = "none";
       return `<div
         class="status-bar${stid} status-bar"
         title="${title}: ${p}%"
-        style="flex: ${p}; display: inline-flex"
+        style="flex: ${p}; display: ${display}"
         ></div>`;
     };
 
