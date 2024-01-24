@@ -144,15 +144,15 @@
 
   let render_book_stats_graph = function(data, type, row, meta) {
     let statuscounts = row[12];
-    if (statuscounts == '') {
-      return "n/a"; // TODO
+    if ((statuscounts ?? '')== '') {
+      return "";
     }
     statuscounts = JSON.parse(statuscounts);
     statuscounts["99"] = statuscounts["98"] + statuscounts["99"];
     delete statuscounts['98'];
     const totalcount = Object.values(statuscounts).reduce((acc, val) => acc + val, 0);
     if (totalcount == 0) {
-      return "n/a"; // TODO
+      return "";
     }
     const statuspct = {};
     Object.entries(statuscounts).forEach(([key, value]) => {
