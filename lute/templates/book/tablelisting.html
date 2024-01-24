@@ -82,47 +82,7 @@
         },
         {
           "targets": 4, "data": null, "searchable": false, "orderable": false,
-          "render": function(data, type, row, meta) {
-            let statuscounts = row[12];
-            if (statuscounts == '') {
-              return "n/a"; // TODO
-            }
-            statuscounts = JSON.parse(statuscounts);
-            statuscounts["99"] = statuscounts["98"] + statuscounts["99"];
-            delete statuscounts['98'];
-            const totalcount = Object.values(statuscounts).reduce((acc, val) => acc + val, 0);
-            if (totalcount == 0) {
-              return "n/a"; // TODO
-            }
-            const statuspct = {};
-            Object.entries(statuscounts).forEach(([key, value]) => {
-              let pct = (value * 100.0) / totalcount;
-              statuspct[key] = pct.toFixed(0);
-            });
-            // return JSON.stringify(statuspct);
-
-            let make_bar = function(stid, title) {
-              const p = statuspct[stid];
-              return `<div
-                class="status-bar${stid} status-bar"
-                title="${title}: ${p}%"
-                style="flex: ${p}; display:${p < 1 ? "none": "inline-flex"}"
-                ></div>`;
-            };
-
-            const bar_titles = {
-              "0": "Unknown",
-              "1": 1, "2": 2, "3": 3, "4": 4, "5": 5,
-              "99": "Well Known or Ignored"
-            };
-            ret = `<div class="status-bar-container">`;
-            Object.entries(bar_titles).forEach(([key, title]) => {
-              ret += make_bar(key, title);
-            });
-            ret += `</div>`;
-            return ret;
-            // return row[12];
-          }
+          "render": render_book_stats_graph
         },
         {
           "targets": 5,
@@ -209,6 +169,48 @@
     }
     do_action_post('delete', bookid);
   }
+
+  let render_book_stats_graph = function(data, type, row, meta) {
+    let statuscounts = row[12];
+    if (statuscounts == '') {
+      return "n/a"; // TODO
+    }
+    statuscounts = JSON.parse(statuscounts);
+    statuscounts["99"] = statuscounts["98"] + statuscounts["99"];
+    delete statuscounts['98'];
+    const totalcount = Object.values(statuscounts).reduce((acc, val) => acc + val, 0);
+    if (totalcount == 0) {
+      return "n/a"; // TODO
+    }
+    const statuspct = {};
+    Object.entries(statuscounts).forEach(([key, value]) => {
+      let pct = (value * 100.0) / totalcount;
+      statuspct[key] = pct.toFixed(0);
+    });
+    // return JSON.stringify(statuspct);
+
+    let make_bar = function(stid, title) {
+      const p = statuspct[stid];
+      return `<div
+        class="status-bar${stid} status-bar"
+        title="${title}: ${p}%"
+        style="flex: ${p}; display:${p < 1 ? "none": "inline-flex"}"
+        ></div>`;
+    };
+
+    const bar_titles = {
+      "0": "Unknown",
+      "1": 1, "2": 2, "3": 3, "4": 4, "5": 5,
+      "99": "Well Known or Ignored"
+    };
+    ret = `<div class="status-bar-container">`;
+    Object.entries(bar_titles).forEach(([key, title]) => {
+      ret += make_bar(key, title);
+    });
+    ret += `</div>`;
+    return ret;
+  };
+
 
   /**
    * Clearing the state is required for acceptance tests,
