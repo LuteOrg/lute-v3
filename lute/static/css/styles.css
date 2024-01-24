@@ -1502,7 +1502,7 @@ input[type="checkbox"][disabled] + label {
 .status-bar {
     display: flex;
     align-items: center;
-    height: 10px;
+    height: 0.7rem;
     font-size: 0.8rem;
     box-sizing: border-box;
     /* saturate the colors  */
