@@ -4,7 +4,7 @@
       <th>Title</th>
       <th>Language</th>
       <th>Tags</th>
-      <th>Word count (% known)</th>
+      <th>Word count</th>
       <th>Statuses</th>
       <th>Actions</th>
     </tr>
@@ -42,21 +42,17 @@
         { "name": "BkTitle", "targets": 0, "width": "40%", "render": render_book_title },
         { "name": "LgName", "targets": 1, "width": "10%" },
         { "name": "TagList", "targets": 2, "width": "10%" },
-        { "targets": 3, "data": null, "width": "15%", "searchable": false, "orderable": false, "render": render_book_word_count },
-        { "targets": 4, "data": null, "searchable": false, "orderable": false, "render": render_book_stats_graph },
+        { "name": "WordCount", "targets": 3, "width": "10%" },
+        { "name": "UnknownPercent", "targets": 4, "data": null, "searchable": true, "orderable": true, "render": render_book_stats_graph },
         { "targets": 5, "data": null, "width": "8%", "searchable": false, "orderable": false, "render": render_book_actions },
 
         /* Extra data that is returned in the row for rendering, but not shown. */
         { "name": "BkID", "targets": 6, "data": null, "visible": false },
         { "name": "BkArchived", "targets": 7, "data": null, "visible": false },
-        { "name": "WordCount", "targets": 8, "data": null, "visible": false },
-        { "name": "UnknownCount", "targets": 9, "data": null, "visible": false },
-        { "name": "UnknownPercent", "targets": 10, "data": null, "visible": false },
-        { "name": "PageCount", "targets": 11, "data": null, "visible": false },
-        { "name": "DistinctCount", "targets": 12, "data": null, "visible": false },
-        { "name": "PageNum", "targets": 13, "data": null, "visible": false },
-        { "name": "IsCompleted", "targets": 14, "data": null, "visible": false },
-        { "name": "StatusDistribution", "targets": 15, "data": null, "visible": false },
+        { "name": "PageCount", "targets": 8, "data": null, "visible": false },
+        { "name": "PageNum", "targets": 9, "data": null, "visible": false },
+        { "name": "IsCompleted", "targets": 10, "data": null, "visible": false },
+        { "name": "StatusDistribution", "targets": 11, "data": null, "visible": false },
       ],
 
       // Ajax call
@@ -111,12 +107,12 @@
 
 
   let render_book_title = function ( data, type, row, meta ) {
-    const bkid = parseInt(row[3]);
-    const pgnum = parseInt(row[10]);
-    const pgcount = parseInt(row[8]);
+    const bkid = parseInt(row[5]);
+    const pgnum = parseInt(row[8]);
+    const pgcount = parseInt(row[7]);
     let pgfraction = '';
 
-    const completed = (parseInt(row[11]) == 1);
+    const completed = (parseInt(row[9]) == 1);
     let book_title_classes = ['book-title'];
     if (completed) {
       book_title_classes.push('completed_book');
@@ -129,21 +125,8 @@
   };
 
 
-  let render_book_word_count = function ( data, type, row, meta ) {
-    let ret = row[5];
-    const pct = row[7];
-    const unkcount = row[6];
-    if (pct != null) {
-      const termcount = row[9];
-      const knownpct = 100 - parseInt(pct);
-      ret += `&nbsp;<span title="${unkcount} unknowns in next ${termcount} unique terms">(${knownpct}%)</span>`;
-    }
-    return ret;
-  };
-
-
   let render_book_stats_graph = function(data, type, row, meta) {
-    let statuscounts = row[12];
+    let statuscounts = row[10];
     if ((statuscounts ?? '')== '') {
       return "";
     }
@@ -189,9 +172,9 @@
   let render_book_actions = function ( data, type, row, meta ) {
     // TODO zzfuture fix: security - add CSRF token
     const ret = [];
-    const bkid = row[3];
+    const bkid = row[5];
     const bktitle = encodeURIComponent(row[0]);
-    if (row[4] == 0) {
+    if (row[6] == 0) {
       // not archived
       ret.push(`<img src="{{ url_for('static', filename='icn/document--pencil.png') }}" title="Edit" onclick="edit_book(${bkid})" />`);
       ret.push(`<img src="{{ url_for('static', filename='icn/inbox-download.png') }}" title="Archive" onclick="confirm_archive(${bkid})" />`);
