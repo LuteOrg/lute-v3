@@ -49,13 +49,13 @@ class Repository:
         bts = self.db.session.query(BookTag).all()
         return [t.text for t in bts]
 
-    def add(self, book):
+    def add(self, book, max_word_tokens_per_text=250):
         """
         Add a book to be saved to the db session.
         Returns DBBook for tests and verification only,
         clients should not change it.
         """
-        dbbook = self._build_db_book(book)
+        dbbook = self._build_db_book(book, max_word_tokens_per_text)
         self.db.session.add(dbbook)
         return dbbook
 
@@ -74,14 +74,16 @@ class Repository:
         """
         self.db.session.commit()
 
-    def _build_db_book(self, book):
+    def _build_db_book(self, book, max_word_tokens_per_text):
         "Convert a book business object to a DBBook."
 
         lang = Language.find(book.language_id)
 
         b = None
         if book.id is None:
-            b = DBBook.create_book(book.title, lang, book.text)
+            b = DBBook.create_book(
+                book.title, lang, book.text, max_word_tokens_per_text
+            )
         else:
             b = DBBook.find(book.id)
         b.title = book.title
