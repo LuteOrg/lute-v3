@@ -46,8 +46,8 @@ class NewBookForm(FlaskForm):
     )
     book_tags = StringField("Tags")
     max_page_tokens = IntegerField(
-        "Words per page(include punctuations)",
-        validators=[NumberRange(min=200, max=1500)],
+        "Words per page",
+        validators=[NumberRange(min=10, max=1500)],
         default=250,
     )
 
