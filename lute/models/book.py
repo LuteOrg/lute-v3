@@ -57,7 +57,6 @@ class Book(
     language_id = db.Column(
         "BkLgID", db.Integer, db.ForeignKey("languages.LgID"), nullable=False
     )
-    word_count = db.Column("BkWordCount", db.Integer)
     source_uri = db.Column("BkSourceURI", db.String(length=1000))
     current_tx_id = db.Column("BkCurrentTxID", db.Integer, default=0)
     archived = db.Column("BkArchived", db.Boolean, default=False)
@@ -132,8 +131,6 @@ class Book(
             return ret.strip()
 
         b = Book(title, language)
-        b.word_count = len([t for t in tokens if t.is_word])
-
         page_number = 0
         it = SentenceGroupIterator(tokens, max_word_tokens_per_text)
         while toks := it.next():

@@ -28,8 +28,8 @@ def test_save_book(empty_db, simple_book):
     db.session.add(b)
     db.session.commit()
 
-    sql = "select BkID, BkTitle, BkLgID, BkWordCount from books"
-    assert_sql_result(sql, ["1; hi; 1; 2"], "book")
+    sql = "select BkID, BkTitle, BkLgID from books"
+    assert_sql_result(sql, ["1; hi; 1"], "book")
 
     sql = "select TxID, TxBkID, TxText from texts"
     assert_sql_result(sql, ["1; 1; some text"], "texts")
