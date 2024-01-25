@@ -4,7 +4,8 @@
 
 from datetime import datetime
 from flask import Blueprint, flash, request, render_template, redirect, jsonify
-from lute.read.service import get_paragraphs, set_unknowns_to_known
+from lute.read.render.service import get_paragraphs
+from lute.read.service import set_unknowns_to_known
 from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
