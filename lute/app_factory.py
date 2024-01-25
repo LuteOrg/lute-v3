@@ -24,6 +24,7 @@ from sqlalchemy.pool import Pool
 from lute.config.app_config import AppConfig
 from lute.db import db
 from lute.db.setup.main import setup_db
+from lute.db.data_cleanup import clean_data
 import lute.backup.service as backupservice
 import lute.db.demo
 
@@ -281,6 +282,7 @@ def _create_app(app_config, extra_config):
     with app.app_context():
         db.create_all()
         UserSetting.load()
+        clean_data()
     app.db = db
 
     _add_base_routes(app, app_config)

@@ -16,10 +16,10 @@ def get_data_tables_list(parameters, is_archived):
         LgName,
         BkTitle,
         case when currtext.TxID is null then 1 else currtext.TxOrder end as PageNum,
-        pagecnt.c as PageCount,
+        textcounts.pagecount AS PageCount,
         BkArchived,
         tags.taglist AS TagList,
-        case when ifnull(b.BkWordCount, 0) = 0 then 'n/a' else b.BkWordCount end as WordCount,
+        textcounts.wc AS WordCount,
         c.distinctterms as DistinctCount,
         c.distinctunknowns as UnknownCount,
         c.unknownpercent as UnknownPercent,
@@ -30,9 +30,10 @@ def get_data_tables_list(parameters, is_archived):
     INNER JOIN languages ON LgID = b.BkLgID
     LEFT OUTER JOIN texts currtext ON currtext.TxID = BkCurrentTxID
     INNER JOIN (
-        SELECT TxBkID, COUNT(TxID) AS c FROM texts
+        SELECT TxBkID, SUM(TxWordCount) as wc, COUNT(TxID) AS pagecount
+        FROM texts
         GROUP BY TxBkID
-    ) pagecnt on pagecnt.TxBkID = b.BkID
+    ) textcounts on textcounts.TxBkID = b.BkID
     LEFT OUTER JOIN bookstats c on c.BkID = b.BkID
 
     LEFT OUTER JOIN (
