@@ -131,7 +131,7 @@ def test_smoke_rendered(spanish, app_context):
 ## Start reading tests. ##########################
 
 
-def disabled_test_smoke_start_reading(english, app_context):
+def test_smoke_start_reading(english, app_context):
     "Smoke test book."
     b = Book()
     b.title = "blah"
@@ -143,4 +143,4 @@ def disabled_test_smoke_start_reading(english, app_context):
 
     assert_record_count_equals("select * from sentences", 0, "before start")
     start_reading(dbbook, 1, db.session)
-    assert_record_count_equals("select * from sentences", 1, "after start")
+    assert_record_count_equals("select * from sentences", 2, "after start")

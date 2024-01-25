@@ -195,7 +195,8 @@ class Text(db.Model):
     @text.setter
     def text(self, s):
         self._text = s
-        self._load_sentences()
+        if self._read_date is not None:
+            self.load_sentences()
 
     @property
     def read_date(self):
@@ -204,17 +205,14 @@ class Text(db.Model):
     @read_date.setter
     def read_date(self, s):
         self._read_date = s
-        self._load_sentences()
+        # Ensure loaded.
+        self.load_sentences()
 
-    def _load_sentences(self):
+    def load_sentences(self):
         """
         Parse the current text and create Sentence objects.
-        Sentences are only needed once the text has been read.
         """
         self._remove_sentences()
-
-        if self.read_date is None:
-            return
 
         lang = self.book.language
         parser = lang.parser
