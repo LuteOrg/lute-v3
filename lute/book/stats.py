@@ -71,7 +71,6 @@ class BookStats(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     BkID = db.Column(db.Integer)
-    wordcount = db.Column(db.Integer)
     distinctterms = db.Column(db.Integer)
     distinctunknowns = db.Column(db.Integer)
     unknownpercent = db.Column(db.Integer)
@@ -112,18 +111,17 @@ def _get_stats(book):
 
     # Any change in the below fields requires a change to
     # update_stats as well, query insert doesn't check field order.
-    return [0, allunique, unknowns, percent, sd]
+    return [allunique, unknowns, percent, sd]
 
 
 def _update_stats(book, stats):
     "Update BookStats for the given book."
     new_stats = BookStats(
         BkID=book.id,
-        wordcount=stats[0],  # TODO delete: old code
-        distinctterms=stats[1],
-        distinctunknowns=stats[2],
-        unknownpercent=stats[3],
-        status_distribution=stats[4],
+        distinctterms=stats[0],
+        distinctunknowns=stats[1],
+        unknownpercent=stats[2],
+        status_distribution=stats[3],
     )
     db.session.add(new_stats)
     db.session.commit()
