@@ -3,7 +3,7 @@ Book statistics.
 """
 
 import json
-from lute.read.service import get_paragraphs
+from lute.read.render.service import get_paragraphs
 from lute.db import db
 from lute.models.book import Book
 
