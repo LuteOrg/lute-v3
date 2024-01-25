@@ -99,6 +99,17 @@ class Book(
     def page_count(self):
         return len(self.texts)
 
+    def page_in_range(self, n):
+        "Return page number that is in the book's page count."
+        ret = max(n, 1)
+        ret = min(ret, self.page_count)
+        return ret
+
+    def text_at_page(self, n):
+        "Return the text object at page n."
+        pagenum = self.page_in_range(n)
+        return self.texts[pagenum - 1]
+
     @property
     def is_supported(self):
         "True if the book's language's parser is supported."
