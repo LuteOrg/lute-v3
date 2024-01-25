@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS "new_books" (
 
 
 -- copy data from the table to the new_table
-INSERT INTO new_book(
+INSERT INTO new_books(
 	BkID,
 	BkLgID,
 	BkTitle,

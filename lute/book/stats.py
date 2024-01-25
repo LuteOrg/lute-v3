@@ -112,14 +112,14 @@ def _get_stats(book):
 
     # Any change in the below fields requires a change to
     # update_stats as well, query insert doesn't check field order.
-    return [book.word_count or 0, allunique, unknowns, percent, sd]
+    return [0, allunique, unknowns, percent, sd]
 
 
 def _update_stats(book, stats):
     "Update BookStats for the given book."
     new_stats = BookStats(
         BkID=book.id,
-        wordcount=stats[0],
+        wordcount=stats[0],  # TODO delete: old code
         distinctterms=stats[1],
         distinctunknowns=stats[2],
         unknownpercent=stats[3],
