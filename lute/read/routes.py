@@ -18,13 +18,6 @@ from lute.db import db
 bp = Blueprint("read", __name__, url_prefix="/read")
 
 
-def _page_in_range(book, n):
-    "Return the page number respecting the page range."
-    ret = max(n, 1)
-    ret = min(ret, book.page_count)
-    return ret
-
-
 def _render_book_page(book, pagenum):
     """
     Render a particular book page.
@@ -78,7 +71,7 @@ def read_page(bookid, pagenum):
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
 
-    pagenum = _page_in_range(book, pagenum)
+    pagenum = book.page_in_range(pagenum)
     return _render_book_page(book, pagenum)
 
 
@@ -91,8 +84,7 @@ def page_done():
     restknown = data.get("restknown")
 
     book = Book.find(bookid)
-    pagenum = _page_in_range(book, pagenum)
-    text = book.texts[pagenum - 1]
+    text = book.text_at_page(pagenum)
     text.read_date = datetime.now()
     db.session.add(text)
     db.session.commit()
@@ -122,8 +114,7 @@ def render_page(bookid, pagenum):
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
 
-    pagenum = _page_in_range(book, pagenum)
-    text = book.texts[pagenum - 1]
+    text = book.text_at_page(pagenum)
 
     mark_stale(book)
     book.current_tx_id = text.id
@@ -213,8 +204,7 @@ def flashcopied():
 def edit_page(bookid, pagenum):
     "Edit the text on a page."
     book = Book.find(bookid)
-    pagenum = _page_in_range(book, pagenum)
-    text = book.texts[pagenum - 1]
+    text = book.text_at_page(pagenum)
     if text is None:
         return redirect("/", 302)
     form = TextForm(obj=text)
