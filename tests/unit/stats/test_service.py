@@ -2,27 +2,8 @@
 
 from datetime import datetime, timedelta
 from lute.db import db
-from lute.stats.service import update_wordcount_stats, get_chart_data, get_table_data
+from lute.stats.service import get_chart_data, get_table_data
 from tests.utils import make_text
-from tests.dbasserts import assert_sql_result
-
-
-def test_wordcount_updates_when_text_is_read(spanish, app_context):
-    "Smoke test per ^^ description ^^."
-    text1 = make_text("hola", "Yo tengo un gato.", spanish)
-    db.session.add(text1.book)
-    db.session.commit()
-    update_wordcount_stats()
-
-    sql = f"select TxWordCount from texts where TxID={text1.id}"
-    assert_sql_result(sql, ["None"], "no data.")
-
-    text1.read_date = datetime.now()
-    db.session.add(text1.book)
-    db.session.commit()
-
-    update_wordcount_stats()
-    assert_sql_result(sql, ["4"], "loaded")
 
 
 def make_read_text(lang, content, readdate):
