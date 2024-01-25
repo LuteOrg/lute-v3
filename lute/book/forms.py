@@ -34,6 +34,11 @@ class NewBookForm(FlaskForm):
             )
         ],
     )
+    max_page_tokens = IntegerField(
+        "Words per page",
+        validators=[NumberRange(min=10, max=1500)],
+        default=250,
+    )
     source_uri = StringField("Text source", validators=[Length(max=255)])
     audiofile = FileField(
         "Audio file",
@@ -45,11 +50,6 @@ class NewBookForm(FlaskForm):
         ],
     )
     book_tags = StringField("Tags")
-    max_page_tokens = IntegerField(
-        "Words per page(include punctuations)",
-        validators=[NumberRange(min=200, max=1500)],
-        default=250,
-    )
 
     def __init__(self, *args, **kwargs):
         "Call the constructor of the superclass (FlaskForm)"
