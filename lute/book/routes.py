@@ -103,8 +103,7 @@ def new():
             f = form.audiofile.data
             if f:
                 b.audio_filename = service.save_audio_file(f)
-            max_page_tokens = form.max_page_tokens.data
-            book = repo.add(b, max_page_tokens)
+            book = repo.add(b)
             repo.commit()
             return redirect(f"/read/{book.id}/page/1", 302)
         except service.BookImportException as e:
