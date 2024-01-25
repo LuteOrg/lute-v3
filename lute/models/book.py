@@ -99,6 +99,17 @@ class Book(
     def page_count(self):
         return len(self.texts)
 
+    def page_in_range(self, n):
+        "Return page number that is in the book's page count."
+        ret = max(n, 1)
+        ret = min(ret, self.page_count)
+        return ret
+
+    def text_at_page(self, n):
+        "Return the text object at page n."
+        pagenum = self.page_in_range(n)
+        return self.texts[pagenum - 1]
+
     @property
     def is_supported(self):
         "True if the book's language's parser is supported."
@@ -184,7 +195,8 @@ class Text(db.Model):
     @text.setter
     def text(self, s):
         self._text = s
-        self._load_sentences()
+        if self._read_date is not None:
+            self.load_sentences()
 
     @property
     def read_date(self):
@@ -193,17 +205,14 @@ class Text(db.Model):
     @read_date.setter
     def read_date(self, s):
         self._read_date = s
-        self._load_sentences()
+        # Ensure loaded.
+        self.load_sentences()
 
-    def _load_sentences(self):
+    def load_sentences(self):
         """
         Parse the current text and create Sentence objects.
-        Sentences are only needed once the text has been read.
         """
-        self.remove_sentences()
-
-        if self.read_date is None:
-            return
+        self._remove_sentences()
 
         lang = self.book.language
         parser = lang.parser
@@ -216,7 +225,7 @@ class Text(db.Model):
             curr_sentence_tokens.append(pt)
             if pt.is_end_of_sentence:
                 se = Sentence.from_tokens(curr_sentence_tokens, sentence_number)
-                self.add_sentence(se)
+                self._add_sentence(se)
 
                 # Reset for the next sentence.
                 curr_sentence_tokens = []
@@ -225,15 +234,15 @@ class Text(db.Model):
         # Add any stragglers.
         if len(curr_sentence_tokens) > 0:
             se = Sentence.from_tokens(curr_sentence_tokens, sentence_number)
-            self.add_sentence(se)
+            self._add_sentence(se)
 
-    def add_sentence(self, sentence):
+    def _add_sentence(self, sentence):
         "Add a sentence to the Text."
         if sentence not in self.sentences:
             self.sentences.append(sentence)
             sentence.text = self
 
-    def remove_sentences(self):
+    def _remove_sentences(self):
         "Remove all sentence from the Text."
         for sentence in self.sentences:
             sentence.text = None

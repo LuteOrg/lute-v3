@@ -4,25 +4,17 @@
 
 from datetime import datetime
 from flask import Blueprint, flash, request, render_template, redirect, jsonify
-from lute.read.service import get_paragraphs, set_unknowns_to_known
+from lute.read.service import set_unknowns_to_known, start_reading
 from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
 from lute.models.book import Book, Text
 from lute.models.term import Term as DBTerm
 from lute.models.setting import UserSetting
-from lute.book.stats import mark_stale
 from lute.db import db
 
 
 bp = Blueprint("read", __name__, url_prefix="/read")
-
-
-def _page_in_range(book, n):
-    "Return the page number respecting the page range."
-    ret = max(n, 1)
-    ret = min(ret, book.page_count)
-    return ret
 
 
 def _render_book_page(book, pagenum):
@@ -78,7 +70,7 @@ def read_page(bookid, pagenum):
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
 
-    pagenum = _page_in_range(book, pagenum)
+    pagenum = book.page_in_range(pagenum)
     return _render_book_page(book, pagenum)
 
 
@@ -91,8 +83,7 @@ def page_done():
     restknown = data.get("restknown")
 
     book = Book.find(bookid)
-    pagenum = _page_in_range(book, pagenum)
-    text = book.texts[pagenum - 1]
+    text = book.text_at_page(pagenum)
     text.read_date = datetime.now()
     db.session.add(text)
     db.session.commit()
@@ -121,16 +112,7 @@ def render_page(bookid, pagenum):
     if book is None:
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
-
-    pagenum = _page_in_range(book, pagenum)
-    text = book.texts[pagenum - 1]
-
-    mark_stale(book)
-    book.current_tx_id = text.id
-    db.session.add(book)
-    db.session.commit()
-
-    paragraphs = get_paragraphs(text.text, text.book.language)
+    paragraphs = start_reading(book, pagenum, db.session)
     return render_template("read/page_content.html", paragraphs=paragraphs)
 
 
@@ -213,8 +195,7 @@ def flashcopied():
 def edit_page(bookid, pagenum):
     "Edit the text on a page."
     book = Book.find(bookid)
-    pagenum = _page_in_range(book, pagenum)
-    text = book.texts[pagenum - 1]
+    text = book.text_at_page(pagenum)
     if text is None:
         return redirect("/", 302)
     form = TextForm(obj=text)
