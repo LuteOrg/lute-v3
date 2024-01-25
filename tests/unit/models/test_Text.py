@@ -13,7 +13,7 @@ def transform_sentence(s):
 
 def test_sentence_lifecycle(english):
     """
-    Sentences should only be generated when a Text is saved with the ReadDate saved.
+    Sentences must be generated when a Text is saved with the ReadDate saved.
     Sentences are only used for reference lookups.
     """
     b = Book("hola", english)
@@ -22,7 +22,7 @@ def test_sentence_lifecycle(english):
     assert len(t.sentences) == 0, "no sentences"
 
     t.read_date = datetime.now()
-    assert len(t.sentences) == 2, "have on read"
+    assert len(t.sentences) == 2, "sentences are created when read_date is set"
 
     assert (
         transform_sentence(t.sentences[0]) == "/Tienes/ /un/ /perro/./"
