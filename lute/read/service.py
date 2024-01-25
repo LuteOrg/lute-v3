@@ -4,8 +4,7 @@ Reading helpers.
 
 from lute.models.term import Term, Status
 from lute.models.book import Text
-
-# from lute.book.stats import mark_stale
+from lute.book.stats import mark_stale
 from lute.read.render.service import get_paragraphs
 from lute.term.model import Repository
 
@@ -76,10 +75,12 @@ def start_reading(dbbook, pagenum, db_session):
     "Start reading a page in the book, getting paragraphs."
 
     text = dbbook.text_at_page(pagenum)
+    text.load_sentences()
 
-    # mark_stale(dbbook)
+    mark_stale(dbbook)
     dbbook.current_tx_id = text.id
     db_session.add(dbbook)
+    db_session.add(text)
     db_session.commit()
 
     paragraphs = get_paragraphs(text.text, text.book.language)
