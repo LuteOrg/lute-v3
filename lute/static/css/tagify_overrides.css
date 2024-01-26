@@ -6,45 +6,35 @@
 }
 
 .tagify {
-  --tag-pad: 0.2em 0.2em;
+    --tag-pad: 0.2rem 0.2rem;
+    --tag-border-radius: 2px;
 }
 
-.tagify__input {
-    margin: 0px;
+.tagify__tag:focus div::before,
+.tagify__tag:hover:not([readonly]) div::before {
+  --tag-bg-inset: -1px !important;
 }
 
- 
-tags.tagify {
-    font-size: 85%;
-    width: 100%;
-}
+/* .tagify__input::placeholder { */
+    /* color: #D8D8D8; */
+    /* opacity: 1; /~ Firefox ~/ */
+/* } */
 
-.tagify__input::placeholder {
-    color: #D8D8D8;
-    opacity: 1; /* Firefox */
-}
-
+/* placeholder is visible when field is out of focus */
 .tagify__input:empty:before {
     content: attr(data-placeholder);
+    font-family: inherit;
     color: #D8D8D8;
     opacity: 1;
 }
- 
-.tagify__tag {
-    margin: 0px;
-    margin-inline: 0.2em;
-    margin-block: 0.2em;
-    font-size: 85%;
-    border: 1px solid #c5c5c5;
-}
 
 .tagify__dropdown__item {
-    margin: 2px;
-    padding: 0px;
-    font-size: 85%;
+    /* margin: 2px; */
+    /* padding: 0px; */
+    font-size: 0.9rem;
 }
 
-/** Hard code colors to prevent theme issues. */
+/* /~* Hard code colors to prevent theme issues. ~/ */
 
 .tagify__dropdown__wrapper {
     background: transparent !important;
@@ -54,3 +44,31 @@ tags.tagify {
     background: white !important;
     color: black !important;
 }
+
+.tagify__input,
+.tagify__tag {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.tagify {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+
+    font-size: 0.8rem;
+    font-family: inherit;
+
+    /* padding: 0.2rem 0.2rem; */
+    border-radius: var(--form-border-radius);
+}
+
+.tagify__tag > div {
+    display: flex;
+    align-items: center;
+}
+
+.tagify__input {
+    padding: 0.2rem 0.2rem !important;
+}
+
