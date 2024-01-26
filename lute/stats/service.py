@@ -3,39 +3,12 @@ Calculating stats.
 """
 
 from datetime import datetime, timedelta
-from sqlalchemy import text, and_
+from sqlalchemy import text
 from lute.db import db
-from lute.models.book import Text
-
-
-def update_wordcount_stats():
-    """
-    Stats module takes care of updating word counts, because
-    this feature was rolled out after users have been reading.
-    """
-    # pylint: disable=protected-access
-    calcstats = (
-        db.session.query(Text)
-        .filter(and_(Text._read_date.isnot(None), Text.word_count.is_(None)))
-        .all()
-    )
-
-    if len(calcstats) == 0:
-        # Nothing to calculate, quit.
-        return
-
-    for t in calcstats:
-        pt = t.book.language.get_parsed_tokens(t.text)
-        words = [w for w in pt if w.is_word]
-        t.word_count = len(words)
-        db.session.add(t)
-    db.session.commit()
 
 
 def _get_data_per_lang():
     "Return dict of lang name to dict[date_yyyymmdd}: count"
-    update_wordcount_stats()
-
     ret = {}
     sql = """
     select lang, dt, sum(TxWordCount) as count

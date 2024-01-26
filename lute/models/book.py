@@ -57,7 +57,6 @@ class Book(
     language_id = db.Column(
         "BkLgID", db.Integer, db.ForeignKey("languages.LgID"), nullable=False
     )
-    word_count = db.Column("BkWordCount", db.Integer)
     source_uri = db.Column("BkSourceURI", db.String(length=1000))
     current_tx_id = db.Column("BkCurrentTxID", db.Integer, default=0)
     archived = db.Column("BkArchived", db.Boolean, default=False)
@@ -132,8 +131,6 @@ class Book(
             return ret.strip()
 
         b = Book(title, language)
-        b.word_count = len([t for t in tokens if t.is_word])
-
         page_number = 0
         it = SentenceGroupIterator(tokens, max_word_tokens_per_text)
         while toks := it.next():
@@ -195,8 +192,11 @@ class Text(db.Model):
     @text.setter
     def text(self, s):
         self._text = s
+        toks = self._get_parsed_tokens()
+        wordtoks = [t for t in toks if t.is_word]
+        self.word_count = len(wordtoks)
         if self._read_date is not None:
-            self.load_sentences()
+            self._load_sentences_from_tokens(toks)
 
     @property
     def read_date(self):
@@ -208,25 +208,21 @@ class Text(db.Model):
         # Ensure loaded.
         self.load_sentences()
 
-    def load_sentences(self):
-        """
-        Parse the current text and create Sentence objects.
-        """
-        self._remove_sentences()
-
+    def _get_parsed_tokens(self):
+        "Return the tokens."
         lang = self.book.language
-        parser = lang.parser
-        parsedtokens = parser.get_parsed_tokens(self.text, lang)
+        return lang.parser.get_parsed_tokens(self.text, lang)
 
+    def _load_sentences_from_tokens(self, parsedtokens):
+        "Save sentences using the tokens."
+        self._remove_sentences()
         curr_sentence_tokens = []
         sentence_number = 1
-
         for pt in parsedtokens:
             curr_sentence_tokens.append(pt)
             if pt.is_end_of_sentence:
                 se = Sentence.from_tokens(curr_sentence_tokens, sentence_number)
                 self._add_sentence(se)
-
                 # Reset for the next sentence.
                 curr_sentence_tokens = []
                 sentence_number += 1
@@ -235,6 +231,13 @@ class Text(db.Model):
         if len(curr_sentence_tokens) > 0:
             se = Sentence.from_tokens(curr_sentence_tokens, sentence_number)
             self._add_sentence(se)
+
+    def load_sentences(self):
+        """
+        Parse the current text and create Sentence objects.
+        """
+        toks = self._get_parsed_tokens()
+        self._load_sentences_from_tokens(toks)
 
     def _add_sentence(self, sentence):
         "Add a sentence to the Text."

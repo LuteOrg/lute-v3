@@ -4,9 +4,9 @@ Book create/edit forms.
 
 import json
 from flask import request
-from wtforms import StringField, SelectField, TextAreaField
+from wtforms import StringField, SelectField, TextAreaField, IntegerField
 from wtforms import ValidationError
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 
@@ -33,6 +33,11 @@ class NewBookForm(FlaskForm):
                 "Please upload a valid '.txt', '.epub' or '.pdf' file.",
             )
         ],
+    )
+    max_page_tokens = IntegerField(
+        "Words per page",
+        validators=[NumberRange(min=10, max=1500)],
+        default=250,
     )
     source_uri = StringField("Text source", validators=[Length(max=255)])
     audiofile = FileField(
