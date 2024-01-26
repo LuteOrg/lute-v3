@@ -942,13 +942,6 @@ div.code pre {
     border-radius: var(--form-border-radius);
     box-sizing: border-box;
 }
-/* focus on fields makes border same as tags */
-#translation:focus,
-#text:focus {
-    border: 1px solid var(--tagify__tag-bg);
-    outline: none;
-}
-
 
 /* GENERAL FORM STYLES */
 input,
@@ -960,6 +953,25 @@ textarea {
 textarea {
     width: 100%;
     resize: vertical;
+}
+
+/* focus on fields makes border same as tags */
+input:focus,
+textarea:focus,
+select:focus {
+    border: 1px solid var(--tagify__tag-bg) !important;
+    outline: none !important;
+}
+
+input[type="checkbox"]:focus,
+input[type="file"]:focus,
+button:focus {
+    outline: 1px solid var(--tagify__tag-bg) !important;
+}
+
+input[type="checkbox"]:focus,
+input[type="file"]:focus {
+    border: none !important;
 }
 
 ::placeholder {
@@ -1301,7 +1313,7 @@ input[type="checkbox"][disabled] + label {
 }
 
 
-@media screen and (max-width: 180px) {
+@media screen and (max-width: 980px) {
 
     #thetexttitle,
     div#thetext {
