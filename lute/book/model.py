@@ -16,6 +16,7 @@ class Book:  # pylint: disable=too-many-instance-attributes
         self.language_id = None
         self.title = None
         self.text = None
+        self.max_page_tokens = 250
         self.source_uri = None
         self.audio_filename = None
         self.audio_current_pos = None
@@ -81,7 +82,7 @@ class Repository:
 
         b = None
         if book.id is None:
-            b = DBBook.create_book(book.title, lang, book.text)
+            b = DBBook.create_book(book.title, lang, book.text, book.max_page_tokens)
         else:
             b = DBBook.find(book.id)
         b.title = book.title
