@@ -217,6 +217,7 @@ def search_by_text_in_language(text, langid):
 def sentences(langid, text):
     "Get sentences for terms."
     repo = Repository(db)
+    text = text.replace("LUTESLASH", "/")
     # Use find_or_new(): if the user clicks on a parent tag
     # in the term form, and the parent does not exist yet, then
     # we're creating a new term.

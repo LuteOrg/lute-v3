@@ -128,6 +128,7 @@ def term_form(langid, text):
     Create or edit a term.
     """
     repo = Repository(db)
+    text = text.replace("LUTESLASH", "/")
     term = repo.find_or_new(langid, text)
 
     return handle_term_form(

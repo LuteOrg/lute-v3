@@ -122,7 +122,7 @@ function showEditFrame(el, extra_args = {}) {
   const lid = parseInt(el.data('lang-id'));
 
   let text = extra_args.textparts ?? [ el.data('text') ];
-  const sendtext = text.join('');
+  const sendtext = encodeURIComponent(text.join('').replaceAll('/', 'LUTESLASH'));
 
   let extras = Object.entries(extra_args).
       map((p) => `${p[0]}=${encodeURIComponent(p[1])}`).

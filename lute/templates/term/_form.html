@@ -402,7 +402,7 @@
 
   function show_term_sentences() {
     const langid = $('#language_id').val();
-    const txt = $('#text').val();
+    const txt = $('#text').val().replaceAll('/', 'LUTESLASH');
     // %E2%80%8B is the zero-width string.  The term is reparsed
     // on the server, so this doesn't need to be sent.
     const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
