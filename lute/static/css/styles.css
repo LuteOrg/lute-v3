@@ -1494,6 +1494,10 @@ input[type="checkbox"][disabled] + label {
     border: 1px solid #787878;
 }
 
+#booktable td:has(.status-bar-container) {
+    padding-right: 1.5rem;
+}
+
 .status-bar-container-empty {
     border-color: #e6e6e6;
     background-color: #fff;
