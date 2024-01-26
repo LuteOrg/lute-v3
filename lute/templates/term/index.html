@@ -114,35 +114,13 @@
       stateSave: true,
       search: { search: initial_search },
       columnDefs: [
-        {
-          // "chk" is included in the underlying SQL query.
-          // Without it, datatables would place the values
-          // in the wrong table columns.  Ugly hack, but works.
-          "name": "chk",
-          "targets": 0,
-          "searchable": false, "orderable": false, "data": null,
-          "render": function (data, type, row, meta) {
-            return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row[7]}" langid="${row[8]}" onclick="handleChkClick()">`;
-          }
-        },
-
-        { "name": "WoText", "targets": 1,
-          "render": function ( data, type, row, meta ) {
-            return `<a href="/term/edit/${row[7]}">${row[1]}</a>`;
-          }
-        },
+        // "chk" is included in the underlying SQL query.
+        // Without it, datatables would place the values
+        // in the wrong table columns.  Ugly hack, but works.
+        { "name": "chk", "targets": 0, "searchable": false, "orderable": false, "data": null, "render": render_checkbox },
+        { "name": "WoText", "targets": 1, "render": render_text },
         { "name": "ParentText", "targets": 2 },
-        { "name": "WoTranslation", "targets": 3, width: "40%",
-          "render": function ( data, type, row, meta ) {
-            let tx = row[3] ?? '';
-            let imgsrc = row[9] ?? '';
-            if (imgsrc != '')
-              imgsrc = `<img style="margin-top: 5px;" src="${imgsrc}" />`;
-            let ret = [ tx, imgsrc ].filter((s) => s != '');
-            return ret.join('<br />');
-          },
-          "searchable": false, "orderable": false,
-        },
+        { "name": "WoTranslation", "targets": 3, width: "40%", "searchable": true, "render": render_translation },
         { "name": "LgName", "targets": 4 },
         { "name": "TagList", "targets": 5 },
         { "name": "StText", "targets": 6 },
@@ -177,6 +155,26 @@
 
     });
   } // end setup_term_datatable
+
+
+  let render_text = function ( data, type, row, meta ) {
+    return `<a href="/term/edit/${row[7]}">${row[1]}</a>`;
+  };
+
+
+  let render_checkbox = function (data, type, row, meta) {
+    return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row[7]}" langid="${row[8]}" onclick="handleChkClick()">`;
+  };
+
+
+  let render_translation = function ( data, type, row, meta ) {
+    let tx = row[3] ?? '';
+    let imgsrc = row[9] ?? '';
+    if (imgsrc != '')
+      imgsrc = `<img style="margin-top: 5px;" src="${imgsrc}" />`;
+    let ret = [ tx, imgsrc ].filter((s) => s != '');
+    return ret.join('<br />');
+  };
 
 
   let handleChkAll = function() {

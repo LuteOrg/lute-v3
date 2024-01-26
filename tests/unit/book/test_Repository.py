@@ -49,6 +49,30 @@ def test_save_new(app_context, new_book, repo):
     assert book.book_tags == ["tag1", "tag2"], "tags filled"
 
 
+def test_save_new_respects_book_words_per_page_count(app_context, new_book, repo):
+    """
+    Saving a simple Book object loads the database.
+    """
+    sql = "select BkTitle from books where BkTitle = 'HELLO'"
+    assert_sql_result(sql, [], "empty table")
+
+    new_book.max_page_tokens = 10
+    new_book.text = (
+        "One two three four. One two three four five six seven eight nine ten eleven."
+    )
+    b = repo.add(new_book)
+    repo.commit()
+    assert_sql_result(sql, ["HELLO"], "Saved")
+    assert b.texts[0].text == "One two three four.", "page 1"
+    assert (
+        b.texts[1].text == "One two three four five six seven eight nine ten eleven."
+    ), "page 2"
+
+    book = repo.load(b.id)
+    assert book.title == new_book.title, "found book"
+    assert book.book_tags == ["tag1", "tag2"], "tags filled"
+
+
 def test_get_tags(app_context, new_book, repo):
     "Helper method test."
     assert repo.get_book_tags() == [], "no tags yet"
