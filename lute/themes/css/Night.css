@@ -44,28 +44,24 @@ a:hover {
   color: #FF5C5C; /* red */
 }
 
-input[type="text"] {
-    border-color: var(--light-grey); /* light grey */
-    background-color: var(--background-color); /* black */
-    color: var(--light-grey); /* light grey font */
-}
-
-.ui-widget-content {
-    border-color: var(--light-grey); /* light grey */
-    background-color: var(--background-color); /* black */
-    color: var(--light-grey); /* light grey font */
-}
-
-textarea {
-    border-color: var(--light-grey); /* light grey */
-    background-color: var(--background-color); /* black */
-    color: var(--light-grey); /* light grey font */
-}
-
+input[type="text"],
+textarea,
+.ui-widget-content,
 .sub-menu {
     border-color: var(--light-grey); /* light grey */
     background-color: var(--background-color); /* black */
     color: var(--light-grey); /* light grey font */
+}
+
+.tagify {
+  --tags-border-color: var(--light-grey);
+  background-color: var(--background-color);
+  color: var(--light-grey);
+  --placeholder-color-focus: var(--light-grey);
+}
+
+.tagify--focus {
+  --tags-border-color: var(--tagify__tag-bg);
 }
 
 div#thetext p { line-height: 1.5; }

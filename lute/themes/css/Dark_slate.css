@@ -56,28 +56,24 @@ span.status3 { background-color: var(--status-3-color); color: #eff1f2; } /* gre
 span.status4 { background-color: var(--status-4-color); color: #eff1f2; } /* blue highlight */
 span.status5 { background-color: var(--status-5-color); color: #eff1f2; } /* purple highlight */
 
-input[type="text"] {
+input[type="text"],
+textarea,
+.ui-widget-content,
+.sub-menu {
     border-color: var(--light-grey); /* light grey */
     background-color: var(--dark-grey); /* dark grey */
     color: var(--light-grey); /* light grey font */
 }
 
-.ui-widget-content {
-    border-color: var(--light-grey); /* light grey font */
-    background-color: var(--dark-grey); /* dark grey */
-    color: var(--light-grey); /* light grey font */
+.tagify {
+  --tags-border-color: var(--light-grey);
+  background-color: var(--dark-grey);
+  color: var(--light-grey);
+  --placeholder-color-focus: var(--light-grey);
 }
 
-textarea {
-    border-color: var(--light-grey); /* light grey font */
-    background-color: var(--dark-grey); /* dark grey */
-    color: var(--light-grey); /* light grey font */
-}
-
-.sub-menu {
-    border-color: var(--light-grey); /* light grey font */
-    background-color: var(--dark-grey); /* dark grey */
-    color: var(--light-grey); /* light grey font */
+.tagify--focus {
+  --tags-border-color: var(--tagify__tag-bg);
 }
 
 #status {

@@ -933,8 +933,8 @@ div.code pre {
 #mecab_path, 
 #custom_styles,
 #language input,
-#importurl {
-    /* width: 100%; */
+#importurl,
+#comment {
     font-size: 0.9rem;
     font-family: inherit;
     padding: 0.2rem 0.2rem;
@@ -978,6 +978,11 @@ input[type="file"]:focus {
     font-family: inherit;
     font-size: 0.8rem;
     color: #D8D8D8;
+    opacity: 0.7;
+}
+
+:focus::placeholder {
+    opacity: 1;
 }
 
 .btn {
@@ -1298,7 +1303,8 @@ input[type="checkbox"][disabled] + label {
 #parser_type,
 #language_id,
 #txtSetParent,
-#predefined {
+#predefined,
+#max_page_tokens {
     width: 8rem;
     box-sizing: border-box;
     border: 1px solid var(--form-border-color);
