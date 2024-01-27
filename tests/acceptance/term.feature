@@ -32,6 +32,7 @@ Feature: Creating and managing terms
         Then the term table contains:
             ; gato; ; cat; Spanish; ; New (1)
         When click Export CSV
+        And sleep for 1
         Then exported CSV file contains:
             term,parent,translation,language,tags,status,link_status
             gato,,cat,Spanish,,1,
