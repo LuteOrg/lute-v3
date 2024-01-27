@@ -154,10 +154,15 @@ div#divbooktable {
 a.book-title:before {
     content: '';
     display: inline-block;
-    width: 16px;
-    height: 16px;
-    vertical-align: baseline;
-    margin-right: 8px;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+/* flex fixes wrapping issue */
+.book-title {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: flex-start;
 }
 
 /* show a check mark for completed books */
