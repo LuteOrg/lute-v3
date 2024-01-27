@@ -8,6 +8,9 @@
 .tagify {
     --tag-pad: 0.2rem 0.2rem;
     --tag-border-radius: 2px;
+    --tags-border-color: var(--form-border-color);
+    --tags-focus-border-color: var(--tagify__tag-bg);
+    --placeholder-color: #D8D8D8;
 
     display: flex;
     align-items: center;
@@ -17,11 +20,17 @@
     font-family: inherit;
 
     border-radius: var(--form-border-radius);
+    padding: 0.2rem;
 }
 
 .tagify__tag:focus div::before,
 .tagify__tag:hover:not([readonly]) div::before {
   --tag-bg-inset: -1px !important;
+  border-radius: 2px;
+}
+
+.tagify--focus {
+    --tags-border-color: var(--tagify__tag-bg);
 }
 
 /* .tagify__input::placeholder { */
@@ -33,8 +42,7 @@
 .tagify__input:empty:before {
     content: attr(data-placeholder);
     font-family: inherit;
-    color: #D8D8D8;
-    opacity: 1;
+    opacity: 0.7;
 }
 
 .tagify__dropdown__item {
@@ -63,10 +71,17 @@
 .tagify__tag > div {
     display: flex;
     align-items: center;
+    padding: 0;
+    padding-left: 0.2rem;
+}
+/* tag border */
+.tagify__tag > div::before {
+    border: 1px solid #c5c5c5;;
 }
 
 .tagify__input {
     margin: 0 !important;
-    padding: 0.2rem 0.2rem !important;
+    padding: 0 !important;
+    font-size: 0.8rem;
 }
 
