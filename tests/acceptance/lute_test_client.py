@@ -20,7 +20,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 
 
-class LuteTestClient:
+class LuteTestClient:  # pylint: disable=too-many-public-methods
     """
     The client!
     """
@@ -345,3 +345,10 @@ class LuteTestClient:
     def sleep(self, seconds):
         "Nap."
         time.sleep(seconds)
+
+    def get_temp_file_content(self, filename):
+        "Get book table content."
+        response = requests.get(
+            f"{self.home}/dev_api/temp_file_content/{filename}", timeout=1
+        )
+        return response.text

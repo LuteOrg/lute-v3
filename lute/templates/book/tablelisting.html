@@ -154,8 +154,9 @@
 
     let make_bar = function(stid, title) {
       const p = statuspct[stid];
+      const smallestP = window.matchMedia("(max-width: 980px)").matches ? 2 : 1;
       let display = "inline-flex"
-      if (p < 1)
+      if (p < smallestP)
         display = "none";
       return `<div
         class="status-bar${stid} status-bar"

@@ -25,6 +25,18 @@ Feature: Creating and managing terms
             ; bb; ; thing; Spanish; ; New (1)
 
 
+    Scenario: Can Export CSV file
+        Given a new Spanish term:
+            text: gato
+            translation: cat
+        Then the term table contains:
+            ; gato; ; cat; Spanish; ; New (1)
+        When click Export CSV
+        Then exported CSV file contains:
+            term,parent,translation,language,tags,status,link_status
+            gato,,cat,Spanish,,1,
+
+
     Scenario: Import a valid term file
         Given import term file:
             language,term,translation,parent,status,tags,pronunciation
