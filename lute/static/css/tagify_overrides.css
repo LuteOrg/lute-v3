@@ -20,7 +20,7 @@
     font-family: inherit;
 
     border-radius: var(--form-border-radius);
-    padding: 0.2rem;
+    padding: 0.1rem;
 }
 
 .tagify__tag:focus div::before,
@@ -65,7 +65,7 @@
 
 .tagify__tag {
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 0.1rem !important;
 }
 
 .tagify__tag > div {
@@ -81,7 +81,7 @@
 
 .tagify__input {
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 0.1rem !important;
     font-size: 0.8rem;
 }
 
