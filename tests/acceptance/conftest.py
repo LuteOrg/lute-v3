@@ -292,6 +292,16 @@ def check_term_table(luteclient, content):
     assert content == luteclient.get_term_table_content()
 
 
+@when("click Export CSV")
+def click_export_csv(luteclient):
+    luteclient.browser.find_by_css("button.dt-button").first.click()
+
+
+@then(parsers.parse("exported CSV file contains:\n{content}"))
+def check_exported_file(luteclient, content):
+    assert content == luteclient.get_temp_file_content("export_terms.csv").strip()
+
+
 # Reading
 
 

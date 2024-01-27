@@ -123,12 +123,13 @@
         { "name": "WoTranslation", "targets": 3, width: "40%", "searchable": true, "render": render_translation },
         { "name": "LgName", "targets": 4 },
         { "name": "TagList", "targets": 5 },
-        { "name": "StText", "targets": 6 },
+        { "name": "StID", "targets": 6, "render": render_status },
         { "name": "WoID", "targets": 7, "visible": false },
         { "name": "LgID", "targets": 8, "visible": false },
         { "name": "WiSource", "targets": 9, "visible": false },
         { "name": "StAbbreviation", "targets": 10, "visible": false },
         { "name": "SyncStatus", "targets": 11, "visible": false },
+        { "name": "StText", "targets": 12, "visible": false },
       ],
 
       // Ajax call
@@ -161,6 +162,11 @@
     return `<a href="/term/edit/${row[7]}">${row[1]}</a>`;
   };
 
+  // Use the status ID for sorting, so Well Known comes after Learned (5),
+  // but use the status text ("New (1)") for the cell display.
+  let render_status = function ( data, type, row, meta ) {
+    return row[12];
+  };
 
   let render_checkbox = function (data, type, row, meta) {
     return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row[7]}" langid="${row[8]}" onclick="handleChkClick()">`;
