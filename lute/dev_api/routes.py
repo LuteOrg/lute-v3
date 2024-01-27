@@ -14,6 +14,7 @@ These are dangerous methods that hack on the db data without
 safeguards, so they can only be run against a test_ db.
 """
 
+import os
 from sqlalchemy import text
 from flask import Blueprint, current_app, Response, jsonify, redirect, flash
 from lute.models.language import Language
@@ -170,3 +171,13 @@ def fake_story():
     </body>
     </html>"""
     )
+
+
+@bp.route("/temp_file_content/<filename>", methods=["GET"])
+def temp_file_content(filename):
+    "Get the content of the file."
+    fpath = os.path.join(current_app.env_config.temppath, filename)
+    s = ""
+    with open(fpath, "r", encoding="utf-8") as f:
+        s = f.read()
+    return s
