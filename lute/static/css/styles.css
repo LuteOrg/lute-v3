@@ -177,6 +177,36 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
     display: none;
 }
 
+/* refresh stats button */
+#statuses {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.refresh {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background-image: url("../icn/reload.png");
+    background-size: 80%;
+    border-radius: 2px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.refresh:hover {
+    background-color: #dadada;
+}
+
+.refresh:active {
+    background-color: #9f9f9f;
+}
+
+.refreshed {
+    background-image: url("../icn/waiting2.gif");
+}
+
 /* End book listing */
 
 div.dt-buttons>.dt-button {
