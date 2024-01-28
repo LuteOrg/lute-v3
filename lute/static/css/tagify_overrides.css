@@ -6,45 +6,53 @@
 }
 
 .tagify {
-  --tag-pad: 0.2em 0.2em;
+    --tag-pad: 0.2rem 0.2rem;
+    --tag-border-radius: 2px;
+    --tags-border-color: var(--form-border-color);
+    --tags-focus-border-color: var(--tagify__tag-bg);
+    --placeholder-color: #D8D8D8;
+
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+
+    font-size: 0.8rem;
+    font-family: inherit;
+
+    border-radius: var(--form-border-radius);
+    padding: 0.1rem;
 }
 
-.tagify__input {
-    margin: 0px;
+.tagify__tag:focus div::before,
+.tagify__tag:hover:not([readonly]) div::before {
+  --tag-bg-inset: -1px !important;
+  border-radius: 2px;
 }
 
- 
-tags.tagify {
-    font-size: 85%;
-    width: 100%;
+.tagify--focus {
+    --tags-border-color: var(--tagify__tag-bg);
 }
 
-.tagify__input::placeholder {
-    color: #D8D8D8;
-    opacity: 1; /* Firefox */
-}
+/* .tagify__input::placeholder { */
+    /* color: #D8D8D8; */
+    /* opacity: 1; /~ Firefox ~/ */
+/* } */
 
+/* placeholder is visible when field is out of focus */
 .tagify__input:empty:before {
     content: attr(data-placeholder);
-    color: #D8D8D8;
-    opacity: 1;
-}
- 
-.tagify__tag {
-    margin: 0px;
-    margin-inline: 0.2em;
-    margin-block: 0.2em;
-    font-size: 85%;
-    border: 1px solid #c5c5c5;
+    font-family: inherit;
+    opacity: 0.7;
 }
 
 .tagify__dropdown__item {
-    margin: 2px;
-    padding: 0px;
-    font-size: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.2rem;
+    margin: 0;
+    border-radius: 0;
 }
 
-/** Hard code colors to prevent theme issues. */
+/* /~* Hard code colors to prevent theme issues. ~/ */
 
 .tagify__dropdown__wrapper {
     background: transparent !important;
@@ -54,3 +62,26 @@ tags.tagify {
     background: white !important;
     color: black !important;
 }
+
+.tagify__tag {
+    margin: 0 !important;
+    padding: 0.1rem !important;
+}
+
+.tagify__tag > div {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    padding-left: 0.2rem;
+}
+/* tag border */
+.tagify__tag > div::before {
+    border: 1px solid #c5c5c5;;
+}
+
+.tagify__input {
+    margin: 0 !important;
+    padding: 0.1rem !important;
+    font-size: 0.8rem;
+}
+

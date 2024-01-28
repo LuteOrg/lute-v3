@@ -12,11 +12,23 @@ body {
   color: var(--font-color); /* dark grey font */
 }
 
- div#thetext p { line-height: 1.5; }
- span.textitem { font-family: Georgia;}
- /* span.status0 { background-color: transparent; } */
- span.status1 { background-color: var(--status-1-color); } /* pink highlight */
- span.status2 { background-color: var(--status-2-color); } /* yellow highlight */
- span.status3 { background-color: var(--status-3-color); } /* green highlight */
- span.status4 { background-color: var(--status-4-color); } /* blue highlight */
- span.status5 { background-color: var(--status-5-color); } /* purple highlight */
+input[type="text"],
+textarea,
+.ui-widget-content,
+.sub-menu,
+.tagify {
+    background-color: #fff;
+}
+
+.tagify--focus {
+  --tags-border-color: var(--tagify__tag-bg);
+}
+
+div#thetext p { line-height: 1.5; }
+span.textitem { font-family: Georgia;}
+/* span.status0 { background-color: transparent; } */
+span.status1 { background-color: var(--status-1-color); } /* pink highlight */
+span.status2 { background-color: var(--status-2-color); } /* yellow highlight */
+span.status3 { background-color: var(--status-3-color); } /* green highlight */
+span.status4 { background-color: var(--status-4-color); } /* blue highlight */
+span.status5 { background-color: var(--status-5-color); } /* purple highlight */
