@@ -150,8 +150,9 @@ def _add_base_routes(app, app_config):
 
     @app.route("/refresh_all_stats")
     def refresh_all_stats():
-        books = db.session.query(Book)
-        for book in books:
+        books_to_update = db.session.query(Book).filter(Book.archived == 0).all()
+
+        for book in books_to_update:
             mark_stale(book)
 
         refresh_stats()
