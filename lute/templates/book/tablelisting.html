@@ -5,7 +5,9 @@
       <th>Language</th>
       <th>Tags</th>
       <th>Word count</th>
-      <th>Statuses</th>
+      <th id="statuses">Statuses
+        <a href="/refresh_all_stats" class="refresh" title="Refresh stats for all books"></a>
+      </th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -196,6 +198,8 @@
     return ret.join('&nbsp;');
   };
 
+  // added class is used for changing static image to rotating arrow animation
+  document.querySelector(".refresh").addEventListener("click", (e) => e.target.classList.add("refreshed"));
 
   /**
    * Clearing the state is required for acceptance tests,
