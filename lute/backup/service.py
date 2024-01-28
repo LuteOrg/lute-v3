@@ -106,6 +106,11 @@ def _create_db_backup(dbfilename, backupfile):
     return f
 
 
+def skip_this_backup():
+    "Set the last backup time to today."
+    SystemSetting.set_last_backup_datetime(int(time.time()))
+
+
 def _remove_excess_backups(count, outdir):
     "Remove old backups."
     files = [f for f in os.listdir(outdir) if f.startswith("lute_backup_")]
