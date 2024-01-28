@@ -199,7 +199,10 @@
   };
 
   // added class is used for changing static image to rotating arrow animation
-  document.querySelector(".refresh").addEventListener("click", (e) => e.target.classList.add("refreshed"));
+  document.querySelector(".refresh").addEventListener("click", function(e) {
+    e.target.classList.add("refreshed");
+    e.stopPropagation();
+  });
 
   /**
    * Clearing the state is required for acceptance tests,
