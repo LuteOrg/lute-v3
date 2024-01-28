@@ -14,6 +14,13 @@
 <p id="backupResult" />
 
 <p id="returnHome" style="visibility:hidden;"><a href="/">Back to home.</a></p>
+<div id="failedBackup" style="visibility:hidden;">
+  <p>Backup failed:
+    <a href="/backup/backup">try again</a>,
+    fix your <a href="/settings/index">backup settings</a>,
+    or <a href="/backup/skip_this_backup">skip this backup</a>.
+  </p>
+</div>
 
 <script>
   $(document).ready(function() {
@@ -26,7 +33,7 @@
         const p = JSON.parse(xhr.responseText);
         const msg = "BACKUP ERROR: " + p.errmsg;
         $('#backupResult').html(msg.replace(/__BREAK__/g, '<br />'));
-        $('#returnHome').css({ visibility: 'visible' })
+        $('#failedBackup').css({ visibility: 'visible' })
       });
   });
 </script>

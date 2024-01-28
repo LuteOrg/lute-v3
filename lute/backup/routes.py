@@ -5,9 +5,9 @@ Backup settings form management, and running backups.
 """
 
 import traceback
-from flask import Blueprint, current_app, render_template, request, jsonify
+from flask import Blueprint, current_app, render_template, request, jsonify, redirect
 from lute.models.setting import BackupSettings
-from lute.backup.service import create_backup
+from lute.backup.service import create_backup, skip_this_backup
 
 
 bp = Blueprint("backup", __name__, url_prefix="/backup")
@@ -49,3 +49,10 @@ def do_backup():
     except Exception as e:  # pylint: disable=broad-exception-caught
         tb = traceback.format_exc()
         return jsonify({"errmsg": str(e) + " -- " + tb}), 500
+
+
+@bp.route("/skip_this_backup", methods=["GET"])
+def handle_skip_this_backup():
+    "Update last backup date so backup not attempted again."
+    skip_this_backup()
+    return redirect("/", 302)
