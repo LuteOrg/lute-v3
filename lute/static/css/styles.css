@@ -177,13 +177,6 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
     display: none;
 }
 
-/* refresh stats button */
-#statuses {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
 .refresh {
     display: inline-block;
     width: 22px;
@@ -193,6 +186,9 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
     border-radius: 2px;
     background-repeat: no-repeat;
     background-position: center;
+
+    vertical-align: middle;
+    margin-left: 0.5rem;
 }
 
 .refresh:hover {
