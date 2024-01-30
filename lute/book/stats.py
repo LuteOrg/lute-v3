@@ -8,6 +8,14 @@ from lute.db import db
 from lute.models.book import Book
 
 
+def _last_5_pages(book, txindex):
+    "Get next 5 pages, or at least 5 pages."
+    start_index = max(0, txindex - 5)
+    end_index = txindex + 5
+    texts = book.texts[start_index:end_index]
+    return texts[-5:]
+
+
 def get_status_distribution(book):
     """
     Return statuses and count of unique words per status.
@@ -23,12 +31,9 @@ def get_status_distribution(book):
                 break
             txindex += 1
 
-    text_sample = [
-        t.text
-        for t in
-        # Next 5 pages, a good enough sample.
-        book.texts[txindex : txindex + 5]
-    ]
+    # get next 5 pages, a good enough sample ...
+    # min 5 pages.
+    text_sample = [t.text for t in _last_5_pages(book, txindex)]
     text_sample = "\n".join(text_sample)
 
     paras = get_paragraphs(text_sample, book.language)
