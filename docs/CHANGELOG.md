@@ -1,4 +1,28 @@
 
+# 3.1.1 (2024-01-30)
+
+Feature changes:
+
+* Add book stats graph and refresh.  By @webofpies in [154](https://github.com/jzohrab/lute-v3/pull/154) and [162](https://github.com/jzohrab/lute-v3/pull/162).
+* [138](https://github.com/jzohrab/lute-v3/issues/138): Separate Word Count and % Known into separate columns and support sorting.
+* Allow term listing search in translations.
+* [155](https://github.com/jzohrab/lute-v3/issues/155): Add "words per page" field during book creation.  By XXX
+
+Bug fixes:
+
+* [112](https://github.com/jzohrab/lute-v3/issues/112): show different options if backup failed (retry, skip, adjust settings)
+* Sort statuses properly in the term listing.
+* [95](https://github.com/jzohrab/lute-v3/issues/95): editing pages updates book word count
+* Shorten migration file names to prevent Windows file path length exceptions
+
+Misc back-end:
+
+* Add term Export CSV test.
+* Calc book stats on at least 5 pages.
+* Clean up some form styles.
+* Speed up book stats calculation.
+
+
 # 3.1.0 (2024-01-22)
 
 Feature changes:
