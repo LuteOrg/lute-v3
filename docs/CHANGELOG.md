@@ -6,7 +6,7 @@ Feature changes:
 * Add book stats graph and refresh.  By @webofpies in [154](https://github.com/jzohrab/lute-v3/pull/154) and [162](https://github.com/jzohrab/lute-v3/pull/162).
 * [138](https://github.com/jzohrab/lute-v3/issues/138): Separate Word Count and % Known into separate columns and support sorting.
 * Allow term listing search in translations.
-* [155](https://github.com/jzohrab/lute-v3/issues/155): Add "words per page" field during book creation.  By XXX
+* [155](https://github.com/jzohrab/lute-v3/issues/155): Add "words per page" field during book creation.  By @fanyingfx.
 
 Bug fixes:
 
