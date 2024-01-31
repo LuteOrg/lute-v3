@@ -20,11 +20,14 @@ def _set_texts_word_count():
     """
     calc_counts = db.session.query(Text).filter(Text.word_count.is_(None)).all()
 
-    if len(calc_counts) == 0:
+    # Don't recalc with invalid parsers!!!!
+    recalc = [t for t in calc_counts if t.book.language.is_supported]
+
+    if len(recalc) == 0:
         # Nothing to calculate, quit.
         return
 
-    for t in calc_counts:
+    for t in recalc:
         pt = t.book.language.get_parsed_tokens(t.text)
         words = [w for w in pt if w.is_word]
         t.word_count = len(words)
