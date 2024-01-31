@@ -293,6 +293,7 @@ def _create_app(app_config, extra_config):
     with app.app_context():
         db.create_all()
         UserSetting.load()
+        # TODO valid parsers: do parser check, mark valid as active, invalid as inactive.
         clean_data()
     app.db = db
 
