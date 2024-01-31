@@ -1,4 +1,9 @@
 
+# 3.1.2 (2024-02-01)
+
+* Bugfix: only recalc texts.TxWordCount for valid parsers.
+
+
 # 3.1.1 (2024-01-30)
 
 Feature changes:
