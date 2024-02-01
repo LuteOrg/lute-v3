@@ -175,6 +175,7 @@
 
   let render_translation = function ( data, type, row, meta ) {
     let tx = row[3] ?? '';
+    tx = tx.replaceAll("\r\n", "<br />");
     let imgsrc = row[9] ?? '';
     if (imgsrc != '')
       imgsrc = `<img style="margin-top: 5px;" src="${imgsrc}" />`;
