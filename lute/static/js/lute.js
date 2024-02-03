@@ -605,6 +605,7 @@ function post_bulk_update(updates) {
   if (elements.length == 0)
     return;
   const firstel = $(elements[0]);
+  const first_status = updates[0].new_status;
   const langid = firstel.data('lang-id');
 
   data = JSON.stringify({
@@ -620,7 +621,7 @@ function post_bulk_update(updates) {
     success: function(response) {
       reload_text_div();
       if (elements.length == 1) {
-        update_term_form(firstel, new_status);
+        update_term_form(firstel, first_status);
       }
     },
     error: function(response, status, err) {
