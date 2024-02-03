@@ -21,10 +21,6 @@
 
       <div id="def-container">
         {{ form.text(class="form-control", value=(form.original_text.data or '')) }}
-        <div class="term-element-box">
-          <img src="{{ url_for('static', filename='icn/external.png') }}" title="Lookup" onclick="do_term_lookup()" />
-          <img src="{{ url_for('static', filename='icn/eye.png') }}" title="Images" onclick="do_image_lookup()" />
-        </div>
       </div>
 
       <div>{{ form.parentslist(class="form-control") }}</div>
@@ -300,105 +296,104 @@
   // Term lookups cycle through the available dictionaries in the language.
   var termdictindex = 0;
 
-  function createIFrame(name) {
+  function createIFrame(name, parent) {
     const iFrame = document.createElement("iframe");
     iFrame.name = name;
     iFrame.src = "about:blank";
     iFrame.classList.add("dictframe");
+    iFrame.dataset.dictOpened = 0;
+
+    parent.appendChild(iFrame);
 
     return iFrame;
+  }
+
+  function createTabBtn(label, parent, data) {
+    const btn = document.createElement("button");
+    if (label) btn.textContent = label;
+    if (data) btn.dataset.dictId = data;
+    btn.classList.add("dict-btn");
+    
+    parent.appendChild(btn);
+
+    return btn;
   }
 
   function createDictTabs() {
     const dictButtons = new Map();
     //const firstDict = parent.document.getElementById("dictframeid");
-    const iFrames = [];
+    //const iFrames = [];
     const langid = $('#language_id').val();
     const termdicts = LANGUAGES[langid].term;
+    termdicts.push("https://de.thefreedictionary.com/###")
     //const dictTabsContainer = parent.document.getElementById("dict-tabs");
     
     //const dictTabsContainer = document.createElement("div");
     //const iFramesContainer = document.createElement("div");
     const dictTabsContainer = parent.document.getElementById("dicttabs");
     const iFramesContainer = parent.document.getElementById("dictframes");
-    //console.log(dictTabsContainer, iFramesContainer)
-    //dictTabsContainer.setAttribute("id", "dicttabs");
-    //iFramesContainer.setAttribute("id", "dictframes");
-    //dictContainer.prepend(dictTabsContainer);
-    //dictContainer.appendChild(iFramesContainer);
 
-    
-    //termdicts.slice(1).forEach((dict, index) => {
-    //  const iFrame = createIFrame(`dict${index}`);
-    //  dictContainer.appendChild(iFrame);
-    //  iFrames.push(iFrame);
-    //})
-
-    //iFrames.forEach(iframe => iframe.dataset.dictOpened = 0)
-    //firstDict.dataset.dictOpened = 1;
-    //for (let index = 0; index < (termdicts.length + 1); index++) {
     termdicts.forEach((dict, index) => {
-      const btn = document.createElement("button");
-      //dictButtons.push(btn);
-      btn.textContent = `Dictionary ${String(index).padStart(2, "0")}`;
-      btn.classList.add("dict-btn");
-      btn.dataset.dictId = index;
-      dictTabsContainer.appendChild(btn);
-
-      const iFrame = createIFrame(`dict${index}`);
-      iFrame.dataset.dictOpened = 0
-      iFramesContainer.appendChild(iFrame);
-      iFrames.push(iFrame);
+      let btnLabel = `Dictionary ${String(index).padStart(2, "0")}`
+      if (dict.charAt(0) == '*') btnLabel = btnLabel.concat("*");
+      const btn = createTabBtn(btnLabel, dictTabsContainer, index);
+      const iFrame = createIFrame(`dict${index}`, iFramesContainer);
+      //iFrame.dataset.dictOpened = 0
+      //iFrames.push(iFrame);
 
       dictButtons.set(btn, iFrame);
     })
-
-    //const imageBtn = Array.from(dictButtons).pop()[0];
-    //const imageFrame = dictButtons.get(imageBtn);
-    //console.log(imageBtn)
-    //console.log(dictButtons)
-    //console.log(dictButtons.values())
-    //console.log(dictButtons[imageBtn])
     
-    const imageBtn = document.createElement("button");
-    const imageFrame = createIFrame("imageframe");
-    imageFrame.name = "imageframe";
-    //imageBtn.setAttribute("src", "{{ url_for('static', filename='icn/eye.png') }}");
-    imageBtn.setAttribute("id", "imageframe")
+    // create image button
+    const imageBtn = createTabBtn("", dictTabsContainer, "")
+    imageBtn.setAttribute("id", "dict-image-btn")
     imageBtn.setAttribute("title", "Look up images for the term");
-    //imageBtn.addEventListener("click", () => {
-    //  do_image_lookup("imageframe")
-    //});
-    //dictTabsContainer.appendChild(imageBtn);
-    //dictContainer.appendChild(imageFrame);
+    const imageFrame = createIFrame("imageframe", iFramesContainer);
+
+    dictButtons.set(imageBtn, imageFrame);
     
-    iFrames[0].classList.add("dict-active");
-    iFrames[0].dataset.dictOpened = 1;
+    // set first frame as active (for final: need to save active tab and retrieve it)
+    const [firstBtn, firstFrame] = dictButtons.entries().next().value;
+    firstBtn.classList.add("dict-btn-active");
+    firstFrame.classList.add("dict-active");
+    firstFrame.dataset.dictOpened = 1;
+    //iFrames[0].classList.add("dict-active");
+    //iFrames[0].dataset.dictOpened = 1;
 
     dictTabsContainer.addEventListener("click", (e) => {
       const btnClicked = e.target.closest(".dict-btn");
 
       if (!btnClicked) return;
-      
+
+      //let imageBtnClicked = e.target.closest("#dict-image-btn");
+      let is_external = false;
+
       const clickedBtn = e.target; 
-      const dict = termdicts[clickedBtn.dataset.dictId]
       const iFrame = dictButtons.get(clickedBtn);
+      const iFrameName = iFrame.getAttribute("name");
+      const imageBtnClicked = (iFrameName == "imageframe") ? true : false;
 
       if (iFrame.dataset.dictOpened == 0) {
-        if (clickedBtn.id === "imageframe") {
-          do_image_lookup(imageFrame.name);
+        if (imageBtnClicked) {
+          do_image_lookup(iFrameName);
         } else {
-          loadIFrameDictionary(dict, $('#text').val(), iFrame.getAttribute("name"))
-        }
-      };
+          const dict = termdicts[clickedBtn.dataset.dictId]
+          is_external = (dict.charAt(0) == '*');
+          show_lookup_page(dict, $('#text').val(), iFrameName, langid, is_external);
+          //loadIFrameDictionary(dict, $('#text').val(), iFrame.getAttribute("name"))
+      }};
 
-      iFrames.forEach(frame => {
-        frame.classList.remove("dict-active");
-      })
+      if (!is_external) {
+        dictButtons.forEach((iframe, btn) => {
+          btn.classList.remove("dict-btn-active");
+          iframe.classList.remove("dict-active");
+        });
 
-      console.log("IFRAME", iFrame)
-      iFrame.classList.add("dict-active");
-      iFrame.dataset.dictOpened = 1;
+        clickedBtn.classList.add("dict-btn-active");
+        iFrame.classList.add("dict-active");
+        
+        iFrame.dataset.dictOpened = 1;
+      }
     })
   }
 
@@ -408,7 +403,7 @@
     window.open(
       url,
       'otherwin',
-      //'width=800, height=400, scrollbars=yes, menubar=no, resizable=yes, status=no'
+      'width=800, height=400, scrollbars=yes, menubar=no, resizable=yes, status=no'
     );
   };
 
@@ -457,7 +452,7 @@
   /**
    * Either open a new window, or show the result in the correct frame.
    */
-  let show_lookup_page = function(dicturl, text, langid, allow_open_new_web_page = true) {
+  let show_lookup_page = function(dicturl, text, iframe, langid, is_external, allow_open_new_web_page = true) {
 
     const is_bing = (dicturl.indexOf('www.bing.com') != -1);
     if (is_bing) {
@@ -473,7 +468,6 @@
     // (e.g. "*http://" means "open an external window", while
     // "http://" means "this can be opened in an iframe."
     // Instead, each dict should have an "is_external" property.
-    const is_external = (dicturl.charAt(0) == '*');
     if (is_external) {
       if (!allow_open_new_web_page) {
         console.log('Declining to open external web page.');
@@ -481,14 +475,14 @@
       }
       dicturl = dicturl.slice(1);
       const url = get_lookup_url(dicturl, text);
-      open_new_lookup_window(url);
-      return;
+      
+      return open_new_lookup_window(url);
     }
 
     // Fallback: open in frame.
     //const url = get_lookup_url(dicturl, text);
     //top.frames.dictframe.location.href = url;
-    loadIFrameDictionary(dicturl, text, "dict0");
+    loadIFrameDictionary(dicturl, text, iframe);
   };
 
   function loadIFrameDictionary(dicturl, text, iframe) {
@@ -511,7 +505,9 @@
 
     const termdicts = LANGUAGES[langid].term;
     const usedict = termdicts[termdictindex];
-    show_lookup_page(usedict, $('#text').val(), langid);
+    const is_external = (usedict.charAt(0) == '*');
+    
+    show_lookup_page(usedict, $('#text').val(), langid, is_external);
 
     termdictindex++;
     if (termdictindex >= termdicts.length)
