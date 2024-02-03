@@ -601,6 +601,10 @@ function make_status_update_hash(new_status, elements) {
 
 
 function post_bulk_update(updates) {
+  if (updates.length == 0) {
+    // console.log("No updates.");
+    return;
+  }
   let elements = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
   if (elements.length == 0)
     return;
