@@ -586,20 +586,34 @@ function update_term_form(el, new_status) {
 
 function update_status_for_marked_elements(new_status) {
   let elements = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
-  update_status_for_elements(new_status, elements);
+  let updates = [ make_status_update_hash(new_status, elements) ]
+  post_bulk_update(updates);
 }
 
-function update_status_for_elements(new_status, elements) {
+
+function make_status_update_hash(new_status, elements) {
+  const texts = elements.map(el => $(el).text());
+  return {
+    new_status: new_status,
+    terms: texts
+  }
+}
+
+
+function post_bulk_update(updates) {
+  if (updates.length == 0) {
+    // console.log("No updates.");
+    return;
+  }
+  let elements = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
   if (elements.length == 0)
     return;
   const firstel = $(elements[0]);
+  const first_status = updates[0].new_status;
   const langid = firstel.data('lang-id');
-  const texts = elements.map(el => $(el).text());
 
   data = JSON.stringify({
-    langid: langid,
-    terms: texts,
-    new_status: new_status
+    langid: langid, updates: updates
   });
 
   $.ajax({
@@ -610,8 +624,8 @@ function update_status_for_elements(new_status, elements) {
     contentType: 'application/json',
     success: function(response) {
       reload_text_div();
-      if (texts.length == 1) {
-        update_term_form(firstel, new_status);
+      if (elements.length == 1) {
+        update_term_form(firstel, first_status);
       }
     },
     error: function(response, status, err) {
@@ -660,6 +674,9 @@ function increment_status_for_selected_elements(e, shiftBy) {
     payloads[statusClass].push(element);
   })
 
+  // Convert payloads to update hashes.
+  let updates = []
+
   Object.keys(payloads).forEach((key) => {
     let originalIndex = validStatuses.indexOf(key);
 
@@ -674,8 +691,10 @@ function increment_status_for_selected_elements(e, shiftBy) {
       // (at the moment).
       // TODO delete term from reading screen: setting to 0 could equal deleting term.
       if (newStatusCode != 0) {
-        update_status_for_elements(newStatusCode, payloads[key]);
+        updates.push(make_status_update_hash(newStatusCode, payloads[key]));
       }
     }
-  })
+  });
+
+  post_bulk_update(updates);
 }
