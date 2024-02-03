@@ -386,24 +386,6 @@ let copy_text_to_clipboard = function(textitemspans, show_flash = true) {
 }
 
 
-let set_cursor = function(newindex) {
-  LUTE_HOVERING = false;
-  $('span.wordhover').removeClass('wordhover');
-  clear_newmultiterm_elements();
-
-  if (newindex < 0 || newindex >= words.size())
-    return;
-  let curr = words.eq(newindex);
-  save_curr_data_order(curr);
-  remove_status_highlights();
-  $('span.kwordmarked').removeClass('kwordmarked');
-  curr.addClass('kwordmarked');
-  apply_status_class(curr);
-  $(window).scrollTo(curr, { axis: 'y', offset: -150 });
-  showEditFrame(curr, { autofocus: false });
-}
-
-
 let find_non_Ign_or_Wkn = function(currindex, shiftby) {
   let newindex = currindex + shiftby;
   while (newindex >= 0 && newindex <= maxindex) {
@@ -439,7 +421,6 @@ let move_cursor = function(shiftby, shift_key_pressed = false) {
   if (shift_key_pressed) {
     // TODO restore this: removing for now.
     console.log("DISABLED");
-    // set_cursor(find_non_Ign_or_Wkn(currindex, shiftby));
   }
 
   // If no terms are clicked, and there is a hovered term,
@@ -561,8 +542,6 @@ function handle_keydown (e) {
 
   const kESC = 27;
   const kRETURN = 13;
-  const kHOME = 36;
-  const kEND = 35;
   const kLEFT = 37;
   const kRIGHT = 39;
   const kUP = 38;
@@ -581,10 +560,8 @@ function handle_keydown (e) {
 
   map[kESC] = () => start_hover_mode();
   map[kRETURN] = () => start_hover_mode();
-  map[kHOME] = () => set_cursor(0);
-  map[kEND] = () => set_cursor(maxindex);
-  map[kLEFT] = () => move_cursor(-1, e);
-  map[kRIGHT] = () => move_cursor(+1, e);
+  map[kLEFT] = () => move_cursor(-1, e.shiftKey);
+  map[kRIGHT] = () => move_cursor(+1, e.shiftKey);
   map[kUP] = () => increment_status_for_selected_elements(e, +1);
   map[kDOWN] = () => increment_status_for_selected_elements(e, -1);
   map[kC] = () => handle_copy(e);
