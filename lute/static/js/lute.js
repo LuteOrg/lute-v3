@@ -311,14 +311,11 @@ let word_clicked = function(el, e) {
 
 // Load all words into scope.
 var words = null;
-var maxindex = null;
 
 function load_reading_pane_globals() {
   words = $('span.word').sort(function(a, b) {
     return $(a).data('order') - $(b).data('order');
   });
-  // console.log('have ' + words.size() + ' words');
-  maxindex = words.size() - 1;
 }
 
 $(document).ready(load_reading_pane_globals);
