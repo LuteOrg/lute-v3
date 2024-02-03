@@ -797,7 +797,7 @@ div.code pre {
 }
 
 /* border */
-.dictframecontainer::after {
+.dictcontainer::after {
     content: '';
     background-color: #dbefff;
     /* background-image: linear-gradient(to right, #dbefff 50%, #dbefff 50%); */
@@ -809,12 +809,9 @@ div.code pre {
     cursor: row-resize;
 }
 
-.dictframecontainer {
+.dictcontainer {
     position: relative;
-    /* overflow: hidden; contents overflow (over audio player) if height is too small */
-    /* there's no much point in hiding it. because after first term save it doesn't get hidden again anyway */
-    /* disabling it for now. */
-    /*opacity: 0; to hide the after element. easier this way */
+    display: none;
 }
 
 
@@ -1166,6 +1163,43 @@ input[type="checkbox"][disabled] + label {
     transform: scale(4) translate(-17px, 5px);
 }
 
+#dicttabs {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 1rem 0.7rem 0.8rem 0.7rem;
+    background-color: #dbefff;
+}
+
+#dictframes {
+    width: 100%;
+    height: 100%;
+}
+
+.dict-btn {
+    padding: 0.2rem;
+}
+
+.dictframe {
+    display: none;
+}
+
+.dict-active {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+}
+
+#image-lookup {
+    background: url("../icn/eye.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 0.6rem;
+    border: 1px solid grey;
+    border-radius: 2px;
+}
+
 
 /* STATUS RADIO */
 
@@ -1482,7 +1516,7 @@ input[type="checkbox"][disabled] + label {
         background-size: 91%;
     }
 
-    .dictframecontainer::after {
+    .dictcontainer::after {
         background-color: #79b7e7;
         height: 6px;
     }

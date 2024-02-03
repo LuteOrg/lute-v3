@@ -272,6 +272,7 @@
   };
 
   $(document).ready(function () {
+    const dictContainer = parent.document.querySelector(".dictcontainer");
     var parentslist = document.getElementById('parentslist');
     parents_tagify = setup_parent_tagify(parentslist);
     var termtagslist = document.getElementById('termtagslist');
@@ -286,6 +287,7 @@
     // this.dispatchEvent(new Event("termFormOpened"));
     // because this form is opened in a frame.
     window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
+    dictContainer.style.display = "block";
 
     enable_disable_sync_status_checkbox();
   });
@@ -293,9 +295,114 @@
   /** LOOKUPS */
 
   var LANGUAGES = {{ language_dicts | safe }};
+  console.log(LANGUAGES)
 
   // Term lookups cycle through the available dictionaries in the language.
   var termdictindex = 0;
+
+  function createIFrame(name) {
+    const iFrame = document.createElement("iframe");
+    iFrame.name = name;
+    iFrame.src = "about:blank";
+    iFrame.classList.add("dictframe");
+
+    return iFrame;
+  }
+
+  function createDictTabs() {
+    const dictButtons = new Map();
+    //const firstDict = parent.document.getElementById("dictframeid");
+    const iFrames = [];
+    const langid = $('#language_id').val();
+    const termdicts = LANGUAGES[langid].term;
+    //const dictTabsContainer = parent.document.getElementById("dict-tabs");
+    
+    //const dictTabsContainer = document.createElement("div");
+    //const iFramesContainer = document.createElement("div");
+    const dictTabsContainer = parent.document.getElementById("dicttabs");
+    const iFramesContainer = parent.document.getElementById("dictframes");
+    //console.log(dictTabsContainer, iFramesContainer)
+    //dictTabsContainer.setAttribute("id", "dicttabs");
+    //iFramesContainer.setAttribute("id", "dictframes");
+    //dictContainer.prepend(dictTabsContainer);
+    //dictContainer.appendChild(iFramesContainer);
+
+    
+    //termdicts.slice(1).forEach((dict, index) => {
+    //  const iFrame = createIFrame(`dict${index}`);
+    //  dictContainer.appendChild(iFrame);
+    //  iFrames.push(iFrame);
+    //})
+
+    //iFrames.forEach(iframe => iframe.dataset.dictOpened = 0)
+    //firstDict.dataset.dictOpened = 1;
+    //for (let index = 0; index < (termdicts.length + 1); index++) {
+    termdicts.forEach((dict, index) => {
+      const btn = document.createElement("button");
+      //dictButtons.push(btn);
+      btn.textContent = `Dictionary ${String(index).padStart(2, "0")}`;
+      btn.classList.add("dict-btn");
+      btn.dataset.dictId = index;
+      dictTabsContainer.appendChild(btn);
+
+      const iFrame = createIFrame(`dict${index}`);
+      iFrame.dataset.dictOpened = 0
+      iFramesContainer.appendChild(iFrame);
+      iFrames.push(iFrame);
+
+      dictButtons.set(btn, iFrame);
+    })
+
+    //const imageBtn = Array.from(dictButtons).pop()[0];
+    //const imageFrame = dictButtons.get(imageBtn);
+    //console.log(imageBtn)
+    //console.log(dictButtons)
+    //console.log(dictButtons.values())
+    //console.log(dictButtons[imageBtn])
+    
+    const imageBtn = document.createElement("button");
+    const imageFrame = createIFrame("imageframe");
+    imageFrame.name = "imageframe";
+    //imageBtn.setAttribute("src", "{{ url_for('static', filename='icn/eye.png') }}");
+    imageBtn.setAttribute("id", "imageframe")
+    imageBtn.setAttribute("title", "Look up images for the term");
+    //imageBtn.addEventListener("click", () => {
+    //  do_image_lookup("imageframe")
+    //});
+    //dictTabsContainer.appendChild(imageBtn);
+    //dictContainer.appendChild(imageFrame);
+    
+    iFrames[0].classList.add("dict-active");
+    iFrames[0].dataset.dictOpened = 1;
+
+    dictTabsContainer.addEventListener("click", (e) => {
+      const btnClicked = e.target.closest(".dict-btn");
+
+      if (!btnClicked) return;
+      
+      const clickedBtn = e.target; 
+      const dict = termdicts[clickedBtn.dataset.dictId]
+      const iFrame = dictButtons.get(clickedBtn);
+
+      if (iFrame.dataset.dictOpened == 0) {
+        if (clickedBtn.id === "imageframe") {
+          do_image_lookup(imageFrame.name);
+        } else {
+          loadIFrameDictionary(dict, $('#text').val(), iFrame.getAttribute("name"))
+        }
+      };
+
+      iFrames.forEach(frame => {
+        frame.classList.remove("dict-active");
+      })
+
+      console.log("IFRAME", iFrame)
+      iFrame.classList.add("dict-active");
+      iFrame.dataset.dictOpened = 1;
+    })
+  }
+
+  createDictTabs();
 
   let open_new_lookup_window = function(url) {
     window.open(
@@ -323,7 +430,7 @@
   };
 
 
-  let do_image_lookup = function() {
+  function do_image_lookup(imageframe) {
     const langid = $('#language_id').val();
     const text = $('#text').val();
 
@@ -342,7 +449,7 @@
     const raw_bing_url = 'https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle';
     const binghash = raw_bing_url.replace('https://www.bing.com/images/search?', '');
     const url = `/bing/search/${langid}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
-    top.frames.dictframe.location.href = url;
+    top.frames[imageframe].location.href = url;
     return;
   }
 
@@ -379,9 +486,20 @@
     }
 
     // Fallback: open in frame.
-    const url = get_lookup_url(dicturl, text);
-    top.frames.dictframe.location.href = url;
+    //const url = get_lookup_url(dicturl, text);
+    //top.frames.dictframe.location.href = url;
+    loadIFrameDictionary(dicturl, text, "dict0");
   };
+
+  function loadIFrameDictionary(dicturl, text, iframe) {
+    const url = get_lookup_url(dicturl, text);
+    console.log("iframe", iframe);
+    //console.log(iframe.location);
+    //console.log(iframe.location.href);
+    //console.log(top.frames);
+    //console.log(top.frames[iframe])
+    top.frames[iframe].location.href = url;
+  }
 
 
   function do_term_lookup(allow_open_new_web_page = true) {
@@ -393,7 +511,7 @@
 
     const termdicts = LANGUAGES[langid].term;
     const usedict = termdicts[termdictindex];
-    show_lookup_page(usedict, $('#text').val(), langid, allow_open_new_web_page);
+    show_lookup_page(usedict, $('#text').val(), langid);
 
     termdictindex++;
     if (termdictindex >= termdicts.length)
