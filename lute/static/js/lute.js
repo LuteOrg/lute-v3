@@ -330,10 +330,15 @@ let current_word_index = function() {
 };
 
 let get_current_word = function() {
-  const selindex = current_word_index();
-  if (selindex == -1)
+  let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
+  if (elements.length == 0)
     return null;
-  return words.eq(selindex);
+  elements.sort(function(a, b) {
+    let orderA = parseInt($(a).data('order'));
+    let orderB = parseInt($(b).data('order'));
+    return orderA - orderB;
+  });
+  return elements[0];
 }
 
 /** Get the rest of the textitems in the current active/hovered word's
@@ -344,7 +349,7 @@ let get_textitems_spans = function(e) {
     return null;
 
   const attr_name = !e.shiftKey ? 'sentence-id' : 'paragraph-id';
-  const attr_value = w.data(attr_name);
+  const attr_value = $(w).data(attr_name);
 
   return $(`span.textitem[data-${attr_name}="${attr_value}"]`).toArray();
 };
