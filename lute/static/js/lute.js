@@ -587,7 +587,7 @@ function update_term_form(el, new_status) {
 function update_status_for_marked_elements(new_status) {
   let elements = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
   let updates = [ make_status_update_hash(new_status, elements) ]
-  update_status_for_elements(updates);
+  post_bulk_update(updates);
 }
 
 
@@ -600,7 +600,7 @@ function make_status_update_hash(new_status, elements) {
 }
 
 
-function update_status_for_elements(updates) {
+function post_bulk_update(updates) {
   let elements = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
   if (elements.length == 0)
     return;
@@ -669,7 +669,7 @@ function increment_status_for_selected_elements(e, shiftBy) {
     payloads[statusClass].push(element);
   })
 
-  // Convert payloads to update hash.
+  // Convert payloads to update hashes.
   let updates = []
 
   Object.keys(payloads).forEach((key) => {
@@ -691,5 +691,5 @@ function increment_status_for_selected_elements(e, shiftBy) {
     }
   });
 
-  update_status_for_elements(updates);
+  post_bulk_update(updates);
 }
