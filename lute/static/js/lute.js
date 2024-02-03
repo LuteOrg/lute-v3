@@ -385,20 +385,6 @@ let copy_text_to_clipboard = function(textitemspans, show_flash = true) {
 }
 
 
-let find_non_Ign_or_Wkn = function(currindex, shiftby) {
-  let newindex = currindex + shiftby;
-  while (newindex >= 0 && newindex <= maxindex) {
-    const nextword = words.eq(newindex);
-    const st = nextword.data('status-class');
-    if (st != 'status99' && st != 'status98') {
-      break;
-    }
-    newindex += shiftby;
-  }
-  return newindex;
-};
-
-
 /** Get first element with
  * newmultiterm or kwordmarked class.
  */
@@ -416,12 +402,7 @@ let _get_first_cursor_pos = function() {
 };
 
 
-let move_cursor = function(shiftby, shift_key_pressed = false) {
-  if (shift_key_pressed) {
-    // TODO restore this: removing for now.
-    console.log("DISABLED");
-  }
-
+let move_cursor = function(shiftby) {
   // If no terms are clicked, and there is a hovered term,
   // switch those to clicked terms before continuing.
   let clicked_els = $('span.kwordmarked, span.newmultiterm');
@@ -559,8 +540,8 @@ function handle_keydown (e) {
 
   map[kESC] = () => start_hover_mode();
   map[kRETURN] = () => start_hover_mode();
-  map[kLEFT] = () => move_cursor(-1, e.shiftKey);
-  map[kRIGHT] = () => move_cursor(+1, e.shiftKey);
+  map[kLEFT] = () => move_cursor(-1);
+  map[kRIGHT] = () => move_cursor(+1);
   map[kUP] = () => increment_status_for_selected_elements(e, +1);
   map[kDOWN] = () => increment_status_for_selected_elements(e, -1);
   map[kC] = () => handle_copy(e);
