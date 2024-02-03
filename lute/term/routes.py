@@ -241,17 +241,28 @@ def sentences(langid, text):
 
 @bp.route("/bulk_update_status", methods=["POST"])
 def bulk_update_status():
-    "Update the statuses."
-    data = request.get_json()
-    terms = data.get("terms")
-    language_id = int(data.get("langid"))
-    new_status = int(data.get("new_status"))
+    """
+    Update the statuses.
 
+    json:
+    {
+      langid: x,
+      updates: [ { new_status: 1, terms: [ 'a', ] }, ... }, ]
+    }
+    """
     repo = Repository(db)
-    for t in terms:
-        term = repo.find_or_new(language_id, t)
-        term.status = new_status
-        repo.add(term)
+
+    data = request.get_json()
+    language_id = int(data.get("langid"))
+    updates = data.get("updates")
+
+    for u in updates:
+        new_status = int(u.get("new_status"))
+        terms = u.get("terms")
+        for t in terms:
+            term = repo.find_or_new(language_id, t)
+            term.status = new_status
+            repo.add(term)
     repo.commit()
     return jsonify("ok")
 
