@@ -1188,9 +1188,10 @@ input[type="checkbox"][disabled] + label {
 #dicttabs {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 1rem 0.7rem 0.8rem 0.7rem;
+    /* gap: 0.4rem; */
+    padding: 2px 0 0 2px;
     background-color: #dbefff;
+    height: 2.5rem;
 }
 
 #dictframes {
@@ -1199,7 +1200,24 @@ input[type="checkbox"][disabled] + label {
 }
 
 .dict-btn {
-    padding: 0.2rem;
+    padding-inline: 1rem;
+
+    border: none;
+    background-color: #a9bac9;
+    height: 100%;
+    box-sizing: border-box;
+    color: #6c6c6c;
+}
+
+.dict-btn-active {
+    background-color: #68ace0;
+    color: #fff;
+    /* font-weight: bold; */
+}
+
+#dict-image-btn.dict-btn-active {
+    outline: 2px solid #68ace0;
+    border-radius: 1px;
 }
 
 .dictframe {
@@ -1213,13 +1231,18 @@ input[type="checkbox"][disabled] + label {
     height: 100%;
 }
 
-#image-lookup {
-    background: url("../icn/eye.png");
+#dict-image-btn {
+    background: url("../icn/images.svg");
     background-repeat: no-repeat;
     background-position: center;
-    padding: 0.6rem;
-    border: 1px solid grey;
-    border-radius: 2px;
+    background-size: cover;
+    padding: 1rem;
+    /* border: 1px solid grey; */
+    /* border-radius: 2px; */
+    height: unset;
+    margin-left: auto;
+    margin-right: 0.8rem;
+    cursor: pointer;
 }
 
 
