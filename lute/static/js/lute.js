@@ -323,12 +323,6 @@ function load_reading_pane_globals() {
 
 $(document).ready(load_reading_pane_globals);
 
-let current_word_index = function() {
-  const i = words.toArray().findIndex(x => parseInt(x.dataset.order) === LUTE_CURR_TERM_DATA_ORDER);
-  // console.log(`found index = ${i}`);
-  return i;
-};
-
 let get_current_word = function() {
   let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
   if (elements.length == 0)
