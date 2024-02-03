@@ -417,14 +417,68 @@ let find_non_Ign_or_Wkn = function(currindex, shiftby) {
   return newindex;
 };
 
-let move_cursor = function(shiftby, e) {
-  const currindex = current_word_index();
-  if (! e.shiftKey) {
-    set_cursor(currindex + shiftby);
+
+/** Get first element with
+ * newmultiterm or kwordmarked class.
+ */
+let _get_first_cursor_pos = function() {
+  let elements = $('span.kwordmarked, span.newmultiterm');
+  if (elements.length == 0) {
+    return null;
   }
-  else {
-    set_cursor(find_non_Ign_or_Wkn(currindex, shiftby));
+  elements.sort(function(a, b) {
+    let orderA = parseInt($(a).data('order'));
+    let orderB = parseInt($(b).data('order'));
+    return orderA - orderB;
+  });
+  return elements[0];
+};
+
+
+let move_cursor = function(shiftby, shift_key_pressed = false) {
+  if (shift_key_pressed) {
+    // TODO restore this: removing for now.
+    console.log("DISABLED");
+    // set_cursor(find_non_Ign_or_Wkn(currindex, shiftby));
   }
+
+  // If no terms are clicked, and there is a hovered term,
+  // switch those to clicked terms before continuing.
+  let clicked_els = $('span.kwordmarked, span.newmultiterm');
+  let hovered_els = $('span.wordhover');
+  if (clicked_els.length == 0 && hovered_els.length > 0) {
+    hovered_els.removeClass('wordhover');
+    hovered_els.addClass('kwordmarked');
+  }
+
+  let allwords = $('span.word');
+  allwords.sort(function(a, b) {
+    let orderA = parseInt($(a).data('order'));
+    let orderB = parseInt($(b).data('order'));
+    return orderA - orderB;
+  });
+  let target = allwords[0];
+
+  let curr = _get_first_cursor_pos();
+  if (curr != null) {
+    const curr_id = $(curr).attr('id');
+    let index = allwords.toArray().findIndex(e => $(e).attr('id') == curr_id);
+    let new_index = index + shiftby;
+    if (new_index < 0)
+      new_index = 0;
+    if (new_index >= allwords.length)
+      new_index = allwords.length - 1;
+    target = allwords[new_index];
+  }
+  target = $(target);
+
+  $('span.newmultiterm').removeClass('newmultiterm');
+  remove_status_highlights();
+  $('span.kwordmarked').removeClass('kwordmarked');
+  target.addClass('kwordmarked');
+  apply_status_class(target);
+  $(window).scrollTo(target, { axis: 'y', offset: -150 });
+  showEditFrame(target, { autofocus: false });
 }
 
 
