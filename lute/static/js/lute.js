@@ -355,26 +355,13 @@ let copy_text_to_clipboard = function(textitemspans, show_flash = true) {
 
 
 let move_cursor = function(shiftby) {
-  // If no terms are clicked, and there is a hovered term,
-  // switch those to clicked terms before continuing.
-  let clicked_els = $('span.kwordmarked, span.newmultiterm');
+  // Use the first clicked element, or the hovered if none clicked.
+  let elements = $('span.kwordmarked, span.newmultiterm');
   let hovered_els = $('span.wordhover');
-  if (clicked_els.length == 0 && hovered_els.length > 0) {
-    hovered_els.removeClass('wordhover');
-    hovered_els.addClass('kwordmarked');
-  }
-
-  let _get_first_cursor_pos = function() {
-    let elements = $('span.kwordmarked, span.newmultiterm');
-    elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
-    return (elements.length == 0) ? null : elements[0];
-  };
-  const curr = _get_first_cursor_pos();
-
-  // Don't move this above _get_first_cursor_pos() :-)
-  $('span.newmultiterm').removeClass('newmultiterm');
-  $('span.kwordmarked').removeClass('kwordmarked');
-  remove_status_highlights();
+  if (elements.length == 0 && hovered_els.length > 0)
+    elements = hovered_els;
+  elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
+  const curr = (elements.length == 0) ? null : elements[0];
 
   let words = $('span.word');
   words.sort((a, b) => _get_order($(a)) - _get_order($(b)));
@@ -388,8 +375,12 @@ let move_cursor = function(shiftby) {
     i = Math.min(i, words.length - 1);  // within array.
     return i;
   }
-  const index = _get_new_index(curr);
-  const target = $(words[index]);
+  const target = $(words[_get_new_index(curr)]);
+
+  // Adjust all screen state.
+  $('span.newmultiterm').removeClass('newmultiterm');
+  $('span.kwordmarked').removeClass('kwordmarked');
+  remove_status_highlights();
   target.addClass('kwordmarked');
   apply_status_class(target);
   $(window).scrollTo(target, { axis: 'y', offset: -150 });
