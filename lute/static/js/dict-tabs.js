@@ -2,7 +2,6 @@
 
 function createDictTabs() {
   const dictButtons = new Map();
-  //const TERM_DICTS = ALL_DICTS[LANG_ID].term;
   const dictTabsContainer = document.getElementById("dicttabs");
   const iFramesContainer = document.getElementById("dictframes");
 
@@ -33,7 +32,6 @@ function createDictTabs() {
   firstBtn.classList.add("dict-btn-active");
   firstBtn.dataset.tabOpened = 1;
   firstFrame.classList.add("dict-active");
-  //firstFrame.dataset.dictOpened = 1;
 
   dictTabsContainer.addEventListener("click", (e) => {
     const dictBtnClicked = e.target.closest(".dict-btn");
@@ -93,7 +91,6 @@ function createIFrame(name, parent) {
   iFrame.name = name;
   iFrame.src = "about:blank";
   iFrame.classList.add("dictframe");
-  //iFrame.dataset.dictOpened = 0;
 
   parent.appendChild(iFrame);
 
