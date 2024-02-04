@@ -228,13 +228,9 @@ function select_started(e) {
   save_curr_data_order($(this));
 }
 
-let get_selected_in_range = function(start_el, end_el, selector) {
-  const a = _get_order(start_el);
-  const b = _get_order(end_el);
-  const startord = Math.min(a, b);
-  const endord = Math.max(a, b);
-
-  const selected = $(selector).filter(function() {
+let get_selected_in_range = function(start_el, end_el) {
+  const [startord, endord] = [_get_order(start_el), _get_order(end_el)].sort();
+  const selected = $('span.textitem').filter(function() {
     const ord = _get_order($(this));
     return ord >= startord && ord <= endord;
   });
@@ -245,7 +241,7 @@ function select_over(e) {
   if (selection_start_el == null)
     return;  // Not selecting
   $('.newmultiterm').removeClass('newmultiterm');
-  const selected = get_selected_in_range(selection_start_el, $(this), 'span.textitem');
+  const selected = get_selected_in_range(selection_start_el, $(this));
   selected.addClass('newmultiterm');
 }
 
@@ -259,7 +255,7 @@ function select_ended(e) {
 
   $('span.kwordmarked').removeClass('kwordmarked');
 
-  const selected = get_selected_in_range(selection_start_el, $(this), 'span.textitem');
+  const selected = get_selected_in_range(selection_start_el, $(this));
   if (e.shiftKey) {
     copy_text_to_clipboard(selected.toArray());
     start_hover_mode(false);
