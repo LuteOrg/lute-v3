@@ -22,14 +22,10 @@ let LUTE_HOVERING = true;
  * editing the word in the Term edit pane, and has to consciously
  * disable the "clicked word" mode by hitting ESC or RETURN.
  *
- * When the user is done editing a the Term form in the Term edit pane
- * and hits "save", the main reading page's text div is updated (see
- * templates/read/updated.twig.html).  This text div reload then has
- * to notify _this_ javascript to start_hover_mode() again.
- * 
- * I dislike this code (specifically, that the updated.twig.html calls
- * this javascript function), but can't think of a better way to
- * manage this.
+ * The full page text is often reloaded via ajax, e.g. when the user
+ * saves an edited term, or the status is updated with a hotkey.
+ * The template lute/templates/read/page_content.html calls
+ * this method on reload to reset the cursor etc.
  */
 function start_hover_mode(should_clear_frames = true) {
   // console.log('CALLING RESET');
@@ -46,8 +42,10 @@ function start_hover_mode(should_clear_frames = true) {
     apply_status_class($(w));
   }
 
-  if (should_clear_frames)
-    clear_frames();
+  if (should_clear_frames) {
+    $('#wordframeid').attr('src', '/read/empty');
+    $('#dictframeid').attr('src', '/read/empty');
+  }
 
   clear_newmultiterm_elements();
 
@@ -63,12 +61,6 @@ function reset_cursor() {
   LUTE_CURR_TERM_DATA_ORDER = -1;
   $('span.wordhover').removeClass('wordhover');
   $('span.kwordmarked').removeClass('kwordmarked');
-}
-
-
-let clear_frames = function() {
-  $('#wordframeid').attr('src', '/read/empty');
-  $('#dictframeid').attr('src', '/read/empty');
 }
 
 
@@ -250,7 +242,6 @@ function select_started(e) {
   LUTE_HOVERING = false;
   $('span.wordhover').removeClass('wordhover');
   clear_newmultiterm_elements();
-  clear_frames();
   $(this).addClass('newmultiterm');
   selection_start_el = $(this);
   save_curr_data_order($(this));
