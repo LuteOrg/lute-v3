@@ -212,6 +212,31 @@ function hover_out(e) {
 
 
 /* ========================================= */
+/** Clicking */
+
+let word_clicked = function(el, e) {
+  el.removeClass('wordhover');
+  save_curr_data_order(el);
+  if (el.hasClass('kwordmarked')) {
+    el.removeClass('kwordmarked');
+    const nothing_marked = $('span.kwordmarked').length == 0;
+    if (nothing_marked) {
+      el.addClass('wordhover');
+      start_hover_mode();
+    }
+  }
+  else {
+    if (! e.shiftKey) {
+      $('span.kwordmarked').removeClass('kwordmarked');
+      showEditFrame(el);
+    }
+    el.addClass('kwordmarked');
+    el.removeClass('hasflash');
+  }
+}
+
+
+/* ========================================= */
 /** Multiword selection */
 
 let selection_start_el = null;
@@ -275,28 +300,6 @@ function select_ended(e) {
 
   showEditFrame(selection_start_el, { textparts: textparts });
   selection_start_el = null;
-}
-
-
-let word_clicked = function(el, e) {
-  el.removeClass('wordhover');
-  save_curr_data_order(el);
-  if (el.hasClass('kwordmarked')) {
-    el.removeClass('kwordmarked');
-    const nothing_marked = $('span.kwordmarked').length == 0;
-    if (nothing_marked) {
-      el.addClass('wordhover');
-      start_hover_mode();
-    }
-  }
-  else {
-    if (! e.shiftKey) {
-      $('span.kwordmarked').removeClass('kwordmarked');
-      showEditFrame(el);
-    }
-    el.addClass('kwordmarked');
-    el.removeClass('hasflash');
-  }
 }
 
 
