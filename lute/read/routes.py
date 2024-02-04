@@ -34,6 +34,7 @@ def _render_book_page(book, pagenum):
         page_num=pagenum,
         page_count=book.page_count,
         show_highlights=show_highlights,
+        all_dicts=lang.all_dictionaries(),
     )
 
 

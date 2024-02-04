@@ -7,6 +7,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
   <pre>
@@ -186,6 +187,11 @@
 </div>
 
 <script>
+  // used in dict-tabs.js
+  const ALL_DICTS = {{ all_dicts | safe }};
+  const LANG_ID = Object.keys(ALL_DICTS)[0];
+  const TERM_DICTS = ALL_DICTS[LANG_ID].term;
+
   let mouseY;
   let scrollY;
   let scrollYBeforeReload;
