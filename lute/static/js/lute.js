@@ -302,12 +302,8 @@ let word_clicked = function(el, e) {
 
 let get_current_word = function() {
   let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
-  if (elements.length == 0)
-    return null;
-  elements.sort(function(a, b) {
-    return _get_order($(a)) - _get_order($(b));
-  });
-  return elements[0];
+  elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
+  return (elements.length == 0) ? null : elements[0];
 }
 
 /** Get the rest of the textitems in the current active/hovered word's
@@ -317,9 +313,8 @@ let get_textitems_spans = function(e) {
   if (w == null)
     return null;
 
-  const attr_name = !e.shiftKey ? 'sentence-id' : 'paragraph-id';
+  const attr_name = e.shiftKey ? 'paragraph-id' : 'sentence-id';
   const attr_value = $(w).data(attr_name);
-
   return $(`span.textitem[data-${attr_name}="${attr_value}"]`).toArray();
 };
 
@@ -327,9 +322,8 @@ let get_textitems_spans = function(e) {
  * color flash. */
 let handle_copy = function(e) {
   tis = get_textitems_spans(e);
-  if (tis == null)
-    return;
-  copy_text_to_clipboard(tis);
+  if (tis != null)
+    copy_text_to_clipboard(tis);
 }
 
 let copy_text_to_clipboard = function(textitemspans, show_flash = true) {
@@ -365,13 +359,8 @@ let copy_text_to_clipboard = function(textitemspans, show_flash = true) {
  */
 let _get_first_cursor_pos = function() {
   let elements = $('span.kwordmarked, span.newmultiterm');
-  if (elements.length == 0) {
-    return null;
-  }
-  elements.sort(function(a, b) {
-    return _get_order($(a)) - _get_order($(b));
-  });
-  return elements[0];
+  elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
+  return (elements.length == 0) ? null : elements[0];
 };
 
 
@@ -386,9 +375,7 @@ let move_cursor = function(shiftby) {
   }
 
   let allwords = $('span.word');
-  allwords.sort(function(a, b) {
-    return _get_order($(a)) - _get_order($(b));
-  });
+  allwords.sort((a, b) => _get_order($(a)) - _get_order($(b)));
   let target = allwords[0];
 
   let curr = _get_first_cursor_pos();
