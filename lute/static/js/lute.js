@@ -515,17 +515,6 @@ function handle_keydown (e) {
 }
 
 
-
-/** Reload the current page. */
-let reload_text_div = function() {
-  const bookid = $('#book_id').val();
-  const pagenum = $('#page_num').val();
-  const url = `/read/renderpage/${bookid}/${pagenum}`;
-  const repel = $('#thetext');
-  repel.load(url);
-};
-
-
 /**
  * If the term editing form is visible when reading, and a hotkey is hit,
  * the form status should also update.
@@ -571,10 +560,28 @@ function post_bulk_update(updates) {
   const firstel = $(elements[0]);
   const first_status = updates[0].new_status;
   const langid = firstel.data('lang-id');
+  const selected_ids = $('span.kwordmarked').toArray().map(el => $(el).attr('id'));
 
   data = JSON.stringify({
     langid: langid, updates: updates
   });
+
+  let re_mark_selected_ids = function() {
+    for (let i = 0; i < selected_ids.length; i++) {
+      let el = $(`#${selected_ids[i]}`);
+      el.addClass('kwordmarked');
+    }
+    if (selected_ids.length > 0)
+      $('span.wordhover').removeClass('wordhover');
+  };
+
+  let reload_text_div = function() {
+    const bookid = $('#book_id').val();
+    const pagenum = $('#page_num').val();
+    const url = `/read/renderpage/${bookid}/${pagenum}`;
+    const repel = $('#thetext');
+    repel.load(url, re_mark_selected_ids);
+  };
 
   $.ajax({
     url: '/term/bulk_update_status',
