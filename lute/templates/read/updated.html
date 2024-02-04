@@ -25,13 +25,20 @@
         const pagenum = $('#page_num', context).val();
         const url = `/read/renderpage/${bookid}/${pagenum}`;
         const repel = $('#thetext', context);
+        const marked = $('.kwordmarked', context);
+        const marked_id = $(marked[0]).attr('id');
 
         // Force remove the old popup.
         // ref https://stackoverflow.com/questions/19266886/
         //   tooltip-not-disappearing
         $('div.ui-tooltip', context).remove();
 
-        repel.load(url);
+        repel.load(url, function() {
+          // console.log(`adding class kwordmarked to id ${marked_id}`);
+          const re_marked = $(`#${marked_id}`, context);
+          re_marked.removeClass('wordhover');
+          re_marked.addClass('kwordmarked');
+        });
       };
 
       $(document).ready(function() {
