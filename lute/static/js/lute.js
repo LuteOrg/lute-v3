@@ -306,19 +306,15 @@ function select_ended(e) {
 /********************************************/
 // Keyboard navigation.
 
-let get_current_word = function() {
-  let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
-  elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
-  return (elements.length == 0) ? null : elements[0];
-}
-
 /** Get the rest of the textitems in the current active/hovered word's
  * sentence or paragraph, or null if no selection. */
 let get_textitems_spans = function(e) {
-  const w = get_current_word();
-  if (w == null)
+  let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
+  elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
+  if (elements.length == 0)
     return null;
 
+  const w = elements[0];
   const attr_name = e.shiftKey ? 'paragraph-id' : 'sentence-id';
   const attr_value = $(w).data(attr_name);
   return $(`span.textitem[data-${attr_name}="${attr_value}"]`).toArray();
