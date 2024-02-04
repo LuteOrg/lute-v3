@@ -33,7 +33,6 @@ let LUTE_HOVERING = true;
  */
 function start_hover_mode(should_clear_frames = true) {
   // console.log('CALLING RESET');
-  load_reading_pane_globals();
   LUTE_HOVERING = true;
 
   $('span.kwordmarked').removeClass('kwordmarked');
@@ -309,17 +308,6 @@ let word_clicked = function(el, e) {
 /********************************************/
 // Keyboard navigation.
 
-// Load all words into scope.
-var words = null;
-
-function load_reading_pane_globals() {
-  words = $('span.word').sort(function(a, b) {
-    return $(a).data('order') - $(b).data('order');
-  });
-}
-
-$(document).ready(load_reading_pane_globals);
-
 let get_current_word = function() {
   let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
   if (elements.length == 0)
@@ -509,7 +497,7 @@ function toggle_highlight() {
 
 
 function handle_keydown (e) {
-  if (words.size() == 0) {
+  if ($('span.word').length == 0) {
     // console.log('no words, exiting');
     return; // Nothing to do.
   }
