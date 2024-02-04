@@ -229,19 +229,13 @@ function select_started(e) {
 }
 
 let get_selected_in_range = function(start_el, end_el, selector) {
-  const first = _get_order(start_el);
-  const last = _get_order(end_el);
-
-  let startord = first;
-  let endord = last;
-
-  if (startord > endord) {
-    endord = first;
-    startord = last;
-  }
+  const a = _get_order(start_el);
+  const b = _get_order(end_el);
+  const startord = Math.min(a, b);
+  const endord = Math.max(a, b);
 
   const selected = $(selector).filter(function() {
-    const ord = $(this).data("order");
+    const ord = _get_order($(this));
     return ord >= startord && ord <= endord;
   });
   return selected;
