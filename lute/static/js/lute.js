@@ -54,16 +54,6 @@ function start_hover_mode(should_clear_frames = true) {
 }
 
 
-/**
- * On new page load, the cursor should be reset to the start of the page.
- */
-function reset_cursor() {
-  LUTE_CURR_TERM_DATA_ORDER = -1;
-  $('span.wordhover').removeClass('wordhover');
-  $('span.kwordmarked').removeClass('kwordmarked');
-}
-
-
 /** 
  * Prepare the interaction events with the text.
  *
@@ -128,6 +118,14 @@ function showEditFrame(el, extra_args = {}) {
   top.frames.wordframe.location.href = url;
 }
 
+
+/* ========================================= */
+/** Cursor management. */
+
+/** Called on page load (read/index.html). */
+function reset_cursor() {
+  LUTE_CURR_TERM_DATA_ORDER = -1;
+}
 
 let _get_order = function(el) { return parseInt(el.data('order')); };
 
