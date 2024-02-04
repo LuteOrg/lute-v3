@@ -22,6 +22,7 @@ let LUTE_CURR_TERM_DATA_ORDER = -1;  // initially not set.
  * this method on reload to reset the cursor etc.
  */
 function start_hover_mode(should_clear_frames = true) {
+
   $('span.kwordmarked').removeClass('kwordmarked');
 
   const curr_word = $('span.word').filter(function() {
@@ -35,23 +36,13 @@ function start_hover_mode(should_clear_frames = true) {
 
   if (should_clear_frames) {
     $('#wordframeid').attr('src', '/read/empty');
-    $('#dictframeid').attr('src', '/read/empty');
+    $('.dictcontainer').hide();
   }
 
   clear_newmultiterm_elements();
 
   // https://stackoverflow.com/questions/35022716/keydown-not-detected-until-window-is-clicked
   $(window).focus();
-}
-
-
-/**
- * On new page load, the cursor should be reset to the start of the page.
- */
-function reset_cursor() {
-  LUTE_CURR_TERM_DATA_ORDER = -1;
-  $('span.wordhover').removeClass('wordhover');
-  $('span.kwordmarked').removeClass('kwordmarked');
 }
 
 
@@ -370,6 +361,7 @@ let move_cursor = function(shiftby) {
   $('span.newmultiterm').removeClass('newmultiterm');
   $('span.kwordmarked').removeClass('kwordmarked');
   $('span.wordhover').removeClass('wordhover');
+
   remove_status_highlights();
   target.addClass('kwordmarked');
   save_curr_data_order(target);
@@ -532,9 +524,9 @@ function handle_keydown (e) {
       right_increment = -1;
     }
   }
-
   map[kLEFT] = () => move_cursor(left_increment);
   map[kRIGHT] = () => move_cursor(right_increment);
+
   map[kUP] = () => increment_status_for_selected_elements(e, +1);
   map[kDOWN] = () => increment_status_for_selected_elements(e, -1);
   map[kC] = () => handle_copy(e);
