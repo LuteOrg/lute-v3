@@ -984,7 +984,7 @@ textarea {
 }
 
 /* focus on fields makes border same as tags */
-input:focus,
+/* input:focus,
 textarea:focus,
 select:focus {
     border: 1px solid var(--tagify__tag-bg) !important;
@@ -1000,7 +1000,7 @@ button:focus {
 input[type="checkbox"]:focus,
 input[type="file"]:focus {
     border: none !important;
-}
+} */
 
 ::placeholder {
     font-family: inherit;
@@ -1165,11 +1165,9 @@ input[type="checkbox"][disabled] + label {
 
 #dicttabs {
     display: flex;
-    align-items: center;
-    /* gap: 0.4rem; */
-    padding: 2px 0 0 2px;
+    padding: 4px 0 0 2px;
     background-color: #dbefff;
-    height: 2.5rem;
+    height: 1.6rem;
 }
 
 #dictframes {
@@ -1179,23 +1177,35 @@ input[type="checkbox"][disabled] + label {
 
 .dict-btn {
     padding-inline: 1rem;
-
     border: none;
-    background-color: #a9bac9;
+    background-color: #68ace0;
     height: 100%;
     box-sizing: border-box;
     color: #6c6c6c;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    filter: brightness(0.8) grayscale(0.7);
+    z-index: 1;
 }
 
+.dict-btn:not(:first-of-type) {
+    margin-left: -4px;
+}
+
+/* remove left margin if img button activated */
+/* .dict-btn:has(~ #dict-image-btn.dict-btn-active) {
+    margin-left: 0;
+} */
+
 .dict-btn-active {
-    background-color: #68ace0;
     color: #fff;
-    /* font-weight: bold; */
+    filter: brightness(1);
+    z-index: 2;
 }
 
 #dict-image-btn.dict-btn-active {
-    outline: 2px solid #68ace0;
-    border-radius: 1px;
+    background-color: #97531f;
+    filter: invert(1);
 }
 
 .dictframe {
@@ -1214,12 +1224,13 @@ input[type="checkbox"][disabled] + label {
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-    padding: 1rem;
-    /* border: 1px solid grey; */
-    /* border-radius: 2px; */
+    padding: 0.8rem;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
     height: unset;
     margin-left: auto;
     margin-right: 0.8rem;
+    margin-bottom: 4px;
     cursor: pointer;
 }
 
@@ -1542,6 +1553,10 @@ input[type="checkbox"][disabled] + label {
     .dictcontainer::after {
         background-color: #79b7e7;
         height: 6px;
+    }
+
+    #dicttabs {
+        padding-top: 6px;
     }
 
     #read-slider {
