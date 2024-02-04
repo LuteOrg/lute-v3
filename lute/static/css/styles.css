@@ -774,13 +774,6 @@ div.code pre {
     height: 100% !important;
 }
 
-#dictframeid {
-    /* calc for crawlbar */
-    /* height: calc(100% - 20px) !important; */
-    height: 100% !important;
-    align-self: end;
-}
-
 /* resize */
 
 /* border */
@@ -1112,12 +1105,6 @@ div.help-text {
 
 #term-form #text {
     flex: 1;
-}
-
-#def-container {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
 }
 
 .term-element-box {

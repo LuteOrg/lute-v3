@@ -19,9 +19,7 @@
   
       {{ form.original_text }}
 
-      <div id="def-container">
-        {{ form.text(class="form-control", value=(form.original_text.data or '')) }}
-      </div>
+      <div>{{ form.text(class="form-control", value=(form.original_text.data or '')) }}</div>
 
       <div>{{ form.parentslist(class="form-control") }}</div>
   
