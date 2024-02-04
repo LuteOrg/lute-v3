@@ -187,16 +187,14 @@ function hover_over_add_status_class(e) {
 /** Hovering */
 
 function hover_over(e) {
-  if (! LUTE_HOVERING)
-    return;
   $('span.wordhover').removeClass('wordhover');
-  $(this).addClass('wordhover');
-  save_curr_data_order($(this));
+  if (LUTE_HOVERING) {
+    $(this).addClass('wordhover');
+    save_curr_data_order($(this));
+  }
 }
 
 function hover_out(e) {
-  if (! LUTE_HOVERING)
-    return;
   $('span.wordhover').removeClass('wordhover');
 }
 
