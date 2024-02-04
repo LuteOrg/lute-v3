@@ -37,8 +37,11 @@ function start_hover_mode(should_clear_frames = true) {
 
   $('span.kwordmarked').removeClass('kwordmarked');
 
-  const w = get_current_word();
-  if (w != null) {
+  const curr_word = $('span.word').filter(function() {
+    return _get_order($(this)) == LUTE_CURR_TERM_DATA_ORDER;
+  });
+  if (curr_word.length == 1) {
+    const w = $(curr_word[0]);
     $(w).addClass('wordhover');
     apply_status_class($(w));
   }
@@ -382,6 +385,7 @@ let move_cursor = function(shiftby) {
   $('span.kwordmarked').removeClass('kwordmarked');
   remove_status_highlights();
   target.addClass('kwordmarked');
+  save_curr_data_order(target);
   apply_status_class(target);
   $(window).scrollTo(target, { axis: 'y', offset: -150 });
   showEditFrame(target, { autofocus: false });
