@@ -326,7 +326,7 @@ let handle_copy = function(e) {
     copy_text_to_clipboard(tis);
 }
 
-let copy_text_to_clipboard = function(textitemspans, show_flash = true) {
+let copy_text_to_clipboard = function(textitemspans) {
   const copytext = textitemspans.map(s => $(s).text()).join('');
 
   // console.log('copying ' + copytext);
