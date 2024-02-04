@@ -374,26 +374,27 @@ let move_cursor = function(shiftby) {
     hovered_els.addClass('kwordmarked');
   }
 
-  let allwords = $('span.word');
-  allwords.sort((a, b) => _get_order($(a)) - _get_order($(b)));
-  let target = allwords[0];
+  const curr = _get_first_cursor_pos();
 
-  let curr = _get_first_cursor_pos();
-  if (curr != null) {
-    const curr_id = $(curr).attr('id');
-    let index = allwords.toArray().findIndex(e => $(e).attr('id') == curr_id);
-    let new_index = index + shiftby;
-    if (new_index < 0)
-      new_index = 0;
-    if (new_index >= allwords.length)
-      new_index = allwords.length - 1;
-    target = allwords[new_index];
-  }
-  target = $(target);
-
+  // Don't move this above _get_first_cursor_pos() :-)
   $('span.newmultiterm').removeClass('newmultiterm');
-  remove_status_highlights();
   $('span.kwordmarked').removeClass('kwordmarked');
+  remove_status_highlights();
+
+  let words = $('span.word');
+  words.sort((a, b) => _get_order($(a)) - _get_order($(b)));
+
+  let _get_new_index = function(curr) {
+    if (curr == null)
+      return 0;
+    const pid = $(curr).attr('id');
+    let i = words.toArray().findIndex(e => $(e).attr('id') == pid) + shiftby;
+    i = Math.max(i, 0); // ensure >= 0
+    i = Math.min(i, words.length - 1);  // within array.
+    return i;
+  }
+  const index = _get_new_index(curr);
+  const target = $(words[index]);
   target.addClass('kwordmarked');
   apply_status_class(target);
   $(window).scrollTo(target, { axis: 'y', offset: -150 });
