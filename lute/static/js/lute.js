@@ -354,16 +354,6 @@ let copy_text_to_clipboard = function(textitemspans, show_flash = true) {
 }
 
 
-/** Get first element with
- * newmultiterm or kwordmarked class.
- */
-let _get_first_cursor_pos = function() {
-  let elements = $('span.kwordmarked, span.newmultiterm');
-  elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
-  return (elements.length == 0) ? null : elements[0];
-};
-
-
 let move_cursor = function(shiftby) {
   // If no terms are clicked, and there is a hovered term,
   // switch those to clicked terms before continuing.
@@ -374,6 +364,11 @@ let move_cursor = function(shiftby) {
     hovered_els.addClass('kwordmarked');
   }
 
+  let _get_first_cursor_pos = function() {
+    let elements = $('span.kwordmarked, span.newmultiterm');
+    elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
+    return (elements.length == 0) ? null : elements[0];
+  };
   const curr = _get_first_cursor_pos();
 
   // Don't move this above _get_first_cursor_pos() :-)
