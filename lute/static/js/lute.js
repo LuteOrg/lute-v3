@@ -134,8 +134,10 @@ function showEditFrame(el, extra_args = {}) {
 }
 
 
+let _get_order = function(el) { return parseInt(el.data('order')); };
+
 let save_curr_data_order = function(el) {
-  LUTE_CURR_TERM_DATA_ORDER = parseInt(el.data('order'));
+  LUTE_CURR_TERM_DATA_ORDER = _get_order(el);
 }
 
 
@@ -227,8 +229,8 @@ function select_started(e) {
 }
 
 let get_selected_in_range = function(start_el, end_el, selector) {
-  const first = parseInt(start_el.data('order'))
-  const last = parseInt(end_el.data('order'));
+  const first = _get_order(start_el);
+  const last = _get_order(end_el);
 
   let startord = first;
   let endord = last;
@@ -313,9 +315,7 @@ let get_current_word = function() {
   if (elements.length == 0)
     return null;
   elements.sort(function(a, b) {
-    let orderA = parseInt($(a).data('order'));
-    let orderB = parseInt($(b).data('order'));
-    return orderA - orderB;
+    return _get_order($(a)) - _get_order($(b));
   });
   return elements[0];
 }
@@ -379,9 +379,7 @@ let _get_first_cursor_pos = function() {
     return null;
   }
   elements.sort(function(a, b) {
-    let orderA = parseInt($(a).data('order'));
-    let orderB = parseInt($(b).data('order'));
-    return orderA - orderB;
+    return _get_order($(a)) - _get_order($(b));
   });
   return elements[0];
 };
@@ -399,9 +397,7 @@ let move_cursor = function(shiftby) {
 
   let allwords = $('span.word');
   allwords.sort(function(a, b) {
-    let orderA = parseInt($(a).data('order'));
-    let orderB = parseInt($(b).data('order'));
-    return orderA - orderB;
+    return _get_order($(a)) - _get_order($(b));
   });
   let target = allwords[0];
 
