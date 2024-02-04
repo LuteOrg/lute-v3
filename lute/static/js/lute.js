@@ -205,22 +205,25 @@ function hover_out(e) {
 let word_clicked = function(el, e) {
   el.removeClass('wordhover');
   save_curr_data_order(el);
+
+  // If already clicked, remove the click marker.
   if (el.hasClass('kwordmarked')) {
     el.removeClass('kwordmarked');
-    const nothing_marked = $('span.kwordmarked').length == 0;
-    if (nothing_marked) {
+    if ($('span.kwordmarked').length == 0) {
       el.addClass('wordhover');
       start_hover_mode();
     }
+    return;
   }
-  else {
-    if (! e.shiftKey) {
-      $('span.kwordmarked').removeClass('kwordmarked');
-      showEditFrame(el);
-    }
-    el.addClass('kwordmarked');
-    el.removeClass('hasflash');
+
+  // Not already clicked.
+  if (! e.shiftKey) {
+    // Only one element should be marked clicked.
+    $('span.kwordmarked').removeClass('kwordmarked');
+    showEditFrame(el);
   }
+  el.addClass('kwordmarked');
+  el.removeClass('hasflash');
 }
 
 
@@ -236,7 +239,6 @@ let clear_newmultiterm_elements = function() {
 
 function select_started(e) {
   LUTE_HOVERING = false;
-  $('span.wordhover').removeClass('wordhover');
   clear_newmultiterm_elements();
   $(this).addClass('newmultiterm');
   selection_start_el = $(this);
