@@ -615,39 +615,36 @@ function increment_status_for_selected_elements(e, shiftBy) {
   // which is odd.
   e.preventDefault();
 
-  const validStatuses = ['status0', 'status1', 'status2', 'status3', 'status4', 'status5', 'status99'];
+  const statuses = ['status0', 'status1', 'status2', 'status3', 'status4', 'status5', 'status99'];
 
   // Build payloads to update for each unique status that will be changing
-  let payloads = {};
+  let status_elements = statuses.reduce((obj, status) => {
+    obj[status] = [];
+    return obj;
+  }, {});
 
   elements.forEach((element) => {
-    let statusClass = element.dataset.statusClass;
-    
-    if (!statusClass || !validStatuses.includes(statusClass)) return;
+    let s = element.dataset.statusClass ?? 'missing';
+    if (s in status_elements)
+      status_elements[s].push(element);
+  });
 
-    payloads[statusClass] ||= [];
-    payloads[statusClass].push(element);
-  })
-
-  // Convert payloads to update hashes.
+  // Convert map to update hashes.
   let updates = []
 
-  Object.keys(payloads).forEach((key) => {
-    let originalIndex = validStatuses.indexOf(key);
+  Object.entries(status_elements).forEach(([status, update_elements]) => {
+    if (update_elements.length == 0)
+      return;
 
-    if (originalIndex == -1) return;
-    
-    newIndex = Math.max(0, Math.min((validStatuses.length-1), originalIndex+shiftBy));
+    let status_index = statuses.indexOf(status);
+    let new_index = status_index + shiftBy;
+    new_index = Math.max(0, Math.min((statuses.length-1), new_index));
+    let new_status = Number(statuses[new_index].replace(/\D/g, ''));
 
-    if (newIndex != originalIndex) {
-      const newStatusCode = Number(validStatuses[newIndex].replace(/\D/g, ''));
-
-      // Can't set status to 0, that implies term deletion, which is a different issue
-      // (at the moment).
-      // TODO delete term from reading screen: setting to 0 could equal deleting term.
-      if (newStatusCode != 0) {
-        updates.push(make_status_update_hash(newStatusCode, payloads[key]));
-      }
+    // Can't set status to 0 (that is for deleted/non-existent terms only).
+    // TODO delete term from reading screen: setting to 0 could equal deleting term.
+    if (new_index != status_index && new_status != 0) {
+      updates.push(make_status_update_hash(new_status, update_elements));
     }
   });
 
