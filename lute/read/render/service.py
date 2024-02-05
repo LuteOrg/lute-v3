@@ -98,17 +98,14 @@ def get_paragraphs(s, language):
     """
     Get array of arrays of RenderableSentences for the given string s.
     """
+    terms = find_all_Terms_in_string(s, language)
 
     # Hacky reset of state of ParsedToken state.
     # _Shouldn't_ matter ... :-(
     ParsedToken.reset_counters()
     tokens = language.get_parsed_tokens(s)
-    tokens = [t for t in tokens if t.token != "¶"]
 
-    # Brutal hack ... the RenderableCalculator requires the
-    # ParsedTokens to be in contiguous order, but the above list
-    # comprehension can cause some tokens to get removed.  In addition
-    # (and this is the worst part), for some reason the tests fail in
+    # Brutal hack ... for some reason the tests fail in
     # CI, but _inconsistently_, with the token order numbers.  The
     # order sometimes jumps by 2 ... I really can't explain it.  So,
     # as a _complete hack_, I'm re-numbering the tokens now, to ensure
@@ -119,7 +116,18 @@ def get_paragraphs(s, language):
         for t in tokens:
             t.order = n
             n += 1
-    terms = find_all_Terms_in_string(s, language)
+
+    # Split into paragraphs.
+    paragraphs = []
+    curr_para = []
+    for t in tokens:
+        if t.token == "¶":
+            paragraphs.append(curr_para)
+            curr_para = []
+        else:
+            curr_para.append(t)
+    if len(curr_para) > 0:
+        paragraphs.append(curr_para)
 
     def make_RenderableSentence(pnum, sentence_num, tokens, terms):
         """
@@ -139,16 +147,14 @@ def get_paragraphs(s, language):
         return list(set(arr))
 
     renderable_paragraphs = []
-    paranums = sorted(unique([t.paragraph_number for t in tokens]))
-    for pnum in paranums:
-        paratokens = [t for t in tokens if t.paragraph_number == pnum]
-        senums = sorted(unique([t.sentence_number for t in paratokens]))
-
-        # A renderable paragraph is a collection of
-        # RenderableSentences.
+    pnum = 0
+    for paratokens in paragraphs:
+        # A renderable paragraph is a collection of RenderableSentences.
         renderable_sentences = [
-            make_RenderableSentence(pnum, senum, paratokens, terms) for senum in senums
+            make_RenderableSentence(pnum, senum, paratokens, terms)
+            for senum in sorted(unique([t.sentence_number for t in paratokens]))
         ]
         renderable_paragraphs.append(renderable_sentences)
+        pnum += 1
 
     return renderable_paragraphs
