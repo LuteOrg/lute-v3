@@ -1,7 +1,7 @@
 """
 Generate a rough data file for a given language for all terms.
 
-Gets all active books for a given language, and writes a data file to
+Gets *all* books for a given language, and writes a data file to
 the specified csv output file name.
 
 Generates csv with headings:
@@ -157,14 +157,10 @@ def generate_file(language_name, outfile_name):
     """
     Generate the datafile for the language.
     """
-    books = (
-        db.session.query(Book)
-        .filter(Book.archived == False)  # pylint: disable=singleton-comparison
-        .all()
-    )
+    books = db.session.query(Book).all()
     books = [b for b in books if b.language.name == language_name]
     if len(books) == 0:
-        print(f"No active books for given language {language_name}, quitting.")
+        print(f"No books for given language {language_name}, quitting.")
         sys.exit(0)
 
     langid = books[0].language.id
