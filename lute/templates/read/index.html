@@ -417,6 +417,7 @@
         set_page_fraction();
         set_footer_control_visibility();
         show_hide_title(actualPage);
+        $("html, body").animate({ scrollTop: 0 });
 
         if (initial_page_load) {
           prepareTextInteractions(tooltipPos);
