@@ -25,6 +25,12 @@ def test_create_book(english):
         500,
         ["Here is a dog.\nAnd a cat.[7]"],
     )
+    scenario(
+        english,
+        "Here is a dog.\n\n\nAnd a cat.",
+        500,
+        ["Here is a dog.\n\n\nAnd a cat.[7]"],
+    )
 
 
 def scenario(english, fulltext, maxwords, expected):

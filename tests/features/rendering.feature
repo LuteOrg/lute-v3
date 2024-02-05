@@ -18,6 +18,7 @@ Feature: Rendering
         Then rendered should be:
             Several/ /lines(1)/ /of/ /text/,
             and(1)/ /also/ /a/ /blank/ /line/.
+            
             And(1)/ /some/ /more/.
 
     Scenario: No terms
