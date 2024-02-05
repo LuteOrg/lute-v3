@@ -156,13 +156,14 @@
 
     let make_bar = function(stid, title) {
       const p = statuspct[stid];
+      const msg = `${p}% (${statuscounts[stid]} words)`;
       const smallestP = window.matchMedia("(max-width: 980px)").matches ? 2 : 1;
       let display = "inline-flex"
       if (p < smallestP)
         display = "none";
       return `<div
         class="status-bar${stid} status-bar"
-        title="${title}: ${p}%"
+        title="${title}: ${msg}"
         style="flex: ${p}; display: ${display}"
         ></div>`;
     };
