@@ -52,8 +52,8 @@ class ParsedToken:
         attrs = [
             f"word: {self.is_word}",
             f"eos: {self.is_end_of_sentence}",
-            f"sent: {self.sentence_number}",
-            f"para: {self.paragraph_number}",
+            # f"sent: {self.sentence_number}",
+            # f"para: {self.paragraph_number}",
         ]
         attrs = ", ".join(attrs)
         return f'<"{self.token}" ({attrs})>'

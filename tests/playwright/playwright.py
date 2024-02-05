@@ -55,7 +55,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     # Open Tutorial
     _print("Tutorial check.")
     page.get_by_role("link", name="Tutorial", exact=True).click()
-    page.locator("#ID-178-1").click()
+    page.locator("#ID-176-1").click()
     page.frame_locator('iframe[name="wordframe"]').get_by_placeholder(
         "Translation"
     ).click()
