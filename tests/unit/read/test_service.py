@@ -128,6 +128,24 @@ def test_smoke_rendered(spanish, app_context):
     assert_rendered_text_equals(text, expected)
 
 
+def test_rendered_leaves_blank_lines(spanish, app_context):
+    """
+    Smoke test to get paragraph information.
+    """
+    add_terms(spanish, ["tengo un", "un gato"])
+    content = ["Tengo un gato. Hay un perro.", "", "Tengo un perro."]
+    text = make_text("Hola", "\n".join(content), spanish)
+    db.session.add(text)
+    db.session.commit()
+
+    expected = [
+        "Tengo un(1)/ gato(1)/. /Hay/ /un/ /perro/.",
+        "",
+        "Tengo un(1)/ /perro/.",
+    ]
+    assert_rendered_text_equals(text, expected)
+
+
 ## Start reading tests. ##########################
 
 

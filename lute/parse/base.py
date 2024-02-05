@@ -49,9 +49,14 @@ class ParsedToken:
             ParsedToken.cls_paragraph_number += 1
 
     def __repr__(self):
-        return (
-            f'<"{self.token}" (word: {self.is_word}, eos: {self.is_end_of_sentence})>'
-        )
+        attrs = [
+            f"word: {self.is_word}",
+            f"eos: {self.is_end_of_sentence}",
+            f"sent: {self.sentence_number}",
+            f"para: {self.paragraph_number}",
+        ]
+        attrs = ", ".join(attrs)
+        return f'<"{self.token}" ({attrs})>'
 
 
 class SentenceGroupIterator:
