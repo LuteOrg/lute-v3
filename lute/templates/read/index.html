@@ -10,6 +10,7 @@
 
 <div id="rendering_controls" style="display: none">
   <pre>
+    lang_is_rtl: <input id="lang_is_rtl" value="{{ is_rtl }}">
     book_id: <input id="book_id" value="{{ book.id }}">
     book_audio: <input id="book_audio_file" value="{{ book.audio_filename or '' }}">
     book_audio_current_pos: <input id="book_audio_current_pos" value="{{ book.audio_current_pos or 0 }}">
