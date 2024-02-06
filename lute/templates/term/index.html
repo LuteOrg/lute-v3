@@ -69,21 +69,21 @@
   <br />
 </div>
 
-<div class="term-action-container">
 
-<div id="term_actions" class="term-action-dropdown" onmouseover="activate_term_actions();">
-  <button class="term-action-button">Actions</button>
-  <div class="term-action-content">
-    <a href="/term/new">Create new</a>
-    <a id="term_action_set_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
+<div class="term-action-container">
+  <div id="term_actions" class="term-action-dropdown" onmouseover="activate_term_actions();">
+    <button class="term-action-button">Actions</button>
+    <div class="term-action-content">
+      <a href="/term/new">Create new</a>
+      <a id="term_action_set_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
+    </div>
+  </div>
+
+  <div id="set_parent_div" style="display: none;">
+    <p>Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" disabled >go</button></p>
   </div>
 </div>
 
-<div id="set_parent_div" style="display: none;">
-  <p>Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" disabled >go</button></p>
-</div>
-
-</div>
 
 <table id="termtable" class="table dataTable stripe">
   <thead>
