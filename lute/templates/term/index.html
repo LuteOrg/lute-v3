@@ -69,10 +69,20 @@
   <br />
 </div>
 
-<div style="margin-top: 10px; margin-bottom: 10px;">
-  <a href="/term/new">Create new</a>
-  &nbsp;|&nbsp;
-  Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" disabled >go</button>
+<div class="term-action-container">
+
+<div id="term_actions" class="term-action-dropdown" onmouseover="activate_term_actions();">
+  <button class="term-action-button">Actions</button>
+  <div class="term-action-content">
+    <a href="/term/new">Create new</a>
+    <a id="term_action_add_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
+  </div>
+</div>
+
+<div id="set_parent_div" style="display: none;">
+  <p>Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" disabled >go</button></p>
+</div>
+
 </div>
 
 <table id="termtable" class="table dataTable stripe">
@@ -202,6 +212,25 @@
     $("#btnSetParent").prop('disabled', disabled);
   }
 
+
+  function activate_term_actions() {
+    $("#term_action_add_parent").addClass("actionDisabled");
+
+    const checked_count = $('.chkWord:checked').length;
+    const lang_id = get_lang_id();
+
+    if (checked_count > 0 && lang_id != null)
+      $("#term_action_add_parent").removeClass("actionDisabled");
+  }
+
+
+  function show_hide_set_parent(event) {
+    if ($("#term_action_add_parent").hasClass("actionDisabled"))
+      return;
+    event.preventDefault();
+    $("#set_parent_div").css("display", "flex");
+    $("#txtSetParent").focus();
+  }
 
   // Return the clicked checkboxes' language ID,
   // or null if the lang id isn't the same for all.

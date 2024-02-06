@@ -1602,3 +1602,65 @@ input[type="checkbox"][disabled] + label {
 #booktable td {
     vertical-align: middle;
 }
+
+
+/** Term listing (/term) action dropdown. ********************/
+
+.term-action-container {
+    display: flex;
+}
+
+.term-action-dropdown,
+#set_parent_div {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+/* The container <div> to position the dropdown content */
+.term-action-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.term-action-button {
+    background-color: #04AA6D;
+    color: white;
+    padding: 8px;
+    font-size: 16px;
+    border: none;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.term-action-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.term-action-content a {
+    text-decoration: none;
+    padding: 12px 16px;
+    display: block;
+}
+
+.term-action-content a:hover {
+    background-color: #ddd;
+}
+
+.term-action-content a.actionDisabled {
+    color: grey;
+}
+
+/* Hover shows content and changes button color. */
+.term-action-dropdown:hover .term-action-content {
+    display: block;
+}
+.term-action-dropdown:hover .term-action-button {
+    background-color: #3e8e41;
+}
