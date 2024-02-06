@@ -75,7 +75,7 @@
   <button class="term-action-button">Actions</button>
   <div class="term-action-content">
     <a href="/term/new">Create new</a>
-    <a id="term_action_add_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
+    <a id="term_action_set_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
   </div>
 </div>
 
@@ -214,18 +214,18 @@
 
 
   function activate_term_actions() {
-    $("#term_action_add_parent").addClass("actionDisabled");
+    $("#term_action_set_parent").addClass("actionDisabled");
 
     const checked_count = $('.chkWord:checked').length;
     const lang_id = get_lang_id();
 
     if (checked_count > 0 && lang_id != null)
-      $("#term_action_add_parent").removeClass("actionDisabled");
+      $("#term_action_set_parent").removeClass("actionDisabled");
   }
 
 
   function show_hide_set_parent(event) {
-    if ($("#term_action_add_parent").hasClass("actionDisabled"))
+    if ($("#term_action_set_parent").hasClass("actionDisabled"))
       return;
     event.preventDefault();
     $("#set_parent_div").css("display", "flex");
