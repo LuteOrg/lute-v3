@@ -477,8 +477,23 @@ function handle_keydown (e) {
 
   map[kESC] = () => start_hover_mode();
   map[kRETURN] = () => start_hover_mode();
-  map[kLEFT] = () => move_cursor(-1);
-  map[kRIGHT] = () => move_cursor(+1);
+
+  // read/index.js has some data rendered at the top of the page.
+  const lang_is_rtl = $('#lang_is_rtl');
+  let left_increment = -1;
+  let right_increment = 1;
+  if (lang_is_rtl == null)
+    console.log("ERROR: missing lang control.");
+  else {
+    const is_rtl = (lang_is_rtl.val().toLowerCase() == "true");
+    if (is_rtl) {
+      left_increment = 1;
+      right_increment = -1;
+    }
+  }
+
+  map[kLEFT] = () => move_cursor(left_increment);
+  map[kRIGHT] = () => move_cursor(right_increment);
   map[kUP] = () => increment_status_for_selected_elements(e, +1);
   map[kDOWN] = () => increment_status_for_selected_elements(e, -1);
   map[kC] = () => handle_copy(e);
