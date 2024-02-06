@@ -331,7 +331,23 @@
       return;
     const checked = $('.chkWord:checked');
     const ids = checked.toArray().map(el => parseInt($(el).attr('wordid')));
-    console.log(ids);
+    const t = (ids.length == 1) ? 'term' : 'terms';
+    const resp = confirm(`Deleting ${ids.length} ${t}.  Continue?`);
+    if (! resp)
+      return;
+
+    data = {
+      wordids: ids
+    };
+    $.ajax({
+      url: '/term/bulk_delete',
+      method: 'POST',
+      data: JSON.stringify(data),
+      contentType: "application/json; charset=utf-8",
+      success: function(data) {
+        location.reload();
+      }
+    });
   }
 
 
