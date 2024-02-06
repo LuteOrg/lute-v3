@@ -69,21 +69,22 @@
   <br />
 </div>
 
-<div class="term-action-container">
 
-<div id="term_actions" class="term-action-dropdown" onmouseover="activate_term_actions();">
-  <button class="term-action-button">Actions</button>
-  <div class="term-action-content">
-    <a href="/term/new">Create new</a>
-    <a id="term_action_add_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
+<div class="term-action-container">
+  <div id="term_actions" class="term-action-dropdown" onmouseover="activate_term_actions();">
+    <button class="term-action-button">Actions</button>
+    <div class="term-action-content">
+      <a href="/term/new">Create new</a>
+      <a id="term_action_set_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
+      <a id="term_action_bulk_delete" href="#" onclick="bulk_delete(event);">Delete selected</a>
+    </div>
+  </div>
+
+  <div id="set_parent_div" style="display: none;">
+    <p>Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" disabled >go</button></p>
   </div>
 </div>
 
-<div id="set_parent_div" style="display: none;">
-  <p>Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" disabled >go</button></p>
-</div>
-
-</div>
 
 <table id="termtable" class="table dataTable stripe">
   <thead>
@@ -213,21 +214,28 @@
   }
 
 
+  /** Deactivate term Actions, activate if they're possible. */
   function activate_term_actions() {
-    $("#term_action_add_parent").addClass("actionDisabled");
-
+    const disabled = "actionDisabled";
     const checked_count = $('.chkWord:checked').length;
     const lang_id = get_lang_id();
 
+    let c = $("#term_action_bulk_delete");
+    c.addClass(disabled);
+    if (checked_count > 0)
+      c.removeClass(disabled);
+
+    c = $("#term_action_set_parent");
+    c.addClass(disabled);
     if (checked_count > 0 && lang_id != null)
-      $("#term_action_add_parent").removeClass("actionDisabled");
+      c.removeClass(disabled);
   }
 
 
   function show_hide_set_parent(event) {
-    if ($("#term_action_add_parent").hasClass("actionDisabled"))
-      return;
     event.preventDefault();
+    if ($("#term_action_set_parent").hasClass("actionDisabled"))
+      return;
     $("#set_parent_div").css("display", "flex");
     $("#txtSetParent").focus();
   }
@@ -315,6 +323,32 @@
       }
     });
   };
+
+
+  function bulk_delete(event) {
+    event.preventDefault();
+    if ($("#term_action_bulk_delete").hasClass("actionDisabled"))
+      return;
+    const checked = $('.chkWord:checked');
+    const ids = checked.toArray().map(el => parseInt($(el).attr('wordid')));
+    const t = (ids.length == 1) ? 'term' : 'terms';
+    const resp = confirm(`Deleting ${ids.length} ${t}.  Continue?`);
+    if (! resp)
+      return;
+
+    data = {
+      wordids: ids
+    };
+    $.ajax({
+      url: '/term/bulk_delete',
+      method: 'POST',
+      data: JSON.stringify(data),
+      contentType: "application/json; charset=utf-8",
+      success: function(data) {
+        location.reload();
+      }
+    });
+  }
 
 
   let handle_filter_update = function() {

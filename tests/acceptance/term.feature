@@ -57,5 +57,6 @@ Feature: Creating and managing terms
             ; 爱好; ; hobby; Classical Chinese; HSK1; New (1)
 
 
-# TODO zzfuture fix: testing scenarios: term filters.
-# TODO zzfuture fix: testing scenarios: bulk set parents.
+# TODO term testing scenarios: term filters.
+# TODO term testing scenarios: bulk set parents.
+# TODO term testing scenarios: bulk delete.
