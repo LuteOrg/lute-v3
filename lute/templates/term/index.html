@@ -76,6 +76,7 @@
     <div class="term-action-content">
       <a href="/term/new">Create new</a>
       <a id="term_action_set_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
+      <a id="term_action_bulk_delete" href="#" onclick="bulk_delete(event);">Delete selected</a>
     </div>
   </div>
 
@@ -213,21 +214,28 @@
   }
 
 
+  /** Deactivate term Actions, activate if they're possible. */
   function activate_term_actions() {
-    $("#term_action_set_parent").addClass("actionDisabled");
-
+    const disabled = "actionDisabled";
     const checked_count = $('.chkWord:checked').length;
     const lang_id = get_lang_id();
 
+    let c = $("#term_action_bulk_delete");
+    c.addClass(disabled);
+    if (checked_count > 0)
+      c.removeClass(disabled);
+
+    c = $("#term_action_set_parent");
+    c.addClass(disabled);
     if (checked_count > 0 && lang_id != null)
-      $("#term_action_set_parent").removeClass("actionDisabled");
+      c.removeClass(disabled);
   }
 
 
   function show_hide_set_parent(event) {
+    event.preventDefault();
     if ($("#term_action_set_parent").hasClass("actionDisabled"))
       return;
-    event.preventDefault();
     $("#set_parent_div").css("display", "flex");
     $("#txtSetParent").focus();
   }
@@ -315,6 +323,16 @@
       }
     });
   };
+
+
+  function bulk_delete(event) {
+    event.preventDefault();
+    if ($("#term_action_bulk_delete").hasClass("actionDisabled"))
+      return;
+    const checked = $('.chkWord:checked');
+    const ids = checked.toArray().map(el => parseInt($(el).attr('wordid')));
+    console.log(ids);
+  }
 
 
   let handle_filter_update = function() {
