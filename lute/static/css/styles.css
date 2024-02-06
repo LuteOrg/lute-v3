@@ -995,7 +995,7 @@ textarea {
 }
 
 /* focus on fields makes border same as tags */
-/* input:focus,
+input:focus,
 textarea:focus,
 select:focus {
     border: 1px solid var(--tagify__tag-bg) !important;
@@ -1011,7 +1011,20 @@ button:focus {
 input[type="checkbox"]:focus,
 input[type="file"]:focus {
     border: none !important;
-} */
+}
+/* undo focus styles for audio and dict containers */
+.audio-player-container *:focus {
+    border: none !important;
+    outline: none !important;
+}
+
+.dictcontainer *:focus {
+    outline: none !important;
+}
+
+.dictcontainer select:focus {
+    border: none !important;
+}
 
 ::placeholder {
     font-family: inherit;
@@ -1122,7 +1135,7 @@ div.help-text {
 }
 
 #term-form #text {
-    flex: 1;
+    width: 100%;
 }
 
 .term-element-box {
@@ -1172,44 +1185,175 @@ input[type="checkbox"][disabled] + label {
     transform: scale(4) translate(-17px, 5px);
 }
 
+/* DICT TABS */
 #dicttabs {
     display: flex;
-    padding: 4px 0 0 2px;
+    justify-content: space-between;
     background-color: #dbefff;
     height: 1.6rem;
+    padding: 4px 0 0 2px;
+}
+
+#dicttabslayout {
+    display: grid;
 }
 
 #dictframes {
     width: 100%;
+    /* height: 100%; */
+    flex: 1;
+}
+
+#select-btn-box {
+    position: relative;
+    border: 1px solid #aaceea;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    overflow: hidden;
+    border-bottom: none;
+    left: 0.3rem;
+    /* flex fixes long button size */
+    display: flex;
+}
+
+#select-btn-box .dict-btn{
     height: 100%;
+    border: none;
 }
 
 .dict-btn {
+    position: relative;
     padding-inline: 1rem;
     border: none;
-    background-color: #68ace0;
-    height: 100%;
+    color: #969696;
+    background-color: #dcebf8;
+    /* height: 100%; */
     box-sizing: border-box;
-    color: #6c6c6c;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    filter: brightness(0.8) grayscale(0.7);
+    /* filter: brightness(0.8) grayscale(0.7); */
     z-index: 1;
+    overflow: hidden;
+    white-space: nowrap;
+
+    display: flex;
+    align-items: center;
+    /* justify-content: center; */
+    gap: 0.3rem;
 }
 
-.dict-btn:not(:first-of-type) {
-    margin-left: -4px;
+.dict-btn:not(#dict-image-btn) {
+    width: 100%;
 }
+
+/* after element is for hiding text at the edges */
+#dicttabslayout .dict-btn::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border-inline: 4px solid #dcebf8;
+    box-sizing: border-box;
+}
+
+#dicttabslayout .dict-btn-active::after {
+    border-color: #68ace0;
+}
+
+#dicttabslayout .dict-btn[data-dict-external="1"]::after {
+    border-right-width: 1.4rem;
+}
+
+#dicttabslayout .dict-btn-select[data-dict-external="1"]::after {
+    border-right-width: 2.4rem
+}
+
+#dicttabslayout .dict-btn:not(.dict-btn-active):not(.dict-btn[data-dict-external="1"]):hover::after,
+#dicttabslayout .dict-btn:not(.dict-btn-active):hover::after {
+    border-color: aliceblue;
+}
+
+/* #dicttabslayout .dict-btn[data-dict-external="1"]::after {
+    border-color: #8ecd8f;
+} */
+
+.dict-btn-external-img {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0.2rem;
+    height: 60%;
+    z-index: 2;
+    opacity: 0.4;
+}
+
+.dict-btn-select .dict-btn-external-img {
+    right: 1.1rem;
+}
+
+.dict-btn:not(.dict-btn-active):not(.dict-btn[data-dict-external="1"]) img {
+    opacity: 0.5;
+}
+
+.dict-btn:hover + #dict-select,
+.dict-btn:not(.dict-btn-active):hover {
+    background-color: aliceblue;
+}
+
+#dict-image-btn:hover {
+    background-color: #412813;
+    filter: invert(1);
+}
+
+.dict-btn.dict-btn-active,
+.dict-btn.dict-btn-active + #dict-select {
+    background-color: #68ace0;
+    color: #fff;
+    /* filter: brightness(1); */
+    z-index: 2;
+}
+
+.dict-btn:not(.dict-btn-select):not(#dict-image-btn) {
+    border: 1px solid #aaceea;
+    border-bottom: none;
+    border-right: none;
+}
+
+.dict-btn:not(#dict-image-btn):not(.dict-btn-select):last-of-type {
+    border-right: 1px solid #aaceea;
+}
+
+.dict-btn-active:not(.dict-btn-select):not(#dict-image-btn) {
+    /* border: 2px solid #68ace0; */
+    box-shadow: inset 0 0 0 2px #68ace0;
+}
+
+/* .dict-btn:not(:first-of-type) {
+    margin-left: -4px;
+} */
+
 
 /* remove left margin if img button activated */
 /* .dict-btn:has(~ #dict-image-btn.dict-btn-active) {
     margin-left: 0;
 } */
 
-.dict-btn-active {
+/* .dict-btn[data-dict-external="1"],
+.dict-btn[data-dict-external="1"] + #dict-select {
+    background-color: #8ecd8f;
+    z-index: 0;
+    filter: unset;
     color: #fff;
-    filter: brightness(1);
-    z-index: 2;
+} */
+
+/* .dict-btn[data-dict-external="1"] {
+    border: 2px solid #6cce6d;
+} */
+
+.dict-btn[data-dict-external="1"] {
+    color: #5b5b5b;
 }
 
 #dict-image-btn.dict-btn-active {
@@ -1219,6 +1363,8 @@ input[type="checkbox"][disabled] + label {
 
 .dictframe {
     display: none;
+    border: none;
+    border-top: 3px solid #68ace0;
 }
 
 .dict-active {
@@ -1232,15 +1378,38 @@ input[type="checkbox"][disabled] + label {
     background: url("../icn/images.svg");
     background-repeat: no-repeat;
     background-position: center;
-    background-size: cover;
-    padding: 0.8rem;
+    background-size: 85%;
+    /* padding: 0.8rem; */
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    height: unset;
-    margin-left: auto;
-    margin-right: 0.8rem;
-    margin-bottom: 4px;
+    /* height: unset; */
+    /* margin-left: 0.5rem; */
+    margin-inline: 0.8rem;
+    /* justify-self: center; */
+    /* margin-bottom: 4px; */
     cursor: pointer;
+
+    filter: invert(66%) sepia(33%) saturate(700%) hue-rotate(170deg) brightness(92%) contrast(90%);
+}
+
+#dict-select {
+    border: none;
+    outline: none;
+    /* background-color: #a6e6c6; */
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    /* background: none;
+    width: 1.1rem;
+    position: absolute;
+    left: 0.1rem; */
+
+    position: absolute;
+    right: 0;
+    width: 1.1rem;
+    top: 0;
+    height: 100%;
+    background: #dcebf8;
+    z-index: 2;
 }
 
 
@@ -1413,8 +1582,10 @@ input[type="checkbox"][disabled] + label {
 #txtSetParent,
 #predefined,
 #max_page_tokens,
+#dict_tabs,
 .dict-type,
-.dict-usefor {
+.dict-usefor
+ {
     width: 8rem;
     box-sizing: border-box;
     border: 1px solid var(--form-border-color);

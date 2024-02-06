@@ -85,6 +85,8 @@ readPaneRight.addEventListener("mousedown", function(e){
 
 // double click -> widen to 95% temporarily (doesn't save state)
 readPaneRight.addEventListener("dblclick", function(e){
+  if (e.target != e.currentTarget) return; // fixes: clicking dict tabs resizes panes
+  
   if (e.offsetX < borderWidth) {
     // if the width is 95% then return to the last width value
     if (readPaneLeft.style.width == "95%") {
