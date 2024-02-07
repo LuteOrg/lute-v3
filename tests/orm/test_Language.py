@@ -2,6 +2,7 @@
 Language mapping tests.
 """
 
+import json
 from lute.models.language import Language, LanguageDictionary
 from lute.db import db
 from tests.dbasserts import assert_sql_result
@@ -87,6 +88,9 @@ def test_language_dictionaries_smoke_test(empty_db):
     ld = retrieved.dictionaries[0]
     assert ld.dicttype == "embeddedhtml", "type"
     assert ld.dicturi == "1?###", "uri"
+
+    expected = """{"1": {"term": ["1?###", "*2?###"], "sentence": "*3?###"}}"""
+    assert json.dumps(Language.all_dictionaries()) == expected
 
 
 def test_delete_language_removes_book_and_terms(app_context, spanish):

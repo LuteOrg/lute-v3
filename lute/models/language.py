@@ -111,12 +111,33 @@ class Language(
         languages = Language.query.all()
         language_data = {}
         for language in languages:
-            term_dicts = [language.dict_1_uri, language.dict_2_uri]
-            term_dicts = [uri for uri in term_dicts if uri is not None]
 
-            data = {"term": term_dicts, "sentence": language.sentence_translate_uri}
+            def _get_active_dicts(lang, t):
+                "Return active dicts."
+                return [d for d in lang.dictionaries if d.is_active and d.usefor == t]
 
-            language_data[language.id] = data
+            # HACK: pre-pend '*' to URLs that need to open a new window.
+            # This is a relic of the original code, and should be changed.
+            # TODO remove-asterisk-hack: remove * from URL start.
+            def _hack_make_uri(d):
+                "Hack add asterisk."
+                prepend = "*" if d.dicttype == "popuphtml" else ""
+                return f"{prepend}{d.dicturi}"
+
+            term_dicts = [
+                _hack_make_uri(d) for d in _get_active_dicts(language, "terms")
+            ]
+
+            # TODO multiple_sentences.
+            sentence_dicts = [
+                _hack_make_uri(d) for d in _get_active_dicts(language, "sentences")
+            ]
+
+            language_data[language.id] = {
+                "term": term_dicts,
+                "sentence": sentence_dicts[0],
+            }
+
         return language_data
 
     @staticmethod
