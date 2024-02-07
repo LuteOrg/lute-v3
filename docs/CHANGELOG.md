@@ -1,4 +1,29 @@
 
+# 3.1.3 (2024-02-07)
+
+Feature changes:
+
+* [#182](https://github.com/jzohrab/lute-v3/issues/182): Confirm book archive.
+* [#174](https://github.com/jzohrab/lute-v3/issues/174): Add bulk term deletion.
+* [#205](https://github.com/jzohrab/lute-v3/issues/205): Add Actions menu to term listing to simplify adding actions.
+* [#175](https://github.com/jzohrab/lute-v3/issues/175): Keep blank lines of imported texts when rendering page for reading.
+* [#202](https://github.com/jzohrab/lute-v3/issues/202): Include all books in cli export.
+* [#191](https://github.com/jzohrab/lute-v3/issues/191): Scroll back to top on "mark as read".
+* [#177](https://github.com/jzohrab/lute-v3/issues/177): Show word count on book listing stats bar hover.
+* [#164[(https://github.com/jzohrab/lute-v3/issues/164): Hit backspace to edit pasted parent tag.
+* Add "(all)" to term status filter.
+* [#166](https://github.com/jzohrab/lute-v3/issues/166): Keep returns in term translation in Terms listing.
+
+Bug fixes:
+
+* [#170](https://github.com/jzohrab/lute-v3/issues/170): Fix arrow keys for RTL languages.
+* [#207](https://github.com/jzohrab/lute-v3/issues/207): Move title to right for RTL languages.
+
+Back end changes:
+
+* Simplify lute.js, remove state tracking
+
+
 # 3.1.2 (2024-02-01)
 
 * Bugfix: only recalc texts.TxWordCount for valid parsers.
