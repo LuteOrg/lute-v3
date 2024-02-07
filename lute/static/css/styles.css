@@ -1168,8 +1168,12 @@ input[type="checkbox"][disabled] + label {
     display: flex;
     justify-content: space-between;
     background-color: #dbefff;
-    height: 1.6rem;
+    /* height: 1.6rem; */
     padding: 4px 0 0 2px;
+
+    --dict-btn-hover-color: #fff;
+    --dict-btn-active-color: #fff;
+    --dict-btn-list-color: #fff8d8;
 }
 
 #dicttabslayout {
@@ -1184,10 +1188,10 @@ input[type="checkbox"][disabled] + label {
 
 #select-btn-box {
     position: relative;
-    border: 1px solid #aaceea;
+    border: 1px solid #85c0ee;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    overflow: hidden;
+    /* overflow: hidden; */
     border-bottom: none;
     left: 0.3rem;
     /* flex fixes long button size */
@@ -1201,7 +1205,7 @@ input[type="checkbox"][disabled] + label {
 
 .dict-btn {
     position: relative;
-    padding-inline: 1rem;
+    padding: 0.2rem 1rem;
     border: none;
     color: #969696;
     background-color: #dcebf8;
@@ -1240,13 +1244,22 @@ input[type="checkbox"][disabled] + label {
     border-color: #68ace0;
 }
 
-#dicttabslayout .dict-btn[data-dict-external="1"]::after {
-    border-right-width: 1.4rem;
+#dicttabslayout .dict-btn[data-dict-external="1"]::after,
+#dicttabslayout .dict-btn-select[data-dict-external="0"]::after {
+    border-right-width: 1.5rem;
 }
 
 #dicttabslayout .dict-btn-select[data-dict-external="1"]::after {
-    border-right-width: 2.4rem
+    border-right-width: 2.6rem
 }
+/* 
+.dict-btn-select {
+    background-color: var(--dict-btn-list-color);
+}
+
+#dicttabslayout .dict-btn-select:not(.dict-btn-active)::after {
+    border-color: var(--dict-btn-list-color);
+} */
 
 #dicttabslayout .dict-btn:not(.dict-btn-active):not(.dict-btn[data-dict-external="1"]):hover::after,
 #dicttabslayout .dict-btn:not(.dict-btn-active):hover::after {
@@ -1257,18 +1270,34 @@ input[type="checkbox"][disabled] + label {
     border-color: #8ecd8f;
 } */
 
+.dict-btn-fav-img,
+.dict-btn-list-img,
+.dict-btn-external-img {
+    height: 60%;
+}
+
+.dict-btn-list-img,
 .dict-btn-external-img {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    right: 0.2rem;
-    height: 60%;
     z-index: 2;
     opacity: 0.4;
 }
 
+.dict-btn-list-img {
+    right: 0;
+    opacity: 1;
+    /* add padding so clicking area is bigger */
+    padding: 0.3rem;
+}
+
+.dict-btn-external-img{
+    right: 0.3rem;
+}
+
 .dict-btn-select .dict-btn-external-img {
-    right: 1.1rem;
+    right: 1.4rem;
 }
 
 .dict-btn:not(.dict-btn-active):not(.dict-btn[data-dict-external="1"]) img {
@@ -1281,7 +1310,7 @@ input[type="checkbox"][disabled] + label {
 }
 
 #dict-image-btn:hover {
-    background-color: #412813;
+    background-color: #623006;
     filter: invert(1);
 }
 
@@ -1357,7 +1386,9 @@ input[type="checkbox"][disabled] + label {
     background-repeat: no-repeat;
     background-position: center;
     background-size: 85%;
-    /* padding: 0.8rem; */
+
+    /* width: 32px; */
+    padding-top: 1.6rem;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     /* height: unset; */
@@ -1370,16 +1401,59 @@ input[type="checkbox"][disabled] + label {
     filter: invert(66%) sepia(33%) saturate(700%) hue-rotate(170deg) brightness(92%) contrast(90%);
 }
 
-#dict-select {
+#dict-select-container.dict-select-list-hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#dict-select-container {
+    opacity: 1;
+    pointer-events: unset;
+
+    position: absolute;
+    background-color: aliceblue;
+    top: 28px;
+    left: 0;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-top: none;
+    box-sizing: border-box;
+    box-shadow: 0 3px 5px 0 #0000002b;
+    /* easier way to hide sharp edges of list elements
+    instead adding border-radius to them too */
+    overflow: hidden; 
+
+    transition: opacity 0.2s;
+}
+
+#select-btn-box:hover .dict-btn-select:not(.dict-btn-active) {
+    background-color: aliceblue;
+}
+
+#select-btn-box:hover .dict-btn-select:not(.dict-btn-active)::after {
+    border-color: aliceblue;
+}
+
+.dict-select-option {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+}
+
+.dict-select-option:hover {
+    background-color: #68ace0;
+    color: #fff;
+}
+
+/* #dict-select {
     border: none;
     outline: none;
-    /* background-color: #a6e6c6; */
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    /* background: none;
-    width: 1.1rem;
-    position: absolute;
-    left: 0.1rem; */
 
     position: absolute;
     right: 0;
@@ -1388,7 +1462,7 @@ input[type="checkbox"][disabled] + label {
     height: 100%;
     background: #dcebf8;
     z-index: 2;
-}
+} */
 
 
 /* STATUS RADIO */

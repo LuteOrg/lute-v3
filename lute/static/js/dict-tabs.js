@@ -1,11 +1,12 @@
 "use strict";
 
 function createDictTabs(num = 0) {
-  // TERM_DICTS.push("*https://glosbe.com/de/en/###");
-  // TERM_DICTS.push("*https://en.langenscheidt.com/german-english/###");
-  // TERM_DICTS.push("*https://en.pons.com/translate/german-english/###");
-  // TERM_DICTS.push("*https://www.collinsdictionary.com/dictionary/german-english/###");
-  // TERM_DICTS.push("*https://dict.tu-chemnitz.de/deutsch-englisch/###.html");
+  TERM_DICTS.push("https://de.thefreedictionary.com/###");
+  TERM_DICTS.push("*https://glosbe.com/de/en/###");
+  TERM_DICTS.push("*https://en.langenscheidt.com/german-english/###");
+  TERM_DICTS.push("*https://en.pons.com/translate/german-english/###");
+  TERM_DICTS.push("*https://www.collinsdictionary.com/dictionary/german-english/###");
+  TERM_DICTS.push("*https://dict.tu-chemnitz.de/deutsch-englisch/###.html");
 
   let sliceIndex;
   let columnCount;
@@ -51,63 +52,100 @@ function createDictTabs(num = 0) {
   });
 
   if (OPTION_DICTS.length > 0) {
-    const selectList = document.createElement("select");
+    const selectContainer = document.createElement("div");
+    // const selectList = document.createElement("ol");
+
+    // const selectList = document.createElement("select");
     const selectButtonBox = document.createElement("div");
     const domain = getDictURLDomain(OPTION_DICTS[0]);
     const faviconURL = getFavicon(domain);
     const btn = createTabBtn(domain.split("www.").splice(-1)[0], 
-                              selectButtonBox, 
+                              dictTabsLayoutContainer, 
                               TERM_DICTS.indexOf(OPTION_DICTS[0]), 
                               isURLExternal(OPTION_DICTS[0]), 
                               faviconURL);
+    btn.setAttribute("title", "Right click for dictionary list");
+    const menuImgEl = createImg("../static/icn/list.svg", "dict-btn-list-img");
+    btn.appendChild(menuImgEl);
     const iFrame = createIFrame("selectframe", iFramesContainer);
     btn.classList.add("dict-btn-select");
     dictTabButtons.set(btn, iFrame);
 
-    selectList.setAttribute("id", "dict-select");
+    selectContainer.setAttribute("id", "dict-select-container");
+    selectContainer.classList.add("dict-select-list-hide");
+    // selectList.setAttribute("id", "dict-select");
     selectButtonBox.setAttribute("id", "select-btn-box");
-    selectButtonBox.appendChild(selectList); // add select AFTER button
+    selectButtonBox.appendChild(btn); // add select AFTER button
+    selectButtonBox.appendChild(selectContainer); // add select AFTER button
+    // selectContainer.appendChild(selectList); // add select AFTER button
     dictTabsLayoutContainer.appendChild(selectButtonBox);
   
     OPTION_DICTS.forEach((dict) => {
-      const option = document.createElement("option");
+      const option = document.createElement("p");
+      option.classList.add("dict-select-option");
       const origIndex = TERM_DICTS.indexOf(dict);
       const domain = getDictURLDomain(dict);
+      const faviconURL = getFavicon(domain);
+      const faviconEl = createImg(faviconURL, "dict-btn-fav-img");
       option.textContent = domain;
-      option.setAttribute("value", origIndex);
-      //option.dataset.dictId = origIndex;
+      option.prepend(faviconEl);
+      option.dataset.dictId = origIndex;
       option.dataset.dictExternal = isURLExternal(dict);
       option.dataset.tabOpened = 1 - isURLExternal(dict);
-      selectList.appendChild(option);
+      selectContainer.appendChild(option);
     });
 
-    selectList.addEventListener("change", (e) => {
-      const optionVal = e.target.value;
-      const optionEl = e.target.selectedOptions[0];
+    btn.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      selectContainer.classList.toggle("dict-select-list-hide");
+      // selectContainer.style.opacity = 1;
+      // selectContainer.style.pointerEvents = "unset";
+    });
+
+    menuImgEl.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectContainer.classList.toggle("dict-select-list-hide");
+    });
+
+    selectButtonBox.addEventListener("mouseleave", () => {
+      selectContainer.classList.add("dict-select-list-hide");
+    });
+
+    selectContainer.addEventListener("click", (e) => {
+      const clickedOption = e.target.closest(".dict-select-option");
+      if (!clickedOption) return;
+
+      selectContainer.classList.add("dict-select-list-hide");
+
+      const optionVal = clickedOption.dataset.dictId;
       const domain = getDictURLDomain(TERM_DICTS[optionVal]);
       const btnLabel = domain.split("www.").splice(-1)[0];
       const faviconURL = getFavicon(domain);
-      const faviconEl = document.createElement("img"); // img elements get deleted after "change" event. so we create them after each change
-      faviconEl.src = faviconURL;
+      const faviconEl = createImg(faviconURL, "dict-btn-fav-img"); // img elements get deleted after "change" event. so we create them after each change
       
       btn.dataset.dictId = optionVal;
-      btn.dataset.dictExternal = optionEl.dataset.dictExternal;
+      btn.dataset.dictExternal = clickedOption.dataset.dictExternal;
       btn.textContent = btnLabel;
-      btn.dataset.tabOpened = optionEl.dataset.tabOpened;
+      btn.dataset.tabOpened = clickedOption.dataset.tabOpened;
       btn.prepend(faviconEl);
+      const menuImgEl = createImg("../static/icn/list.svg", "dict-btn-list-img");
+      btn.appendChild(menuImgEl);
       
-      //faviconEl.classList("dict-btn-img");
-      if (optionEl.dataset.dictExternal == 1) {
+      if (clickedOption.dataset.dictExternal == 1) {
         loadDictPage(optionVal, "");
 
-        const arrowEl = document.createElement("img");
-        arrowEl.src = "../static/icn/arrow-out.svg";
-        arrowEl.classList.add("dict-btn-external-img");
+        const arrowEl = createImg("../static/icn/open.svg", "dict-btn-external-img");
         btn.appendChild(arrowEl);
+        // btn.classList.remove("dict-btn-active");
       } else {
         loadDictPage(optionVal, iFrame);
         activateTab(btn, dictTabButtons);
       }
+      // as with the icons, btn content changes so events get deleted
+      menuImgEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectContainer.classList.toggle("dict-select-list-hide");
+      });
     });
   }
   
@@ -133,7 +171,11 @@ function createDictTabs(num = 0) {
     // const clickedTab = e.target; 
     const isExternal = clickedTab.dataset.dictExternal;
     let iFrame = dictTabButtons.get(clickedTab);
-    if (isExternal == 1) iFrame = "";
+    
+    if (isExternal == 1) {
+      iFrame = "";
+    }
+
     if (clickedTab.dataset.tabOpened == 0) {
       //const dictID = clickedTab.dataset.dictId;
       loadDictPage(dictID, iFrame);
@@ -209,9 +251,7 @@ function createTabBtn(label, parent, data, external, faviconURL=null) {
   if (external != null) {
     btn.dataset.dictExternal = external;
     if (external == 1) {
-      const arrowEl = document.createElement("img");
-      arrowEl.src = "../static/icn/arrow-out.svg";
-      arrowEl.classList.add("dict-btn-external-img");
+      const arrowEl = createImg("../static/icn/open.svg", "dict-btn-external-img");
       btn.appendChild(arrowEl);
     }
   }
@@ -219,15 +259,21 @@ function createTabBtn(label, parent, data, external, faviconURL=null) {
   btn.classList.add("dict-btn");
 
   if (faviconURL) {
-    const faviconEl = document.createElement("img");
-    //faviconEl.classList("dict-btn-img");
-    faviconEl.src = faviconURL;
+    const faviconEl = createImg(faviconURL, "dict-btn-fav-img");
     btn.prepend(faviconEl);
   }
   
   parent.appendChild(btn);
 
   return btn;
+}
+
+function createImg(src, className) {
+  const img = document.createElement("img");
+  img.classList.add(className);
+  img.src = src;
+
+  return img;
 }
 
 function isURLExternal(dictURL) {
@@ -354,4 +400,4 @@ let get_parents = function() {
   
 // }
 
-createDictTabs();
+createDictTabs(5);
