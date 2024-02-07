@@ -74,6 +74,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     # Open and archive book.
     _print("Archive.")
     page.get_by_role("link", name="Büyük ağaç").click()
+    page.on("dialog", lambda dialog: dialog.accept())
     page.get_by_role("link", name="Archive book").click()
 
     # Make a new book
