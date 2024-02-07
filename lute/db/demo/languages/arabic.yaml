@@ -1,4 +1,14 @@
 name: Arabic
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://www.arabicstudentsdictionary.com/search?q=###
+  - for: terms
+    type: popup
+    url: https://translate.google.com/?hl=es&sl=ar&tl=en&text=###&op=translate
+  - for: sentences
+    type: popup
+    url: https://translate.google.com/?hl=es&sl=ar&tl=en&text=###
 dict_1: https://www.arabicstudentsdictionary.com/search?q=###
 dict_2: "*https://translate.google.com/?hl=es&sl=ar&tl=en&text=###&op=translate"
 sentence_translation: "*https://translate.google.com/?hl=es&sl=ar&tl=en&text=###"

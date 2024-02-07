@@ -1,4 +1,14 @@
-name: 
+name:
+dictionaries:
+  - for: terms
+    type: embedded
+    url: x
+  - for: terms
+    type: popup
+    url: x
+  - for: sentences
+    type: popup
+    url: x
 dict_1: 
 dict_2: 
 sentence_translation: 

@@ -1,4 +1,14 @@
 name: Czech
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://slovniky.lingea.cz/Anglicko-cesky/###
+  - for: terms
+    type: embedded
+    url: https://slovnik.seznam.cz/preklad/cesky_anglicky/###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#cs/en/###
 dict_1: https://slovniky.lingea.cz/Anglicko-cesky/###
 dict_2: https://slovnik.seznam.cz/preklad/cesky_anglicky/###
 sentence_translation: https://www.deepl.com/translator#cs/en/###

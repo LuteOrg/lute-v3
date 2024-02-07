@@ -1,4 +1,14 @@
 name: Sanskrit
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://dsal.uchicago.edu/cgi-bin/app/sanskrit_query.py?qs=###&searchhws=yes&matchtype=default
+  - for: terms
+    type: embedded
+    url: https://www.learnsanskrit.cc/translate?search=###&dir=se
+  - for: sentences
+    type: popup
+    url: https://translate.google.com/?hl=en&sl=sa&tl=en&text=###&op=translate
 dict_1: https://dsal.uchicago.edu/cgi-bin/app/sanskrit_query.py?qs=###&searchhws=yes&matchtype=default
 dict_2: https://www.learnsanskrit.cc/translate?search=###&dir=se
 sentence_translation: https://translate.google.com/?hl=en&sl=sa&tl=en&text=###&op=translate

@@ -1,4 +1,11 @@
 name: Classical Chinese
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://ctext.org/dictionary.pl?if=en&char=###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#ch/en/###
 dict_1: https://ctext.org/dictionary.pl?if=en&char=###
 dict_2: https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle
 sentence_translation: "*https://www.deepl.com/translator#ch/en/###"

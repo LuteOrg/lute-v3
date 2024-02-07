@@ -14,7 +14,7 @@ from glob import glob
 import yaml
 from sqlalchemy import text
 
-from lute.models.language import Language
+from lute.models.language import Language, LanguageDictionary
 from lute.models.book import Book
 from lute.book.stats import refresh_stats
 from lute.models.setting import SystemSetting
@@ -121,6 +121,26 @@ def get_demo_language(filename):
         funcname = mappings.get(key, "")
         if funcname:
             load(key, funcname)
+
+    ld_sort = 1
+    for ld_data in d["dictionaries"]:
+        dtype = ld_data["type"]
+        if dtype == "embedded":
+            dtype = "embeddedhtml"
+        elif dtype == "popup":
+            dtype = "popuphtml"
+        else:
+            raise ValueError(f"Invalid dictionary type {dtype}")
+
+        ld = LanguageDictionary()
+        # ld.language = lang -- if you do this, the dict is added twice.
+        ld.usefor = ld_data["for"]
+        ld.dicttype = dtype
+        ld.dicturi = ld_data["url"]
+        ld.is_active = True
+        ld.sort_order = ld_sort
+        ld_sort += 1
+        lang.dictionaries.append(ld)
 
     return lang
 

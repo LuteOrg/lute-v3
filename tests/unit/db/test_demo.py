@@ -72,12 +72,23 @@ def test_new_english_from_yaml_file():
     f = os.path.join(demo_data_path(), "languages", "english.yaml")
     lang = get_demo_language(f)
 
-    # Replace the following assertions with your specific expectations
     assert lang.name == "English"
     assert lang.dict_1_uri == "https://en.thefreedictionary.com/###"
     assert lang.sentence_translate_uri == "*https://www.deepl.com/translator#en/en/###"
     assert lang.show_romanization is False, "uses default"
     assert lang.right_to_left is False, "uses default"
+
+    print(lang.dictionaries)
+    expected = [
+        "terms; embeddedhtml; https://en.thefreedictionary.com/###; True; 1",
+        "terms; popuphtml; https://www.collinsdictionary.com/dictionary/english/###; True; 2",
+        "sentences; popuphtml; https://www.deepl.com/translator#en/en/###; True; 3",
+    ]
+    actual = [
+        f"{ld.usefor}; {ld.dicttype}; {ld.dicturi}; {ld.is_active}; {ld.sort_order}"
+        for ld in lang.dictionaries
+    ]
+    assert actual == expected, "dictionaries"
 
 
 def test_get_predefined():
