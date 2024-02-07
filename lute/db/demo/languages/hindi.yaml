@@ -6,9 +6,6 @@ dictionaries:
   - for: sentences
     type: embedded
     url: https://www.bing.com/translator/?from=hi&to=en&text=###
-dict_1: https://www.boltidictionary.com/en/search?s=###
-dict_2: https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle
-sentence_translation: https://www.bing.com/translator/?from=hi&to=en&text=###
 show_romanization: true
 # right_to_left: 
 

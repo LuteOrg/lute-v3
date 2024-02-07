@@ -9,9 +9,6 @@ dictionaries:
   - for: sentences
     type: popup
     url: https://www.deepl.com/translator#es/en/###
-dict_1: https://es.thefreedictionary.com/###
-dict_2: https://www.wordreference.com/es/en/translation.asp?spen=###
-sentence_translation: "*https://www.deepl.com/translator#es/en/###"
 # show_romanization: false
 # right_to_left: false
 

@@ -9,9 +9,6 @@ dictionaries:
   - for: sentences
     type: popup
     url: https://translate.google.com/?hl=es&sl=ar&tl=en&text=###
-dict_1: https://www.arabicstudentsdictionary.com/search?q=###
-dict_2: "*https://translate.google.com/?hl=es&sl=ar&tl=en&text=###&op=translate"
-sentence_translation: "*https://translate.google.com/?hl=es&sl=ar&tl=en&text=###"
 show_romanization: true
 right_to_left: true
 
