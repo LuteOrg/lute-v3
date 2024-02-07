@@ -22,6 +22,29 @@ def test_save_new_language(empty_db):
     lang.dict_1_uri = "something"
     lang.sentence_translate_uri = "sentence_uri"
 
+    db.session.add(lang)
+    db.session.commit()
+    assert_sql_result(sql, ["abc; 0; 0; .!?"], "have language, defaults as expected")
+
+    lang.right_to_left = True
+    db.session.add(lang)
+    db.session.commit()
+    assert_sql_result(sql, ["abc; 1; 0; .!?"], "rtl is True")
+
+    retrieved = db.session.query(Language).filter(Language.name == "abc").first()
+    # print(retrieved)
+    assert retrieved.name == "abc"
+    assert retrieved.right_to_left is True, "retrieved is RTL"
+    assert retrieved.show_romanization is False, "retrieved no roman"
+
+
+def test_language_dictionaries_smoke_test(empty_db):
+    "Smoke test for new dictionary structure."
+    lang = Language()
+    lang.name = "abc"
+    lang.dict_1_uri = "something"
+    lang.sentence_translate_uri = "sentence_uri"
+
     ld = LanguageDictionary()
     ld.usefor = "terms"
     ld.dicttype = "embeddedhtml"
@@ -37,7 +60,6 @@ def test_save_new_language(empty_db):
 
     db.session.add(lang)
     db.session.commit()
-    assert_sql_result(sql, ["abc; 0; 0; .!?"], "have language, defaults as expected")
 
     sqldicts = """select LgName, LdType, LdDictURI
     from languages
@@ -52,17 +74,7 @@ def test_save_new_language(empty_db):
         "dict saved",
     )
 
-    lang.right_to_left = True
-    db.session.add(lang)
-    db.session.commit()
-    assert_sql_result(sql, ["abc; 1; 0; .!?"], "rtl is True")
-
     retrieved = db.session.query(Language).filter(Language.name == "abc").first()
-    # print(retrieved)
-    assert retrieved.name == "abc"
-    assert retrieved.right_to_left is True, "retrieved is RTL"
-    assert retrieved.show_romanization is False, "retrieved no roman"
-
     assert len(retrieved.dictionaries) == 2, "have dicts"
     ld = retrieved.dictionaries[0]
     assert ld.dicttype == "embeddedhtml", "type"
