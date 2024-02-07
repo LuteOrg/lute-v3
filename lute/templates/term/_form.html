@@ -298,6 +298,10 @@
     }
   };
 
+  const ALL_DICTS = {{ language_dicts | safe }};
+  const LANG_ID = Object.keys(ALL_DICTS)[0];
+  const TERM_DICTS = ALL_DICTS[LANG_ID].term;
+
   $(document).ready(function () {
 
     /** TERM IMAGE *************************/
@@ -328,6 +332,12 @@
     var termtagslist = document.getElementById('termtagslist');
     var termtags_tagify = setup_term_tags_tagify(termtagslist);
 
+    // needed for new/edit term page to auto open the dict
+    if (($('#text').val() ?? '') != '') {
+      const iframe = window.parent.document.querySelector("iframe[name='dict0']");
+      loadIFrameDictionary(TERM_DICTS[0], $('#text').val(), iframe)
+    }
+    
     // Post message re form opened.
     // Note have to use this rather than the better
     // this.dispatchEvent(new Event("termFormOpened"));
@@ -336,6 +346,27 @@
 
     enable_disable_sync_status_checkbox();
   });
+
+  function loadIFrameDictionary(dicturl, text, iframe) {
+    const url = get_lookup_url(dicturl, text);
+    iframe.setAttribute("src", url);
+  }
+
+  function get_lookup_url(dicturl, term) {
+    let ret = dicturl;
+
+    // Terms are saved with zero-width space between each token;
+    // remove that for dict searches!
+    const zeroWidthSpace = '\u200b';
+    const sqlZWS = '%E2%80%8B';
+    const cleantext = term.
+          replaceAll(zeroWidthSpace, '').
+          replace(/\s+/g, ' ');
+    const searchterm = encodeURIComponent(cleantext).
+          replaceAll(sqlZWS, '');
+    ret = ret.replace('###', searchterm);
+    return ret;
+  }
 
   function show_term_sentences() {
     const langid = $('#language_id').val();

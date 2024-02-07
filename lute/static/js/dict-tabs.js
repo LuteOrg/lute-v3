@@ -339,7 +339,7 @@ const open_new_lookup_window = function(url) {
   );
 };
 
-const get_lookup_url = function(dicturl, term) {
+function get_lookup_url(dicturl, term) {
   let ret = dicturl;
 
   // Terms are saved with zero-width space between each token;
@@ -353,7 +353,7 @@ const get_lookup_url = function(dicturl, term) {
         replaceAll(sqlZWS, '');
   ret = ret.replace('###', searchterm);
   return ret;
-};
+}
 
 
 function do_image_lookup(text, iframe) {
