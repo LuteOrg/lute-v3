@@ -48,37 +48,45 @@ def test_language_dictionaries_smoke_test(empty_db):
     ld = LanguageDictionary()
     ld.usefor = "terms"
     ld.dicttype = "embeddedhtml"
-    ld.dicturi = "something?###"
+    ld.dicturi = "1?###"
     ld.sort_order = 1
     lang.dictionaries.append(ld)
     ld2 = LanguageDictionary()
     ld2.usefor = "terms"
     ld2.dicttype = "popuphtml"
-    ld2.dicturi = "pop?###"
+    ld2.dicturi = "2?###"
     ld2.sort_order = 2
     lang.dictionaries.append(ld2)
+
+    ld3 = LanguageDictionary()
+    ld3.usefor = "sentences"
+    ld3.dicttype = "popuphtml"
+    ld3.dicturi = "3?###"
+    ld3.sort_order = 3
+    lang.dictionaries.append(ld3)
 
     db.session.add(lang)
     db.session.commit()
 
-    sqldicts = """select LgName, LdType, LdDictURI
+    sqldicts = """select LgName, LdUseFor, LdType, LdDictURI
     from languages
     inner join languagedicts on LdLgID = LgID
     order by LdSortOrder"""
     assert_sql_result(
         sqldicts,
         [
-            "abc; embeddedhtml; something?###",
-            "abc; popuphtml; pop?###",
+            "abc; terms; embeddedhtml; 1?###",
+            "abc; terms; popuphtml; 2?###",
+            "abc; sentences; popuphtml; 3?###",
         ],
         "dict saved",
     )
 
     retrieved = db.session.query(Language).filter(Language.name == "abc").first()
-    assert len(retrieved.dictionaries) == 2, "have dicts"
+    assert len(retrieved.dictionaries) == 3, "have dicts"
     ld = retrieved.dictionaries[0]
     assert ld.dicttype == "embeddedhtml", "type"
-    assert ld.dicturi == "something?###", "uri"
+    assert ld.dicturi == "1?###", "uri"
 
 
 def test_delete_language_removes_book_and_terms(app_context, spanish):
