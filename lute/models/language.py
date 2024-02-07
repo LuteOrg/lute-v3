@@ -23,6 +23,7 @@ class LanguageDictionary(db.Model):
     usefor = db.Column("LdUseFor", db.String(20), nullable=False)
     dicttype = db.Column("LdType", db.String(20), nullable=False)
     dicturi = db.Column("LdDictURI", db.String(200), nullable=False)
+    is_active = db.Column("LdIsActive", db.Boolean)
     sort_order = db.Column("LdSortOrder", db.SmallInteger, nullable=False)
 
 

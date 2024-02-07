@@ -22,14 +22,19 @@ class LanguageDictionaryForm(Form):
     Language dictionary form, nested in Language form.
     """
 
-    usefor = SelectField(choices=["terms", "sentences"])
+    usefor = SelectField(
+        choices=[("terms", "Terms"), ("sentences", "Sentences")],
+        render_kw={"title": "Use dictionary for"},
+    )
     dicttype = SelectField(
         choices=[
             ("embeddedhtml", "Embedded"),
             ("popuphtml", "Pop-up window"),
-        ]
+        ],
+        render_kw={"title": "Show as"},
     )
     dicturi = StringField("URL", validators=[DataRequired()])
+    is_active = BooleanField("Is active", render_kw={"title": "Is active?"})
     sort_order = IntegerField("Sort", render_kw={"style": "display: none"})
 
     def validate_dicturi(self, field):  # pylint: disable=unused-argument

@@ -36,6 +36,7 @@
             {{ dictionary.usefor(class="dict-usefor") }}
             {{ dictionary.dicttype(class="dict-type") }}
             {{ dictionary.dicturi(class="dict-uri form-control-narrower") }}
+            {{ dictionary.is_active }}
             {{ dictionary.sort_order }}
             <span class="test-dict-entity" title="Test dictionary">
               <img src="{{ url_for('static', filename='icn/external.png') }}">
@@ -114,8 +115,9 @@
       let template = `<div class="dict_entry valign">` + templateInput.closest('div.dict_entry').html() + "</div>";
       template = template.replaceAll(`-${idToReplace}-`, `-${index}-`);
       template = template.replaceAll('__TEMPLATE__', '');
-      // console.log(template);
+      console.log(template);
       $("#dictionary_entities").append(template);
+      $(`#dictionaries-${index}-is_active`).attr("checked", true);
       apply_sortable();
       add_sort_values();
     });
