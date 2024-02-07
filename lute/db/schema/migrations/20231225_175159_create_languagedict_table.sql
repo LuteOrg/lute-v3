@@ -22,7 +22,7 @@ select lgid, "terms", "embeddedhtml", LgDict1URI, 1
 from languages where LgDict1URI is not null and LgDict1URI NOT LIKE '*%';
 
 -- popup
-insert into languagedicts (LdLgID, LdType, LdDictURI, LdSortOrder)
+insert into languagedicts (LdLgID, LdUseFor, LdType, LdDictURI, LdSortOrder)
 select lgid, "terms", "popuphtml", substr(LgDict1URI,2), 2
 from languages where LgDict1URI is not null and LgDict1URI LIKE '*%';
 
@@ -30,12 +30,12 @@ from languages where LgDict1URI is not null and LgDict1URI LIKE '*%';
 -- TERMS: dict 2
 
 -- embedded
-insert into languagedicts (LdLgID, LdType, LdDictURI, LdSortOrder)
+insert into languagedicts (LdLgID, LdUseFor, LdType, LdDictURI, LdSortOrder)
 select lgid, "terms", "embeddedhtml", LgDict2URI, 2
 from languages where LgDict2URI is not null and LgDict2URI NOT LIKE '*%';
 
 -- popup
-insert into languagedicts (LdLgID, LdType, LdDictURI, LdSortOrder)
+insert into languagedicts (LdLgID, LdUseFor, LdType, LdDictURI, LdSortOrder)
 select lgid, "terms", "popuphtml", substr(LgDict2URI,2), 2
 from languages where LgDict2URI is not null and LgDict2URI LIKE '*%';
 
@@ -48,6 +48,6 @@ select lgid, "sentences", "embeddedhtml", LgGoogleTranslateURI, 3
 from languages where LgGoogleTranslateURI is not null and LgGoogleTranslateURI NOT LIKE '*%';
 
 -- popup
-insert into languagedicts (LdLgID, LdType, LdDictURI, LdSortOrder)
+insert into languagedicts (LdLgID, LdUseFor, LdType, LdDictURI, LdSortOrder)
 select lgid, "sentences", "popuphtml", substr(LgGoogleTranslateURI,2), 3
 from languages where LgGoogleTranslateURI is not null and LgGoogleTranslateURI LIKE '*%';
