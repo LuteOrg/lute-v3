@@ -23,11 +23,13 @@ def test_save_new_language(empty_db):
     lang.sentence_translate_uri = "sentence_uri"
 
     ld = LanguageDictionary()
+    ld.usefor = "terms"
     ld.dicttype = "embeddedhtml"
     ld.dicturi = "something?###"
     ld.sort_order = 1
     lang.dictionaries.append(ld)
     ld2 = LanguageDictionary()
+    ld2.usefor = "terms"
     ld2.dicttype = "popuphtml"
     ld2.dicturi = "pop?###"
     ld2.sort_order = 2
@@ -74,14 +76,26 @@ def test_delete_language_removes_book_and_terms(app_context, spanish):
     add_terms(spanish, ["gato", "perro"])
     t = make_text("hola", "Hola amigo", spanish)
     db.session.add(t)
+
+    ld = LanguageDictionary()
+    ld.usefor = "terms"
+    ld.dicttype = "embeddedhtml"
+    ld.dicturi = "something?###"
+    ld.sort_order = 1
+    spanish.dictionaries.append(ld)
+    db.session.add(spanish)
+
     db.session.commit()
 
     sqlterms = "select WoText from words order by WoText"
     sqlbook = "select BkTitle from books where BkTitle = 'hola'"
+    sqldict = "select LdDictURI from languagedicts where LdDictURI = 'something?###'"
     assert_sql_result(sqlterms, ["gato", "perro"], "initial terms")
     assert_sql_result(sqlbook, ["hola"], "initial book")
+    assert_sql_result(sqldict, ["something?###"], "dict")
 
     Language.delete(spanish)
 
     assert_sql_result(sqlbook, [], "book deleted")
     assert_sql_result(sqlterms, [], "terms deleted")
+    assert_sql_result(sqldict, [], "dicts deleted")

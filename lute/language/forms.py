@@ -22,6 +22,7 @@ class LanguageDictionaryForm(Form):
     Language dictionary form, nested in Language form.
     """
 
+    usefor = SelectField(choices=["terms", "sentences"])
     dicttype = SelectField(
         choices=[
             ("embeddedhtml", "Embedded"),

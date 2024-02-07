@@ -20,6 +20,7 @@ class LanguageDictionary(db.Model):
         "LdLgID", db.Integer, db.ForeignKey("languages.LgID"), nullable=False
     )
     language = db.relationship("Language", back_populates="dictionaries")
+    usefor = db.Column("LdUseFor", db.String(20), nullable=False)
     dicttype = db.Column("LdType", db.String(20), nullable=False)
     dicturi = db.Column("LdDictURI", db.String(200), nullable=False)
     sort_order = db.Column("LdSortOrder", db.SmallInteger, nullable=False)
