@@ -47,9 +47,6 @@ class Language(
         cascade="all, delete-orphan",
     )
 
-    dict_1_uri = db.Column("LgDict1URI", db.String(200))
-    dict_2_uri = db.Column("LgDict2URI", db.String(200))
-    sentence_translate_uri = db.Column("LgGoogleTranslateURI", db.String(200))
     character_substitutions = db.Column("LgCharacterSubstitutions", db.String(500))
     regexp_split_sentences = db.Column("LgRegexpSplitSentences", db.String(500))
     exceptions_split_sentences = db.Column("LgExceptionsSplitSentences", db.String(500))
@@ -102,6 +99,26 @@ class Language(
     @word_characters.setter
     def word_characters(self, s):
         self._word_characters = self._get_python_regex_pattern(s)
+
+    @property
+    def sentence_hack_translate_uri(self):
+        "TODO multiple_sentences: remove this hack."
+
+        def _get_active_dicts(t):
+            "Return active dicts."
+            return [d for d in self.dictionaries if d.is_active and d.usefor == t]
+
+        # HACK: pre-pend '*' to URLs that need to open a new window.
+        # This is a relic of the original code, and should be changed.
+        # TODO remove-asterisk-hack: remove * from URL start.
+        def _hack_make_uri(d):
+            "Hack add asterisk."
+            prepend = "*" if d.dicttype == "popuphtml" else ""
+            return f"{prepend}{d.dicturi}"
+
+        # TODO multiple_sentences: allow multiple
+        sentence_dicts = [_hack_make_uri(d) for d in _get_active_dicts("sentences")]
+        return sentence_dicts[0]
 
     @classmethod
     def all_dictionaries(cls):

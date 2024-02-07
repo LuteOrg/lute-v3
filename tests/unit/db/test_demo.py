@@ -73,8 +73,6 @@ def test_new_english_from_yaml_file():
     lang = get_demo_language(f)
 
     assert lang.name == "English"
-    assert lang.dict_1_uri == "https://en.thefreedictionary.com/###"
-    assert lang.sentence_translate_uri == "*https://www.deepl.com/translator#en/en/###"
     assert lang.show_romanization is False, "uses default"
     assert lang.right_to_left is False, "uses default"
 

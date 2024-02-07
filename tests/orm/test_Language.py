@@ -20,8 +20,6 @@ def test_save_new_language(empty_db):
 
     lang = Language()
     lang.name = "abc"
-    lang.dict_1_uri = "something"
-    lang.sentence_translate_uri = "sentence_uri"
 
     db.session.add(lang)
     db.session.commit()
@@ -43,8 +41,6 @@ def test_language_dictionaries_smoke_test(empty_db):
     "Smoke test for new dictionary structure."
     lang = Language()
     lang.name = "abc"
-    lang.dict_1_uri = "something"
-    lang.sentence_translate_uri = "sentence_uri"
 
     ld = LanguageDictionary()
     ld.usefor = "terms"

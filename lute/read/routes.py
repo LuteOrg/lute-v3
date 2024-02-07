@@ -24,13 +24,14 @@ def _render_book_page(book, pagenum):
     lang = book.language
     show_highlights = bool(int(UserSetting.get_value("show_highlights")))
 
+    # TODO multiple_sentences: allow multiple
     return render_template(
         "read/index.html",
         hide_top_menu=True,
         is_rtl=lang.right_to_left,
         html_title=book.title,
         book=book,
-        dictionary_url=lang.sentence_translate_uri,
+        dictionary_url=lang.sentence_hack_translate_uri,
         page_num=pagenum,
         page_count=book.page_count,
         show_highlights=show_highlights,

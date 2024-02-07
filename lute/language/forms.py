@@ -49,15 +49,8 @@ class LanguageForm(FlaskForm):
     """
 
     name = StringField("Name", validators=[DataRequired()])
-    dict_1_uri = StringField("Dictionary 1", validators=[DataRequired()])
-    dict_2_uri = StringField("Dictionary 2")
-
     dictionaries = FieldList(
         FormField(LanguageDictionaryForm, default=LanguageDictionary)
-    )
-
-    sentence_translate_uri = StringField(
-        "Sentence translation", validators=[DataRequired()]
     )
     show_romanization = BooleanField("Show Pronunciation field")
     right_to_left = BooleanField("Right-to-left")

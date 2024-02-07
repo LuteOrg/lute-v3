@@ -105,9 +105,6 @@ def get_demo_language(filename):
     # Define mappings for fields
     mappings = {
         "name": "name",
-        "dict_1": "dict_1_uri",
-        "dict_2": "dict_2_uri",
-        "sentence_translation": "sentence_translate_uri",
         "show_romanization": "show_romanization",
         "right_to_left": "right_to_left",
         "parser_type": "parser_type",
