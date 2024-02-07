@@ -1,7 +1,5 @@
 "use strict";
 
-createDictTabs(5);
-
 function createDictTabs(num = 0) {
   // TERM_DICTS.push("https://de.thefreedictionary.com/###");
   // TERM_DICTS.push("*https://glosbe.com/de/en/###");
