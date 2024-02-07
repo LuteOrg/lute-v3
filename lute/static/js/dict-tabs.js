@@ -1,12 +1,16 @@
 "use strict";
 
+createDictTabs(5);
+
 function createDictTabs(num = 0) {
-  TERM_DICTS.push("https://de.thefreedictionary.com/###");
-  TERM_DICTS.push("*https://glosbe.com/de/en/###");
-  TERM_DICTS.push("*https://en.langenscheidt.com/german-english/###");
-  TERM_DICTS.push("*https://en.pons.com/translate/german-english/###");
-  TERM_DICTS.push("*https://www.collinsdictionary.com/dictionary/german-english/###");
-  TERM_DICTS.push("*https://dict.tu-chemnitz.de/deutsch-englisch/###.html");
+  // TERM_DICTS.push("https://de.thefreedictionary.com/###");
+  // TERM_DICTS.push("*https://glosbe.com/de/en/###");
+  // TERM_DICTS.push("*https://en.langenscheidt.com/german-english/###");
+  // TERM_DICTS.push("*https://en.pons.com/translate/german-english/###");
+  // TERM_DICTS.push("*https://www.collinsdictionary.com/dictionary/german-english/###");
+  // TERM_DICTS.push("*https://dict.tu-chemnitz.de/deutsch-englisch/###.html");
+
+  if (TERM_DICTS.length <= 0) return;
 
   let sliceIndex;
   let columnCount;
@@ -171,7 +175,7 @@ function createDictTabs(num = 0) {
     // const clickedTab = e.target; 
     const isExternal = clickedTab.dataset.dictExternal;
     let iFrame = dictTabButtons.get(clickedTab);
-    
+
     if (isExternal == 1) {
       iFrame = "";
     }
@@ -399,5 +403,3 @@ let get_parents = function() {
 //   });
   
 // }
-
-createDictTabs(5);
