@@ -80,6 +80,7 @@
     const tagify = new Tagify(input, {
       placeholder: 'Parents',
       editTags: false,
+      backspace: 'edit',
       autoComplete: { enabled: true, rightKey: true, tabKey: true },
       enforceWhitelist: false,
       whitelist: [],
@@ -244,6 +245,7 @@
       placeholder: 'Tags',
       editTags: false,
       autoComplete: { enabled: true, rightKey: true, tabKey: true },
+      dropdown: { enabled: 1 },
       enforceWhitelist: false,
       whitelist: TAGS
     });  // end tagify

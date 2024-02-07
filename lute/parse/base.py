@@ -17,7 +17,6 @@ class ParsedToken:
 
     # Class counters.
     cls_sentence_number = 0
-    cls_paragraph_number = 0
     cls_order = 0
 
     @classmethod
@@ -26,7 +25,6 @@ class ParsedToken:
         Reset all the counters.
         """
         ParsedToken.cls_sentence_number = 0
-        ParsedToken.cls_paragraph_number = 0
         ParsedToken.cls_order = 0
 
     def __init__(self, token: str, is_word: bool, is_end_of_sentence: bool = False):
@@ -38,20 +36,21 @@ class ParsedToken:
         self.order = ParsedToken.cls_order
 
         self.sentence_number = ParsedToken.cls_sentence_number
-        self.paragraph_number = ParsedToken.cls_paragraph_number
 
         # Increment counters after the TextToken has been
         # completed, so that it belongs to the correct
-        # sentence/paragraph.
+        # sentence.
         if self.is_end_of_sentence:
             ParsedToken.cls_sentence_number += 1
-        if self.token == "¶":
-            ParsedToken.cls_paragraph_number += 1
 
     def __repr__(self):
-        return (
-            f'<"{self.token}" (word: {self.is_word}, eos: {self.is_end_of_sentence})>'
-        )
+        attrs = [
+            f"word: {self.is_word}",
+            f"eos: {self.is_end_of_sentence}",
+            # f"sent: {self.sentence_number}",
+        ]
+        attrs = ", ".join(attrs)
+        return f'<"{self.token}" ({attrs})>'
 
 
 class SentenceGroupIterator:

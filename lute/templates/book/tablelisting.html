@@ -79,7 +79,12 @@
     f.submit();
   }
 
-  function confirm_archive(bookid) {
+  function confirm_archive(el) {
+    const booktitle = decodeURIComponent($(el).data('bktitle'));
+    const bookid = $(el).data('bkid');
+    if (!confirm(`Archiving "${booktitle}".  Click OK to proceed, or Cancel.`)) {
+      return;
+    }
     do_action_post('archive', bookid);
   }
 
@@ -156,13 +161,14 @@
 
     let make_bar = function(stid, title) {
       const p = statuspct[stid];
+      const msg = `${p}% (${statuscounts[stid]} words)`;
       const smallestP = window.matchMedia("(max-width: 980px)").matches ? 2 : 1;
       let display = "inline-flex"
       if (p < smallestP)
         display = "none";
       return `<div
         class="status-bar${stid} status-bar"
-        title="${title}: ${p}%"
+        title="${title}: ${msg}"
         style="flex: ${p}; display: ${display}"
         ></div>`;
     };
@@ -189,7 +195,7 @@
     if (row[6] == 0) {
       // not archived
       ret.push(`<img src="{{ url_for('static', filename='icn/document--pencil.png') }}" title="Edit" onclick="edit_book(${bkid})" />`);
-      ret.push(`<img src="{{ url_for('static', filename='icn/inbox-download.png') }}" title="Archive" onclick="confirm_archive(${bkid})" />`);
+      ret.push(`<img src="{{ url_for('static', filename='icn/inbox-download.png') }}" title="Archive" data-bktitle="${bktitle}" data-bkid="${bkid}" onclick="confirm_archive(this)" />`);
     }
     else {
       ret.push(`<img src="{{ url_for('static', filename='icn/inbox-upload.png') }}" title="Unarchive" onclick="confirm_unarchive(${bkid})" />`);

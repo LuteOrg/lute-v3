@@ -190,6 +190,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         self.visit("/")
         self.browser.find_by_css("#menu_terms").mouse_over()
         self.browser.find_by_id("term_index").first.click()
+        self.browser.find_by_css("#term_actions").mouse_over()
         self.click_link("Create new")
         assert "New Term" in self.browser.html
 
@@ -234,7 +235,10 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             return f"{t.text} ({status})"
 
         etext = [_to_string(e) for e in elements]
-        return "/".join(etext)
+        ret = "/".join(etext)
+        if ret.endswith("/"):
+            ret = ret[:-1]
+        return ret
 
     ################################3
     # Reading, term actions

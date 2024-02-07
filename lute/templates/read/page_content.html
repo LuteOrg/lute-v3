@@ -1,16 +1,15 @@
 {% for para in paragraphs %}
 
 <p>
-
   {% for sentence in para %}
-
   <span class="textsentence" id="sent_{{ sentence.sentence_id }}">
     {# Note: do not add paragraphs between the renders, it messes up some online chinese dictionary tools. #}
     {% for item in sentence.textitems %}{% include 'read/textitem.html' %}{% endfor %}
   </span>
-
   {% endfor %}
 
+  {# Add a blank element for empty paragraphs (blank lines) to show up. #}
+  <span class="textitem">&ZeroWidthSpace;</span>
 </p>
 
 {% endfor %}

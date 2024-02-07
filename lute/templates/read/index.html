@@ -11,6 +11,7 @@
 
 <div id="rendering_controls" style="display: none">
   <pre>
+    lang_is_rtl: <input id="lang_is_rtl" value="{{ is_rtl }}">
     book_id: <input id="book_id" value="{{ book.id }}">
     book_audio: <input id="book_audio_file" value="{{ book.audio_filename or '' }}">
     book_audio_current_pos: <input id="book_audio_current_pos" value="{{ book.audio_current_pos or 0 }}">
@@ -49,7 +50,7 @@
         <div class="reading_header_mid">
         <div class="reading_header_mid_top">
           <div class="texttitlecontainer">
-            <h1 id="headertexttitle" class="hide">{{ book.title }}</h1>
+            <h1 id="headertexttitle" {% if is_rtl %}dir="rtl" {% endif %} class="hide">{{ book.title }}</h1>
           </div>
           <div class="reading_header_page">
             <!-- <a id="reading_home_link" class="home-link" href="/">Home</a> -->
@@ -81,7 +82,7 @@
 
   {% include "read/audio_player.html" %}
 
-  <h1 id="thetexttitle" class="hide">{{ book.title }}</h1>
+  <h1 id="thetexttitle" {% if is_rtl %}dir="rtl" {% endif %} class="hide">{{ book.title }}</h1>
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
     ...
   </div>
@@ -412,6 +413,7 @@
         set_page_fraction();
         set_footer_control_visibility();
         show_hide_title(actualPage);
+        $("html, body").animate({ scrollTop: 0 });
 
         if (initial_page_load) {
           prepareTextInteractions(tooltipPos);

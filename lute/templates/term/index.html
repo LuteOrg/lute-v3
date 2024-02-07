@@ -38,7 +38,7 @@
       <td>Status range</td>
       <td>
         <select id="filtStatusMin">
-          <option value=0></option>
+          <option value=0>(all)</option>
           <option value=1>New (1)</option>
           <option value=2>New (2)</option>
           <option value=3>Learn (3)</option>
@@ -48,7 +48,7 @@
         </select>
         to
         <select id="filtStatusMax">
-          <option value=0></option>
+          <option value=0>(all)</option>
           <option value=1>New (1)</option>
           <option value=2>New (2)</option>
           <option value=3>Learn (3)</option>
@@ -69,11 +69,22 @@
   <br />
 </div>
 
-<div style="margin-top: 10px; margin-bottom: 10px;">
-  <a href="/term/new">Create new</a>
-  &nbsp;|&nbsp;
-  Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" disabled >go</button>
+
+<div class="term-action-container">
+  <div id="term_actions" class="term-action-dropdown" onmouseover="activate_term_actions();">
+    <button class="term-action-button">Actions</button>
+    <div class="term-action-content">
+      <a href="/term/new">Create new</a>
+      <a id="term_action_set_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
+      <a id="term_action_bulk_delete" href="#" onclick="bulk_delete(event);">Delete selected</a>
+    </div>
+  </div>
+
+  <div id="set_parent_div" style="display: none;">
+    <p>Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" disabled >go</button></p>
+  </div>
 </div>
+
 
 <table id="termtable" class="table dataTable stripe">
   <thead>
@@ -175,6 +186,7 @@
 
   let render_translation = function ( data, type, row, meta ) {
     let tx = row[3] ?? '';
+    tx = tx.replaceAll("\r\n", "<br />");
     let imgsrc = row[9] ?? '';
     if (imgsrc != '')
       imgsrc = `<img style="margin-top: 5px;" src="${imgsrc}" />`;
@@ -201,6 +213,32 @@
     $("#btnSetParent").prop('disabled', disabled);
   }
 
+
+  /** Deactivate term Actions, activate if they're possible. */
+  function activate_term_actions() {
+    const disabled = "actionDisabled";
+    const checked_count = $('.chkWord:checked').length;
+    const lang_id = get_lang_id();
+
+    let c = $("#term_action_bulk_delete");
+    c.addClass(disabled);
+    if (checked_count > 0)
+      c.removeClass(disabled);
+
+    c = $("#term_action_set_parent");
+    c.addClass(disabled);
+    if (checked_count > 0 && lang_id != null)
+      c.removeClass(disabled);
+  }
+
+
+  function show_hide_set_parent(event) {
+    event.preventDefault();
+    if ($("#term_action_set_parent").hasClass("actionDisabled"))
+      return;
+    $("#set_parent_div").css("display", "flex");
+    $("#txtSetParent").focus();
+  }
 
   // Return the clicked checkboxes' language ID,
   // or null if the lang id isn't the same for all.
@@ -285,6 +323,32 @@
       }
     });
   };
+
+
+  function bulk_delete(event) {
+    event.preventDefault();
+    if ($("#term_action_bulk_delete").hasClass("actionDisabled"))
+      return;
+    const checked = $('.chkWord:checked');
+    const ids = checked.toArray().map(el => parseInt($(el).attr('wordid')));
+    const t = (ids.length == 1) ? 'term' : 'terms';
+    const resp = confirm(`Deleting ${ids.length} ${t}.  Continue?`);
+    if (! resp)
+      return;
+
+    data = {
+      wordids: ids
+    };
+    $.ajax({
+      url: '/term/bulk_delete',
+      method: 'POST',
+      data: JSON.stringify(data),
+      contentType: "application/json; charset=utf-8",
+      success: function(data) {
+        location.reload();
+      }
+    });
+  }
 
 
   let handle_filter_update = function() {
