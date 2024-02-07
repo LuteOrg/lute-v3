@@ -7,6 +7,7 @@ function createDictTabs(num = 0) {
   // TERM_DICTS.push("*https://en.pons.com/translate/german-english/###");
   // TERM_DICTS.push("*https://www.collinsdictionary.com/dictionary/german-english/###");
   // TERM_DICTS.push("*https://dict.tu-chemnitz.de/deutsch-englisch/###.html");
+  // TERM_DICTS.push("*https://www.translate.ru/%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4/%D0%BD%D0%B5%D0%BC%D0%B5%D1%86%D0%BA%D0%B8%D0%B9-%D0%B0%D0%BD%D0%B3%D0%BB%D0%B8%D0%B9%D1%81%D0%BA%D0%B8%D0%B9/###");
 
   if (TERM_DICTS.length <= 0) return;
 
@@ -89,7 +90,7 @@ function createDictTabs(num = 0) {
       const domain = getDictURLDomain(dict);
       const faviconURL = getFavicon(domain);
       const faviconEl = createImg(faviconURL, "dict-btn-fav-img");
-      option.textContent = domain;
+      option.textContent = domain.split("www.").splice(-1)[0];
       option.prepend(faviconEl);
       option.dataset.dictId = origIndex;
       option.dataset.dictExternal = isURLExternal(dict);
