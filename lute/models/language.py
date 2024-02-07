@@ -51,8 +51,6 @@ class Language(
     regexp_split_sentences = db.Column("LgRegexpSplitSentences", db.String(500))
     exceptions_split_sentences = db.Column("LgExceptionsSplitSentences", db.String(500))
     _word_characters = db.Column("LgRegexpWordCharacters", db.String(500))
-    remove_spaces = db.Column("LgRemoveSpaces", db.Boolean)
-    split_each_char = db.Column("LgSplitEachChar", db.Boolean)
     right_to_left = db.Column("LgRightToLeft", db.Boolean)
     show_romanization = db.Column("LgShowRomanization", db.Boolean)
     parser_type = db.Column("LgParserType", db.String(20))
@@ -62,8 +60,6 @@ class Language(
         self.regexp_split_sentences = ".!?"
         self.exceptions_split_sentences = "Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds."
         self.word_characters = "a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ"
-        self.remove_spaces = False
-        self.split_each_char = False
         self.right_to_left = False
         self.show_romanization = False
         self.parser_type = "spacedel"
