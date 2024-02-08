@@ -174,9 +174,10 @@
 
 <script>
   // used in dict-tabs.js
-  const ALL_DICTS = {{ all_dicts | safe }};
-  const LANG_ID = Object.keys(ALL_DICTS)[0];
-  const TERM_DICTS = ALL_DICTS[LANG_ID].term;
+  // const ALL_DICTS = {{ all_dicts | safe }};
+  const LANG_ID = {{ lang_id | safe }};
+  // const TERM_DICTS = ALL_DICTS[LANG_ID].term;
+  const TERM_DICTS = {{ term_dicts | safe }};
 
   let mouseY;
   let scrollY;

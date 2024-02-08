@@ -251,10 +251,6 @@
     }
   };
 
-  const ALL_DICTS = {{ language_dicts | safe }};
-  const LANG_ID = Object.keys(ALL_DICTS)[0];
-  const TERM_DICTS = ALL_DICTS[LANG_ID].term;
-
   $(document).ready(function () {
     var parentslist = document.getElementById('parentslist');
     parents_tagify = setup_parent_tagify(parentslist);
@@ -263,8 +259,11 @@
 
     // needed for new/edit term page to auto open the dict
     if (($('#text').val() ?? '') != '') {
+      const ALL_DICTS = {{ language_dicts | safe }};
+      const LANG_ID = $('#language_id').val();
+      const TERM_DICTS = ALL_DICTS[LANG_ID].term;
       const iframe = window.parent.document.querySelector("iframe[name='dict0']");
-      loadIFrameDictionary(TERM_DICTS[0], $('#text').val(), iframe)
+      loadIFrameDictionary(TERM_DICTS[0], $('#text').val(), iframe);
     }
     
     // Post message re form opened.
