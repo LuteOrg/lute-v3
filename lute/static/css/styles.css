@@ -1404,11 +1404,13 @@ input[type="checkbox"][disabled] + label {
 #dict-select-container.dict-select-list-hide {
     opacity: 0;
     pointer-events: none;
+    /* clip-path: rect(0 0 0 114%); */
 }
 
 #dict-select-container {
     opacity: 1;
     pointer-events: unset;
+    /* clip-path: rect(0 0 106% 114%); */
 
     position: absolute;
     background-color: aliceblue;
@@ -1423,7 +1425,7 @@ input[type="checkbox"][disabled] + label {
     instead adding border-radius to them too */
     overflow: hidden; 
 
-    transition: opacity 0.2s;
+    transition: opacity 0.1s;
 }
 
 #select-btn-box:hover .dict-btn-select:not(.dict-btn-active) {

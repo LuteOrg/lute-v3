@@ -99,10 +99,13 @@ function createDictTabs(num = 0) {
     });
 
     btn.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
+      e.preventDefault(); // disables default right click menu
       selectContainer.classList.toggle("dict-select-list-hide");
-      // selectContainer.style.opacity = 1;
-      // selectContainer.style.pointerEvents = "unset";
+    });
+
+    btn.addEventListener("click", (e) => {
+      if (e.target === menuImgEl) return;
+      selectContainer.classList.add("dict-select-list-hide");
     });
 
     menuImgEl.addEventListener("click", (e) => {
