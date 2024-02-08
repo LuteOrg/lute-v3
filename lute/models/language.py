@@ -26,6 +26,14 @@ class LanguageDictionary(db.Model):
     is_active = db.Column("LdIsActive", db.Boolean, default=True)
     sort_order = db.Column("LdSortOrder", db.SmallInteger, nullable=False)
 
+    # HACK: pre-pend '*' to URLs that need to open a new window.
+    # This is a relic of the original code, and should be changed.
+    # TODO remove-asterisk-hack: remove * from URL start.
+    def make_uri(self):
+        "Hack add asterisk."
+        prepend = "*" if self.dicttype == "popuphtml" else ""
+        return f"{prepend}{self.dicturi}"
+
 
 class Language(
     db.Model
@@ -96,62 +104,28 @@ class Language(
     def word_characters(self, s):
         self._word_characters = self._get_python_regex_pattern(s)
 
+    def active_dict_uris(self, use_for):
+        "Get sorted uris for active dicts of correct type."
+        actives = [d for d in self.dictionaries if d.is_active and d.usefor == use_for]
+        sorted_actives = sorted(actives, key=lambda x: x.sort_order)
+        return [d.make_uri() for d in sorted_actives]
+
     @property
-    def sentence_hack_translate_uri(self):
-        "TODO multiple_sentences: remove this hack."
-
-        def _get_active_dicts(t):
-            "Return active dicts."
-            return [d for d in self.dictionaries if d.is_active and d.usefor == t]
-
-        # HACK: pre-pend '*' to URLs that need to open a new window.
-        # This is a relic of the original code, and should be changed.
-        # TODO remove-asterisk-hack: remove * from URL start.
-        def _hack_make_uri(d):
-            "Hack add asterisk."
-            prepend = "*" if d.dicttype == "popuphtml" else ""
-            return f"{prepend}{d.dicturi}"
-
-        # TODO multiple_sentences: allow multiple
-        sentence_dicts = [_hack_make_uri(d) for d in _get_active_dicts("sentences")]
-        return sentence_dicts[0]
+    def sentence_dict_uris(self):
+        return self.active_dict_uris("sentences")
 
     @classmethod
     def all_dictionaries(cls):
         """
         All dictionaries for all languages.
         """
-        languages = Language.query.all()
-        language_data = {}
-        for language in languages:
-
-            def _get_active_dicts(lang, t):
-                "Return active dicts."
-                return [d for d in lang.dictionaries if d.is_active and d.usefor == t]
-
-            # HACK: pre-pend '*' to URLs that need to open a new window.
-            # This is a relic of the original code, and should be changed.
-            # TODO remove-asterisk-hack: remove * from URL start.
-            def _hack_make_uri(d):
-                "Hack add asterisk."
-                prepend = "*" if d.dicttype == "popuphtml" else ""
-                return f"{prepend}{d.dicturi}"
-
-            term_dicts = [
-                _hack_make_uri(d) for d in _get_active_dicts(language, "terms")
-            ]
-
-            # TODO multiple_sentences.
-            sentence_dicts = [
-                _hack_make_uri(d) for d in _get_active_dicts(language, "sentences")
-            ]
-
-            language_data[language.id] = {
-                "term": term_dicts,
-                "sentence": sentence_dicts[0],
+        lang_dicts = {}
+        for lang in Language.query.all():
+            lang_dicts[lang.id] = {
+                "term": lang.active_dict_uris("terms"),
+                "sentence": lang.active_dict_uris("sentences"),
             }
-
-        return language_data
+        return lang_dicts
 
     @staticmethod
     def delete(language):

@@ -18,9 +18,15 @@
     page_num: <input id="page_num" value="{{ page_num }}">
     page_count: <input id="page_count" value="{{ page_count }}">
     highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
-    sentence translation url: <span id="translateURL" style="display: none">{{ dictionary_url }}</span>
   </pre>
 </div>
+
+<script>
+  // The sentence dictionaries configured for the language.  This var
+  // is used in lute.js.
+  var LUTE_SENTENCE_LOOKUP_URIS = {{ sentence_dict_uris|safe }};
+</script>
+
 
 <div id="read_pane_container">
 
