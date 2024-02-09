@@ -155,6 +155,17 @@ function createDictTabs(num = 0) {
     });
   }
   
+  // set first embedded frame as active (for final: need to save active tab and retrieve it)
+  const tabsArray = Array.from(dictTabButtons.keys());
+  const firstEmbeddedTab = tabsArray.find(tab => tab.dataset.dictExternal == 0);
+  if (firstEmbeddedTab) {
+      const firstEmbeddedFrame = dictTabButtons.get(firstEmbeddedTab);
+      firstEmbeddedTab.classList.add("dict-btn-active");
+      firstEmbeddedTab.dataset.firstEmbedded = 1;
+      firstEmbeddedTab.dataset.tabOpened = 1;
+      firstEmbeddedFrame.classList.add("dict-active");
+  }
+
   // create image button
   const imageBtn = createTabBtn("", dictTabsContainer, -1, 0);
   imageBtn.setAttribute("id", "dict-image-btn");
@@ -162,15 +173,6 @@ function createDictTabs(num = 0) {
   const imageFrame = createIFrame("imageframe", iFramesContainer);
 
   dictTabButtons.set(imageBtn, imageFrame);
-  
-  // set first embedded frame as active (for final: need to save active tab and retrieve it)
-  const tabsArray = Array.from(dictTabButtons.keys());
-  const firstEmbeddedTab = tabsArray.find(tab => tab.dataset.dictExternal == 0);
-  const firstEmbeddedFrame = dictTabButtons.get(firstEmbeddedTab);
-  firstEmbeddedTab.classList.add("dict-btn-active");
-  firstEmbeddedTab.dataset.firstEmbedded = 1;
-  firstEmbeddedTab.dataset.tabOpened = 1;
-  firstEmbeddedFrame.classList.add("dict-active");
 
   dictTabsContainer.addEventListener("click", (e) => {
     const clickedTab = e.target.closest(".dict-btn");
@@ -205,16 +207,18 @@ function loadDictionaries(dictTabButtons) {
   dictTabButtons.forEach((iframe, btn) => {
     btn.dataset.tabOpened = 0;
   });
-
-  // needs to be defined here and not globally because it's in different pages
+  // dictContainer needs to be defined here and not retrieved from global var because it's in different pages
   const dictContainer = document.querySelector(".dictcontainer");
-  const activeTab = document.querySelector(".dict-btn-active");
-  const iFrame = dictTabButtons.get(activeTab);
-  const dictID = activeTab.dataset.dictId;
-  loadDictPage(dictID, iFrame);
-
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
+
+  const activeTab = document.querySelector(".dict-btn-active");
+  // check for case if all dicts are external
+  if (activeTab) {
+    const iFrame = dictTabButtons.get(activeTab);
+    const dictID = activeTab.dataset.dictId;
+    loadDictPage(dictID, iFrame);
+  }
 }
 
 function addSentenceBtnEvent(dictTabButtons) {
