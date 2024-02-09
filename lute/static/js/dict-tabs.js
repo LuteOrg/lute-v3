@@ -229,6 +229,7 @@ function addSentenceBtnEvent(dictTabButtons) {
 
     iframe.setAttribute("src", url);
     activateTab(tab0, dictTabButtons);
+    tab0.classList.remove("dict-btn-active");
   });
 }
 
