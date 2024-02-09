@@ -163,11 +163,14 @@ function createDictTabs(num = 0) {
 
   dictTabButtons.set(imageBtn, imageFrame);
   
-  // set first frame as active (for final: need to save active tab and retrieve it)
-  const [firstBtn, firstFrame] = dictTabButtons.entries().next().value;
-  firstBtn.classList.add("dict-btn-active");
-  firstBtn.dataset.tabOpened = 1;
-  firstFrame.classList.add("dict-active");
+  // set first embedded frame as active (for final: need to save active tab and retrieve it)
+  const tabsArray = Array.from(dictTabButtons.keys());
+  const firstEmbeddedTab = tabsArray.find(tab => tab.dataset.dictExternal == 0);
+  const firstEmbeddedFrame = dictTabButtons.get(firstEmbeddedTab);
+  firstEmbeddedTab.classList.add("dict-btn-active");
+  firstEmbeddedTab.dataset.firstEmbedded = 1;
+  firstEmbeddedTab.dataset.tabOpened = 1;
+  firstEmbeddedFrame.classList.add("dict-active");
 
   dictTabsContainer.addEventListener("click", (e) => {
     const clickedTab = e.target.closest(".dict-btn");
@@ -215,9 +218,9 @@ function loadDictionaries(dictTabButtons) {
 }
 
 function addSentenceBtnEvent(dictTabButtons) {
-  const iframe = document.querySelector("iframe[name='dict0']");
+  const tab = document.querySelector("button[data-first-embedded]");
+  const iframe = dictTabButtons.get(tab);
   const sentencesBtn = TERM_FORM_CONTAINER.querySelector("#term-button-container > a");
-  const tab0 = document.querySelector("button[data-dict-id='0']");
 
   sentencesBtn.addEventListener("click", (e) => {
     e.preventDefault();
@@ -225,11 +228,11 @@ function addSentenceBtnEvent(dictTabButtons) {
     if (!url) return;
 
     // set to "opened" so clicking on the tab reloads dictionary
-    tab0.dataset.tabOpened = 0;
+    tab.dataset.tabOpened = 0;
 
     iframe.setAttribute("src", url);
-    activateTab(tab0, dictTabButtons);
-    tab0.classList.remove("dict-btn-active");
+    activateTab(tab, dictTabButtons);
+    tab.classList.remove("dict-btn-active");
   });
 }
 
