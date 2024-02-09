@@ -5,15 +5,9 @@
  */
 let LUTE_CURR_TERM_DATA_ORDER = -1;  // initially not set.
 
-/**
- * Lute has 2 different "modes" when reading:
- * - LUTE_HOVERING = true: Hover mode, not selecting
- * - LUTE_HOVERING = false: Word clicked, or click-drag
- */ 
-let LUTE_HOVERING = true;
 
 /**
- * When the reading pane is first loaded, it is set in "hover mode",
+ * When the reading pane is first loaded, it's in "hover mode",
  * meaning that when the user hovers over a word, that word becomes
  * the "active word" -- i.e., status update keyboard shortcuts should
  * operate on that hovered word, and as the user moves the mouse
@@ -28,9 +22,6 @@ let LUTE_HOVERING = true;
  * this method on reload to reset the cursor etc.
  */
 function start_hover_mode(should_clear_frames = true) {
-  // console.log('CALLING RESET');
-  LUTE_HOVERING = true;
-
   $('span.kwordmarked').removeClass('kwordmarked');
 
   const curr_word = $('span.word').filter(function() {
@@ -189,10 +180,7 @@ function hover_over_add_status_class(e) {
 function hover_over(e) {
   $('span.wordhover').removeClass('wordhover');
   const marked_count = $('span.kwordmarked').toArray().length;
-  if (marked_count > 0) {
-    LUTE_HOVERING = false;
-  }
-  if (LUTE_HOVERING) {
+  if (marked_count == 0) {
     $(this).addClass('wordhover');
     save_curr_data_order($(this));
   }
@@ -207,7 +195,6 @@ function hover_out(e) {
 /** Clicking */
 
 let word_clicked = function(el, e) {
-  LUTE_HOVERING = false;  // No longer hovering.
   el.removeClass('wordhover');
   save_curr_data_order(el);
 
@@ -243,7 +230,6 @@ let clear_newmultiterm_elements = function() {
 }
 
 function select_started(e) {
-  LUTE_HOVERING = false;
   clear_newmultiterm_elements();
   $(this).addClass('newmultiterm');
   selection_start_el = $(this);
