@@ -34,10 +34,10 @@
         $('div.ui-tooltip', context).remove();
 
         repel.load(url, function() {
-          // console.log(`adding class kwordmarked to id ${marked_id}`);
+          // console.log(`adding hover class to id ${marked_id}`);
           const re_marked = $(`#${marked_id}`, context);
-          re_marked.removeClass('wordhover');
-          re_marked.addClass('kwordmarked');
+          re_marked.removeClass('kwordmarked');
+          re_marked.addClass('wordhover');
         });
       };
 

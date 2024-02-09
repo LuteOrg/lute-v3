@@ -188,6 +188,10 @@ function hover_over_add_status_class(e) {
 
 function hover_over(e) {
   $('span.wordhover').removeClass('wordhover');
+  const marked_count = $('span.kwordmarked').toArray().length;
+  if (marked_count > 0) {
+    LUTE_HOVERING = false;
+  }
   if (LUTE_HOVERING) {
     $(this).addClass('wordhover');
     save_curr_data_order($(this));
@@ -203,6 +207,7 @@ function hover_out(e) {
 /** Clicking */
 
 let word_clicked = function(el, e) {
+  LUTE_HOVERING = false;  // No longer hovering.
   el.removeClass('wordhover');
   save_curr_data_order(el);
 
@@ -346,11 +351,8 @@ let copy_text_to_clipboard = function(textitemspans) {
 
 
 let move_cursor = function(shiftby) {
-  // Use the first clicked element, or the hovered if none clicked.
-  let elements = $('span.kwordmarked, span.newmultiterm');
-  let hovered_els = $('span.wordhover');
-  if (elements.length == 0 && hovered_els.length > 0)
-    elements = hovered_els;
+  // Cursor is set to the first clicked or hovered element.
+  let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
   elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
   const curr = (elements.length == 0) ? null : elements[0];
 
@@ -371,6 +373,7 @@ let move_cursor = function(shiftby) {
   // Adjust all screen state.
   $('span.newmultiterm').removeClass('newmultiterm');
   $('span.kwordmarked').removeClass('kwordmarked');
+  $('span.wordhover').removeClass('wordhover');
   remove_status_highlights();
   target.addClass('kwordmarked');
   save_curr_data_order(target);
