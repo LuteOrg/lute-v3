@@ -348,7 +348,6 @@ function show_lookup_page(dicturl, text, iframe) {
   // }
 
   if (iframe) {
-    // console.log(iframe);
     loadIFrameDictionary(dicturl, text, iframe);
   } else {
     // TODO zzfuture fix: fix_language_dict_asterisk
