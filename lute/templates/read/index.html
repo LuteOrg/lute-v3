@@ -174,12 +174,9 @@
 
 <script>
   // used in dict-tabs.js
-  // const ALL_DICTS = {{ all_dicts | safe }};
   const LANG_ID = {{ lang_id | safe }};
-  // const TERM_DICTS = ALL_DICTS[LANG_ID].term;
   const TERM_DICTS = {{ term_dicts | safe }};
   // because read term field is in iframe, but new term field is not
-  // let TERM_INPUT_FIELD;
   let TERM_FORM_CONTAINER;
 
   let mouseY;

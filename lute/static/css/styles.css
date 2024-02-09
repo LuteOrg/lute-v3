@@ -1193,10 +1193,6 @@ input[type="checkbox"][disabled] + label {
     background-color: #dbefff;
     /* height: 1.6rem; */
     padding: 4px 0 0 2px;
-
-    --dict-btn-hover-color: #fff;
-    --dict-btn-active-color: #fff;
-    --dict-btn-list-color: #fff8d8;
 }
 
 #dicttabslayout {
@@ -1275,23 +1271,11 @@ input[type="checkbox"][disabled] + label {
 #dicttabslayout .dict-btn-select[data-dict-external="1"]::after {
     border-right-width: 2.6rem
 }
-/* 
-.dict-btn-select {
-    background-color: var(--dict-btn-list-color);
-}
-
-#dicttabslayout .dict-btn-select:not(.dict-btn-active)::after {
-    border-color: var(--dict-btn-list-color);
-} */
 
 #dicttabslayout .dict-btn:not(.dict-btn-active):not(.dict-btn[data-dict-external="1"]):hover::after,
 #dicttabslayout .dict-btn:not(.dict-btn-active):hover::after {
     border-color: aliceblue;
 }
-
-/* #dicttabslayout .dict-btn[data-dict-external="1"]::after {
-    border-color: #8ecd8f;
-} */
 
 .dict-btn-fav-img,
 .dict-btn-list-img,
@@ -1362,28 +1346,6 @@ input[type="checkbox"][disabled] + label {
     /* border: 2px solid #68ace0; */
     box-shadow: inset 0 0 0 2px #68ace0;
 }
-
-/* .dict-btn:not(:first-of-type) {
-    margin-left: -4px;
-} */
-
-
-/* remove left margin if img button activated */
-/* .dict-btn:has(~ #dict-image-btn.dict-btn-active) {
-    margin-left: 0;
-} */
-
-/* .dict-btn[data-dict-external="1"],
-.dict-btn[data-dict-external="1"] + #dict-select {
-    background-color: #8ecd8f;
-    z-index: 0;
-    filter: unset;
-    color: #fff;
-} */
-
-/* .dict-btn[data-dict-external="1"] {
-    border: 2px solid #6cce6d;
-} */
 
 .dict-btn[data-dict-external="1"] {
     color: #5b5b5b;
@@ -1476,22 +1438,6 @@ input[type="checkbox"][disabled] + label {
     background-color: #68ace0;
     color: #fff;
 }
-
-/* #dict-select {
-    border: none;
-    outline: none;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-
-    position: absolute;
-    right: 0;
-    width: 1.1rem;
-    top: 0;
-    height: 100%;
-    background: #dcebf8;
-    z-index: 2;
-} */
-
 
 /* STATUS RADIO */
 
