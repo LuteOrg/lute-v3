@@ -805,6 +805,7 @@ div.code pre {
 .dictcontainer {
     position: relative;
     display: none;
+    height: 100%;
 }
 
 
@@ -1125,6 +1126,28 @@ div.help-text {
     gap: 0.5rem;
 }
 
+#term #languageSel {
+    display: flex;
+    justify-content: space-between;
+}
+
+#load-dicts-btn {
+    background: url("../icn/book-open-text.svg");
+    background-position: center;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    border: none;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+#load-dicts-btn:hover {
+    background-color: #97531f;
+    filter: invert();
+}
+
 #status-container {
     display: flex;
     justify-content: flex-start;
@@ -1286,6 +1309,8 @@ input[type="checkbox"][disabled] + label {
 }
 
 .dict-btn-list-img {
+    /* src needs to be set here instead of js. explanation in createTabBtn */
+    content: url("../icn/list.svg");
     right: 0;
     opacity: 1;
     /* add padding so clicking area is bigger */
@@ -1293,6 +1318,7 @@ input[type="checkbox"][disabled] + label {
 }
 
 .dict-btn-external-img{
+    content: url("../icn/open.svg");
     right: 0.3rem;
 }
 
@@ -1414,7 +1440,7 @@ input[type="checkbox"][disabled] + label {
 
     position: absolute;
     background-color: aliceblue;
-    top: 28px;
+    top: 100%;
     left: 0;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;

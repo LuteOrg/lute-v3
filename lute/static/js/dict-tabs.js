@@ -68,7 +68,7 @@ function createDictTabs(num = 0) {
                               isURLExternal(OPTION_DICTS[0]), 
                               faviconURL);
     btn.setAttribute("title", "Right click for dictionary list");
-    const menuImgEl = createImg("../static/icn/list.svg", "dict-btn-list-img");
+    const menuImgEl = createImg("", "dict-btn-list-img");
     btn.appendChild(menuImgEl);
     const iFrame = createIFrame("selectframe", iFramesContainer);
     btn.classList.add("dict-btn-select");
@@ -134,13 +134,13 @@ function createDictTabs(num = 0) {
       btn.textContent = btnLabel;
       btn.dataset.tabOpened = clickedOption.dataset.tabOpened;
       btn.prepend(faviconEl);
-      const menuImgEl = createImg("../static/icn/list.svg", "dict-btn-list-img");
+      const menuImgEl = createImg("", "dict-btn-list-img");
       btn.appendChild(menuImgEl);
       
       if (clickedOption.dataset.dictExternal == 1) {
         loadDictPage(optionVal, "");
 
-        const arrowEl = createImg("../static/icn/open.svg", "dict-btn-external-img");
+        const arrowEl = createImg("", "dict-btn-external-img");
         btn.appendChild(arrowEl);
         // btn.classList.remove("dict-btn-active");
       } else {
@@ -195,21 +195,56 @@ function createDictTabs(num = 0) {
     }
   });
 
-  window.addEventListener("message", function(event) {
-    if (event.data.event === "LuteTermFormOpened") {
-      dictTabButtons.forEach((iframe, btn) => {
-        btn.dataset.tabOpened = 0;
-      });
+  return dictTabButtons;
+}
 
-      const activeTab = document.querySelector(".dict-btn-active");
-      const iFrame = dictTabButtons.get(activeTab);
-      const dictID = activeTab.dataset.dictId;
-      loadDictPage(dictID, iFrame);
-
-      dictContainer.style.display = "flex";
-      dictContainer.style.flexDirection = "column";
-    }
+function loadDictionaries(dictTabButtons) {
+  dictTabButtons.forEach((iframe, btn) => {
+    btn.dataset.tabOpened = 0;
   });
+
+  // needs to be defined here and not globally because it's in different pages
+  const dictContainer = document.querySelector(".dictcontainer");
+  const activeTab = document.querySelector(".dict-btn-active");
+  const iFrame = dictTabButtons.get(activeTab);
+  const dictID = activeTab.dataset.dictId;
+  loadDictPage(dictID, iFrame);
+
+  dictContainer.style.display = "flex";
+  dictContainer.style.flexDirection = "column";
+}
+
+function addSentenceBtnEvent(dictTabButtons) {
+  const iframe = document.querySelector("iframe[name='dict0']");
+  const sentencesBtn = TERM_FORM_CONTAINER.querySelector("#term-button-container > a");
+  const tab0 = document.querySelector("button[data-dict-id='0']");
+
+  sentencesBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const url = getSentenceURL();
+    if (!url) return;
+
+    // set to "opened" so clicking on the tab reloads dictionary
+    tab0.dataset.tabOpened = 0;
+
+    iframe.setAttribute("src", url);
+    activateTab(tab0, dictTabButtons);
+  });
+}
+
+function getSentenceURL() {
+  const txt = TERM_FORM_CONTAINER.querySelector("#text").value;
+  // check for the "new term" page
+  if (txt.length == 0) return;
+  // %E2%80%8B is the zero-width string.  The term is reparsed
+  // on the server, so this doesn't need to be sent.
+  const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
+  if (LANG_ID == '0' || t == '')
+    return;
+
+  const url = `/term/sentences/${LANG_ID}/${t}`;
+
+  return url;
 }
 
 function activateTab(tab, allTabs) {
@@ -225,7 +260,7 @@ function activateTab(tab, allTabs) {
 
 function loadDictPage(dictID, iFrame) {
   //const iFrameName = iFrame.getAttribute("name") ? iFrame : "";
-  const term = wordFrame.contentDocument.getElementById("text").value;
+  const term = TERM_FORM_CONTAINER.querySelector("#text").value;
 
   if (dictID == -1) {
     do_image_lookup(term, iFrame);
@@ -257,7 +292,7 @@ function createTabBtn(label, parent, data, external, faviconURL=null) {
   if (external != null) {
     btn.dataset.dictExternal = external;
     if (external == 1) {
-      const arrowEl = createImg("../static/icn/open.svg", "dict-btn-external-img");
+      const arrowEl = createImg("", "dict-btn-external-img");
       btn.appendChild(arrowEl);
     }
   }
@@ -277,7 +312,7 @@ function createTabBtn(label, parent, data, external, faviconURL=null) {
 function createImg(src, className) {
   const img = document.createElement("img");
   img.classList.add(className);
-  img.src = src;
+  if (src) img.src = src;
 
   return img;
 }
@@ -321,10 +356,7 @@ function show_lookup_page(dicturl, text, iframe) {
     // (e.g. "*http://" means "open an external window", while
     // "http://" means "this can be opened in an iframe."
     // Instead, each dict should have an "is_external" property.
-    dicturl = dicturl.slice(1);
-    const url = get_lookup_url(dicturl, text);
-    
-    return open_new_lookup_window(url);
+    loadPopupDictionary(dicturl, text);
   }
 }
 
@@ -333,7 +365,13 @@ function loadIFrameDictionary(dicturl, text, iframe) {
   iframe.setAttribute("src", url);
 }
 
-const open_new_lookup_window = function(url) {
+function loadPopupDictionary(dicturl, text) {
+  dicturl = dicturl.slice(1);
+  const url = get_lookup_url(dicturl, text);
+  openPopupWindow(url);
+}
+
+function openPopupWindow(url) {
   window.open(
     url,
     'otherwin',
