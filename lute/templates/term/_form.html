@@ -86,6 +86,7 @@
     const tagify = new Tagify(input, {
       placeholder: 'Parents',
       editTags: false,
+      pasteAsTags: false,
       backspace: 'edit',
       autoComplete: { enabled: true, rightKey: true, tabKey: true },
       enforceWhitelist: false,
@@ -104,7 +105,24 @@
           return `<footer data-selector='tagify-suggestions-footer' class="${this.settings.classNames.dropdownFooter}">
             (more items available, please refine your search.)</footer>`;
         }
-      }
+      },
+
+      // Use a hook to fire the onInput event!
+      // Pasting from the clipboard doesn't fire the
+      // tagify.on('input') event, so intercept it and handle
+      // it manually.
+      hooks: {
+        beforePaste : function(content) {
+          return new Promise((resolve, reject) => {
+            clipboardData = content.clipboardData || window.clipboardData;
+            pastedData = clipboardData.getData('Text');
+            // console.log("pasting => " + pastedData);
+            let e = { detail: { value: pastedData } };
+            onInput(e);
+            resolve();
+          });
+        }
+      },
     });  // end tagify
 
     tagify.on('click', function (e) {
