@@ -91,7 +91,7 @@
       enforceWhitelist: false,
       whitelist: [],
       dropdown: {
-        enabled: 2,  // Min 2 chars - this doesn't seem to work.
+        enabled: 1,
         maxItems: 15,
         mapValueTo: 'suggestion',  // Field to display
         placeAbove: false,  // Always put the dropdown below the textbox
@@ -165,7 +165,7 @@
     tagify.on('input', onInput);
     function onInput(e) {
       tagify.whitelist = null;  // Reset whitelist.
-      if (e.detail.value == '' || e.detail.value.length < 2) {
+      if (e.detail.value == '' || e.detail.value.length < 1) {
         controller && controller.abort();
         tagify.whitelist = [];
         tagify.loading(false).dropdown.hide();
