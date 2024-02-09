@@ -51,7 +51,7 @@
       <div>{{ form.termtagslist(class="form-control") }}</div>
 
       <div id="term-button-container">
-        <a href="" onclick="show_term_sentences(); return false;">Sentences</a>
+        <a href="">Sentences</a>
         <div class="term-element-box">
           {% if term.id %}
           <button id="delete" type="button" class="btn" onclick="deleteTerm()">Delete</button>
@@ -63,7 +63,18 @@
   </form>
 </div>
 
-<script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8" defer></script>
+<script>
+  // this is used in formframes.html
+  const ALL_DICTS = {{ language_dicts | safe }};
+  // const TERM_INPUT_FIELD = document.getElementById("text");
+  const TERM_FORM_CONTAINER = document.getElementById("term-form-container");
+  let TERM_DICTS;
+  let LANG_ID;
+</script>
+
+<!-- do not defer. if deferred it gets loaded at the end of formframes. bu we need it to load after _form, but before formframes -->
+<script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
+
 <script type="text/javascript">
 
   /** TERM IMAGE. ***************/
@@ -311,15 +322,6 @@
     parents_tagify = setup_parent_tagify(parentslist);
     var termtagslist = document.getElementById('termtagslist');
     var termtags_tagify = setup_term_tags_tagify(termtagslist);
-
-    // needed for new/edit term page to auto open the dict
-    if (($('#text').val() ?? '') != '') {
-      const ALL_DICTS = {{ language_dicts | safe }};
-      const LANG_ID = $('#language_id').val();
-      const TERM_DICTS = ALL_DICTS[LANG_ID].term;
-      const iframe = window.parent.document.querySelector("iframe[name='dict0']");
-      loadIFrameDictionary(TERM_DICTS[0], $('#text').val(), iframe);
-    }
     
     // Post message re form opened.
     // Note have to use this rather than the better
@@ -329,18 +331,6 @@
 
     enable_disable_sync_status_checkbox();
   });
-
-  function show_term_sentences() {
-    const langid = $('#language_id').val();
-    const txt = $('#text').val();
-    // %E2%80%8B is the zero-width string.  The term is reparsed
-    // on the server, so this doesn't need to be sent.
-    const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
-    if (langid == '0' || t == '')
-      return;
-    const url = `/term/sentences/${langid}/${t}`;
-    top.frames.dictframe.location.href = url;
-  }
 
   function deleteTerm() {
     const msg = "Are you sure you want to delete this term?\n\n" +

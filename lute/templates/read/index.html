@@ -184,6 +184,9 @@
   const LANG_ID = {{ lang_id | safe }};
   // const TERM_DICTS = ALL_DICTS[LANG_ID].term;
   const TERM_DICTS = {{ term_dicts | safe }};
+  // because read term field is in iframe, but new term field is not
+  // let TERM_INPUT_FIELD;
+  let TERM_FORM_CONTAINER;
 
   let mouseY;
   let scrollY;
@@ -224,7 +227,20 @@
       tooltipPos = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
     }
     
-    createDictTabs(5);
+    const dictTabButtons = createDictTabs(5);
+
+    window.addEventListener("message", function(event) {
+      if (event.data.event === "LuteTermFormOpened") {
+        TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
+        loadDictionaries(dictTabButtons);
+      }
+    });
+    // add event only on first form open (form needs to open because the sentence button doesn't exist before that)
+    window.addEventListener("message", function(event) {
+      if (event.data.event === "LuteTermFormOpened") {
+        addSentenceBtnEvent(dictTabButtons);
+      }
+    }, {once: true});
     
     if (have_audio_file()) {
       // Don't actually load the source -- for some reason,

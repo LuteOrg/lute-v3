@@ -12,10 +12,64 @@
 
 
 <div id="term_form_right">
-  <iframe name="dict0" class="rightreadingframe" src="/read/empty" scrolling="auto"
-          style="height: 100%; width: 100%;" frameBorder="1">
-    Frame support required.
-  </iframe>
+  <div class="dictcontainer">
+    <div id="dicttabs">
+      <div id="dicttabslayout"></div>
+    </div>
+    <div id="dictframes"></div>
+  </div>
 </div>
+
+<!-- <script>
+  const TERM_INPUT_FIELD = document.getElementById("text");
+  const dictContainer = document.querySelector(".dictcontainer");
+  // const LANG_ID = $('#language_id').val();
+  let TERM_DICTS;
+  let LANG_ID;
+</script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script> -->
+
+<!-- <script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script> -->
+
+<script>let dictTabButtons;</script>
+
+{% if term.language_id is none %}
+
+  <script>
+    const loadDictsBtn = document.createElement("button");
+    const languageDiv = document.getElementById("languageSel");
+    const langSelect = document.getElementById("language_id");
+    loadDictsBtn.setAttribute("title", "Load dictionaries for the new term");
+    loadDictsBtn.setAttribute("id", "load-dicts-btn");
+    loadDictsBtn.setAttribute("type", "button");
+    languageDiv.appendChild(loadDictsBtn);
+
+    loadDictsBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      LANG_ID = langSelect.value;
+      if (LANG_ID != 0) {
+        TERM_DICTS = ALL_DICTS[LANG_ID].term;
+        dictTabButtons = createDictTabs(5);
+        loadDictionaries(dictTabButtons);
+      }
+    })
+    // add event after first click, because no dict tabs before then
+    loadDictsBtn.addEventListener("click", () => {
+      addSentenceBtnEvent(dictTabButtons);}, {once: true})
+  </script>
+
+{% else %}
+
+  <script>
+    // const TERM_INPUT_FIELD = document.getElementById("text");
+    LANG_ID = $('#language_id').val();
+    TERM_DICTS = ALL_DICTS[LANG_ID].term;
+    dictTabButtons = createDictTabs(5);
+    loadDictionaries(dictTabButtons);
+    addSentenceBtnEvent(dictTabButtons);
+  </script>
+
+{% endif %}
 
 {% endblock %}
