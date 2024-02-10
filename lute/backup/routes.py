@@ -7,10 +7,22 @@ Backup settings form management, and running backups.
 import traceback
 from flask import Blueprint, current_app, render_template, request, jsonify, redirect
 from lute.models.setting import BackupSettings
-from lute.backup.service import create_backup, skip_this_backup
+from lute.backup.service import create_backup, skip_this_backup, list_backups
 
 
 bp = Blueprint("backup", __name__, url_prefix="/backup")
+
+
+@bp.route("/index")
+def index():
+    """
+    List all backups.
+    """
+    settings = BackupSettings.get_backup_settings()
+    backups = list_backups(settings.backup_dir)
+    backups.sort(reverse=True)
+
+    return render_template("backup/index.html", backups=backups)
 
 
 @bp.route("/backup", methods=["GET"])
