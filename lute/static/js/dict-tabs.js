@@ -1,11 +1,11 @@
 "use strict";
 
 function createDictTabs(num = 0) {
-  // TERM_DICTS.push("https://de.thefreedictionary.com/###");
   // TERM_DICTS.push("*https://glosbe.com/de/en/###");
   // TERM_DICTS.push("*https://en.langenscheidt.com/german-english/###");
   // TERM_DICTS.push("*https://en.pons.com/translate/german-english/###");
   // TERM_DICTS.push("*https://www.collinsdictionary.com/dictionary/german-english/###");
+  // TERM_DICTS.push("https://de.thefreedictionary.com/###");
   // TERM_DICTS.push("*https://dict.tu-chemnitz.de/deutsch-englisch/###.html");
   // TERM_DICTS.push("*https://www.translate.ru/%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4/%D0%BD%D0%B5%D0%BC%D0%B5%D1%86%D0%BA%D0%B8%D0%B9-%D0%B0%D0%BD%D0%B3%D0%BB%D0%B8%D0%B9%D1%81%D0%BA%D0%B8%D0%B9/###");
 
@@ -15,7 +15,6 @@ function createDictTabs(num = 0) {
   let columnCount;
 
   if (num < 0) num = 0;
-  if (num == 1) num = 2;
 
   if (num == 0 || num == null || num >= TERM_DICTS.length) {
     sliceIndex = TERM_DICTS.length;
@@ -50,11 +49,17 @@ function createDictTabs(num = 0) {
     if (isURLExternal(dict) == 0) {
       iFrame = createIFrame(`dict${index}`, iFramesContainer);
     }
-
+    
     dictTabButtons.set(btn, iFrame);
   });
 
   if (OPTION_DICTS.length > 0) {
+    let iFrame = null;
+    const isAllExternal = OPTION_DICTS.every(dict => isURLExternal(dict) == 1);
+    if (!isAllExternal) {
+      iFrame = createIFrame("listframe", iFramesContainer);
+    }
+
     const selectContainer = document.createElement("div");
     // const selectList = document.createElement("ol");
 
@@ -70,9 +75,8 @@ function createDictTabs(num = 0) {
     btn.setAttribute("title", "Right click for dictionary list");
     const menuImgEl = createImg("", "dict-btn-list-img");
     btn.appendChild(menuImgEl);
-    const iFrame = createIFrame("selectframe", iFramesContainer);
-    btn.classList.add("dict-btn-select");
     dictTabButtons.set(btn, iFrame);
+    btn.classList.add("dict-btn-select");
 
     selectContainer.setAttribute("id", "dict-select-container");
     selectContainer.classList.add("dict-select-list-hide");
@@ -94,7 +98,8 @@ function createDictTabs(num = 0) {
       option.prepend(faviconEl);
       option.dataset.dictId = origIndex;
       option.dataset.dictExternal = isURLExternal(dict);
-      option.dataset.tabOpened = 1 - isURLExternal(dict);
+      // if (isURLExternal(dict) == 1) option.dataset.tabOpened = 0;
+      // option.dataset.tabOpened = 1 - isURLExternal(dict);
       selectContainer.appendChild(option);
     });
 
@@ -132,7 +137,7 @@ function createDictTabs(num = 0) {
       btn.dataset.dictId = optionVal;
       btn.dataset.dictExternal = clickedOption.dataset.dictExternal;
       btn.textContent = btnLabel;
-      btn.dataset.tabOpened = clickedOption.dataset.tabOpened;
+      // btn.dataset.tabOpened = clickedOption.dataset.tabOpened;
       btn.prepend(faviconEl);
       const menuImgEl = createImg("", "dict-btn-list-img");
       btn.appendChild(menuImgEl);
@@ -157,12 +162,16 @@ function createDictTabs(num = 0) {
   
   // set first embedded frame as active (for final: need to save active tab and retrieve it)
   const tabsArray = Array.from(dictTabButtons.keys());
+  const framesArray = Array.from(dictTabButtons.values());
+
+  framesArray.forEach(frame => {if (frame) frame.dataset.tabOpened = 0;});
+
   const firstEmbeddedTab = tabsArray.find(tab => tab.dataset.dictExternal == 0);
   if (firstEmbeddedTab) {
       const firstEmbeddedFrame = dictTabButtons.get(firstEmbeddedTab);
       firstEmbeddedTab.classList.add("dict-btn-active");
       firstEmbeddedTab.dataset.firstEmbedded = 1;
-      firstEmbeddedTab.dataset.tabOpened = 1;
+      firstEmbeddedFrame.dataset.tabOpened = 1;
       firstEmbeddedFrame.classList.add("dict-active");
   }
 
@@ -174,30 +183,43 @@ function createDictTabs(num = 0) {
 
   dictTabButtons.set(imageBtn, imageFrame);
 
+  const sentenceFrame = createIFrame("sentenceframe", iFramesContainer);
+  dictTabButtons.set("sentenceTab", sentenceFrame);
+
   dictTabsContainer.addEventListener("click", (e) => {
     const clickedTab = e.target.closest(".dict-btn");
     if (!clickedTab) return;
 
-    const dictID = clickedTab.dataset.dictId;
     // const clickedTab = e.target; 
     const isExternal = clickedTab.dataset.dictExternal;
-    let iFrame = dictTabButtons.get(clickedTab);
+    const dictID = clickedTab.dataset.dictId;
 
-    if (isExternal == 1) {
-      iFrame = "";
-    }
-
-    if (clickedTab.dataset.tabOpened == 0) {
-      //const dictID = clickedTab.dataset.dictId;
-      loadDictPage(dictID, iFrame);
-    }
-    // checking for iFrame is effectively equal to checking for external
-    if (iFrame) {
-      activateTab(clickedTab, dictTabButtons);
-      if (isExternal == 0) {
-        clickedTab.dataset.tabOpened = 1;
+    // console.log(isExternal);
+    
+    // if (isExternal == 1) {
+      //   iFrame = "";
+    if (isExternal == 0) {
+      const iFrame = dictTabButtons.get(clickedTab);
+      if (iFrame.dataset.tabOpened == 0) {
+        loadDictPage(dictID, iFrame);
       }
+      iFrame.dataset.tabOpened = 1;
+      activateTab(clickedTab, dictTabButtons);
+    } else {
+      loadDictPage(dictID, "");
     }
+
+    // if (clickedTab.dataset.tabOpened == 0) {
+    //   //const dictID = clickedTab.dataset.dictId;
+    //   loadDictPage(dictID, iFrame);
+    // }
+    // // checking for iFrame is effectively equal to checking for external
+    // if (iFrame) {
+    //   activateTab(clickedTab, dictTabButtons);
+    //   if (isExternal == 0) {
+    //     clickedTab.dataset.tabOpened = 1;
+    //   }
+    // }
   });
 
   return dictTabButtons;
@@ -205,7 +227,7 @@ function createDictTabs(num = 0) {
 
 function loadDictionaries(dictTabButtons) {
   dictTabButtons.forEach((iframe, btn) => {
-    btn.dataset.tabOpened = 0;
+    if (iframe) iframe.dataset.tabOpened = 0;
   });
   // dictContainer needs to be defined here and not retrieved from global var because it's in different pages
   const dictContainer = document.querySelector(".dictcontainer");
@@ -213,30 +235,45 @@ function loadDictionaries(dictTabButtons) {
   dictContainer.style.flexDirection = "column";
 
   const activeTab = document.querySelector(".dict-btn-active");
-  // check for case if all dicts are external
-  if (activeTab) {
-    const iFrame = dictTabButtons.get(activeTab);
-    const dictID = activeTab.dataset.dictId;
-    loadDictPage(dictID, iFrame);
+  const activeFrame = document.querySelector(".dict-active");
+
+  if (activeFrame) {
+    if (activeTab) {
+      const dictID = activeTab.dataset.dictId;
+      loadDictPage(dictID, activeFrame);
+    } else {
+      if (activeFrame.getAttribute("name") == "sentenceframe") {
+        const url = getSentenceURL();
+        activeFrame.setAttribute("src", url);
+        activateTab("sentenceTab", dictTabButtons);
+      }
+    }
+    activeFrame.dataset.tabOpened = 1;
   }
 }
 
 function addSentenceBtnEvent(dictTabButtons) {
-  const tab = document.querySelector("button[data-first-embedded]");
-  const iframe = dictTabButtons.get(tab);
+  // const tab = document.querySelector("button[data-first-embedded]");
+  const iframe = dictTabButtons.get("sentenceTab");
+  // const iFramesContainer = document.getElementById("dictframes");
+  // const allFrames = Array.from(dictTabButtons.values());
+  // const iframe = createIFrame(`sentenceframe`, iFramesContainer);
+
   const sentencesBtn = TERM_FORM_CONTAINER.querySelector("#term-button-container > a");
 
   sentencesBtn.addEventListener("click", (e) => {
     e.preventDefault();
+
     const url = getSentenceURL();
     if (!url) return;
-
-    // set to "opened" so clicking on the tab reloads dictionary
-    tab.dataset.tabOpened = 0;
-
-    iframe.setAttribute("src", url);
-    activateTab(tab, dictTabButtons);
-    tab.classList.remove("dict-btn-active");
+    
+    if (iframe.dataset.tabOpened == 0) {
+      iframe.setAttribute("src", url);
+    }
+    
+    activateTab("sentenceTab", dictTabButtons);
+    iframe.dataset.tabOpened = 1;
+    iframe.classList.add("dict-active");
   });
 }
 
@@ -256,13 +293,13 @@ function getSentenceURL() {
 }
 
 function activateTab(tab, allTabs) {
-  const iFrame = allTabs.get(tab);
   allTabs.forEach((iframe, btn) => {
-    btn.classList.remove("dict-btn-active");
+    if (btn.classList) btn.classList.remove("dict-btn-active");
     if (iframe) iframe.classList.remove("dict-active");
   });
   
-  tab.classList.add("dict-btn-active");
+  const iFrame = allTabs.get(tab);
+  if (tab.classList) tab.classList.add("dict-btn-active");
   if (iFrame) iFrame.classList.add("dict-active");
 }
 
