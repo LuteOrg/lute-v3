@@ -180,7 +180,7 @@ def _mirror_images_dir(userimagespath, outdir):
 
 
 def list_backups(outdir) -> List[DatabaseBackupFile]:
-    "List all backup files. Filtered to either manual or automatically generated."
+    "List all backup files."
     return [
         DatabaseBackupFile(os.path.join(outdir, f))
         for f in os.listdir(outdir)
