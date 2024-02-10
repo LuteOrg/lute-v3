@@ -1162,6 +1162,10 @@ input[type="checkbox"][disabled] + label {
     display: none;
 }
 
+.clickedZoomableImage {
+    border: 1px solid red;
+}
+
 .zoomableTermImage:hover {
     transform: scale(4) translate(-17px, 5px);
 }
