@@ -163,7 +163,7 @@ def skip_this_backup():
 
 def _remove_excess_backups(count, outdir):
     "Remove old backups."
-    files = [f for f in list_backups(outdir) if f.is_manual]
+    files = [f for f in list_backups(outdir) if not f.is_manual]
     files.sort(reverse=True)
     to_remove = files[count:]
     for f in to_remove:
