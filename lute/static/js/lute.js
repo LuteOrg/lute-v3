@@ -601,23 +601,17 @@ function post_bulk_update(updates) {
 
 
 /**
- * Change status using arrow keys for *select* (clicked) elements only,
- * *not* hovered elements.
- *
- * When hovering, clicking an arrow should just scroll the screen, because
- * the user is *kind of passively* viewing content.
- * If the user has clicked on an element (or used arrow keys), they're actively
- * focused on it.
+ * Change status using arrow keys for selected or hovered elements.
  */
 function increment_status_for_selected_elements(e, shiftBy) {
-  const elements = Array.from(document.querySelectorAll('span.kwordmarked'));
-  if (elements.length == 0)
-    return;
-
   // Don't scroll screen.  If screen scrolling happens, then pressing
   // "up" will both scroll up *and* change the status the selected term,
   // which is odd.
   e.preventDefault();
+
+  const elements = Array.from(document.querySelectorAll('span.kwordmarked, span.wordhover'));
+  if (elements.length == 0)
+    return;
 
   const statuses = ['status0', 'status1', 'status2', 'status3', 'status4', 'status5', 'status99'];
 
