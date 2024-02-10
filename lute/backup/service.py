@@ -167,7 +167,7 @@ def _remove_excess_backups(count, outdir):
     files.sort(reverse=True)
     to_remove = files[count:]
     for f in to_remove:
-        os.remove(os.path.join(outdir, f))
+        os.remove(f.filepath)
 
 
 def _mirror_images_dir(userimagespath, outdir):
