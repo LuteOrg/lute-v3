@@ -176,7 +176,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                     span = b.find_by_xpath("".join(xpath))
                     span.type(p, slowly=False)
                     span.type(Keys.RETURN)
-                    time.sleep(0.1)  # seconds
+                    time.sleep(0.3)  # seconds
             elif k == "sync_status":
                 if v:
                     b.check("sync_status")

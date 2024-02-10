@@ -5,15 +5,9 @@
  */
 let LUTE_CURR_TERM_DATA_ORDER = -1;  // initially not set.
 
-/**
- * Lute has 2 different "modes" when reading:
- * - LUTE_HOVERING = true: Hover mode, not selecting
- * - LUTE_HOVERING = false: Word clicked, or click-drag
- */ 
-let LUTE_HOVERING = true;
 
 /**
- * When the reading pane is first loaded, it is set in "hover mode",
+ * When the reading pane is first loaded, it's in "hover mode",
  * meaning that when the user hovers over a word, that word becomes
  * the "active word" -- i.e., status update keyboard shortcuts should
  * operate on that hovered word, and as the user moves the mouse
@@ -28,9 +22,6 @@ let LUTE_HOVERING = true;
  * this method on reload to reset the cursor etc.
  */
 function start_hover_mode(should_clear_frames = true) {
-  // console.log('CALLING RESET');
-  LUTE_HOVERING = true;
-
   $('span.kwordmarked').removeClass('kwordmarked');
 
   const curr_word = $('span.word').filter(function() {
@@ -188,7 +179,8 @@ function hover_over_add_status_class(e) {
 
 function hover_over(e) {
   $('span.wordhover').removeClass('wordhover');
-  if (LUTE_HOVERING) {
+  const marked_count = $('span.kwordmarked').toArray().length;
+  if (marked_count == 0) {
     $(this).addClass('wordhover');
     save_curr_data_order($(this));
   }
@@ -238,7 +230,6 @@ let clear_newmultiterm_elements = function() {
 }
 
 function select_started(e) {
-  LUTE_HOVERING = false;
   clear_newmultiterm_elements();
   $(this).addClass('newmultiterm');
   selection_start_el = $(this);
@@ -346,11 +337,8 @@ let copy_text_to_clipboard = function(textitemspans) {
 
 
 let move_cursor = function(shiftby) {
-  // Use the first clicked element, or the hovered if none clicked.
-  let elements = $('span.kwordmarked, span.newmultiterm');
-  let hovered_els = $('span.wordhover');
-  if (elements.length == 0 && hovered_els.length > 0)
-    elements = hovered_els;
+  // Cursor is set to the first clicked or hovered element.
+  let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
   elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
   const curr = (elements.length == 0) ? null : elements[0];
 
@@ -371,6 +359,7 @@ let move_cursor = function(shiftby) {
   // Adjust all screen state.
   $('span.newmultiterm').removeClass('newmultiterm');
   $('span.kwordmarked').removeClass('kwordmarked');
+  $('span.wordhover').removeClass('wordhover');
   remove_status_highlights();
   target.addClass('kwordmarked');
   save_curr_data_order(target);
@@ -612,23 +601,17 @@ function post_bulk_update(updates) {
 
 
 /**
- * Change status using arrow keys for *select* (clicked) elements only,
- * *not* hovered elements.
- *
- * When hovering, clicking an arrow should just scroll the screen, because
- * the user is *kind of passively* viewing content.
- * If the user has clicked on an element (or used arrow keys), they're actively
- * focused on it.
+ * Change status using arrow keys for selected or hovered elements.
  */
 function increment_status_for_selected_elements(e, shiftBy) {
-  const elements = Array.from(document.querySelectorAll('span.kwordmarked'));
-  if (elements.length == 0)
-    return;
-
   // Don't scroll screen.  If screen scrolling happens, then pressing
   // "up" will both scroll up *and* change the status the selected term,
   // which is odd.
   e.preventDefault();
+
+  const elements = Array.from(document.querySelectorAll('span.kwordmarked, span.wordhover'));
+  if (elements.length == 0)
+    return;
 
   const statuses = ['status0', 'status1', 'status2', 'status3', 'status4', 'status5', 'status99'];
 

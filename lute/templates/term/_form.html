@@ -36,9 +36,12 @@
       <div id="translation-container">
         <div>{{ form.translation }}</div>
         <img {% if term.current_image %}style="grid-column: -1; display: block"{% endif %} 
-        class="zoomableTermImage" 
-        id="term_image" 
-        src="{{ form.current_image.object_data or '' }}"/>
+             class="zoomableTermImage"
+             id="term_image"
+             tabindex="0"
+             src="{{ form.current_image.object_data or '' }}"
+             onclick="clicked_zoomable_image(this);"
+             />
       </div>
 
       <div id="status-container">
@@ -69,6 +72,15 @@
 
 <script type="text/javascript">
 
+  /** TERM IMAGE. ***************/
+
+  var term_image = null;
+
+  function clicked_zoomable_image(el) {
+    // alert('clicked');
+    $(el).toggleClass("clickedZoomableImage");
+  }
+
   // The parent tag list, managed by tagify.
   // Global reference needed for runtime inspection of tag list.
   var parents_tagify = null;
@@ -86,12 +98,14 @@
     const tagify = new Tagify(input, {
       placeholder: 'Parents',
       editTags: false,
-      backspace: 'edit',
+      pasteAsTags: false,
+      backspace: true,
+      addTagOnBlur: false,
       autoComplete: { enabled: true, rightKey: true, tabKey: true },
       enforceWhitelist: false,
       whitelist: [],
       dropdown: {
-        enabled: 2,  // Min 2 chars - this doesn't seem to work.
+        enabled: 1,
         maxItems: 15,
         mapValueTo: 'suggestion',  // Field to display
         placeAbove: false,  // Always put the dropdown below the textbox
@@ -104,7 +118,24 @@
           return `<footer data-selector='tagify-suggestions-footer' class="${this.settings.classNames.dropdownFooter}">
             (more items available, please refine your search.)</footer>`;
         }
-      }
+      },
+
+      // Use a hook to fire the onInput event!
+      // Pasting from the clipboard doesn't fire the
+      // tagify.on('input') event, so intercept it and handle
+      // it manually.
+      hooks: {
+        beforePaste : function(content) {
+          return new Promise((resolve, reject) => {
+            clipboardData = content.clipboardData || window.clipboardData;
+            pastedData = clipboardData.getData('Text');
+            // console.log("pasting => " + pastedData);
+            let e = { detail: { value: pastedData } };
+            onInput(e);
+            resolve();
+          });
+        }
+      },
     });  // end tagify
 
     tagify.on('click', function (e) {
@@ -165,7 +196,7 @@
     tagify.on('input', onInput);
     function onInput(e) {
       tagify.whitelist = null;  // Reset whitelist.
-      if (e.detail.value == '' || e.detail.value.length < 2) {
+      if (e.detail.value == '' || e.detail.value.length < 1) {
         controller && controller.abort();
         tagify.whitelist = [];
         tagify.loading(false).dropdown.hide();
@@ -274,6 +305,30 @@
   };
 
   $(document).ready(function () {
+
+    /** TERM IMAGE *************************/
+
+    var term_image = $("#term_image");
+
+    term_image.hover(
+      function(){ $(this).attr("title", "Click and hit Delete to remove, then Save."); },
+      function(){ $(this).removeClass('clickedZoomableImage') }
+    );
+
+    term_image.on("keydown", function(event) {
+      if (term_image.hasClass("clickedZoomableImage")) {
+        const k = event.key;
+        if (k === "Delete" || k === "Backspace") {
+          // Hide image on screen.
+          term_image.attr("src", "");
+          term_image.css("display", "none");
+          // Erase hidden form control value.
+          $("#current_image").val("");
+        }
+      }
+    });
+
+
     var parentslist = document.getElementById('parentslist');
     parents_tagify = setup_parent_tagify(parentslist);
     var termtagslist = document.getElementById('termtagslist');
