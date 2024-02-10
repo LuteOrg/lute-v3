@@ -230,14 +230,10 @@
       if (event.data.event === "LuteTermFormOpened") {
         TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
         loadDictionaries(dictTabButtons);
-      }
-    });
-    // add event only on first form open (form needs to open because the sentence button doesn't exist before that)
-    window.addEventListener("message", function(event) {
-      if (event.data.event === "LuteTermFormOpened") {
+        // because the sentence buttons gets deleted. we have to add the event each time form is opened
         addSentenceBtnEvent(dictTabButtons);
       }
-    }, {once: true});
+    });
     
     if (have_audio_file()) {
       // Don't actually load the source -- for some reason,
