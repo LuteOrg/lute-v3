@@ -1,4 +1,16 @@
 
+# 3.1.4 (2024-02-11)
+
+Feature changes:
+
+* Issue 25: click term image and Delete/Backspace to delete.
+* Issue 214: user must press Return to create parent tag.
+* Issue 215: arrow changes status for hovered.
+* Issue 213: no hovered elements if clicked.
+* Issue 216: parent paste should show dropdown for hints.
+* Show parent suggestions after single char input.
+
+
 # 3.1.3 (2024-02-07)
 
 Feature changes:
