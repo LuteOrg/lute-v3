@@ -19,6 +19,7 @@ For this demo, English has been configured to do an image search for the second 
 You can also click on the little "eye icon" next to the term, and it opens up a common image search URL.
 In either case, if you click on one of the images shown in the list, that image is saved in your data/userimages folder.  When you hover over the word in the reading pane, that picture is included in the word hover.  Try adding an image for your elephant by clicking on the term, clicking the eye icon, and clicking a picture you like.  Then hover over your elephant.
 Note: sometimes these images make _no sense_ -- it's using Bing image search, and it does the best it can with the limited context it has.
+To delete an image added to your term, click on it.  Its border will change to red.  Hit Delete or Backspace to delete it, and then save the term (you must save!).
 
 2. Multi-word Terms
 You can create multi-word terms by clicking and dragging across multiple words, then release the mouse.  Try creating a term for the phrase "the cat's pyjamas", and add a translation and set the status.
