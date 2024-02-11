@@ -39,8 +39,10 @@ class LanguageDictionaryForm(Form):
 
     def validate_dicturi(self, field):  # pylint: disable=unused-argument
         "Language must be set."
-        if "###" not in field.data and "<TERM>" not in field.data:
-            raise ValidationError("Dictionary URI must contain ### or <TERM>")
+        # TODO TERM_for_dict_lookup_key: re-add <TERM> criteria.
+        #  and "<TERM>" not in field.data:
+        if "###" not in field.data:
+            raise ValidationError("Dictionary URI must contain ###")  # or <TERM>
 
 
 class LanguageForm(FlaskForm):
