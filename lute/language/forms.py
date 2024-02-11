@@ -13,6 +13,7 @@ from wtforms import (
     Form,
     ValidationError,
 )
+from wtforms import ValidationError
 from wtforms.validators import DataRequired
 from lute.models.language import LanguageDictionary
 
@@ -71,3 +72,8 @@ class LanguageForm(FlaskForm):
     )
     exceptions_split_sentences = StringField("Split sentence exceptions")
     word_characters = StringField("Word characters", validators=[DataRequired()])
+
+    def validate_dictionaries(self, field):  # pylint: disable=unused-argument
+        "Dictionaries must be valid."
+        if len(self.dictionaries) == 0:
+            raise ValidationError("Please add a dictionary")

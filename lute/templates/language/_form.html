@@ -1,4 +1,5 @@
 {% for field_name, field_errors in form.errors.items() %}
+<div class="flash-notice-narrow">
 <p>{{ field_name }}
   <ul>
     {% for error in field_errors %}
@@ -8,6 +9,13 @@
     {% endfor %}
   </ul>
 </p>
+</div>
+{% endfor %}
+
+{% for field_name, field_errors in form.errors.items() %}
+{% for error in field_errors %}
+<div class="flash-notice-narrow">{{ error }}</div>
+{% endfor %}
 {% endfor %}
 
 <form method="POST">
@@ -93,11 +101,13 @@
     /** Add a new entity, using the __TEMPLATE__ entry as the template. */
     /** The TEMPLATE is added in language/routes.py. */
     $("#add-dict-entity").click(function() {
-      const templateInput = $('.dict_entry input[type="text"][value="__TEMPLATE__"]');
-      if (templateInput == null) {
+      let templateInput = $('.dict_entry input[type="text"][value="__TEMPLATE__"]');
+      if (templateInput.length == 0) {
         alert("Can't find __TEMPLATE__ input to create dictionary ...");
         return;
       }
+      templateInput = $(templateInput[0]);
+      // console.log(templateInput);
       const templateInputId = templateInput.attr('id');
       const idParts = templateInputId.split('-');
       if (idParts.length != 3) {
@@ -115,7 +125,8 @@
       let template = `<div class="dict_entry valign">` + templateInput.closest('div.dict_entry').html() + "</div>";
       template = template.replaceAll(`-${idToReplace}-`, `-${index}-`);
       template = template.replaceAll('__TEMPLATE__', '');
-      console.log(template);
+      // console.log(template);
+
       $("#dictionary_entities").append(template);
       $(`#dictionaries-${index}-is_active`).attr("checked", true);
       apply_sortable();
