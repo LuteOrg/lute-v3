@@ -35,18 +35,16 @@ function createDictTabs(num = 0) {
   dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${columnCount}, minmax(2rem, 8rem))`;
 
   TABBED_DICTS.forEach((dict, index) => {
-    const domain = getDictURLDomain(dict);
-    const faviconURL = getFavicon(domain);
     let iFrame = null;
-    let btnLabel = domain.split("www.").splice(-1)[0];
+    const dictInfo = getDictInfo(dict);
 
-    const btn = createTabBtn(btnLabel, 
+    const btn = createTabBtn(dictInfo.label, 
                               dictTabsLayoutContainer, 
                               index, 
-                              isURLExternal(dict), 
-                              faviconURL);
+                              dictInfo.isExternal, 
+                              dictInfo.faviconURL);
 
-    if (!isURLExternal(dict)) {
+    if (!dictInfo.isExternal) {
       iFrame = createIFrame(`dict${index}`, iFramesContainer);
     }
     
@@ -59,14 +57,13 @@ function createDictTabs(num = 0) {
     if (!isAllExternal) {
       iFrame = createIFrame("listframe", iFramesContainer);
     }
-   
-    const domain = getDictURLDomain(LISTED_DICTS[0]);
-    const faviconURL = getFavicon(domain);
-    const btn = createTabBtn(domain.split("www.").splice(-1)[0], 
+    
+    const dictInfo = getDictInfo(LISTED_DICTS[0]);
+    const btn = createTabBtn(dictInfo.label, 
                               dictTabsLayoutContainer, 
                               TERM_DICTS.indexOf(LISTED_DICTS[0]), 
-                              isURLExternal(LISTED_DICTS[0]), 
-                              faviconURL);
+                              dictInfo.isExternal, 
+                              dictInfo.faviconURL);
     btn.setAttribute("title", "Right click for dictionary list");
     const menuImgEl = createImg("", "dict-btn-list-img");
     btn.appendChild(menuImgEl);
@@ -167,28 +164,25 @@ function listMenuClick(event, listMenuContainer, btn, dictTabButtons, iFrame) {
 
   listMenuContainer.classList.add("dict-select-list-hide");
 
-  const optionVal = clickedOption.dataset.dictId;
-  const domain = getDictURLDomain(TERM_DICTS[optionVal]);
-  const btnLabel = domain.split("www.").splice(-1)[0];
-  const faviconURL = getFavicon(domain);
-  const faviconEl = createImg(faviconURL, "dict-btn-fav-img"); // img elements get deleted after "change" event. so we create them after each change
+  const dictID = clickedOption.dataset.dictId;
+  const dictInfo = getDictInfo(TERM_DICTS[dictID]);
+  const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img"); // img elements get deleted after "change" event. so we create them after each change
   
-  btn.dataset.dictId = optionVal;
+  btn.dataset.dictId = dictID;
   btn.dataset.dictExternal = clickedOption.dataset.dictExternal;
-  btn.textContent = btnLabel;
-  // btn.dataset.tabOpened = clickedOption.dataset.tabOpened;
+  btn.textContent = dictInfo.label;
   btn.prepend(faviconEl);
+
   const menuImgEl = createImg("", "dict-btn-list-img");
   btn.appendChild(menuImgEl);
   
   if (clickedOption.dataset.dictExternal == 1) {
-    loadDictPage(optionVal, "");
+    loadDictPage(dictID, "");
 
     const arrowEl = createImg("", "dict-btn-external-img");
     btn.appendChild(arrowEl);
-    // btn.classList.remove("dict-btn-active");
   } else {
-    loadDictPage(optionVal, iFrame);
+    loadDictPage(dictID, iFrame);
     activateTab(btn, dictTabButtons);
   }
   // as with the icons, btn content changes so events get deleted
@@ -204,16 +198,14 @@ function createDictListMenu(dicts) {
   listContainer.classList.add("dict-select-list-hide");
   
   dicts.forEach((dict) => {
+    const dictInfo = getDictInfo(dict);
     const menuItem = document.createElement("p");
+    const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img");
     menuItem.classList.add("dict-select-option");
-    const origIndex = TERM_DICTS.indexOf(dict);
-    const domain = getDictURLDomain(dict);
-    const faviconURL = getFavicon(domain);
-    const faviconEl = createImg(faviconURL, "dict-btn-fav-img");
-    menuItem.textContent = domain.split("www.").splice(-1)[0];
+    menuItem.textContent = dictInfo.label;
     menuItem.prepend(faviconEl);
-    menuItem.dataset.dictId = origIndex;
-    menuItem.dataset.dictExternal = isURLExternal(dict) ? 1 : 0;
+    menuItem.dataset.dictId = TERM_DICTS.indexOf(dict);
+    menuItem.dataset.dictExternal = dictInfo.isExternal ? 1 : 0;
     listContainer.appendChild(menuItem);
   });
 
@@ -224,7 +216,7 @@ function loadDictionaries(dictTabButtons) {
   dictTabButtons.forEach((iframe, btn) => {
     if (iframe) iframe.dataset.tabOpened = 0;
   });
-  // dictContainer needs to be defined here and not retrieved from global var because it's in different pages
+  // dictContainer needs to be defined here and not retrieved from global var because it exists in different pages
   const dictContainer = document.querySelector(".dictcontainer");
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
@@ -265,6 +257,16 @@ function addSentenceBtnEvent(dictTabButtons) {
     iframe.dataset.tabOpened = 1;
     iframe.classList.add("dict-active");
   });
+}
+
+function getDictInfo(dictURL) {
+  const domain = getURLDomain(dictURL);
+
+  return {
+    label: domain.split("www.").splice(-1)[0],
+    isExternal: isURLExternal(dictURL),
+    faviconURL: getFavicon(domain),
+  };
 }
 
 function getSentenceURL() {
@@ -355,11 +357,22 @@ function isURLExternal(dictURL) {
   return (dictURL.charAt(0) == '*') ? true : false; 
 }
 
-function getDictURLDomain(url) {
-  const cleanURLString = url.split("*").splice(-1)[0];
-  const urlObj = new URL(cleanURLString);
+function getURLDomain(url) {
+  const cleanURL = url.split("*").splice(-1)[0];
 
-  return urlObj.hostname;
+  try {
+    const urlObj = new URL(cleanURL);
+
+    return urlObj.hostname;
+  }
+  catch(err) {
+    // Handle test/non-http dictionaries.
+    let d = cleanURL.slice(0, 10);
+    if (d.length < cleanURL.length)
+      d += '...';
+
+    return d;
+  }
 }
 
 function getFavicon(domain) {
