@@ -162,7 +162,7 @@ function tabsClick(event, dictTabButtons) {
   }
 }
 
-function listMenuClick(event, listMenuContainer, menuItem, dictTabButtons, iFrame) {
+function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame) {
   const clickedItem = event.target.closest(".dict-menu-item");
   if (!clickedItem) return;
   // hide menu list when clicked on an item
@@ -172,23 +172,23 @@ function listMenuClick(event, listMenuContainer, menuItem, dictTabButtons, iFram
   const dictInfo = getDictInfo(TERM_DICTS[dictID]);
   const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img"); // img elements get deleted after "change" event. so we create them after each change
   
-  menuItem.dataset.dictId = dictID;
-  menuItem.dataset.dictExternal = clickedItem.dataset.dictExternal;
-  menuItem.dataset.tabOpened = clickedItem.dataset.tabOpened;
-  menuItem.textContent = dictInfo.label;
-  menuItem.prepend(faviconEl);
+  menuBtn.dataset.dictId = dictID;
+  menuBtn.dataset.dictExternal = clickedItem.dataset.dictExternal;
+  menuBtn.dataset.tabOpened = clickedItem.dataset.tabOpened;
+  menuBtn.textContent = dictInfo.label;
+  menuBtn.prepend(faviconEl);
 
   const menuImgEl = createImg("", "dict-btn-list-img");
-  menuItem.appendChild(menuImgEl);
+  menuBtn.appendChild(menuImgEl);
   
   if (clickedItem.dataset.dictExternal == "true") {
     loadDictPage(dictID, "");
 
     const arrowEl = createImg("", "dict-btn-external-img");
-    menuItem.appendChild(arrowEl);
+    menuBtn.appendChild(arrowEl);
   } else {
     loadDictPage(dictID, iFrame);
-    activateTab(menuItem, dictTabButtons);
+    activateTab(menuBtn, dictTabButtons);
   }
   // as with the icons, btn content changes so events get deleted
   menuImgEl.addEventListener("click", (e) => {
