@@ -25,26 +25,46 @@
 {% if term.language_id is none %}
 
   <script>
-    const loadDictsBtn = document.createElement("button");
-    const languageDiv = document.getElementById("languageSel");
+    const dictTabsContainer = document.getElementById("dicttabs");
+    const loadDictsBtn = document.getElementById("load-dicts-btn");
     const langSelect = document.getElementById("language_id");
-    loadDictsBtn.setAttribute("title", "Load dictionaries for the new term");
-    loadDictsBtn.setAttribute("id", "load-dicts-btn");
-    loadDictsBtn.setAttribute("type", "button");
-    languageDiv.appendChild(loadDictsBtn);
+    const termField = document.getElementById("text");
+    let term = "";
+    let langid = 0;
 
     loadDictsBtn.addEventListener("click", (e) => {
       e.preventDefault();
+
       LANG_ID = langSelect.value;
-      if (LANG_ID != 0) {
+      // continue only if lang or term has been changed
+      if (termField.value && termField.value != term || 
+          LANG_ID != 0 && LANG_ID != langid) {
+            
+        // delete all tabs and frames if they exist
+        if (dictTabButtons) {
+          const tabs = document.querySelectorAll(".dict-btn");
+          const frames = document.querySelectorAll(".dictframe")
+          tabs.forEach(item => item.remove())
+          frames.forEach(item => item.remove())
+        }
+
         TERM_DICTS = ALL_DICTS[LANG_ID].term;
         dictTabButtons = createDictTabs(5);
         loadDictionaries(dictTabButtons);
+        addSentenceBtnEvent(dictTabButtons);
+
+        // update the event with new dictionaries
+        if (LANG_ID != langid) {
+          dictTabsContainer.onclick = function(e) {
+            tabsClick(e, dictTabButtons);
+          };
+        }
+
+        term = termField.value;
+        langid = LANG_ID;
       }
+      
     })
-    // add event after first click, because no dict tabs before then
-    loadDictsBtn.addEventListener("click", () => {
-      addSentenceBtnEvent(dictTabButtons);}, {once: true})
   </script>
 
 {% else %}

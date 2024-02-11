@@ -134,9 +134,10 @@ function createDictTabs(num = 0) {
   const sentencesFrame = createIFrame("sentencesframe", iFramesContainer);
   dictTabButtons.set("sentencesTab", sentencesFrame);
 
-  dictTabsContainer.addEventListener("click", (e) => {
+  // using onevent property to update the event listener later (formframes)
+  dictTabsContainer.onclick = function(e) {
     tabsClick(e, dictTabButtons);
-  });
+  };
 
   return dictTabButtons;
 }
@@ -376,7 +377,7 @@ function show_lookup_page(dicturl, text, iframe) {
     let use_text = text;
     const binghash = dicturl.replace('https://www.bing.com/images/search?', '');
     const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
-    document.querySelector(`[name="${iframe}"]`).setAttribute("src", url);
+    iframe.setAttribute("src", url);
     return;
   }
 
