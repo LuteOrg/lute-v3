@@ -1205,7 +1205,7 @@ input[type="checkbox"][disabled] + label {
     flex: 1;
 }
 
-#select-btn-box {
+#dict-menu-container {
     position: relative;
     border: 1px solid #85c0ee;
     border-top-left-radius: 3px;
@@ -1217,7 +1217,7 @@ input[type="checkbox"][disabled] + label {
     display: flex;
 }
 
-#select-btn-box .dict-btn{
+#dict-menu-container .dict-btn{
     height: 100%;
     border: none;
 }
@@ -1389,13 +1389,13 @@ input[type="checkbox"][disabled] + label {
     filter: invert(66%) sepia(33%) saturate(700%) hue-rotate(170deg) brightness(92%) contrast(90%);
 }
 
-#dict-select-container.dict-select-list-hide {
+#dict-list-container.dict-list-hide {
     opacity: 0;
     pointer-events: none;
     /* clip-path: rect(0 0 0 114%); */
 }
 
-#dict-select-container {
+#dict-list-container {
     opacity: 1;
     pointer-events: unset;
     /* clip-path: rect(0 0 106% 114%); */
@@ -1416,15 +1416,15 @@ input[type="checkbox"][disabled] + label {
     transition: opacity 0.1s;
 }
 
-#select-btn-box:hover .dict-btn-select:not(.dict-btn-active) {
+#dict-menu-container:hover .dict-btn-select:not(.dict-btn-active) {
     background-color: aliceblue;
 }
 
-#select-btn-box:hover .dict-btn-select:not(.dict-btn-active)::after {
+#dict-menu-container:hover .dict-btn-select:not(.dict-btn-active)::after {
     border-color: aliceblue;
 }
 
-.dict-select-option {
+.dict-menu-item {
     font-size: 0.9rem;
     padding: 0.5rem 1rem;
     margin: 0;
@@ -1434,7 +1434,7 @@ input[type="checkbox"][disabled] + label {
     cursor: pointer;
 }
 
-.dict-select-option:hover {
+.dict-menu-item:hover {
     background-color: #68ace0;
     color: #fff;
 }
