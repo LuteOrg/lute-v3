@@ -1,21 +1,15 @@
 {% for field_name, field_errors in form.errors.items() %}
-<div class="flash-notice-narrow">
-<p>{{ field_name }}
-  <ul>
-    {% for error in field_errors %}
-    {% if error != {} %}
-    <li>{{ error }}</li>
-    {% endif %}
-    {% endfor %}
-  </ul>
-</p>
-</div>
-{% endfor %}
-
-{% for field_name, field_errors in form.errors.items() %}
-{% for error in field_errors %}
-<div class="flash-notice-narrow">{{ error }}</div>
-{% endfor %}
+  {% for error in field_errors %}
+    <div class="flash-notice-narrow">
+      {% if error is mapping %}
+        {% for err_field, err_msg in error.items() %}
+          {{ err_msg }}
+        {% endfor %}
+      {% else %}
+        {{ error }}
+      {% endif %}
+    </div>
+  {% endfor %}
 {% endfor %}
 
 <form method="POST">
@@ -33,7 +27,10 @@
       <td>Dictionaries</td>
       <td>
         <div id="dictionary_entities">
-          {# Render all the dictionaries, but don't show the template. #}
+          {#
+            Render all the dictionaries, but don't show the __TEMPLATE__,
+            added in "_add_hidden_dictionary_template_entry()" in routes.py
+          #}
           {% for dictionary in form.dictionaries %}
           <div class="dict_entry valign"
                {% if dictionary.dicturi.data == '__TEMPLATE__' %}

@@ -13,7 +13,6 @@ from wtforms import (
     Form,
     ValidationError,
 )
-from wtforms import ValidationError
 from wtforms.validators import DataRequired
 from lute.models.language import LanguageDictionary
 
@@ -75,5 +74,19 @@ class LanguageForm(FlaskForm):
 
     def validate_dictionaries(self, field):  # pylint: disable=unused-argument
         "Dictionaries must be valid."
-        if len(self.dictionaries) == 0:
-            raise ValidationError("Please add a dictionary")
+
+        # raise ValueError(self.dictionaries.data) # debugging
+        def _get_actives(usefor):
+            "Return dictionaries."
+            return [
+                d
+                for d in self.dictionaries.data
+                if d.get("usefor", "") == usefor and d.get("is_active")
+            ]
+
+        term_dicts = _get_actives("terms")
+        sentence_dicts = _get_actives("sentences")
+        if len(term_dicts) == 0:
+            raise ValidationError("Please add an active Terms dictionary")
+        if len(sentence_dicts) == 0:
+            raise ValidationError("Please add an active Sentences dictionary")
