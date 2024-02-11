@@ -1,11 +1,12 @@
 "use strict";
 
 function createDictTabs(num = 0) {
+  // TERM_DICTS.push("https://www.dict.cc/?s=###");
   // TERM_DICTS.push("*https://glosbe.com/de/en/###");
   // TERM_DICTS.push("*https://en.langenscheidt.com/german-english/###");
   // TERM_DICTS.push("*https://en.pons.com/translate/german-english/###");
   // TERM_DICTS.push("*https://www.collinsdictionary.com/dictionary/german-english/###");
-  // TERM_DICTS.push("https://de.thefreedictionary.com/###");
+  // TERM_DICTS.push("https://www.dict.cc/?s=###");
   // TERM_DICTS.push("*https://dict.tu-chemnitz.de/deutsch-englisch/###.html");
   // TERM_DICTS.push("*https://www.translate.ru/%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4/%D0%BD%D0%B5%D0%BC%D0%B5%D1%86%D0%BA%D0%B8%D0%B9-%D0%B0%D0%BD%D0%B3%D0%BB%D0%B8%D0%B9%D1%81%D0%BA%D0%B8%D0%B9/###");
 
@@ -109,14 +110,14 @@ function createDictTabs(num = 0) {
   const tabsArray = Array.from(dictTabButtons.keys());
   const framesArray = Array.from(dictTabButtons.values());
 
-  framesArray.forEach(frame => {if (frame) frame.dataset.tabOpened = 0;});
+  framesArray.forEach(frame => {if (frame) frame.dataset.tabOpened = "false";});
 
-  const firstEmbeddedTab = tabsArray.find(tab => tab.dataset.dictExternal == 0);
+  const firstEmbeddedTab = tabsArray.find(tab => tab.dataset.dictExternal == "false");
   if (firstEmbeddedTab) {
       const firstEmbeddedFrame = dictTabButtons.get(firstEmbeddedTab);
       firstEmbeddedTab.classList.add("dict-btn-active");
       firstEmbeddedTab.dataset.firstEmbedded = 1;
-      firstEmbeddedFrame.dataset.tabOpened = 1;
+      firstEmbeddedFrame.dataset.tabOpened = "true";
       firstEmbeddedFrame.classList.add("dict-active");
   }
 
@@ -143,17 +144,17 @@ function tabsClick(event, dictTabButtons) {
   const clickedTab = event.target.closest(".dict-btn");
   if (!clickedTab) return;
 
-  const isExternal = clickedTab.dataset.dictExternal == 1 ? true : false;
+  const isExternal = clickedTab.dataset.dictExternal == "true" ? true : false;
   const dictID = clickedTab.dataset.dictId;
 
   if (isExternal) {
     loadDictPage(dictID, "");
   } else {
     const iFrame = dictTabButtons.get(clickedTab);
-    if (iFrame.dataset.tabOpened == 0) {
+    if (iFrame.dataset.tabOpened == "false") {
       loadDictPage(dictID, iFrame);
     }
-    iFrame.dataset.tabOpened = 1;
+    iFrame.dataset.tabOpened = "true";
     activateTab(clickedTab, dictTabButtons);
   }
 }
@@ -170,13 +171,14 @@ function listMenuClick(event, listMenuContainer, btn, dictTabButtons, iFrame) {
   
   btn.dataset.dictId = dictID;
   btn.dataset.dictExternal = clickedOption.dataset.dictExternal;
+  btn.dataset.tabOpened = clickedOption.dataset.tabOpened;
   btn.textContent = dictInfo.label;
   btn.prepend(faviconEl);
 
   const menuImgEl = createImg("", "dict-btn-list-img");
   btn.appendChild(menuImgEl);
   
-  if (clickedOption.dataset.dictExternal == 1) {
+  if (clickedOption.dataset.dictExternal == "true") {
     loadDictPage(dictID, "");
 
     const arrowEl = createImg("", "dict-btn-external-img");
@@ -205,7 +207,8 @@ function createDictListMenu(dicts) {
     menuItem.textContent = dictInfo.label;
     menuItem.prepend(faviconEl);
     menuItem.dataset.dictId = TERM_DICTS.indexOf(dict);
-    menuItem.dataset.dictExternal = dictInfo.isExternal ? 1 : 0;
+    menuItem.dataset.dictExternal = dictInfo.isExternal ? "true" : "false";
+    menuItem.dataset.tabOpened = dictInfo.isExternal ? "false" : "true";
     listContainer.appendChild(menuItem);
   });
 
@@ -214,7 +217,7 @@ function createDictListMenu(dicts) {
 
 function loadDictionaries(dictTabButtons) {
   dictTabButtons.forEach((iframe, btn) => {
-    if (iframe) iframe.dataset.tabOpened = 0;
+    if (iframe) iframe.dataset.tabOpened = "false";
   });
   // dictContainer needs to be defined here and not retrieved from global var because it exists in different pages
   const dictContainer = document.querySelector(".dictcontainer");
@@ -235,7 +238,7 @@ function loadDictionaries(dictTabButtons) {
         activateTab("sentencesTab", dictTabButtons);
       }
     }
-    activeFrame.dataset.tabOpened = 1;
+    activeFrame.dataset.tabOpened = "true";
   }
 }
 
@@ -249,12 +252,12 @@ function addSentenceBtnEvent(dictTabButtons) {
     const url = getSentenceURL();
     if (!url) return;
     
-    if (iframe.dataset.tabOpened == 0) {
+    if (iframe.dataset.tabOpened == "false") {
       iframe.setAttribute("src", url);
     }
     
     activateTab("sentencesTab", dictTabButtons);
-    iframe.dataset.tabOpened = 1;
+    iframe.dataset.tabOpened = "true";
     iframe.classList.add("dict-active");
   });
 }
@@ -326,7 +329,7 @@ function createTabBtn(label, parent, data, external, faviconURL=null) {
   }
   if (data != null) btn.dataset.dictId = data;
   if (external != null) {
-    btn.dataset.dictExternal = external ? 1 : 0;
+    btn.dataset.dictExternal = external ? "true" : "false";
     if (external) {
       const arrowEl = createImg("", "dict-btn-external-img");
       btn.appendChild(arrowEl);

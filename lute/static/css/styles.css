@@ -1285,16 +1285,16 @@ input[type="checkbox"][disabled] + label {
     border-color: #68ace0;
 }
 
-#dicttabslayout .dict-btn[data-dict-external="1"]::after,
-#dicttabslayout .dict-btn-select[data-dict-external="0"]::after {
+#dicttabslayout .dict-btn[data-dict-external="true"]::after,
+#dicttabslayout .dict-btn-select[data-dict-external="false"]::after {
     border-right-width: 1.5rem;
 }
 
-#dicttabslayout .dict-btn-select[data-dict-external="1"]::after {
+#dicttabslayout .dict-btn-select[data-dict-external="true"]::after {
     border-right-width: 2.6rem
 }
 
-#dicttabslayout .dict-btn:not(.dict-btn-active):not(.dict-btn[data-dict-external="1"]):hover::after,
+#dicttabslayout .dict-btn:not(.dict-btn-active):not(.dict-btn[data-dict-external="true"]):hover::after,
 #dicttabslayout .dict-btn:not(.dict-btn-active):hover::after {
     border-color: aliceblue;
 }
@@ -1332,7 +1332,7 @@ input[type="checkbox"][disabled] + label {
     right: 1.4rem;
 }
 
-.dict-btn:not(.dict-btn-active):not(.dict-btn[data-dict-external="1"]) img {
+.dict-btn:not(.dict-btn-active):not(.dict-btn[data-dict-external="true"]) img {
     opacity: 0.5;
 }
 
@@ -1369,7 +1369,7 @@ input[type="checkbox"][disabled] + label {
     box-shadow: inset 0 0 0 2px #68ace0;
 }
 
-.dict-btn[data-dict-external="1"] {
+.dict-btn[data-dict-external="true"] {
     color: #5b5b5b;
 }
 
