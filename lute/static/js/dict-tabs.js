@@ -144,7 +144,7 @@ function tabsClick(event, dictTabButtons) {
   const dictID = clickedTab.dataset.dictId;
 
   if (isExternal) {
-    loadDictPage(dictID, "");
+    loadDictPage(dictID, null);
   } else {
     const iFrame = dictTabButtons.get(clickedTab);
     if (iFrame.dataset.contentLoaded == "false") {
@@ -177,7 +177,7 @@ function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame
   menuBtn.appendChild(menuImgEl);
   
   if (clickedItem.dataset.dictExternal == "true") {
-    loadDictPage(dictID, "");
+    loadDictPage(dictID, null);
 
     const arrowEl = createImg("", "dict-btn-external-img");
     menuBtn.appendChild(arrowEl);
