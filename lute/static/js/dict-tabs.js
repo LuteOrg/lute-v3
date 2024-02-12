@@ -31,12 +31,12 @@ function createDictTabs(num = 0) {
   const dictTabsLayoutContainer = document.getElementById("dicttabslayout");
   const iFramesContainer = document.getElementById("dictframes");
 
-  let createIFrame = function(name, parent) {
+  let createIFrame = function(name) {
     const iFrame = document.createElement("iframe");
     iFrame.name = name;
     iFrame.src = "about:blank";
     iFrame.classList.add("dictframe");
-    parent.appendChild(iFrame);
+    iFramesContainer.appendChild(iFrame);
     return iFrame;
   }
 
@@ -53,7 +53,7 @@ function createDictTabs(num = 0) {
                                 dictInfo.faviconURL);
 
     if (!dictInfo.isExternal) {
-      iFrame = createIFrame(`dict${index}`, iFramesContainer);
+      iFrame = createIFrame(`dict${index}`);
     }
     
     dictTabButtons.set(tabBtn, iFrame);
@@ -74,7 +74,7 @@ function createDictTabs(num = 0) {
     let iFrame = null;
     const all_are_external = LISTED_DICTS.every(dict => getDictInfo(dict).isExternal);
     if (!all_are_external)
-      iFrame = createIFrame("listframe", iFramesContainer);
+      iFrame = createIFrame("listframe");
     dictTabButtons.set(tabBtn, iFrame);
     
     const listMenuContainer = createDictListMenu(LISTED_DICTS);
@@ -128,11 +128,11 @@ function createDictTabs(num = 0) {
   const imageBtn = createTabBtn("", dictTabsContainer, -1, 0);
   imageBtn.setAttribute("id", "dict-image-btn");
   imageBtn.setAttribute("title", "Look up images for the term");
-  const imageFrame = createIFrame("imageframe", iFramesContainer);
+  const imageFrame = createIFrame("imageframe");
   dictTabButtons.set(imageBtn, imageFrame);
 
   // Sentences frame.
-  const sentencesFrame = createIFrame("sentencesframe", iFramesContainer);
+  const sentencesFrame = createIFrame("sentencesframe");
   dictTabButtons.set("sentencesTab", sentencesFrame);
 
   // using onevent property to update the event listener later (formframes)
