@@ -1,15 +1,6 @@
 "use strict";
 
 function createDictTabs(num = 0) {
-  TERM_DICTS.push("https://www.dict.cc/?s=###");
-  TERM_DICTS.push("*https://glosbe.com/de/en/###");
-  TERM_DICTS.push("*https://en.langenscheidt.com/german-english/###");
-  TERM_DICTS.push("*https://en.pons.com/translate/german-english/###");
-  TERM_DICTS.push("*https://www.collinsdictionary.com/dictionary/german-english/###");
-  TERM_DICTS.push("https://www.dict.cc/?s=###");
-  TERM_DICTS.push("*https://dict.tu-chemnitz.de/deutsch-englisch/###.html");
-  TERM_DICTS.push("*https://www.translate.ru/%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4/%D0%BD%D0%B5%D0%BC%D0%B5%D1%86%D0%BA%D0%B8%D0%B9-%D0%B0%D0%BD%D0%B3%D0%BB%D0%B8%D0%B9%D1%81%D0%BA%D0%B8%D0%B9/###");
-
   /*
   if num is null/zero or greater than number of dicts => every dict gets a tab
   else if num is, for example, 5 and there are 7 dicts => 4 dicts get a tab each, and the next 3 dicts are listed to be opened in the 5th tab menu
