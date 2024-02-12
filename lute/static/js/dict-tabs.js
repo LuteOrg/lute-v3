@@ -142,7 +142,7 @@ function tabsClick(clickedTab, dictTabButtons) {
   const dictID = clickedTab.dataset.dictId;
 
   if (clickedTab.dataset.dictExternal == "true") {
-    loadDictPage(dictID, null);
+    load_dict_popup(dictID);
     return;
   }
 
@@ -176,8 +176,7 @@ function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame
   menuBtn.appendChild(menuImgEl);
   
   if (clickedItem.dataset.dictExternal == "true") {
-    loadDictPage(dictID, null);
-
+    load_dict_popup(dictID);
     const arrowEl = createImg("", "dict-btn-external-img");
     menuBtn.appendChild(arrowEl);
   } else {
@@ -406,6 +405,13 @@ function show_lookup_page(dicturl, text, iframe) {
   const url = get_lookup_url(dicturl, text);
   openPopupWindow(url);
 }
+
+
+function load_dict_popup(dictID) {
+  const term = TERM_FORM_CONTAINER.querySelector("#text").value;
+  show_lookup_page(TERM_DICTS[dictID], term, null);
+}
+
 
 function openPopupWindow(url) {
   window.open(
