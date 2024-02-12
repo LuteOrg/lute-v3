@@ -225,20 +225,21 @@ function loadDictionaries(dictTabButtons) {
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
 
-  const activeTab = document.querySelector(".dict-btn-active");
   const activeFrame = document.querySelector(".dict-active");
+  if (activeFrame == null)
+    return;
 
-  if (activeFrame) {
-    if (activeTab) {
-      loadDictPage(activeTab.dataset.dictId, activeFrame);
-    } else {
-      if (activeFrame.getAttribute("name") == "sentencesframe") {
-        activeFrame.setAttribute("src", getSentenceURL());
-        activateTab("sentencesTab", dictTabButtons);
-      }
+  const activeTab = document.querySelector(".dict-btn-active");
+
+  if (activeTab) {
+    loadDictPage(activeTab.dataset.dictId, activeFrame);
+  } else {
+    if (activeFrame.getAttribute("name") == "sentencesframe") {
+      activeFrame.setAttribute("src", getSentenceURL());
+      activateTab("sentencesTab", dictTabButtons);
     }
-    activeFrame.dataset.contentLoaded = "true";
   }
+  activeFrame.dataset.contentLoaded = "true";
 }
 
 function addSentenceBtnEvent(dictTabButtons) {
