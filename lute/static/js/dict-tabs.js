@@ -36,6 +36,7 @@ function createDictTabs(num = 0) {
     f.name = name;
     f.src = "about:blank";
     f.classList.add("dictframe");
+    f.dataset.contentLoaded = "false";
     iFramesContainer.appendChild(f);
     return f;
   }
@@ -110,9 +111,6 @@ function createDictTabs(num = 0) {
   }
   
   // set first embedded frame as active
-  const framesArray = Array.from(dictTabButtons.values());
-  framesArray.forEach(frame => {if (frame) frame.dataset.contentLoaded = "false";});
-
   const tabsArray = Array.from(dictTabButtons.keys());
   const firstEmbeddedTab = tabsArray.find(tab => tab.dataset.dictExternal == "false");
   if (firstEmbeddedTab) {
