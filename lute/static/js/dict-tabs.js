@@ -115,8 +115,6 @@ function createDictTabs(num = 0) {
   const firstEmbeddedTab = tabsArray.find(tab => tab.dataset.dictExternal == "false");
   if (firstEmbeddedTab) {
       firstEmbeddedTab.classList.add("dict-btn-active");
-      firstEmbeddedTab.dataset.firstEmbedded = 1;
-
       const firstEmbeddedFrame = dictTabButtons.get(firstEmbeddedTab);
       firstEmbeddedFrame.dataset.contentLoaded = "true";
       firstEmbeddedFrame.classList.add("dict-active");
