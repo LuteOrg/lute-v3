@@ -69,11 +69,11 @@ function createDictTabs(num = 0) {
     dictTabButtons.set(tabBtn, iFrame);
     
     const listMenuContainer = createDictListMenu(LISTED_DICTS);
-    const menuButtonContainer = document.createElement("div");
-    menuButtonContainer.setAttribute("id", "dict-menu-container");
-    menuButtonContainer.appendChild(tabBtn); // add select AFTER button
-    menuButtonContainer.appendChild(listMenuContainer); // add select AFTER button
-    dictTabsLayoutContainer.appendChild(menuButtonContainer);
+    const menu_div = document.createElement("div");
+    menu_div.setAttribute("id", "dict-menu-container");
+    menu_div.appendChild(tabBtn); // add select AFTER button
+    menu_div.appendChild(listMenuContainer); // add select AFTER button
+    dictTabsLayoutContainer.appendChild(menu_div);
 
     // EVENTS
     tabBtn.addEventListener("contextmenu", (e) => {
