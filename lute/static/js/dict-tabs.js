@@ -408,18 +408,21 @@ function show_lookup_page(dicturl, text, iframe) {
 
 
 function load_dict_popup(dictID) {
+  let url = TERM_DICTS[dictID];
+  if ((url ?? "") == "") {
+    return;
+  }
+  if (url[0] == "*")  // Should be true!
+    url = url.slice(1);
   const term = TERM_FORM_CONTAINER.querySelector("#text").value;
-  show_lookup_page(TERM_DICTS[dictID], term, null);
-}
-
-
-function openPopupWindow(url) {
+  const lookup_url = get_lookup_url(url, term);
   window.open(
-    url,
+    lookup_url,
     'otherwin',
     'width=800, height=400, scrollbars=yes, menubar=no, resizable=yes, status=no'
   );
 }
+
 
 function get_lookup_url(dicturl, term) {
   let ret = dicturl;
