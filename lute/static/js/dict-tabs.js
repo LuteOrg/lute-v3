@@ -51,12 +51,6 @@ function createDictTabs(num = 0) {
   });
 
   if (LISTED_DICTS.length > 0) {
-    let iFrame = null;
-    const isAllExternal = LISTED_DICTS.every(dict => getDictInfo(dict).isExternal);
-    if (!isAllExternal) {
-      iFrame = createIFrame("listframe", iFramesContainer);
-    }
-    
     const dictInfo = getDictInfo(LISTED_DICTS[0]);
     const tabBtn = createTabBtn(dictInfo.label, 
                                 dictTabsLayoutContainer, 
@@ -67,7 +61,11 @@ function createDictTabs(num = 0) {
     const menuImgEl = createImg("", "dict-btn-list-img");
     tabBtn.appendChild(menuImgEl);
     tabBtn.classList.add("dict-btn-select");
-    
+
+    let iFrame = null;
+    const all_are_external = LISTED_DICTS.every(dict => getDictInfo(dict).isExternal);
+    if (!all_are_external)
+      iFrame = createIFrame("listframe", iFramesContainer);
     dictTabButtons.set(tabBtn, iFrame);
     
     const listMenuContainer = createDictListMenu(LISTED_DICTS);
