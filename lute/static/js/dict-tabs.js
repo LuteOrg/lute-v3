@@ -299,37 +299,6 @@ function getDictInfo(dictURL) {
   };
 }
 
-function getURLDomain(url) {
-  try {
-    const urlObj = new URL(url);
-    return urlObj.hostname;
-
-  } catch(err) {
-    return null;
-  }
-}
-
-function getFavicon(domain) {
-  if (domain) {
-    return `http://www.google.com/s2/favicons?domain=${domain}`;
-  } else {
-    return null;
-  }
-}
-
-function getLabelFromDomain(domain) {
-  let label;
-  if (domain) {
-    label = domain.split("www.").splice(-1)[0]
-  } else {
-    // Handle test/non-http dictionaries.
-    label = url.slice(0, 10);
-    if (label.length < url.length)
-      label += '...';
-  }
-  return label;
-}
-
 function getSentenceURL() {
   const txt = TERM_FORM_CONTAINER.querySelector("#text").value;
   // check for the "new term" page
