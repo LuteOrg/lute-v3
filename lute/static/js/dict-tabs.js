@@ -30,7 +30,16 @@ function createDictTabs(num = 0) {
   const dictTabsContainer = document.getElementById("dicttabs");
   const dictTabsLayoutContainer = document.getElementById("dicttabslayout");
   const iFramesContainer = document.getElementById("dictframes");
-  
+
+  let createIFrame = function(name, parent) {
+    const iFrame = document.createElement("iframe");
+    iFrame.name = name;
+    iFrame.src = "about:blank";
+    iFrame.classList.add("dictframe");
+    parent.appendChild(iFrame);
+    return iFrame;
+  }
+
   dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${columnCount}, minmax(2rem, 8rem))`;
 
   TABBED_DICTS.forEach((dict, index) => {
@@ -314,17 +323,6 @@ function activateTab(tab, allTabs) {
   if (iFrame) iFrame.classList.add("dict-active");
 }
 
-
-function createIFrame(name, parent) {
-  const iFrame = document.createElement("iframe");
-  iFrame.name = name;
-  iFrame.src = "about:blank";
-  iFrame.classList.add("dictframe");
-
-  parent.appendChild(iFrame);
-
-  return iFrame;
-}
 
 function createTabBtn(label, parent, data, external, faviconURL=null) {
   const btn = document.createElement("button");
