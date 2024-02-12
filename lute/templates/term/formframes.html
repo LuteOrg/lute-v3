@@ -56,7 +56,9 @@
         // update the event with new dictionaries
         if (LANG_ID != langid) {
           dictTabsContainer.onclick = function(e) {
-            tabsClick(e, dictTabButtons);
+            const clickedTab = e.target.closest(".dict-btn");
+            if (clickedTab)
+              tabsClick(e, dictTabButtons);
           };
         }
 
