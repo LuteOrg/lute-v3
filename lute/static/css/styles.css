@@ -494,10 +494,43 @@ span.drag-handle {
     color: grey;
 }
 
+#dict-headings {
+    display: grid;
+    grid-template-columns: 0.9rem 5.5rem 7.1rem 1fr 3.8rem 1rem 1rem;
+    gap: 0.6rem;
+    grid-template-areas: ". dict-usefor dict-type dict-url dict-enable . .";
+}
+
+.dict-heading {
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.dict_entry > input[type="checkbox"] {
+    width: 7rem;
+}
+
+#dict-usefor {
+    grid-area: dict-usefor;
+}
+
+#dict-type {
+    grid-area: dict-type;
+}
+
+#dict-url {
+    grid-area: dict-url;
+}
+
+#dict-enable {
+    justify-self: center;
+    grid-area: dict-enable;
+}
+
 .valign {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.6rem
 }
 
 input[type=text].form-control-narrower {
