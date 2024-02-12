@@ -32,12 +32,12 @@ function createDictTabs(num = 0) {
   const iFramesContainer = document.getElementById("dictframes");
 
   let createIFrame = function(name) {
-    const iFrame = document.createElement("iframe");
-    iFrame.name = name;
-    iFrame.src = "about:blank";
-    iFrame.classList.add("dictframe");
-    iFramesContainer.appendChild(iFrame);
-    return iFrame;
+    const f = document.createElement("iframe");
+    f.name = name;
+    f.src = "about:blank";
+    f.classList.add("dictframe");
+    iFramesContainer.appendChild(f);
+    return f;
   }
 
   dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${columnCount}, minmax(2rem, 8rem))`;
