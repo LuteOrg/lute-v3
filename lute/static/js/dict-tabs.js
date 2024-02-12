@@ -103,16 +103,16 @@ function createDictTabs(num = 0) {
   }
   
   // set first embedded frame as active
-  const tabsArray = Array.from(dictTabButtons.keys());
   const framesArray = Array.from(dictTabButtons.values());
-
   framesArray.forEach(frame => {if (frame) frame.dataset.contentLoaded = "false";});
 
+  const tabsArray = Array.from(dictTabButtons.keys());
   const firstEmbeddedTab = tabsArray.find(tab => tab.dataset.dictExternal == "false");
   if (firstEmbeddedTab) {
-      const firstEmbeddedFrame = dictTabButtons.get(firstEmbeddedTab);
       firstEmbeddedTab.classList.add("dict-btn-active");
       firstEmbeddedTab.dataset.firstEmbedded = 1;
+
+      const firstEmbeddedFrame = dictTabButtons.get(firstEmbeddedTab);
       firstEmbeddedFrame.dataset.contentLoaded = "true";
       firstEmbeddedFrame.classList.add("dict-active");
   }
@@ -245,19 +245,17 @@ function loadDictionaries(dictTabButtons) {
 }
 
 function addSentenceBtnEvent(dictTabButtons) {
-  const iframe = dictTabButtons.get("sentencesTab");
   const sentencesBtn = TERM_FORM_CONTAINER.querySelector("#term-button-container > a");
 
   sentencesBtn.addEventListener("click", (e) => {
     e.preventDefault();
-
     const url = getSentenceURL();
     if (!url) return;
-    
+
+    const iframe = dictTabButtons.get("sentencesTab");
     if (iframe.dataset.contentLoaded == "false") {
       iframe.setAttribute("src", url);
     }
-    
     activateTab("sentencesTab", dictTabButtons);
     iframe.dataset.contentLoaded = "true";
     iframe.classList.add("dict-active");
