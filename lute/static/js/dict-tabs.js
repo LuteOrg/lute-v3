@@ -266,11 +266,36 @@ function addSentenceBtnEvent(dictTabButtons) {
 
 function getDictInfo(dictURL) {
   const cleanURL = dictURL.split("*").splice(-1)[0];
-  const domain = getURLDomain(cleanURL);
+
+  let _getURLDomain = function(url) {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname;
+    } catch(err) {
+      return null;
+    }
+  };
+
+  let _getFavicon = function(domain) {
+    if (domain)
+      return `http://www.google.com/s2/favicons?domain=${domain}`;
+    return null;
+  };
+
+  let _getLabel = function(domain, url) {
+    if (domain)
+      return domain.split("www.").splice(-1)[0]
+    let label = url.slice(0, 10);
+    if (label.length < url.length)
+      label += '...';
+    return label;
+  }
+
+  const domain = _getURLDomain(cleanURL);
   return {
-    label: getLabelFromDomain(domain),
+    label: _getLabel(domain, cleanURL),
     isExternal: (dictURL.charAt(0) == '*') ? true : false,
-    faviconURL: getFavicon(domain),
+    faviconURL: _getFavicon(domain),
   };
 }
 
