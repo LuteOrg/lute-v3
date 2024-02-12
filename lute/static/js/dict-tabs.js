@@ -106,14 +106,14 @@ function createDictTabs(num = 0) {
   const tabsArray = Array.from(dictTabButtons.keys());
   const framesArray = Array.from(dictTabButtons.values());
 
-  framesArray.forEach(frame => {if (frame) frame.dataset.tabOpened = "false";});
+  framesArray.forEach(frame => {if (frame) frame.dataset.contentLoaded = "false";});
 
   const firstEmbeddedTab = tabsArray.find(tab => tab.dataset.dictExternal == "false");
   if (firstEmbeddedTab) {
       const firstEmbeddedFrame = dictTabButtons.get(firstEmbeddedTab);
       firstEmbeddedTab.classList.add("dict-btn-active");
       firstEmbeddedTab.dataset.firstEmbedded = 1;
-      firstEmbeddedFrame.dataset.tabOpened = "true";
+      firstEmbeddedFrame.dataset.contentLoaded = "true";
       firstEmbeddedFrame.classList.add("dict-active");
   }
 
@@ -147,10 +147,10 @@ function tabsClick(event, dictTabButtons) {
     loadDictPage(dictID, "");
   } else {
     const iFrame = dictTabButtons.get(clickedTab);
-    if (iFrame.dataset.tabOpened == "false") {
+    if (iFrame.dataset.contentLoaded == "false") {
       loadDictPage(dictID, iFrame);
     }
-    iFrame.dataset.tabOpened = "true";
+    iFrame.dataset.contentLoaded = "true";
     activateTab(clickedTab, dictTabButtons);
   }
 }
@@ -165,7 +165,7 @@ function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame
   const dictInfo = getDictInfo(TERM_DICTS[dictID]);
   menuBtn.dataset.dictId = dictID;
   menuBtn.dataset.dictExternal = clickedItem.dataset.dictExternal;
-  menuBtn.dataset.tabOpened = clickedItem.dataset.tabOpened;
+  menuBtn.dataset.contentLoaded = clickedItem.dataset.contentLoaded;
   menuBtn.textContent = dictInfo.label;
 
   if (dictInfo.faviconURL) {
@@ -204,7 +204,7 @@ function createDictListMenu(dicts) {
     menuItem.textContent = dictInfo.label;
     menuItem.dataset.dictId = TERM_DICTS.indexOf(dict);
     menuItem.dataset.dictExternal = dictInfo.isExternal ? "true" : "false";
-    menuItem.dataset.tabOpened = dictInfo.isExternal ? "false" : "true";
+    menuItem.dataset.contentLoaded = dictInfo.isExternal ? "false" : "true";
     
     if (dictInfo.faviconURL) {
       const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img");
@@ -219,7 +219,7 @@ function createDictListMenu(dicts) {
 
 function loadDictionaries(dictTabButtons) {
   dictTabButtons.forEach((iframe, btn) => {
-    if (iframe) iframe.dataset.tabOpened = "false";
+    if (iframe) iframe.dataset.contentLoaded = "false";
   });
   // dictContainer needs to be defined here and not retrieved from global var because it exists in different pages
   const dictContainer = document.querySelector(".dictcontainer");
@@ -240,7 +240,7 @@ function loadDictionaries(dictTabButtons) {
         activateTab("sentencesTab", dictTabButtons);
       }
     }
-    activeFrame.dataset.tabOpened = "true";
+    activeFrame.dataset.contentLoaded = "true";
   }
 }
 
@@ -254,12 +254,12 @@ function addSentenceBtnEvent(dictTabButtons) {
     const url = getSentenceURL();
     if (!url) return;
     
-    if (iframe.dataset.tabOpened == "false") {
+    if (iframe.dataset.contentLoaded == "false") {
       iframe.setAttribute("src", url);
     }
     
     activateTab("sentencesTab", dictTabButtons);
-    iframe.dataset.tabOpened = "true";
+    iframe.dataset.contentLoaded = "true";
     iframe.classList.add("dict-active");
   });
 }
