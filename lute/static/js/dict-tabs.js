@@ -266,11 +266,11 @@ function addSentenceBtnEvent(dictTabButtons) {
 
 function getDictInfo(dictURL) {
   const cleanURL = dictURL.split("*").splice(-1)[0];
-
+  const domain = getURLDomain(cleanURL);
   return {
-    label: getLabelFromURL(cleanURL),
+    label: getLabelFromDomain(domain),
     isExternal: (dictURL.charAt(0) == '*') ? true : false,
-    faviconURL: getFavicon(getURLDomain(cleanURL)),
+    faviconURL: getFavicon(domain),
   };
 }
 
@@ -292,10 +292,8 @@ function getFavicon(domain) {
   }
 }
 
-function getLabelFromURL(url) {
+function getLabelFromDomain(domain) {
   let label;
-  const domain = getURLDomain(url);
-
   if (domain) {
     label = domain.split("www.").splice(-1)[0]
   } else {
@@ -304,7 +302,6 @@ function getLabelFromURL(url) {
     if (label.length < url.length)
       label += '...';
   }
-
   return label;
 }
 
