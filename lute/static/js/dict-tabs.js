@@ -1,18 +1,20 @@
 "use strict";
 
 function createDictTabs(num = 0) {
-  // TERM_DICTS.push("https://www.dict.cc/?s=###");
-  // TERM_DICTS.push("*https://glosbe.com/de/en/###");
-  // TERM_DICTS.push("*https://en.langenscheidt.com/german-english/###");
-  // TERM_DICTS.push("*https://en.pons.com/translate/german-english/###");
-  // TERM_DICTS.push("*https://www.collinsdictionary.com/dictionary/german-english/###");
-  // TERM_DICTS.push("https://www.dict.cc/?s=###");
-  // TERM_DICTS.push("*https://dict.tu-chemnitz.de/deutsch-englisch/###.html");
-  // TERM_DICTS.push("*https://www.translate.ru/%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4/%D0%BD%D0%B5%D0%BC%D0%B5%D1%86%D0%BA%D0%B8%D0%B9-%D0%B0%D0%BD%D0%B3%D0%BB%D0%B8%D0%B9%D1%81%D0%BA%D0%B8%D0%B9/###");
+  TERM_DICTS.push("https://www.dict.cc/?s=###");
+  TERM_DICTS.push("*https://glosbe.com/de/en/###");
+  TERM_DICTS.push("*https://en.langenscheidt.com/german-english/###");
+  TERM_DICTS.push("*https://en.pons.com/translate/german-english/###");
+  TERM_DICTS.push("*https://www.collinsdictionary.com/dictionary/german-english/###");
+  TERM_DICTS.push("https://www.dict.cc/?s=###");
+  TERM_DICTS.push("*https://dict.tu-chemnitz.de/deutsch-englisch/###.html");
+  TERM_DICTS.push("*https://www.translate.ru/%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4/%D0%BD%D0%B5%D0%BC%D0%B5%D1%86%D0%BA%D0%B8%D0%B9-%D0%B0%D0%BD%D0%B3%D0%BB%D0%B8%D0%B9%D1%81%D0%BA%D0%B8%D0%B9/###");
 
   /*
-  if num is none/null/zero or greater than number of dicts => every dict gets a tab
+  if num is null/zero or greater than number of dicts => every dict gets a tab
   else if num is, for example, 5 and there are 7 dicts => 4 dicts get a tab each, and the next 3 dicts are listed to be opened in the 5th tab menu
+  TABBED_DICTS = dicts to get a separate tab
+  LISTED_DICTS = dicts to be listed in the menu
   */
 
   if (TERM_DICTS.length <= 0) return;
@@ -43,7 +45,7 @@ function createDictTabs(num = 0) {
   TABBED_DICTS.forEach((dict, index) => {
     let iFrame = null;
     const dictInfo = getDictInfo(dict);
-
+    console.log(dictInfo.faviconURL)
     const tabBtn = createTabBtn(dictInfo.label, 
                                 dictTabsLayoutContainer, 
                                 index, 
@@ -59,7 +61,7 @@ function createDictTabs(num = 0) {
 
   if (LISTED_DICTS.length > 0) {
     let iFrame = null;
-    const isAllExternal = LISTED_DICTS.every(dict => isURLExternal(dict));
+    const isAllExternal = LISTED_DICTS.every(dict => getDictInfo(dict).isExternal);
     if (!isAllExternal) {
       iFrame = createIFrame("listframe", iFramesContainer);
     }
@@ -170,13 +172,15 @@ function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame
 
   const dictID = clickedItem.dataset.dictId;
   const dictInfo = getDictInfo(TERM_DICTS[dictID]);
-  const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img"); // img elements get deleted after "change" event. so we create them after each change
-  
   menuBtn.dataset.dictId = dictID;
   menuBtn.dataset.dictExternal = clickedItem.dataset.dictExternal;
   menuBtn.dataset.tabOpened = clickedItem.dataset.tabOpened;
   menuBtn.textContent = dictInfo.label;
-  menuBtn.prepend(faviconEl);
+
+  if (dictInfo.faviconURL) {
+    const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img"); // img elements get deleted after "change" event. so we create them after each change
+    menuBtn.prepend(faviconEl);
+  }
 
   const menuImgEl = createImg("", "dict-btn-list-img");
   menuBtn.appendChild(menuImgEl);
@@ -205,13 +209,17 @@ function createDictListMenu(dicts) {
   dicts.forEach((dict) => {
     const dictInfo = getDictInfo(dict);
     const menuItem = document.createElement("p");
-    const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img");
     menuItem.classList.add("dict-menu-item");
     menuItem.textContent = dictInfo.label;
-    menuItem.prepend(faviconEl);
     menuItem.dataset.dictId = TERM_DICTS.indexOf(dict);
     menuItem.dataset.dictExternal = dictInfo.isExternal ? "true" : "false";
     menuItem.dataset.tabOpened = dictInfo.isExternal ? "false" : "true";
+    
+    if (dictInfo.faviconURL) {
+      const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img");
+      menuItem.prepend(faviconEl);
+    }
+
     listContainer.appendChild(menuItem);
   });
 
@@ -266,13 +274,47 @@ function addSentenceBtnEvent(dictTabButtons) {
 }
 
 function getDictInfo(dictURL) {
-  const domain = getURLDomain(dictURL);
+  const cleanURL = dictURL.split("*").splice(-1)[0];
 
   return {
-    label: domain.split("www.").splice(-1)[0],
-    isExternal: isURLExternal(dictURL),
-    faviconURL: getFavicon(domain),
+    label: getLabelFromURL(cleanURL),
+    isExternal: (dictURL.charAt(0) == '*') ? true : false,
+    faviconURL: getFavicon(getURLDomain(cleanURL)),
   };
+}
+
+function getURLDomain(url) {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.hostname;
+
+  } catch(err) {
+    return null;
+  }
+}
+
+function getFavicon(domain) {
+  if (domain) {
+    return `http://www.google.com/s2/favicons?domain=${domain}`;
+  } else {
+    return null;
+  }
+}
+
+function getLabelFromURL(url) {
+  let label;
+  const domain = getURLDomain(url);
+
+  if (domain) {
+    label = domain.split("www.").splice(-1)[0]
+  } else {
+    // Handle test/non-http dictionaries.
+    label = url.slice(0, 10);
+    if (label.length < url.length)
+      label += '...';
+  }
+
+  return label;
 }
 
 function getSentenceURL() {
@@ -359,50 +401,24 @@ function createImg(src, className) {
   return img;
 }
 
-function isURLExternal(dictURL) {
-  return (dictURL.charAt(0) == '*') ? true : false; 
-}
 
-function getURLDomain(url) {
-  const cleanURL = url.split("*").splice(-1)[0];
-
-  try {
-    const urlObj = new URL(cleanURL);
-
-    return urlObj.hostname;
-  }
-  catch(err) {
-    // Handle test/non-http dictionaries.
-    let d = cleanURL.slice(0, 10);
-    if (d.length < cleanURL.length)
-      d += '...';
-
-    return d;
-  }
-}
-
-function getFavicon(domain) {
-  return `http://www.google.com/s2/favicons?domain=${domain}`;
-}
-
-/**
-   * Either open a new window, or show the result in the correct frame.
-   */
+// Either open a new window, or show the result in the correct frame.
 function show_lookup_page(dicturl, text, iframe) {
   // if iframe is provided use that, else it's an external link
-
-  const is_bing = (dicturl.indexOf('www.bing.com') != -1);
-  if (is_bing) {
-    let use_text = text;
-    const binghash = dicturl.replace('https://www.bing.com/images/search?', '');
-    const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
-    iframe.setAttribute("src", url);
-    return;
-  }
-
   if (iframe) {
-    const url = get_lookup_url(dicturl, text);
-    iframe.setAttribute("src", url);
+    const is_bing = (dicturl.indexOf('www.bing.com') != -1);
+
+    if (is_bing) {
+      let use_text = text;
+      const binghash = dicturl.replace('https://www.bing.com/images/search?', '');
+      const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
+      iframe.setAttribute("src", url);
+      return;
+    } else {
+      const url = get_lookup_url(dicturl, text);
+      iframe.setAttribute("src", url);
+    }
+
   } else {
     // TODO zzfuture fix: fix_language_dict_asterisk
     // The URL shouldn not be prepended with trash
