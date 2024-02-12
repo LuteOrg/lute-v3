@@ -115,14 +115,14 @@ function createDictTabs(num = 0) {
       firstEmbeddedFrame.classList.add("dict-active");
   }
 
-  // create image button
+  // Image button and frame.
   const imageBtn = createTabBtn("", dictTabsContainer, -1, 0);
   imageBtn.setAttribute("id", "dict-image-btn");
   imageBtn.setAttribute("title", "Look up images for the term");
-  // create image frame
   const imageFrame = createIFrame("imageframe", iFramesContainer);
   dictTabButtons.set(imageBtn, imageFrame);
-  // create sentences frame
+
+  // Sentences frame.
   const sentencesFrame = createIFrame("sentencesframe", iFramesContainer);
   dictTabButtons.set("sentencesTab", sentencesFrame);
 
