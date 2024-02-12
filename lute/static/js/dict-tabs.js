@@ -130,16 +130,15 @@ function createDictTabs(num = 0) {
 
   // using onevent property to update the event listener later (formframes)
   dictTabsContainer.onclick = function(e) {
-    tabsClick(e, dictTabButtons);
+    const clickedTab = e.target.closest(".dict-btn");
+    if (clickedTab)
+      tabsClick(clickedTab, dictTabButtons);
   };
 
   return dictTabButtons;
 }
 
-function tabsClick(event, dictTabButtons) {
-  const clickedTab = event.target.closest(".dict-btn");
-  if (!clickedTab) return;
-
+function tabsClick(clickedTab, dictTabButtons) {
   const isExternal = clickedTab.dataset.dictExternal == "true" ? true : false;
   const dictID = clickedTab.dataset.dictId;
 
