@@ -495,12 +495,13 @@ span.drag-handle {
 }
 
 .valign {
+    display: flex;
     align-items: center;
+    gap: 0.6rem;
 }
 
-input[type=text].form-control-narrower
-{
-    width: 70%;
+input[type=text].form-control-narrower {
+    min-width: 8rem;
     /* padding: 5px 5px; */
     margin: 2px 0;
     box-sizing: border-box;
@@ -1356,7 +1357,9 @@ input[type="checkbox"][disabled] + label {
 #language_id,
 #txtSetParent,
 #predefined,
-#max_page_tokens {
+#max_page_tokens,
+.dict-type,
+.dict-usefor {
     width: 8rem;
     box-sizing: border-box;
     border: 1px solid var(--form-border-color);
