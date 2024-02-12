@@ -364,23 +364,16 @@ function createImg(src, className) {
 }
 
 
-function load_dict_iframe(dictID, iFrame) {
-  //const iFrameName = iFrame.getAttribute("name") ? iFrame : "";
-  const term = TERM_FORM_CONTAINER.querySelector("#text").value;
+function load_dict_iframe(dictID, iframe) {
+  const text = TERM_FORM_CONTAINER.querySelector("#text").value;
 
   if (dictID == -1) {
-    do_image_lookup(term, iFrame);
-  } else {
-    const dict = TERM_DICTS[dictID];
-    show_lookup_page(dict, term, iFrame);
+    // TODO handle_image_lookup_separately: don't mix term lookups with image lookups.
+    do_image_lookup(text, iframe);
+    return;
   }
-}
 
-
-// Either open a new window, or show the result in the correct frame.
-function show_lookup_page(dicturl, text, iframe) {
-  // if iframe is provided use that, else it's an external link
-  // TODO handle_image_lookup_separately: don't mix term lookups with image lookups.
+  const dicturl = TERM_DICTS[dictID];
   const is_bing = (dicturl.indexOf('www.bing.com') != -1);
   if (iframe != null && is_bing) {
     let use_text = text;
