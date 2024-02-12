@@ -377,6 +377,7 @@ function load_dict_iframe(dictID, iframe) {
   const is_bing = (dicturl.indexOf('www.bing.com') != -1);
 
   if (is_bing) {
+    // TODO handle_image_lookup_separately: don't mix term lookups with image lookups.
     let use_text = text;
     const binghash = dicturl.replace('https://www.bing.com/images/search?', '');
     const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
