@@ -247,7 +247,7 @@ function addSentenceBtnEvent(dictTabButtons) {
   sentencesBtn.addEventListener("click", (e) => {
     e.preventDefault();
     const url = getSentenceURL();
-    if (!url)
+    if (url == null)
       return;
 
     const iframe = dictTabButtons.get("sentencesTab");
@@ -298,16 +298,13 @@ function getDictInfo(dictURL) {
 function getSentenceURL() {
   const txt = TERM_FORM_CONTAINER.querySelector("#text").value;
   // check for the "new term" page
-  if (txt.length == 0) return;
+  if (txt.length == 0) return null;
   // %E2%80%8B is the zero-width string.  The term is reparsed
   // on the server, so this doesn't need to be sent.
   const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
   if (LANG_ID == '0' || t == '')
-    return;
-
-  const url = `/term/sentences/${LANG_ID}/${t}`;
-
-  return url;
+    return null;
+  return `/term/sentences/${LANG_ID}/${t}`;
 }
 
 function activateTab(tab, allTabs) {
