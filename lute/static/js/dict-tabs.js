@@ -230,12 +230,10 @@ function loadDictionaries(dictTabButtons) {
 
   if (activeFrame) {
     if (activeTab) {
-      const dictID = activeTab.dataset.dictId;
-      loadDictPage(dictID, activeFrame);
+      loadDictPage(activeTab.dataset.dictId, activeFrame);
     } else {
       if (activeFrame.getAttribute("name") == "sentencesframe") {
-        const url = getSentenceURL();
-        activeFrame.setAttribute("src", url);
+        activeFrame.setAttribute("src", getSentenceURL());
         activateTab("sentencesTab", dictTabButtons);
       }
     }
@@ -249,7 +247,8 @@ function addSentenceBtnEvent(dictTabButtons) {
   sentencesBtn.addEventListener("click", (e) => {
     e.preventDefault();
     const url = getSentenceURL();
-    if (!url) return;
+    if (!url)
+      return;
 
     const iframe = dictTabButtons.get("sentencesTab");
     if (iframe.dataset.contentLoaded == "false") {
