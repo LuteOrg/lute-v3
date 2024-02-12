@@ -198,19 +198,19 @@ function createDictListMenu(dicts) {
   
   dicts.forEach((dict) => {
     const dictInfo = getDictInfo(dict);
-    const menuItem = document.createElement("p");
-    menuItem.classList.add("dict-menu-item");
-    menuItem.textContent = dictInfo.label;
-    menuItem.dataset.dictId = TERM_DICTS.indexOf(dict);
-    menuItem.dataset.dictExternal = dictInfo.isExternal ? "true" : "false";
-    menuItem.dataset.contentLoaded = dictInfo.isExternal ? "false" : "true";
+    const p = document.createElement("p");
+    p.classList.add("dict-menu-item");
+    p.textContent = dictInfo.label;
+    p.dataset.dictId = TERM_DICTS.indexOf(dict);
+    p.dataset.dictExternal = dictInfo.isExternal ? "true" : "false";
+    p.dataset.contentLoaded = dictInfo.isExternal ? "false" : "true";
     
     if (dictInfo.faviconURL) {
       const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img");
-      menuItem.prepend(faviconEl);
+      p.prepend(faviconEl);
     }
 
-    listContainer.appendChild(menuItem);
+    listContainer.appendChild(p);
   });
 
   return listContainer;
