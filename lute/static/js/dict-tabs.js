@@ -230,14 +230,12 @@ function loadDictionaries(dictTabButtons) {
     return;
 
   const activeTab = document.querySelector(".dict-btn-active");
-
   if (activeTab) {
     loadDictPage(activeTab.dataset.dictId, activeFrame);
-  } else {
-    if (activeFrame.getAttribute("name") == "sentencesframe") {
-      activeFrame.setAttribute("src", getSentenceURL());
-      activateTab("sentencesTab", dictTabButtons);
-    }
+  }
+  else if (activeFrame.getAttribute("name") == "sentencesframe") {
+    activeFrame.setAttribute("src", getSentenceURL());
+    activateTab("sentencesTab", dictTabButtons);
   }
   activeFrame.dataset.contentLoaded = "true";
 }
