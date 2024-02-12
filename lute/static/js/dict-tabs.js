@@ -148,7 +148,7 @@ function tabsClick(clickedTab, dictTabButtons) {
 
   const iFrame = dictTabButtons.get(clickedTab);
   if (iFrame.dataset.contentLoaded == "false") {
-    loadDictPage(dictID, iFrame);
+    load_dict_iframe(dictID, iFrame);
   }
   iFrame.dataset.contentLoaded = "true";
   activateTab(clickedTab, dictTabButtons);
@@ -180,7 +180,7 @@ function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame
     const arrowEl = createImg("", "dict-btn-external-img");
     menuBtn.appendChild(arrowEl);
   } else {
-    loadDictPage(dictID, iFrame);
+    load_dict_iframe(dictID, iFrame);
     activateTab(menuBtn, dictTabButtons);
   }
   // as with the icons, btn content changes so events get deleted
@@ -230,7 +230,7 @@ function loadDictionaries(dictTabButtons) {
 
   const activeTab = document.querySelector(".dict-btn-active");
   if (activeTab) {
-    loadDictPage(activeTab.dataset.dictId, activeFrame);
+    load_dict_iframe(activeTab.dataset.dictId, activeFrame);
   }
   else if (activeFrame.getAttribute("name") == "sentencesframe") {
     activeFrame.setAttribute("src", getSentenceURL());
@@ -364,7 +364,7 @@ function createImg(src, className) {
 }
 
 
-function loadDictPage(dictID, iFrame) {
+function load_dict_iframe(dictID, iFrame) {
   //const iFrameName = iFrame.getAttribute("name") ? iFrame : "";
   const term = TERM_FORM_CONTAINER.querySelector("#text").value;
 
