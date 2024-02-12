@@ -384,30 +384,30 @@ function createImg(src, className) {
 // Either open a new window, or show the result in the correct frame.
 function show_lookup_page(dicturl, text, iframe) {
   // if iframe is provided use that, else it's an external link
-  if (iframe) {
-    const is_bing = (dicturl.indexOf('www.bing.com') != -1);
-
-    if (is_bing) {
-      let use_text = text;
-      const binghash = dicturl.replace('https://www.bing.com/images/search?', '');
-      const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
-      iframe.setAttribute("src", url);
-      return;
-    } else {
-      const url = get_lookup_url(dicturl, text);
-      iframe.setAttribute("src", url);
-    }
-
-  } else {
-    // TODO zzfuture fix: fix_language_dict_asterisk
-    // The URL shouldn not be prepended with trash
-    // (e.g. "*http://" means "open an external window", while
-    // "http://" means "this can be opened in an iframe."
-    // Instead, each dict should have an "is_external" property.
-    dicturl = dicturl.slice(1);
-    const url = get_lookup_url(dicturl, text);
-    openPopupWindow(url);
+  // TODO handle_image_lookup_separately: don't mix term lookups with image lookups.
+  const is_bing = (dicturl.indexOf('www.bing.com') != -1);
+  if (iframe != null and is_bing) {
+    let use_text = text;
+    const binghash = dicturl.replace('https://www.bing.com/images/search?', '');
+    const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
+    iframe.setAttribute("src", url);
+    return;
   }
+
+  if (iframe != null) {
+    const url = get_lookup_url(dicturl, text);
+    iframe.setAttribute("src", url);
+    return;
+  }
+
+  // TODO zzfuture fix: fix_language_dict_asterisk
+  // The URL shouldn not be prepended with trash
+  // (e.g. "*http://" means "open an external window", while
+  // "http://" means "this can be opened in an iframe."
+  // Instead, each dict should have an "is_external" property.
+  dicturl = dicturl.slice(1);
+  const url = get_lookup_url(dicturl, text);
+  openPopupWindow(url);
 }
 
 function openPopupWindow(url) {
