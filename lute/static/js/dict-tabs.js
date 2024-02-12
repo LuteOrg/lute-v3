@@ -139,19 +139,19 @@ function createDictTabs(num = 0) {
 }
 
 function tabsClick(clickedTab, dictTabButtons) {
-  const isExternal = clickedTab.dataset.dictExternal == "true" ? true : false;
   const dictID = clickedTab.dataset.dictId;
 
-  if (isExternal) {
+  if (clickedTab.dataset.dictExternal == "true") {
     loadDictPage(dictID, null);
-  } else {
-    const iFrame = dictTabButtons.get(clickedTab);
-    if (iFrame.dataset.contentLoaded == "false") {
-      loadDictPage(dictID, iFrame);
-    }
-    iFrame.dataset.contentLoaded = "true";
-    activateTab(clickedTab, dictTabButtons);
+    return;
   }
+
+  const iFrame = dictTabButtons.get(clickedTab);
+  if (iFrame.dataset.contentLoaded == "false") {
+    loadDictPage(dictID, iFrame);
+  }
+  iFrame.dataset.contentLoaded = "true";
+  activateTab(clickedTab, dictTabButtons);
 }
 
 function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame) {
