@@ -317,17 +317,6 @@ function activateTab(tab, allTabs) {
   if (iFrame) iFrame.classList.add("dict-active");
 }
 
-function loadDictPage(dictID, iFrame) {
-  //const iFrameName = iFrame.getAttribute("name") ? iFrame : "";
-  const term = TERM_FORM_CONTAINER.querySelector("#text").value;
-
-  if (dictID == -1) {
-    do_image_lookup(term, iFrame);
-  } else {
-    const dict = TERM_DICTS[dictID];
-    show_lookup_page(dict, term, iFrame);
-  }
-}
 
 function createIFrame(name, parent) {
   const iFrame = document.createElement("iframe");
@@ -373,6 +362,19 @@ function createImg(src, className) {
   if (src) img.src = src;
 
   return img;
+}
+
+
+function loadDictPage(dictID, iFrame) {
+  //const iFrameName = iFrame.getAttribute("name") ? iFrame : "";
+  const term = TERM_FORM_CONTAINER.querySelector("#text").value;
+
+  if (dictID == -1) {
+    do_image_lookup(term, iFrame);
+  } else {
+    const dict = TERM_DICTS[dictID];
+    show_lookup_page(dict, term, iFrame);
+  }
 }
 
 
