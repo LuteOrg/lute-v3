@@ -182,11 +182,14 @@ function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame
     listMenuContainer.classList.toggle("dict-list-hide");
   });
   menuBtn.appendChild(menuImgEl);
-  
+
   if (clickedItem.dataset.dictExternal == "true") {
-    load_dict_popup(dictID);
     const arrowEl = createImg("", "dict-btn-external-img");
     menuBtn.appendChild(arrowEl);
+  }
+
+  if (clickedItem.dataset.dictExternal == "true") {
+    load_dict_popup(dictID);
   } else {
     load_dict_iframe(dictID, iFrame);
     activateTab(menuBtn, dictTabButtons);
