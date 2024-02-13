@@ -53,6 +53,10 @@ function createDictListMenu(dicts) {
 function createDictTabs(tab_count) {
   if (TERM_DICTS.length <= 0) return;
 
+  // TEMP HACK
+  for (let i = 0; i < 10; i++)
+    TERM_DICTS.push(`*https://dtt${i}/###`);
+
   const dictTabButtons = new Map();
   const dictTabsContainer = document.getElementById("dicttabs");
   const dictTabsLayoutContainer = document.getElementById("dicttabslayout");
@@ -94,6 +98,7 @@ function createDictTabs(tab_count) {
     let iFrame = dictInfo.isExternal ? null : createIFrame(`dict${index}`);
     dictTabButtons.set(tabBtn, iFrame);
   });
+
 
   if (LISTED_DICTS.length > 0) {
     const dictInfo = getDictInfo(LISTED_DICTS[0]);
