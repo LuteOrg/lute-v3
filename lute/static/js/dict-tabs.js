@@ -36,19 +36,14 @@ function createDictTabs(tab_count) {
   dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${grid_column_count}, minmax(2rem, 8rem))`;
 
   TABBED_DICTS.forEach((dict, index) => {
-    let iFrame = null;
     const dictInfo = getDictInfo(dict);
-    console.log(dictInfo.faviconURL)
     const tabBtn = createTabBtn(dictInfo.label, 
                                 dictTabsLayoutContainer, 
                                 index, 
                                 dictInfo.isExternal, 
                                 dictInfo.faviconURL);
 
-    if (!dictInfo.isExternal) {
-      iFrame = createIFrame(`dict${index}`);
-    }
-    
+    let iFrame = dictInfo.isExternal ? null : createIFrame(`dict${index}`;
     dictTabButtons.set(tabBtn, iFrame);
   });
 
