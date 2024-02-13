@@ -192,8 +192,8 @@ function createDictListMenu(dicts) {
   const listContainer = document.createElement("div");
   listContainer.setAttribute("id", "dict-list-container");
   listContainer.classList.add("dict-list-hide");
-  
-  dicts.forEach((dict) => {
+
+  let _make_para = function (dict) {
     const dictInfo = getDictInfo(dict);
     const p = document.createElement("p");
     p.classList.add("dict-menu-item");
@@ -201,14 +201,17 @@ function createDictListMenu(dicts) {
     p.dataset.dictId = TERM_DICTS.indexOf(dict);
     p.dataset.dictExternal = dictInfo.isExternal ? "true" : "false";
     p.dataset.contentLoaded = dictInfo.isExternal ? "false" : "true";
-    
     if (dictInfo.faviconURL) {
       const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img");
       p.prepend(faviconEl);
     }
+    return p;
+  };
 
+  const paras = dicts.map(_make_para);
+  for (let p of Object.values(paras)) {
     listContainer.appendChild(p);
-  });
+  }
 
   return listContainer;
 }
