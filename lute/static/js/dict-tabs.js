@@ -161,7 +161,6 @@ function tabsClick(clickedTab, dictTabButtons) {
 function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame) {
   const clickedItem = event.target.closest(".dict-menu-item");
   if (!clickedItem) return;
-  // hide menu list when clicked on an item
   listMenuContainer.classList.add("dict-list-hide");
 
   const dictID = clickedItem.dataset.dictId;
@@ -227,7 +226,6 @@ function loadDictionaries(dictTabButtons) {
   dictTabButtons.forEach((iframe, btn) => {
     if (iframe) iframe.dataset.contentLoaded = "false";
   });
-  // dictContainer needs to be defined here and not retrieved from global var because it exists in different pages
   const dictContainer = document.querySelector(".dictcontainer");
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
@@ -248,9 +246,8 @@ function loadDictionaries(dictTabButtons) {
 }
 
 function addSentenceBtnEvent(dictTabButtons) {
-  const sentencesBtn = TERM_FORM_CONTAINER.querySelector("#term-button-container > a");
-
-  sentencesBtn.addEventListener("click", (e) => {
+  const b = TERM_FORM_CONTAINER.querySelector("#term-button-container > a");
+  b.addEventListener("click", (e) => {
     e.preventDefault();
     const url = getSentenceURL();
     if (url == null)
@@ -327,6 +324,8 @@ function activateTab(tab, allTabs) {
 
 function createTabBtn(label, parent, data, external, faviconURL=null) {
   const btn = document.createElement("button");
+  btn.classList.add("dict-btn");
+
   if (label) {
     btn.textContent = label;
     btn.setAttribute("title", label);
@@ -339,12 +338,8 @@ function createTabBtn(label, parent, data, external, faviconURL=null) {
       btn.appendChild(arrowEl);
     }
   }
-
-  btn.classList.add("dict-btn");
-
   if (faviconURL) {
-    const faviconEl = createImg(faviconURL, "dict-btn-fav-img");
-    btn.prepend(faviconEl);
+    btn.prepend(createImg(faviconURL, "dict-btn-fav-img"));
   }
   
   parent.appendChild(btn);
@@ -355,8 +350,8 @@ function createTabBtn(label, parent, data, external, faviconURL=null) {
 function createImg(src, className) {
   const img = document.createElement("img");
   img.classList.add(className);
-  if (src) img.src = src;
-
+  if (src)
+    img.src = src;
   return img;
 }
 
