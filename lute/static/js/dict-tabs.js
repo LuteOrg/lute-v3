@@ -4,8 +4,10 @@
 function createTabBtn(label, dictID, external, faviconURL=null) {
   const btn = document.createElement("button");
   btn.classList.add("dict-btn");
-  if (label != "")
+  if (label != "") {
     btn.textContent = label;
+    btn.setAttribute("title", label);
+  }
   btn.dataset.dictId = dictID;
   btn.dataset.dictExternal = external ? "true" : "false";
   if (faviconURL)
