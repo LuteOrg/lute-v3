@@ -171,11 +171,16 @@ function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame
   menuBtn.textContent = dictInfo.label;
 
   if (dictInfo.faviconURL) {
-    const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img"); // img elements get deleted after "change" event. so we create them after each change
+    // img elements get deleted after "change" event, so create them after each change.
+    const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img");
     menuBtn.prepend(faviconEl);
   }
 
   const menuImgEl = createImg("", "dict-btn-list-img");
+  menuImgEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    listMenuContainer.classList.toggle("dict-list-hide");
+  });
   menuBtn.appendChild(menuImgEl);
   
   if (clickedItem.dataset.dictExternal == "true") {
@@ -186,11 +191,6 @@ function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame
     load_dict_iframe(dictID, iFrame);
     activateTab(menuBtn, dictTabButtons);
   }
-  // as with the icons, btn content changes so events get deleted
-  menuImgEl.addEventListener("click", (e) => {
-    e.stopPropagation();
-    listMenuContainer.classList.toggle("dict-list-hide");
-  });
 }
 
 function createDictListMenu(dicts) {
