@@ -1,5 +1,30 @@
 "use strict";
 
+
+function createTabBtn(label, parent, dictID, external, faviconURL=null) {
+  const btn = document.createElement("button");
+  btn.classList.add("dict-btn");
+
+  if (label != "") {
+    btn.textContent = label;
+    btn.setAttribute("title", label);
+  }
+  btn.dataset.dictId = dictID;
+  btn.dataset.dictExternal = external ? "true" : "false";
+  if (external) {
+    const arrowEl = createImg("", "dict-btn-external-img");
+    btn.appendChild(arrowEl);
+  }
+  if (faviconURL) {
+    btn.prepend(createImg(faviconURL, "dict-btn-fav-img"));
+  }
+
+  parent.appendChild(btn);
+
+  return btn;
+}
+
+
 /**
  * Create dictionary tabs, and a listing for any extra dicts.
  */
@@ -311,29 +336,6 @@ function activateTab(tab, allTabs) {
   if (iFrame) iFrame.classList.add("dict-active");
 }
 
-
-function createTabBtn(label, parent, dictID, external, faviconURL=null) {
-  const btn = document.createElement("button");
-  btn.classList.add("dict-btn");
-
-  if (label != "") {
-    btn.textContent = label;
-    btn.setAttribute("title", label);
-  }
-  btn.dataset.dictId = dictID;
-  btn.dataset.dictExternal = external ? "true" : "false";
-  if (external) {
-    const arrowEl = createImg("", "dict-btn-external-img");
-    btn.appendChild(arrowEl);
-  }
-  if (faviconURL) {
-    btn.prepend(createImg(faviconURL, "dict-btn-fav-img"));
-  }
-  
-  parent.appendChild(btn);
-
-  return btn;
-}
 
 function createImg(src, className) {
   const img = document.createElement("img");
