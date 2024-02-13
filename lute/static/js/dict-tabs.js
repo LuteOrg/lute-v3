@@ -1,29 +1,10 @@
 "use strict";
 
-function createDictTabs(num = 0) {
-  /*
-  if num is null/zero or greater than number of dicts => every dict gets a tab
-  else if num is, for example, 5 and there are 7 dicts => 4 dicts get a tab each, and the next 3 dicts are listed to be opened in the 5th tab menu
-  TABBED_DICTS = dicts to get a separate tab
-  LISTED_DICTS = dicts to be listed in the menu
-  */
-
+/**
+ * Create dictionary tabs, and a listing for any extra dicts.
+ */
+function createDictTabs(tab_count) {
   if (TERM_DICTS.length <= 0) return;
-
-  let sliceIndex;
-  let columnCount;
-
-  if ((num ?? 0) <= 0 || num >= TERM_DICTS.length) {
-    sliceIndex = TERM_DICTS.length;
-    columnCount = sliceIndex;
-  }
-  else {
-    sliceIndex = num - 1;
-    columnCount = num;
-  }
-  
-  const TABBED_DICTS = TERM_DICTS.slice(0, sliceIndex);
-  const LISTED_DICTS = TERM_DICTS.slice(sliceIndex);
 
   const dictTabButtons = new Map();
   const dictTabsContainer = document.getElementById("dicttabs");
@@ -40,7 +21,19 @@ function createDictTabs(num = 0) {
     return f;
   }
 
-  dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${columnCount}, minmax(2rem, 8rem))`;
+  const n = Math.max(0, tab_count);
+  let TABBED_DICTS = TERM_DICTS.slice(0, n);
+  let LISTED_DICTS = TERM_DICTS.slice(n);
+
+  // If the LISTED_DICTS only contains one item, just add it as
+  // a tab, as it will take up the same space.
+  if (LISTED_DICTS.length == 1) {
+    TABBED_DICTS = TERM_DICTS;
+    LISTED_DICTS = [];
+  }
+
+  const grid_column_count = TABBED_DICTS.length + (LISTED_DICTS.length > 0 ? 1 : 0);
+  dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${grid_column_count}, minmax(2rem, 8rem))`;
 
   TABBED_DICTS.forEach((dict, index) => {
     let iFrame = null;
