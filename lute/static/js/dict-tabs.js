@@ -18,7 +18,8 @@ function createDictTabs(num = 0) {
   if (num == 0 || num == null || num >= TERM_DICTS.length) {
     sliceIndex = TERM_DICTS.length;
     columnCount = sliceIndex;
-  } else {
+  }
+  else {
     sliceIndex = num - 1;
     columnCount = num;
   }
@@ -190,7 +191,8 @@ function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame
 
   if (clickedItem.dataset.dictExternal == "true") {
     load_dict_popup(dictID);
-  } else {
+  }
+  else {
     load_dict_iframe(dictID, iFrame);
     activateTab(menuBtn, dictTabButtons);
   }
