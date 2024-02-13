@@ -44,7 +44,7 @@ function createDictTabs(tab_count) {
       dictInfo.isExternal, 
       dictInfo.faviconURL);
 
-    let iFrame = dictInfo.isExternal ? null : createIFrame(`dict${index}`;
+    let iFrame = dictInfo.isExternal ? null : createIFrame(`dict${index}`);
     dictTabButtons.set(tabBtn, iFrame);
   });
 
