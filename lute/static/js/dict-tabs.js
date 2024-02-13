@@ -54,8 +54,12 @@ function createDictTabs(tab_count) {
 
   // TEMP HACK
   for (let i = 0; i < 5; i++) {
+    /*
     TERM_DICTS.push(TERM_DICTS[0]);
     TERM_DICTS.push(TERM_DICTS[1]);
+    */
+    TERM_DICTS.push(`http://a${i}.com?###`);
+    TERM_DICTS.push(`http://b${i}.com?###`);
   }
 
   const dictTabButtons = new Map();
@@ -110,11 +114,12 @@ function createDictTabs(tab_count) {
 
   if (LISTED_BUTTONS.length > 0) {
     const first = LISTED_BUTTONS[0];
-    dictTabsLayoutContainer.appendChild(first);
-    first.setAttribute("title", "Right click for dictionary list");
+    const show_clone = first.cloneNode(true);  // deep copy.
+    dictTabsLayoutContainer.appendChild(show_clone);
+    show_clone.setAttribute("title", "Right click for dictionary list");
     const menuImgEl = createImg("", "dict-btn-list-img");
-    first.appendChild(menuImgEl);
-    first.classList.add("dict-btn-select");
+    show_clone.appendChild(menuImgEl);
+    show_clone.classList.add("dict-btn-select");
 
     const list_div = document.createElement("div");
     list_div.setAttribute("id", "dict-list-container");
@@ -122,34 +127,31 @@ function createDictTabs(tab_count) {
     for (let b of LISTED_BUTTONS) {
       list_div.appendChild(b);
     }
-    const listMenuContainer = list_div;
 
     const menu_div = document.createElement("div");
     menu_div.setAttribute("id", "dict-menu-container");
-    menu_div.appendChild(first); // add select AFTER button
-    menu_div.appendChild(listMenuContainer); // add select AFTER button
+    menu_div.appendChild(list_div); // add select AFTER button
     dictTabsLayoutContainer.appendChild(menu_div);
 
     // EVENTS
-    first.addEventListener("contextmenu", (e) => {
+    show_clone.addEventListener("contextmenu", (e) => {
       e.preventDefault(); // disables default right click menu
-      listMenuContainer.classList.toggle("dict-list-hide");
+      list_div.classList.toggle("dict-list-hide");
     });
 
-    first.addEventListener("click", (e) => {
+    show_clone.addEventListener("click", (e) => {
       if (e.target === menuImgEl) return;
-      listMenuContainer.classList.add("dict-list-hide");
+      list_div.classList.add("dict-list-hide");
     });
 
     menuImgEl.addEventListener("click", (e) => {
       e.stopPropagation();
-      listMenuContainer.classList.toggle("dict-list-hide");
+      list_div.classList.toggle("dict-list-hide");
     });
 
     menu_div.addEventListener("mouseleave", () => {
-      listMenuContainer.classList.add("dict-list-hide");
+      list_div.classList.add("dict-list-hide");
     });
-
   }
   
   // set first embedded frame as active
@@ -192,6 +194,10 @@ function tabsClick(clickedTab, dictTabButtons) {
     return;
   }
 
+  // This currently throws for the cloned button at the
+  // top of the LISTED_BUTTONS, because that clone is _not_
+  // the same as the original button, and so is not in the
+  // dictTabButtons map.
   const iFrame = dictTabButtons.get(clickedTab);
   if (iFrame.dataset.contentLoaded == "false") {
     load_dict_iframe(dictID, iFrame);
