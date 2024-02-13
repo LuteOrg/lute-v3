@@ -189,10 +189,6 @@ function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame
 }
 
 function createDictListMenu(dicts) {
-  const listContainer = document.createElement("div");
-  listContainer.setAttribute("id", "dict-list-container");
-  listContainer.classList.add("dict-list-hide");
-
   let _make_para = function (dict) {
     const dictInfo = getDictInfo(dict);
     const p = document.createElement("p");
@@ -209,11 +205,14 @@ function createDictListMenu(dicts) {
   };
 
   const paras = dicts.map(_make_para);
-  for (let p of Object.values(paras)) {
-    listContainer.appendChild(p);
-  }
 
-  return listContainer;
+  const list_div = document.createElement("div");
+  list_div.setAttribute("id", "dict-list-container");
+  list_div.classList.add("dict-list-hide");
+  for (let p of Object.values(paras)) {
+    list_div.appendChild(p);
+  }
+  return list_div;
 }
 
 function loadDictionaries(dictTabButtons) {
