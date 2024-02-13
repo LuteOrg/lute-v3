@@ -13,9 +13,7 @@ function createDictTabs(num = 0) {
   let sliceIndex;
   let columnCount;
 
-  if (num < 0) num = 0;
-
-  if (num == 0 || num == null || num >= TERM_DICTS.length) {
+  if ((num ?? 0) <= 0 || num >= TERM_DICTS.length) {
     sliceIndex = TERM_DICTS.length;
     columnCount = sliceIndex;
   }
