@@ -73,66 +73,70 @@ function createDictTabs(tab_count) {
     return f;
   }
 
-  const n = Math.max(0, tab_count);
-  let TABBED_DICTS = TERM_DICTS.slice(0, n);
-  let LISTED_DICTS = TERM_DICTS.slice(n);
-
-  // If the LISTED_DICTS only contains one item, just add it as
-  // a tab, as it will take up the same space.
-  if (LISTED_DICTS.length == 1) {
-    TABBED_DICTS = TERM_DICTS;
-    LISTED_DICTS = [];
-  }
-
-  const grid_column_count = TABBED_DICTS.length + (LISTED_DICTS.length > 0 ? 1 : 0);
-  dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${grid_column_count}, minmax(2rem, 8rem))`;
-
-  TABBED_DICTS.forEach((dict, index) => {
+  const all_dict_buttons = [];
+  TERM_DICTS.forEach((dict, index) => {
     const dictInfo = getDictInfo(dict);
     const tabBtn = createTabBtn(
       dictInfo.label,
       index, 
       dictInfo.isExternal, 
       dictInfo.faviconURL);
-    dictTabsLayoutContainer.appendChild(tabBtn);
     let iFrame = dictInfo.isExternal ? null : createIFrame(`dict${index}`);
     dictTabButtons.set(tabBtn, iFrame);
+
+    all_dict_buttons.push(tabBtn);
   });
 
+  const n = Math.max(0, tab_count);
+  let TABBED_BUTTONS = all_dict_buttons.slice(0, n);
+  let LISTED_BUTTONS = all_dict_buttons.slice(n);
 
-  if (LISTED_DICTS.length > 0) {
-    const dictInfo = getDictInfo(LISTED_DICTS[0]);
-    const tabBtn = createTabBtn(
-      dictInfo.label, 
-      TERM_DICTS.indexOf(LISTED_DICTS[0]), 
-      dictInfo.isExternal, 
-      dictInfo.faviconURL);
-    dictTabsLayoutContainer.appendChild(tabBtn);
-    tabBtn.setAttribute("title", "Right click for dictionary list");
+  // If the LISTED_BUTTONS only contains one item, just add it as
+  // a tab, as it will take up the same space.
+  if (LISTED_BUTTONS.length == 1) {
+    TABBED_BUTTONS = all_dict_buttons;
+    LISTED_BUTTONS = [];
+  }
+
+  const grid_column_count = TABBED_BUTTONS.length + (LISTED_BUTTONS.length > 0 ? 1 : 0);
+  dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${grid_column_count}, minmax(2rem, 8rem))`;
+
+  // console.log(TABBED_BUTTONS);
+  for (let b of TABBED_BUTTONS) {
+    // console.log(typeof b);
+    // console.log(b);
+    dictTabsLayoutContainer.appendChild(b);
+  }
+
+  if (LISTED_BUTTONS.length > 0) {
+    const first = LISTED_BUTTONS[0];
+    dictTabsLayoutContainer.appendChild(first);
+    first.setAttribute("title", "Right click for dictionary list");
     const menuImgEl = createImg("", "dict-btn-list-img");
-    tabBtn.appendChild(menuImgEl);
-    tabBtn.classList.add("dict-btn-select");
+    first.appendChild(menuImgEl);
+    first.classList.add("dict-btn-select");
 
-    let iFrame = null;
-    const all_are_external = LISTED_DICTS.every(dict => getDictInfo(dict).isExternal);
-    if (!all_are_external)
-      iFrame = createIFrame("listframe");
-    dictTabButtons.set(tabBtn, iFrame);
-    
-    const listMenuContainer = createDictListMenu(LISTED_DICTS);
+    const list_div = document.createElement("div");
+    list_div.setAttribute("id", "dict-list-container");
+    list_div.classList.add("dict-list-hide");
+    for (let b of LISTED_BUTTONS) {
+      list_div.appendChild(b);
+    }
+    const listMenuContainer = list_div;
+
     const menu_div = document.createElement("div");
     menu_div.setAttribute("id", "dict-menu-container");
-    menu_div.appendChild(tabBtn); // add select AFTER button
+    menu_div.appendChild(first); // add select AFTER button
     menu_div.appendChild(listMenuContainer); // add select AFTER button
     dictTabsLayoutContainer.appendChild(menu_div);
 
     // EVENTS
-    tabBtn.addEventListener("contextmenu", (e) => {
+    first.addEventListener("contextmenu", (e) => {
       e.preventDefault(); // disables default right click menu
       listMenuContainer.classList.toggle("dict-list-hide");
     });
 
-    tabBtn.addEventListener("click", (e) => {
+    first.addEventListener("click", (e) => {
       if (e.target === menuImgEl) return;
       listMenuContainer.classList.add("dict-list-hide");
     });
@@ -146,9 +150,6 @@ function createDictTabs(tab_count) {
       listMenuContainer.classList.add("dict-list-hide");
     });
 
-    listMenuContainer.addEventListener("click", (e) => {
-      listMenuClick(e, listMenuContainer, tabBtn, dictTabButtons, iFrame);
-    });
   }
   
   // set first embedded frame as active
