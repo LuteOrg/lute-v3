@@ -53,8 +53,10 @@ function createDictTabs(tab_count) {
   if (TERM_DICTS.length <= 0) return;
 
   // TEMP HACK
-  for (let i = 0; i < 10; i++)
-    TERM_DICTS.push(`*https://dtt${i}/###`);
+  for (let i = 0; i < 5; i++) {
+    TERM_DICTS.push(TERM_DICTS[0]);
+    TERM_DICTS.push(TERM_DICTS[1]);
+  }
 
   const dictTabButtons = new Map();
   const dictTabsContainer = document.getElementById("dicttabs");
