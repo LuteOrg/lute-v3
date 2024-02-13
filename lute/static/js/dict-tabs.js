@@ -312,7 +312,7 @@ function activateTab(tab, allTabs) {
 }
 
 
-function createTabBtn(label, parent, data, external, faviconURL=null) {
+function createTabBtn(label, parent, dictID, external, faviconURL=null) {
   const btn = document.createElement("button");
   btn.classList.add("dict-btn");
 
@@ -320,7 +320,7 @@ function createTabBtn(label, parent, data, external, faviconURL=null) {
     btn.textContent = label;
     btn.setAttribute("title", label);
   }
-  if (data != null) btn.dataset.dictId = data;
+  if (dictID != null) btn.dataset.dictId = dictID;
   if (external != null) {
     btn.dataset.dictExternal = external ? "true" : "false";
     if (external) {
