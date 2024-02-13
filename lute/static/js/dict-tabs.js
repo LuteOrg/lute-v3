@@ -18,34 +18,6 @@ function createTabBtn(label, dictID, external, faviconURL=null) {
 }
 
 
-function createDictListMenu(dicts) {
-  let _make_para = function (dict) {
-    const dictInfo = getDictInfo(dict);
-    const p = document.createElement("p");
-    p.classList.add("dict-menu-item");
-    p.textContent = dictInfo.label;
-    p.dataset.dictId = TERM_DICTS.indexOf(dict);
-    p.dataset.dictExternal = dictInfo.isExternal ? "true" : "false";
-    p.dataset.contentLoaded = dictInfo.isExternal ? "false" : "true";
-    if (dictInfo.faviconURL) {
-      const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img");
-      p.prepend(faviconEl);
-    }
-    return p;
-  };
-
-  const paras = dicts.map(_make_para);
-
-  const list_div = document.createElement("div");
-  list_div.setAttribute("id", "dict-list-container");
-  list_div.classList.add("dict-list-hide");
-  for (let p of Object.values(paras)) {
-    list_div.appendChild(p);
-  }
-  return list_div;
-}
-
-
 /**
  * Create dictionary tabs, and a listing for any extra dicts.
  */
@@ -204,45 +176,6 @@ function tabsClick(clickedTab, dictTabButtons) {
   }
   iFrame.dataset.contentLoaded = "true";
   activateTab(clickedTab, dictTabButtons);
-}
-
-function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame) {
-  const clickedItem = event.target.closest(".dict-menu-item");
-  if (!clickedItem) return;
-  listMenuContainer.classList.add("dict-list-hide");
-
-  const dictID = clickedItem.dataset.dictId;
-  const dictInfo = getDictInfo(TERM_DICTS[dictID]);
-  menuBtn.dataset.dictId = dictID;
-  menuBtn.dataset.dictExternal = clickedItem.dataset.dictExternal;
-  menuBtn.dataset.contentLoaded = clickedItem.dataset.contentLoaded;
-  menuBtn.textContent = dictInfo.label;
-
-  if (dictInfo.faviconURL) {
-    // img elements get deleted after "change" event, so create them after each change.
-    const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img");
-    menuBtn.prepend(faviconEl);
-  }
-
-  const menuImgEl = createImg("", "dict-btn-list-img");
-  menuImgEl.addEventListener("click", (e) => {
-    e.stopPropagation();
-    listMenuContainer.classList.toggle("dict-list-hide");
-  });
-  menuBtn.appendChild(menuImgEl);
-
-  if (clickedItem.dataset.dictExternal == "true") {
-    const arrowEl = createImg("", "dict-btn-external-img");
-    menuBtn.appendChild(arrowEl);
-  }
-
-  if (clickedItem.dataset.dictExternal == "true") {
-    load_dict_popup(dictID);
-  }
-  else {
-    load_dict_iframe(dictID, iFrame);
-    activateTab(menuBtn, dictTabButtons);
-  }
 }
 
 
