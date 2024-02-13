@@ -110,7 +110,7 @@ function createDictTabs(tab_count) {
   }
 
   // Image button and frame.
-  const imageBtn = createTabBtn("", dictTabsContainer, -1, 0);
+  const imageBtn = createTabBtn("", dictTabsContainer, -1, false);
   imageBtn.setAttribute("id", "dict-image-btn");
   imageBtn.setAttribute("title", "Look up images for the term");
   const imageFrame = createIFrame("imageframe");
