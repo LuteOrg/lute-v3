@@ -1,7 +1,7 @@
 "use strict";
 
 
-function createTabBtn(label, parent, dictID, external, faviconURL=null) {
+function createTabBtn(label, dictID, external, faviconURL=null) {
   const btn = document.createElement("button");
   btn.classList.add("dict-btn");
   if (label != "")
@@ -12,9 +12,6 @@ function createTabBtn(label, parent, dictID, external, faviconURL=null) {
     btn.prepend(createImg(faviconURL, "dict-btn-fav-img"));
   if (external)
     btn.appendChild(createImg("", "dict-btn-external-img"));
-
-  parent.appendChild(btn);
-
   return btn;
 }
 
@@ -89,12 +86,11 @@ function createDictTabs(tab_count) {
   TABBED_DICTS.forEach((dict, index) => {
     const dictInfo = getDictInfo(dict);
     const tabBtn = createTabBtn(
-      dictInfo.label, 
-      dictTabsLayoutContainer, 
+      dictInfo.label,
       index, 
       dictInfo.isExternal, 
       dictInfo.faviconURL);
-
+    dictTabsLayoutContainer.appendChild(tabBtn);
     let iFrame = dictInfo.isExternal ? null : createIFrame(`dict${index}`);
     dictTabButtons.set(tabBtn, iFrame);
   });
@@ -104,10 +100,10 @@ function createDictTabs(tab_count) {
     const dictInfo = getDictInfo(LISTED_DICTS[0]);
     const tabBtn = createTabBtn(
       dictInfo.label, 
-      dictTabsLayoutContainer, 
       TERM_DICTS.indexOf(LISTED_DICTS[0]), 
       dictInfo.isExternal, 
       dictInfo.faviconURL);
+    dictTabsLayoutContainer.appendChild(tabBtn);
     tabBtn.setAttribute("title", "Right click for dictionary list");
     const menuImgEl = createImg("", "dict-btn-list-img");
     tabBtn.appendChild(menuImgEl);
@@ -162,7 +158,8 @@ function createDictTabs(tab_count) {
   }
 
   // Image button and frame.
-  const imageBtn = createTabBtn("", dictTabsContainer, -1, false);
+  const imageBtn = createTabBtn("", -1, false);
+  dictTabsContainer.appendChild(imageBtn);
   imageBtn.setAttribute("id", "dict-image-btn");
   imageBtn.setAttribute("title", "Look up images for the term");
   const imageFrame = createIFrame("imageframe");
