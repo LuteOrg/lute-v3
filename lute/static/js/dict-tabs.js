@@ -316,17 +316,15 @@ function createTabBtn(label, parent, dictID, external, faviconURL=null) {
   const btn = document.createElement("button");
   btn.classList.add("dict-btn");
 
-  if (label) {
+  if (label != "") {
     btn.textContent = label;
     btn.setAttribute("title", label);
   }
-  if (dictID != null) btn.dataset.dictId = dictID;
-  if (external != null) {
-    btn.dataset.dictExternal = external ? "true" : "false";
-    if (external) {
-      const arrowEl = createImg("", "dict-btn-external-img");
-      btn.appendChild(arrowEl);
-    }
+  btn.dataset.dictId = dictID;
+  btn.dataset.dictExternal = external ? "true" : "false";
+  if (external) {
+    const arrowEl = createImg("", "dict-btn-external-img");
+    btn.appendChild(arrowEl);
   }
   if (faviconURL) {
     btn.prepend(createImg(faviconURL, "dict-btn-fav-img"));
