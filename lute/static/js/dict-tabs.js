@@ -37,11 +37,12 @@ function createDictTabs(tab_count) {
 
   TABBED_DICTS.forEach((dict, index) => {
     const dictInfo = getDictInfo(dict);
-    const tabBtn = createTabBtn(dictInfo.label, 
-                                dictTabsLayoutContainer, 
-                                index, 
-                                dictInfo.isExternal, 
-                                dictInfo.faviconURL);
+    const tabBtn = createTabBtn(
+      dictInfo.label, 
+      dictTabsLayoutContainer, 
+      index, 
+      dictInfo.isExternal, 
+      dictInfo.faviconURL);
 
     let iFrame = dictInfo.isExternal ? null : createIFrame(`dict${index}`;
     dictTabButtons.set(tabBtn, iFrame);
@@ -49,11 +50,12 @@ function createDictTabs(tab_count) {
 
   if (LISTED_DICTS.length > 0) {
     const dictInfo = getDictInfo(LISTED_DICTS[0]);
-    const tabBtn = createTabBtn(dictInfo.label, 
-                                dictTabsLayoutContainer, 
-                                TERM_DICTS.indexOf(LISTED_DICTS[0]), 
-                                dictInfo.isExternal, 
-                                dictInfo.faviconURL);
+    const tabBtn = createTabBtn(
+      dictInfo.label, 
+      dictTabsLayoutContainer, 
+      TERM_DICTS.indexOf(LISTED_DICTS[0]), 
+      dictInfo.isExternal, 
+      dictInfo.faviconURL);
     tabBtn.setAttribute("title", "Right click for dictionary list");
     const menuImgEl = createImg("", "dict-btn-list-img");
     tabBtn.appendChild(menuImgEl);
