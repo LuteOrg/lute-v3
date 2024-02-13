@@ -19,6 +19,34 @@ function createTabBtn(label, parent, dictID, external, faviconURL=null) {
 }
 
 
+function createDictListMenu(dicts) {
+  let _make_para = function (dict) {
+    const dictInfo = getDictInfo(dict);
+    const p = document.createElement("p");
+    p.classList.add("dict-menu-item");
+    p.textContent = dictInfo.label;
+    p.dataset.dictId = TERM_DICTS.indexOf(dict);
+    p.dataset.dictExternal = dictInfo.isExternal ? "true" : "false";
+    p.dataset.contentLoaded = dictInfo.isExternal ? "false" : "true";
+    if (dictInfo.faviconURL) {
+      const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img");
+      p.prepend(faviconEl);
+    }
+    return p;
+  };
+
+  const paras = dicts.map(_make_para);
+
+  const list_div = document.createElement("div");
+  list_div.setAttribute("id", "dict-list-container");
+  list_div.classList.add("dict-list-hide");
+  for (let p of Object.values(paras)) {
+    list_div.appendChild(p);
+  }
+  return list_div;
+}
+
+
 /**
  * Create dictionary tabs, and a listing for any extra dicts.
  */
@@ -204,32 +232,6 @@ function listMenuClick(event, listMenuContainer, menuBtn, dictTabButtons, iFrame
   }
 }
 
-function createDictListMenu(dicts) {
-  let _make_para = function (dict) {
-    const dictInfo = getDictInfo(dict);
-    const p = document.createElement("p");
-    p.classList.add("dict-menu-item");
-    p.textContent = dictInfo.label;
-    p.dataset.dictId = TERM_DICTS.indexOf(dict);
-    p.dataset.dictExternal = dictInfo.isExternal ? "true" : "false";
-    p.dataset.contentLoaded = dictInfo.isExternal ? "false" : "true";
-    if (dictInfo.faviconURL) {
-      const faviconEl = createImg(dictInfo.faviconURL, "dict-btn-fav-img");
-      p.prepend(faviconEl);
-    }
-    return p;
-  };
-
-  const paras = dicts.map(_make_para);
-
-  const list_div = document.createElement("div");
-  list_div.setAttribute("id", "dict-list-container");
-  list_div.classList.add("dict-list-hide");
-  for (let p of Object.values(paras)) {
-    list_div.appendChild(p);
-  }
-  return list_div;
-}
 
 function loadDictionaries(dictTabButtons) {
   dictTabButtons.forEach((iframe, btn) => {
