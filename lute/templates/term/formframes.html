@@ -49,6 +49,12 @@
         }
 
         TERM_DICTS = ALL_DICTS[LANG_ID].term;
+        // TODO fix: this code smells bad.
+        // Its various copies here and in the read/index
+        // mean that we're exposing the dictTabButtons data structure spread
+        // across various files, and I feel there is something wrong with
+        // the design that requires the separate calls to loadDictionaries
+        // and addSentenceBtnEvent.
         dictTabButtons = createDictTabs(5);
         loadDictionaries(dictTabButtons);
         addSentenceBtnEvent(dictTabButtons);
