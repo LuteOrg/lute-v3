@@ -154,14 +154,14 @@ function createDictTabs(tab_count) {
     });
   }
   
-  // set first embedded frame as active
+  // Set first embedded frame as active.
   const tabsArray = Array.from(dictTabButtons.keys());
-  const firstEmbeddedTab = tabsArray.find(tab => tab.dataset.dictExternal == "false");
-  if (firstEmbeddedTab) {
-      firstEmbeddedTab.classList.add("dict-btn-active");
-      const firstEmbeddedFrame = dictTabButtons.get(firstEmbeddedTab);
-      firstEmbeddedFrame.dataset.contentLoaded = "true";
-      firstEmbeddedFrame.classList.add("dict-active");
+  const active_tab = tabsArray.find(tab => tab.dataset.dictExternal == "false");
+  if (active_tab) {
+      active_tab.classList.add("dict-btn-active");
+      const active_frame = dictTabButtons.get(active_tab);
+      active_frame.dataset.contentLoaded = "true";
+      active_frame.classList.add("dict-active");
   }
 
   // Image button and frame.
