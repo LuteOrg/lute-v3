@@ -100,7 +100,7 @@ function createDictTabs(num = 0) {
       listMenuContainer.classList.toggle("dict-list-hide");
     });
 
-    menuButtonContainer.addEventListener("mouseleave", () => {
+    menu_div.addEventListener("mouseleave", () => {
       listMenuContainer.classList.add("dict-list-hide");
     });
 
