@@ -170,6 +170,11 @@ function tabsClick(clickedTab, dictTabButtons) {
   // top of the LISTED_BUTTONS, because that clone is _not_
   // the same as the original button, and so is not in the
   // dictTabButtons map.
+  //
+  // TODO fix this: if this is a cloned clickedTab, find the
+  // real source button, and use that.  This could be avoided
+  // if the source button has an iframe key, and the frame is
+  // loaded using that.
   const iFrame = dictTabButtons.get(clickedTab);
   if (iFrame.dataset.contentLoaded == "false") {
     load_dict_iframe(dictID, iFrame);
