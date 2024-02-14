@@ -369,18 +369,59 @@ let move_cursor = function(shiftby) {
 }
 
 
-let show_translation = function(e) {
+/** SENTENCE TRANSLATIONS *************************/
+
+// LUTE_SENTENCE_LOOKUP_URIS is rendered in templates/read/index.html.
+// Hitting "t" repeatedly cycles through the uris.  Moving to a new
+// sentence resets the order.
+
+var LUTE_LAST_SENTENCE_TRANSLATION_TEXT = '';
+var LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX = 0;
+
+/** Cycle through the LUTE_SENTENCE_LOOKUP_URIS.
+ * If the current sentence is the same as the last translation,
+ * move to the next sentence dictionary; otherwise start the cycle
+ * again (from index 0).
+ */
+let _get_translation_dict_index = function(sentence) {
+  const dict_count = LUTE_SENTENCE_LOOKUP_URIS.length;
+  if (dict_count == 0)
+    return 0;
+  let new_index = LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX;
+  if (LUTE_LAST_SENTENCE_TRANSLATION_TEXT != sentence) {
+    // New sentence, start at beginning.
+    new_index = 0;
+  }
+  else {
+    // Same sentence, next dict.
+    new_index += 1;
+    if (new_index >= dict_count)
+      new_index = 0;
+  }
+  LUTE_LAST_SENTENCE_TRANSLATION_TEXT = sentence;
+  LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX = new_index;
+  return new_index;
+}
+
+
+/** Show the translation using the next dictionary. */
+let show_sentence_translation = function(e) {
   tis = get_textitems_spans(e);
   if (tis == null)
     return;
   const sentence = tis.map(s => $(s).text()).join('');
 
-  const userdict = $('#translateURL').text();
-  if (userdict == null || userdict == '')
-    console.log('No userdict for lookup.  ???');
+  if (LUTE_SENTENCE_LOOKUP_URIS.length == 0) {
+    console.log('No sentence translation uris configured.');
+    return;
+  }
 
+  const dict_index = _get_translation_dict_index(sentence);
+  const userdict = LUTE_SENTENCE_LOOKUP_URIS[dict_index];
   // console.log(userdict);
-  const url = userdict.replace('###', encodeURIComponent(sentence));
+
+  const lookup = encodeURIComponent(sentence);
+  const url = userdict.replace('###', lookup);
   if (url[0] == '*') {
     const finalurl = url.substring(1);  // drop first char.
     const settings = 'width=800, height=400, scrollbars=yes, menubar=no, resizable=yes, status=no';
@@ -392,6 +433,7 @@ let show_translation = function(e) {
 }
 
 
+/** THEMES AND HIGHLIGHTS *************************/
 /* Change to the next theme, and reload the page. */
 function next_theme() {
   $.ajax({
@@ -486,7 +528,7 @@ function handle_keydown (e) {
   map[kUP] = () => increment_status_for_selected_elements(e, +1);
   map[kDOWN] = () => increment_status_for_selected_elements(e, -1);
   map[kC] = () => handle_copy(e);
-  map[kT] = () => show_translation(e);
+  map[kT] = () => show_sentence_translation(e);
   map[kM] = () => next_theme();
   map[kH] = () => toggle_highlight();
   map[k1] = () => update_status_for_marked_elements(1);
