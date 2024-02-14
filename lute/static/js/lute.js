@@ -424,7 +424,7 @@ let show_sentence_translation = function(e) {
   const url = userdict.replace('###', lookup);
   if (url[0] == '*') {
     const finalurl = url.substring(1);  // drop first char.
-    const settings = 'width=800, height=400, scrollbars=yes, menubar=no, resizable=yes, status=no';
+    const settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no';
     window.open(finalurl, 'dictwin', settings);
   }
   else {
