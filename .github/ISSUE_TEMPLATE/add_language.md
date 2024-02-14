@@ -12,9 +12,6 @@ assignees: ''
 If your language settings are working well for you, please share them with other new users by providing the following data:
 
 * name: <language-name>
-* dict_1: <dictionary-1-uri>
-* dict_2: <dictionary-2-uri>
-* sentence_translation: <translation uri>
 * show_romanization: <true or false>
 * right_to_left: <true or false>
 * parser_type: spacedel or mecab   (probably "spacedel" is the correct one, "space delimited")
@@ -22,6 +19,12 @@ If your language settings are working well for you, please share them with other
 * split_sentence_exceptions:
 * word_chars:
 * character_substitutions:  (if there are any special characters)
+
+Dictionaries.  A list of one or more entries:
+
+* use_for: terms or sentences
+* type: embedded or popup
+* url
 
 It's good to have a short demonstration story available as well.  Please paste a family-friendly (!) story below:
 
