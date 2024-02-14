@@ -1,7 +1,14 @@
 name: English
-dict_1: https://en.thefreedictionary.com/###
-dict_2: https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle
-sentence_translation: "*https://www.deepl.com/translator#en/en/###"
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://en.thefreedictionary.com/###
+  - for: terms
+    type: popup
+    url: https://www.collinsdictionary.com/dictionary/english/###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#en/en/###
 # show_romanization: 
 # right_to_left: 
 
