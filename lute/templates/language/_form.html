@@ -1,11 +1,15 @@
 {% for field_name, field_errors in form.errors.items() %}
-<p>{{ field_name }}
-  <ul>
-    {% for error in field_errors %}
-    <li>{{ error }}</li>
-    {% endfor %}
-  </ul>
-</p>
+  {% for error in field_errors %}
+    <div class="flash-notice-narrow">
+      {% if error is mapping %}
+        {% for err_field, err_msg in error.items() %}
+          {{ err_msg }}
+        {% endfor %}
+      {% else %}
+        {{ error }}
+      {% endif %}
+    </div>
+  {% endfor %}
 {% endfor %}
 
 <form method="POST">
@@ -14,8 +18,48 @@
   <table id="language">
   <tbody>
 
+    <tr>
+      <td>{{ form.name.label(class="form-control-label") }}</td>
+      <td>{{ form.name(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>Dictionaries</td>
+      <td>
+        <div id="dictionary_entities">
+          {#
+            Render all the dictionaries, but don't show the __TEMPLATE__,
+            added in "_add_hidden_dictionary_template_entry()" in routes.py
+          #}
+          {% for dictionary in form.dictionaries %}
+          <div class="dict_entry valign"
+               {% if dictionary.dicturi.data == '__TEMPLATE__' %}
+               style="display: none"
+               {% endif %}
+               >
+            <span class="drag-handle">☰</span>
+            {{ dictionary.usefor(class="dict-usefor") }}
+            {{ dictionary.dicttype(class="dict-type") }}
+            {{ dictionary.dicturi(class="dict-uri form-control-narrower") }}
+            {{ dictionary.is_active }}
+            {{ dictionary.sort_order }}
+            <span class="test-dict-entity" title="Test dictionary" style="margin-left: 20px">
+              <img src="{{ url_for('static', filename='icn/external.png') }}">
+            </span>
+            <span class="remove-dict-entity" title="Remove dictionary">
+              <img src="{{ url_for('static', filename='icn/minus-button.png') }}">
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+        <span id="add-dict-entity" title="Add dictionary">
+          <img src="{{ url_for('static', filename='icn/plus-button.png') }}">
+        </span>
+      </td>
+    </tr>
+
     {% for field in form %}
-    {% if field.name != 'csrf_token' %}
+    {% if field.name not in ('name', 'csrf_token', 'dictionaries') %}
     <tr>
       <td>{{ field.label(class="form-control-label") }}</td>
       <td>{{ field(class="form-control") }}</td>
@@ -28,6 +72,139 @@
 
   <button id="submit" type="submit" class="btn btn-primary">Save</button>
 </form>
+
+<script>
+  $(document).ready(function() {
+    // Make the list of entities sortable
+    let add_sort_values = function() {
+      // console.log('sort called');
+      $("div.dict_entry").each(function(index) {
+        var numberInput = $(this).find('input[type="number"]');
+        numberInput.val(index + 1);
+      });
+    };
+
+    let apply_sortable = function() {
+      $("#dictionary_entities").sortable({
+        handle: ".drag-handle",
+        update: function(event, ui) {
+          add_sort_values();
+        }
+      });
+    };
+
+    apply_sortable();
+
+    /** Add a new entity, using the __TEMPLATE__ entry as the template. */
+    /** The TEMPLATE is added in language/routes.py. */
+    $("#add-dict-entity").click(function() {
+      let templateInput = $('.dict_entry input[type="text"][value="__TEMPLATE__"]');
+      if (templateInput.length == 0) {
+        alert("Can't find __TEMPLATE__ input to create dictionary ...");
+        return;
+      }
+      templateInput = $(templateInput[0]);
+      // console.log(templateInput);
+      const templateInputId = templateInput.attr('id');
+      const idParts = templateInputId.split('-');
+      if (idParts.length != 3) {
+        alert(`Bad template id ${templateInputId}`);
+        return;
+      }
+      if (idParts[0] != 'dictionaries' || idParts[2] != 'dicturi') {
+        alert(`Non-conformant template id ${templateInputId}`);
+        return;
+      }
+      const idToReplace = idParts[1];
+      var index = $("#dictionary_entities").children().length;
+      // Couldn't figure out how to get the enclosing div and its
+      // classes, adding manually.
+      let template = `<div class="dict_entry valign">` + templateInput.closest('div.dict_entry').html() + "</div>";
+      template = template.replaceAll(`-${idToReplace}-`, `-${index}-`);
+      template = template.replaceAll('__TEMPLATE__', '');
+      // console.log(template);
+
+      $("#dictionary_entities").append(template);
+      $(`#dictionaries-${index}-is_active`).attr("checked", true);
+      apply_sortable();
+      add_sort_values();
+    });
+
+    // Remove an entity
+    $(document).on("click", ".remove-dict-entity", function() {
+      $(this).closest("div").remove();
+    });
+
+    let test_embedded_dict_lookup = function(testurl) {
+      // Open a new window
+      var popup = window.open('', '_blank', 'width=600,height=600,top=50,left=50');
+      const content = `<html>
+<head>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+<title>Dictionary test</title>
+</head>
+
+<body>
+<div class="container">
+<h2>Embedded dictionary test.</h2>
+<p>If you see the expected content, this dictionary can be embedded;
+if not, change the type to "Pop-up window".</p>
+<hr />
+<iframe
+    name="dictframe"
+    id="dictframeid"
+    class="rightreadingframe"
+    src="${testurl}"
+    scrolling="auto"
+    style="height: 100%; width: 100%"
+    frameborder="0"
+  >
+    Frame support required.
+</iframe>
+</div>
+</body>
+</html>`;
+      const doc = popup.document;
+      doc.write(content);
+      doc.close();
+    };
+
+    // Test the dict entry.
+    $(document).on("click", ".test-dict-entity", function() {
+      const div = $(this).closest("div");
+
+      const dicturi = div.find(".dict-uri").val();
+      const dict_type = div.find(".dict-type").val();
+      const testurl = dicturi.replace('###', 'test').replace('<TERM>', 'test');
+      // console.log(dicturi);
+      // console.log(dict_type);
+      // console.log(testurl);
+
+      switch (dict_type) {
+      case 'popuphtml':
+        window.open(testurl, '_blank', 'width=600,height=600,top=50,left=50');
+        break;
+      case 'embeddedhtml':
+        test_embedded_dict_lookup(testurl);
+        break;
+      default:
+        alert(`Unhandled dict type ${dict_type}, don't know how to test!`);
+      }
+    });
+
+
+    /** Remove the TEMPLATE dict entry on submit, so it's not saved to the db! */
+    $(document).on("click", "#submit", function() {
+      const templateInput = $('.dict_entry input[type="text"][value="__TEMPLATE__"]');
+      if (templateInput == null) {
+        console.log('template not found ... weird, but can submit.');
+        return;
+      }
+      templateInput.closest('div.dict_entry').remove();
+    });
+
+  });
+</script>
 
 {% if language.id %}
 <form method="post" action="/language/delete/{{ language.id }}" onsubmit="return confirm('WARNING: deleting a language deletes all its books and defined terms.  Are you *absolutely* sure you want to delete this item?');">

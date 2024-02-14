@@ -1,7 +1,11 @@
 name: Japanese
-dict_1: https://jisho.org/search/###
-dict_2: https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle
-sentence_translation: "*https://www.deepl.com/translator#jp/en/###"
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://jisho.org/search/###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#jp/en/###
 show_romanization: true
 # right_to_left: 
 

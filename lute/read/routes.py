@@ -30,7 +30,7 @@ def _render_book_page(book, pagenum):
         is_rtl=lang.right_to_left,
         html_title=book.title,
         book=book,
-        dictionary_url=lang.sentence_translate_uri,
+        sentence_dict_uris=lang.sentence_dict_uris,
         page_num=pagenum,
         page_count=book.page_count,
         show_highlights=show_highlights,

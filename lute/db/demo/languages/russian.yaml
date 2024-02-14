@@ -1,7 +1,14 @@
 name: Russian
-dict_1: https://www.dict.com/Russian-English/###
-dict_2: https://en.openrussian.org/?search=###
-sentence_translation: "*https://www.deepl.com/translator#ru/en/###"
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://www.dict.com/Russian-English/###
+  - for: terms
+    type: embedded
+    url: https://en.openrussian.org/?search=###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#ru/en/###
 # show_romanization: 
 # right_to_left: 
 
