@@ -104,9 +104,10 @@
           {% if backup_last_display_date is not none %}
           <li>Last backup was {{ backup_time_since }}.</li>
           <li>{{ backup_last_display_date | format }}</li>
-          {% endif %}
           <hr>
+          {% endif %}
           <li><a id="backup_index" href="/backup/index">Backups</a></li>
+          <li><a href="/backup/backup?type=manual">Create backup</a></li>
         </ul>
       </div>
       {% endif %}

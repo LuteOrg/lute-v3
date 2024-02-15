@@ -23,7 +23,7 @@
     <tr>
       <td>{{ backup.name }}</td>
       <td>{{ backup.size }}</td>
-      <td>{{ backup.last_modified }}</td>
+      <td>{{ backup.last_modified.strftime('%Y-%m-%d %H:%M:%S') }}</td>
     </tr>
     {% endfor %}
   </tbody>
