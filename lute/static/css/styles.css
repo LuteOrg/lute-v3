@@ -1269,7 +1269,8 @@ input[type="checkbox"][disabled] + label {
 }
 
 /* after element is for hiding text at the edges */
-#dicttabslayout .dict-btn::after {
+#dicttabslayout .dict-btn::after,
+#dicttabslayout .dict-menu-item::after {
     content: "";
     position: absolute;
     width: 100%;
@@ -1280,11 +1281,16 @@ input[type="checkbox"][disabled] + label {
     box-sizing: border-box;
 }
 
+#dicttabslayout .dict-menu-item::after {
+    border-color: aliceblue;
+}
+
 #dicttabslayout .dict-btn-active::after {
     border-color: #68ace0;
 }
 
 #dicttabslayout .dict-btn[data-dict-external="true"]::after,
+#dicttabslayout .dict-menu-item[data-dict-external="true"]::after,
 #dicttabslayout .dict-btn-select[data-dict-external="false"]::after {
     border-right-width: 1.5rem;
 }
@@ -1463,11 +1469,16 @@ input[type="checkbox"][disabled] + label {
     border: none;
     background: none;
     width: 100%;
+    position: relative;
 }
 
 .dict-menu-item:hover {
     background-color: #68ace0;
     color: #fff;
+}
+
+#dict-menu-container .dict-menu-item:hover::after {
+    border-color: #68ace0;
 }
 
 /* STATUS RADIO */
