@@ -165,6 +165,7 @@
   <div class="dictcontainer">
     <div id="dicttabs">
       <div id="dicttabslayout"></div>
+      <div id="dicttabsstatic"></div>
     </div>
     <div id="dictframes"></div>
   </div>
@@ -218,14 +219,12 @@
       tooltipPos = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
     }
     
-    const dictTabButtons = createDictTabs(5);
+    createDictTabs(5);
 
     window.addEventListener("message", function(event) {
       if (event.data.event === "LuteTermFormOpened") {
         TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
-        loadDictionaries(dictTabButtons);
-        // because the sentence buttons gets deleted. we have to add the event each time form is opened
-        addSentenceBtnEvent(dictTabButtons);
+        loadDictionaries();
       }
     });
     

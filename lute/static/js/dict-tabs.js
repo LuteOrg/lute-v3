@@ -3,37 +3,33 @@
 let dictTabs = [];
 
 class DictTab {
-  constructor(dict, frameName, frameOnly=false) {
+  constructor(dict, frameName) {
     const dictInfo = dict ? getDictInfo(dict) : null;
-
-    this.dictID = dictInfo?.id;
+    this.dictID = dictInfo ? dictInfo.id : null;
 
     this.frame = this.createIFrame(frameName);
-    
-    if (!frameOnly) {
-      this.btn = document.createElement("button");
+    this.btn = document.createElement("button");
+    this.btn.classList.add("dict-btn");
 
-      this.isExternal = dictInfo?.isExternal;
-      this.label = dictInfo?.label;
-
+    if (this.dictID != null) {
+      this.label = dictInfo.label;
+      this.isExternal = dictInfo.isExternal;
+      this.btn.dataset.dictId = this.dictID;
+      this.btn.onclick = this.clickCallback.bind(this);
+      this.btn.dataset.dictExternal = this.isExternal ? "true" : "false";
+      
       if (this.label != "") {
         this.btn.textContent = this.label;
         this.btn.setAttribute("title", this.label);
       }
 
-      if (dictInfo?.faviconURL) {
-        this.btn.prepend(createImg(dictInfo?.faviconURL, "dict-btn-fav-img"));
+      if (dictInfo.faviconURL) {
+        this.btn.prepend(createImg(dictInfo.faviconURL, "dict-btn-fav-img"));
       }
-
-      this.btn.classList.add("dict-btn");
-      this.btn.dataset.dictId = this.dictID;
-      this.btn.dataset.dictExternal = this.isExternal ? "true" : "false";
 
       if (this.isExternal) {
         this.btn.appendChild(createImg("", "dict-btn-external-img"));
       }
-
-      this.btn.onclick = this.clickCallback.bind(this);
     }
   }
 
@@ -46,8 +42,6 @@ class DictTab {
       load_dict_iframe(this.dictID, this.frame);
     }
 
-    this.frame.dataset.contentLoaded = "true";
-    deactivateAllTabs();
     activateTab(this);
   }
 
@@ -79,8 +73,8 @@ function createDictTabs(tab_count) {
     TERM_DICTS.push(`http://b${i}.com?###`);
   }
 
-  const dictTabsContainer = document.getElementById("dicttabs");
   const dictTabsLayoutContainer = document.getElementById("dicttabslayout");
+  const dictTabsStaticContainer = document.getElementById("dicttabsstatic");
   const iFramesContainer = document.getElementById("dictframes");
 
   const all_dict_buttons = [];
@@ -162,26 +156,49 @@ function createDictTabs(tab_count) {
   const active_tab = dictTabs.find(tab => !tab.isExternal);
   if (active_tab) {
       active_tab.btn.classList.add("dict-btn-active");
-      const active_frame = active_tab.frame;
-      active_frame.dataset.contentLoaded = "true";
-      active_frame.classList.add("dict-active");
+      active_tab.frame.classList.add("dict-active");
   }
+  
+  // Sentences frame.
+  const sentencesTab = new DictTab(null, "sentencesframe");
+  dictTabsStaticContainer.appendChild(sentencesTab.btn);
+  sentencesTab.btn.textContent = "Sentences";
+  sentencesTab.btn.classList.add("dict-sentences-btn");
+  iFramesContainer.appendChild(sentencesTab.frame);
+  dictTabs.push(sentencesTab);
 
   // Image button and frame.
   const imageTab = new DictTab(null, "imageframe");
-  dictTabsContainer.appendChild(imageTab.btn);
   imageTab.btn.setAttribute("id", "dict-image-btn");
   imageTab.btn.setAttribute("title", "Look up images for the term");
+  dictTabsStaticContainer.appendChild(imageTab.btn);
   iFramesContainer.appendChild(imageTab.frame);
   dictTabs.push(imageTab);
 
-  // Sentences frame.
-  const sentencesTab = new DictTab(null, "sentencesframe", true);
-  iFramesContainer.appendChild(sentencesTab.frame);
+  sentencesTab.btn.addEventListener("click", function () {
+    if (sentencesTab.frame.dataset.contentLoaded == "false") {
+      loadSentencesFrame(sentencesTab.frame);
+    }
+    activateTab(sentencesTab);
+  });
+
+  imageTab.btn.addEventListener("click", function () {
+    if (imageTab.frame.dataset.contentLoaded == "false") {
+      do_image_lookup(imageTab.frame);
+    }
+    activateTab(imageTab);
+  });
+
 
   return dictTabs;
 }
 
+function loadSentencesFrame(iframe) {
+  const url = getSentenceURL();
+  if (url == null)
+    return;
+  iframe.setAttribute("src", url);
+}
 
 function loadDictionaries() {
   dictTabs.forEach(tab => tab.frame.dataset.contentLoaded = "false");
@@ -194,35 +211,18 @@ function loadDictionaries() {
     return;
 
   const activeTab = document.querySelector(".dict-btn-active");
-  if (activeTab) {
+  if (activeTab == null) 
+    return;
+
+  if ("dictId" in activeTab.dataset) {
     load_dict_iframe(activeTab.dataset.dictId, activeFrame);
+  } else if (activeFrame.name === "imageframe") {
+    do_image_lookup(activeFrame);
+  } else if (activeFrame.name === "sentencesframe") {
+    loadSentencesFrame(activeFrame);
   }
-  else if (activeFrame.getAttribute("name") == "sentencesframe") {
-    activeFrame.setAttribute("src", getSentenceURL());
-    deactivateAllTabs();
-    activeFrame.classList.add("dict-active");
-    // activateTab("sentencesTab", dictTabs);
-  }
+
   activeFrame.dataset.contentLoaded = "true";
-}
-
-function addSentenceBtnEvent() {
-  const b = TERM_FORM_CONTAINER.querySelector("#term-button-container > a");
-  b.addEventListener("click", (e) => {
-    e.preventDefault();
-    const url = getSentenceURL();
-    if (url == null)
-      return;
-
-    // const iframe = dictTabs.get("sentencesTab");
-    const iframe = document.querySelector("iframe[name='sentencesframe']");
-    if (iframe.dataset.contentLoaded == "false") {
-      iframe.setAttribute("src", url);
-    }
-    deactivateAllTabs();
-    iframe.dataset.contentLoaded = "true";
-    iframe.classList.add("dict-active");
-  });
 }
 
 function getDictInfo(dictURL) {
@@ -273,17 +273,18 @@ function getSentenceURL() {
   return `/term/sentences/${LANG_ID}/${t}`;
 }
 
-function deactivateAllTabs() {
+function activateTab(tab) {
   dictTabs.forEach(tab => {
     if (tab.btn.classList) tab.btn.classList.remove("dict-btn-active");
     if (tab.frame) tab.frame.classList.remove("dict-active");
   });
-}
 
-function activateTab(tab) {
   const iFrame = tab.frame;
   if (tab.btn.classList) tab.btn.classList.add("dict-btn-active");
-  if (iFrame) iFrame.classList.add("dict-active");
+  if (iFrame) {
+    iFrame.classList.add("dict-active");
+    iFrame.dataset.contentLoaded = "true";
+  }
 }
 
 function createImg(src, className) {
@@ -297,13 +298,6 @@ function createImg(src, className) {
 
 function load_dict_iframe(dictID, iframe) {
   const text = TERM_FORM_CONTAINER.querySelector("#text").value;
-
-  if (dictID == -1) {
-    // TODO handle_image_lookup_separately: don't mix term lookups with image lookups.
-    do_image_lookup(text, iframe);
-    return;
-  }
-
   const dicturl = TERM_DICTS[dictID];
   const is_bing = (dicturl.indexOf('www.bing.com') != -1);
 
@@ -354,12 +348,12 @@ function get_lookup_url(dicturl, term) {
   return ret;
 }
 
-function do_image_lookup(text, iframe) {
+function do_image_lookup(iframe) {
+  const text = TERM_FORM_CONTAINER.querySelector("#text").value;
   if (LANG_ID == null || LANG_ID == '' || parseInt(LANG_ID) == 0 || text == null || text == '') {
     alert('Please select a language and enter the term.');
     return;
   }
-
   let use_text = text;
 
   // If there is a single parent, use that as the basis of the lookup.
@@ -370,7 +364,9 @@ function do_image_lookup(text, iframe) {
   const raw_bing_url = 'https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle';
   const binghash = raw_bing_url.replace('https://www.bing.com/images/search?', '');
   const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
+
   iframe.setAttribute("src", url);
+
   return;
 }
 
