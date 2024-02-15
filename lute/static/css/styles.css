@@ -1139,11 +1139,6 @@ div.help-text {
     width: 100%;
 }
 
-.term-element-box {
-    display: flex;
-    gap: 0.5rem;
-}
-
 #term #languageSel {
     display: flex;
     justify-content: space-between;
@@ -1183,12 +1178,10 @@ input[type="checkbox"][disabled] + label {
 
 #term-button-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-}
-
-#term-button-container .term-element-box {
     gap: 0.2rem;
+    margin-top: 0.6rem;
 }
 
 .zoomableTermImage {
@@ -1267,6 +1260,12 @@ input[type="checkbox"][disabled] + label {
 
 .dict-btn:not(#dict-image-btn) {
     width: 100%;
+}
+
+#dicttabsstatic {
+    display: flex;
+    margin-left: 1rem;
+    /* justify-content: end; */
 }
 
 /* after element is for hiding text at the edges */
@@ -1358,6 +1357,12 @@ input[type="checkbox"][disabled] + label {
     border: 1px solid #aaceea;
     border-bottom: none;
     border-right: none;
+}
+
+#dicttabsstatic .dict-btn.dict-sentences-btn {
+    width: 6rem;
+    border: 1px solid #85c0ee;
+    border-bottom: none;
 }
 
 .dict-btn:not(#dict-image-btn):not(.dict-btn-select):last-of-type {

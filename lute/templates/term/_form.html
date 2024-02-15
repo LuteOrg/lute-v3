@@ -52,13 +52,10 @@
       <div>{{ form.termtagslist(class="form-control") }}</div>
 
       <div id="term-button-container">
-        <a href="">Sentences</a>
-        <div class="term-element-box">
           {% if term.id %}
           <button id="delete" type="button" class="btn" onclick="deleteTerm()">Delete</button>
           {% endif %}
           <button id="submit" type="submit" class="btn btn-primary">Save</button>
-        </div>
       </div>
     </div>
   </form>
