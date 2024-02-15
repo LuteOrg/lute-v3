@@ -1,22 +1,67 @@
 "use strict";
 
+let dictTabs = [];
 
-function createTabBtn(label, dictID, external, faviconURL=null) {
-  const btn = document.createElement("button");
-  btn.classList.add("dict-btn");
-  if (label != "") {
-    btn.textContent = label;
-    btn.setAttribute("title", label);
+class DictTab {
+  constructor(dict, frameName, frameOnly=false) {
+    const dictInfo = dict ? getDictInfo(dict) : null;
+
+    this.dictID = dictInfo?.id;
+
+    this.frame = this.createIFrame(frameName);
+    
+    if (!frameOnly) {
+      this.btn = document.createElement("button");
+
+      this.isExternal = dictInfo?.isExternal;
+      this.label = dictInfo?.label;
+
+      if (this.label != "") {
+        this.btn.textContent = this.label;
+        this.btn.setAttribute("title", this.label);
+      }
+
+      if (dictInfo?.faviconURL) {
+        this.btn.prepend(createImg(dictInfo?.faviconURL, "dict-btn-fav-img"));
+      }
+
+      this.btn.classList.add("dict-btn");
+      this.btn.dataset.dictId = this.dictID;
+      this.btn.dataset.dictExternal = this.isExternal ? "true" : "false";
+
+      if (this.isExternal) {
+        this.btn.appendChild(createImg("", "dict-btn-external-img"));
+      }
+
+      this.btn.onclick = this.clickCallback.bind(this);
+    }
   }
-  btn.dataset.dictId = dictID;
-  btn.dataset.dictExternal = external ? "true" : "false";
-  if (faviconURL)
-    btn.prepend(createImg(faviconURL, "dict-btn-fav-img"));
-  if (external)
-    btn.appendChild(createImg("", "dict-btn-external-img"));
-  return btn;
-}
 
+  clickCallback() {
+    if (this.isExternal) {
+      load_dict_popup(this.dictID);
+      return;
+    }
+    if (this.frame.dataset.contentLoaded == "false") {
+      load_dict_iframe(this.dictID, this.frame);
+    }
+
+    this.frame.dataset.contentLoaded = "true";
+    deactivateAllTabs();
+    activateTab(this);
+  }
+
+  createIFrame(name) {
+    const f = document.createElement("iframe");
+    f.name = name;
+    f.src = "about:blank";
+    f.classList.add("dictframe");
+    f.dataset.contentLoaded = "false";
+
+    return f;
+  }
+
+}
 
 /**
  * Create dictionary tabs, and a listing for any extra dicts.
@@ -34,33 +79,17 @@ function createDictTabs(tab_count) {
     TERM_DICTS.push(`http://b${i}.com?###`);
   }
 
-  const dictTabButtons = new Map();
   const dictTabsContainer = document.getElementById("dicttabs");
   const dictTabsLayoutContainer = document.getElementById("dicttabslayout");
   const iFramesContainer = document.getElementById("dictframes");
 
-  let createIFrame = function(name) {
-    const f = document.createElement("iframe");
-    f.name = name;
-    f.src = "about:blank";
-    f.classList.add("dictframe");
-    f.dataset.contentLoaded = "false";
-    iFramesContainer.appendChild(f);
-    return f;
-  }
-
   const all_dict_buttons = [];
   TERM_DICTS.forEach((dict, index) => {
-    const dictInfo = getDictInfo(dict);
-    const tabBtn = createTabBtn(
-      dictInfo.label,
-      index, 
-      dictInfo.isExternal, 
-      dictInfo.faviconURL);
-    let iFrame = dictInfo.isExternal ? null : createIFrame(`dict${index}`);
-    dictTabButtons.set(tabBtn, iFrame);
+    const tab = new DictTab(dict,`dict${index}`);
 
-    all_dict_buttons.push(tabBtn);
+    dictTabs.push(tab);
+    all_dict_buttons.push(tab.btn);
+    iFramesContainer.appendChild(tab.frame);
   });
 
   const n = Math.max(0, tab_count);
@@ -78,7 +107,7 @@ function createDictTabs(tab_count) {
   dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${grid_column_count}, minmax(2rem, 8rem))`;
 
   // console.log(TABBED_BUTTONS);
-  for (let b of TABBED_BUTTONS) {
+  for (const b of TABBED_BUTTONS) {
     // console.log(typeof b);
     // console.log(b);
     dictTabsLayoutContainer.appendChild(b);
@@ -96,7 +125,7 @@ function createDictTabs(tab_count) {
     const list_div = document.createElement("div");
     list_div.setAttribute("id", "dict-list-container");
     list_div.classList.add("dict-list-hide");
-    for (let b of LISTED_BUTTONS) {
+    for (const b of LISTED_BUTTONS) {
       list_div.appendChild(b);
     }
 
@@ -127,67 +156,32 @@ function createDictTabs(tab_count) {
   }
   
   // Set first embedded frame as active.
-  const tabsArray = Array.from(dictTabButtons.keys());
-  const active_tab = tabsArray.find(tab => tab.dataset.dictExternal == "false");
+  const active_tab = dictTabs.find(tab => !tab.isExternal);
   if (active_tab) {
-      active_tab.classList.add("dict-btn-active");
-      const active_frame = dictTabButtons.get(active_tab);
+      active_tab.btn.classList.add("dict-btn-active");
+      const active_frame = active_tab.frame;
       active_frame.dataset.contentLoaded = "true";
       active_frame.classList.add("dict-active");
   }
 
   // Image button and frame.
-  const imageBtn = createTabBtn("", -1, false);
-  dictTabsContainer.appendChild(imageBtn);
-  imageBtn.setAttribute("id", "dict-image-btn");
-  imageBtn.setAttribute("title", "Look up images for the term");
-  const imageFrame = createIFrame("imageframe");
-  dictTabButtons.set(imageBtn, imageFrame);
+  const imageTab = new DictTab(null, "imageframe");
+  dictTabsContainer.appendChild(imageTab.btn);
+  imageTab.btn.setAttribute("id", "dict-image-btn");
+  imageTab.btn.setAttribute("title", "Look up images for the term");
+  iFramesContainer.appendChild(imageTab.frame);
+  dictTabs.push(imageTab);
 
   // Sentences frame.
-  const sentencesFrame = createIFrame("sentencesframe");
-  dictTabButtons.set("sentencesTab", sentencesFrame);
+  const sentencesTab = new DictTab(null, "sentencesframe", true);
+  iFramesContainer.appendChild(sentencesTab.frame);
 
-  // using onevent property to update the event listener later (formframes)
-  dictTabsContainer.onclick = function(e) {
-    const clickedTab = e.target.closest(".dict-btn");
-    if (clickedTab)
-      tabsClick(clickedTab, dictTabButtons);
-  };
-
-  return dictTabButtons;
-}
-
-function tabsClick(clickedTab, dictTabButtons) {
-  const dictID = clickedTab.dataset.dictId;
-
-  if (clickedTab.dataset.dictExternal == "true") {
-    load_dict_popup(dictID);
-    return;
-  }
-
-  // This currently throws for the cloned button at the
-  // top of the LISTED_BUTTONS, because that clone is _not_
-  // the same as the original button, and so is not in the
-  // dictTabButtons map.
-  //
-  // TODO fix this: if this is a cloned clickedTab, find the
-  // real source button, and use that.  This could be avoided
-  // if the source button has an iframe key, and the frame is
-  // loaded using that.
-  const iFrame = dictTabButtons.get(clickedTab);
-  if (iFrame.dataset.contentLoaded == "false") {
-    load_dict_iframe(dictID, iFrame);
-  }
-  iFrame.dataset.contentLoaded = "true";
-  activateTab(clickedTab, dictTabButtons);
+  return dictTabs;
 }
 
 
-function loadDictionaries(dictTabButtons) {
-  dictTabButtons.forEach((iframe, btn) => {
-    if (iframe) iframe.dataset.contentLoaded = "false";
-  });
+function loadDictionaries() {
+  dictTabs.forEach(tab => tab.frame.dataset.contentLoaded = "false");
   const dictContainer = document.querySelector(".dictcontainer");
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
@@ -202,12 +196,14 @@ function loadDictionaries(dictTabButtons) {
   }
   else if (activeFrame.getAttribute("name") == "sentencesframe") {
     activeFrame.setAttribute("src", getSentenceURL());
-    activateTab("sentencesTab", dictTabButtons);
+    deactivateAllTabs();
+    activeFrame.classList.add("dict-active");
+    // activateTab("sentencesTab", dictTabs);
   }
   activeFrame.dataset.contentLoaded = "true";
 }
 
-function addSentenceBtnEvent(dictTabButtons) {
+function addSentenceBtnEvent() {
   const b = TERM_FORM_CONTAINER.querySelector("#term-button-container > a");
   b.addEventListener("click", (e) => {
     e.preventDefault();
@@ -215,11 +211,12 @@ function addSentenceBtnEvent(dictTabButtons) {
     if (url == null)
       return;
 
-    const iframe = dictTabButtons.get("sentencesTab");
+    // const iframe = dictTabs.get("sentencesTab");
+    const iframe = document.querySelector("iframe[name='sentencesframe']");
     if (iframe.dataset.contentLoaded == "false") {
       iframe.setAttribute("src", url);
     }
-    activateTab("sentencesTab", dictTabButtons);
+    deactivateAllTabs();
     iframe.dataset.contentLoaded = "true";
     iframe.classList.add("dict-active");
   });
@@ -257,6 +254,7 @@ function getDictInfo(dictURL) {
     label: _getLabel(domain, cleanURL),
     isExternal: (dictURL.charAt(0) == '*') ? true : false,
     faviconURL: _getFavicon(domain),
+    id: TERM_DICTS.indexOf(dictURL),
   };
 }
 
@@ -272,17 +270,18 @@ function getSentenceURL() {
   return `/term/sentences/${LANG_ID}/${t}`;
 }
 
-function activateTab(tab, allTabs) {
-  allTabs.forEach((iframe, btn) => {
-    if (btn.classList) btn.classList.remove("dict-btn-active");
-    if (iframe) iframe.classList.remove("dict-active");
+function deactivateAllTabs() {
+  dictTabs.forEach(tab => {
+    if (tab.btn.classList) tab.btn.classList.remove("dict-btn-active");
+    if (tab.frame) tab.frame.classList.remove("dict-active");
   });
-  
-  const iFrame = allTabs.get(tab);
-  if (tab.classList) tab.classList.add("dict-btn-active");
-  if (iFrame) iFrame.classList.add("dict-active");
 }
 
+function activateTab(tab) {
+  const iFrame = tab.frame;
+  if (tab.btn.classList) tab.btn.classList.add("dict-btn-active");
+  if (iFrame) iFrame.classList.add("dict-active");
+}
 
 function createImg(src, className) {
   const img = document.createElement("img");

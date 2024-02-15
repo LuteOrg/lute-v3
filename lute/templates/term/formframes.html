@@ -20,7 +20,7 @@
   </div>
 </div>
 
-<script>let dictTabButtons;</script>
+<!-- <script>let dictTabButtons;</script> -->
 
 {% if term.language_id is none %}
 
@@ -41,12 +41,13 @@
           LANG_ID != 0 && LANG_ID != langid) {
             
         // delete all tabs and frames if they exist
-        if (dictTabButtons) {
-          const tabs = document.querySelectorAll(".dict-btn");
-          const frames = document.querySelectorAll(".dictframe")
-          tabs.forEach(item => item.remove())
-          frames.forEach(item => item.remove())
-        }
+        // console.log(dictTabs);
+        // if (dictTabs) {
+        //   const tabs = document.querySelectorAll(".dict-btn");
+        //   const frames = document.querySelectorAll(".dictframe")
+        //   tabs.forEach(item => item.remove())
+        //   frames.forEach(item => item.remove())
+        // }
 
         TERM_DICTS = ALL_DICTS[LANG_ID].term;
         // TODO fix: this code smells bad.
@@ -55,18 +56,24 @@
         // across various files, and I feel there is something wrong with
         // the design that requires the separate calls to loadDictionaries
         // and addSentenceBtnEvent.
-        dictTabButtons = createDictTabs(5);
-        loadDictionaries(dictTabButtons);
-        addSentenceBtnEvent(dictTabButtons);
+
+        if (dictTabs.length === 0) {
+          dictTabs = createDictTabs(5);
+          addSentenceBtnEvent();
+        } else {
+          deactivateAllTabs();
+        }
+
+        loadDictionaries(dictTabs);
 
         // update the event with new dictionaries
-        if (LANG_ID != langid) {
-          dictTabsContainer.onclick = function(e) {
-            const clickedTab = e.target.closest(".dict-btn");
-            if (clickedTab)
-              tabsClick(e, dictTabButtons);
-          };
-        }
+        // if (LANG_ID != langid) {
+        //   dictTabsContainer.onclick = function(e) {
+        //     const clickedTab = e.target.closest(".dict-btn");
+        //     if (clickedTab)
+        //       tabsClick(e, dictTabButtons);
+        //   };
+        // }
 
         term = termField.value;
         langid = LANG_ID;
@@ -80,9 +87,9 @@
   <script>
     LANG_ID = $('#language_id').val();
     TERM_DICTS = ALL_DICTS[LANG_ID].term;
-    dictTabButtons = createDictTabs(5);
-    loadDictionaries(dictTabButtons);
-    addSentenceBtnEvent(dictTabButtons);
+    dictTabs = createDictTabs(5);
+    loadDictionaries();
+    addSentenceBtnEvent(dictTabs);
   </script>
 
 {% endif %}
