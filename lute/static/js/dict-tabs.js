@@ -112,7 +112,7 @@ function createDictTabs(tab_count) {
     // console.log(b);
     dictTabsLayoutContainer.appendChild(b);
   }
-
+  // !CLICKING MENU ITEM DOES NOT UPDATE MAIN BUTTON LABEL AND IMAGES (FAVICON AND EXTERNAL)
   if (LISTED_BUTTONS.length > 0) {
     const first = LISTED_BUTTONS[0];
     const show_clone = first.cloneNode(true);  // deep copy.
@@ -126,12 +126,15 @@ function createDictTabs(tab_count) {
     list_div.setAttribute("id", "dict-list-container");
     list_div.classList.add("dict-list-hide");
     for (const b of LISTED_BUTTONS) {
+      b.classList.remove("dict-btn");
+      b.classList.add("dict-menu-item");
       list_div.appendChild(b);
     }
 
     const menu_div = document.createElement("div");
     menu_div.setAttribute("id", "dict-menu-container");
     menu_div.appendChild(list_div); // add select AFTER button
+    menu_div.appendChild(show_clone);
     dictTabsLayoutContainer.appendChild(menu_div);
 
     // EVENTS

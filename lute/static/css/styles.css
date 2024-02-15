@@ -1402,6 +1402,7 @@ input[type="checkbox"][disabled] + label {
 
     position: absolute;
     background-color: aliceblue;
+    min-width: 100%;
     top: 100%;
     left: 0;
     border-bottom-left-radius: 3px;
@@ -1432,6 +1433,9 @@ input[type="checkbox"][disabled] + label {
     align-items: center;
     gap: 0.3rem;
     cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
 }
 
 .dict-menu-item:hover {
