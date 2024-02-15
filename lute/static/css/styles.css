@@ -1139,11 +1139,6 @@ div.help-text {
     width: 100%;
 }
 
-.term-element-box {
-    display: flex;
-    gap: 0.5rem;
-}
-
 #term #languageSel {
     display: flex;
     justify-content: space-between;
@@ -1183,12 +1178,10 @@ input[type="checkbox"][disabled] + label {
 
 #term-button-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-}
-
-#term-button-container .term-element-box {
     gap: 0.2rem;
+    margin-top: 0.6rem;
 }
 
 .zoomableTermImage {
@@ -1269,8 +1262,15 @@ input[type="checkbox"][disabled] + label {
     width: 100%;
 }
 
+#dicttabsstatic {
+    display: flex;
+    margin-left: 1rem;
+    /* justify-content: end; */
+}
+
 /* after element is for hiding text at the edges */
-#dicttabslayout .dict-btn::after {
+#dicttabslayout .dict-btn::after,
+#dicttabslayout .dict-menu-item::after {
     content: "";
     position: absolute;
     width: 100%;
@@ -1281,11 +1281,16 @@ input[type="checkbox"][disabled] + label {
     box-sizing: border-box;
 }
 
+#dicttabslayout .dict-menu-item::after {
+    border-color: aliceblue;
+}
+
 #dicttabslayout .dict-btn-active::after {
     border-color: #68ace0;
 }
 
 #dicttabslayout .dict-btn[data-dict-external="true"]::after,
+#dicttabslayout .dict-menu-item[data-dict-external="true"]::after,
 #dicttabslayout .dict-btn-select[data-dict-external="false"]::after {
     border-right-width: 1.5rem;
 }
@@ -1360,6 +1365,12 @@ input[type="checkbox"][disabled] + label {
     border-right: none;
 }
 
+#dicttabsstatic .dict-btn.dict-sentences-btn {
+    width: 6rem;
+    border: 1px solid #85c0ee;
+    border-bottom: none;
+}
+
 .dict-btn:not(#dict-image-btn):not(.dict-btn-select):last-of-type {
     border-right: 1px solid #aaceea;
 }
@@ -1424,6 +1435,7 @@ input[type="checkbox"][disabled] + label {
 
     position: absolute;
     background-color: aliceblue;
+    min-width: 100%;
     top: 100%;
     left: 0;
     border-bottom-left-radius: 3px;
@@ -1454,11 +1466,19 @@ input[type="checkbox"][disabled] + label {
     align-items: center;
     gap: 0.3rem;
     cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    position: relative;
 }
 
 .dict-menu-item:hover {
     background-color: #68ace0;
     color: #fff;
+}
+
+#dict-menu-container .dict-menu-item:hover::after {
+    border-color: #68ace0;
 }
 
 /* STATUS RADIO */
