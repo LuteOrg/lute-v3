@@ -1001,7 +1001,7 @@ textarea {
 
 textarea {
     width: 100%;
-    resize: vertical;
+    resize: both;
 }
 
 /* focus on fields makes border same as tags */
