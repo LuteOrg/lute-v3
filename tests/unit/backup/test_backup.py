@@ -4,6 +4,7 @@ DB Backup tests.
 
 import os
 from datetime import datetime
+from unittest.mock import Mock, patch
 import pytest
 
 from lute.backup.service import (
@@ -11,6 +12,8 @@ from lute.backup.service import (
     BackupException,
     should_run_auto_backup,
     backup_warning,
+    DatabaseBackupFile,
+    list_backups,
 )
 from lute.models.setting import BackupSettings
 
@@ -52,6 +55,32 @@ def fixture_backup_settings(app_context, bkp_dir):
     ret.backup_dir = bkp_dir
     ret.backup_enabled = True
     yield ret
+
+
+def _mock_backup_file(directory, name, time, size):
+    file_mock = Mock()
+    file_mock.name = name
+    file_mock.path = os.path.join(directory, name)
+    file_mock.size = size
+    with open(file_mock.path, "wb") as f:
+        f.seek(file_mock.size - 1)
+        f.write(b"\0")
+    os.utime(file_mock.path, (time, time))
+    return file_mock
+
+
+@pytest.fixture(name="auto_backup_file")
+def fixture_auto_backup_file(bkp_dir):
+    yield _mock_backup_file(
+        bkp_dir, "lute_backup_2024-01-01-000000.db.gz", 1704092400, 567890
+    )
+
+
+@pytest.fixture(name="manual_backup_file")
+def fixture_manual_backup_file(bkp_dir):
+    yield _mock_backup_file(
+        bkp_dir, "manual_lute_backup_2024-02-01-000000.db.gz", 1706770800, 123450
+    )
 
 
 def test_backup_writes_file_to_output_dir(testconfig, bkp_dir, backup_settings):
@@ -150,3 +179,81 @@ def test_warn_if_last_backup_never_happened_or_is_old(backup_settings):
 
     backup_settings.backup_warn = False
     assert backup_warning(backup_settings) == ""
+
+
+def test_database_backup_file_on_nonexistent_path(bkp_dir):
+    file = os.path.join(bkp_dir, "lute_backup_nonexistent.db.gz")
+    with pytest.raises(BackupException) as excinfo:
+        DatabaseBackupFile(file)
+    assert str(excinfo.value) == f"No backup file at {file}."
+
+
+def test_database_backup_file_with_non_lute_backup(bkp_dir):
+    file = os.path.join(bkp_dir, "some_other_file.db.gz")
+    with open(file, "wb") as f:
+        f.write(b"\0")
+    with pytest.raises(BackupException) as excinfo:
+        DatabaseBackupFile(file)
+    assert str(excinfo.value) == f"Not a valid lute database backup at {file}."
+
+
+def test_database_backup_file_with_auto_backup_returns_success(auto_backup_file):
+    dbf = DatabaseBackupFile(auto_backup_file.path)
+
+    assert auto_backup_file.name == dbf.name
+    assert auto_backup_file.path == dbf.filepath
+    assert auto_backup_file.size == dbf.size_bytes
+    assert dbf.size == "568 KB"
+    assert dbf.last_modified == datetime(2024, 1, 1, 0, 0, 0)
+
+
+def test_database_backup_file_for_auto_is_not_manual(auto_backup_file):
+    dbf = DatabaseBackupFile(auto_backup_file.path)
+    assert not dbf.is_manual
+
+
+def test_database_backup_file_for_manual_is_not_manual(manual_backup_file):
+    dbf = DatabaseBackupFile(manual_backup_file.path)
+    assert dbf.is_manual
+
+
+def test_database_backup_file_size_formatting(auto_backup_file):
+    dbf = DatabaseBackupFile(auto_backup_file.path)
+
+    with patch("lute.backup.service.DatabaseBackupFile.size_bytes", 11234567890):
+        assert dbf.size == "11 GB"
+    with patch("lute.backup.service.DatabaseBackupFile.size_bytes", 1123456789):
+        assert dbf.size == "1 GB"
+    with patch("lute.backup.service.DatabaseBackupFile.size_bytes", 19876543):
+        assert dbf.size == "20 MB"
+    with patch("lute.backup.service.DatabaseBackupFile.size_bytes", 7654321):
+        assert dbf.size == "8 MB"
+    with patch("lute.backup.service.DatabaseBackupFile.size_bytes", 1024):
+        assert dbf.size == "1 KB"
+    with patch("lute.backup.service.DatabaseBackupFile.size_bytes", 1001):
+        assert dbf.size == "1 KB"
+    with patch("lute.backup.service.DatabaseBackupFile.size_bytes", 944):
+        assert dbf.size == "944 bytes"
+
+
+def test_list_backups_returns_both(bkp_dir, auto_backup_file, manual_backup_file):
+    backups = list_backups(bkp_dir)
+    assert len(backups) == 2
+    assert all(isinstance(backup, DatabaseBackupFile) for backup in backups)
+    assert any(not backup.is_manual for backup in backups)
+    assert any(backup.is_manual for backup in backups)
+
+
+def test_backup_listing_sorts_by_modified(
+    bkp_dir, auto_backup_file, manual_backup_file
+):
+    backups = list_backups(bkp_dir)
+    assert len(backups) == 2
+
+    backups.sort()
+    assert backups[0].last_modified == datetime(2024, 1, 1, 0, 0, 0)
+    assert backups[1].last_modified == datetime(2024, 2, 1, 0, 0, 0)
+
+    backups.sort(reverse=True)
+    assert backups[0].last_modified == datetime(2024, 2, 1, 0, 0, 0)
+    assert backups[1].last_modified == datetime(2024, 1, 1, 0, 0, 0)
