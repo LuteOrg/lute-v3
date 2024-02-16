@@ -71,6 +71,7 @@ class DictTab {
 
 }
 
+
 /**
  * Create dictionary tabs, and a listing for any extra dicts.
  */
@@ -155,40 +156,37 @@ function createDictTabs(tab_count) {
       active_tab.btn.classList.add("dict-btn-active");
       active_tab.frame.classList.add("dict-active");
   }
-  
-  // Sentences frame.
-  const sentencesTab = new DictTab(null, "sentencesframe");
-  dictTabsStaticContainer.appendChild(sentencesTab.btn);
-  // sentencesTab.btn.setAttribute("id", "sentences-btn");
-  // sentencesTab.btn.setAttribute("title", "See term usage");
-  sentencesTab.btn.textContent = "Sentences";
-  sentencesTab.btn.classList.add("dict-sentences-btn");
-  iFramesContainer.appendChild(sentencesTab.frame);
-  sentencesTab.btn.addEventListener("click", function () {
-    if (sentencesTab.frame.dataset.contentLoaded == "false") {
-      loadSentencesFrame(sentencesTab.frame);
-    }
-    activateTab(sentencesTab);
-  });
 
-  dictTabs.push(sentencesTab);
+  let _make_button = function(
+    btn_id, framename,
+    btn_textContent, btn_title, btn_className,
+    clickHandler
+  ) {
+    const tab = new DictTab(null, framename);
+    dictTabsStaticContainer.appendChild(tab.btn);
+    tab.btn.setAttribute("id", btn_id);
+    tab.btn.setAttribute("title", btn_title);
+    tab.btn.textContent = btn_textContent;
+    tab.btn.classList.add(btn_className);
+    iFramesContainer.appendChild(tab.frame);
+    tab.btn.addEventListener("click", function () {
+      if (tab.frame.dataset.contentLoaded == "false") {
+        clickHandler(tab.frame);
+      }
+      activateTab(tab);
+    });
+    return tab;
+  }
 
-  // Image button and frame.
-  const imageTab = new DictTab(null, "imageframe");
-  dictTabsStaticContainer.appendChild(imageTab.btn);
-  imageTab.btn.setAttribute("id", "dict-image-btn");
-  imageTab.btn.setAttribute("title", "Look up images for the term");
-  imageTab.btn.textContent = null;
-  imageTab.btn.classList.add("dict-image-btn");
-  iFramesContainer.appendChild(imageTab.frame);
-  imageTab.btn.addEventListener("click", function () {
-    if (imageTab.frame.dataset.contentLoaded == "false") {
-      do_image_lookup(imageTab.frame);
-    }
-    activateTab(imageTab);
-  });
+  const sentence_button = _make_button(
+    "sentences-btn", "sentencesframe",
+    "Sentences", "See term usage", "dict-sentences-btn", loadSentencesFrame);
+  dictTabs.push(sentence_button);
 
-  dictTabs.push(imageTab);
+  const image_button = _make_button(
+    "dict-image-btn", "imageframe",
+    null, "Lookup images", "dict-image-btn", do_image_lookup);
+  dictTabs.push(image_button);
 
   return dictTabs;
 }
