@@ -208,8 +208,10 @@
     scrollYBeforeReload = window.scrollY;
   });
 
-  focusChk.addEventListener("click", () => {
+  focusChk.addEventListener("change", () => {
+    const book_id = $('#book_id').val();
     readPaneContainer.classList.toggle("focus-mode-active");
+    localStorage.setItem(`focusMode-book${book_id}`, `${focusChk.checked}`)
   })
 
   $(document).ready(function () {
@@ -221,6 +223,13 @@
 
     if (mediaTablet.matches) {
       tooltipPos = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
+    }
+
+    const book_id = $('#book_id').val();
+    const focusVal = localStorage.getItem(`focusMode-book${book_id}`);
+    if (focusVal === "true") {
+      readPaneContainer.classList.add("focus-mode-active");
+      focusChk.checked = true;
     }
     
     if (have_audio_file()) {
