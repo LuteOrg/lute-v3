@@ -86,35 +86,31 @@ function createDictTabs(tab_count) {
   const dictTabsStaticContainer = document.getElementById("dicttabsstatic");
   const iFramesContainer = document.getElementById("dictframes");
 
-  const all_dict_buttons = [];
+  const allDictButtons = [];
   TERM_DICTS.forEach((dict, index) => {
     const tab = new DictTab(dict,`dict${index}`);
 
     dictTabs.push(tab);
-    all_dict_buttons.push(tab.btn);
+    allDictButtons.push(tab.btn);
     iFramesContainer.appendChild(tab.frame);
   });
 
   const n = Math.max(0, tab_count);
-  let TABBED_BUTTONS = all_dict_buttons.slice(0, n);
-  let LISTED_BUTTONS = all_dict_buttons.slice(n);
+  let TABBED_BUTTONS = allDictButtons.slice(0, n);
+  let LISTED_BUTTONS = allDictButtons.slice(n);
 
   // If the LISTED_BUTTONS only contains one item, just add it as
   // a tab, as it will take up the same space.
   if (LISTED_BUTTONS.length == 1) {
-    TABBED_BUTTONS = all_dict_buttons;
+    TABBED_BUTTONS = allDictButtons;
     LISTED_BUTTONS = [];
   }
 
   const grid_column_count = TABBED_BUTTONS.length + (LISTED_BUTTONS.length > 0 ? 1 : 0);
   dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${grid_column_count}, minmax(2rem, 8rem))`;
 
-  // console.log(TABBED_BUTTONS);
-  for (const b of TABBED_BUTTONS) {
-    // console.log(typeof b);
-    // console.log(b);
-    dictTabsLayoutContainer.appendChild(b);
-  }
+  TABBED_BUTTONS.forEach(btn => dictTabsLayoutContainer.appendChild(btn));
+  
   // !CLICKING MENU ITEM DOES NOT UPDATE MAIN BUTTON LABEL AND IMAGES (FAVICON AND EXTERNAL)
   // !CLICKING show_clone DOESN'T DO ANYTHING!
   // !after each click to menu item, show_clone button click event needs to change, or the button needs to be replaced altogether. event delegation?
