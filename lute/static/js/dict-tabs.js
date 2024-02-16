@@ -212,8 +212,10 @@ function loadDictionaries() {
 
 function activateTab(tab) {
   dictTabs.forEach(tab => {
-    if (tab.btn.classList) tab.btn.classList.remove("dict-btn-active");
-    if (tab.frame) tab.frame.classList.remove("dict-active");
+    if (tab.btn.classList)
+      tab.btn.classList.remove("dict-btn-active");
+    if (tab.frame)
+      tab.frame.classList.remove("dict-active");
   });
 
   if (tab.btn.classList)
