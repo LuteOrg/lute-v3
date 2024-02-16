@@ -8,7 +8,7 @@ import shutil
 import gzip
 from datetime import datetime
 import time
-from typing import List
+from typing import List, Union
 
 from lute.db import db
 from lute.models.setting import SystemSetting
@@ -27,7 +27,7 @@ class DatabaseBackupFile:
     A representation of a lute backup file to hold metadata attributes.
     """
 
-    def __init__(self, filepath: os.PathLike):
+    def __init__(self, filepath: Union[str, os.PathLike]):
         if not os.path.exists(filepath):
             raise BackupException(f"No backup file at {filepath}.")
 
