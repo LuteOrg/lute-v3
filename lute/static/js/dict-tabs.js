@@ -86,11 +86,12 @@ let _make_standalone_tab = function(
   clickHandler
 ) {
   const tab = new DictTab(null, framename);
-  tab.btn.setAttribute("id", btn_id);
-  tab.btn.setAttribute("title", btn_title);
-  tab.btn.textContent = btn_textContent;
-  tab.btn.classList.add(btn_className);
-  tab.btn.addEventListener("click", function () {
+  const b = tab.btn;
+  b.setAttribute("id", btn_id);
+  b.setAttribute("title", btn_title);
+  b.textContent = btn_textContent;
+  b.classList.add(btn_className);
+  b.addEventListener("click", function () {
     if (tab.frame.dataset.contentLoaded == "false") {
       clickHandler(tab.frame);
     }
