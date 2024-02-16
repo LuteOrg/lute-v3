@@ -173,13 +173,11 @@ function createDictTabs(tab_count = 5) {
     iFramesContainer.appendChild(tab.frame);
   });
 
-  const n = Math.max(0, tab_count);
-  let buttons_in_tabs = dictTabs.slice(0, n);
-  let buttons_in_list = dictTabs.slice(n);
+  let buttons_in_tabs = dictTabs.slice(0, tab_count);
+  let buttons_in_list = dictTabs.slice(tab_count);
 
-  // If the buttons_in_list only contains one item, just add it as
-  // a tab, as it will take up the same space.
   if (buttons_in_list.length == 1) {
+    // Don't bother making a list with a single item.
     buttons_in_tabs = dictTabs;
     buttons_in_list = [];
   }
