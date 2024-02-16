@@ -162,6 +162,13 @@ function createDictTabs(tab_count) {
   sentencesTab.btn.textContent = "Sentences";
   sentencesTab.btn.classList.add("dict-sentences-btn");
   iFramesContainer.appendChild(sentencesTab.frame);
+  sentencesTab.btn.addEventListener("click", function () {
+    if (sentencesTab.frame.dataset.contentLoaded == "false") {
+      loadSentencesFrame(sentencesTab.frame);
+    }
+    activateTab(sentencesTab);
+  });
+
   dictTabs.push(sentencesTab);
 
   // Image button and frame.
@@ -170,15 +177,6 @@ function createDictTabs(tab_count) {
   imageTab.btn.setAttribute("title", "Look up images for the term");
   dictTabsStaticContainer.appendChild(imageTab.btn);
   iFramesContainer.appendChild(imageTab.frame);
-  dictTabs.push(imageTab);
-
-  sentencesTab.btn.addEventListener("click", function () {
-    if (sentencesTab.frame.dataset.contentLoaded == "false") {
-      loadSentencesFrame(sentencesTab.frame);
-    }
-    activateTab(sentencesTab);
-  });
-
   imageTab.btn.addEventListener("click", function () {
     if (imageTab.frame.dataset.contentLoaded == "false") {
       do_image_lookup(imageTab.frame);
@@ -186,6 +184,7 @@ function createDictTabs(tab_count) {
     activateTab(imageTab);
   });
 
+  dictTabs.push(imageTab);
 
   return dictTabs;
 }
