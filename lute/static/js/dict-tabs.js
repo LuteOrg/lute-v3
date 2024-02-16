@@ -189,8 +189,6 @@ function createDictTabs(tab_count) {
     iFramesContainer.appendChild(tab.frame);
     dictTabs.push(tab);
   }
-
-  return dictTabs;
 }
 
 
