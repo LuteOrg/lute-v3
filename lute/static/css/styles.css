@@ -461,6 +461,10 @@ span.hamburger {
     transition: background-color 0.2s
 }
 
+#focus-container label {
+    font-weight: bold;
+}
+
 #focus::after {
     content: "";
     display: block;
