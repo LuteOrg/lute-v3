@@ -66,7 +66,7 @@ class DatabaseBackupFile:
         if s >= 1e6:
             return f"{round(s * 1e-6)} MB"
         if s >= 1e3:
-            return f"{round(s * 1e-3)} kB"
+            return f"{round(s * 1e-3)} KB"
         return f"{s} bytes"
 
 
