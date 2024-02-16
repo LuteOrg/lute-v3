@@ -46,8 +46,18 @@ class DictTab {
     this.btn = document.createElement("button");
     this.btn.classList.add("dict-btn");
 
-    const dictInfo = dictURL ? getDictInfo(dictURL) : null;
-    this.dictID = dictInfo ? dictInfo.id : null;
+    // Some DictTabs aren't actually dicts, e.g. Sentence tab and
+    // Image button.  Perhaps there's a better class design ...
+    if (dictURL == null) {
+      return;
+    }
+
+    const dictInfo = getDictInfo(dictURL);
+    this.dictID = dictInfo.id;
+    if (this.dictID == -1) {
+      console.log(`Error: Dict url ${dictURL} not found (??)`);
+      return;
+    }
 
     if (this.dictID != null) {
       this.label = dictInfo.label;
