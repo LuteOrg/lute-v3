@@ -2,6 +2,44 @@
 
 let dictTabs = [];
 
+
+function getDictInfo(dictURL) {
+  const cleanURL = dictURL.split("*").splice(-1)[0];
+
+  let _getURLDomain = function(url) {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname;
+    } catch(err) {
+      return null;
+    }
+  };
+
+  let _getFavicon = function(domain) {
+    if (domain)
+      return `http://www.google.com/s2/favicons?domain=${domain}`;
+    return null;
+  };
+
+  let _getLabel = function(domain, url) {
+    if (domain)
+      return domain.split("www.").splice(-1)[0]
+    let label = url.slice(0, 10);
+    if (label.length < url.length)
+      label += '...';
+    return label;
+  }
+
+  const domain = _getURLDomain(cleanURL);
+  return {
+    label: _getLabel(domain, cleanURL),
+    isExternal: (dictURL.charAt(0) == '*') ? true : false,
+    faviconURL: _getFavicon(domain),
+    id: TERM_DICTS.indexOf(dictURL),
+  };
+}
+
+
 class DictTab {
   constructor(dict, frameName) {
     const dictInfo = dict ? getDictInfo(dict) : null;
@@ -234,41 +272,6 @@ function loadDictionaries() {
   activeFrame.dataset.contentLoaded = "true";
 }
 
-function getDictInfo(dictURL) {
-  const cleanURL = dictURL.split("*").splice(-1)[0];
-
-  let _getURLDomain = function(url) {
-    try {
-      const urlObj = new URL(url);
-      return urlObj.hostname;
-    } catch(err) {
-      return null;
-    }
-  };
-
-  let _getFavicon = function(domain) {
-    if (domain)
-      return `http://www.google.com/s2/favicons?domain=${domain}`;
-    return null;
-  };
-
-  let _getLabel = function(domain, url) {
-    if (domain)
-      return domain.split("www.").splice(-1)[0]
-    let label = url.slice(0, 10);
-    if (label.length < url.length)
-      label += '...';
-    return label;
-  }
-
-  const domain = _getURLDomain(cleanURL);
-  return {
-    label: _getLabel(domain, cleanURL),
-    isExternal: (dictURL.charAt(0) == '*') ? true : false,
-    faviconURL: _getFavicon(domain),
-    id: TERM_DICTS.indexOf(dictURL),
-  };
-}
 
 function getSentenceURL() {
   const txt = TERM_FORM_CONTAINER.querySelector("#text").value;
