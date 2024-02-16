@@ -230,14 +230,17 @@ class BackupSettings:
     @property
     def time_since_last_backup(self):
         """
-        Return the time since the last backup, or None if not set.
-        Eg. "3 days ago" or "40 seconds from now"
+        Return the time since the last backup. Returns None either if not set or
+        it is in the future.
+        Eg. "3 days ago"
         """
         t = self.last_backup_datetime
         if t is None:
             return None
 
         delta = int(time.time() - t)
+        if delta < 0:
+            return None
 
         thresholds = [
             ("week", 1 * 60 * 60 * 24 * 7),
@@ -257,9 +260,4 @@ class BackupSettings:
         else:
             message = f"{abs(delta)} seconds"
 
-        if delta >= 0:
-            message += " ago"
-        else:
-            message += " from now"
-
-        return message
+        return message + " ago"
