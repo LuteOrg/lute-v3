@@ -159,6 +159,8 @@ function createDictTabs(tab_count) {
   // Sentences frame.
   const sentencesTab = new DictTab(null, "sentencesframe");
   dictTabsStaticContainer.appendChild(sentencesTab.btn);
+  // sentencesTab.btn.setAttribute("id", "sentences-btn");
+  // sentencesTab.btn.setAttribute("title", "See term usage");
   sentencesTab.btn.textContent = "Sentences";
   sentencesTab.btn.classList.add("dict-sentences-btn");
   iFramesContainer.appendChild(sentencesTab.frame);
@@ -173,9 +175,11 @@ function createDictTabs(tab_count) {
 
   // Image button and frame.
   const imageTab = new DictTab(null, "imageframe");
+  dictTabsStaticContainer.appendChild(imageTab.btn);
   imageTab.btn.setAttribute("id", "dict-image-btn");
   imageTab.btn.setAttribute("title", "Look up images for the term");
-  dictTabsStaticContainer.appendChild(imageTab.btn);
+  imageTab.btn.textContent = null;
+  imageTab.btn.classList.add("dict-image-btn");
   iFramesContainer.appendChild(imageTab.frame);
   imageTab.btn.addEventListener("click", function () {
     if (imageTab.frame.dataset.contentLoaded == "false") {
