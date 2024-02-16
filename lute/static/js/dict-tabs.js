@@ -135,40 +135,37 @@ function createDictTabs(tab_count = 5) {
   const dictTabsStaticContainer = document.getElementById("dicttabsstatic");
   const iFramesContainer = document.getElementById("dictframes");
 
-  const allDictButtons = [];
   TERM_DICTS.forEach((dict, index) => {
     const tab = new DictTab(dict,`dict${index}`);
-
     dictTabs.push(tab);
-    allDictButtons.push(tab.btn);
     iFramesContainer.appendChild(tab.frame);
   });
 
   const n = Math.max(0, tab_count);
-  let buttons_in_tabs = allDictButtons.slice(0, n);
-  let buttons_in_list = allDictButtons.slice(n);
+  let buttons_in_tabs = dictTabs.slice(0, n);
+  let buttons_in_list = dictTabs.slice(n);
 
   // If the buttons_in_list only contains one item, just add it as
   // a tab, as it will take up the same space.
   if (buttons_in_list.length == 1) {
-    buttons_in_tabs = allDictButtons;
+    buttons_in_tabs = dictTabs;
     buttons_in_list = [];
   }
 
   const grid_column_count = buttons_in_tabs.length + (buttons_in_list.length > 0 ? 1 : 0);
   dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${grid_column_count}, minmax(2rem, 8rem))`;
 
-  buttons_in_tabs.forEach(btn => dictTabsLayoutContainer.appendChild(btn));
+  buttons_in_tabs.forEach(tab => dictTabsLayoutContainer.appendChild(tab.btn));
   
   if (buttons_in_list.length > 0) {
     // div containing all the buttons_in_list.
     const list_div = document.createElement("div");
     list_div.setAttribute("id", "dict-list-container");
     list_div.classList.add("dict-list-hide");
-    buttons_in_list.forEach(btn => {
-        btn.classList.remove("dict-btn");
-        btn.classList.add("dict-menu-item");
-        list_div.appendChild(btn);
+    buttons_in_list.forEach(tab => {
+        tab.btn.classList.remove("dict-btn");
+        tab.btn.classList.add("dict-menu-item");
+        list_div.appendChild(tab.btn);
       }
     );
 
