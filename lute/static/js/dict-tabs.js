@@ -171,8 +171,7 @@ function createDictTabs(tab_count = 5) {
 
     // Top level button to show/hide the list.
     const btn = document.createElement("button");
-    btn.classList.add("dict-btn");
-    btn.classList.add("dict-btn-select");
+    btn.classList.add("dict-btn", "dict-btn-select");
     btn.innerHTML = "&hellip; &#9660;"
     btn.setAttribute("title", "More dictionaries");
     btn.addEventListener("click", (e) => {
