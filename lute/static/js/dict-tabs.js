@@ -107,16 +107,6 @@ let _make_standalone_tab = function(
 function createDictTabs(tab_count) {
   if (TERM_DICTS.length <= 0) return;
 
-  // TEMP HACK
-  for (let i = 0; i < 5; i++) {
-    /*
-    TERM_DICTS.push(TERM_DICTS[0]);
-    TERM_DICTS.push(TERM_DICTS[1]);
-    */
-    TERM_DICTS.push(`http://a${i}.com?###`);
-    TERM_DICTS.push(`http://b${i}.com?###`);
-  }
-
   const dictTabsLayoutContainer = document.getElementById("dicttabslayout");
   const dictTabsStaticContainer = document.getElementById("dicttabsstatic");
   const iFramesContainer = document.getElementById("dictframes");
