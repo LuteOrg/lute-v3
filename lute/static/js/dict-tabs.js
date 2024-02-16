@@ -165,8 +165,6 @@ function createDictTabs(tab_count = 5) {
   const dev_hack_add_dicts = Array.from({ length: 8 }, (_, i) => `a${i}`);
   TERM_DICTS.push(...dev_hack_add_dicts);
 
-  const dictTabsLayoutContainer = document.getElementById("dicttabslayout");
-  const dictTabsStaticContainer = document.getElementById("dicttabsstatic");
   const iFramesContainer = document.getElementById("dictframes");
 
   TERM_DICTS.forEach((dict, index) => {
@@ -186,14 +184,14 @@ function createDictTabs(tab_count = 5) {
     buttons_in_list = [];
   }
 
+  const layout_container = document.getElementById("dicttabslayout");
   const grid_column_count = buttons_in_tabs.length + (buttons_in_list.length > 0 ? 1 : 0);
-  dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${grid_column_count}, minmax(2rem, 8rem))`;
+  layout_container.style.gridTemplateColumns = `repeat(${grid_column_count}, minmax(2rem, 8rem))`;
 
-  buttons_in_tabs.forEach(tab => dictTabsLayoutContainer.appendChild(tab.btn));
-  
+  buttons_in_tabs.forEach(tab => layout_container.appendChild(tab.btn));
   if (buttons_in_list.length > 0) {
     const m = _create_dict_dropdown_div(buttons_in_list);
-    dictTabsLayoutContainer.appendChild(m);
+    layout_container.appendChild(m);
   }
   
   // Set first embedded frame as active.
@@ -212,7 +210,7 @@ function createDictTabs(tab_count = 5) {
     null, "Lookup images", "dict-image-btn", do_image_lookup);
 
   for (let tab of Object.values([sentence_tab, image_tab])) {
-    dictTabsStaticContainer.appendChild(tab.btn);
+    document.getElementById("dicttabsstatic").appendChild(tab.btn);
     iFramesContainer.appendChild(tab.frame);
     dictTabs.push(tab);
   }
