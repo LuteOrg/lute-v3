@@ -41,8 +41,8 @@ function getDictInfo(dictURL) {
 
 
 class DictTab {
-  constructor(dict, frameName) {
-    const dictInfo = dict ? getDictInfo(dict) : null;
+  constructor(dictURL, frameName) {
+    const dictInfo = dictURL ? getDictInfo(dictURL) : null;
     this.dictID = dictInfo ? dictInfo.id : null;
 
     this.frame = this.createIFrame(frameName);
