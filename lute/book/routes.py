@@ -3,7 +3,7 @@
 """
 
 import os
-
+import json
 from flask import (
     Blueprint,
     request,
@@ -19,6 +19,7 @@ from lute.book.forms import NewBookForm, EditBookForm
 import lute.utils.formutils
 from lute.db import db
 
+from lute.models.language import Language
 from lute.models.book import Book as DBBook
 from lute.book.model import Book, Repository
 
@@ -83,6 +84,16 @@ def _book_from_url(url):
     return b
 
 
+def _language_is_rtl_map():
+    """
+    Return language-id to is_rtl map, to be used during book creation.
+    """
+    ret = {}
+    for lang in db.session.query(Language).all():
+        ret[lang.id] = lang.right_to_left
+    return ret
+
+
 @bp.route("/new", methods=["GET", "POST"])
 def new():
     "Create a new book, either from text or from a file."
@@ -114,6 +125,7 @@ def new():
         book=b,
         form=form,
         tags=repo.get_book_tags(),
+        rtl_map=json.dumps(_language_is_rtl_map()),
         show_language_selector=True,
     )
 
@@ -137,8 +149,13 @@ def edit(bookid):
         flash(f"{b.title} updated.")
         return redirect("/", 302)
 
+    lang = Language.find(b.language_id)
     return render_template(
-        "book/edit.html", book=b, form=form, tags=repo.get_book_tags()
+        "book/edit.html",
+        book=b,
+        title_direction="rtl" if lang.right_to_left else "ltr",
+        form=form,
+        tags=repo.get_book_tags(),
     )
 
 
