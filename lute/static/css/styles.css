@@ -472,21 +472,21 @@ span.hamburger {
     transition: transform 0.2s;
 }
 
-.focus-mode #focus::after {
+.focus-mode-active #focus::after {
     transform: translate(100%, 0);
     background-color: #7950f2;
 }
 
-.focus-mode #focus{
+.focus-mode-active #focus{
     background-color: #b197fc;
     border-color: #b197fc;
 }
 
-.focus-mode #read_pane_right {
+.focus-mode-active #read_pane_right {
     display: none;
 }
 
-.focus-mode #read_pane_left {
+.focus-mode-active #read_pane_left {
     margin: 0 auto;
 }
 
