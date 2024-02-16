@@ -72,6 +72,29 @@ class DictTab {
 }
 
 
+/** Factory method for sentence, image buttons. */
+let _make_standalone_tab_button = function(
+  btn_id, framename,
+  btn_textContent, btn_title, btn_className,
+  clickHandler
+) {
+  const tab = new DictTab(null, framename);
+  dictTabsStaticContainer.appendChild(tab.btn);
+  tab.btn.setAttribute("id", btn_id);
+  tab.btn.setAttribute("title", btn_title);
+  tab.btn.textContent = btn_textContent;
+  tab.btn.classList.add(btn_className);
+  iFramesContainer.appendChild(tab.frame);
+  tab.btn.addEventListener("click", function () {
+    if (tab.frame.dataset.contentLoaded == "false") {
+      clickHandler(tab.frame);
+    }
+    activateTab(tab);
+  });
+  return tab;
+}
+
+
 /**
  * Create dictionary tabs, and a listing for any extra dicts.
  */
@@ -157,33 +180,12 @@ function createDictTabs(tab_count) {
       active_tab.frame.classList.add("dict-active");
   }
 
-  let _make_button = function(
-    btn_id, framename,
-    btn_textContent, btn_title, btn_className,
-    clickHandler
-  ) {
-    const tab = new DictTab(null, framename);
-    dictTabsStaticContainer.appendChild(tab.btn);
-    tab.btn.setAttribute("id", btn_id);
-    tab.btn.setAttribute("title", btn_title);
-    tab.btn.textContent = btn_textContent;
-    tab.btn.classList.add(btn_className);
-    iFramesContainer.appendChild(tab.frame);
-    tab.btn.addEventListener("click", function () {
-      if (tab.frame.dataset.contentLoaded == "false") {
-        clickHandler(tab.frame);
-      }
-      activateTab(tab);
-    });
-    return tab;
-  }
-
-  const sentence_button = _make_button(
+  const sentence_button = _make_standalone_tab_button(
     "sentences-btn", "sentencesframe",
     "Sentences", "See term usage", "dict-sentences-btn", loadSentencesFrame);
   dictTabs.push(sentence_button);
 
-  const image_button = _make_button(
+  const image_button = _make_standalone_tab_button(
     "dict-image-btn", "imageframe",
     null, "Lookup images", "dict-image-btn", do_image_lookup);
   dictTabs.push(image_button);
