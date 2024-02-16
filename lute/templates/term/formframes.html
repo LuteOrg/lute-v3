@@ -35,17 +35,26 @@
       e.preventDefault();
 
       LANG_ID = langSelect.value;
-      // continue only if lang or term has been changed
-      if (termField.value && termField.value != term || 
-          LANG_ID != 0 && LANG_ID != langid) {
+      if (LANG_ID == 0 || !termField.value) return;
+      if (LANG_ID == langid || termField.value == term) return;
 
-        TERM_DICTS = ALL_DICTS[LANG_ID].term;
-        if (dictTabs.length === 0) createDictTabs(5);
-        loadDictionaries();
+      if (dictTabs.length > 0) {
+        const tabs = document.querySelectorAll(".dict-btn");
+        const frames = document.querySelectorAll(".dictframe")
+        const menuContainer = document.getElementById("dict-menu-container")
+        tabs.forEach(item => item.remove())
+        frames.forEach(item => item.remove())
+        menuContainer.remove();
 
-        term = termField.value;
-        langid = LANG_ID;
+        dictTabs = [];
       }
+
+      TERM_DICTS = ALL_DICTS[LANG_ID].term;
+      createDictTabs(5);
+      loadDictionaries();
+
+      term = termField.value;
+      langid = LANG_ID;
       
     })
   </script>
