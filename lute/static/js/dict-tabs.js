@@ -59,25 +59,23 @@ class DictTab {
       return;
     }
 
-    if (this.dictID != null) {
-      this.label = dictInfo.label;
-      this.isExternal = dictInfo.isExternal;
-      this.btn.dataset.dictId = this.dictID;
-      this.btn.onclick = this.clickCallback.bind(this);
-      this.btn.dataset.dictExternal = this.isExternal ? "true" : "false";
+    this.label = dictInfo.label;
+    this.isExternal = dictInfo.isExternal;
+    this.btn.dataset.dictId = this.dictID;
+    this.btn.onclick = this.clickCallback.bind(this);
+    this.btn.dataset.dictExternal = this.isExternal ? "true" : "false";
       
-      if (this.label != "") {
-        this.btn.textContent = this.label;
-        this.btn.setAttribute("title", this.label);
-      }
+    if (this.label != "") {
+      this.btn.textContent = this.label;
+      this.btn.setAttribute("title", this.label);
+    }
 
-      if (dictInfo.faviconURL) {
-        this.btn.prepend(createImg(dictInfo.faviconURL, "dict-btn-fav-img"));
-      }
+    if (dictInfo.faviconURL) {
+      this.btn.prepend(createImg(dictInfo.faviconURL, "dict-btn-fav-img"));
+    }
 
-      if (this.isExternal) {
-        this.btn.appendChild(createImg("", "dict-btn-external-img"));
-      }
+    if (this.isExternal) {
+      this.btn.appendChild(createImg("", "dict-btn-external-img"));
     }
   }
 
