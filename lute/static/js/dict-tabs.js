@@ -75,6 +75,17 @@ class DictTab {
     activateTab(this);
   }
 
+  deactivate() {
+    this.btn.classList.remove("dict-btn-active");
+    this.frame.classList.remove("dict-active");
+  }
+
+  activate() {
+    this.btn.classList.add("dict-btn-active");
+    this.frame.classList.add("dict-active");
+    this.frame.dataset.contentLoaded = "true";
+  }
+
 }
 
 
@@ -210,20 +221,10 @@ function loadDictionaries() {
 
 
 function activateTab(tab) {
-  dictTabs.forEach(tab => {
-    if (tab.btn.classList)
-      tab.btn.classList.remove("dict-btn-active");
-    if (tab.frame)
-      tab.frame.classList.remove("dict-active");
-  });
-
-  if (tab.btn.classList)
-    tab.btn.classList.add("dict-btn-active");
-  if (tab.frame) {
-    tab.frame.classList.add("dict-active");
-    tab.frame.dataset.contentLoaded = "true";
-  }
+  dictTabs.forEach(tab => tab.deactivate());
+  tab.activate();
 }
+
 
 function load_dict_iframe(dictID, iframe) {
   const text = TERM_FORM_CONTAINER.querySelector("#text").value;
