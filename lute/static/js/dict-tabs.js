@@ -202,12 +202,6 @@ function createDictTabs(tab_count) {
   return dictTabs;
 }
 
-function do_sentence_lookup(iframe) {
-  const url = getSentenceURL();
-  if (url == null)
-    return;
-  iframe.setAttribute("src", url);
-}
 
 function loadDictionaries() {
   dictTabs.forEach(tab => tab.frame.dataset.contentLoaded = "false");
@@ -226,18 +220,6 @@ function loadDictionaries() {
   }
 }
 
-
-function getSentenceURL() {
-  const txt = TERM_FORM_CONTAINER.querySelector("#text").value;
-  // check for the "new term" page
-  if (txt.length == 0) return null;
-  // %E2%80%8B is the zero-width string.  The term is reparsed
-  // on the server, so this doesn't need to be sent.
-  const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
-  if (LANG_ID == '0' || t == '')
-    return null;
-  return `/term/sentences/${LANG_ID}/${t}`;
-}
 
 function activateTab(tab) {
   dictTabs.forEach(tab => {
@@ -304,6 +286,18 @@ function get_lookup_url(dicturl, term) {
   ret = ret.replace('###', searchterm);
   return ret;
 }
+
+
+function do_sentence_lookup(iframe) {
+  const txt = TERM_FORM_CONTAINER.querySelector("#text").value;
+  // %E2%80%8B is the zero-width string.  The term is reparsed
+  // on the server, so this doesn't need to be sent.
+  const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
+  if (LANG_ID == '0' || t == '')
+    return;
+  iframe.setAttribute("src", `/term/sentences/${LANG_ID}/${t}`);
+}
+
 
 function do_image_lookup(iframe) {
   const text = TERM_FORM_CONTAINER.querySelector("#text").value;
