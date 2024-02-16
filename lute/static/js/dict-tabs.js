@@ -187,7 +187,7 @@ function createDictTabs(tab_count) {
 
   const sentence_tab = _make_standalone_tab(
     "sentences-btn", "sentencesframe",
-    "Sentences", "See term usage", "dict-sentences-btn", loadSentencesFrame);
+    "Sentences", "See term usage", "dict-sentences-btn", do_sentence_lookup);
 
   const image_tab = _make_standalone_tab(
     "dict-image-btn", "imageframe",
@@ -202,7 +202,7 @@ function createDictTabs(tab_count) {
   return dictTabs;
 }
 
-function loadSentencesFrame(iframe) {
+function do_sentence_lookup(iframe) {
   const url = getSentenceURL();
   if (url == null)
     return;
