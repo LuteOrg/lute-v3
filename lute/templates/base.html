@@ -102,7 +102,9 @@
         <span>Backup</span>
         <ul class="sub-menu last-sub-menu">
           {% if backup_last_display_date is not none %}
+          {% if backup_time_since is not none %}
           <li>Last backup was {{ backup_time_since }}.</li>
+          {% endif %}
           <li>{{ backup_last_display_date | format }}</li>
           <hr>
           {% endif %}
