@@ -209,11 +209,8 @@ function loadDictionaries() {
   dictContainer.style.flexDirection = "column";
 
   const activeFrame = document.querySelector(".dict-active");
-  if (activeFrame == null)
-    return;
-
   const activeTab = document.querySelector(".dict-btn-active");
-  if (activeTab == null)
+  if (activeFrame == null || activeTab == null)
     return;
 
   if ("dictId" in activeTab.dataset) {
