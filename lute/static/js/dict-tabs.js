@@ -104,7 +104,7 @@ let _make_standalone_tab = function(
 /**
  * Create dictionary tabs, and a listing for any extra dicts.
  */
-function createDictTabs(tab_count) {
+function createDictTabs(tab_count = 5) {
   if (TERM_DICTS.length <= 0) return;
 
   const dictTabsLayoutContainer = document.getElementById("dicttabslayout");
