@@ -116,22 +116,11 @@ function createDictTabs(tab_count) {
 
   TABBED_BUTTONS.forEach(btn => dictTabsLayoutContainer.appendChild(btn));
   
-  // !CLICKING MENU ITEM DOES NOT UPDATE MAIN BUTTON LABEL AND IMAGES (FAVICON AND EXTERNAL)
-  // !CLICKING menuMainButton DOESN'T DO ANYTHING!
-  // !after each click to menu item, menuMainButton button click event needs to change, or the button needs to be replaced altogether. event delegation?
   if (LISTED_BUTTONS.length > 0) {
-    const menuMainButton = LISTED_BUTTONS[0].cloneNode(true);  // deep copy.
-    dictTabsLayoutContainer.appendChild(menuMainButton);
-    menuMainButton.setAttribute("title", "Right click for dictionary list");
-
-    const menuImgEl = createImg("", "dict-btn-list-img");
-    menuMainButton.appendChild(menuImgEl);
-    menuMainButton.classList.add("dict-btn-select");
-
+    // div containing all the LISTED_BUTTONS.
     const list_div = document.createElement("div");
     list_div.setAttribute("id", "dict-list-container");
     list_div.classList.add("dict-list-hide");
-
     LISTED_BUTTONS.forEach(btn => {
         btn.classList.remove("dict-btn");
         btn.classList.add("dict-menu-item");
@@ -139,31 +128,25 @@ function createDictTabs(tab_count) {
       }
     );
 
+    // Top level button to show/hide the list.
+    const btn = document.createElement("button");
+    btn.classList.add("dict-btn");
+    btn.classList.add("dict-btn-select");
+    btn.innerHTML = "&hellip; &#9660;"
+    btn.setAttribute("title", "More dictionaries");
+    btn.addEventListener("click", (e) => {
+      list_div.classList.toggle("dict-list-hide");
+    });
+
     const menu_div = document.createElement("div");
     menu_div.setAttribute("id", "dict-menu-container");
-    menu_div.appendChild(list_div); // add select AFTER button
-    menu_div.appendChild(menuMainButton);
-    dictTabsLayoutContainer.appendChild(menu_div);
-
-    // EVENTS
-    menuMainButton.addEventListener("contextmenu", (e) => {
-      e.preventDefault(); // disables default right click menu
-      list_div.classList.toggle("dict-list-hide");
-    });
-
-    menuMainButton.addEventListener("click", (e) => {
-      if (e.target === menuImgEl) return;
-      list_div.classList.add("dict-list-hide");
-    });
-
-    menuImgEl.addEventListener("click", (e) => {
-      e.stopPropagation();
-      list_div.classList.toggle("dict-list-hide");
-    });
-
+    menu_div.appendChild(list_div);
+    menu_div.appendChild(btn);
     menu_div.addEventListener("mouseleave", () => {
       list_div.classList.add("dict-list-hide");
     });
+
+    dictTabsLayoutContainer.appendChild(menu_div);
   }
   
   // Set first embedded frame as active.
