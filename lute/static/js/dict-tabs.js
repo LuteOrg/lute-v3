@@ -212,6 +212,13 @@ function loadDictionaries() {
   if (activeTab == null) 
     return;
 
+  // TODO: I'm not sure when we'd ever hit the branches for imageframe or sentencesframe.
+  // this function is only called from:
+  // - lute/templates/term/formframes.html
+  // - lute/templates/read/index.html
+  // and I think this is only to try to pre-load the frame somehow ...
+  // but that's already handled in the "Set first embedded frame as active."
+  // section of createDictTabs().
   if ("dictId" in activeTab.dataset) {
     load_dict_iframe(activeTab.dataset.dictId, activeFrame);
   } else if (activeFrame.name === "imageframe") {
