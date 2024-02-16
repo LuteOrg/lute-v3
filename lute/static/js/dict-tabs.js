@@ -5,7 +5,16 @@ let dictTabs = [];
 
 class DictTab {
   constructor(dictURL, frameName) {
-    this.frame = this.createIFrame(frameName);
+    let createIFrame = function(name) {
+      const f = document.createElement("iframe");
+      f.name = name;
+      f.src = "about:blank";
+      f.classList.add("dictframe");
+      f.dataset.contentLoaded = "false";
+      return f;
+    };
+
+    this.frame = createIFrame(frameName);
     this.btn = document.createElement("button");
     this.btn.classList.add("dict-btn");
 
@@ -64,16 +73,6 @@ class DictTab {
     }
 
     activateTab(this);
-  }
-
-  createIFrame(name) {
-    const f = document.createElement("iframe");
-    f.name = name;
-    f.src = "about:blank";
-    f.classList.add("dictframe");
-    f.dataset.contentLoaded = "false";
-
-    return f;
   }
 
 }
