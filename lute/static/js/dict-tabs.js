@@ -112,39 +112,41 @@ function createDictTabs(tab_count) {
   TABBED_BUTTONS.forEach(btn => dictTabsLayoutContainer.appendChild(btn));
   
   // !CLICKING MENU ITEM DOES NOT UPDATE MAIN BUTTON LABEL AND IMAGES (FAVICON AND EXTERNAL)
-  // !CLICKING show_clone DOESN'T DO ANYTHING!
-  // !after each click to menu item, show_clone button click event needs to change, or the button needs to be replaced altogether. event delegation?
+  // !CLICKING menuMainButton DOESN'T DO ANYTHING!
+  // !after each click to menu item, menuMainButton button click event needs to change, or the button needs to be replaced altogether. event delegation?
   if (LISTED_BUTTONS.length > 0) {
-    const first = LISTED_BUTTONS[0];
-    const show_clone = first.cloneNode(true);  // deep copy.
-    dictTabsLayoutContainer.appendChild(show_clone);
-    show_clone.setAttribute("title", "Right click for dictionary list");
+    const menuMainButton = LISTED_BUTTONS[0].cloneNode(true);  // deep copy.
+    dictTabsLayoutContainer.appendChild(menuMainButton);
+    menuMainButton.setAttribute("title", "Right click for dictionary list");
+
     const menuImgEl = createImg("", "dict-btn-list-img");
-    show_clone.appendChild(menuImgEl);
-    show_clone.classList.add("dict-btn-select");
+    menuMainButton.appendChild(menuImgEl);
+    menuMainButton.classList.add("dict-btn-select");
 
     const list_div = document.createElement("div");
     list_div.setAttribute("id", "dict-list-container");
     list_div.classList.add("dict-list-hide");
-    for (const b of LISTED_BUTTONS) {
-      b.classList.remove("dict-btn");
-      b.classList.add("dict-menu-item");
-      list_div.appendChild(b);
-    }
+
+    LISTED_BUTTONS.forEach(btn => {
+        btn.classList.remove("dict-btn");
+        btn.classList.add("dict-menu-item");
+        list_div.appendChild(btn);
+      }
+    );
 
     const menu_div = document.createElement("div");
     menu_div.setAttribute("id", "dict-menu-container");
     menu_div.appendChild(list_div); // add select AFTER button
-    menu_div.appendChild(show_clone);
+    menu_div.appendChild(menuMainButton);
     dictTabsLayoutContainer.appendChild(menu_div);
 
     // EVENTS
-    show_clone.addEventListener("contextmenu", (e) => {
+    menuMainButton.addEventListener("contextmenu", (e) => {
       e.preventDefault(); // disables default right click menu
       list_div.classList.toggle("dict-list-hide");
     });
 
-    show_clone.addEventListener("click", (e) => {
+    menuMainButton.addEventListener("click", (e) => {
       if (e.target === menuImgEl) return;
       list_div.classList.add("dict-list-hide");
     });
