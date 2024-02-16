@@ -38,19 +38,8 @@
       if (LANG_ID == 0 || !termField.value) return;
       if (LANG_ID == langid || termField.value == term) return;
 
-      if (dictTabs.length > 0) {
-        const tabs = document.querySelectorAll(".dict-btn");
-        const frames = document.querySelectorAll(".dictframe")
-        const menuContainer = document.getElementById("dict-menu-container")
-        tabs.forEach(item => item.remove())
-        frames.forEach(item => item.remove())
-        menuContainer.remove();
-
-        dictTabs = [];
-      }
-
       TERM_DICTS = ALL_DICTS[LANG_ID].term;
-      createDictTabs(5);
+      createDictButtons();
       loadDictionaries();
 
       term = termField.value;
@@ -64,7 +53,7 @@
   <script>
     LANG_ID = $('#language_id').val();
     TERM_DICTS = ALL_DICTS[LANG_ID].term;
-    createDictTabs(5);
+    createDictButtons();
     loadDictionaries();
   </script>
 
