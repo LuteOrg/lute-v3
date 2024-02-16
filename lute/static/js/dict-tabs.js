@@ -83,6 +83,7 @@ class DictTab {
   activate() {
     this.btn.classList.add("dict-btn-active");
     this.frame.classList.add("dict-active");
+    // TODO - flag should only be set once content actually loaded.
     this.frame.dataset.contentLoaded = "true";
   }
 
