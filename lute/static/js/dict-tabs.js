@@ -121,27 +121,27 @@ function createDictTabs(tab_count) {
   });
 
   const n = Math.max(0, tab_count);
-  let TABBED_BUTTONS = allDictButtons.slice(0, n);
-  let LISTED_BUTTONS = allDictButtons.slice(n);
+  let buttons_in_tabs = allDictButtons.slice(0, n);
+  let buttons_in_list = allDictButtons.slice(n);
 
-  // If the LISTED_BUTTONS only contains one item, just add it as
+  // If the buttons_in_list only contains one item, just add it as
   // a tab, as it will take up the same space.
-  if (LISTED_BUTTONS.length == 1) {
-    TABBED_BUTTONS = allDictButtons;
-    LISTED_BUTTONS = [];
+  if (buttons_in_list.length == 1) {
+    buttons_in_tabs = allDictButtons;
+    buttons_in_list = [];
   }
 
-  const grid_column_count = TABBED_BUTTONS.length + (LISTED_BUTTONS.length > 0 ? 1 : 0);
+  const grid_column_count = buttons_in_tabs.length + (buttons_in_list.length > 0 ? 1 : 0);
   dictTabsLayoutContainer.style.gridTemplateColumns = `repeat(${grid_column_count}, minmax(2rem, 8rem))`;
 
-  TABBED_BUTTONS.forEach(btn => dictTabsLayoutContainer.appendChild(btn));
+  buttons_in_tabs.forEach(btn => dictTabsLayoutContainer.appendChild(btn));
   
-  if (LISTED_BUTTONS.length > 0) {
-    // div containing all the LISTED_BUTTONS.
+  if (buttons_in_list.length > 0) {
+    // div containing all the buttons_in_list.
     const list_div = document.createElement("div");
     list_div.setAttribute("id", "dict-list-container");
     list_div.classList.add("dict-list-hide");
-    LISTED_BUTTONS.forEach(btn => {
+    buttons_in_list.forEach(btn => {
         btn.classList.remove("dict-btn");
         btn.classList.add("dict-menu-item");
         list_div.appendChild(btn);
