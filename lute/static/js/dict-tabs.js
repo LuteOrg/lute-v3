@@ -30,8 +30,12 @@ class DictTab {
       const urlObj = new URL(url);  // Throws if invalid.
       const domain = urlObj.hostname;
       this.label = domain.split("www.").splice(-1)[0];
-      const favicon = `http://www.google.com/s2/favicons?domain=${domain}`;
-      this.btn.prepend(createImg(favicon, "dict-btn-fav-img"));
+
+      const fimg = document.createElement("img");
+      fimg.classList.add("dict-btn-fav-img");
+      const favicon_src = `http://www.google.com/s2/favicons?domain=${domain}`;
+      fimg.src = favicon_src;
+      this.btn.prepend(fimg);
     }
     catch(err) {}
 
@@ -39,8 +43,11 @@ class DictTab {
     this.btn.setAttribute("title", this.label);
 
     this.isExternal = (dictURL.charAt(0) == '*');
-    if (this.isExternal)
-      this.btn.appendChild(createImg("", "dict-btn-external-img"));
+    if (this.isExternal) {
+      const ext_img = document.createElement("img");
+      ext_img.classList.add("dict-btn-external-img");
+      this.btn.appendChild(ext_img);
+    }
 
     this.btn.dataset.dictId = this.dictID;
     this.btn.onclick = this.clickCallback.bind(this);
@@ -238,22 +245,13 @@ function activateTab(tab) {
     if (tab.frame) tab.frame.classList.remove("dict-active");
   });
 
-  const iFrame = tab.frame;
-  if (tab.btn.classList) tab.btn.classList.add("dict-btn-active");
-  if (iFrame) {
-    iFrame.classList.add("dict-active");
-    iFrame.dataset.contentLoaded = "true";
+  if (tab.btn.classList)
+    tab.btn.classList.add("dict-btn-active");
+  if (tab.frame) {
+    tab.frame.classList.add("dict-active");
+    tab.frame.dataset.contentLoaded = "true";
   }
 }
-
-function createImg(src, className) {
-  const img = document.createElement("img");
-  img.classList.add(className);
-  if (src)
-    img.src = src;
-  return img;
-}
-
 
 function load_dict_iframe(dictID, iframe) {
   const text = TERM_FORM_CONTAINER.querySelector("#text").value;
