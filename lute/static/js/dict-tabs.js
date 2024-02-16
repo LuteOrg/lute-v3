@@ -113,6 +113,40 @@ let _make_standalone_tab = function(
 
 
 /**
+ * Load excess buttons in a separate div.
+ */
+function _create_dict_dropdown_div(buttons_in_list) {
+  // div containing all the buttons_in_list.
+  const list_div = document.createElement("div");
+  list_div.setAttribute("id", "dict-list-container");
+  list_div.classList.add("dict-list-hide");
+  buttons_in_list.forEach(tab => {
+    tab.btn.classList.remove("dict-btn");
+    tab.btn.classList.add("dict-menu-item");
+    list_div.appendChild(tab.btn);
+  });
+
+  // Top level button to show/hide the list.
+  const btn = document.createElement("button");
+  btn.classList.add("dict-btn", "dict-btn-select");
+  btn.innerHTML = "&hellip; &#9660;"
+  btn.setAttribute("title", "More dictionaries");
+  btn.addEventListener("click", (e) => {
+    list_div.classList.toggle("dict-list-hide");
+  });
+
+  const menu_div = document.createElement("div");
+  menu_div.setAttribute("id", "dict-menu-container");
+  menu_div.appendChild(list_div);
+  menu_div.appendChild(btn);
+  menu_div.addEventListener("mouseleave", () => {
+    list_div.classList.add("dict-list-hide");
+  });
+
+  return menu_div;
+}
+
+/**
  * Create dictionary tabs, and a listing for any extra dicts.
  */
 function createDictTabs(tab_count = 5) {
@@ -158,35 +192,8 @@ function createDictTabs(tab_count = 5) {
   buttons_in_tabs.forEach(tab => dictTabsLayoutContainer.appendChild(tab.btn));
   
   if (buttons_in_list.length > 0) {
-    // div containing all the buttons_in_list.
-    const list_div = document.createElement("div");
-    list_div.setAttribute("id", "dict-list-container");
-    list_div.classList.add("dict-list-hide");
-    buttons_in_list.forEach(tab => {
-        tab.btn.classList.remove("dict-btn");
-        tab.btn.classList.add("dict-menu-item");
-        list_div.appendChild(tab.btn);
-      }
-    );
-
-    // Top level button to show/hide the list.
-    const btn = document.createElement("button");
-    btn.classList.add("dict-btn", "dict-btn-select");
-    btn.innerHTML = "&hellip; &#9660;"
-    btn.setAttribute("title", "More dictionaries");
-    btn.addEventListener("click", (e) => {
-      list_div.classList.toggle("dict-list-hide");
-    });
-
-    const menu_div = document.createElement("div");
-    menu_div.setAttribute("id", "dict-menu-container");
-    menu_div.appendChild(list_div);
-    menu_div.appendChild(btn);
-    menu_div.addEventListener("mouseleave", () => {
-      list_div.classList.add("dict-list-hide");
-    });
-
-    dictTabsLayoutContainer.appendChild(menu_div);
+    const m = _create_dict_dropdown_div(buttons_in_list);
+    dictTabsLayoutContainer.appendChild(m);
   }
   
   // Set first embedded frame as active.
