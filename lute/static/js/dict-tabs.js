@@ -128,6 +128,9 @@ function createDictTabs(tab_count = 5) {
 
   if (TERM_DICTS.length <= 0) return;
 
+  const dev_hack_add_dicts = Array.from({ length: 8 }, (_, i) => `a${i}`);
+  TERM_DICTS.push(...dev_hack_add_dicts);
+
   const dictTabsLayoutContainer = document.getElementById("dicttabslayout");
   const dictTabsStaticContainer = document.getElementById("dicttabsstatic");
   const iFramesContainer = document.getElementById("dictframes");
