@@ -116,6 +116,16 @@ let _make_standalone_tab = function(
  * Create dictionary tabs, and a listing for any extra dicts.
  */
 function createDictTabs(tab_count = 5) {
+  let destroy_existing_dictTab_controls = function() {
+    document.querySelectorAll(".dict-btn").forEach(item => item.remove())
+    document.querySelectorAll(".dictframe").forEach(item => item.remove())
+    const el = document.getElementById("dict-menu-container");
+    if (el)
+      el.remove();
+  }
+  destroy_existing_dictTab_controls();
+  dictTabs = [];
+
   if (TERM_DICTS.length <= 0) return;
 
   const dictTabsLayoutContainer = document.getElementById("dicttabslayout");
