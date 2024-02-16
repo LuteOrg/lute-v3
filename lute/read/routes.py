@@ -206,4 +206,7 @@ def edit_page(bookid, pagenum):
         db.session.commit()
         return redirect(f"/read/{book.id}", 302)
 
-    return render_template("read/page_edit_form.html", hide_top_menu=True, form=form)
+    text_dir = "rtl" if book.language.right_to_left else "ltr"
+    return render_template(
+        "read/page_edit_form.html", hide_top_menu=True, form=form, text_dir=text_dir
+    )

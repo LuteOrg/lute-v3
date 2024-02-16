@@ -67,6 +67,7 @@
 
 <script type="text/javascript">
   var TAGS = {{ tags | safe }};
+  const LANG_RTL_MAP = {{ rtl_map | safe }}
 
   let setup_book_tags_tagify = function(input) {
     const tagify = new Tagify(input, {
@@ -80,9 +81,20 @@
     return tagify;
   };
 
+  /* On language change, may need to change field directions. */
+  let set_field_directions = function() {
+    const new_id = parseInt($("#language_id").val());
+    let is_rtl = LANG_RTL_MAP[new_id] ?? false;
+    const direction = is_rtl ? "rtl" : "ltr";
+    $('#title, #text').css('direction', direction);
+  };
+
   $(document).ready(function () {
     var tagslist = document.getElementById('book_tags');
     var tags_tagify = setup_book_tags_tagify(tagslist);
+
+    set_field_directions();
+    $("#language_id").change(set_field_directions);
   });
 </script>
 
