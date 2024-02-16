@@ -42,12 +42,12 @@ function getDictInfo(dictURL) {
 
 class DictTab {
   constructor(dictURL, frameName) {
-    const dictInfo = dictURL ? getDictInfo(dictURL) : null;
-    this.dictID = dictInfo ? dictInfo.id : null;
-
     this.frame = this.createIFrame(frameName);
     this.btn = document.createElement("button");
     this.btn.classList.add("dict-btn");
+
+    const dictInfo = dictURL ? getDictInfo(dictURL) : null;
+    this.dictID = dictInfo ? dictInfo.id : null;
 
     if (this.dictID != null) {
       this.label = dictInfo.label;
