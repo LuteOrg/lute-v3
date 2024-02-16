@@ -50,7 +50,7 @@
       }
 
       TERM_DICTS = ALL_DICTS[LANG_ID].term;
-      createDictTabs(5);
+      createDictTabs();
       loadDictionaries();
 
       term = termField.value;
@@ -64,7 +64,7 @@
   <script>
     LANG_ID = $('#language_id').val();
     TERM_DICTS = ALL_DICTS[LANG_ID].term;
-    createDictTabs(5);
+    createDictTabs();
     loadDictionaries();
   </script>
 
