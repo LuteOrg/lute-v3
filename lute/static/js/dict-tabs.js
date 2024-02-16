@@ -73,18 +73,16 @@ class DictTab {
 
 
 /** Factory method for sentence, image buttons. */
-let _make_standalone_tab_button = function(
+let _make_standalone_tab = function(
   btn_id, framename,
   btn_textContent, btn_title, btn_className,
   clickHandler
 ) {
   const tab = new DictTab(null, framename);
-  dictTabsStaticContainer.appendChild(tab.btn);
   tab.btn.setAttribute("id", btn_id);
   tab.btn.setAttribute("title", btn_title);
   tab.btn.textContent = btn_textContent;
   tab.btn.classList.add(btn_className);
-  iFramesContainer.appendChild(tab.frame);
   tab.btn.addEventListener("click", function () {
     if (tab.frame.dataset.contentLoaded == "false") {
       clickHandler(tab.frame);
@@ -180,15 +178,19 @@ function createDictTabs(tab_count) {
       active_tab.frame.classList.add("dict-active");
   }
 
-  const sentence_button = _make_standalone_tab_button(
+  const sentence_tab = _make_standalone_tab(
     "sentences-btn", "sentencesframe",
     "Sentences", "See term usage", "dict-sentences-btn", loadSentencesFrame);
-  dictTabs.push(sentence_button);
 
-  const image_button = _make_standalone_tab_button(
+  const image_tab = _make_standalone_tab(
     "dict-image-btn", "imageframe",
     null, "Lookup images", "dict-image-btn", do_image_lookup);
-  dictTabs.push(image_button);
+
+  for (let tab of Object.values([sentence_tab, image_tab])) {
+    dictTabsStaticContainer.appendChild(tab.btn);
+    iFramesContainer.appendChild(tab.frame);
+    dictTabs.push(tab);
+  }
 
   return dictTabs;
 }
