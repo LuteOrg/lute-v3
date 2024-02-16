@@ -86,15 +86,6 @@ function createDictTabs(tab_count) {
     TERM_DICTS.push(`http://a${i}.com?###`);
     TERM_DICTS.push(`http://b${i}.com?###`);
   }
-  // real dictionaries
-  // TERM_DICTS.push("https://www.dict.cc/?s=###");
-  // TERM_DICTS.push("*https://glosbe.com/de/en/###");
-  // TERM_DICTS.push("*https://en.langenscheidt.com/german-english/###");
-  // TERM_DICTS.push("*https://en.pons.com/translate/german-english/###");
-  // TERM_DICTS.push("*https://www.collinsdictionary.com/dictionary/german-english/###");
-  // TERM_DICTS.push("https://www.dict.cc/?s=###");
-  // TERM_DICTS.push("*https://dict.tu-chemnitz.de/deutsch-englisch/###.html");
-  // TERM_DICTS.push("*https://www.translate.ru/%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4/%D0%BD%D0%B5%D0%BC%D0%B5%D1%86%D0%BA%D0%B8%D0%B9-%D0%B0%D0%BD%D0%B3%D0%BB%D0%B8%D0%B9%D1%81%D0%BA%D0%B8%D0%B9/###");
 
   const dictTabsLayoutContainer = document.getElementById("dicttabslayout");
   const dictTabsStaticContainer = document.getElementById("dicttabsstatic");
