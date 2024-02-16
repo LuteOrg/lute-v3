@@ -208,33 +208,18 @@ function loadDictionaries() {
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
 
-  // TODO: I'm not sure when we'd ever hit the below branches for imageframe or sentencesframe.
-  // commenting out this section pending further discussion.
-  //
-  // this function is only called from:
-  // - lute/templates/term/formframes.html
-  // - lute/templates/read/index.html
-  // and I think this is only to try to pre-load the frame somehow ...
-  // but that's already handled in the "Set first embedded frame as active."
-  // section of createDictTabs().
-  //
-  // As a result, I think everything here can be deleted.
-  //// const activeFrame = document.querySelector(".dict-active");
-  //// if (activeFrame == null)
-  ////   return;
+  const activeFrame = document.querySelector(".dict-active");
+  if (activeFrame == null)
+    return;
 
-  //// const activeTab = document.querySelector(".dict-btn-active");
-  //// if (activeTab == null)
-  ////   return;
+  const activeTab = document.querySelector(".dict-btn-active");
+  if (activeTab == null)
+    return;
 
-  //// if ("dictId" in activeTab.dataset) {
-  ////   load_dict_iframe(activeTab.dataset.dictId, activeFrame);
-  //// } else if (activeFrame.name === "imageframe") {
-  ////   do_image_lookup(activeFrame);
-  //// } else if (activeFrame.name === "sentencesframe") {
-  ////   loadSentencesFrame(activeFrame);
-  //// }
-  //// activeFrame.dataset.contentLoaded = "true";
+  if ("dictId" in activeTab.dataset) {
+    load_dict_iframe(activeTab.dataset.dictId, activeFrame);
+    activeFrame.dataset.contentLoaded = "true";
+  }
 }
 
 
