@@ -69,11 +69,13 @@ class DictTab {
   /** LOOKUPS *************************/
 
   do_lookup() {
+    const dicturl = TERM_DICTS[this.dictID];
+    const term = TERM_FORM_CONTAINER.querySelector("#text").value;
     if (this.isExternal) {
-      this._load_popup();
+      this._load_popup(dicturl, term);
     }
     else {
-      this._load_frame();
+      this._load_frame(dicturl, term);
       this.activate();
     }
   }
@@ -93,13 +95,11 @@ class DictTab {
     return ret;
   }
 
-  _load_popup() {
-    let url = TERM_DICTS[this.dictID];
+  _load_popup(url, term) {
     if ((url ?? "") == "")
       return;
     if (url[0] == "*")  // Should be true!
       url = url.slice(1);
-    const term = TERM_FORM_CONTAINER.querySelector("#text").value;
     const lookup_url = this._get_lookup_url(url, term);
     window.open(
       lookup_url,
@@ -108,7 +108,7 @@ class DictTab {
     );
   }
 
-  _load_frame() {
+  _load_frame(dicturl, text) {
     if (this.isExternal || this.dictID == null) {
       return;
     }
@@ -117,8 +117,6 @@ class DictTab {
       return;
     }
 
-    const dicturl = TERM_DICTS[this.dictID];
-    const text = TERM_FORM_CONTAINER.querySelector("#text").value;
     let url = this._get_lookup_url(dicturl, text);
 
     const is_bing = (dicturl.indexOf('www.bing.com') != -1);
