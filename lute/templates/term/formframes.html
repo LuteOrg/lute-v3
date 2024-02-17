@@ -39,7 +39,7 @@
       if (LANG_ID == langid || termField.value == term) return;
 
       TERM_DICTS = ALL_DICTS[LANG_ID].term;
-      createDictTabs();
+      createDictButtons();
       loadDictionaries();
 
       term = termField.value;
@@ -53,7 +53,7 @@
   <script>
     LANG_ID = $('#language_id').val();
     TERM_DICTS = ALL_DICTS[LANG_ID].term;
-    createDictTabs();
+    createDictButtons();
     loadDictionaries();
   </script>
 

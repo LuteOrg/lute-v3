@@ -1,13 +1,13 @@
 "use strict";
 
 /**
- * A "dictionary tab" to be shown in the UI.
+ * A "dictionary button" to be shown in the UI.
  * Manages display state, loading and caching content.
  *
  * The class *could* be broken up into things like
- * PopupDictTab, EmbeddedDictTab, etc, but no need for that yet.
+ * PopupDictButton, EmbeddedDictButton, etc, but no need for that yet.
  */
-class DictTab {
+class DictButton {
 
   /** All dictTabs created. */
   static dictTabs = [];
@@ -29,9 +29,9 @@ class DictTab {
     this.btn = document.createElement("button");
     this.btn.classList.add("dict-btn");
 
-    DictTab.dictTabs.push(this);
+    DictButton.dictTabs.push(this);
 
-    // Some DictTabs aren't actually dicts, e.g. Sentence tab and
+    // Some DictButtons aren't actually dicts, e.g. Sentence tab and
     // Image button.  Perhaps there's a better class design ...
     if (dictURL == null) {
       return;
@@ -148,7 +148,7 @@ class DictTab {
   }
 
   activate() {
-    DictTab.dictTabs.forEach(tab => tab.deactivate());
+    DictButton.dictTabs.forEach(tab => tab.deactivate());
     this.is_active = true;
     this.btn.classList.add("dict-btn-active");
     this.frame.classList.add("dict-active");
@@ -163,7 +163,7 @@ let _make_standalone_tab = function(
   btn_textContent, btn_title, btn_className,
   clickHandler
 ) {
-  const tab = new DictTab(null, framename);
+  const tab = new DictButton(null, framename);
   const b = tab.btn;
   b.setAttribute("id", btn_id);
   b.setAttribute("title", btn_title);
@@ -217,7 +217,7 @@ function _create_dict_dropdown_div(buttons_in_list) {
 /**
  * Create dictionary tabs, and a listing for any extra dicts.
  */
-function createDictTabs(tab_count = 5) {
+function createDictButtons(tab_count = 5) {
   let destroy_existing_dictTab_controls = function() {
     document.querySelectorAll(".dict-btn").forEach(item => item.remove())
     document.querySelectorAll(".dictframe").forEach(item => item.remove())
@@ -226,7 +226,7 @@ function createDictTabs(tab_count = 5) {
       el.remove();
   }
   destroy_existing_dictTab_controls();
-  DictTab.dictTabs = [];
+  DictButton.dictTabs = [];
 
   if (TERM_DICTS.length <= 0) return;
 
@@ -234,15 +234,15 @@ function createDictTabs(tab_count = 5) {
   TERM_DICTS.push(...dev_hack_add_dicts);
 
   TERM_DICTS.forEach((dict, index) => {
-    const tab = new DictTab(dict,`dict${index}`);
+    const tab = new DictButton(dict,`dict${index}`);
   });
 
-  let buttons_in_tabs = DictTab.dictTabs.slice(0, tab_count);
-  let buttons_in_list = DictTab.dictTabs.slice(tab_count);
+  let buttons_in_tabs = DictButton.dictTabs.slice(0, tab_count);
+  let buttons_in_list = DictButton.dictTabs.slice(tab_count);
 
   if (buttons_in_list.length == 1) {
     // Don't bother making a list with a single item.
-    buttons_in_tabs = DictTab.dictTabs;
+    buttons_in_tabs = DictButton.dictTabs;
     buttons_in_list = [];
   }
 
@@ -257,7 +257,7 @@ function createDictTabs(tab_count = 5) {
   }
   
   // Set first embedded frame as active.
-  const active_tab = DictTab.dictTabs.find(tab => !tab.isExternal);
+  const active_tab = DictButton.dictTabs.find(tab => !tab.isExternal);
   if (active_tab)
     active_tab.activate();
 
@@ -274,7 +274,7 @@ function createDictTabs(tab_count = 5) {
   }
 
   const dictframes = document.getElementById("dictframes");
-  DictTab.dictTabs.forEach((tab) => { dictframes.appendChild(tab.frame); });
+  DictButton.dictTabs.forEach((tab) => { dictframes.appendChild(tab.frame); });
 }
 
 
@@ -283,8 +283,8 @@ function loadDictionaries() {
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
 
-  DictTab.dictTabs.forEach(tab => tab.contentLoaded = false);
-  const active_tab = DictTab.dictTabs.find(tab => tab.is_active && !tab.isExternal);
+  DictButton.dictTabs.forEach(tab => tab.contentLoaded = false);
+  const active_tab = DictButton.dictTabs.find(tab => tab.is_active && !tab.isExternal);
   if (active_tab)
     active_tab.do_lookup();
 }
