@@ -72,7 +72,7 @@ class DictTab {
     }
     else {
       this._load_frame();
-      activateTab(this);
+      this.activate();
     }
   }
 
@@ -123,6 +123,7 @@ class DictTab {
   }
 
   activate() {
+    DictTab.dictTabs.forEach(tab => tab.deactivate());
     this.is_active = true;
     this.btn.classList.add("dict-btn-active");
     this.frame.classList.add("dict-active");
@@ -148,7 +149,7 @@ let _make_standalone_tab = function(
       clickHandler(tab.frame);
     }
     tab.contentLoaded = true;
-    activateTab(tab);
+    tab.activate();
   });
   return tab;
 }
@@ -264,12 +265,6 @@ function loadDictionaries() {
   const active_tab = DictTab.dictTabs.find(tab => tab.is_active && !tab.isExternal);
   if (active_tab)
     active_tab.do_lookup();
-}
-
-
-function activateTab(tab) {
-  DictTab.dictTabs.forEach(tab => tab.deactivate());
-  tab.activate();
 }
 
 
