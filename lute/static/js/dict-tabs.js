@@ -225,12 +225,9 @@ function createDictTabs(tab_count = 5) {
   const dev_hack_add_dicts = Array.from({ length: 8 }, (_, i) => `a${i}`);
   TERM_DICTS.push(...dev_hack_add_dicts);
 
-  const iFramesContainer = document.getElementById("dictframes");
-
   TERM_DICTS.forEach((dict, index) => {
     const tab = new DictTab(dict,`dict${index}`);
     DictTab.dictTabs.push(tab);
-    iFramesContainer.appendChild(tab.frame);
   });
 
   let buttons_in_tabs = DictTab.dictTabs.slice(0, tab_count);
@@ -267,9 +264,11 @@ function createDictTabs(tab_count = 5) {
 
   for (let tab of Object.values([sentence_tab, image_tab])) {
     document.getElementById("dicttabsstatic").appendChild(tab.btn);
-    iFramesContainer.appendChild(tab.frame);
     DictTab.dictTabs.push(tab);
   }
+
+  const dictframes = document.getElementById("dictframes");
+  DictTab.dictTabs.forEach((tab) => { dictframes.appendChild(tab.frame); });
 }
 
 
