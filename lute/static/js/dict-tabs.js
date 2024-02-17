@@ -66,6 +66,8 @@ class DictTab {
     this.btn.onclick = () => this.do_lookup();
   }
 
+  /** LOOKUPS *************************/
+
   do_lookup() {
     if (this.isExternal) {
       this._load_popup();
@@ -76,6 +78,21 @@ class DictTab {
     }
   }
 
+  _get_lookup_url(dicturl, term) {
+    let ret = dicturl;
+    // Terms are saved with zero-width space between each token;
+    // remove that for dict searches.
+    const zeroWidthSpace = '\u200b';
+    const sqlZWS = '%E2%80%8B';
+    const cleantext = term.
+          replaceAll(zeroWidthSpace, '').
+          replace(/\s+/g, ' ');
+    const searchterm = encodeURIComponent(cleantext).
+          replaceAll(sqlZWS, '');
+    ret = ret.replace('###', searchterm);
+    return ret;
+  }
+
   _load_popup() {
     let url = TERM_DICTS[this.dictID];
     if ((url ?? "") == "")
@@ -83,7 +100,7 @@ class DictTab {
     if (url[0] == "*")  // Should be true!
       url = url.slice(1);
     const term = TERM_FORM_CONTAINER.querySelector("#text").value;
-    const lookup_url = get_lookup_url(url, term);
+    const lookup_url = this._get_lookup_url(url, term);
     window.open(
       lookup_url,
       'otherwin',
@@ -102,7 +119,7 @@ class DictTab {
 
     const dicturl = TERM_DICTS[this.dictID];
     const text = TERM_FORM_CONTAINER.querySelector("#text").value;
-    let url = get_lookup_url(dicturl, text);
+    let url = this._get_lookup_url(dicturl, text);
 
     const is_bing = (dicturl.indexOf('www.bing.com') != -1);
     if (is_bing) {
@@ -115,6 +132,8 @@ class DictTab {
     this.frame.setAttribute("src", url);
     this.contentLoaded = true;
   }
+
+  /** Activate/deact. *************************/
 
   deactivate() {
     this.is_active = false;
@@ -265,23 +284,6 @@ function loadDictionaries() {
   const active_tab = DictTab.dictTabs.find(tab => tab.is_active && !tab.isExternal);
   if (active_tab)
     active_tab.do_lookup();
-}
-
-
-function get_lookup_url(dicturl, term) {
-  let ret = dicturl;
-
-  // Terms are saved with zero-width space between each token;
-  // remove that for dict searches!
-  const zeroWidthSpace = '\u200b';
-  const sqlZWS = '%E2%80%8B';
-  const cleantext = term.
-        replaceAll(zeroWidthSpace, '').
-        replace(/\s+/g, ' ');
-  const searchterm = encodeURIComponent(cleantext).
-        replaceAll(sqlZWS, '');
-  ret = ret.replace('###', searchterm);
-  return ret;
 }
 
 
