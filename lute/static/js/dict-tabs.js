@@ -148,7 +148,7 @@ class DictButton {
   }
 
   activate() {
-    DictButton.all.forEach(tab => tab.deactivate());
+    DictButton.all.forEach(button => button.deactivate());
     this.is_active = true;
     this.btn.classList.add("dict-btn-active");
     this.frame.classList.add("dict-active");
@@ -162,20 +162,20 @@ let _make_standalone_tab = function(
   btn_id, btn_textContent, btn_title, btn_className,
   clickHandler
 ) {
-  const tab = new DictButton(null, `frame_for_${btn_id}`);
-  const b = tab.btn;
+  const button = new DictButton(null, `frame_for_${btn_id}`);
+  const b = button.btn;
   b.setAttribute("id", btn_id);
   b.setAttribute("title", btn_title);
   b.textContent = btn_textContent;
   b.classList.add(btn_className);
   b.addEventListener("click", function () {
-    if (!tab.contentLoaded) {
-      clickHandler(tab.frame);
+    if (!button.contentLoaded) {
+      clickHandler(button.frame);
     }
-    tab.contentLoaded = true;
-    tab.activate();
+    button.contentLoaded = true;
+    button.activate();
   });
-  return tab;
+  return button;
 }
 
 
@@ -187,10 +187,10 @@ function _create_dict_dropdown_div(buttons_in_list) {
   const list_div = document.createElement("div");
   list_div.setAttribute("id", "dict-list-container");
   list_div.classList.add("dict-list-hide");
-  buttons_in_list.forEach(tab => {
-    tab.btn.classList.remove("dict-btn");
-    tab.btn.classList.add("dict-menu-item");
-    list_div.appendChild(tab.btn);
+  buttons_in_list.forEach(button => {
+    button.btn.classList.remove("dict-btn");
+    button.btn.classList.add("dict-menu-item");
+    list_div.appendChild(button.btn);
   });
 
   // Top level button to show/hide the list.
@@ -214,7 +214,7 @@ function _create_dict_dropdown_div(buttons_in_list) {
 }
 
 /**
- * Create dictionary tabs, and a listing for any extra dicts.
+ * Create dictionary buttons, and a listing for any extra dicts.
  */
 function createDictButtons(tab_count = 5) {
   let destroy_existing_dictTab_controls = function() {
@@ -245,7 +245,7 @@ function createDictButtons(tab_count = 5) {
   // Add elements to container.
   const container = document.getElementById("dicttabslayout");
   let grid_col_count = tab_count;
-  tab_buttons.forEach(tab => container.appendChild(tab.btn));
+  tab_buttons.forEach(button => container.appendChild(button.btn));
   if (list_buttons.length > 0) {
     const dropdown_div = _create_dict_dropdown_div(list_buttons);
     container.appendChild(dropdown_div);
@@ -253,9 +253,9 @@ function createDictButtons(tab_count = 5) {
   }
   container.style.gridTemplateColumns = `repeat(${grid_col_count}, minmax(2rem, 8rem))`;
 
-  const first_embedded_tab = DictButton.all.find(tab => !tab.isExternal);
-  if (first_embedded_tab)
-    first_embedded_tab.activate();
+  const first_embedded_button = DictButton.all.find(button => !button.isExternal);
+  if (first_embedded_button)
+    first_embedded_button.activate();
 
   const static_buttons = [
     [ "sentences-btn", "Sentences", "See term usage", "dict-sentences-btn", do_sentence_lookup ],
@@ -267,7 +267,7 @@ function createDictButtons(tab_count = 5) {
   }
 
   const dictframes = document.getElementById("dictframes");
-  DictButton.all.forEach((tab) => { dictframes.appendChild(tab.frame); });
+  DictButton.all.forEach((button) => { dictframes.appendChild(button.frame); });
 }
 
 
@@ -276,10 +276,10 @@ function loadDictionaries() {
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
 
-  DictButton.all.forEach(tab => tab.contentLoaded = false);
-  const active_tab = DictButton.all.find(tab => tab.is_active && !tab.isExternal);
-  if (active_tab)
-    active_tab.do_lookup();
+  DictButton.all.forEach(button => button.contentLoaded = false);
+  const active_button = DictButton.all.find(button => button.is_active && !button.isExternal);
+  if (active_button)
+    active_button.do_lookup();
 }
 
 
