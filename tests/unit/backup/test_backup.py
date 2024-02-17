@@ -3,9 +3,8 @@ DB Backup tests.
 """
 
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import Mock, patch
-from zoneinfo import ZoneInfo
 import pytest
 
 from lute.backup.service import (
@@ -21,7 +20,7 @@ from lute.models.setting import BackupSettings
 # pylint: disable=missing-function-docstring
 # Test method names are pretty descriptive already.
 
-utc = ZoneInfo("UTC")
+utc = timezone.utc
 
 
 @pytest.fixture(name="bkp_dir")
