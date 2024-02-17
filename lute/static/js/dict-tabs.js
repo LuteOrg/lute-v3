@@ -1,9 +1,11 @@
 "use strict";
 
-let dictTabs = [];
-
-
 class DictTab {
+
+  /** All dictTabs created. */
+  static dictTabs = [];
+
+
   constructor(dictURL, frameName) {
     let createIFrame = function(name) {
       const f = document.createElement("iframe");
@@ -198,7 +200,7 @@ function createDictTabs(tab_count = 5) {
       el.remove();
   }
   destroy_existing_dictTab_controls();
-  dictTabs = [];
+  DictTab.dictTabs = [];
 
   if (TERM_DICTS.length <= 0) return;
 
@@ -209,16 +211,16 @@ function createDictTabs(tab_count = 5) {
 
   TERM_DICTS.forEach((dict, index) => {
     const tab = new DictTab(dict,`dict${index}`);
-    dictTabs.push(tab);
+    DictTab.dictTabs.push(tab);
     iFramesContainer.appendChild(tab.frame);
   });
 
-  let buttons_in_tabs = dictTabs.slice(0, tab_count);
-  let buttons_in_list = dictTabs.slice(tab_count);
+  let buttons_in_tabs = DictTab.dictTabs.slice(0, tab_count);
+  let buttons_in_list = DictTab.dictTabs.slice(tab_count);
 
   if (buttons_in_list.length == 1) {
     // Don't bother making a list with a single item.
-    buttons_in_tabs = dictTabs;
+    buttons_in_tabs = DictTab.dictTabs;
     buttons_in_list = [];
   }
 
@@ -233,7 +235,7 @@ function createDictTabs(tab_count = 5) {
   }
   
   // Set first embedded frame as active.
-  const active_tab = dictTabs.find(tab => !tab.isExternal);
+  const active_tab = DictTab.dictTabs.find(tab => !tab.isExternal);
   if (active_tab)
     active_tab.activate();
 
@@ -248,7 +250,7 @@ function createDictTabs(tab_count = 5) {
   for (let tab of Object.values([sentence_tab, image_tab])) {
     document.getElementById("dicttabsstatic").appendChild(tab.btn);
     iFramesContainer.appendChild(tab.frame);
-    dictTabs.push(tab);
+    DictTab.dictTabs.push(tab);
   }
 }
 
@@ -258,15 +260,15 @@ function loadDictionaries() {
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
 
-  dictTabs.forEach(tab => tab.contentLoaded = false);
-  const active_tab = dictTabs.find(tab => tab.is_active && !tab.isExternal);
+  DictTab.dictTabs.forEach(tab => tab.contentLoaded = false);
+  const active_tab = DictTab.dictTabs.find(tab => tab.is_active && !tab.isExternal);
   if (active_tab)
     active_tab.do_lookup();
 }
 
 
 function activateTab(tab) {
-  dictTabs.forEach(tab => tab.deactivate());
+  DictTab.dictTabs.forEach(tab => tab.deactivate());
   tab.activate();
 }
 
