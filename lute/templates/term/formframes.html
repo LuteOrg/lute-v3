@@ -28,22 +28,30 @@
     const loadDictsBtn = document.getElementById("load-dicts-btn");
     const langSelect = document.getElementById("language_id");
     const termField = document.getElementById("text");
-    let term = "";
-    let langid = 0;
+    let old_term = "";
+    let old_langid = 0;
 
     loadDictsBtn.addEventListener("click", (e) => {
       e.preventDefault();
 
       LANG_ID = langSelect.value;
-      if (LANG_ID == 0 || !termField.value) return;
-      if (LANG_ID == langid || termField.value == term) return;
+      if (LANG_ID == 0 || !termField.value)
+        return;
 
-      TERM_DICTS = ALL_DICTS[LANG_ID].term;
-      createDictButtons();
-      loadDictionaries();
+      const lang_changed = LANG_ID != old_langid;
+      const term_changed = termField.value != old_term;
+      if (lang_changed) {
+        // New language = new buttons, rebuild it all.
+        TERM_DICTS = ALL_DICTS[LANG_ID].term;
+        createDictButtons();
+      }
+      if (lang_changed || term_changed) {
+        // Refresh the tabs if needed.
+        loadDictionaries();
+      }
 
-      term = termField.value;
-      langid = LANG_ID;
+      old_term = termField.value;
+      old_langid = LANG_ID;
       
     })
   </script>
