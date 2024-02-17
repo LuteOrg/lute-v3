@@ -70,13 +70,36 @@ class DictTab {
   clickCallback() {
     if (this.isExternal) {
       load_dict_popup(this.dictID);
+    }
+    else {
+      this.load_dict_iframe();
+      activateTab(this);
+    }
+  }
+
+  load_dict_iframe() {
+    if (this.isExternal || this.dictID == null) {
       return;
     }
-    if (this.frame.dataset.contentLoaded == "false") {
-      load_dict_iframe(this.dictID, this.frame);
+    if (this.contentLoaded) {
+      console.log(`${this.label} content already loaded.`);
+      return;
     }
 
-    activateTab(this);
+    const dicturl = TERM_DICTS[this.dictID];
+    const text = TERM_FORM_CONTAINER.querySelector("#text").value;
+    let url = get_lookup_url(dicturl, text);
+
+    const is_bing = (dicturl.indexOf('www.bing.com') != -1);
+    if (is_bing) {
+      // TODO handle_image_lookup_separately: don't mix term lookups with image lookups.
+      let use_text = text;
+      const binghash = dicturl.replace('https://www.bing.com/images/search?', '');
+      url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
+    }
+
+    this.frame.setAttribute("src", url);
+    this.contentLoaded = true;
   }
 
   deactivate() {
@@ -228,38 +251,16 @@ function loadDictionaries() {
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
 
-  const active_tab = dictTabs.find(tab => tab.is_active);
+  const active_tab = dictTabs.find(tab => tab.is_active && !tab.isExternal);
   if (active_tab == null)
     return;
-  if (active_tab.dictID != null && active_tab.frame) {
-    load_dict_iframe(active_tab.dictID, active_tab.frame);
-    active_tab.frame.dataset.contentLoaded = "true";
-  }
+  active_tab.load_dict_iframe();
 }
 
 
 function activateTab(tab) {
   dictTabs.forEach(tab => tab.deactivate());
   tab.activate();
-}
-
-
-function load_dict_iframe(dictID, iframe) {
-  const text = TERM_FORM_CONTAINER.querySelector("#text").value;
-  const dicturl = TERM_DICTS[dictID];
-  const is_bing = (dicturl.indexOf('www.bing.com') != -1);
-
-  if (is_bing) {
-    // TODO handle_image_lookup_separately: don't mix term lookups with image lookups.
-    let use_text = text;
-    const binghash = dicturl.replace('https://www.bing.com/images/search?', '');
-    const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
-    iframe.setAttribute("src", url);
-    return;
-  }
-
-  const url = get_lookup_url(dicturl, text);
-  iframe.setAttribute("src", url);
 }
 
 
