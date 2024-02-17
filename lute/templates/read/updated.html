@@ -42,7 +42,8 @@
       };
 
       $(document).ready(function() {
-        top.frames.dictframe.location.href = '/read/empty';
+        const dictContainer = parent.document.querySelector(".dictcontainer");
+        dictContainer.style.display = "none";
         reload_updated_text_div();
         $('#flash').delay(1000).fadeOut();
       });

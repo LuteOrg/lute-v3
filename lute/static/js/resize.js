@@ -5,8 +5,9 @@ let widthDefault;
 let trHeightDefault;
 const borderWidth = 30; // drag click area is actually dependent on the pseudo element width. this is arbitrary high value
 const wordFrame = document.getElementById("wordframeid");
-const dictFrame = document.getElementById("dictframeid");
-const dictFrameCont = document.querySelector(".dictframecontainer");
+// const dictFrame = document.querySelector("dictframeid");
+const dictFramesCont = document.getElementById("dictframes");
+const dictContainer = document.querySelector(".dictcontainer");
 // const readPaneRight = document.querySelector("#read_pane_right");
 
 applyInitialPaneSizes();
@@ -34,11 +35,8 @@ function resizeCol(e){
 function resizeRow(e){
   const dx = mouse_pos - e.y;
   mouse_pos = e.y;
-  // const currentWidth = getFromLocalStorage("textWidth", widthDefault);
   const currentHeightWordFrame = parseFloat(window.getComputedStyle(readPaneRight).gridTemplateRows.split(" ")[0]);
   const readPaneRightHeight = parseFloat(window.getComputedStyle(readPaneRight).getPropertyValue("height"));
-  // const currentHeightWordFrame = parseFloat(window.getComputedStyle(dictFrameCont).getPropertyValue("height"));
-  // const currentHeightWordFrame = parseFloat(dictFrameCont.style.height);
   // console.log(currentHeightWordFrame);
   let wordFrameHeight = (currentHeightWordFrame / readPaneRightHeight * 100) - (dx / readPaneRightHeight * 100);
   wordFrameHeight = clamp(wordFrameHeight, 5, 95);
@@ -62,17 +60,19 @@ function resizePaneRight(e) {
   e.preventDefault();
 }
 
-readPaneRight.addEventListener("mousedown", function(e){
-if (e.offsetY < borderWidth) {
-  // if there's transition animation dragging is not smooth.
-  // get's reverted back on document.mouseup below
-  readPaneRight.style.transition = "unset";
-  setIFrameStatus("none");
-  mouse_pos = e.y;
-  document.addEventListener("mousemove", resizePaneRight);
-  e.preventDefault();
+if (mediaTablet.matches) {
+  readPaneRight.addEventListener("mousedown", function(e){
+    if (e.offsetY < borderWidth) {
+      // if there's transition animation dragging is not smooth.
+      // get's reverted back on document.mouseup below
+      readPaneRight.style.transition = "unset";
+      setIFrameStatus("none");
+      mouse_pos = e.y;
+      document.addEventListener("mousemove", resizePaneRight);
+      e.preventDefault();
+    }
+  });
 }
-});
 
 readPaneRight.addEventListener("mousedown", function(e){
   if (e.offsetX < borderWidth) {
@@ -85,6 +85,8 @@ readPaneRight.addEventListener("mousedown", function(e){
 
 // double click -> widen to 95% temporarily (doesn't save state)
 readPaneRight.addEventListener("dblclick", function(e){
+  if (e.target != e.currentTarget) return; // fixes: clicking dict tabs resizes panes
+  
   if (e.offsetX < borderWidth) {
     // if the width is 95% then return to the last width value
     if (readPaneLeft.style.width == "95%") {
@@ -98,10 +100,13 @@ readPaneRight.addEventListener("dblclick", function(e){
     }
 });
 
-dictFrameCont.addEventListener("mousedown", function(e){
+dictContainer.addEventListener("mousedown", function(e){
   //if not stopPropagation resizing dictcontainer triggers parent event which resizes
   //readPaneRight at the same time (for @media 900)
-  e.stopPropagation(); 
+  e.stopPropagation();
+  // resize only if the border is selected. fixes: clicking on tab buttons area also able to resize pane
+  if (e.target != e.currentTarget) return; 
+
   setIFrameStatus("none");
   if (e.offsetY < borderWidth) {
     mouse_pos = e.y;
@@ -110,7 +115,9 @@ dictFrameCont.addEventListener("mousedown", function(e){
   }
 });
 
-dictFrameCont.addEventListener("dblclick", function(e){
+dictContainer.addEventListener("dblclick", function(e){
+  if (e.target != e.currentTarget) return; 
+  
   if (e.offsetY < borderWidth) {
     if (readPaneRight.style.gridTemplateRows.split(" ")[0] == "5%") {
       readPaneRight.style.gridTemplateRows = `${getFromLocalStorage("trHeight", trHeightDefault)}% 1fr`;
@@ -125,21 +132,23 @@ document.addEventListener("mouseup", function(){
   document.removeEventListener("mousemove", resizeRow);
   setIFrameStatus("unset");
 
-  document.removeEventListener("mousemove", resizePaneRight);
-  readPaneRight.style.removeProperty("transition");
+  if (mediaTablet.matches) {
+    document.removeEventListener("mousemove", resizePaneRight);
+    readPaneRight.style.removeProperty("transition");
+  }
 });
 
 // hide horizontal line (turned off opacity=0 in the css for now. comments over there)
 // window.addEventListener("message", function(event) {
 //   if (event.data.event === "LuteTermFormOpened") {
-//     dictFrameCont.style.opacity = "1";
+//     dictContainer.style.opacity = "1";
 //   }
 // });
 
 // if the iframes are clickable mousemove doesn't work correctly
 function setIFrameStatus(status) {
   wordFrame.style.pointerEvents = status;
-  dictFrame.style.pointerEvents = status;
+  dictFramesCont.style.pointerEvents = status;
 }
 
 // because right side is fixed. it's width value is different. need to find ratio
@@ -162,7 +171,7 @@ function getTextWidthPercentage() {
 
 function getWordFrameHeightPercentage() {
   // returns percentage value
-  // const elementComputedStyle = window.getComputedStyle(dictFrameCont);
+  // const elementComputedStyle = window.getComputedStyle(dictContainer);
   return (parseFloat(window.getComputedStyle(readPaneRight).gridTemplateRows.split(" ")[0]) / parseFloat(window.getComputedStyle(readPaneRight).getPropertyValue("height"))) * 100;
   // return parseFloat(elementComputedStyle.width);
 }
