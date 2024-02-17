@@ -10,7 +10,6 @@ class DictTab {
       f.name = name;
       f.src = "about:blank";
       f.classList.add("dictframe");
-      f.dataset.contentLoaded = "false";
       return f;
     };
 
@@ -127,8 +126,6 @@ class DictTab {
     this.is_active = true;
     this.btn.classList.add("dict-btn-active");
     this.frame.classList.add("dict-active");
-    // TODO - flag should only be set once content actually loaded.
-    // this.frame.dataset.contentLoaded = "true";
   }
 
 }
@@ -147,9 +144,10 @@ let _make_standalone_tab = function(
   b.textContent = btn_textContent;
   b.classList.add(btn_className);
   b.addEventListener("click", function () {
-    if (tab.frame.dataset.contentLoaded == "false") {
+    if (!tab.contentLoaded) {
       clickHandler(tab.frame);
     }
+    tab.contentLoaded = true;
     activateTab(tab);
   });
   return tab;
@@ -238,11 +236,8 @@ function createDictTabs(tab_count = 5) {
   
   // Set first embedded frame as active.
   const active_tab = dictTabs.find(tab => !tab.isExternal);
-  if (active_tab) {
+  if (active_tab)
     active_tab.activate();
-      active_tab.btn.classList.add("dict-btn-active");
-      active_tab.frame.classList.add("dict-active");
-  }
 
   const sentence_tab = _make_standalone_tab(
     "sentences-btn", "sentencesframe",
@@ -324,8 +319,6 @@ function do_image_lookup(iframe) {
   const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
 
   iframe.setAttribute("src", url);
-
-  return;
 }
 
 /** Parents are in the tagify-managed #parentslist input box. */
