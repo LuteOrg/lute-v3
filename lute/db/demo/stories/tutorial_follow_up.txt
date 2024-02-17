@@ -11,7 +11,7 @@ Now we'll do a brief spin through a few other things Lute does.  You can read ab
 In case you missed it, on the Home screen there are some menu bar items on the top right.  Go back there and hover over them to see what you can do.  This is all demo data, so you can do what you want.  (But don't delete the tutorials until you've gone through them.)
 
 2. Term Sentences
-In the "Term" edit form, you can click on the "Sentences" link to see where that term or its relations have been used.  Click on "elephant", and then click the Sentences link shown to see where that term has been used.
+In the "Term" edit form, you can click on the "Sentences" tab to see where that term or its relations have been used.  Click on "elephant", and then click the Sentences tab to see where that term has been used.
 You're only shown sentences on pages that have been marked "Read", using the controls in the footer of the reading screen, i.e. the green checkmark or the ">".  This ensures that you only see references that you have already seen before, so you don't get overwhelmed with new vocabulary, and avoids spoilers of the material you're reading.
 
 3. Archiving, Unarchiving, and Deleting Books
