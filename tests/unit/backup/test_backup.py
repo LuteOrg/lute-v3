@@ -5,6 +5,7 @@ DB Backup tests.
 import os
 from datetime import datetime
 from unittest.mock import Mock, patch
+from zoneinfo import ZoneInfo
 import pytest
 
 from lute.backup.service import (
@@ -19,6 +20,8 @@ from lute.models.setting import BackupSettings
 
 # pylint: disable=missing-function-docstring
 # Test method names are pretty descriptive already.
+
+utc = ZoneInfo("UTC")
 
 
 @pytest.fixture(name="bkp_dir")
@@ -65,21 +68,27 @@ def _mock_backup_file(directory, name, time, size):
     with open(file_mock.path, "wb") as f:
         f.seek(file_mock.size - 1)
         f.write(b"\0")
-    os.utime(file_mock.path, (time, time))
+    os.utime(file_mock.path, (time.timestamp(), time.timestamp()))
     return file_mock
 
 
 @pytest.fixture(name="auto_backup_file")
 def fixture_auto_backup_file(bkp_dir):
     yield _mock_backup_file(
-        bkp_dir, "lute_backup_2024-01-01-000000.db.gz", 1704092400, 567890
+        bkp_dir,
+        "lute_backup_2024-01-01-000000.db.gz",
+        datetime(2024, 1, 1, 0, 0, 0, tzinfo=utc),
+        567890,
     )
 
 
 @pytest.fixture(name="manual_backup_file")
 def fixture_manual_backup_file(bkp_dir):
     yield _mock_backup_file(
-        bkp_dir, "manual_lute_backup_2024-02-01-000000.db.gz", 1706770800, 123450
+        bkp_dir,
+        "manual_lute_backup_2024-02-01-000000.db.gz",
+        datetime(2024, 2, 1, 0, 0, 0, tzinfo=utc),
+        123450,
     )
 
 
@@ -204,7 +213,7 @@ def test_database_backup_file_with_auto_backup_returns_success(auto_backup_file)
     assert auto_backup_file.path == dbf.filepath
     assert auto_backup_file.size == dbf.size_bytes
     assert dbf.size == "568 KB"
-    assert dbf.last_modified == datetime(2024, 1, 1, 0, 0, 0)
+    assert dbf.last_modified == datetime(2024, 1, 1, 0, 0, 0, tzinfo=utc)
 
 
 def test_database_backup_file_for_auto_is_not_manual(auto_backup_file):
@@ -251,9 +260,9 @@ def test_backup_listing_sorts_by_modified(
     assert len(backups) == 2
 
     backups.sort()
-    assert backups[0].last_modified == datetime(2024, 1, 1, 0, 0, 0)
-    assert backups[1].last_modified == datetime(2024, 2, 1, 0, 0, 0)
+    assert backups[0].last_modified == datetime(2024, 1, 1, 0, 0, 0, tzinfo=utc)
+    assert backups[1].last_modified == datetime(2024, 2, 1, 0, 0, 0, tzinfo=utc)
 
     backups.sort(reverse=True)
-    assert backups[0].last_modified == datetime(2024, 2, 1, 0, 0, 0)
-    assert backups[1].last_modified == datetime(2024, 1, 1, 0, 0, 0)
+    assert backups[0].last_modified == datetime(2024, 2, 1, 0, 0, 0, tzinfo=utc)
+    assert backups[1].last_modified == datetime(2024, 1, 1, 0, 0, 0, tzinfo=utc)
