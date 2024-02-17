@@ -35,7 +35,7 @@ function start_hover_mode(should_clear_frames = true) {
 
   if (should_clear_frames) {
     $('#wordframeid').attr('src', '/read/empty');
-    $('#dictframeid').attr('src', '/read/empty');
+    $('.dictcontainer').hide();
   }
 
   clear_newmultiterm_elements();

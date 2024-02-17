@@ -12,10 +12,59 @@
 
 
 <div id="term_form_right">
-  <iframe name="dictframe" class="rightreadingframe" src="/read/empty" scrolling="auto"
-          style="height: 100%; width: 100%;" frameBorder="1">
-    Frame support required.
-  </iframe>
+  <div class="dictcontainer">
+    <div id="dicttabs">
+      <div id="dicttabslayout"></div>
+      <div id="dicttabsstatic"></div>
+    </div>
+    <div id="dictframes"></div>
+  </div>
 </div>
+
+{% if term.language_id is none %}
+
+  <script>
+    const dictTabsContainer = document.getElementById("dicttabs");
+    const loadDictsBtn = document.getElementById("load-dicts-btn");
+    const langSelect = document.getElementById("language_id");
+    const termField = document.getElementById("text");
+    let old_term = "";
+    let old_langid = 0;
+
+    loadDictsBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      LANG_ID = langSelect.value;
+      if (LANG_ID == 0 || !termField.value)
+        return;
+
+      const lang_changed = LANG_ID != old_langid;
+      const term_changed = termField.value != old_term;
+      if (lang_changed) {
+        // New language = new buttons, rebuild it all.
+        TERM_DICTS = ALL_DICTS[LANG_ID].term;
+        createDictButtons();
+      }
+      if (lang_changed || term_changed) {
+        // Refresh the tabs if needed.
+        loadDictionaries();
+      }
+
+      old_term = termField.value;
+      old_langid = LANG_ID;
+      
+    })
+  </script>
+
+{% else %}
+
+  <script>
+    LANG_ID = $('#language_id').val();
+    TERM_DICTS = ALL_DICTS[LANG_ID].term;
+    createDictButtons();
+    loadDictionaries();
+  </script>
+
+{% endif %}
 
 {% endblock %}
