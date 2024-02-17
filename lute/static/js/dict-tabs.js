@@ -69,15 +69,15 @@ class DictTab {
 
   clickCallback() {
     if (this.isExternal) {
-      this.load_popup();
+      this._load_popup();
     }
     else {
-      this.load_frame();
+      this._load_frame();
       activateTab(this);
     }
   }
 
-  load_popup() {
+  _load_popup() {
     let url = TERM_DICTS[this.dictID];
     if ((url ?? "") == "")
       return;
@@ -92,7 +92,7 @@ class DictTab {
     );
   }
 
-  load_frame() {
+  _load_frame() {
     if (this.isExternal || this.dictID == null) {
       return;
     }
@@ -269,7 +269,7 @@ function loadDictionaries() {
   const active_tab = dictTabs.find(tab => tab.is_active && !tab.isExternal);
   if (active_tab == null)
     return;
-  active_tab.load_frame();
+  active_tab._load_frame();  // TODO change this.
 }
 
 
