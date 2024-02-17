@@ -229,32 +229,29 @@ function createDictButtons(tab_count = 5) {
 
   if (TERM_DICTS.length <= 0) return;
 
-  const dev_hack_add_dicts = Array.from({ length: 8 }, (_, i) => `a${i}`);
-  TERM_DICTS.push(...dev_hack_add_dicts);
+  // const dev_hack_add_dicts = Array.from({ length: 5 }, (_, i) => `a${i}`);
+  // TERM_DICTS.push(...dev_hack_add_dicts);
 
-  TERM_DICTS.forEach((dict, index) => {
-    const tab = new DictButton(dict,`dict${index}`);
-  });
+  TERM_DICTS.forEach((dict, index) => { new DictButton(dict,`dict${index}`); });
+
+  if (tab_count == (TERM_DICTS.length - 1)) {
+    // Don't bother making a list with a single item.
+    tab_count += 1;
+  }
 
   let buttons_in_tabs = DictButton.all_buttons.slice(0, tab_count);
   let buttons_in_list = DictButton.all_buttons.slice(tab_count);
 
-  if (buttons_in_list.length == 1) {
-    // Don't bother making a list with a single item.
-    buttons_in_tabs = DictButton.all_buttons;
-    buttons_in_list = [];
-  }
-
   const layout_container = document.getElementById("dicttabslayout");
-  const grid_column_count = buttons_in_tabs.length + (buttons_in_list.length > 0 ? 1 : 0);
-  layout_container.style.gridTemplateColumns = `repeat(${grid_column_count}, minmax(2rem, 8rem))`;
-
+  let col_count = tab_count;
   buttons_in_tabs.forEach(tab => layout_container.appendChild(tab.btn));
   if (buttons_in_list.length > 0) {
     const m = _create_dict_dropdown_div(buttons_in_list);
     layout_container.appendChild(m);
+    col_count += 1;
   }
-  
+  layout_container.style.gridTemplateColumns = `repeat(${col_count}, minmax(2rem, 8rem))`;
+
   // Set first embedded frame as active.
   const active_tab = DictButton.all_buttons.find(tab => !tab.isExternal);
   if (active_tab)
