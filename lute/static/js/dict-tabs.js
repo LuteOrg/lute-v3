@@ -159,11 +159,10 @@ class DictButton {
 
 /** Factory method for sentence, image buttons. */
 let _make_standalone_tab = function(
-  btn_id, framename,
-  btn_textContent, btn_title, btn_className,
+  btn_id, btn_textContent, btn_title, btn_className,
   clickHandler
 ) {
-  const tab = new DictButton(null, framename);
+  const tab = new DictButton(null, `frame_for_${btn_id}`);
   const b = tab.btn;
   b.setAttribute("id", btn_id);
   b.setAttribute("title", btn_title);
@@ -262,8 +261,8 @@ function createDictButtons(tab_count = 5) {
     active_tab.activate();
 
   const static_buttons = [
-    [ "sentences-btn", "sentencesframe", "Sentences", "See term usage", "dict-sentences-btn", do_sentence_lookup ],
-    [ "dict-image-btn", "imageframe", null, "Lookup images", "dict-image-btn", do_image_lookup ]
+    [ "sentences-btn", "Sentences", "See term usage", "dict-sentences-btn", do_sentence_lookup ],
+    [ "dict-image-btn", null, "Lookup images", "dict-image-btn", do_image_lookup ]
   ];
   for (let b of static_buttons) {
     const tab = _make_standalone_tab(...b);
