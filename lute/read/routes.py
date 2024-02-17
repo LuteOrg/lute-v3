@@ -23,10 +23,7 @@ def _render_book_page(book, pagenum):
     """
     lang = book.language
     show_highlights = bool(int(UserSetting.get_value("show_highlights")))
-
     term_dicts = lang.all_dictionaries()[lang.id]["term"]
-    # print(lang.all_dictionaries())
-    # print(term_dicts)
 
     return render_template(
         "read/index.html",
@@ -38,7 +35,6 @@ def _render_book_page(book, pagenum):
         page_num=pagenum,
         page_count=book.page_count,
         show_highlights=show_highlights,
-        # all_dicts=lang.all_dictionaries(),
         lang_id=lang.id,
         term_dicts=term_dicts,
     )
