@@ -109,7 +109,7 @@ def test_time_since_last_backup_in_past(app_context):
     """
     Check formatting when last backup is reported to be in the past.
 
-    current time = 1209600, backup time = various
+    current time = 62899200, backup time = various
     """
     b = BackupSettings.get_backup_settings()
     now = 62899200
