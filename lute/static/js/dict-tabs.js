@@ -73,6 +73,7 @@ class DictButton {
     if (this.isExternal) {
       const ext_img = document.createElement("img");
       ext_img.classList.add("dict-btn-external-img");
+      this.btn.classList.add("dict-btn-external");
       this.btn.appendChild(ext_img);
     }
 

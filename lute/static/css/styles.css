@@ -1289,17 +1289,17 @@ input[type="checkbox"][disabled] + label {
     border-color: #68ace0;
 }
 
-#dicttabslayout .dict-btn[data-dict-external="true"]::after,
-#dicttabslayout .dict-menu-item[data-dict-external="true"]::after,
-#dicttabslayout .dict-btn-select[data-dict-external="false"]::after {
+#dicttabslayout .dict-btn.dict-btn-external::after,
+#dicttabslayout .dict-menu-item.dict-btn-external::after,
+#dicttabslayout .dict-btn-select:not(.dict-btn-external)::after {
     border-right-width: 1.5rem;
 }
 
-#dicttabslayout .dict-btn-select[data-dict-external="true"]::after {
+#dicttabslayout .dict-btn-select.dict-btn-external::after {
     border-right-width: 2.6rem
 }
 
-#dicttabslayout .dict-btn:not(.dict-btn-active):not(.dict-btn[data-dict-external="true"]):hover::after,
+#dicttabslayout .dict-btn:not(.dict-btn-active):not(.dict-btn.dict-btn-external):hover::after,
 #dicttabslayout .dict-btn:not(.dict-btn-active):hover::after {
     border-color: aliceblue;
 }
@@ -1337,7 +1337,7 @@ input[type="checkbox"][disabled] + label {
     right: 1.4rem;
 }
 
-.dict-btn:not(.dict-btn-active):not(.dict-btn[data-dict-external="true"]) img {
+.dict-btn:not(.dict-btn-active):not(.dict-btn.dict-btn-external) img {
     opacity: 0.5;
 }
 
@@ -1380,7 +1380,7 @@ input[type="checkbox"][disabled] + label {
     box-shadow: inset 0 0 0 2px #68ace0;
 }
 
-.dict-btn[data-dict-external="true"] {
+.dict-btn.dict-btn-external {
     color: #5b5b5b;
 }
 
