@@ -1290,8 +1290,7 @@ input[type="checkbox"][disabled] + label {
 }
 
 #dicttabslayout .dict-btn.dict-btn-external::after,
-#dicttabslayout .dict-menu-item.dict-btn-external::after,
-#dicttabslayout .dict-btn-select:not(.dict-btn-external)::after {
+#dicttabslayout .dict-menu-item.dict-btn-external::after {
     border-right-width: 1.5rem;
 }
 
@@ -1437,7 +1436,7 @@ input[type="checkbox"][disabled] + label {
     background-color: aliceblue;
     min-width: 100%;
     top: 100%;
-    left: 0;
+    right: 0;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
     border-top: none;
@@ -1456,6 +1455,12 @@ input[type="checkbox"][disabled] + label {
 
 #dict-menu-container:hover .dict-btn-select:not(.dict-btn-active)::after {
     border-color: aliceblue;
+}
+
+.dict-btn-select {
+    display: flex;
+    justify-content: flex-end;
+    padding-inline: 0.5rem;
 }
 
 .dict-menu-item {
