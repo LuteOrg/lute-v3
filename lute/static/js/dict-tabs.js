@@ -31,8 +31,8 @@ class DictButton {
 
     DictButton.all_buttons.push(this);
 
-    // Some DictButtons aren't actually dicts, e.g. Sentence tab and
-    // Image button.  Perhaps there's a better class design ...
+    // Some DictButtons don't do regular dict lookups -- their
+    // construction is managed separately.
     if (dictURL == null) {
       return;
     }
