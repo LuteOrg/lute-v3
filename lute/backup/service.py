@@ -44,7 +44,7 @@ class DatabaseBackupFile:
 
     @property
     def last_modified(self) -> datetime:
-        return datetime.fromtimestamp(os.path.getmtime(self.filepath))
+        return datetime.fromtimestamp(os.path.getmtime(self.filepath)).astimezone()
 
     @property
     def size_bytes(self) -> int:
