@@ -1,10 +1,16 @@
 "use strict";
 
+/**
+ * A "dictionary tab" to be shown in the UI.
+ * Manages display state, loading and caching content.
+ *
+ * The class *could* be broken up into things like
+ * PopupDictTab, EmbeddedDictTab, etc, but no need for that yet.
+ */
 class DictTab {
 
   /** All dictTabs created. */
   static dictTabs = [];
-
 
   constructor(dictURL, frameName) {
     let createIFrame = function(name) {
