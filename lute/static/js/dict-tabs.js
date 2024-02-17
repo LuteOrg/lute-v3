@@ -261,15 +261,12 @@ function createDictButtons(tab_count = 5) {
   if (active_tab)
     active_tab.activate();
 
-  const sentence_tab = _make_standalone_tab(
-    "sentences-btn", "sentencesframe",
-    "Sentences", "See term usage", "dict-sentences-btn", do_sentence_lookup);
-
-  const image_tab = _make_standalone_tab(
-    "dict-image-btn", "imageframe",
-    null, "Lookup images", "dict-image-btn", do_image_lookup);
-
-  for (let tab of Object.values([sentence_tab, image_tab])) {
+  const static_buttons = [
+    [ "sentences-btn", "sentencesframe", "Sentences", "See term usage", "dict-sentences-btn", do_sentence_lookup ],
+    [ "dict-image-btn", "imageframe", null, "Lookup images", "dict-image-btn", do_image_lookup ]
+  ];
+  for (let b of static_buttons) {
+    const tab = _make_standalone_tab(...b);
     document.getElementById("dicttabsstatic").appendChild(tab.btn);
   }
 
