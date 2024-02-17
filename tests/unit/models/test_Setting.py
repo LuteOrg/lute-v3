@@ -3,6 +3,7 @@ Settings test.
 """
 
 import os
+from unittest.mock import patch
 import pytest
 from sqlalchemy import text
 from lute.db import db
@@ -66,6 +67,73 @@ def test_get_backup_settings(app_context):
     assert b.backup_warn is False  # set to 0 above
     assert b.backup_count == 12
     assert b.last_backup_datetime is None
+
+
+def test_time_since_last_backup_future(app_context):
+    """
+    Check formatting when last backup is reported to be in the future.
+
+    current time = 600, backup time = 900
+    """
+    b = BackupSettings.get_backup_settings()
+    with patch("time.time", return_value=600):
+        b.last_backup_datetime = 900
+        assert b.time_since_last_backup is None
+
+
+def test_time_since_last_backup_none(app_context):
+    """
+    Check formatting when last backup is reported to be None.
+
+    current time = 600, backup time = None
+    """
+    b = BackupSettings.get_backup_settings()
+    with patch("time.time", return_value=600):
+        b.last_backup_datetime = None
+        assert b.time_since_last_backup is None
+
+
+def test_time_since_last_backup_right_now(app_context):
+    """
+    Check formatting when last backup is reported to be the same as current time.
+
+    current time = 600, backup time = 600
+    """
+    b = BackupSettings.get_backup_settings()
+    with patch("time.time", return_value=600):
+        b.last_backup_datetime = 600
+        assert b.time_since_last_backup == "0 seconds ago"
+
+
+def test_time_since_last_backup_in_past(app_context):
+    """
+    Check formatting when last backup is reported to be in the past.
+
+    current time = 1209600, backup time = various
+    """
+    b = BackupSettings.get_backup_settings()
+    now = 62899200
+    with patch("time.time", return_value=now):
+        b.last_backup_datetime = now - 45
+        assert b.time_since_last_backup == "45 seconds ago"
+        b.last_backup_datetime = now - 75
+        assert b.time_since_last_backup == "1 minute ago"
+        b.last_backup_datetime = now - 135
+        assert b.time_since_last_backup == "2 minutes ago"
+        b.last_backup_datetime = now - 3601
+        assert b.time_since_last_backup == "1 hour ago"
+        b.last_backup_datetime = now - 7201
+        assert b.time_since_last_backup == "2 hours ago"
+        b.last_backup_datetime = now - 86401
+        assert b.time_since_last_backup == "1 day ago"
+        b.last_backup_datetime = now - 172801
+        assert b.time_since_last_backup == "2 days ago"
+        b.last_backup_datetime = now - 604801
+        assert b.time_since_last_backup == "1 week ago"
+        b.last_backup_datetime = now - 15724801
+        assert b.time_since_last_backup == "26 weeks ago"
+        b.last_backup_datetime = now - 45360001
+        assert b.time_since_last_backup == "75 weeks ago"
 
 
 def test_user_settings_loaded_with_defaults(app_context):
