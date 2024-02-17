@@ -301,6 +301,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         # Have to refresh the content to query the dom ...
         # Unfortunately, I can't see how to refresh without reloading
         self.browser.reload()
+        time.sleep(0.2)  # Hack, test failing.
 
     def click_word_fill_form(self, word, updates=None):
         """
@@ -311,8 +312,11 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
         should_refresh = False
         with self.browser.get_iframe("wordframe") as iframe:
+            time.sleep(0.2)  # Hack, test failing.
             self._fill_term_form(iframe, updates)
+            time.sleep(0.2)  # Hack, test failing.
             iframe.find_by_css("#submit").first.click()
+            time.sleep(0.2)  # Hack, test failing.
 
             # Only refresh the reading frame if everything was ok.
             # Some submits will fail due to validation errors,
@@ -324,6 +328,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         # Unfortunately, I can't see how to refresh without reloading
         if should_refresh:
             self.browser.reload()
+            time.sleep(0.2)  # Hack, test failing.
 
     ################################3
     # Misc.
