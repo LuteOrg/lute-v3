@@ -72,12 +72,12 @@ class DictTab {
       load_dict_popup(this.dictID);
     }
     else {
-      this.load_dict_iframe();
+      this.load_frame();
       activateTab(this);
     }
   }
 
-  load_dict_iframe() {
+  load_frame() {
     if (this.isExternal || this.dictID == null) {
       return;
     }
@@ -254,7 +254,7 @@ function loadDictionaries() {
   const active_tab = dictTabs.find(tab => tab.is_active && !tab.isExternal);
   if (active_tab == null)
     return;
-  active_tab.load_dict_iframe();
+  active_tab.load_frame();
 }
 
 
