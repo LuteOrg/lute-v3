@@ -9,8 +9,8 @@
  */
 class DictButton {
 
-  /** All dictTabs created. */
-  static dictTabs = [];
+  /** All DictButtons created. */
+  static all_buttons = [];
 
   constructor(dictURL, frameName) {
     let createIFrame = function(name) {
@@ -29,7 +29,7 @@ class DictButton {
     this.btn = document.createElement("button");
     this.btn.classList.add("dict-btn");
 
-    DictButton.dictTabs.push(this);
+    DictButton.all_buttons.push(this);
 
     // Some DictButtons aren't actually dicts, e.g. Sentence tab and
     // Image button.  Perhaps there's a better class design ...
@@ -148,7 +148,7 @@ class DictButton {
   }
 
   activate() {
-    DictButton.dictTabs.forEach(tab => tab.deactivate());
+    DictButton.all_buttons.forEach(tab => tab.deactivate());
     this.is_active = true;
     this.btn.classList.add("dict-btn-active");
     this.frame.classList.add("dict-active");
@@ -226,7 +226,7 @@ function createDictButtons(tab_count = 5) {
       el.remove();
   }
   destroy_existing_dictTab_controls();
-  DictButton.dictTabs = [];
+  DictButton.all_buttons = [];
 
   if (TERM_DICTS.length <= 0) return;
 
@@ -237,12 +237,12 @@ function createDictButtons(tab_count = 5) {
     const tab = new DictButton(dict,`dict${index}`);
   });
 
-  let buttons_in_tabs = DictButton.dictTabs.slice(0, tab_count);
-  let buttons_in_list = DictButton.dictTabs.slice(tab_count);
+  let buttons_in_tabs = DictButton.all_buttons.slice(0, tab_count);
+  let buttons_in_list = DictButton.all_buttons.slice(tab_count);
 
   if (buttons_in_list.length == 1) {
     // Don't bother making a list with a single item.
-    buttons_in_tabs = DictButton.dictTabs;
+    buttons_in_tabs = DictButton.all_buttons;
     buttons_in_list = [];
   }
 
@@ -257,7 +257,7 @@ function createDictButtons(tab_count = 5) {
   }
   
   // Set first embedded frame as active.
-  const active_tab = DictButton.dictTabs.find(tab => !tab.isExternal);
+  const active_tab = DictButton.all_buttons.find(tab => !tab.isExternal);
   if (active_tab)
     active_tab.activate();
 
@@ -274,7 +274,7 @@ function createDictButtons(tab_count = 5) {
   }
 
   const dictframes = document.getElementById("dictframes");
-  DictButton.dictTabs.forEach((tab) => { dictframes.appendChild(tab.frame); });
+  DictButton.all_buttons.forEach((tab) => { dictframes.appendChild(tab.frame); });
 }
 
 
@@ -283,8 +283,8 @@ function loadDictionaries() {
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
 
-  DictButton.dictTabs.forEach(tab => tab.contentLoaded = false);
-  const active_tab = DictButton.dictTabs.find(tab => tab.is_active && !tab.isExternal);
+  DictButton.all_buttons.forEach(tab => tab.contentLoaded = false);
+  const active_tab = DictButton.all_buttons.find(tab => tab.is_active && !tab.isExternal);
   if (active_tab)
     active_tab.do_lookup();
 }
