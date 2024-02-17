@@ -63,11 +63,11 @@ class DictTab {
     }
 
     this.btn.dataset.dictId = this.dictID;
-    this.btn.onclick = this.clickCallback.bind(this);
+    this.btn.onclick = () => this.do_lookup();
     this.btn.dataset.dictExternal = this.isExternal ? "true" : "false";
   }
 
-  clickCallback() {
+  do_lookup() {
     if (this.isExternal) {
       this._load_popup();
     }
@@ -261,15 +261,14 @@ function createDictTabs(tab_count = 5) {
 
 
 function loadDictionaries() {
-  dictTabs.forEach(tab => tab.frame.dataset.contentLoaded = "false");
   const dictContainer = document.querySelector(".dictcontainer");
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
 
+  dictTabs.forEach(tab => tab.contentLoaded = false);
   const active_tab = dictTabs.find(tab => tab.is_active && !tab.isExternal);
-  if (active_tab == null)
-    return;
-  active_tab._load_frame();  // TODO change this.
+  if (active_tab)
+    active_tab.do_lookup();
 }
 
 
