@@ -14,6 +14,10 @@ class DictTab {
       return f;
     };
 
+    this.dictID = null;
+    this.is_active = false;
+    this.contentLoaded = false;
+
     this.frame = createIFrame(frameName);
     this.btn = document.createElement("button");
     this.btn.classList.add("dict-btn");
@@ -76,15 +80,17 @@ class DictTab {
   }
 
   deactivate() {
+    this.is_active = false;
     this.btn.classList.remove("dict-btn-active");
     this.frame.classList.remove("dict-active");
   }
 
   activate() {
+    this.is_active = true;
     this.btn.classList.add("dict-btn-active");
     this.frame.classList.add("dict-active");
     // TODO - flag should only be set once content actually loaded.
-    this.frame.dataset.contentLoaded = "true";
+    // this.frame.dataset.contentLoaded = "true";
   }
 
 }
@@ -195,6 +201,7 @@ function createDictTabs(tab_count = 5) {
   // Set first embedded frame as active.
   const active_tab = dictTabs.find(tab => !tab.isExternal);
   if (active_tab) {
+    active_tab.activate();
       active_tab.btn.classList.add("dict-btn-active");
       active_tab.frame.classList.add("dict-active");
   }
@@ -221,14 +228,12 @@ function loadDictionaries() {
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
 
-  const activeFrame = document.querySelector(".dict-active");
-  const activeTab = document.querySelector(".dict-btn-active");
-  if (activeFrame == null || activeTab == null)
+  const active_tab = dictTabs.find(tab => tab.is_active);
+  if (active_tab == null)
     return;
-
-  if ("dictId" in activeTab.dataset) {
-    load_dict_iframe(activeTab.dataset.dictId, activeFrame);
-    activeFrame.dataset.contentLoaded = "true";
+  if (active_tab.dictID != null && active_tab.frame) {
+    load_dict_iframe(active_tab.dictID, active_tab.frame);
+    active_tab.frame.dataset.contentLoaded = "true";
   }
 }
 
