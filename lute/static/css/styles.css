@@ -1652,8 +1652,7 @@ input[type="checkbox"][disabled] + label {
 #max_page_tokens,
 #dict_tabs,
 .dict-type,
-.dict-usefor
- {
+.dict-usefor {
     width: 8rem;
     box-sizing: border-box;
     border: 1px solid var(--form-border-color);
