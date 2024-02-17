@@ -48,20 +48,25 @@ class DictButton {
     this.label = (url.length <= 10) ? url : (url.slice(0, 10) + '...');
 
     // If the URL is a real url, get icon and label.
+    let fimg = null;
     try {
       const urlObj = new URL(url);  // Throws if invalid.
       const domain = urlObj.hostname;
       this.label = domain.split("www.").splice(-1)[0];
 
-      const fimg = document.createElement("img");
+      fimg = document.createElement("img");
       fimg.classList.add("dict-btn-fav-img");
       const favicon_src = `http://www.google.com/s2/favicons?domain=${domain}`;
       fimg.src = favicon_src;
-      this.btn.prepend(fimg);
     }
     catch(err) {}
 
     this.btn.textContent = this.label;
+
+    // Must prepend after the textContent is set, or it is overwritten/lost.
+    if (fimg != null)
+      this.btn.prepend(fimg);
+
     this.btn.setAttribute("title", this.label);
 
     this.isExternal = (dictURL.charAt(0) == '*');
