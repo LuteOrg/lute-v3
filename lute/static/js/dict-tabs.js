@@ -23,6 +23,8 @@ class DictTab {
     this.btn = document.createElement("button");
     this.btn.classList.add("dict-btn");
 
+    DictTab.dictTabs.push(this);
+
     // Some DictTabs aren't actually dicts, e.g. Sentence tab and
     // Image button.  Perhaps there's a better class design ...
     if (dictURL == null) {
@@ -227,7 +229,6 @@ function createDictTabs(tab_count = 5) {
 
   TERM_DICTS.forEach((dict, index) => {
     const tab = new DictTab(dict,`dict${index}`);
-    DictTab.dictTabs.push(tab);
   });
 
   let buttons_in_tabs = DictTab.dictTabs.slice(0, tab_count);
@@ -264,7 +265,6 @@ function createDictTabs(tab_count = 5) {
 
   for (let tab of Object.values([sentence_tab, image_tab])) {
     document.getElementById("dicttabsstatic").appendChild(tab.btn);
-    DictTab.dictTabs.push(tab);
   }
 
   const dictframes = document.getElementById("dictframes");
