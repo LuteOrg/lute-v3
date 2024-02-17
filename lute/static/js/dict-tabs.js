@@ -69,12 +69,27 @@ class DictTab {
 
   clickCallback() {
     if (this.isExternal) {
-      load_dict_popup(this.dictID);
+      this.load_popup();
     }
     else {
       this.load_frame();
       activateTab(this);
     }
+  }
+
+  load_popup() {
+    let url = TERM_DICTS[this.dictID];
+    if ((url ?? "") == "")
+      return;
+    if (url[0] == "*")  // Should be true!
+      url = url.slice(1);
+    const term = TERM_FORM_CONTAINER.querySelector("#text").value;
+    const lookup_url = get_lookup_url(url, term);
+    window.open(
+      lookup_url,
+      'otherwin',
+      'width=800, height=400, scrollbars=yes, menubar=no, resizable=yes, status=no'
+    );
   }
 
   load_frame() {
@@ -261,23 +276,6 @@ function loadDictionaries() {
 function activateTab(tab) {
   dictTabs.forEach(tab => tab.deactivate());
   tab.activate();
-}
-
-
-function load_dict_popup(dictID) {
-  let url = TERM_DICTS[dictID];
-  if ((url ?? "") == "") {
-    return;
-  }
-  if (url[0] == "*")  // Should be true!
-    url = url.slice(1);
-  const term = TERM_FORM_CONTAINER.querySelector("#text").value;
-  const lookup_url = get_lookup_url(url, term);
-  window.open(
-    lookup_url,
-    'otherwin',
-    'width=800, height=400, scrollbars=yes, menubar=no, resizable=yes, status=no'
-  );
 }
 
 
