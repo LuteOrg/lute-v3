@@ -10,7 +10,7 @@
 class DictButton {
 
   /** All DictButtons created. */
-  static all_buttons = [];
+  static all = [];
 
   constructor(dictURL, frameName) {
     let createIFrame = function(name) {
@@ -29,7 +29,7 @@ class DictButton {
     this.btn = document.createElement("button");
     this.btn.classList.add("dict-btn");
 
-    DictButton.all_buttons.push(this);
+    DictButton.all.push(this);
 
     // Some DictButtons don't do regular dict lookups -- their
     // construction is managed separately.
@@ -148,7 +148,7 @@ class DictButton {
   }
 
   activate() {
-    DictButton.all_buttons.forEach(tab => tab.deactivate());
+    DictButton.all.forEach(tab => tab.deactivate());
     this.is_active = true;
     this.btn.classList.add("dict-btn-active");
     this.frame.classList.add("dict-active");
@@ -225,37 +225,37 @@ function createDictButtons(tab_count = 5) {
       el.remove();
   }
   destroy_existing_dictTab_controls();
-  DictButton.all_buttons = [];
+  DictButton.all = [];
 
   if (TERM_DICTS.length <= 0) return;
 
   // const dev_hack_add_dicts = Array.from({ length: 5 }, (_, i) => `a${i}`);
   // TERM_DICTS.push(...dev_hack_add_dicts);
 
-  TERM_DICTS.forEach((dict, index) => { new DictButton(dict,`dict${index}`); });
-
   if (tab_count == (TERM_DICTS.length - 1)) {
     // Don't bother making a list with a single item.
     tab_count += 1;
   }
 
-  let buttons_in_tabs = DictButton.all_buttons.slice(0, tab_count);
-  let buttons_in_list = DictButton.all_buttons.slice(tab_count);
+  // Make all DictButtons, which loads DictButton.all.
+  TERM_DICTS.forEach((dict, index) => { new DictButton(dict,`dict${index}`); });
+  const tab_buttons = DictButton.all.slice(0, tab_count);
+  const list_buttons = DictButton.all.slice(tab_count);
 
-  const layout_container = document.getElementById("dicttabslayout");
-  let col_count = tab_count;
-  buttons_in_tabs.forEach(tab => layout_container.appendChild(tab.btn));
-  if (buttons_in_list.length > 0) {
-    const m = _create_dict_dropdown_div(buttons_in_list);
-    layout_container.appendChild(m);
-    col_count += 1;
+  // Add elements to container.
+  const container = document.getElementById("dicttabslayout");
+  let grid_col_count = tab_count;
+  tab_buttons.forEach(tab => container.appendChild(tab.btn));
+  if (list_buttons.length > 0) {
+    const dropdown_div = _create_dict_dropdown_div(list_buttons);
+    container.appendChild(dropdown_div);
+    grid_col_count += 1;
   }
-  layout_container.style.gridTemplateColumns = `repeat(${col_count}, minmax(2rem, 8rem))`;
+  container.style.gridTemplateColumns = `repeat(${grid_col_count}, minmax(2rem, 8rem))`;
 
-  // Set first embedded frame as active.
-  const active_tab = DictButton.all_buttons.find(tab => !tab.isExternal);
-  if (active_tab)
-    active_tab.activate();
+  const first_embedded_tab = DictButton.all.find(tab => !tab.isExternal);
+  if (first_embedded_tab)
+    first_embedded_tab.activate();
 
   const static_buttons = [
     [ "sentences-btn", "Sentences", "See term usage", "dict-sentences-btn", do_sentence_lookup ],
@@ -267,7 +267,7 @@ function createDictButtons(tab_count = 5) {
   }
 
   const dictframes = document.getElementById("dictframes");
-  DictButton.all_buttons.forEach((tab) => { dictframes.appendChild(tab.frame); });
+  DictButton.all.forEach((tab) => { dictframes.appendChild(tab.frame); });
 }
 
 
@@ -276,8 +276,8 @@ function loadDictionaries() {
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
 
-  DictButton.all_buttons.forEach(tab => tab.contentLoaded = false);
-  const active_tab = DictButton.all_buttons.find(tab => tab.is_active && !tab.isExternal);
+  DictButton.all.forEach(tab => tab.contentLoaded = false);
+  const active_tab = DictButton.all.find(tab => tab.is_active && !tab.isExternal);
   if (active_tab)
     active_tab.do_lookup();
 }
