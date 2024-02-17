@@ -61,9 +61,7 @@ class DictTab {
       this.btn.appendChild(ext_img);
     }
 
-    this.btn.dataset.dictId = this.dictID;
     this.btn.onclick = () => this.do_lookup();
-    this.btn.dataset.dictExternal = this.isExternal ? "true" : "false";
   }
 
   do_lookup() {
