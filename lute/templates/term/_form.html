@@ -253,6 +253,21 @@
     return tagify;
   }  // end setup_parent_tagify
 
+  // Parents are in the tagify-managed #parentslist input box.
+  let get_parents = function() {
+    // During form load, and in "steady state" (i.e., after the tags
+    // have been added or removed, and the focus has switched to
+    // another control) the #sync_status text box is loaded with the
+    // values.
+    const pdata = $('#parentslist').val();
+    if ((pdata ?? '') == '') {
+      return [];
+    }
+    const j = JSON.parse(pdata);
+    const parents = j.map(e => e.value);
+    return parents;
+  };
+
   let enable_disable_sync_status_checkbox = function() {
     const cb = $("#sync_status");
     if (get_parents().length == 1)

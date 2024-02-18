@@ -1,15 +1,12 @@
 "use strict";
 
-/**
- * A "dictionary button" to be shown in the UI.
- * Manages display state, loading and caching content.
- *
- * The class *could* be broken up into things like
- * PopupDictButton, EmbeddedDictButton, etc, but no need for that yet.
- */
-class DictButton {
 
-  /** All DictButtons created. */
+/**
+ * A general lookup button, for images, sentences, etc.
+ */
+class LookupButton {
+
+  /** All LookupButtons created. */
   static all = [];
 
   constructor(dictURL, frameName) {
@@ -28,14 +25,126 @@ class DictButton {
     this.frame = createIFrame(frameName);
     this.btn = document.createElement("button");
     this.btn.classList.add("dict-btn");
+    this.btn.onclick = () => this.do_lookup();
 
-    DictButton.all.push(this);
+    LookupButton.all.push(this);
+  }
 
-    // Some DictButtons don't do regular dict lookups -- their
-    // construction is managed separately.
-    if (dictURL == null) {
-      return;
-    }
+  /** Lookup. *************************/
+
+  do_lookup() {
+    throw new Error('Subclasses must override.');
+  }
+
+  /** Activate/deact. *************************/
+
+  deactivate() {
+    this.is_active = false;
+    this.btn.classList.remove("dict-btn-active");
+    this.frame.classList.remove("dict-active");
+  }
+
+  activate() {
+    DictButton.all.forEach(button => button.deactivate());
+    this.is_active = true;
+    this.btn.classList.add("dict-btn-active");
+    this.frame.classList.add("dict-active");
+  }
+
+};
+
+
+/**
+ * A general lookup button that's doesn't use dictionaries.
+ * For buttons that get info about a term.
+ * This content is never cached -- form values may change the search,
+ * so it's fine to always reload.
+ */
+class GeneralLookupButton extends LookupButton {
+  constructor(btn_id, btn_textContent, btn_title, btn_className, clickHandler) {
+    super(`frame_for_${btn_id}`);
+
+    const b = this.btn;
+    b.setAttribute("id", btn_id);
+    b.setAttribute("title", btn_title);
+    b.textContent = btn_textContent;
+    b.classList.add(btn_className);
+
+    this.click_handler = clickHandler;
+  }
+
+  do_lookup() {
+    this.click_handler(this.frame);
+    this.activate();
+  }
+
+}  // end GeneralLookupButton
+
+
+class SentenceLookupButton extends GeneralLookupButton {
+  constructor() {
+    let handler = function(iframe) {
+      const txt = TERM_FORM_CONTAINER.querySelector("#text").value;
+      // %E2%80%8B is the zero-width string.  The term is reparsed
+      // on the server, so this doesn't need to be sent.
+      const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
+      if (LANG_ID == '0' || t == '')
+        return;
+      iframe.setAttribute("src", `/term/sentences/${LANG_ID}/${t}`);
+    };
+
+    super("sentences-btn", "Sentences", "See term usage", "dict-sentences-btn", handler);
+  }
+}
+
+
+class ImageLookupButton extends GeneralLookupButton {
+  constructor() {
+
+    // Parents are in the tagify-managed #parentslist input box.
+    let _get_parent_tag_values = function() {
+      const pdata = TERM_FORM_CONTAINER.querySelector("#parentslist").value
+      if ((pdata ?? '') == '')
+        return [];
+      return JSON.parse(pdata).map(e => e.value);
+    };
+
+    let handler = function(iframe) {
+      const text = TERM_FORM_CONTAINER.querySelector("#text").value;
+      if (LANG_ID == null || LANG_ID == '' || parseInt(LANG_ID) == 0 || text == null || text == '') {
+        alert('Please select a language and enter the term.');
+        return;
+      }
+      let use_text = text;
+
+      // If there is a single parent, use that as the basis of the lookup.
+      const parents = _get_parent_tag_values();
+      if (parents.length == 1)
+        use_text = parents[0];
+
+      const raw_bing_url = 'https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle';
+      const binghash = raw_bing_url.replace('https://www.bing.com/images/search?', '');
+      const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
+
+      iframe.setAttribute("src", url);
+    };  // end handler
+
+    super("dict-image-btn", null, "Lookup images", "dict-image-btn", handler);
+  }
+}
+
+
+/**
+ * A "dictionary button" to be shown in the UI.
+ * Manages display state, loading and caching content.
+ *
+ * The class *could* be broken up into things like
+ * PopupDictButton, EmbeddedDictButton, etc, but no need for that yet.
+ */
+class DictButton extends LookupButton {
+
+  constructor(dictURL, frameName) {
+    super(frameName);
 
     this.dictID = TERM_DICTS.indexOf(dictURL);
     if (this.dictID == -1) {
@@ -76,8 +185,6 @@ class DictButton {
       this.btn.classList.add("dict-btn-external");
       this.btn.appendChild(ext_img);
     }
-
-    this.btn.onclick = () => this.do_lookup();
   }
 
   /** LOOKUPS *************************/
@@ -145,44 +252,7 @@ class DictButton {
     this.contentLoaded = true;
   }
 
-  /** Activate/deact. *************************/
-
-  deactivate() {
-    this.is_active = false;
-    this.btn.classList.remove("dict-btn-active");
-    this.frame.classList.remove("dict-active");
-  }
-
-  activate() {
-    DictButton.all.forEach(button => button.deactivate());
-    this.is_active = true;
-    this.btn.classList.add("dict-btn-active");
-    this.frame.classList.add("dict-active");
-  }
-
-}
-
-
-/** Factory method for sentence, image buttons. */
-let _make_standalone_tab = function(
-  btn_id, btn_textContent, btn_title, btn_className,
-  clickHandler
-) {
-  const button = new DictButton(null, `frame_for_${btn_id}`);
-  const b = button.btn;
-  b.setAttribute("id", btn_id);
-  b.setAttribute("title", btn_title);
-  b.textContent = btn_textContent;
-  b.classList.add(btn_className);
-  b.addEventListener("click", function () {
-    if (!button.contentLoaded) {
-      clickHandler(button.frame);
-    }
-    button.contentLoaded = true;
-    button.activate();
-  });
-  return button;
-}
+}  // end DictButton
 
 
 /**
@@ -220,9 +290,9 @@ function _create_dict_dropdown_div(buttons_in_list) {
 }
 
 /**
- * Create dictionary buttons, and a listing for any extra dicts.
+ * Create all buttons.
  */
-function createDictButtons(tab_count = 5) {
+function createLookupButtons(tab_count = 5) {
   let destroy_existing_dictTab_controls = function() {
     document.querySelectorAll(".dict-btn").forEach(item => item.remove())
     document.querySelectorAll(".dictframe").forEach(item => item.remove())
@@ -231,7 +301,7 @@ function createDictButtons(tab_count = 5) {
       el.remove();
   }
   destroy_existing_dictTab_controls();
-  DictButton.all = [];
+  LookupButton.all = [];
 
   if (TERM_DICTS.length <= 0) return;
 
@@ -243,10 +313,10 @@ function createDictButtons(tab_count = 5) {
     tab_count += 1;
   }
 
-  // Make all DictButtons, which loads DictButton.all.
+  // Make all DictButtons, which loads LookupButton.all.
   TERM_DICTS.forEach((dict, index) => { new DictButton(dict,`dict${index}`); });
-  const tab_buttons = DictButton.all.slice(0, tab_count);
-  const list_buttons = DictButton.all.slice(tab_count);
+  const tab_buttons = LookupButton.all.slice(0, tab_count);
+  const list_buttons = LookupButton.all.slice(tab_count);
 
   // Add elements to container.
   const container = document.getElementById("dicttabslayout");
@@ -259,21 +329,15 @@ function createDictButtons(tab_count = 5) {
   }
   container.style.gridTemplateColumns = `repeat(${grid_col_count}, minmax(2rem, 8rem))`;
 
-  const first_embedded_button = DictButton.all.find(button => !button.isExternal);
+  const first_embedded_button = LookupButton.all.find(button => !button.isExternal);
   if (first_embedded_button)
     first_embedded_button.activate();
 
-  const static_buttons = [
-    [ "sentences-btn", "Sentences", "See term usage", "dict-sentences-btn", do_sentence_lookup ],
-    [ "dict-image-btn", null, "Lookup images", "dict-image-btn", do_image_lookup ]
-  ];
-  for (let b of static_buttons) {
-    const tab = _make_standalone_tab(...b);
-    document.getElementById("dicttabsstatic").appendChild(tab.btn);
-  }
+  for (let b of [new SentenceLookupButton(), new ImageLookupButton()])
+    document.getElementById("dicttabsstatic").appendChild(b.btn);
 
   const dictframes = document.getElementById("dictframes");
-  DictButton.all.forEach((button) => { dictframes.appendChild(button.frame); });
+  LookupButton.all.forEach((button) => { dictframes.appendChild(button.frame); });
 }
 
 
@@ -282,55 +346,8 @@ function loadDictionaries() {
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
 
-  DictButton.all.forEach(button => button.contentLoaded = false);
-  const active_button = DictButton.all.find(button => button.is_active && !button.isExternal);
+  LookupButton.all.forEach(button => button.contentLoaded = false);
+  const active_button = LookupButton.all.find(button => button.is_active && !button.isExternal);
   if (active_button)
     active_button.do_lookup();
 }
-
-
-function do_sentence_lookup(iframe) {
-  const txt = TERM_FORM_CONTAINER.querySelector("#text").value;
-  // %E2%80%8B is the zero-width string.  The term is reparsed
-  // on the server, so this doesn't need to be sent.
-  const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
-  if (LANG_ID == '0' || t == '')
-    return;
-  iframe.setAttribute("src", `/term/sentences/${LANG_ID}/${t}`);
-}
-
-
-function do_image_lookup(iframe) {
-  const text = TERM_FORM_CONTAINER.querySelector("#text").value;
-  if (LANG_ID == null || LANG_ID == '' || parseInt(LANG_ID) == 0 || text == null || text == '') {
-    alert('Please select a language and enter the term.');
-    return;
-  }
-  let use_text = text;
-
-  // If there is a single parent, use that as the basis of the lookup.
-  const parents = get_parents();
-  if (parents.length == 1)
-    use_text = parents[0];
-
-  const raw_bing_url = 'https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle';
-  const binghash = raw_bing_url.replace('https://www.bing.com/images/search?', '');
-  const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
-
-  iframe.setAttribute("src", url);
-}
-
-/** Parents are in the tagify-managed #parentslist input box. */
-let get_parents = function() {
-  // During form load, and in "steady state" (i.e., after the tags
-  // have been added or removed, and the focus has switched to
-  // another control) the #sync_status text box is loaded with the
-  // values.
-  const pdata = $('#parentslist').val();
-  if ((pdata ?? '') == '') {
-    return [];
-  }
-  const j = JSON.parse(pdata);
-  const parents = j.map(e => e.value);
-  return parents;
-};

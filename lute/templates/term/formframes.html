@@ -43,7 +43,7 @@
       if (lang_changed) {
         // New language = new buttons, rebuild it all.
         TERM_DICTS = ALL_DICTS[LANG_ID].term;
-        createDictButtons();
+        createLookupButtons();
       }
       if (lang_changed || term_changed) {
         // Refresh the tabs if needed.
@@ -61,7 +61,7 @@
   <script>
     LANG_ID = $('#language_id').val();
     TERM_DICTS = ALL_DICTS[LANG_ID].term;
-    createDictButtons();
+    createLookupButtons();
     loadDictionaries();
   </script>
 
