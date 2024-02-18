@@ -31,26 +31,22 @@
   {% if book.source_uri %}
   <li class="menu-list-item-text">
     <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
-      <img class="menu-icon" src="/static/icn/open.svg" alt="">
       <span>Show source URL</span>
     </a>
   </li>
   {% endif %}
   <li class="menu-list-item-text">
     <a id="editText" href="" onclick="edit_current_page(); return false;">
-      <img class="menu-icon" src="/static/icn/edit.svg" alt="">
       <span>Edit page</span>
     </a>
   </li>
   <li class="menu-list-item-text">
     <a id="next_theme" onclick="next_theme(); return false;" title="Next theme">
-      <img class="menu-icon" src="/static/icn/color.svg" alt="">
       <span>Next theme (m)</span>
     </a>
   </li>
   <li class="menu-list-item-text">
     <a id="toggle_highlights" onclick="toggle_highlight(); return false;" title="Toggle highlights">
-      <img class="menu-icon" src="/static/icn/highlight.svg" alt="">
       <span>Toggle highlights (h)</span>
     </a>
   </li>
@@ -58,7 +54,6 @@
     <a id="keyboard_shortcuts" title="Keyboard shortcuts"
        href="/hotkeys"
        target="_blank">
-      <img class="menu-icon" src="/static/icn/keyboard.svg" alt="">
       <span>Keyboard shortcuts</span>
     </a>
   </li>
