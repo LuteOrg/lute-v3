@@ -82,6 +82,50 @@ class GeneralLookupButton extends LookupButton {
 }  // end GeneralLookupButton
 
 
+class SentenceLookupButton extends GeneralLookupButton {
+  constructor() {
+    let handler = function(iframe) {
+      const txt = TERM_FORM_CONTAINER.querySelector("#text").value;
+      // %E2%80%8B is the zero-width string.  The term is reparsed
+      // on the server, so this doesn't need to be sent.
+      const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
+      if (LANG_ID == '0' || t == '')
+        return;
+      iframe.setAttribute("src", `/term/sentences/${LANG_ID}/${t}`);
+    };
+
+    super("sentences-btn", "Sentences", "See term usage", "dict-sentences-btn", handler);
+  }
+}
+
+
+class ImageLookupButton extends GeneralLookupButton {
+  constructor() {
+    let handler = function(iframe) {
+      const text = TERM_FORM_CONTAINER.querySelector("#text").value;
+      if (LANG_ID == null || LANG_ID == '' || parseInt(LANG_ID) == 0 || text == null || text == '') {
+        alert('Please select a language and enter the term.');
+        return;
+      }
+      let use_text = text;
+
+      // If there is a single parent, use that as the basis of the lookup.
+      const parents = get_parents();
+      if (parents.length == 1)
+        use_text = parents[0];
+
+      const raw_bing_url = 'https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle';
+      const binghash = raw_bing_url.replace('https://www.bing.com/images/search?', '');
+      const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
+
+      iframe.setAttribute("src", url);
+    };  // end handler
+
+    super("dict-image-btn", null, "Lookup images", "dict-image-btn", handler);
+  }
+}
+
+
 /**
  * A "dictionary button" to be shown in the UI.
  * Manages display state, loading and caching content.
@@ -281,14 +325,8 @@ function createLookupButtons(tab_count = 5) {
   if (first_embedded_button)
     first_embedded_button.activate();
 
-  const static_buttons = [
-    [ "sentences-btn", "Sentences", "See term usage", "dict-sentences-btn", do_sentence_lookup ],
-    [ "dict-image-btn", null, "Lookup images", "dict-image-btn", do_image_lookup ]
-  ];
-  for (let bdata of static_buttons) {
-    const b = new GeneralLookupButton(...bdata);
+  for (let b of [new SentenceLookupButton(), new ImageLookupButton()])
     document.getElementById("dicttabsstatic").appendChild(b.btn);
-  }
 
   const dictframes = document.getElementById("dictframes");
   LookupButton.all.forEach((button) => { dictframes.appendChild(button.frame); });
@@ -306,37 +344,6 @@ function loadDictionaries() {
     active_button.do_lookup();
 }
 
-
-function do_sentence_lookup(iframe) {
-  const txt = TERM_FORM_CONTAINER.querySelector("#text").value;
-  // %E2%80%8B is the zero-width string.  The term is reparsed
-  // on the server, so this doesn't need to be sent.
-  const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
-  if (LANG_ID == '0' || t == '')
-    return;
-  iframe.setAttribute("src", `/term/sentences/${LANG_ID}/${t}`);
-}
-
-
-function do_image_lookup(iframe) {
-  const text = TERM_FORM_CONTAINER.querySelector("#text").value;
-  if (LANG_ID == null || LANG_ID == '' || parseInt(LANG_ID) == 0 || text == null || text == '') {
-    alert('Please select a language and enter the term.');
-    return;
-  }
-  let use_text = text;
-
-  // If there is a single parent, use that as the basis of the lookup.
-  const parents = get_parents();
-  if (parents.length == 1)
-    use_text = parents[0];
-
-  const raw_bing_url = 'https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle';
-  const binghash = raw_bing_url.replace('https://www.bing.com/images/search?', '');
-  const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
-
-  iframe.setAttribute("src", url);
-}
 
 /** Parents are in the tagify-managed #parentslist input box. */
 let get_parents = function() {
