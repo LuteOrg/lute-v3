@@ -320,7 +320,7 @@ function createLookupButtons(tab_count = 5) {
 
   // Add elements to container.
   const container = document.getElementById("dicttabslayout");
-  let grid_col_count = tab_count;
+  let grid_col_count = tab_buttons.length;
   tab_buttons.forEach(button => container.appendChild(button.btn));
   if (list_buttons.length > 0) {
     const dropdown_div = _create_dict_dropdown_div(list_buttons);
