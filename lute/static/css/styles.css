@@ -1754,6 +1754,10 @@ input[type="checkbox"][disabled] + label {
         padding: 1.3rem;
     }
 
+    #focus-container {
+        display: none;
+    }
+
     .read-pane-right-close-btn {
         position: absolute;
         left: 0;

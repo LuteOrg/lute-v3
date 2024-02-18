@@ -231,6 +231,15 @@
     if (mediaTablet.matches) {
       tooltipPos = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
     }
+    // do not load focus state if in tablet mode
+    if (!mediaTablet.matches) {
+      const book_id = $('#book_id').val();
+      const focusVal = localStorage.getItem(`focusMode-book${book_id}`);
+      if (focusVal === "true") {
+        readPaneContainer.classList.add("focus-mode-active");
+        focusChk.checked = true;
+      }
+    }
     
     createLookupButtons();
 
@@ -241,13 +250,6 @@
       }
     });
 
-    const book_id = $('#book_id').val();
-    const focusVal = localStorage.getItem(`focusMode-book${book_id}`);
-    if (focusVal === "true") {
-      readPaneContainer.classList.add("focus-mode-active");
-      focusChk.checked = true;
-    }
-    
     if (have_audio_file()) {
       // Don't actually load the source -- for some reason,
       // the ajax page load was causing the audio src to
