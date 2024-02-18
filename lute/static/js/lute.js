@@ -457,12 +457,10 @@ function next_theme() {
 }
 
 function toggleFocus() {
-  $('#focus').prop("checked", !$('#focus').prop("checked")); // toggle checkbox
-  $("#read_pane_container").toggleClass("focus-mode-active");
-  
-  const book_id = $('#book_id').val();
-  const focusState = $('#focus').is(":checked");
-  localStorage.setItem(`focusMode-book${book_id}`, `${focusState}`);
+  const focusChk = document.getElementById("focus");
+  const event = new Event("change");
+  focusChk.checked = !focusChk.checked;
+  focusChk.dispatchEvent(event);
 }
 
 /* Toggle highlighting, and reload the page. */
