@@ -7,6 +7,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
   <pre>
@@ -18,9 +19,15 @@
     page_num: <input id="page_num" value="{{ page_num }}">
     page_count: <input id="page_count" value="{{ page_count }}">
     highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
-    sentence translation url: <span id="translateURL" style="display: none">{{ dictionary_url }}</span>
   </pre>
 </div>
+
+<script>
+  // The sentence dictionaries configured for the language.  This var
+  // is used in lute.js.
+  var LUTE_SENTENCE_LOOKUP_URIS = {{ sentence_dict_uris|safe }};
+</script>
+
 
 <div id="read_pane_container">
 
@@ -161,24 +168,24 @@
     Frame support required.
   </iframe>
   </div>
-  <div class="dictframecontainer">
-  <iframe
-    name="dictframe"
-    id="dictframeid"
-    class="rightreadingframe"
-    src="about:blank"
-    scrolling="auto"
-    style="height: 65%; width: 100%"
-    frameborder="0"
-  >
-    Frame support required.
-  </iframe>
+  <div class="dictcontainer">
+    <div id="dicttabs">
+      <div id="dicttabslayout"></div>
+      <div id="dicttabsstatic"></div>
+    </div>
+    <div id="dictframes"></div>
   </div>
 </div>
 
 </div>
 
 <script>
+  // used in dict-tabs.js
+  const LANG_ID = {{ lang_id | safe }};
+  const TERM_DICTS = {{ term_dicts | safe }};
+  // because read term field is in iframe, but new term field is not
+  let TERM_FORM_CONTAINER;
+
   let mouseY;
   let scrollY;
   let scrollYBeforeReload;
@@ -224,6 +231,15 @@
     if (mediaTablet.matches) {
       tooltipPos = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
     }
+    
+    createLookupButtons();
+
+    window.addEventListener("message", function(event) {
+      if (event.data.event === "LuteTermFormOpened") {
+        TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
+        loadDictionaries();
+      }
+    });
 
     const book_id = $('#book_id').val();
     const focusVal = localStorage.getItem(`focusMode-book${book_id}`);
@@ -248,10 +264,6 @@
       const menu_clicked = event.target.closest("#reading_menu");
       const menuBtn_clicked = event.target.closest(".hamburger-btn");
       const rightPaneClicked = event.target.closest("#read_pane_right");
-      // const rightPaneClicked = event.target.closest(".dictframecontainer");
-      //console.log(rightPaneClicked);
-      //console.log(event.target);
-      //console.log(event.target.parentNode);
       // if (event.target != menuBtn || event.target.parentNode != menuBtn) 
       if(!menu_clicked && !menuBtn_clicked)
         menu.classList.remove("open-menu");

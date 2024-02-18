@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Backups{% endblock %}
+
+{% block header %}Backups{% endblock %}
+
+{% block body %}
+
+{% if backups|length == 0 %}
+  <p>No backups have been made yet.</p>
+{% else %}
+
+<p>Stored in: {{ backup_dir }}</p>
+<br />
+
+<table class="table dataTable no-footer" style="width: 80%; margin: 0;">
+  <thead>
+    <tr>
+      <th>Backup File</th>
+      <th>Size</th>
+      <th>Last Modified</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for backup in backups %}
+    <tr>
+      <td>{{ backup.name }}</td>
+      <td>{{ backup.size }}</td>
+      <td>{{ backup.last_modified.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td><a href="/backup/download/{{ backup.name }}">Download</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endif %}
+
+<br />
+<a href="{{ url_for('backup.backup', type='manual') }}">Create new</a>
+
+{% endblock %}

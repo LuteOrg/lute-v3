@@ -15,17 +15,12 @@
         style="display:none;"
         {% endif %}>
         {{ form.language_id(class="form-control") }}
+        <button id="load-dicts-btn" title="Load dictionaries for the new term" type="button"></button>
       </div>
   
       {{ form.original_text }}
 
-      <div id="def-container">
-        {{ form.text(class="form-control", value=(form.original_text.data or '')) }}
-        <div class="term-element-box">
-          <img src="{{ url_for('static', filename='icn/external.png') }}" title="Lookup" onclick="do_term_lookup()" />
-          <img src="{{ url_for('static', filename='icn/eye.png') }}" title="Images" onclick="do_image_lookup()" />
-        </div>
-      </div>
+      <div>{{ form.text(class="form-control", value=(form.original_text.data or '')) }}</div>
 
       <div>{{ form.parentslist(class="form-control") }}</div>
   
@@ -57,18 +52,25 @@
       <div>{{ form.termtagslist(class="form-control") }}</div>
 
       <div id="term-button-container">
-        <a href="" onclick="show_term_sentences(); return false;">Sentences</a>
-        <div class="term-element-box">
           {% if term.id %}
           <button id="delete" type="button" class="btn" onclick="deleteTerm()">Delete</button>
           {% endif %}
           <button id="submit" type="submit" class="btn btn-primary">Save</button>
-        </div>
       </div>
     </div>
   </form>
 </div>
 
+<script>
+  // this is used in formframes.html
+  const ALL_DICTS = {{ language_dicts | safe }};
+  const TERM_FORM_CONTAINER = document.getElementById("term-form-container");
+  let TERM_DICTS;
+  let LANG_ID;
+</script>
+
+<!-- do not defer. if deferred it gets loaded at the end of formframes. bu we need it to load after _form, but before formframes -->
+<script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
 
 <script type="text/javascript">
 
@@ -251,8 +253,7 @@
     return tagify;
   }  // end setup_parent_tagify
 
-
-  /** Parents are in the tagify-managed #parentslist input box. */
+  // Parents are in the tagify-managed #parentslist input box.
   let get_parents = function() {
     // During form load, and in "steady state" (i.e., after the tags
     // have been added or removed, and the focus has switched to
@@ -262,7 +263,7 @@
     if ((pdata ?? '') == '') {
       return [];
     }
-    const j = JSON.parse(pdata)
+    const j = JSON.parse(pdata);
     const parents = j.map(e => e.value);
     return parents;
   };
@@ -328,16 +329,12 @@
       }
     });
 
-
+    const dictContainer = parent.document.querySelector(".dictcontainer");
     var parentslist = document.getElementById('parentslist');
     parents_tagify = setup_parent_tagify(parentslist);
     var termtagslist = document.getElementById('termtagslist');
     var termtags_tagify = setup_term_tags_tagify(termtagslist);
-
-    if (($('#text').val() ?? '') != '') {
-      do_term_lookup(false);
-    }
-
+    
     // Post message re form opened.
     // Note have to use this rather than the better
     // this.dispatchEvent(new Event("termFormOpened"));
@@ -346,128 +343,6 @@
 
     enable_disable_sync_status_checkbox();
   });
-
-  /** LOOKUPS */
-
-  var LANGUAGES = {{ language_dicts | safe }};
-
-  // Term lookups cycle through the available dictionaries in the language.
-  var termdictindex = 0;
-
-  let open_new_lookup_window = function(url) {
-    window.open(
-      url,
-      'otherwin',
-      //'width=800, height=400, scrollbars=yes, menubar=no, resizable=yes, status=no'
-    );
-  };
-
-  let get_lookup_url = function(dicturl, term) {
-    let ret = dicturl;
-
-    // Terms are saved with zero-width space between each token;
-    // remove that for dict searches!
-    const zeroWidthSpace = '\u200b';
-    const sqlZWS = '%E2%80%8B';
-    const cleantext = term.
-          replaceAll(zeroWidthSpace, '').
-          replace(/\s+/g, ' ');
-    const searchterm = encodeURIComponent(cleantext).
-          replaceAll(sqlZWS, '');
-    ret = ret.replace('###', searchterm);
-    // console.log(ret);
-    return ret;
-  };
-
-
-  let do_image_lookup = function() {
-    const langid = $('#language_id').val();
-    const text = $('#text').val();
-
-    if (langid == null || langid == '' || parseInt(langid) == 0 || text == null || text == '') {
-      alert('Please select a language and enter the term.');
-      return;
-    }
-
-    let use_text = text;
-
-    // If there is a single parent, use that as the basis of the lookup.
-    const parents = get_parents();
-    if (parents.length == 1)
-      use_text = parents[0];
-
-    const raw_bing_url = 'https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle';
-    const binghash = raw_bing_url.replace('https://www.bing.com/images/search?', '');
-    const url = `/bing/search/${langid}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
-    top.frames.dictframe.location.href = url;
-    return;
-  }
-
-
-  /**
-   * Either open a new window, or show the result in the correct frame.
-   */
-  let show_lookup_page = function(dicturl, text, langid, allow_open_new_web_page = true) {
-
-    const is_bing = (dicturl.indexOf('www.bing.com') != -1);
-    if (is_bing) {
-      let use_text = text;
-      const binghash = dicturl.replace('https://www.bing.com/images/search?', '');
-      const url = `/bing/search/${langid}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
-      top.frames.dictframe.location.href = url;
-      return;
-    }
-
-    // TODO zzfuture fix: fix_language_dict_asterisk
-    // The URL shouldn not be prepended with trash
-    // (e.g. "*http://" means "open an external window", while
-    // "http://" means "this can be opened in an iframe."
-    // Instead, each dict should have an "is_external" property.
-    const is_external = (dicturl.charAt(0) == '*');
-    if (is_external) {
-      if (!allow_open_new_web_page) {
-        console.log('Declining to open external web page.');
-        return;
-      }
-      dicturl = dicturl.slice(1);
-      const url = get_lookup_url(dicturl, text);
-      open_new_lookup_window(url);
-      return;
-    }
-
-    // Fallback: open in frame.
-    const url = get_lookup_url(dicturl, text);
-    top.frames.dictframe.location.href = url;
-  };
-
-
-  function do_term_lookup(allow_open_new_web_page = true) {
-    const langid = $('#language_id').val();
-    if (langid == null || langid == '' || parseInt(langid) == 0) {
-      alert('Please select a language.');
-      return;
-    }
-
-    const termdicts = LANGUAGES[langid].term;
-    const usedict = termdicts[termdictindex];
-    show_lookup_page(usedict, $('#text').val(), langid, allow_open_new_web_page);
-
-    termdictindex++;
-    if (termdictindex >= termdicts.length)
-      termdictindex = 0;
-  }
-
-  function show_term_sentences() {
-    const langid = $('#language_id').val();
-    const txt = $('#text').val();
-    // %E2%80%8B is the zero-width string.  The term is reparsed
-    // on the server, so this doesn't need to be sent.
-    const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
-    if (langid == '0' || t == '')
-      return;
-    const url = `/term/sentences/${langid}/${t}`;
-    top.frames.dictframe.location.href = url;
-  }
 
   function deleteTerm() {
     const msg = "Are you sure you want to delete this term?\n\n" +

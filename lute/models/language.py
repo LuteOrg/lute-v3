@@ -8,6 +8,33 @@ from lute.db import db
 from lute.parse.registry import get_parser, is_supported
 
 
+class LanguageDictionary(db.Model):
+    """
+    Language dictionary.
+    """
+
+    __tablename__ = "languagedicts"
+
+    id = db.Column("LdID", db.SmallInteger, primary_key=True)
+    language_id = db.Column(
+        "LdLgID", db.Integer, db.ForeignKey("languages.LgID"), nullable=False
+    )
+    language = db.relationship("Language", back_populates="dictionaries")
+    usefor = db.Column("LdUseFor", db.String(20), nullable=False)
+    dicttype = db.Column("LdType", db.String(20), nullable=False)
+    dicturi = db.Column("LdDictURI", db.String(200), nullable=False)
+    is_active = db.Column("LdIsActive", db.Boolean, default=True)
+    sort_order = db.Column("LdSortOrder", db.SmallInteger, nullable=False)
+
+    # HACK: pre-pend '*' to URLs that need to open a new window.
+    # This is a relic of the original code, and should be changed.
+    # TODO remove-asterisk-hack: remove * from URL start.
+    def make_uri(self):
+        "Hack add asterisk."
+        prepend = "*" if self.dicttype == "popuphtml" else ""
+        return f"{prepend}{self.dicturi}"
+
+
 class Language(
     db.Model
 ):  # pylint: disable=too-few-public-methods, too-many-instance-attributes
@@ -19,15 +46,19 @@ class Language(
 
     id = db.Column("LgID", db.SmallInteger, primary_key=True)
     name = db.Column("LgName", db.String(40))
-    dict_1_uri = db.Column("LgDict1URI", db.String(200))
-    dict_2_uri = db.Column("LgDict2URI", db.String(200))
-    sentence_translate_uri = db.Column("LgGoogleTranslateURI", db.String(200))
+
+    dictionaries = db.relationship(
+        "LanguageDictionary",
+        back_populates="language",
+        order_by="LanguageDictionary.sort_order",
+        lazy="subquery",
+        cascade="all, delete-orphan",
+    )
+
     character_substitutions = db.Column("LgCharacterSubstitutions", db.String(500))
     regexp_split_sentences = db.Column("LgRegexpSplitSentences", db.String(500))
     exceptions_split_sentences = db.Column("LgExceptionsSplitSentences", db.String(500))
     _word_characters = db.Column("LgRegexpWordCharacters", db.String(500))
-    remove_spaces = db.Column("LgRemoveSpaces", db.Boolean)
-    split_each_char = db.Column("LgSplitEachChar", db.Boolean)
     right_to_left = db.Column("LgRightToLeft", db.Boolean)
     show_romanization = db.Column("LgShowRomanization", db.Boolean)
     parser_type = db.Column("LgParserType", db.String(20))
@@ -37,11 +68,10 @@ class Language(
         self.regexp_split_sentences = ".!?"
         self.exceptions_split_sentences = "Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds."
         self.word_characters = "a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ"
-        self.remove_spaces = False
-        self.split_each_char = False
         self.right_to_left = False
         self.show_romanization = False
         self.parser_type = "spacedel"
+        self.dictionaries = []
 
     def __repr__(self):
         return f"<Language {self.id} '{self.name}'>"
@@ -74,26 +104,33 @@ class Language(
     def word_characters(self, s):
         self._word_characters = self._get_python_regex_pattern(s)
 
+    def active_dict_uris(self, use_for):
+        "Get sorted uris for active dicts of correct type."
+        actives = [d for d in self.dictionaries if d.is_active and d.usefor == use_for]
+        sorted_actives = sorted(actives, key=lambda x: x.sort_order)
+        return [d.make_uri() for d in sorted_actives]
+
+    @property
+    def sentence_dict_uris(self):
+        return self.active_dict_uris("sentences")
+
     @classmethod
     def all_dictionaries(cls):
         """
         All dictionaries for all languages.
         """
-        languages = Language.query.all()
-        language_data = {}
-        for language in languages:
-            term_dicts = [language.dict_1_uri, language.dict_2_uri]
-            term_dicts = [uri for uri in term_dicts if uri is not None]
-
-            data = {"term": term_dicts, "sentence": language.sentence_translate_uri}
-
-            language_data[language.id] = data
-        return language_data
+        lang_dicts = {}
+        for lang in Language.query.all():
+            lang_dicts[lang.id] = {
+                "term": lang.active_dict_uris("terms"),
+                "sentence": lang.active_dict_uris("sentences"),
+            }
+        return lang_dicts
 
     @staticmethod
     def delete(language):
         """
-        Hacky method to delete language and all terms and books
+        Hacky method to delete language and all terms, books, and dicts
         associated with it.
 
         There is _certainly_ a better way to do this using

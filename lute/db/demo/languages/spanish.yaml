@@ -1,7 +1,14 @@
 name: Spanish
-dict_1: https://es.thefreedictionary.com/###
-dict_2: https://www.wordreference.com/es/en/translation.asp?spen=###
-sentence_translation: "*https://www.deepl.com/translator#es/en/###"
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://es.thefreedictionary.com/###
+  - for: terms
+    type: popup
+    url: https://www.wordreference.com/es/en/translation.asp?spen=###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#es/en/###
 # show_romanization: false
 # right_to_left: false
 

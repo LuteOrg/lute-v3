@@ -31,8 +31,6 @@ def test_new_language_has_sane_defaults():
     assert lang.regexp_split_sentences == ".!?"
     assert lang.exceptions_split_sentences == "Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds."
     assert lang.word_characters == "a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ"
-    assert lang.remove_spaces is False
-    assert lang.split_each_char is False
     assert lang.right_to_left is False
     assert lang.show_romanization is False
     assert lang.parser_type == "spacedel"
