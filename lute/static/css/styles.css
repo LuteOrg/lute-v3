@@ -1051,7 +1051,8 @@ textarea {
 
 /* focus on fields makes border same as tags */
 form input:focus,
-form textarea:focus {
+form textarea:focus,
+form select:focus {
     border: 1px solid var(--tagify__tag-bg) !important;
     outline: none !important;
 }
@@ -1065,19 +1066,7 @@ form input[type="checkbox"]:focus,
 form input[type="file"]:focus {
     border: none !important;
 }
-/* undo focus styles for audio and dict containers */
-.audio-player-container *:focus {
-    border: none !important;
-    outline: none !important;
-}
-
-.dictcontainer *:focus {
-    outline: none !important;
-}
-
-.dictcontainer select:focus {
-    border: none !important;
-}
+/* / */
 
 ::placeholder {
     font-family: inherit;
