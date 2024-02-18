@@ -25,7 +25,7 @@
       <td>{{ backup.name }}</td>
       <td>{{ backup.size }}</td>
       <td>{{ backup.last_modified.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-      <td>Download</td>
+      <td><a href="/backup/download/{{ backup.name }}">Download</a></td>
     </tr>
     {% endfor %}
   </tbody>
