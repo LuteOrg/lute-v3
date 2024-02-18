@@ -94,12 +94,6 @@ class DictButton extends LookupButton {
   constructor(dictURL, frameName) {
     super(frameName);
 
-    // Some DictButtons don't do regular dict lookups -- their
-    // construction is managed separately.
-    if (dictURL == null) {
-      return;
-    }
-
     this.dictID = TERM_DICTS.indexOf(dictURL);
     if (this.dictID == -1) {
       console.log(`Error: Dict url ${dictURL} not found (??)`);
