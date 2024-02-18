@@ -3,10 +3,12 @@ Db and image backup.
 """
 
 import os
+import re
 import shutil
 import gzip
 from datetime import datetime
 import time
+from typing import List, Union
 
 from lute.db import db
 from lute.models.setting import SystemSetting
@@ -18,6 +20,54 @@ class BackupException(Exception):
     """
     Raised if export bombs for some reason.
     """
+
+
+class DatabaseBackupFile:
+    """
+    A representation of a lute backup file to hold metadata attributes.
+    """
+
+    def __init__(self, filepath: Union[str, os.PathLike]):
+        if not os.path.exists(filepath):
+            raise BackupException(f"No backup file at {filepath}.")
+
+        name = os.path.basename(filepath)
+        if not re.match(r"(manual_)?lute_backup_", name):
+            raise BackupException(f"Not a valid lute database backup at {filepath}.")
+
+        self.filepath = filepath
+        self.name = name
+        self.is_manual = self.name.startswith("manual_")
+
+    def __lt__(self, other):
+        return self.last_modified < other.last_modified
+
+    @property
+    def last_modified(self) -> datetime:
+        return datetime.fromtimestamp(os.path.getmtime(self.filepath)).astimezone()
+
+    @property
+    def size_bytes(self) -> int:
+        return os.path.getsize(self.filepath)
+
+    @property
+    def size(self) -> str:
+        """
+        A human-readable string representation of the size of the file.
+
+        Eg.
+        1746 bytes
+        4 kB
+        27 MB
+        """
+        s = self.size_bytes
+        if s >= 1e9:
+            return f"{round(s * 1e-9)} GB"
+        if s >= 1e6:
+            return f"{round(s * 1e-6)} MB"
+        if s >= 1e3:
+            return f"{round(s * 1e-3)} KB"
+        return f"{s} bytes"
 
 
 def create_backup(app_config, settings, is_manual=False, suffix=None):
@@ -113,11 +163,11 @@ def skip_this_backup():
 
 def _remove_excess_backups(count, outdir):
     "Remove old backups."
-    files = [f for f in os.listdir(outdir) if f.startswith("lute_backup_")]
+    files = [f for f in list_backups(outdir) if not f.is_manual]
     files.sort(reverse=True)
     to_remove = files[count:]
     for f in to_remove:
-        os.remove(os.path.join(outdir, f))
+        os.remove(f.filepath)
 
 
 def _mirror_images_dir(userimagespath, outdir):
@@ -127,3 +177,12 @@ def _mirror_images_dir(userimagespath, outdir):
     if not os.path.exists(target_dir):
         os.mkdir(target_dir)
     shutil.copytree(userimagespath, target_dir, dirs_exist_ok=True)
+
+
+def list_backups(outdir) -> List[DatabaseBackupFile]:
+    "List all backup files."
+    return [
+        DatabaseBackupFile(os.path.join(outdir, f))
+        for f in os.listdir(outdir)
+        if re.match(r"(manual_)?lute_backup_", f)
+    ]
