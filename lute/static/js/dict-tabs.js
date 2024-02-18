@@ -238,9 +238,9 @@ function _create_dict_dropdown_div(buttons_in_list) {
 }
 
 /**
- * Create dictionary buttons, and a listing for any extra dicts.
+ * Create all buttons.
  */
-function createDictButtons(tab_count = 5) {
+function createLookupButtons(tab_count = 5) {
   let destroy_existing_dictTab_controls = function() {
     document.querySelectorAll(".dict-btn").forEach(item => item.remove())
     document.querySelectorAll(".dictframe").forEach(item => item.remove())
