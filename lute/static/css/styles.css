@@ -543,6 +543,24 @@ div#thetext p {
     font-size: 0;
 }
 
+span.drag-handle {
+    cursor: pointer;
+    color: grey;
+}
+
+.valign {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+input[type=text].form-control-narrower {
+    min-width: 8rem;
+    /* padding: 5px 5px; */
+    margin: 2px 0;
+    box-sizing: border-box;
+}
+
 .nomarginblock {
     margin-block-start: 0px;
     margin-block-end: 0px;
@@ -828,13 +846,6 @@ div.code pre {
     height: 100% !important;
 }
 
-#dictframeid {
-    /* calc for crawlbar */
-    /* height: calc(100% - 20px) !important; */
-    height: 100% !important;
-    align-self: end;
-}
-
 /* resize */
 
 /* border */
@@ -851,7 +862,7 @@ div.code pre {
 }
 
 /* border */
-.dictframecontainer::after {
+.dictcontainer::after {
     content: '';
     background-color: #dbefff;
     /* background-image: linear-gradient(to right, #dbefff 50%, #dbefff 50%); */
@@ -863,12 +874,10 @@ div.code pre {
     cursor: row-resize;
 }
 
-.dictframecontainer {
+.dictcontainer {
     position: relative;
-    /* overflow: hidden; contents overflow (over audio player) if height is too small */
-    /* there's no much point in hiding it. because after first term save it doesn't get hidden again anyway */
-    /* disabling it for now. */
-    /*opacity: 0; to hide the after element. easier this way */
+    display: none;
+    height: 100%;
 }
 
 
@@ -1037,7 +1046,7 @@ textarea {
 
 textarea {
     width: 100%;
-    resize: vertical;
+    resize: both;
 }
 
 /* focus on fields makes border same as tags */
@@ -1054,6 +1063,19 @@ form input[type="file"]:focus {
 
 form input[type="checkbox"]:focus,
 form input[type="file"]:focus {
+    border: none !important;
+}
+/* undo focus styles for audio and dict containers */
+.audio-player-container *:focus {
+    border: none !important;
+    outline: none !important;
+}
+
+.dictcontainer *:focus {
+    outline: none !important;
+}
+
+.dictcontainer select:focus {
     border: none !important;
 }
 
@@ -1166,18 +1188,29 @@ div.help-text {
 }
 
 #term-form #text {
-    flex: 1;
+    width: 100%;
 }
 
-#def-container {
+#term #languageSel {
     display: flex;
-    align-items: center;
-    gap: 0.6rem;
+    justify-content: space-between;
 }
 
-.term-element-box {
-    display: flex;
-    gap: 0.5rem;
+#load-dicts-btn {
+    background: url("../icn/book-open-text.svg");
+    background-position: center;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    border: none;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+#load-dicts-btn:hover {
+    background-color: #97531f;
+    filter: invert();
 }
 
 #status-container {
@@ -1197,12 +1230,10 @@ input[type="checkbox"][disabled] + label {
 
 #term-button-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-}
-
-#term-button-container .term-element-box {
     gap: 0.2rem;
+    margin-top: 0.6rem;
 }
 
 .zoomableTermImage {
@@ -1222,6 +1253,290 @@ input[type="checkbox"][disabled] + label {
     transform: scale(4) translate(-17px, 5px);
 }
 
+/* DICT TABS */
+#dicttabs {
+    display: flex;
+    justify-content: space-between;
+    background-color: #dbefff;
+    /* height: 1.6rem; */
+    padding: 4px 0 0 2px;
+}
+
+#dicttabslayout {
+    display: grid;
+}
+
+#dictframes {
+    width: 100%;
+    /* height: 100%; */
+    flex: 1;
+}
+
+#dict-menu-container {
+    position: relative;
+    border: 1px solid #85c0ee;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    /* overflow: hidden; */
+    border-bottom: none;
+    left: 0.3rem;
+    /* flex fixes long button size */
+    display: flex;
+}
+
+#dict-menu-container .dict-btn{
+    height: 100%;
+    border: none;
+}
+
+.dict-btn {
+    position: relative;
+    padding: 0.2rem 1rem;
+    border: none;
+    color: #969696;
+    background-color: #dcebf8;
+    /* height: 100%; */
+    box-sizing: border-box;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    /* filter: brightness(0.8) grayscale(0.7); */
+    z-index: 1;
+    overflow: hidden;
+    white-space: nowrap;
+
+    display: flex;
+    align-items: center;
+    /* justify-content: center; */
+    gap: 0.3rem;
+}
+
+.dict-btn:not(#dict-image-btn) {
+    width: 100%;
+}
+
+#dicttabsstatic {
+    display: flex;
+    margin-left: 1rem;
+    /* justify-content: end; */
+}
+
+/* after element is for hiding text at the edges */
+#dicttabslayout .dict-btn::after,
+#dicttabslayout .dict-menu-item::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border-inline: 4px solid #dcebf8;
+    box-sizing: border-box;
+}
+
+#dicttabslayout .dict-menu-item::after {
+    border-color: aliceblue;
+}
+
+#dicttabslayout .dict-btn-active::after {
+    border-color: #68ace0;
+}
+
+#dicttabslayout .dict-btn.dict-btn-external::after,
+#dicttabslayout .dict-menu-item.dict-btn-external::after {
+    border-right-width: 1.5rem;
+}
+
+#dicttabslayout .dict-btn-select.dict-btn-external::after {
+    border-right-width: 2.6rem
+}
+
+#dicttabslayout .dict-btn:not(.dict-btn-active):not(.dict-btn.dict-btn-external):hover::after,
+#dicttabslayout .dict-btn:not(.dict-btn-active):hover::after {
+    border-color: aliceblue;
+}
+
+.dict-btn-fav-img,
+.dict-btn-list-img,
+.dict-btn-external-img {
+    height: 60%;
+}
+
+.dict-btn-list-img,
+.dict-btn-external-img {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    opacity: 0.4;
+}
+
+.dict-btn-list-img {
+    /* src needs to be set here instead of js. explanation in createTabBtn */
+    content: url("../icn/list.svg");
+    right: 0;
+    opacity: 1;
+    /* add padding so clicking area is bigger */
+    padding: 0.3rem;
+}
+
+.dict-btn-external-img{
+    content: url("../icn/open.svg");
+    right: 0.3rem;
+}
+
+.dict-btn-select .dict-btn-external-img {
+    right: 1.4rem;
+}
+
+.dict-btn:not(.dict-btn-active):not(.dict-btn.dict-btn-external) img {
+    opacity: 0.5;
+}
+
+.dict-btn:hover + #dict-select,
+.dict-btn:not(.dict-btn-active):hover {
+    background-color: aliceblue;
+}
+
+#dict-image-btn:hover {
+    background-color: #623006;
+    filter: invert(1);
+}
+
+.dict-btn.dict-btn-active,
+.dict-btn.dict-btn-active + #dict-select {
+    background-color: #68ace0;
+    color: #fff;
+    /* filter: brightness(1); */
+    z-index: 2;
+}
+
+.dict-btn:not(.dict-btn-select):not(#dict-image-btn) {
+    border: 1px solid #aaceea;
+    border-bottom: none;
+    border-right: none;
+}
+
+#dicttabsstatic .dict-btn.dict-sentences-btn {
+    width: 6rem;
+    border: 1px solid #85c0ee;
+    border-bottom: none;
+}
+
+.dict-btn:not(#dict-image-btn):not(.dict-btn-select):last-of-type {
+    border-right: 1px solid #aaceea;
+}
+
+.dict-btn-active:not(.dict-btn-select):not(#dict-image-btn) {
+    /* border: 2px solid #68ace0; */
+    box-shadow: inset 0 0 0 2px #68ace0;
+}
+
+.dict-btn.dict-btn-external {
+    color: #5b5b5b;
+}
+
+#dict-image-btn.dict-btn-active {
+    background-color: #97531f;
+    filter: invert(1);
+}
+
+.dictframe {
+    display: none;
+    border: none;
+    border-top: 3px solid #68ace0;
+}
+
+.dict-active {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+}
+
+#dict-image-btn {
+    background: url("../icn/images.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 85%;
+
+    /* width: 32px; */
+    padding-top: 1.6rem;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    /* height: unset; */
+    /* margin-left: 0.5rem; */
+    margin-inline: 0.8rem;
+    /* justify-self: center; */
+    /* margin-bottom: 4px; */
+    cursor: pointer;
+
+    filter: invert(66%) sepia(33%) saturate(700%) hue-rotate(170deg) brightness(92%) contrast(90%);
+}
+
+#dict-list-container.dict-list-hide {
+    opacity: 0;
+    pointer-events: none;
+    /* clip-path: rect(0 0 0 114%); */
+}
+
+#dict-list-container {
+    opacity: 1;
+    pointer-events: unset;
+    /* clip-path: rect(0 0 106% 114%); */
+
+    position: absolute;
+    background-color: aliceblue;
+    min-width: 100%;
+    top: 100%;
+    right: 0;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-top: none;
+    box-sizing: border-box;
+    box-shadow: 0 3px 5px 0 #0000002b;
+    /* easier way to hide sharp edges of list elements
+    instead adding border-radius to them too */
+    overflow: hidden; 
+
+    transition: opacity 0.1s;
+}
+
+#dict-menu-container:hover .dict-btn-select:not(.dict-btn-active) {
+    background-color: aliceblue;
+}
+
+#dict-menu-container:hover .dict-btn-select:not(.dict-btn-active)::after {
+    border-color: aliceblue;
+}
+
+.dict-btn-select {
+    display: flex;
+    justify-content: flex-end;
+    padding-inline: 0.5rem;
+}
+
+.dict-menu-item {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    position: relative;
+}
+
+.dict-menu-item:hover {
+    background-color: #68ace0;
+    color: #fff;
+}
+
+#dict-menu-container .dict-menu-item:hover::after {
+    border-color: #68ace0;
+}
 
 /* STATUS RADIO */
 
@@ -1391,7 +1706,10 @@ input[type="checkbox"][disabled] + label {
 #language_id,
 #txtSetParent,
 #predefined,
-#max_page_tokens {
+#max_page_tokens,
+#dict_tabs,
+.dict-type,
+.dict-usefor {
     width: 8rem;
     box-sizing: border-box;
     border: 1px solid var(--form-border-color);
@@ -1538,9 +1856,13 @@ input[type="checkbox"][disabled] + label {
         background-size: 91%;
     }
 
-    .dictframecontainer::after {
+    .dictcontainer::after {
         background-color: #79b7e7;
         height: 6px;
+    }
+
+    #dicttabs {
+        padding-top: 6px;
     }
 
     #read-slider {

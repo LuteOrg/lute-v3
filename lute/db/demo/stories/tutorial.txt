@@ -12,12 +12,10 @@ You can click on a word, and create a definition.  For example, click on this wo
 When the form pops up in the right-hand frame, a dictionary is loaded below.  Copy-paste something from the dictionary into the translation, or make up your own, mark the status, add some tags if you want (eg, type "noun" in the tags field), and click save.  From now on, every English text that you read that contains the word "elephant" will show the status.  If you hover over any "elephant", you'll see some information.
 
 1.1 Multiple dictionaries.
-Next to the term is a small arrow, "Lookup".  If you click on this repeatedly, Lute cycles through the dictionaries that you configure for the language in the "Languages" link on the homepage.
+Languages can have multiple dictionaries, configured in the "Languages" link on the homepage.  Each dictionary is shown as a small tab.  For this demo, English has been configured with two dictionaries.  The second dictionary will open a popup window.  If you have many dictionaries, the extra ones will be shown in a small list box next to the tabs.
 
 1.2 Images
-For this demo, English has been configured to do an image search for the second English dictionary, so if you click on the arrow, you'll see some happy elephants (if you clicked on elephant!).
-You can also click on the little "eye icon" next to the term, and it opens up a common image search URL.
-In either case, if you click on one of the images shown in the list, that image is saved in your data/userimages folder.  When you hover over the word in the reading pane, that picture is included in the word hover.  Try adding an image for your elephant by clicking on the term, clicking the eye icon, and clicking a picture you like.  Then hover over your elephant.
+Lute can do a simple image search for terms.  Next to the Sentences tab is a small image button.  If you click on it, you'll see some happy elephants (if you clicked on elephant!).  If you click on one of the images shown in the list, that image is saved in your data/userimages folder.  When you hover over the word in the reading pane, that picture is included in the word hover.  Try adding an image for your elephant by clicking on the term, clicking the eye icon, and clicking a picture you like.  Then hover over your elephant.
 Note: sometimes these images make _no sense_ -- it's using Bing image search, and it does the best it can with the limited context it has.
 To delete an image added to your term, click on it.  Its border will change to red.  Hit Delete or Backspace to delete it, and then save the term (you must save!).
 

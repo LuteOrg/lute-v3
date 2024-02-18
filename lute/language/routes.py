@@ -86,6 +86,21 @@ def _handle_form(language, form) -> bool:
     return result
 
 
+def _add_hidden_dictionary_template_entry(form):
+    "Add a dummy placeholder dictionary to be used as a template."
+    # Add a dummy dictionary entry with dicturi __TEMPLATE__.
+    #
+    # This entry is used as a "template" when adding a new dictionary
+    # to the list of dictionaries (see templates/language/_form.html).
+    # This is the easiest way to ensure that new dictionary entries
+    # have the correct controls.
+    #
+    # This dummy entry is not rendered on the form, or submitted
+    # when the form is submitted.  Search for __TEMPLATE__ in
+    # templates/language/_form.html to see where it is handled.
+    form.dictionaries.append_entry({"dicturi": "__TEMPLATE__"})
+
+
 @bp.route("/edit/<int:langid>", methods=["GET", "POST"])
 def edit(langid):
     """
@@ -102,6 +117,9 @@ def edit(langid):
 
     if _handle_form(language, form):
         return redirect("/")
+
+    _add_hidden_dictionary_template_entry(form)
+
     return render_template("language/edit.html", form=form, language=language)
 
 
@@ -123,6 +141,8 @@ def new(langname):
 
     if _handle_form(language, form):
         return redirect("/")
+
+    _add_hidden_dictionary_template_entry(form)
 
     return render_template(
         "language/new.html", form=form, language=language, predefined=predefined

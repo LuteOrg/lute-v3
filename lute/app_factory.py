@@ -106,6 +106,7 @@ def _add_base_routes(app, app_config):
             "backup_enabled": bs.backup_enabled,
             "backup_directory": bs.backup_dir,
             "backup_last_display_date": bs.last_backup_display_date,
+            "backup_time_since": bs.time_since_last_backup,
         }
         return ret
 

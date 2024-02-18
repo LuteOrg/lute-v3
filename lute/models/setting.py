@@ -4,6 +4,7 @@ Lute settings, in settings key-value table.
 
 import os
 import datetime
+import time
 from flask import current_app
 from lute.db import db
 
@@ -225,3 +226,38 @@ class BackupSettings:
     def get_backup_settings():
         "Get BackupSettings."
         return BackupSettings()
+
+    @property
+    def time_since_last_backup(self):
+        """
+        Return the time since the last backup. Returns None either if not set or
+        it is in the future.
+        Eg. "3 days ago"
+        """
+        t = self.last_backup_datetime
+        if t is None:
+            return None
+
+        delta = int(time.time() - t)
+        if delta < 0:
+            return None
+
+        thresholds = [
+            ("week", 1 * 60 * 60 * 24 * 7),
+            ("day", 1 * 60 * 60 * 24),
+            ("hour", 1 * 60 * 60),
+            ("minute", 1 * 60),
+            ("second", 1),
+        ]
+
+        for unit, seconds in thresholds:
+            multiples = abs(delta // seconds)
+            if multiples >= 1:
+                message = f"{multiples} {unit}"
+                if multiples > 1:
+                    message += "s"
+                break
+        else:
+            message = f"{abs(delta)} seconds"
+
+        return message + " ago"
