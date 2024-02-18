@@ -31,7 +31,9 @@ def index():
     backups = list_backups(settings.backup_dir)
     backups.sort(reverse=True)
 
-    return render_template("backup/index.html", backups=backups)
+    return render_template(
+        "backup/index.html", backup_dir=settings.backup_dir, backups=backups
+    )
 
 
 @bp.route("/download/<filename>")
