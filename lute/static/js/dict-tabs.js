@@ -1,15 +1,12 @@
 "use strict";
 
-/**
- * A "dictionary button" to be shown in the UI.
- * Manages display state, loading and caching content.
- *
- * The class *could* be broken up into things like
- * PopupDictButton, EmbeddedDictButton, etc, but no need for that yet.
- */
-class DictButton {
 
-  /** All DictButtons created. */
+/**
+ * A general lookup button, for images, sentences, etc.
+ */
+class LookupButton {
+
+  /** All LookupButtons created. */
   static all = [];
 
   constructor(dictURL, frameName) {
@@ -29,7 +26,38 @@ class DictButton {
     this.btn = document.createElement("button");
     this.btn.classList.add("dict-btn");
 
-    DictButton.all.push(this);
+    LookupButton.all.push(this);
+  }
+
+  /** Activate/deact. *************************/
+
+  deactivate() {
+    this.is_active = false;
+    this.btn.classList.remove("dict-btn-active");
+    this.frame.classList.remove("dict-active");
+  }
+
+  activate() {
+    DictButton.all.forEach(button => button.deactivate());
+    this.is_active = true;
+    this.btn.classList.add("dict-btn-active");
+    this.frame.classList.add("dict-active");
+  }
+
+};
+
+
+/**
+ * A "dictionary button" to be shown in the UI.
+ * Manages display state, loading and caching content.
+ *
+ * The class *could* be broken up into things like
+ * PopupDictButton, EmbeddedDictButton, etc, but no need for that yet.
+ */
+class DictButton extends LookupButton {
+
+  constructor(dictURL, frameName) {
+    super(frameName);
 
     // Some DictButtons don't do regular dict lookups -- their
     // construction is managed separately.
@@ -145,21 +173,6 @@ class DictButton {
     this.contentLoaded = true;
   }
 
-  /** Activate/deact. *************************/
-
-  deactivate() {
-    this.is_active = false;
-    this.btn.classList.remove("dict-btn-active");
-    this.frame.classList.remove("dict-active");
-  }
-
-  activate() {
-    DictButton.all.forEach(button => button.deactivate());
-    this.is_active = true;
-    this.btn.classList.add("dict-btn-active");
-    this.frame.classList.add("dict-active");
-  }
-
 }
 
 
@@ -231,7 +244,7 @@ function createDictButtons(tab_count = 5) {
       el.remove();
   }
   destroy_existing_dictTab_controls();
-  DictButton.all = [];
+  LookupButton.all = [];
 
   if (TERM_DICTS.length <= 0) return;
 
@@ -243,10 +256,10 @@ function createDictButtons(tab_count = 5) {
     tab_count += 1;
   }
 
-  // Make all DictButtons, which loads DictButton.all.
+  // Make all DictButtons, which loads LookupButton.all.
   TERM_DICTS.forEach((dict, index) => { new DictButton(dict,`dict${index}`); });
-  const tab_buttons = DictButton.all.slice(0, tab_count);
-  const list_buttons = DictButton.all.slice(tab_count);
+  const tab_buttons = LookupButton.all.slice(0, tab_count);
+  const list_buttons = LookupButton.all.slice(tab_count);
 
   // Add elements to container.
   const container = document.getElementById("dicttabslayout");
@@ -259,7 +272,7 @@ function createDictButtons(tab_count = 5) {
   }
   container.style.gridTemplateColumns = `repeat(${grid_col_count}, minmax(2rem, 8rem))`;
 
-  const first_embedded_button = DictButton.all.find(button => !button.isExternal);
+  const first_embedded_button = LookupButton.all.find(button => !button.isExternal);
   if (first_embedded_button)
     first_embedded_button.activate();
 
@@ -273,7 +286,7 @@ function createDictButtons(tab_count = 5) {
   }
 
   const dictframes = document.getElementById("dictframes");
-  DictButton.all.forEach((button) => { dictframes.appendChild(button.frame); });
+  LookupButton.all.forEach((button) => { dictframes.appendChild(button.frame); });
 }
 
 
@@ -282,8 +295,8 @@ function loadDictionaries() {
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
 
-  DictButton.all.forEach(button => button.contentLoaded = false);
-  const active_button = DictButton.all.find(button => button.is_active && !button.isExternal);
+  LookupButton.all.forEach(button => button.contentLoaded = false);
+  const active_button = LookupButton.all.find(button => button.is_active && !button.isExternal);
   if (active_button)
     active_button.do_lookup();
 }
