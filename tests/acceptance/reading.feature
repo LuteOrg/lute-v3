@@ -125,8 +125,10 @@ Feature: User can actually read and stuff.
             He/ /escrito/ /cap. (2)/ /uno/.
         When I click "He" and edit the form:
             parents: [ 'cap.' ]
+        And I hover over "He"
+        And I press hotkey "3"
         Then the reading pane shows:
-            He (2)/ /escrito/ /cap. (2)/ /uno/.
+            He (3)/ /escrito/ /cap. (3)/ /uno/.
 
 
     Scenario: User can update the text while reading.
