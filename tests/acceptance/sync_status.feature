@@ -27,6 +27,7 @@ Feature: User can link child and parent term statuses.
 
         When I click "gatito" and edit the form:
             parents: [ 'Gato' ]
+        And I click "Gato" and press hotkey "2"
         Then the reading pane shows:
             Gato (2)/ /gatos (2)/ /gatito (2)/ /perro/.
 
