@@ -25,8 +25,15 @@ class LookupButton {
     this.frame = createIFrame(frameName);
     this.btn = document.createElement("button");
     this.btn.classList.add("dict-btn");
+    this.btn.onclick = () => this.do_lookup();
 
     LookupButton.all.push(this);
+  }
+
+  /** Lookup. *************************/
+
+  do_lookup() {
+    throw new Error('Subclasses must override.');
   }
 
   /** Activate/deact. *************************/
@@ -45,6 +52,34 @@ class LookupButton {
   }
 
 };
+
+
+/**
+ * A general lookup button that's doesn't use dictionaries.
+ * For buttons that get info about a term.
+ */
+class GeneralLookupButton extends LookupButton {
+  constructor(btn_id, btn_textContent, btn_title, btn_className, clickHandler) {
+    super(`frame_for_${btn_id}`);
+
+    const b = this.btn;
+    b.setAttribute("id", btn_id);
+    b.setAttribute("title", btn_title);
+    b.textContent = btn_textContent;
+    b.classList.add(btn_className);
+
+    this.click_handler = clickHandler;
+  }
+
+  do_lookup() {
+    if (!this.contentLoaded) {
+      this.click_handler(this.frame);
+    }
+    this.contentLoaded = true;
+    this.activate();
+  }
+
+}  // end GeneralLookupButton
 
 
 /**
@@ -104,8 +139,6 @@ class DictButton extends LookupButton {
       this.btn.classList.add("dict-btn-external");
       this.btn.appendChild(ext_img);
     }
-
-    this.btn.onclick = () => this.do_lookup();
   }
 
   /** LOOKUPS *************************/
@@ -173,29 +206,7 @@ class DictButton extends LookupButton {
     this.contentLoaded = true;
   }
 
-}
-
-
-/** Factory method for sentence, image buttons. */
-let _make_standalone_tab = function(
-  btn_id, btn_textContent, btn_title, btn_className,
-  clickHandler
-) {
-  const button = new DictButton(null, `frame_for_${btn_id}`);
-  const b = button.btn;
-  b.setAttribute("id", btn_id);
-  b.setAttribute("title", btn_title);
-  b.textContent = btn_textContent;
-  b.classList.add(btn_className);
-  b.addEventListener("click", function () {
-    if (!button.contentLoaded) {
-      clickHandler(button.frame);
-    }
-    button.contentLoaded = true;
-    button.activate();
-  });
-  return button;
-}
+}  // end DictButton
 
 
 /**
@@ -280,9 +291,9 @@ function createDictButtons(tab_count = 5) {
     [ "sentences-btn", "Sentences", "See term usage", "dict-sentences-btn", do_sentence_lookup ],
     [ "dict-image-btn", null, "Lookup images", "dict-image-btn", do_image_lookup ]
   ];
-  for (let b of static_buttons) {
-    const tab = _make_standalone_tab(...b);
-    document.getElementById("dicttabsstatic").appendChild(tab.btn);
+  for (let bdata of static_buttons) {
+    const b = new GeneralLookupButton(...bdata);
+    document.getElementById("dicttabsstatic").appendChild(b.btn);
   }
 
   const dictframes = document.getElementById("dictframes");
