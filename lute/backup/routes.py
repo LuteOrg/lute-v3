@@ -4,8 +4,17 @@ Backup routes.
 Backup settings form management, and running backups.
 """
 
+import os
 import traceback
-from flask import Blueprint, current_app, render_template, request, jsonify, redirect
+from flask import (
+    Blueprint,
+    current_app,
+    render_template,
+    request,
+    jsonify,
+    redirect,
+    send_file,
+)
 from lute.models.setting import BackupSettings
 from lute.backup.service import create_backup, skip_this_backup, list_backups
 
@@ -22,7 +31,17 @@ def index():
     backups = list_backups(settings.backup_dir)
     backups.sort(reverse=True)
 
-    return render_template("backup/index.html", backups=backups)
+    return render_template(
+        "backup/index.html", backup_dir=settings.backup_dir, backups=backups
+    )
+
+
+@bp.route("/download/<filename>")
+def download_backup(filename):
+    "Download the given backup file."
+    settings = BackupSettings.get_backup_settings()
+    fullpath = os.path.join(settings.backup_dir, filename)
+    return send_file(fullpath, as_attachment=True)
 
 
 @bp.route("/backup", methods=["GET"])
