@@ -416,7 +416,7 @@ span.hamburger {
   justify-content: center;
   gap: 0.2rem;
   padding: 0;
-  margin-bottom: 1rem;
+  margin-block: 1rem;
 }
 
 .text-options-btn-container {
@@ -440,6 +440,60 @@ span.hamburger {
   background-color: aliceblue;
   padding: 0.9rem 1.5rem;
 }
+
+#focus-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    align-items: center;
+}
+
+#focus {
+    appearance: none;
+    display: block;
+    background-color: #ffffff;
+    border: 1px solid #616161;
+    width: 34px;
+    height: 21px;
+    border-radius: 50px;
+    padding: 3px;
+
+    transition: background-color 0.2s
+}
+
+#focus-container label {
+    font-weight: bold;
+}
+
+#focus::after {
+    content: "";
+    display: block;
+    background-color: #616161;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+
+    transition: transform 0.2s;
+}
+
+.focus-mode-active #focus::after {
+    transform: translate(100%, 0);
+    background-color: #7950f2;
+}
+
+.focus-mode-active #focus{
+    background-color: #b197fc;
+    border-color: #b197fc;
+}
+
+.focus-mode-active #read_pane_right {
+    display: none;
+}
+
+.focus-mode-active #read_pane_left {
+    margin: 0 auto;
+}
+
 /* End reader slide-in hamburger menu. *********************/
 
 .read_page_nav {
@@ -996,36 +1050,23 @@ textarea {
 }
 
 /* focus on fields makes border same as tags */
-input:focus,
-textarea:focus,
-select:focus {
+form input:focus,
+form textarea:focus,
+form select:focus {
     border: 1px solid var(--tagify__tag-bg) !important;
     outline: none !important;
 }
 
-input[type="checkbox"]:focus,
-input[type="file"]:focus,
-button:focus {
+form input[type="checkbox"]:focus,
+form input[type="file"]:focus {
     outline: 1px solid var(--tagify__tag-bg) !important;
 }
 
-input[type="checkbox"]:focus,
-input[type="file"]:focus {
+form input[type="checkbox"]:focus,
+form input[type="file"]:focus {
     border: none !important;
 }
-/* undo focus styles for audio and dict containers */
-.audio-player-container *:focus {
-    border: none !important;
-    outline: none !important;
-}
-
-.dictcontainer *:focus {
-    outline: none !important;
-}
-
-.dictcontainer select:focus {
-    border: none !important;
-}
+/* / */
 
 ::placeholder {
     font-family: inherit;
@@ -1711,6 +1752,10 @@ input[type="checkbox"][disabled] + label {
 
     .close-btn {
         padding: 1.3rem;
+    }
+
+    #focus-container {
+        display: none;
     }
 
     .read-pane-right-close-btn {
