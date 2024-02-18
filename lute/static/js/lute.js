@@ -456,6 +456,14 @@ function next_theme() {
 
 }
 
+function toggleFocus() {
+  $('#focus').prop("checked", !$('#focus').prop("checked")); // toggle checkbox
+  $("#read_pane_container").toggleClass("focus-mode-active");
+  
+  const book_id = $('#book_id').val();
+  const focusState = $('#focus').is(":checked");
+  localStorage.setItem(`focusMode-book${book_id}`, `${focusState}`);
+}
 
 /* Toggle highlighting, and reload the page. */
 function toggle_highlight() {
@@ -498,6 +506,7 @@ function handle_keydown (e) {
   const kT = 84; // T)ranslate
   const kM = 77; // The(M)e
   const kH = 72; // Toggle H)ighlight
+  const kF = 70; // Toggle F)ocus mode
   const k1 = 49;
   const k2 = 50;
   const k3 = 51;
@@ -531,6 +540,7 @@ function handle_keydown (e) {
   map[kT] = () => show_sentence_translation(e);
   map[kM] = () => next_theme();
   map[kH] = () => toggle_highlight();
+  map[kF] = () => toggleFocus();
   map[k1] = () => update_status_for_marked_elements(1);
   map[k2] = () => update_status_for_marked_elements(2);
   map[k3] = () => update_status_for_marked_elements(3);
