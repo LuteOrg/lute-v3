@@ -10,12 +10,13 @@
   <p>No backups have been made yet.</p>
 {% else %}
 
-<table class="table dataTable no-footer" style="width: 50%; margin: 0;">
+<table class="table dataTable no-footer" style="width: 80%; margin: 0;">
   <thead>
     <tr>
       <th>Backup File</th>
       <th>Size</th>
       <th>Last Modified</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -24,6 +25,7 @@
       <td>{{ backup.name }}</td>
       <td>{{ backup.size }}</td>
       <td>{{ backup.last_modified.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td>Download</td>
     </tr>
     {% endfor %}
   </tbody>
