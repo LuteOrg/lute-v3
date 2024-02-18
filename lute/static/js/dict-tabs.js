@@ -57,6 +57,8 @@ class LookupButton {
 /**
  * A general lookup button that's doesn't use dictionaries.
  * For buttons that get info about a term.
+ * This content is never cached -- form values may change the search,
+ * so it's fine to always reload.
  */
 class GeneralLookupButton extends LookupButton {
   constructor(btn_id, btn_textContent, btn_title, btn_className, clickHandler) {
@@ -72,10 +74,7 @@ class GeneralLookupButton extends LookupButton {
   }
 
   do_lookup() {
-    if (!this.contentLoaded) {
-      this.click_handler(this.frame);
-    }
-    this.contentLoaded = true;
+    this.click_handler(this.frame);
     this.activate();
   }
 
@@ -101,6 +100,15 @@ class SentenceLookupButton extends GeneralLookupButton {
 
 class ImageLookupButton extends GeneralLookupButton {
   constructor() {
+
+    // Parents are in the tagify-managed #parentslist input box.
+    let _get_parent_tag_values = function() {
+      const pdata = TERM_FORM_CONTAINER.querySelector("#parentslist").value
+      if ((pdata ?? '') == '')
+        return [];
+      return JSON.parse(pdata).map(e => e.value);
+    };
+
     let handler = function(iframe) {
       const text = TERM_FORM_CONTAINER.querySelector("#text").value;
       if (LANG_ID == null || LANG_ID == '' || parseInt(LANG_ID) == 0 || text == null || text == '') {
@@ -110,7 +118,7 @@ class ImageLookupButton extends GeneralLookupButton {
       let use_text = text;
 
       // If there is a single parent, use that as the basis of the lookup.
-      const parents = get_parents();
+      const parents = _get_parent_tag_values();
       if (parents.length == 1)
         use_text = parents[0];
 
@@ -343,19 +351,3 @@ function loadDictionaries() {
   if (active_button)
     active_button.do_lookup();
 }
-
-
-/** Parents are in the tagify-managed #parentslist input box. */
-let get_parents = function() {
-  // During form load, and in "steady state" (i.e., after the tags
-  // have been added or removed, and the focus has switched to
-  // another control) the #sync_status text box is loaded with the
-  // values.
-  const pdata = $('#parentslist').val();
-  if ((pdata ?? '') == '') {
-    return [];
-  }
-  const j = JSON.parse(pdata);
-  const parents = j.map(e => e.value);
-  return parents;
-};
