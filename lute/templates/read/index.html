@@ -215,11 +215,7 @@
     scrollYBeforeReload = window.scrollY;
   });
 
-  focusChk.addEventListener("change", () => {
-    const book_id = $('#book_id').val();
-    readPaneContainer.classList.toggle("focus-mode-active");
-    localStorage.setItem(`focusMode-book${book_id}`, `${focusChk.checked}`)
-  })
+  focusChk.addEventListener("change", toggleFocus)
 
   $(document).ready(function () {
     const theTextReloadObs = new MutationObserver((mutationList, observer) => {
