@@ -107,6 +107,7 @@ function showEditFrame(el, extra_args = {}) {
   // console.log('go to url = ' + url);
 
   top.frames.wordframe.location.href = url;
+  applyInitialPaneSizes();  // in resize.js
 }
 
 
@@ -428,7 +429,8 @@ let show_sentence_translation = function(e) {
     window.open(finalurl, 'dictwin', settings);
   }
   else {
-    top.frames.dictframe.location.href = url;
+    top.frames.wordframe.location.href = url;
+    $('#read_pane_right').css('grid-template-rows', '1fr 0');
   }
 }
 
