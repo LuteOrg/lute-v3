@@ -68,7 +68,7 @@ _(raw info to process)_
 " > docs/tmp_CHANGELOG.tmp
 
 # Add raw log info.
-git log ${FROMTAG}..${TOCOMMIT} --pretty="* %s" >> docs/tmp_CHANGELOG.tmp
+git log ${FROMTAG}..${TOCOMMIT} --oneline --graph >> docs/tmp_CHANGELOG.tmp
 
 # Finish changelog entry.
 echo "
