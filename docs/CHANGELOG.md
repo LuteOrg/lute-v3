@@ -1,4 +1,21 @@
 
+# 3.2.1 (2024-02-19)
+
+Feature changes:
+
+* #238: add "Focus mode".  From @webofpies in #262, #268.
+* #266: Add backup file download link.
+* #237: Show last backup date, add listing.  By @sakolkar in #227.
+* Improve dictionary UI, use tabs.  With @webofpies in #264.
+* #5: Support variable number of dictionaries.
+* #261: fix rtl language controls for book add, edit, page edit.
+* #223: resize text areas horiz and vert.
+
+Back end changes:
+
+* schema, js changes for dictionary tabs.
+
+
 # 3.1.4 (2024-02-11)
 
 Feature changes:
