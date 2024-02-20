@@ -248,6 +248,29 @@
         TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
         loadDictionaries();
       }
+
+      // When term form posts data (either updating or deleting terms),
+      // reload the full reading screen.
+      if (event.data.event === "LuteTermFormPosted") {
+        const bookid = $('#book_id').val();
+        const pagenum = $('#page_num').val();
+        const url = `/read/renderpage/${bookid}/${pagenum}`;
+        const marked = $('.kwordmarked');
+        const marked_id = $(marked[0]).attr('id');
+
+        // Force remove the old popup.
+        // ref https://stackoverflow.com/questions/19266886/
+        //   tooltip-not-disappearing
+        $('div.ui-tooltip').remove();
+
+        $('#thetext').load(url, function() {
+          // console.log(`adding hover class to id ${marked_id}`);
+          const re_marked = $(`#${marked_id}`);
+          re_marked.removeClass('kwordmarked');
+          re_marked.addClass('wordhover');
+        });
+      };
+
     });
 
     if (have_audio_file()) {
