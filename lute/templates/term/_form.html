@@ -352,8 +352,7 @@
 
     $.post("/term/delete/{{ term.id }}", function( data ) {
       if ("{{ embedded_in_reading_frame }}" == "True") {
-        // If on reading page, reload page
-        parent.location.reload();
+        window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
       }
       else {
         // If on term page, go to term listing
