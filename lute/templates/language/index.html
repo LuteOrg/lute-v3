@@ -10,7 +10,8 @@
   <p>No languages defined.</p>
 {% else %}
 
-<table class="table dataTable no-footer" style="width: 50%; margin: 0;">
+<div style="width: 70%">
+<table id="languagetable" class="table dataTable no-footer" style="margin: 0;">
   <thead>
     <tr>
       <th>Language</th>
@@ -32,10 +33,33 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
 
 {% endif %}
 
 <br />
 <a href="{{ url_for('language.new') }}">Create new</a>
+
+<script>
+  var language_listing_table;
+
+  let setup_lang_datatable = function() {
+    lang_listing_table = $('#languagetable').DataTable({
+      responsive: true,
+      select: true,
+      lengthMenu: [ 10, 25, 50 ],
+      pageLength: 25,
+      paging: true,
+      info: true,
+      searching: true,
+      processing: true,
+      stateSave: true,
+    });
+  }; // end setup_lang_datatable
+
+  $(document).ready(function () {
+    setup_lang_datatable();
+  });
+</script>
 
 {% endblock %}
