@@ -263,6 +263,8 @@
         //   tooltip-not-disappearing
         $('div.ui-tooltip').remove();
 
+        $(".dictcontainer").css('display', 'none');
+
         $('#thetext').load(url, function() {
           // console.log(`adding hover class to id ${marked_id}`);
           const re_marked = $(`#${marked_id}`);
