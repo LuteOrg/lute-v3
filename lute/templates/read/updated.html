@@ -20,8 +20,6 @@
 
     <script>
       $(document).ready(function() {
-        const dictContainer = parent.document.querySelector(".dictcontainer");
-        dictContainer.style.display = "none";
         window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
         $('#flash').delay(1000).fadeOut();
       });
