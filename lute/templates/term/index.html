@@ -77,6 +77,7 @@
       <a href="/term/new">Create new</a>
       <a id="term_action_set_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
       <a id="term_action_bulk_delete" href="#" onclick="bulk_delete(event);">Delete selected</a>
+      <a id="term_action_export_csv" href="#" onclick="export_csv(event);">Export CSV</a>
     </div>
   </div>
 
@@ -110,6 +111,10 @@
       responsive: true,
       select: true,
       lengthMenu: [ 25, 50, 100, 500, 1000 ],
+
+      // The button is included but the div.dt-buttons is hidden,
+      // so that the button actions can be trigged by a link
+      // in the "Actions" list.
       buttons: [
          {
            extend: 'download',
@@ -349,6 +354,26 @@
       }
     });
   }
+
+
+  /** Click the export button.
+   * I'm doing this so that the Datatables "export" extension button
+   * works out of the box, but the actual call to export the CSV
+   * is in the "Actions" list.
+   */
+  function export_csv(event) {
+    event.preventDefault();
+    /*
+    // TODO export_csv: only export selected/checked terms?
+    const checked = $('.chkWord:checked');
+    const ids = checked.toArray().map(el => parseInt($(el).attr('wordid')));
+    */
+    const export_button = $('.dt-button:contains("Export CSV")');
+    if (export_button.length === 0) {
+      throw new Error("Export CSV button not found");
+    }
+    export_button.click();
+  };
 
 
   let handle_filter_update = function() {

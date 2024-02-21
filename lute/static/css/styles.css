@@ -2035,3 +2035,7 @@ input[type="checkbox"][disabled] + label {
 .term-action-dropdown:hover .term-action-button {
     background-color: #3e8e41;
 }
+
+div.dt-buttons {
+    display: none;
+}
