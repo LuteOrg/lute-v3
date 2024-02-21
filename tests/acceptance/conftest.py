@@ -294,7 +294,9 @@ def check_term_table(luteclient, content):
 
 @when("click Export CSV")
 def click_export_csv(luteclient):
-    luteclient.browser.find_by_css("button.dt-button").first.click()
+    "Export the term csv"
+    luteclient.browser.find_by_css("#term_actions").mouse_over()
+    luteclient.click_link("Export CSV")
 
 
 @then(parsers.parse("exported CSV file contains:\n{content}"))
