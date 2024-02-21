@@ -238,7 +238,10 @@ function select_started(e) {
 }
 
 let get_selected_in_range = function(start_el, end_el) {
-  const [startord, endord] = [_get_order(start_el), _get_order(end_el)].sort();
+  let tmp_start = _get_order(start_el);
+  let tmp_end = _get_order(end_el);
+  // Javascript sorts numbers as strings.  wtf.
+  const [startord, endord] = [tmp_start, tmp_end].sort((a, b) => a - b);
   const selected = $('span.textitem').filter(function() {
     const ord = _get_order($(this));
     return ord >= startord && ord <= endord;
