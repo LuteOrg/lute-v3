@@ -1,4 +1,15 @@
 
+# 3.2.2 (2024-02-21)
+
+Feature changes:
+
+* Move 'Export CSV' into term Actions menu.
+* Issue #271: Fix multiword select in some text locations
+* Issue #240: Use datatables for language listing.
+* Issue #221: Don't scroll reading pane on term delete.
+* Issue #269: Fix embedded translation dict.
+
+
 # 3.2.1 (2024-02-19)
 
 Feature changes:
