@@ -24,6 +24,7 @@
 
   let setup_text_datatable = function(initial_search) {
     book_listing_table = $('#booktable').DataTable({
+      dom: 'lf<"toolbar">rtip',
       {% if status != 'Archived' %}
       "language": {
             "emptyTable": "No books available. <a href='/book/new'>Create one?</a>"
@@ -71,6 +72,20 @@
 
   $(document).ready(function () {
     setup_text_datatable("{{ initial_search or '' }}");
+
+    var dropdown = $('<select id="my-dropdown"></select>');
+    var options = [
+      { value: 'option1', text: 'Option 1' },
+      { value: 'option2', text: 'Option 2' },
+      { value: 'option3', text: 'Option 3' }
+    ];
+    $.each(options, function(index, option) {
+      dropdown.append($('<option></option>').attr('value', option.value).text(option.text));
+    });
+    $('div.toolbar').append(dropdown);
+    $('div.toolbar').addClass('dataTables_filter');
+    $('div.toolbar').css('float', 'right');
+    $('div.toolbar').css('margin-right', '1rem');
   });
 
   function do_action_post(action, bookid) {
