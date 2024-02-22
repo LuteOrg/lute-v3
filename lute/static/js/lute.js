@@ -65,6 +65,7 @@ function prepareTextInteractions(pos) {
 
   if (!_show_highlights()) {
     t.on('mouseover', '.word', hover_over_add_status_class);
+    t.on('mouseout', '.word', remove_status_highlights);
   }
 
   $(document).on('keydown', handle_keydown);
