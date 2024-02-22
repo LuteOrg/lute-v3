@@ -121,22 +121,39 @@ class Book(
         splitting the content into separate Text objects with max
         token count.
         """
-        tokens = language.parser.get_parsed_tokens(fulltext, language)
 
-        def token_string(toks):
-            a = [t.token for t in toks]
-            ret = "".join(a)
-            ret = ret.replace("\r", "")
-            ret = ret.replace("¶", "\n")
-            return ret.strip()
+        def split_text_at_page_breaks(txt):
+            "Break fulltext manually at lines consisting of '---' only."
+            # Tried doing this with a regex without success.
+            segments = []
+            current_segment = ""
+            for line in txt.split("\n"):
+                if line.strip() == "---":
+                    segments.append(current_segment.strip())
+                    current_segment = ""
+                else:
+                    current_segment += line + "\n"
+            if current_segment:
+                segments.append(current_segment.strip())
+            return segments
+
+        pages = []
+        for segment in split_text_at_page_breaks(fulltext):
+            tokens = language.parser.get_parsed_tokens(segment, language)
+            it = SentenceGroupIterator(tokens, max_word_tokens_per_text)
+            while toks := it.next():
+                s = (
+                    "".join([t.token for t in toks])
+                    .replace("\r", "")
+                    .replace("¶", "\n")
+                    .strip()
+                )
+                pages.append(s)
+        pages = [p for p in pages if p.strip() != ""]
 
         b = Book(title, language)
-        page_number = 0
-        it = SentenceGroupIterator(tokens, max_word_tokens_per_text)
-        while toks := it.next():
-            page_number += 1
-            # Note the text is automatically added to b.texts!
-            t = Text(b, token_string(toks), page_number)
+        for index, page in enumerate(pages):
+            t = Text(b, page, index + 1)
 
         return b
 

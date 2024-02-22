@@ -2,6 +2,7 @@
 Book tests.
 """
 
+import textwrap
 from lute.models.book import Book
 
 
@@ -33,6 +34,40 @@ def test_create_book(english):
     )
 
 
+def test_create_book_page_breaks(english):
+    "--- on its own line means a page break."
+    fulltext = textwrap.dedent(
+        """\
+      Here is a dog.
+      And a cat.
+    """
+    )
+    scenario(english, fulltext, 500, ["Here is a dog.\nAnd a cat.[7]"])
+
+    fulltext = textwrap.dedent(
+        """\
+      Here is a dog.
+      ---
+      And a cat.
+    """
+    )
+    scenario(english, fulltext, 500, ["Here is a dog.[4]", "And a cat.[3]"])
+
+    fulltext = textwrap.dedent(
+        """\
+      Here is a dog.
+      ---
+      ---
+      ---
+      ---
+      And a cat.
+      ---
+      ---
+    """
+    )
+    scenario(english, fulltext, 500, ["Here is a dog.[4]", "And a cat.[3]"])
+
+
 def scenario(english, fulltext, maxwords, expected):
     """
     Check scenarios.
@@ -41,4 +76,4 @@ def scenario(english, fulltext, maxwords, expected):
 
     actuals = [f"{t.text}[{t.word_count}]" for t in b.texts]
     print(actuals)
-    assert "/".join(actuals) == "/".join(expected), f"scen {maxwords}"
+    assert "/".join(actuals) == "/".join(expected), f"scen {maxwords}, {fulltext}"
