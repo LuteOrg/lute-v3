@@ -5,7 +5,7 @@ dictionaries:
     url: https://www.wordreference.com/tren/###
   - for: terms
     type: embedded
-    url: https://tr.wiktionary.org/###
+    url: https://tr.wiktionary.org/wiki/###
   - for: sentences
     type: popup
     url: https://www.deepl.com/translator#tr/en/###
