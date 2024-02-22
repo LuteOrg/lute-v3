@@ -137,26 +137,23 @@ class Book(
                 segments.append(current_segment.strip())
             return segments
 
-        b = Book(title, language)
-        page_number = 0
-
-        def token_string(toks):
-            a = [t.token for t in toks]
-            ret = "".join(a)
-            ret = ret.replace("\r", "")
-            ret = ret.replace("¶", "\n")
-            return ret.strip()
-
-        segments = split_text_at_page_breaks(fulltext)
-        for segment in segments:
+        pages = []
+        for segment in split_text_at_page_breaks(fulltext):
             tokens = language.parser.get_parsed_tokens(segment, language)
             it = SentenceGroupIterator(tokens, max_word_tokens_per_text)
             while toks := it.next():
-                s = token_string(toks)
-                if s != "":
-                    page_number += 1
-                    # Note the text is automatically added to b.texts!
-                    t = Text(b, token_string(toks), page_number)
+                s = (
+                    "".join([t.token for t in toks])
+                    .replace("\r", "")
+                    .replace("¶", "\n")
+                    .strip()
+                )
+                pages.append(s)
+        pages = [p for p in pages if p.strip() != ""]
+
+        b = Book(title, language)
+        for index, page in enumerate(pages):
+            t = Text(b, page, index + 1)
 
         return b
 
