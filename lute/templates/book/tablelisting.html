@@ -70,19 +70,12 @@
   } // end setup_text_datatable
 
 
-  let setup_language_filter = function() {
-    var dropdown = $('<select id="my-dropdown"></select>');
-    var options = [
-      { value: '0', text: '(all)' },
-      { value: 'option1', text: 'Option1' },
-      { value: 'option2', text: 'Option2' },
-      { value: 'option3', text: 'Option3' },
-      { value: 'option34', text: 'Option3aoeeaosunthaosutaohus' }
-    ];
-
-    $.each(options, function(index, option) {
-      var $option = $('<option></option>').attr('value', option.value).text(option.text);
-      dropdown.append($option);
+  let setup_language_filter = function(lang_choices) {
+    var dropdown = $('<select id="lang_filter" title="Default language"></select>');
+    $.each(lang_choices, function(index, lang_choice) {
+      const [langid, langname] = lang_choice;
+      var option = $('<option></option>').attr('value', langid).text(langname);
+      dropdown.append(option);
     });
     dropdown.addClass('dataTables_filter');
     dropdown.css('text-align', 'left');
@@ -91,18 +84,30 @@
     dropdown.on('change', function() {
       var selectedOption = $(this).find('option:selected');
       console.log(`Selected ID: ${selectedOption.val()}`);
+      // TODO lang_filter: set setting in db via ajax
     });
 
-    $('div.toolbar').append(dropdown);
-    $('div.toolbar').css({
-      'float':'right',
-      'margin-right': '1rem',
-    });
+    // TODO lang_filter: get current ID from settings.
+    let default_lang_id = 7;
+
+    // If not valid (due to changing environment, deleted langs, etc),
+    // switch to first in list.
+    const invalid_default_lang = (-1 == lang_choices.findIndex(el => el[0] === default_lang_id));
+    if (invalid_default_lang)
+      default_lang_id = 0;
+
+    dropdown.val(default_lang_id);
+    dropdown.trigger('change');
+
+    const t = $('div.toolbar');
+    t.append(dropdown);
+    t.css({ 'float':'right', 'margin-right': '1rem' }); // TODO move to stylesheet
   };
 
   $(document).ready(function () {
     setup_text_datatable("{{ initial_search or '' }}");
-    setup_language_filter();
+    const lang_choices = {{ language_choices | safe }};
+    setup_language_filter(lang_choices);
   });
 
 
