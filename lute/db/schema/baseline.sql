@@ -231,7 +231,7 @@ INSERT INTO languagedicts VALUES(3,1,'sentences','popuphtml','https://translate.
 INSERT INTO languagedicts VALUES(4,2,'terms','embeddedhtml','https://ctext.org/dictionary.pl?if=en&char=###',1,1);
 INSERT INTO languagedicts VALUES(5,2,'sentences','popuphtml','https://www.deepl.com/translator#ch/en/###',1,2);
 INSERT INTO languagedicts VALUES(6,3,'terms','embeddedhtml','https://slovniky.lingea.cz/Anglicko-cesky/###',1,1);
-INSERT INTO languagedicts VALUES(7,3,'terms','embeddedhtml','https://slovnik.seznam.cz/preklad/cesky_anglicky/###',1,2);
+INSERT INTO languagedicts VALUES(7,3,'terms','popuphtml','https://slovnik.seznam.cz/preklad/cesky_anglicky/###',1,2);
 INSERT INTO languagedicts VALUES(8,3,'sentences','popuphtml','https://www.deepl.com/translator#cs/en/###',1,3);
 INSERT INTO languagedicts VALUES(9,4,'terms','embeddedhtml','https://en.thefreedictionary.com/###',1,1);
 INSERT INTO languagedicts VALUES(10,4,'terms','popuphtml','https://www.collinsdictionary.com/dictionary/english/###',1,2);
