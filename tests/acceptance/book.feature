@@ -12,6 +12,16 @@ Feature: Books and stats are available
         And the reading pane shows:
             Hola/. /Tengo/ /un/ /gato/.
 
+    Scenario: I can force page breaks where I want with "---".
+        Given I visit "/"
+        Given a Spanish book "Hola" with content:
+            Hola. Tengo un gato.
+            ---
+            Tienes un gato.
+        Then the page title is Reading "Hola"
+        And the reading pane shows:
+            Hola/. /Tengo/ /un/ /gato/.
+
     Scenario: I can import a text file.
         Given I visit "/"
         Given a Spanish book "Hola" from file hola.txt
