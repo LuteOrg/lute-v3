@@ -22,7 +22,7 @@
   /* The book listing. */
   var book_listing_table;
 
-  let setup_text_datatable = function(initial_search) {
+  let setup_text_datatable = function(initial_search, current_language_id) {
     book_listing_table = $('#booktable').DataTable({
       dom: 'lf<"toolbar">rtip',
       {% if status != 'Archived' %}
@@ -65,7 +65,7 @@
         // current filter field values.  These are included in the
         // data sent to the controller.
         data: {
-          filtLanguage: () => $('#filtLanguage').val(),
+          filtLanguage: () => $('#filtLanguage').val() ?? current_language_id,
         },
 
         type: "POST",
@@ -94,26 +94,13 @@
       $.post(`/settings/set/current_language_id/${langid}`);
       $('#booktable').DataTable().draw();
     });
-
-    let default_lang_id = current_language_id;
-
-    // If not valid (due to changing environment, deleted langs, etc),
-    // switch to first in list.
-    const invalid_default_lang = (-1 == lang_choices.findIndex(el => el[0] === default_lang_id));
-    if (invalid_default_lang)
-      default_lang_id = lang_choices[0][0];
-
-    dropdown.val(default_lang_id);
+    dropdown.val(current_language_id);
 
     const t = $('div.toolbar');
     t.append(dropdown);
     t.css({ 'float':'right', 'margin-right': '1rem' }); // TODO move to stylesheet
-
-    // Trigger the change event now with the loaded select box after
-    // it's attached to the DOM, because the Ajax call to get the data
-    // has to find the select box in the DOM.
-    dropdown.trigger('change');
   };
+
 
   $(document).ready(function () {
     setup_text_datatable("{{ initial_search or '' }}");
