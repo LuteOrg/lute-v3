@@ -6,6 +6,7 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
 from lute.models.language import Language
+from lute.models.setting import UserSetting
 from lute.models.book import Book
 from lute.models.term import Term
 from lute.language.forms import LanguageForm
@@ -140,6 +141,16 @@ def new(langname):
     form.parser_type.choices = supported_parsers()
 
     if _handle_form(language, form):
+        # New language, so show everything b/c user should re-choose
+        # the default.
+        #
+        # Reason for this: a user may start off with just language X,
+        # so the current_language_id is set to X.id.  If the user then
+        # adds language Y, the filter stays on X, which may be
+        # disconcerting/confusing.  Forcing a reselect is painless and
+        # unambiguous.
+        UserSetting.set_value("current_language_id", 0)
+        db.session.commit()
         return redirect("/")
 
     _add_hidden_dictionary_template_entry(form)
