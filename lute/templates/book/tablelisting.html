@@ -1,4 +1,4 @@
-<select id="filtLanguage" class="dataTables_filter" title="Default language">
+<select id="defaultLanguageSelect" class="dataTables_filter" title="Default language">
   {% for lang_choice in language_choices %}
     <option value="{{ lang_choice[0] }}">{{ lang_choice[1] }}</option>
   {% endfor %}
@@ -71,7 +71,7 @@
         // current filter field values.  These are included in the
         // data sent to the controller.
         data: {
-          filtLanguage: () => (typeof $("#filtLanguage").val() !== 'undefined') ? $("#filtLanguage").val() : current_language_id,
+          filtLanguage: () => (typeof $("#defaultLanguageSelect").val() !== 'undefined') ? $("#defaultLanguageSelect").val() : current_language_id,
         },
 
         type: "POST",
@@ -84,7 +84,7 @@
 
 
   let setup_language_filter = function(current_language_id = 0) {
-    var dropdown = $('#filtLanguage');
+    var dropdown = $('#defaultLanguageSelect');
     dropdown.css('text-align', 'left');
     dropdown.css('padding', '4px');
 
