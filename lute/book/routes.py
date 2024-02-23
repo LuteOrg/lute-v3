@@ -124,8 +124,6 @@ def new():
 
     form = NewBookForm(obj=b)
     form.language_id.choices = lute.utils.formutils.language_choices()
-    current_language_id = int(UserSetting.get_value("current_language_id"))
-    form.language_id.data = current_language_id
     repo = Repository(db)
 
     if form.validate_on_submit():
@@ -141,6 +139,10 @@ def new():
             return redirect(f"/read/{book.id}/page/1", 302)
         except service.BookImportException as e:
             flash(e.message, "notice")
+
+    # Don't set the current language before submit.
+    current_language_id = int(UserSetting.get_value("current_language_id"))
+    form.language_id.data = current_language_id
 
     return render_template(
         "book/create_new.html",

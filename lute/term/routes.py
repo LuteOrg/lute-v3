@@ -126,8 +126,6 @@ def handle_term_form(
     term.flash_message = None
 
     form.language_id.choices = lute.utils.formutils.language_choices()
-    current_language_id = int(UserSetting.get_value("current_language_id"))
-    form.language_id.data = current_language_id
 
     if form.validate_on_submit():
         form.populate_obj(term)
@@ -145,6 +143,9 @@ def handle_term_form(
     # pylint: disable=protected-access
     if term._language is not None:
         hide_pronunciation = not term._language.show_romanization
+
+    current_language_id = int(UserSetting.get_value("current_language_id"))
+    form.language_id.data = current_language_id
 
     return render_template(
         form_template_name,
