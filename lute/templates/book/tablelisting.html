@@ -22,7 +22,7 @@
   /* The book listing. */
   var book_listing_table;
 
-  let setup_text_datatable = function(initial_search, current_language_id) {
+  let setup_book_datatable = function(initial_search, current_language_id) {
     book_listing_table = $('#booktable').DataTable({
       dom: 'lf<"toolbar">rtip',
       {% if status != 'Archived' %}
@@ -65,7 +65,7 @@
         // current filter field values.  These are included in the
         // data sent to the controller.
         data: {
-          filtLanguage: () => $('#filtLanguage').val() ?? current_language_id,
+          filtLanguage: () => (typeof $("#filtLanguage").val() !== 'undefined') ? $("#filtLanguage").val() : current_language_id,
         },
 
         type: "POST",
@@ -74,7 +74,7 @@
 
     });
 
-  } // end setup_text_datatable
+  } // end setup_book_datatable
 
 
   let setup_language_filter = function(lang_choices, current_language_id = 0) {
@@ -103,9 +103,9 @@
 
 
   $(document).ready(function () {
-    setup_text_datatable("{{ initial_search or '' }}");
     const lang_choices = {{ language_choices | safe }};
     const current_language_id = {{ current_language_id }};
+    setup_book_datatable("{{ initial_search or '' }}", current_language_id);
     setup_language_filter(lang_choices, current_language_id);
   });
 
