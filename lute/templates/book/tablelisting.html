@@ -80,33 +80,29 @@
 
     });
 
+    var dropdown = $('#defaultLanguageSelect');
+    $('div.toolbar').append(dropdown);
   } // end setup_book_datatable
 
 
   let setup_language_filter = function(current_language_id = 0) {
-    var dropdown = $('#defaultLanguageSelect');
-    dropdown.css('text-align', 'left');
-    dropdown.css('padding', '4px');
+    const dropdown = $('#defaultLanguageSelect');
+    dropdown.val(current_language_id);
 
-    // Handle change event to update displayed text
     dropdown.on('change', function() {
-      var selectedOption = $(this).find('option:selected');
-      const langid = selectedOption.val();
+      const langid = $(this).val();
       $.post(`/settings/set/current_language_id/${langid}`);
       $('#booktable').DataTable().draw();
     });
-    dropdown.val(current_language_id);
-
-    const t = $('div.toolbar');
-    t.append(dropdown);
-    t.css({ 'float':'right', 'margin-right': '1rem' });
   };
 
 
   $(document).ready(function () {
     const current_language_id = {{ current_language_id }};
-    setup_book_datatable("{{ initial_search or '' }}", current_language_id);
+    // Language filter is set up first, because its value
+    // is used during the initial datatable draw.
     setup_language_filter(current_language_id);
+    setup_book_datatable("{{ initial_search or '' }}", current_language_id);
   });
 
 
