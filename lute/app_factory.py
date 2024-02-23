@@ -112,6 +112,22 @@ def _add_base_routes(app, app_config):
         }
         return ret
 
+    def _get_valid_current_language_id(language_choices):
+        """
+        Get the current language id from UserSetting, ensuring
+        it's still valid.  If not, change it.
+        """
+        current_language_id = UserSetting.get_value("current_language_id")
+        current_language_id = int(current_language_id)
+        choice_ids = [int(p[0]) for p in language_choices]
+        if current_language_id in choice_ids:
+            return current_language_id
+
+        current_language_id = choice_ids[0]
+        UserSetting.set_value("current_language_id", current_language_id)
+        db.session.commit()
+        return current_language_id
+
     @app.route("/")
     def index():
         is_production = not lute.db.demo.contains_demo_data()
@@ -119,11 +135,8 @@ def _add_base_routes(app, app_config):
 
         have_books = len(db.session.query(Book).all()) > 0
         have_languages = len(db.session.query(Language).all()) > 0
-        language_choices = json.dumps(
-            lute.utils.formutils.language_choices("(all languages)")
-        )
-        current_language_id = UserSetting.get_value("current_language_id")
-        current_language_id = int(current_language_id)
+        language_choices = lute.utils.formutils.language_choices("(all languages)")
+        current_language_id = _get_valid_current_language_id(language_choices)
 
         # Only back up if we have books, otherwise the backup is
         # kicked off when the user empties the demo database.
@@ -150,7 +163,7 @@ def _add_base_routes(app, app_config):
             tutorial_book_id=lute.db.demo.tutorial_book_id(),
             have_books=have_books,
             have_languages=have_languages,
-            language_choices=language_choices,
+            language_choices=json.dumps(language_choices),
             current_language_id=current_language_id,
             is_production_data=is_production,
             # Backup stats
