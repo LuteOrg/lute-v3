@@ -52,28 +52,11 @@ def datatables_active_source():
     return datatables_source(False)
 
 
-def _get_valid_current_language_id(language_choices):
-    """
-    Get the current language id from UserSetting, ensuring
-    it's still valid.  If not, change it.
-    """
-    current_language_id = UserSetting.get_value("current_language_id")
-    current_language_id = int(current_language_id)
-    choice_ids = [int(p[0]) for p in language_choices]
-    if current_language_id in choice_ids:
-        return current_language_id
-
-    current_language_id = choice_ids[0]
-    UserSetting.set_value("current_language_id", current_language_id)
-    db.session.commit()
-    return current_language_id
-
-
 @bp.route("/archived", methods=["GET"])
 def archived():
     "List archived books."
     language_choices = lute.utils.formutils.language_choices("(all languages)")
-    current_language_id = _get_valid_current_language_id(language_choices)
+    current_language_id = lute.utils.formutils.valid_current_language_id()
 
     return render_template(
         "book/index.html",
