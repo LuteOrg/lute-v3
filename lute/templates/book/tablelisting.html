@@ -61,6 +61,13 @@
       // Ajax call
       ajax: {
         url: "/book/datatables/{{ status or 'active' }}",
+        // Additional filters.  func calls are required to get the
+        // current filter field values.  These are included in the
+        // data sent to the controller.
+        data: {
+          filtLanguage: () => $('#filtLanguage').val(),
+        },
+
         type: "POST",
         dataType: "json"
       },
@@ -71,7 +78,7 @@
 
 
   let setup_language_filter = function(lang_choices) {
-    var dropdown = $('<select id="lang_filter" title="Default language"></select>');
+    var dropdown = $('<select id="filtLanguage" title="Default language"></select>');
     $.each(lang_choices, function(index, lang_choice) {
       const [langid, langname] = lang_choice;
       var option = $('<option></option>').attr('value', langid).text(langname);
@@ -85,6 +92,7 @@
       var selectedOption = $(this).find('option:selected');
       console.log(`Selected ID: ${selectedOption.val()}`);
       // TODO lang_filter: set setting in db via ajax
+      $('#booktable').DataTable().draw();
     });
 
     // TODO lang_filter: get current ID from settings.
@@ -94,14 +102,18 @@
     // switch to first in list.
     const invalid_default_lang = (-1 == lang_choices.findIndex(el => el[0] === default_lang_id));
     if (invalid_default_lang)
-      default_lang_id = 0;
+      default_lang_id = lang_choices[0][0];
 
     dropdown.val(default_lang_id);
-    dropdown.trigger('change');
 
     const t = $('div.toolbar');
     t.append(dropdown);
     t.css({ 'float':'right', 'margin-right': '1rem' }); // TODO move to stylesheet
+
+    // Trigger the change event now with the loaded select box after
+    // it's attached to the DOM, because the Ajax call to get the data
+    // has to find the select box in the DOM.
+    dropdown.trigger('change');
   };
 
   $(document).ready(function () {
