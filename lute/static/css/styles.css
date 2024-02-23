@@ -150,6 +150,16 @@ div#divbooktable {
     margin-left: auto;
 }
 
+#defaultLanguageSelect {
+    text-align: left;
+    padding: 4px;  /* copied padding from datatables css. */
+}
+
+div.toolbar {
+    float: right;
+    margin-right: 1rem;
+}
+
 /* blank space to hang completed_book bullets while maintaining proper justification on the whole column */
 a.book-title:before {
     content: '';

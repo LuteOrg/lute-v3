@@ -26,6 +26,7 @@ def fixture_dt_params():
         "start": "0",  # Start from page 0
         "length": "10",
         "search": {"value": "", "regex": False},
+        "filtLanguage": "0",  # Ha!
     }
     return params
 

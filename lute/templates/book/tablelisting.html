@@ -1,3 +1,10 @@
+<!-- The default language selector.  This is moved into the datatables toolbar during setup. -->
+<select id="defaultLanguageSelect" class="dataTables_filter" title="Default language">
+  {% for lang_choice in language_choices %}
+    <option value="{{ lang_choice[0] }}">{{ lang_choice[1] }}</option>
+  {% endfor %}
+</select>
+
 <table id="booktable" class="table dataTable stripe">
   <thead>
     <tr>
@@ -22,8 +29,9 @@
   /* The book listing. */
   var book_listing_table;
 
-  let setup_text_datatable = function(initial_search) {
+  let setup_book_datatable = function(initial_search) {
     book_listing_table = $('#booktable').DataTable({
+      dom: 'lf<"toolbar">rtip',
       {% if status != 'Archived' %}
       "language": {
             "emptyTable": "No books available. <a href='/book/new'>Create one?</a>"
@@ -60,18 +68,48 @@
       // Ajax call
       ajax: {
         url: "/book/datatables/{{ status or 'active' }}",
+        // Additional filters.  func calls are required to get the
+        // current filter field values.  These are included in the
+        // data sent to the controller.
+        data: {
+          filtLanguage: () => $("#defaultLanguageSelect").val(),
+        },
+
         type: "POST",
         dataType: "json"
       },
 
     });
 
-  } // end setup_text_datatable
+    var dropdown = $('#defaultLanguageSelect');
+    $('div.toolbar').append(dropdown);
+  } // end setup_book_datatable
+
+
+  let setup_language_filter = function(current_language_id = 0) {
+    const dropdown = $('#defaultLanguageSelect');
+    dropdown.val(current_language_id);
+    const lang_count = $("#defaultLanguageSelect option").length;
+    if (lang_count == 1) {
+      dropdown.css("display", "none");
+    }
+
+    dropdown.on('change', function() {
+      const langid = $(this).val();
+      $.post(`/settings/set/current_language_id/${langid}`);
+      $('#booktable').DataTable().draw();
+    });
+  };
 
 
   $(document).ready(function () {
-    setup_text_datatable("{{ initial_search or '' }}");
+    const current_language_id = {{ current_language_id }};
+    // Language filter is set up first, because its value
+    // is used during the initial datatable draw.
+    setup_language_filter(current_language_id);
+    setup_book_datatable("{{ initial_search or '' }}");
   });
+
 
   function do_action_post(action, bookid) {
     let f = $('#actionposter');

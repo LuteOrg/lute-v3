@@ -21,15 +21,27 @@ from lute.db import db
 
 from lute.models.language import Language
 from lute.models.book import Book as DBBook
+from lute.models.setting import UserSetting
 from lute.book.model import Book, Repository
 
 
 bp = Blueprint("book", __name__, url_prefix="/book")
 
 
+def _load_term_custom_filters(request_form, parameters):
+    "Manually add filters that the DataTablesFlaskParamParser doesn't know about."
+    filter_param_names = [
+        "filtLanguage",
+    ]
+    request_params = request_form.to_dict(flat=True)
+    for p in filter_param_names:
+        parameters[p] = request_params.get(p)
+
+
 def datatables_source(is_archived):
     "Get datatables json for books."
     parameters = DataTablesFlaskParamParser.parse_params(request.form)
+    _load_term_custom_filters(request.form, parameters)
     data = get_data_tables_list(parameters, is_archived)
     return jsonify(data)
 
@@ -43,7 +55,15 @@ def datatables_active_source():
 @bp.route("/archived", methods=["GET"])
 def archived():
     "List archived books."
-    return render_template("book/index.html", status="Archived")
+    language_choices = lute.utils.formutils.language_choices("(all languages)")
+    current_language_id = lute.utils.formutils.valid_current_language_id()
+
+    return render_template(
+        "book/index.html",
+        status="Archived",
+        language_choices=language_choices,
+        current_language_id=current_language_id,
+    )
 
 
 # Archived must be capitalized, or the ajax call 404's.
@@ -119,6 +139,10 @@ def new():
             return redirect(f"/read/{book.id}/page/1", 302)
         except service.BookImportException as e:
             flash(e.message, "notice")
+
+    # Don't set the current language before submit.
+    current_language_id = int(UserSetting.get_value("current_language_id"))
+    form.language_id.data = current_language_id
 
     return render_template(
         "book/create_new.html",

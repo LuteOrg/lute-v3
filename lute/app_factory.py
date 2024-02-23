@@ -27,6 +27,7 @@ from lute.db.setup.main import setup_db
 from lute.db.data_cleanup import clean_data
 import lute.backup.service as backupservice
 import lute.db.demo
+import lute.utils.formutils
 
 from lute.models.book import Book
 from lute.models.language import Language
@@ -117,6 +118,8 @@ def _add_base_routes(app, app_config):
 
         have_books = len(db.session.query(Book).all()) > 0
         have_languages = len(db.session.query(Language).all()) > 0
+        language_choices = lute.utils.formutils.language_choices("(all languages)")
+        current_language_id = lute.utils.formutils.valid_current_language_id()
 
         # Only back up if we have books, otherwise the backup is
         # kicked off when the user empties the demo database.
@@ -143,6 +146,8 @@ def _add_base_routes(app, app_config):
             tutorial_book_id=lute.db.demo.tutorial_book_id(),
             have_books=have_books,
             have_languages=have_languages,
+            language_choices=language_choices,
+            current_language_id=current_language_id,
             is_production_data=is_production,
             # Backup stats
             backup_show_warning=backup_show_warning,
