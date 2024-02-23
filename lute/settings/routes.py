@@ -138,3 +138,18 @@ def test_parse():
         UserSetting.set_value("mecab_path", old_setting)
 
     return jsonify(result)
+
+
+@bp.route("/set/<key>/<value>", methods=["POST"])
+def set_key_value(key, value):
+    "Set a UserSetting key to value."
+    old_value = UserSetting.get_value(key)
+    try:
+        UserSetting.set_value(key, value)
+        result = {"result": "success", "message": "OK"}
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        message = f"{type(e).__name__}: { str(e) }"
+        UserSetting.set_value(key, old_value)
+        result = {"result": "failure", "message": message}
+    db.session.commit()
+    return jsonify(result)
