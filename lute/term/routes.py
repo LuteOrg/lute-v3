@@ -144,8 +144,13 @@ def handle_term_form(
     if term._language is not None:
         hide_pronunciation = not term._language.show_romanization
 
-    current_language_id = int(UserSetting.get_value("current_language_id"))
-    form.language_id.data = current_language_id
+    # If this form is embedded_in_reading_frame, then there is no
+    # language dropdown shown, so we shouldn't set the language id;
+    # otherwise, if not embedded_in_reading_frame, respect the
+    # current_language_id.
+    if not embedded_in_reading_frame:
+        current_language_id = int(UserSetting.get_value("current_language_id"))
+        form.language_id.data = current_language_id
 
     return render_template(
         form_template_name,
