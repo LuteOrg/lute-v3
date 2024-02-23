@@ -89,6 +89,10 @@
   let setup_language_filter = function(current_language_id = 0) {
     const dropdown = $('#defaultLanguageSelect');
     dropdown.val(current_language_id);
+    const lang_count = $("#defaultLanguageSelect option").length;
+    if (lang_count == 1) {
+      dropdown.css("display", "none");
+    }
 
     dropdown.on('change', function() {
       const langid = $(this).val();
