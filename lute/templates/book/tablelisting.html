@@ -77,7 +77,7 @@
   } // end setup_text_datatable
 
 
-  let setup_language_filter = function(lang_choices) {
+  let setup_language_filter = function(lang_choices, current_language_id = 0) {
     var dropdown = $('<select id="filtLanguage" title="Default language"></select>');
     $.each(lang_choices, function(index, lang_choice) {
       const [langid, langname] = lang_choice;
@@ -95,8 +95,7 @@
       $('#booktable').DataTable().draw();
     });
 
-    // TODO lang_filter: get current ID from settings.
-    let default_lang_id = 7;
+    let default_lang_id = current_language_id;
 
     // If not valid (due to changing environment, deleted langs, etc),
     // switch to first in list.
@@ -119,7 +118,8 @@
   $(document).ready(function () {
     setup_text_datatable("{{ initial_search or '' }}");
     const lang_choices = {{ language_choices | safe }};
-    setup_language_filter(lang_choices);
+    const current_language_id = {{ current_language_id }};
+    setup_language_filter(lang_choices, current_language_id);
   });
 
 
