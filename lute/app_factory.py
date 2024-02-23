@@ -5,7 +5,6 @@ Methods: create_app.
 """
 
 import os
-import json
 import platform
 import traceback
 from flask import (
@@ -163,7 +162,7 @@ def _add_base_routes(app, app_config):
             tutorial_book_id=lute.db.demo.tutorial_book_id(),
             have_books=have_books,
             have_languages=have_languages,
-            language_choices=json.dumps(language_choices),
+            language_choices=language_choices,
             current_language_id=current_language_id,
             is_production_data=is_production,
             # Backup stats
