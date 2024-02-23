@@ -90,8 +90,8 @@
     // Handle change event to update displayed text
     dropdown.on('change', function() {
       var selectedOption = $(this).find('option:selected');
-      console.log(`Selected ID: ${selectedOption.val()}`);
-      // TODO lang_filter: set setting in db via ajax
+      const langid = selectedOption.val();
+      $.post(`/settings/set/current_language_id/${langid}`);
       $('#booktable').DataTable().draw();
     });
 
