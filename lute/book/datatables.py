@@ -64,6 +64,14 @@ def get_data_tables_list(parameters, is_archived):
       and languages.LgParserType in ({ supported_parser_type_criteria() })
     """
 
+    # Add "where" criteria for all the filters.
+    language_id = parameters["filtLanguage"]
+    if language_id == "null" or language_id == "undefined" or language_id is None:
+        language_id = "0"
+    language_id = int(language_id)
+    if language_id != 0:
+        base_sql += f" and LgID = {language_id}"
+
     # print(base_sql)
     session = db.session
     connection = session.connection()
