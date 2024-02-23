@@ -15,6 +15,7 @@ from flask import (
 )
 from lute.models.language import Language
 from lute.models.term import Term as DBTerm
+from lute.models.setting import UserSetting
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list
 from lute.term.model import Repository, Term
@@ -125,6 +126,8 @@ def handle_term_form(
     term.flash_message = None
 
     form.language_id.choices = lute.utils.formutils.language_choices()
+    current_language_id = int(UserSetting.get_value("current_language_id"))
+    form.language_id.data = current_language_id
 
     if form.validate_on_submit():
         form.populate_obj(term)
