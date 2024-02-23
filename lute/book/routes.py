@@ -27,9 +27,20 @@ from lute.book.model import Book, Repository
 bp = Blueprint("book", __name__, url_prefix="/book")
 
 
+def _load_term_custom_filters(request_form, parameters):
+    "Manually add filters that the DataTablesFlaskParamParser doesn't know about."
+    filter_param_names = [
+        "filtLanguage",
+    ]
+    request_params = request_form.to_dict(flat=True)
+    for p in filter_param_names:
+        parameters[p] = request_params.get(p)
+
+
 def datatables_source(is_archived):
     "Get datatables json for books."
     parameters = DataTablesFlaskParamParser.parse_params(request.form)
+    _load_term_custom_filters(request.form, parameters)
     data = get_data_tables_list(parameters, is_archived)
     return jsonify(data)
 
