@@ -21,6 +21,7 @@ from lute.db import db
 
 from lute.models.language import Language
 from lute.models.book import Book as DBBook
+from lute.models.setting import UserSetting
 from lute.book.model import Book, Repository
 
 
@@ -115,6 +116,8 @@ def new():
 
     form = NewBookForm(obj=b)
     form.language_id.choices = lute.utils.formutils.language_choices()
+    current_language_id = int(UserSetting.get_value("current_language_id"))
+    form.language_id.data = current_language_id
     repo = Repository(db)
 
     if form.validate_on_submit():
