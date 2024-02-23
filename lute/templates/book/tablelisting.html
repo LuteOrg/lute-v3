@@ -1,3 +1,9 @@
+<select id="filtLanguage" class="dataTables_filter" title="Default language">
+  {% for lang_choice in language_choices %}
+    <option value="{{ lang_choice[0] }}">{{ lang_choice[1] }}</option>
+  {% endfor %}
+</select>
+
 <table id="booktable" class="table dataTable stripe">
   <thead>
     <tr>
@@ -77,14 +83,8 @@
   } // end setup_book_datatable
 
 
-  let setup_language_filter = function(lang_choices, current_language_id = 0) {
-    var dropdown = $('<select id="filtLanguage" title="Default language"></select>');
-    $.each(lang_choices, function(index, lang_choice) {
-      const [langid, langname] = lang_choice;
-      var option = $('<option></option>').attr('value', langid).text(langname);
-      dropdown.append(option);
-    });
-    dropdown.addClass('dataTables_filter');
+  let setup_language_filter = function(current_language_id = 0) {
+    var dropdown = $('#filtLanguage');
     dropdown.css('text-align', 'left');
     dropdown.css('padding', '4px');
 
@@ -99,15 +99,14 @@
 
     const t = $('div.toolbar');
     t.append(dropdown);
-    t.css({ 'float':'right', 'margin-right': '1rem' }); // TODO move to stylesheet
+    t.css({ 'float':'right', 'margin-right': '1rem' });
   };
 
 
   $(document).ready(function () {
-    const lang_choices = {{ language_choices | safe }};
     const current_language_id = {{ current_language_id }};
     setup_book_datatable("{{ initial_search or '' }}", current_language_id);
-    setup_language_filter(lang_choices, current_language_id);
+    setup_language_filter(current_language_id);
   });
 
 
