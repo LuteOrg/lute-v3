@@ -1827,6 +1827,8 @@ input[type="checkbox"][disabled] + label {
         bottom: 0;
         left: 0;
         opacity: 0;
+        /* for touch drag resize to work */
+        touch-action: none;
     }
 
     #read_pane_right::after {
@@ -1842,26 +1844,40 @@ input[type="checkbox"][disabled] + label {
     }
 
     /*drag button*/
-    #read_pane_right::before {
+    #read_pane_right::before,
+    .dictcontainer::before {
         content: '';
         background-color: #79b7e7;
         position: absolute;
-        right: 0;
         top: 0;
-        transform: translateY(-100%);
-        width: 50px;
-        height: 42px;
         cursor: row-resize;
-        border-top-left-radius: 5px;
+        
         background-image: url("/static/icn/drag-handle.svg");
         background-position: center;
         background-repeat: no-repeat;
+    }
+
+    #read_pane_right::before {
+        right: 0;
+        transform: translate(0, -100%);
+        width: 50px;
+        height: 42px;
+        border-top-left-radius: 5px;
         background-size: 91%;
+    }
+
+    .dictcontainer::before {
+        left: 50%;
+        width: 100px;
+        height: 25px;
+        transform: translate(-50%, -85%);
+        background-size: 30%;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
     }
 
     .dictcontainer::after {
         background-color: #79b7e7;
-        height: 6px;
     }
 
     #dicttabs {
