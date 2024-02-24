@@ -141,14 +141,19 @@ def handle_term_form(
 
     hide_pronunciation = False
     # pylint: disable=protected-access
-    if term._language is not None:
-        hide_pronunciation = not term._language.show_romanization
+    term_language = term._language
 
-    # If this form is embedded_in_reading_frame, then there is no
-    # language dropdown shown, so we shouldn't set the language id;
-    # otherwise, if not embedded_in_reading_frame, respect the
-    # current_language_id.
-    if not embedded_in_reading_frame:
+    if term_language is not None:
+        hide_pronunciation = not term_language.show_romanization
+
+    # Set the language dropdown to the user's current_language_id IF APPLICABLE.
+    if embedded_in_reading_frame or term_language is not None:
+        # Do nothing.  The language dropdown is not shown, or the term already
+        # has a language assigned, and we shouldn't change it.
+        pass
+    else:
+        # The language select control is shown and this is a new term,
+        # so use the default value.
         current_language_id = int(UserSetting.get_value("current_language_id"))
         form.language_id.data = current_language_id
 
