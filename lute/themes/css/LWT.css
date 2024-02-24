@@ -1,0 +1,50 @@
+body {
+  --status-0-color: #ADDFFF;
+  --status-1-color: #F5B8A9;
+  --status-2-color: #F5CCA9;
+  --status-3-color: #F5E1A9;
+  --status-4-color: #F5F3A9;
+  --status-5-color: #DDFFDD;
+
+  --status-98-color: #F8F8F8;
+  --status-99-color: #F8F8F8;
+
+  font: 100%/1.25 "Lucida Grande", Arial, sans-serif, STHeiti, "Arial Unicode MS", MingLiu;
+}
+
+span.textitem {
+  font-size: 24px;
+  margin-bottom: 5px;
+  border-bottom: 2px solid transparent;
+}
+
+span.status98 {
+  background-color: var(--status-98-color);
+  border-bottom: 2px dashed #000000;
+}
+
+span.status99 {
+  background-color: var(--status-99-color);
+  border-bottom: 2px solid #CCFFCC;
+}
+
+.wordhover {
+  border-bottom: 2px solid blue !important;
+}
+
+.kwordmarked {
+  border-bottom: 2px solid red !important;
+}
+
+div.ui-tooltip {
+  font-size: 16px;
+}
+
+#status #status-5:checked+label::after,
+#status #status-6:checked+label::after {
+  filter: invert(0);
+}
+
+.status-bar99 {
+  background-color: #72DA88;
+}
