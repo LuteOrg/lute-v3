@@ -1,0 +1,53 @@
+body {
+  --status-0-color: #C6DFFF;
+  --status-1-color: #FFE895;
+  --status-2-color: #FFF2C5;
+  --status-3-color: #FFF7DB;
+  --status-4-color: transparent;
+  --status-5-color: transparent;
+
+  --status-98-color: transparent;
+  --status-99-color: transparent;
+
+  --border-bottom-color: #ACB2B9;
+
+  font: 100%/1.25 Rubik, BlinkMacSystemFont, -apple-system, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+span.status4 {
+  border-bottom: 1px dashed var(--border-bottom-color);
+}
+
+span.status5 {
+  border-bottom: 1px solid var(--border-bottom-color);
+}
+
+span.status98 {
+  background-color: var(--status-98-color);
+}
+
+span.status99 {
+  background-color: var(--status-99-color);
+}
+
+span.textitem {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+#status #status-5:checked+label::after,
+#status #status-6:checked+label::after {
+  filter: invert(0);
+}
+
+.status-bar4 {
+  background-color: var(--border-bottom-color);
+}
+
+.status-bar5 {
+  background-color: var(--border-bottom-color);
+}
+
+.status-bar99 {
+  background-color: #72DA88;
+}
