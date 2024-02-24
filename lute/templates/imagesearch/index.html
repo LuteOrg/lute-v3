@@ -4,24 +4,40 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>Images</title>
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}" charset="utf-8"></script>
-    <style>
-      .initial {
-          border: solid 2px transparent;
-      }
-
-      .highlight {
-          border: solid 2px red !important;
-      }
-
-      .saved {
-          border: solid 2px green !important;
-      }
-
-      span > img {
-          display:inline;
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <link rel="stylesheet" type="text/css" href="/theme/current">
+    <link rel="stylesheet" type="text/css" href="/theme/custom_styles">
   </head>
+
+  <body>
+    <div id="termimagesearch" class="container">
+
+      <!-- form post is handled via javascript, added below -->
+      <form id="manual_image_upload" method="post" enctype="multipart/form-data" style="display: none">
+        <input type="hidden" name="langid" value="{{ langid }}">
+        <input type="hidden" name="text" value="{{ text }}">
+        <input type="file" name="manual_image_file" id="manual_image_file" />
+      </form>
+
+      <p class="termimagesearchtitle">
+        Click an image below,
+        <span id="upload_image_link" class="imageAction">upload an image</span>, or
+        <span class="imageAction" title="Click to set focus in this window">click here</span>
+        then paste from your clipboard.
+      </p>
+
+      {% for image in images %}
+      <span class="initial"
+            style="margin: 2px; display:inline-block;"
+            onmouseover="highlight_image(this);"
+            onmouseout="un_highlight_image(this);"
+            onclick='save_image_locally("{{ image['src'] }}", {{ langid }}, "{{ text }}")'
+            >
+        {{ image['html'] | safe }}
+      </span>
+      {% endfor %}
+    </div>
+  </body>
 
   <script>
 
@@ -53,7 +69,10 @@
       // Ref https://github.com/symfony/symfony/issues/25541.
       // The src/ImageController adds the .jpeg at the end again to
       // find the actual file.
-      img.src = filename.replace('.jpeg', '');
+      var timestamp = new Date().getTime();
+      const newsrc = filename.replace('.jpeg', '') + `?${timestamp}`;
+      // console.log(`switching source to ${newsrc}`);
+      img.src = newsrc;
     }
 
     function save_image_locally(src, langid, text) {
@@ -83,21 +102,46 @@
       $(el).removeClass('highlight');
     }
 
+
+    $(document).ready(function() {
+      $('#manual_image_upload').submit(function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+          url: '/bing/manual_image_post',
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function(data) {
+            // console.log("Saved: " + data + "\nStatus: " + status);
+            update_term_form(data.filename);
+          },
+          error: function(xhr, status, error) {
+            console.error(`Error submitting form.  ${error}; ${status}; ${xhr.responseText}`);
+          }
+        });
+      });
+
+      $(window).on('paste', function(event) {
+        const e = event.originalEvent;
+        if (e && e.clipboardData && e.clipboardData.files) {
+          $("#manual_image_file").prop('files', e.clipboardData.files);
+          $('#manual_image_upload').submit();
+        }
+      });
+
+      $("#upload_image_link").on('click', function(event) {
+        $("#manual_image_file").click();
+      });
+
+      $("#manual_image_file").on('change', function(event) {
+        event.preventDefault();
+        $('#manual_image_upload').submit();
+      });
+
+    });
+
   </script>
-
-  <body>
-    <p>Clicking an image will save it in your userimages/{{ langid }}/{{ text }}.jpeg</p>
-
-    {% for image in images %}
-    <span class="initial"
-          style="margin: 2px; display:inline-block;"
-          onmouseover="highlight_image(this);"
-          onmouseout="un_highlight_image(this);"
-          onclick='save_image_locally("{{ image['src'] }}", {{ langid }}, "{{ text }}")'
-          >
-      {{ image['html'] | safe }}
-    </span>
-    {% endfor %}
-  </body>
 
 </html>
