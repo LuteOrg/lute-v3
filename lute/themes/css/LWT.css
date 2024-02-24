@@ -18,30 +18,6 @@ span.textitem {
   border-bottom: 2px solid transparent;
 }
 
-span.status0 {
-  background-color: var(--status-0-color);
-}
-
-span.status1 {
-  background-color: var(--status-1-color);
-}
-
-span.status2 {
-  background-color: var(--status-2-color);
-}
-
-span.status3 {
-  background-color: var(--status-3-color);
-}
-
-span.status4 {
-  background-color: var(--status-4-color);
-}
-
-span.status5 {
-  background-color: var(--status-5-color);
-}
-
 span.status98 {
   background-color: var(--status-98-color);
   border-bottom: 2px dashed #000000;
@@ -67,36 +43,4 @@ div.ui-tooltip {
 #status #status-5:checked+label::after,
 #status #status-6:checked+label::after {
   filter: invert(0);
-}
-
-.status-bar0 {
-  background-color: var(--status-0-color);
-}
-
-.status-bar1 {
-  background-color: var(--status-1-color);
-}
-
-.status-bar2 {
-  background-color: var(--status-2-color);
-}
-
-.status-bar3 {
-  background-color: var(--status-3-color);
-}
-
-.status-bar4 {
-  background-color: var(--status-4-color);
-}
-
-.status-bar5 {
-  background-color: var(--status-5-color);
-}
-
-.status-bar98 {
-  background-color: var(--status-98-color);
-}
-
-.status-bar99 {
-  background-color: var(--status-99-color);
 }
