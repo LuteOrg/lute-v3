@@ -44,3 +44,7 @@ div.ui-tooltip {
 #status #status-6:checked+label::after {
   filter: invert(0);
 }
+
+.status-bar99 {
+  background-color: #72DA88;
+}
