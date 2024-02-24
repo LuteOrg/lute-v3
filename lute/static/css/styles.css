@@ -2049,3 +2049,32 @@ input[type="checkbox"][disabled] + label {
 div.dt-buttons {
     display: none;
 }
+
+
+/** Term image search ****************/
+
+div#termimagesearch p.termimagesearchtitle {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+div#termimagesearch .initial {
+    border: solid 2px transparent;
+}
+
+div#termimagesearch .highlight {
+    border: solid 2px red !important;
+}
+
+div#termimagesearch .saved {
+    border: solid 2px green !important;
+}
+
+div#termimagesearch span > img {
+    display:inline;
+}
+
+div#termimagesearch span.imageAction:hover {
+    color: #C00000;
+    cursor: pointer;
+}
