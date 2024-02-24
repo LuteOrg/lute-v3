@@ -258,7 +258,7 @@ INSERT INTO languagedicts VALUES(30,12,'terms','embeddedhtml','https://es.thefre
 INSERT INTO languagedicts VALUES(31,12,'terms','popuphtml','https://www.wordreference.com/es/en/translation.asp?spen=###',1,2);
 INSERT INTO languagedicts VALUES(32,12,'sentences','popuphtml','https://www.deepl.com/translator#es/en/###',1,3);
 INSERT INTO languagedicts VALUES(33,13,'terms','embeddedhtml','https://www.wordreference.com/tren/###',1,1);
-INSERT INTO languagedicts VALUES(34,13,'terms','embeddedhtml','https://tr.wiktionary.org/###',1,2);
+INSERT INTO languagedicts VALUES(34,13,'terms','embeddedhtml','https://tr.wiktionary.org/wiki/###',1,2);
 INSERT INTO languagedicts VALUES(35,13,'sentences','popuphtml','https://www.deepl.com/translator#tr/en/###',1,3);
 CREATE TABLE IF NOT EXISTS "languages" (
 	"LgID" INTEGER NOT NULL  ,
