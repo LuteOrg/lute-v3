@@ -35,7 +35,8 @@ def list_themes():
 
     glob_results = glob(theme_glob)
     themes = [(os.path.basename(f), _make_display_name(f)) for f in glob_results]
-    return [default_entry] + themes
+    sorted_themes = sorted(themes, key=lambda x: x[1])
+    return [default_entry] + sorted_themes
 
 
 def get_current_css():
