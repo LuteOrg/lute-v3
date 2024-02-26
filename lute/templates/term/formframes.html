@@ -31,6 +31,7 @@
     let old_term = "";
     let old_langid = 0;
 
+    const ALL_DICTS = {{ language_dicts | safe }};
     LookupButton.TERM_FORM_CONTAINER = document.getElementById("term-form-container");
     LookupButton.LANG_ID = 0;
     LookupButton.TERM_DICTS = [];
@@ -65,6 +66,7 @@
 {% else %}
 
   <script>
+    const ALL_DICTS = {{ language_dicts | safe }};
     LookupButton.TERM_FORM_CONTAINER = document.getElementById("term-form-container");
     LookupButton.LANG_ID = $('#language_id').val();
     LookupButton.TERM_DICTS = ALL_DICTS[LookupButton.LANG_ID].term;
