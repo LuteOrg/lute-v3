@@ -1,3 +1,5 @@
+<script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
+
 {% for field_name, field_errors in form.errors.items() %}
 {% for error in field_errors %}
 <div class="flash-notice-narrow">{{ error }}</div>
@@ -64,13 +66,7 @@
 <script>
   // this is used in formframes.html
   const ALL_DICTS = {{ language_dicts | safe }};
-  const TERM_FORM_CONTAINER = document.getElementById("term-form-container");
-  let TERM_DICTS;
-  let LANG_ID;
 </script>
-
-<!-- do not defer. if deferred it gets loaded at the end of formframes. bu we need it to load after _form, but before formframes -->
-<script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
 
 <script type="text/javascript">
 
@@ -342,7 +338,8 @@
     window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
 
     enable_disable_sync_status_checkbox();
-  });
+  });  // end $(document).ready
+
 
   function deleteTerm() {
     const msg = "Are you sure you want to delete this term?\n\n" +
