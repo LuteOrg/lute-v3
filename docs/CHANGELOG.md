@@ -1,4 +1,16 @@
 
+# 3.2.3 (2024-02-25)
+
+Feature changes:
+
+* #31: Using page break markers ("---") during new book creation only to force page breaks.
+* #133: Set "current language" filter (and setting) from home page.
+* #14: Allow term image uploads from keyboard or paste from clipboard.
+* Add LWT and LingQ themes.  From @imamcr in #285.
+* Fix touch-drag problem for mobile.  From @webofpies in #286.
+* Small bug fixes.
+
+
 # 3.2.2 (2024-02-21)
 
 Feature changes:
