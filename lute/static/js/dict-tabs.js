@@ -207,8 +207,8 @@ class DictButton extends LookupButton {
     }
     else {
       this._load_frame(dicturl, term);
-      this.activate();
     }
+    this.activate();
   }
 
   _get_lookup_url(dicturl, term) {
@@ -339,9 +339,11 @@ function createLookupButtons(tab_count = 5) {
   }
   container.style.gridTemplateColumns = `repeat(${grid_col_count}, minmax(2rem, 8rem))`;
 
-  const first_embedded_button = LookupButton.all.find(button => !button.isExternal);
-  if (first_embedded_button)
-    first_embedded_button.activate();
+  const first_button = LookupButton.all[0];
+  if (first_button) {
+    first_button.activate();
+    first_button.do_lookup();
+  }
 
   for (let b of [new SentenceLookupButton(), new ImageLookupButton()])
     document.getElementById("dicttabsstatic").appendChild(b.btn);
@@ -355,9 +357,9 @@ function loadDictionaries() {
   const dictContainer = document.querySelector(".dictcontainer");
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
-
   LookupButton.all.forEach(button => button.contentLoaded = false);
-  const active_button = LookupButton.all.find(button => button.is_active && !button.isExternal);
-  if (active_button)
+  const active_button = LookupButton.all.find(button => button.is_active);
+  if (active_button) {
     active_button.do_lookup();
+  }
 }
