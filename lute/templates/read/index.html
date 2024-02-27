@@ -7,7 +7,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}" charset="utf-8" defer></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
 
 <div id="rendering_controls" style="display: none">
   <pre>
@@ -180,11 +180,8 @@
 </div>
 
 <script>
-  // used in dict-tabs.js
-  const LANG_ID = {{ lang_id | safe }};
-  const TERM_DICTS = {{ term_dicts | safe }};
-  // because read term field is in iframe, but new term field is not
-  let TERM_FORM_CONTAINER;
+  LookupButton.LANG_ID = {{ lang_id | safe }};
+  LookupButton.TERM_DICTS = {{ term_dicts | safe }};
 
   let mouseY;
   let scrollY;
@@ -245,7 +242,7 @@
 
     window.addEventListener("message", function(event) {
       if (event.data.event === "LuteTermFormOpened") {
-        TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
+        LookupButton.TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
         loadDictionaries();
       }
 
