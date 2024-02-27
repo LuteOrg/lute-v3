@@ -6,6 +6,12 @@
  */
 class LookupButton {
 
+  /** State required by the buttons. */
+  static TERM_FORM_CONTAINER = null;
+  static TERM_DICTS = null;
+  static LANG_ID = null;
+
+
   /** All LookupButtons created. */
   static all = [];
 
@@ -84,13 +90,14 @@ class GeneralLookupButton extends LookupButton {
 class SentenceLookupButton extends GeneralLookupButton {
   constructor() {
     let handler = function(iframe) {
-      const txt = TERM_FORM_CONTAINER.querySelector("#text").value;
+      const txt = LookupButton.TERM_FORM_CONTAINER.querySelector("#text").value;
       // %E2%80%8B is the zero-width string.  The term is reparsed
       // on the server, so this doesn't need to be sent.
       const t = encodeURIComponent(txt).replaceAll('%E2%80%8B', '');
-      if (LANG_ID == '0' || t == '')
+      const langid = `${LookupButton.LANG_ID ?? 0}`;
+      if (langid == '0' || t == '')
         return;
-      iframe.setAttribute("src", `/term/sentences/${LANG_ID}/${t}`);
+      iframe.setAttribute("src", `/term/sentences/${LookupButton.LANG_ID}/${t}`);
     };
 
     super("sentences-btn", "Sentences", "See term usage", "dict-sentences-btn", handler);
@@ -103,15 +110,16 @@ class ImageLookupButton extends GeneralLookupButton {
 
     // Parents are in the tagify-managed #parentslist input box.
     let _get_parent_tag_values = function() {
-      const pdata = TERM_FORM_CONTAINER.querySelector("#parentslist").value
+      const pdata = LookupButton.TERM_FORM_CONTAINER.querySelector("#parentslist").value
       if ((pdata ?? '') == '')
         return [];
       return JSON.parse(pdata).map(e => e.value);
     };
 
     let handler = function(iframe) {
-      const text = TERM_FORM_CONTAINER.querySelector("#text").value;
-      if (LANG_ID == null || LANG_ID == '' || parseInt(LANG_ID) == 0 || text == null || text == '') {
+      const text = LookupButton.TERM_FORM_CONTAINER.querySelector("#text").value;
+      const lang_id = LookupButton.LANG_ID;
+      if (lang_id == null || lang_id == '' || parseInt(lang_id) == 0 || text == null || text == '') {
         alert('Please select a language and enter the term.');
         return;
       }
@@ -124,7 +132,7 @@ class ImageLookupButton extends GeneralLookupButton {
 
       const raw_bing_url = 'https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle';
       const binghash = raw_bing_url.replace('https://www.bing.com/images/search?', '');
-      const url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
+      const url = `/bing/search/${LookupButton.LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
 
       iframe.setAttribute("src", url);
     };  // end handler
@@ -146,7 +154,7 @@ class DictButton extends LookupButton {
   constructor(dictURL, frameName) {
     super(frameName);
 
-    this.dictID = TERM_DICTS.indexOf(dictURL);
+    this.dictID = LookupButton.TERM_DICTS.indexOf(dictURL);
     if (this.dictID == -1) {
       console.log(`Error: Dict url ${dictURL} not found (??)`);
       return;
@@ -190,15 +198,17 @@ class DictButton extends LookupButton {
   /** LOOKUPS *************************/
 
   do_lookup() {
-    const dicturl = TERM_DICTS[this.dictID];
-    const term = TERM_FORM_CONTAINER.querySelector("#text").value;
+    const dicturl = LookupButton.TERM_DICTS[this.dictID];
+    if (LookupButton.TERM_FORM_CONTAINER == null || dicturl == null)
+      return;
+    const term = LookupButton.TERM_FORM_CONTAINER.querySelector("#text").value;
     if (this.isExternal) {
       this._load_popup(dicturl, term);
     }
     else {
       this._load_frame(dicturl, term);
-      this.activate();
     }
+    this.activate();
   }
 
   _get_lookup_url(dicturl, term) {
@@ -245,7 +255,7 @@ class DictButton extends LookupButton {
       // TODO handle_image_lookup_separately: don't mix term lookups with image lookups.
       let use_text = text;
       const binghash = dicturl.replace('https://www.bing.com/images/search?', '');
-      url = `/bing/search/${LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
+      url = `/bing/search/${LookupButton.LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
     }
 
     this.frame.setAttribute("src", url);
@@ -303,18 +313,18 @@ function createLookupButtons(tab_count = 5) {
   destroy_existing_dictTab_controls();
   LookupButton.all = [];
 
-  if (TERM_DICTS.length <= 0) return;
+  if (LookupButton.TERM_DICTS.length <= 0) return;
 
   // const dev_hack_add_dicts = Array.from({ length: 5 }, (_, i) => `a${i}`);
-  // TERM_DICTS.push(...dev_hack_add_dicts);
+  // LookupButton.TERM_DICTS.push(...dev_hack_add_dicts);
 
-  if (tab_count == (TERM_DICTS.length - 1)) {
+  if (tab_count == (LookupButton.TERM_DICTS.length - 1)) {
     // Don't bother making a list with a single item.
     tab_count += 1;
   }
 
   // Make all DictButtons, which loads LookupButton.all.
-  TERM_DICTS.forEach((dict, index) => { new DictButton(dict,`dict${index}`); });
+  LookupButton.TERM_DICTS.forEach((dict, index) => { new DictButton(dict,`dict${index}`); });
   const tab_buttons = LookupButton.all.slice(0, tab_count);
   const list_buttons = LookupButton.all.slice(tab_count);
 
@@ -329,9 +339,11 @@ function createLookupButtons(tab_count = 5) {
   }
   container.style.gridTemplateColumns = `repeat(${grid_col_count}, minmax(2rem, 8rem))`;
 
-  const first_embedded_button = LookupButton.all.find(button => !button.isExternal);
-  if (first_embedded_button)
-    first_embedded_button.activate();
+  const first_button = LookupButton.all[0];
+  if (first_button) {
+    first_button.activate();
+    first_button.do_lookup();
+  }
 
   for (let b of [new SentenceLookupButton(), new ImageLookupButton()])
     document.getElementById("dicttabsstatic").appendChild(b.btn);
@@ -345,9 +357,9 @@ function loadDictionaries() {
   const dictContainer = document.querySelector(".dictcontainer");
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
-
   LookupButton.all.forEach(button => button.contentLoaded = false);
-  const active_button = LookupButton.all.find(button => button.is_active && !button.isExternal);
-  if (active_button)
+  const active_button = LookupButton.all.find(button => button.is_active);
+  if (active_button) {
     active_button.do_lookup();
+  }
 }

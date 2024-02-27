@@ -31,27 +31,34 @@
     let old_term = "";
     let old_langid = 0;
 
+    const ALL_DICTS = {{ language_dicts | safe }};
+    LookupButton.TERM_FORM_CONTAINER = document.getElementById("term-form-container");
+    LookupButton.LANG_ID = 0;
+    LookupButton.TERM_DICTS = [];
+
     loadDictsBtn.addEventListener("click", (e) => {
       e.preventDefault();
 
-      LANG_ID = langSelect.value;
-      if (LANG_ID == 0 || !termField.value)
+      let selected_lang_id = langSelect.value;
+      if (selected_lang_id == 0 || !termField.value)
         return;
 
-      const lang_changed = LANG_ID != old_langid;
+      const lang_changed = selected_lang_id != old_langid;
       const term_changed = termField.value != old_term;
       if (lang_changed) {
         // New language = new buttons, rebuild it all.
-        TERM_DICTS = ALL_DICTS[LANG_ID].term;
+        LookupButton.LANG_ID = selected_lang_id;
+        LookupButton.TERM_DICTS = ALL_DICTS[selected_lang_id].term;
         createLookupButtons();
       }
       if (lang_changed || term_changed) {
         // Refresh the tabs if needed.
+        LookupButton.LANG_ID = selected_lang_id;
         loadDictionaries();
       }
 
       old_term = termField.value;
-      old_langid = LANG_ID;
+      old_langid = selected_lang_id;
       
     })
   </script>
@@ -59,8 +66,10 @@
 {% else %}
 
   <script>
-    LANG_ID = $('#language_id').val();
-    TERM_DICTS = ALL_DICTS[LANG_ID].term;
+    const ALL_DICTS = {{ language_dicts | safe }};
+    LookupButton.TERM_FORM_CONTAINER = document.getElementById("term-form-container");
+    LookupButton.LANG_ID = $('#language_id').val();
+    LookupButton.TERM_DICTS = ALL_DICTS[LookupButton.LANG_ID].term;
     createLookupButtons();
     loadDictionaries();
   </script>
