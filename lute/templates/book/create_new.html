@@ -107,11 +107,19 @@
     textarea.addEventListener("selectionchange", getWordCountInfo);
 
     function getWordCountInfo() {
-      const selectionStart = (this.selectionEnd - this.selectionStart) > 0 ? this.selectionStart : 0;
-      const allWordsArray = this.value.split(/\n| /).filter((item) => item);
-      const stringToCursor = this.value.slice(selectionStart, this.selectionEnd);
-      const wordsToCursorArray = stringToCursor.split(/\n| /).filter((item) => item);
-      wordCountEl.textContent = `${wordsToCursorArray.length} / ${allWordsArray.length}`;
+      let allWordsArray = [];
+      let wordsToCursorArray = [];
+
+      try {
+        allWordsArray = this.value.match(/\p{L}+/gu).filter((item) => item);
+        const selectionStart = (this.selectionEnd - this.selectionStart) > 0 ? this.selectionStart : 0;
+        const stringToCursor = this.value.slice(selectionStart, this.selectionEnd);
+        wordsToCursorArray = stringToCursor.match(/\p{L}+/gu).filter((item) => item);
+      } catch(error) {
+        // 
+      } finally {
+        wordCountEl.textContent = `${wordsToCursorArray.length} / ${allWordsArray.length}`;
+      }
     }
   });
 </script>
