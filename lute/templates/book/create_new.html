@@ -30,7 +30,7 @@
     <tr>
       <td id="word-count-container">
         {{ form.text.label }}
-        <p id=word-count title="Number of: words up to cursor / all words"></p>
+        <p id=word-count title="words up to cursor(or selected) / all words">0 / 0</p>
       </td>
       <td>{{ form.text(class="form-largetextarea") }}</td>
     </tr>
@@ -100,25 +100,18 @@
     $("#language_id").change(set_field_directions);
 
     const textarea = document.getElementById("text");
-    const countDisplay = document.getElementById("word-count");
+    const wordCountEl = document.getElementById("word-count");
+
     textarea.addEventListener("input", getWordCountInfo);
     textarea.addEventListener("click", getWordCountInfo);
     textarea.addEventListener("selectionchange", getWordCountInfo);
 
-    // textarea.addEventListener("keydown", (e) => {
-    //   console.log(e.keyCode)
-    // })
-
     function getWordCountInfo() {
+      const selectionStart = (this.selectionEnd - this.selectionStart) > 0 ? this.selectionStart : 0;
       const allWordsArray = this.value.split(/\n| /).filter((item) => item);
-      const stringToCursor = this.value.slice(0, this.selectionEnd);
+      const stringToCursor = this.value.slice(selectionStart, this.selectionEnd);
       const wordsToCursorArray = stringToCursor.split(/\n| /).filter((item) => item);
-      // allWordCount = allWordsArray.length;
-      countDisplay.textContent = `${wordsToCursorArray.length} / ${allWordsArray.length}`;
-      // console.log(this.value.split(/\n| /).filter((item) => item))
-
-      // console.log(`${cursorWordCount} / ${allWordCount}`);
-      // console.log("selend", this.selectionEnd)
+      wordCountEl.textContent = `${wordsToCursorArray.length} / ${allWordsArray.length}`;
     }
   });
 </script>
