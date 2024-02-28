@@ -20,6 +20,18 @@
   </thead>
 </table>
 
+<!-- the config widget for datatables.  Moved into the datatables table footer during setup. -->
+<div id="datatables_config_widget">
+  <img
+    src="{{ url_for('static', filename='icn/settings-gear-icon.svg') }}"
+    title="configuration"
+    id="datatables_config_toggle"
+    style="width: 1rem"
+    />
+</div>
+
+<div id="datatables_config_items" style="display: none;"></div>
+
 {# Hidden form for archive, unarchive, delete. #}
 <form id="actionposter" method="post" action="">
 </form>
@@ -39,10 +51,22 @@
           },
           'search'
         ],
-        bottomStart: 'info',
+        bottomStart: [
+          function() {
+            return $('#datatables_config_widget');
+          },
+          {
+            info: {
+              callback: function (s, start, end, max, total, result) {
+                return `${start} to ${end} of ${max}`;
+              }
+            }
+          },
+          'buttons'
+        ],
         bottomEnd: 'paging'
       },
-
+      buttons: [ { extend: 'colvis' } ],
       {% if status != 'Archived' %}
       "language": {
             "emptyTable": "No books available. <a href='/book/new'>Create one?</a>"
@@ -113,12 +137,28 @@
   };
 
 
+  let move_datatables_controls_to_config_widget = function() {
+    const widget = $('#datatables_config_items');
+    const append_children = [ '.dt-buttons', '.dt-length' ];
+    for (let c of append_children) {
+      const el = $(`div${c}`);
+      el.css({ padding: '0.2rem', margin: '0rem', display: 'inline' });
+      widget.append(el);
+    }
+  }
+
   $(document).ready(function () {
     const current_language_id = {{ current_language_id }};
     // Language filter is set up first, because its value
     // is used during the initial datatable draw.
     setup_language_filter(current_language_id);
     setup_book_datatable("{{ initial_search or '' }}");
+
+    move_datatables_controls_to_config_widget();
+
+    $("#datatables_config_toggle").click(function() {
+      $("#datatables_config_items").toggle();
+    });
   });
 
 
