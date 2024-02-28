@@ -235,7 +235,7 @@ class DictButton extends LookupButton {
     window.open(
       lookup_url,
       'otherwin',
-      'width=800, height=400, scrollbars=yes, menubar=no, resizable=yes, status=no'
+      'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no'
     );
   }
 
