@@ -91,14 +91,15 @@
   <thead>
     <tr>
       <th style="width: 20px;"><input type="checkbox" id="chkAll" onclick="handleChkAll()"></th>
-      <th>Term</th>
-      <th>Parent</th>
-      <th>Translation</th>
-      <th>Language</th>
-      <th>Tags</th>
-      <th>Status</th>
-      <th>TermID</th>
-      <th>LanguageID</th>
+      <!-- adding text-align because sometimes datatables seemed to align them to right. -->
+      <th style="text-align: left">Term</th>
+      <th style="text-align: left">Parent</th>
+      <th style="text-align: left">Translation</th>
+      <th style="text-align: left">Language</th>
+      <th style="text-align: left">Tags</th>
+      <th style="text-align: left">Status</th>
+      <th style="text-align: left">TermID</th>
+      <th style="text-align: left">LanguageID</th>
     </tr>
   </thead>
 </table>
@@ -107,7 +108,12 @@
 
   let setup_term_datatable = function(initial_search) {
     var table = $('#termtable').DataTable({
-      dom: 'lfrtiBp',
+      layout: {
+        topStart: 'pageLength',
+        topEnd: 'search',
+        bottomStart: ['info', 'buttons'],
+        bottomEnd: 'paging'
+      },
       responsive: true,
       select: true,
       lengthMenu: [ 25, 50, 100, 500, 1000 ],

@@ -8,14 +8,14 @@
 <table id="booktable" class="table dataTable stripe">
   <thead>
     <tr>
-      <th>Title</th>
-      <th>Language</th>
-      <th>Tags</th>
-      <th>Word count</th>
-      <th>Statuses
+      <th style="text-align: left">Title</th>
+      <th style="text-align: left">Language</th>
+      <th style="text-align: left">Tags</th>
+      <th style="text-align: left">Word count</th>
+      <th style="text-align: left">Statuses
         <a href="/refresh_all_stats" class="refresh" title="Refresh stats for all books"></a>
       </th>
-      <th>Actions</th>
+      <th style="text-align: left">Actions</th>
     </tr>
   </thead>
 </table>
@@ -31,7 +31,18 @@
 
   let setup_book_datatable = function(initial_search) {
     book_listing_table = $('#booktable').DataTable({
-      dom: 'lf<"toolbar">rtip',
+      layout: {
+        topStart: 'pageLength',
+        topEnd: [
+          function() {
+            return $('#defaultLanguageSelect');
+          },
+          'search'
+        ],
+        bottomStart: 'info',
+        bottomEnd: 'paging'
+      },
+
       {% if status != 'Archived' %}
       "language": {
             "emptyTable": "No books available. <a href='/book/new'>Create one?</a>"
@@ -81,8 +92,8 @@
 
     });
 
-    var dropdown = $('#defaultLanguageSelect');
-    $('div.toolbar').append(dropdown);
+    // var dropdown = $('#defaultLanguageSelect');
+    // $('div.toolbar').append(dropdown);
   } // end setup_book_datatable
 
 
