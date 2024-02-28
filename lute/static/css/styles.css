@@ -155,6 +155,16 @@ div.dt-search {
     display: inline;
 }
 
+#datatables_config_widget {
+    display: inline;
+    cursor: pointer;
+    margin-right: 0.25rem;
+}
+
+div#booktable_wrapper div.dt-info {
+    display: inline;
+}
+
 #defaultLanguageSelect {
     text-align: left;
     padding: 4px;  /* copied padding from datatables css. */
@@ -228,8 +238,9 @@ div.dt-buttons>.dt-button {
 
 
 .flash-notice {
-    margin: 20px;
-    padding: 20px;
+    margin: 1rem;
+    margin-bottom: 2rem;
+    padding: 0.5rem;
     background-color: #fff3cd;
     border-color: #ffeeba;
 }
@@ -2068,7 +2079,7 @@ input[type="checkbox"][disabled] + label {
     background-color: #3e8e41;
 }
 
-div.dt-buttons {
+div#termtable_wrapper div.dt-buttons {
     display: none;
 }
 
