@@ -188,10 +188,13 @@ jobs:
     #   run: inv playwright || exit /b
 
     # Run specific sanity check.
+    # Old tests no longer run -- datatables may have timing issues on Windows tests,
+    # tests were far too flaky.
+    # inv accept --headless -s -k test_unsupported_language_not_shown || exit /b
+    # inv accept --headless -s -k import_a_valid_term_file || exit /b
     - name: Smoke tests
       run: |
-        inv accept --headless -s -k test_unsupported_language_not_shown || exit /b
-        inv accept --headless -s -k import_a_valid_term_file || exit /b
+        inv accept --headless -s -k test_updating_term_status_updates_the_reading_frame || exit /b
 
     - name: Remove config to force using prod config
       run: del ${{ github.workspace }}\lute\config\config.yml
