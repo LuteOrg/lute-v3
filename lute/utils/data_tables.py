@@ -143,25 +143,27 @@ class DataTablesSqliteQuery:
     @staticmethod
     def get_sql(base_sql, parameters):
         "Build sql used for datatables queries."
-        start = parameters["start"]
-        length = parameters["length"]
         columns = parameters["columns"]
 
         def cols_with(attr):
-            cols = [c["name"] for c in columns if c[attr] is True]
-            return cols
+            return [c["name"] for c in columns if c[attr] is True]
 
         orderby = ", ".join(cols_with("orderable"))
-
         for order in parameters["order"]:
-            sort_field = columns[int(order["column"])]["name"]
-            orderby = f"ORDER BY {sort_field} {order['dir']}, {orderby}"
+            col_index = int(order["column"])
+            sort_field = columns[col_index]["name"]
+            orderby = f"{sort_field} {order['dir']}, {orderby}"
+        orderby = f"ORDER BY {orderby}"
 
-        searchable = [c["name"] for c in columns if c["searchable"] is True]
-        [where, params] = DataTablesSqliteQuery.where_and_params(searchable, parameters)
+        [where, params] = DataTablesSqliteQuery.where_and_params(
+            cols_with("searchable"), parameters
+        )
 
         realbase = f"({base_sql}) realbase".replace("\n", " ")
         select_field_list = ", ".join([c["name"] for c in columns if c["name"] != ""])
+
+        start = parameters["start"]
+        length = parameters["length"]
         # pylint: disable=line-too-long
         data_sql = f"SELECT {select_field_list} FROM (select * from {realbase} {where} {orderby} LIMIT {start}, {length}) src {orderby}"
 
