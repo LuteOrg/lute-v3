@@ -1722,6 +1722,17 @@ input[type="checkbox"][disabled] + label {
     height: 420px;
 }
 
+#word-count-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+#word-count {
+    color: #bbb;
+    font-size: 1rem;
+    margin: 0;
+}
+
 
 @media screen and (max-width: 980px) {
 
