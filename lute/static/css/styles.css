@@ -150,9 +150,15 @@ div#divbooktable {
     margin-left: auto;
 }
 
+div.dt-search {
+    /* Change to inline so that it's shown on the same line as the #defaultLanguageSelect. */
+    display: inline;
+}
+
 #defaultLanguageSelect {
     text-align: left;
     padding: 4px;  /* copied padding from datatables css. */
+    margin-right: 10px;
 }
 
 div.toolbar {
