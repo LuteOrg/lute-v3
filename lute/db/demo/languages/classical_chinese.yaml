@@ -2,7 +2,7 @@ name: Classical Chinese
 dictionaries:
   - for: terms
     type: embedded
-    url: https://ctext.org/dictionary.pl?if=en&char=###
+    url: https://www.archchinese.com/chinese_english_dictionary.html?find=###
   - for: sentences
     type: popup
     url: https://www.deepl.com/translator#ch/en/###
