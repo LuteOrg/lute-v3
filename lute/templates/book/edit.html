@@ -33,8 +33,15 @@
       <td>{{ form.audiofile.label }}</td>
       <td>
         {{ form.audiofile() }}
+        {{ form.audio_filename() }}
         {% if book.audio_filename %}
-        <br /><span class="smallfilename">Current file: {{ book.audio_filename }}</span>
+        <div id="current_file_div" style="margin: 5px">
+        <span class="smallfilename">Current file: {{ book.audio_filename }}</span>
+        <img src="{{ url_for('static', filename='icn/minus-button.png') }}"
+             title="Delete audio file"
+             style="margin-left: 5px"
+             onclick="confirm_delete(this)" />
+        </div>
         {% endif %}
       </td>
     </tr>
@@ -71,6 +78,14 @@
     var tagslist = document.getElementById('book_tags');
     var tags_tagify = setup_book_tags_tagify(tagslist);
   });
+
+  function confirm_delete(el) {
+    if (!confirm(`Deleting audio file.  Click OK to proceed, or Cancel.`)) {
+      return;
+    }
+    $('#current_file_div').toggle();  // Hide the div.
+    $('#audio_filename').val(null);
+  }
 
 </script>
 

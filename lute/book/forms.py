@@ -4,7 +4,7 @@ Book create/edit forms.
 
 import json
 from flask import request
-from wtforms import StringField, SelectField, TextAreaField, IntegerField
+from wtforms import StringField, SelectField, TextAreaField, IntegerField, HiddenField
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm
@@ -111,6 +111,9 @@ class EditBookForm(FlaskForm):
             )
         ],
     )
+
+    # The current audio_filename can be removed from the current book.
+    audio_filename = HiddenField("Audio filename")
 
     def __init__(self, *args, **kwargs):
         "Call the constructor of the superclass (FlaskForm)"
