@@ -71,6 +71,20 @@ def bulk_status_update(text: Text, terms_text_array, new_status):
     repo.commit()
 
 
+def _create_unknown_terms(text):
+    "Create any terms required for the page."
+    lang = text.book.language
+    parsed_tokens = lang.parser.get_parsed_tokens(text.text, lang)
+    word_tokens = [w for w in parsed_tokens if w.is_word]
+    repo = Repository(db)
+    for w in word_tokens:
+        t = repo.find_or_new(lang.id, w.token)
+        if t.id is None:
+            t.status = 0
+            repo.add(t)
+            repo.commit()
+
+
 def start_reading(dbbook, pagenum, db_session):
     "Start reading a page in the book, getting paragraphs."
 
@@ -82,6 +96,9 @@ def start_reading(dbbook, pagenum, db_session):
     db_session.add(dbbook)
     db_session.add(text)
     db_session.commit()
+
+    # Create new terms for all unknown word tokens in the text!
+    _create_unknown_terms(text)
 
     paragraphs = get_paragraphs(text.text, text.book.language)
 
