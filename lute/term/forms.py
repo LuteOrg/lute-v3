@@ -46,6 +46,20 @@ class TermForm(FlaskForm):
 
     current_image = HiddenField("current_image")
 
+    # DUPLICATE_TERM_CHECK: an already existing term that a new form
+    # submission would duplicate.
+    #
+    # This is a "clever hack" (aka bad hack) that is populated on form
+    # validation check.  If the form post would result in a duplicated
+    # term, this is set to the value of the original term.
+    #
+    # I would have preferred to do some kind of try/catch check and
+    # have the original duplicated_term be included in the raised
+    # error's data, but this method works.
+    #
+    # See the DUPLICATE_TERM_CHECK comments in term/routes.py.
+    duplicated_term = None
+
     def __init__(self, *args, **kwargs):
         "Call the constructor of the superclass (FlaskForm)"
         super().__init__(*args, **kwargs)
@@ -57,6 +71,7 @@ class TermForm(FlaskForm):
 
         self.parentslist.data = _data(term.parents)
         self.termtagslist.data = _data(term.term_tags)
+        self.duplicated_term = None
 
         if request.method == "POST":
             self.parentslist.data = request.form.get("parentslist", "")
@@ -91,20 +106,17 @@ class TermForm(FlaskForm):
         if lang is None:
             return
 
-        if self.original_text.data in ("", None):
-            # New term.
+        orig_text = self.original_text.data
+        if orig_text in ("", None):
+            # New term - throw if already exists.
             spec = Term(lang, self.text.data)
-            checkdup = Term.find_by_spec(spec)
-            if checkdup is None:
-                # Not a dup.
-                return
-            # Is a dup.
-            raise ValidationError("Term already exists")
+            self.duplicated_term = Term.find_by_spec(spec)
+            if self.duplicated_term is not None:
+                raise ValidationError("Term already exists")
 
-        if self.text.data == self.original_text.data:
-            return
-        langid = int(self.language_id.data)
-        newterm = Term(lang, self.text.data)
-        origterm = Term(lang, self.original_text.data)
-        if newterm.text_lc != origterm.text_lc:
-            raise ValidationError("Can only change term case")
+        elif self.text.data != orig_text:
+            # Text may have changed.
+            newterm = Term(lang, self.text.data)
+            origterm = Term(lang, self.original_text.data)
+            if newterm.text_lc != origterm.text_lc:
+                raise ValidationError("Can only change term case")
