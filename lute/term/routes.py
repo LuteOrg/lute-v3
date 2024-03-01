@@ -131,19 +131,15 @@ def handle_term_form(
 
     if form.validate_on_submit():
         form.populate_obj(term)
-
-        # parents_list_data = request.form.get("parentslist", "")
-        # parents_list = json.loads(parents_list_data) if parents_list_data else []
-        # parents = [h["value"] for h in parents_list]
-        # term.parents = parents
-
         repo.add(term)
         repo.commit()
         return return_on_success
 
+    # Note: on validation, form.duplicated_term may be set.
+    # See DUPLICATE_TERM_CHECK comments in other files.
+
     hide_pronunciation = False
-    # pylint: disable=protected-access
-    term_language = term._language
+    term_language = term._language  # pylint: disable=protected-access
 
     if term_language is not None:
         hide_pronunciation = not term_language.show_romanization
@@ -163,6 +159,7 @@ def handle_term_form(
         form_template_name,
         form=form,
         term=term,
+        duplicated_term=form.duplicated_term,
         language_dicts=Language.all_dictionaries(),
         hide_pronunciation=hide_pronunciation,
         tags=repo.get_term_tags(),
