@@ -183,6 +183,8 @@ def edit(termid):
     """
     repo = Repository(db)
     term = repo.load(termid)
+    if term.status == 0:
+        term.status = 1
     return _handle_form(term, repo)
 
 
@@ -193,6 +195,8 @@ def edit_by_text(langid, text):
     """
     repo = Repository(db)
     term = repo.find_or_new(langid, text)
+    if term.status == 0:
+        term.status = 1
     return _handle_form(term, repo)
 
 
