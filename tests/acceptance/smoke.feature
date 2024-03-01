@@ -9,7 +9,7 @@ Feature: Smoke test.
     Scenario: Smoke test
         # Book created and loaded.
         Given a Spanish book "Hola" with content:
-            Hola. Adios amigo.
+            Hola. Adios amigo, adios.
 
         # No terms listed yet.
         Given I visit "/"
@@ -21,7 +21,7 @@ Feature: Smoke test.
         When I click the "Hola" link
         Then the page title is Reading "Hola"
         And the reading pane shows:
-            Hola/. /Adios/ /amigo/.
+            Hola/. /Adios/ /amigo/, /adios/.
 
         # Still no terms listed.
         Given I visit "/"
@@ -34,11 +34,11 @@ Feature: Smoke test.
             translation: Hello
             status: 2
         Then the reading pane shows:
-            Hola (2)/. /Adios/ /amigo/.
+            Hola (2)/. /Adios/ /amigo/, /adios/.
 
         When I click "Adios" and press hotkey "1"
         Then the reading pane shows:
-            Hola (2)/. /Adios (1)/ /amigo/.
+            Hola (2)/. /Adios (1)/ /amigo/, /adios (1)/.
 
         # Now terms exist.
         Then the term table contains:
@@ -64,4 +64,4 @@ Feature: Smoke test.
         When I click the "Hola" link
         Then the page title is Reading "Hola"
         And the reading pane shows:
-            Hola (2)/. /Adios (1)/ /amigo (4)/.
+            Hola (2)/. /Adios (1)/ /amigo (4)/, /adios (1)/.
