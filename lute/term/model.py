@@ -333,6 +333,8 @@ class Repository:
         p = DBTerm.find_by_spec(spec)
 
         if p is not None:
+            if p.status == 0:  # previously unknown, inherits from term.
+                p.status = term.status
             if (p.translation or "") == "":
                 p.translation = term.translation
             if (p.get_current_image() or "") == "":
