@@ -181,7 +181,8 @@ def term_form(langid, text):
     """
     repo = Repository(db)
     term = repo.find_or_new(langid, text)
-
+    if term.status == 0:
+        term.status = 1
     return handle_term_form(
         term,
         repo,
