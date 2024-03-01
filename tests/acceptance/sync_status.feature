@@ -55,11 +55,10 @@ Feature: User can link child and parent term statuses.
 
         When I click "gatos" and edit the form:
             parents: [ 'Gato', 'perro' ]
-            sync_status: true
             status: 2
         Then the reading pane shows:
             Gato (4)/ /gatos (2)/ /gatito/ /perro (2)/.
 
-        When I click "gatos" and press hotkey "1"
+        When I click "gatos" and press hotkey "3"
         Then the reading pane shows:
-            Gato (4)/ /gatos (1)/ /gatito/ /perro (2)/.
+            Gato (4)/ /gatos (3)/ /gatito/ /perro (2)/.
