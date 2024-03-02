@@ -57,7 +57,7 @@
           {% if term.id %}
           <button id="delete" type="button" class="btn" onclick="deleteTerm()">Delete</button>
           {% endif %}
-          <button id="submit" type="submit" class="btn btn-primary">Save</button>
+          <button id="submit" type="submit" title="Shortcut: Control+Enter" class="btn btn-primary">Save</button>
       </div>
     </div>
   </form>
@@ -299,8 +299,15 @@
 
   $(document).ready(function () {
 
-    /** TERM IMAGE *************************/
+    // "Save" shortcut
+    $(document).keydown(function(event) {
+      console.log(event);
+      if (event.ctrlKey && event.key === "Enter") {
+        $("#submit").click();
+      }
+    });
 
+    // Term image events.
     var term_image = $("#term_image");
 
     term_image.hover(
