@@ -297,7 +297,7 @@ let get_textitems_spans = function(e) {
   let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
   elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
   if (elements.length == 0)
-    return null;
+    return elements;
 
   const w = elements[0];
   const attr_name = e.shiftKey ? 'paragraph-id' : 'sentence-id';
@@ -309,12 +309,13 @@ let get_textitems_spans = function(e) {
  * color flash. */
 let handle_copy = function(e) {
   tis = get_textitems_spans(e);
-  if (tis != null)
-    copy_text_to_clipboard(tis);
+  copy_text_to_clipboard(tis);
 }
 
 let copy_text_to_clipboard = function(textitemspans) {
   const copytext = textitemspans.map(s => $(s).text()).join('');
+  if (copytext == '')
+    return;
 
   // console.log('copying ' + copytext);
   var textArea = document.createElement("textarea");
@@ -409,17 +410,33 @@ let _get_translation_dict_index = function(sentence) {
 }
 
 
+let _get_text_to_translate = function(e) {
+  let sentence = '';
+  if (e.ctrlKey) {
+    sentence = $('#thetext p').map(function() {
+      return $(this).find('span.textitem').map(function() {
+        return $(this).text();
+      }).get().join('');
+    }).get().join('\n');
+  }
+  else {
+    const tis = get_textitems_spans(e);
+    sentence = tis.map(s => $(s).text()).join('');
+  }
+  return sentence.replace(/\u200B/g, '');
+}
+
+
 /** Show the translation using the next dictionary. */
 let show_sentence_translation = function(e) {
-  tis = get_textitems_spans(e);
-  if (tis == null)
-    return;
-  const sentence = tis.map(s => $(s).text()).join('');
-
   if (LUTE_SENTENCE_LOOKUP_URIS.length == 0) {
     console.log('No sentence translation uris configured.');
     return;
   }
+
+  const sentence = _get_text_to_translate(e);
+  if (sentence == '')
+    return;
 
   const dict_index = _get_translation_dict_index(sentence);
   const userdict = LUTE_SENTENCE_LOOKUP_URIS[dict_index];
