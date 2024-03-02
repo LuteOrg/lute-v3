@@ -232,11 +232,10 @@ class DictButton extends LookupButton {
     if (url[0] == "*")  // Should be true!
       url = url.slice(1);
     const lookup_url = this._get_lookup_url(url, term);
-    window.open(
-      lookup_url,
-      'otherwin',
-      'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no'
-    );
+    let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no'
+    if (LUTE_USER_SETTINGS.open_popup_in_full_screen)
+      settings = null;
+    window.open(lookup_url, 'otherwin', settings);
   }
 
   _load_frame(dicturl, text) {
