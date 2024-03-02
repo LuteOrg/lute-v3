@@ -174,6 +174,17 @@ class UserSetting(SettingBase):
         UserSetting.set_value("mecab_path", revised_mecab_path)
         db.session.commit()
 
+    @staticmethod
+    def all_settings():
+        """
+        Get dict of all settings, for rendering into Javascript global space.
+        """
+        settings = db.session.query(UserSetting).all()
+        ret = {}
+        for s in settings:
+            ret[s.key] = s.value
+        return ret
+
 
 class SystemSetting(SettingBase):
     "System setting."
