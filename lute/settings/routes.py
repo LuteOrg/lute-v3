@@ -104,15 +104,9 @@ def edit_settings():
     for field in form:
         if field.id != "csrf_token":
             field.data = UserSetting.get_value(field.id)
-
-    # Hack: set boolean settings to ints, otherwise they're always checked.
-    form.backup_warn.data = int(form.backup_warn.data or 0)
-    form.backup_auto.data = int(form.backup_auto.data or 0)
-    form.show_highlights.data = int(form.show_highlights.data or 0)
-    form.open_popup_in_full_screen.data = int(form.open_popup_in_full_screen.data or 0)
-    form.stop_audio_on_term_form_open.data = int(
-        form.stop_audio_on_term_form_open.data or 0
-    )
+        if isinstance(field, BooleanField):
+            # Hack: set boolean settings to ints, otherwise they're always checked.
+            field.data = int(field.data or 0)
 
     return render_template("settings/form.html", form=form)
 
