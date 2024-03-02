@@ -28,14 +28,15 @@ Feature: Creating and managing terms
     Scenario: Can Export CSV file
         Given a new Spanish term:
             text: gato
+            pronunciation: GAH-to
             translation: cat
         Then the term table contains:
             ; gato; ; cat; Spanish; ; New (1)
         When click Export CSV
         And sleep for 1
         Then exported CSV file contains:
-            term,parent,translation,language,tags,status,link_status
-            gato,,cat,Spanish,,1,
+            term,parent,translation,language,tags,status,link_status,pronunciation
+            gato,,cat,Spanish,,1,,GAH-to
 
 
     Scenario: Import a valid term file

@@ -89,6 +89,7 @@ def export_terms():
         "status",
         "link_status",
         "OMIT_status_text",
+        "pronunciation",
     ]
     columns_to_exclude = []
     for i, h in enumerate(headings):
