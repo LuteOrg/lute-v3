@@ -161,8 +161,10 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                 assert len(labels) == 1, "have matching radio button"
                 label = labels[0]
                 label.click()
-            elif k in ("translation", "text"):
+            elif k in ("translation", "text", "romanization"):
                 b.find_by_css(f"#{k}").fill(v)
+            elif k in ("pronunciation"):
+                b.find_by_css("#romanization").fill(v)
             elif k == "parents":
                 for p in updates["parents"]:
                     xpath = [
