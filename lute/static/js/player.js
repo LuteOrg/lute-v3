@@ -82,9 +82,9 @@ player.addEventListener("pause", function () {
 
 // Listening for form opened event created by lute/templates/term/_form.html.
 window.addEventListener("message", function(event) {
-    if (event.data.event === "LuteTermFormOpened") {
-        player.pause();
-    }
+  if (event.data.event === "LuteTermFormOpened" && LUTE_USER_SETTINGS.stop_audio_on_term_form_open) {
+    player.pause();
+  }
 });
 
 player.addEventListener("play", function () {
