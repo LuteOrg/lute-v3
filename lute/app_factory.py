@@ -5,6 +5,7 @@ Methods: create_app.
 """
 
 import os
+import json
 import platform
 import traceback
 from flask import (
@@ -108,6 +109,7 @@ def _add_base_routes(app, app_config):
             "backup_directory": bs.backup_dir,
             "backup_last_display_date": bs.last_backup_display_date,
             "backup_time_since": bs.time_since_last_backup,
+            "user_settings": json.dumps(UserSetting.all_settings()),
         }
         return ret
 
