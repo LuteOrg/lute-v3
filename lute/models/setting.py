@@ -144,6 +144,9 @@ class UserSetting(SettingBase):
         """
         app_config = current_app.env_config
 
+        # These keys are rendered into the global javascript namespace var
+        # LUTE_USER_SETTINGS, so if any of these keys change, check the usage
+        # of that variable as well.
         keys_and_defaults = {
             "backup_enabled": True,
             "backup_auto": True,
@@ -156,6 +159,9 @@ class UserSetting(SettingBase):
             "custom_styles": "/* Custom css to modify Lute's appearance. */",
             "show_highlights": True,
             "current_language_id": 0,
+            # Behaviour:
+            "open_popup_in_full_screen": False,
+            "stop_audio_on_term_form_open": True,
         }
         for k, v in keys_and_defaults.items():
             if not UserSetting.key_exists(k):
@@ -173,6 +179,23 @@ class UserSetting(SettingBase):
         revised_mecab_path = UserSetting._revised_mecab_path()
         UserSetting.set_value("mecab_path", revised_mecab_path)
         db.session.commit()
+
+    @staticmethod
+    def all_settings():
+        """
+        Get dict of all settings, for rendering into Javascript global space.
+        """
+        settings = db.session.query(UserSetting).all()
+        ret = {}
+        for s in settings:
+            ret[s.key] = s.value
+
+        # Convert some ints into bools.
+        boolkeys = ["open_popup_in_full_screen", "stop_audio_on_term_form_open"]
+        for k in boolkeys:
+            ret[k] = ret[k] == "1"
+
+        return ret
 
 
 class SystemSetting(SettingBase):

@@ -83,6 +83,21 @@
 
     <tr>
       <td>
+        <h2>Behaviour</h2>
+      </td>
+    </tr>
+    {% for f in [
+    form.open_popup_in_full_screen,
+    form.stop_audio_on_term_form_open,
+    ]%}
+    <tr>
+      <td>{{ f.label }}</td>
+      <td>{{ f(class="form-control") }}</td>
+    </tr>
+    {% endfor %}
+
+    <tr>
+      <td>
         <h2>Japanese</h2>
       </td>
     </tr>
