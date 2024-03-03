@@ -410,39 +410,19 @@ let _get_translation_dict_index = function(sentence) {
 }
 
 
-let _get_text_to_translate = function(e) {
-  let sentence = '';
-  if (e.ctrlKey) {
-    sentence = $('#thetext p').map(function() {
-      return $(this).find('span.textitem').map(function() {
-        return $(this).text();
-      }).get().join('');
-    }).get().join('\n');
-  }
-  else {
-    const tis = get_textitems_spans(e);
-    sentence = tis.map(s => $(s).text()).join('');
-  }
-  return sentence.replace(/\u200B/g, '');
-}
+let show_translation_for_text = function(text) {
+  if (text == '')
+    return;
 
-
-/** Show the translation using the next dictionary. */
-let show_sentence_translation = function(e) {
   if (LUTE_SENTENCE_LOOKUP_URIS.length == 0) {
     console.log('No sentence translation uris configured.');
     return;
   }
 
-  const sentence = _get_text_to_translate(e);
-  if (sentence == '')
-    return;
-
-  const dict_index = _get_translation_dict_index(sentence);
+  const dict_index = _get_translation_dict_index(text);
   const userdict = LUTE_SENTENCE_LOOKUP_URIS[dict_index];
-  // console.log(userdict);
 
-  const lookup = encodeURIComponent(sentence);
+  const lookup = encodeURIComponent(text);
   const url = userdict.replace('###', lookup);
   if (url[0] == '*') {
     const finalurl = url.substring(1);  // drop first char.
@@ -455,6 +435,27 @@ let show_sentence_translation = function(e) {
     top.frames.wordframe.location.href = url;
     $('#read_pane_right').css('grid-template-rows', '1fr 0');
   }
+
+};
+
+
+/** Show the translation using the next dictionary. */
+let show_sentence_translation = function(e) {
+  const tis = get_textitems_spans(e);
+  const sentence = tis.map(s => $(s).text()).join('');
+  show_translation_for_text(sentence);
+}
+
+
+/** Translation for the full page. */
+function show_page_translation() {
+  let fulltext = $('#thetext p').map(function() {
+    return $(this).find('span.textitem').map(function() {
+      return $(this).text();
+    }).get().join('');
+  }).get().join('\n');
+  fulltext = fulltext.replace(/\u200B/g, '');
+  show_translation_for_text(fulltext);
 }
 
 
