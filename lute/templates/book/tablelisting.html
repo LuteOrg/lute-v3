@@ -66,7 +66,12 @@
         ],
         bottomEnd: 'paging'
       },
-      buttons: [ { extend: 'colvis' } ],
+      buttons: [
+        {
+          extend: 'colvis',
+          columns: '.colVisToggled'
+        }
+      ],
       {% if status != 'Archived' %}
       "language": {
             "emptyTable": "No books available. <a href='/book/new'>Create one?</a>"
@@ -84,14 +89,14 @@
       stateSave: true,
       search: { search: initial_search },
       columnDefs: [
-        { "name": "BkTitle", "targets": 0, "width": "40%", "render": render_book_title },
-        { "name": "LgName", "targets": 1, "width": "10%" },
-        { "name": "TagList", "targets": 2, "width": "10%" },
-        { "name": "WordCount", "targets": 3, "width": "10%" },
-        { "name": "UnknownPercent", "targets": 4, "data": null, "searchable": true, "orderable": true, "render": render_book_stats_graph },
-        { "targets": 5, "data": null, "width": "8%", "searchable": false, "orderable": false, "render": render_book_actions },
+        { "name": "BkTitle", "targets": 0, "width": "40%", "render": render_book_title, className: "colVisToggled" },
+        { "name": "LgName", "targets": 1, "width": "10%", className: "colVisToggled" },
+        { "name": "TagList", "targets": 2, "width": "10%", className: "colVisToggled" },
+        { "name": "WordCount", "targets": 3, "width": "10%", className: "colVisToggled" },
+        { "name": "UnknownPercent", "targets": 4, "data": null, "searchable": true, "orderable": true, "render": render_book_stats_graph, className: "colVisToggled" },
+        { "targets": 5, "data": null, "width": "8%", "searchable": false, "orderable": false, "render": render_book_actions, className: "colVisToggled" },
 
-        /* Extra data that is returned in the row for rendering, but not shown. */
+        /* Extra data that is returned in the row for rendering, but not shown, not changed by colvis. */
         { "name": "BkID", "targets": 6, "data": null, "visible": false },
         { "name": "BkArchived", "targets": 7, "data": null, "visible": false },
         { "name": "PageCount", "targets": 8, "data": null, "visible": false },
