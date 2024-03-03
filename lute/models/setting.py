@@ -160,7 +160,7 @@ class UserSetting(SettingBase):
             "show_highlights": True,
             "current_language_id": 0,
             # Behaviour:
-            "open_popup_in_full_screen": False,
+            "open_popup_in_new_tab": False,
             "stop_audio_on_term_form_open": True,
         }
         for k, v in keys_and_defaults.items():
@@ -191,7 +191,7 @@ class UserSetting(SettingBase):
             ret[s.key] = s.value
 
         # Convert some ints into bools.
-        boolkeys = ["open_popup_in_full_screen", "stop_audio_on_term_form_open"]
+        boolkeys = ["open_popup_in_new_tab", "stop_audio_on_term_form_open"]
         for k in boolkeys:
             ret[k] = ret[k] == "1"
 

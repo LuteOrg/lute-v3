@@ -427,7 +427,7 @@ let show_translation_for_text = function(text) {
   if (url[0] == '*') {
     const finalurl = url.substring(1);  // drop first char.
     let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no';
-    if (LUTE_USER_SETTINGS.open_popup_in_full_screen)
+    if (LUTE_USER_SETTINGS.open_popup_in_new_tab)
       settings = null;
     window.open(finalurl, 'dictwin', settings);
   }
