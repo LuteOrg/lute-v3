@@ -46,7 +46,7 @@ class UserSettingsForm(FlaskForm):
     custom_styles = TextAreaField("Custom styles")
     show_highlights = BooleanField("Highlight terms by status")
 
-    open_popup_in_full_screen = BooleanField("Open popup in full screen")
+    open_popup_in_new_tab = BooleanField("Open popup in new tab")
     stop_audio_on_term_form_open = BooleanField("Stop audio on term form open")
 
     mecab_path = StringField("MECAB_PATH environment variable")

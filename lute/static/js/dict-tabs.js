@@ -233,7 +233,7 @@ class DictButton extends LookupButton {
       url = url.slice(1);
     const lookup_url = this._get_lookup_url(url, term);
     let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no'
-    if (LUTE_USER_SETTINGS.open_popup_in_full_screen)
+    if (LUTE_USER_SETTINGS.open_popup_in_new_tab)
       settings = null;
     window.open(lookup_url, 'otherwin', settings);
   }
