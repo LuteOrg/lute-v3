@@ -31,6 +31,16 @@ Feature: Term import
             tags: animal, noun
 
 
+    Scenario: Import new term as unknown
+        Given import file:
+            language,term,translation,parent,status,tags,pronunciation
+            Spanish,gato,cat,,1,"animal, noun",GA-toh
+        When import with create true, update false, new as unknown true
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+        And sql "select WoText, WoStatus from words order by WoText" should return:
+            gato; 0
+
+
     Scenario: Smoke test updates ignored if not updating
         Given import file:
             language,term,translation,parent,status,tags,pronunciation

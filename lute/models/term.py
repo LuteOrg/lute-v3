@@ -217,7 +217,6 @@ class Term(
 
         self._text = t
         self.text_lc = new_text_lc
-        # TODO should_this_be_done: not sure if readings should be created for status=0 new terms.
         self.romanization = lang.parser.get_reading(t)
         self._calc_token_count()
 
