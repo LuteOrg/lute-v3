@@ -410,9 +410,8 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         self.is_word: int
         self.text_length: int
 
+        # Calls setter
         self.term = term
-        self.wo_id = term.id if term is not None else None
-        self.wo_status = term.status if term is not None else None
 
         # The tooltip should be shown for well-known/ignored TextItems
         # that merit a tooltip. e.g., if there isn't any actual Term
@@ -425,6 +424,19 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         # to determine if it has been loaded or not.
         self._flash_message_loaded: bool = False
         self._flash_message: str = None
+
+    def __repr__(self):
+        return f'<TextItem "{self.text}" (wo_id={self.wo_id})>'
+
+    @property
+    def term(self):
+        return self._term
+
+    @term.setter
+    def term(self, t):
+        self._term = t
+        self.wo_id = t.id if t is not None else None
+        self.wo_status = t.status if t is not None else None
 
     @property
     def show_tooltip(self):
