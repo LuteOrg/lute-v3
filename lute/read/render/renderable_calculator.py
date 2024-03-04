@@ -452,9 +452,11 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         def has_extra(cterm):
             if cterm is None:
                 return False
+            r = cterm.romanization
+            no_romanization = r is None or r.strip() == ""
             no_extra = (
                 cterm.translation is None
-                and cterm.romanization is None
+                and no_romanization
                 and cterm.get_current_image() is None
             )
             return not no_extra
@@ -526,7 +528,7 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         ]
 
         tooltip = (
-            st not in (Status.WELLKNOWN, Status.IGNORED)
+            st not in (Status.WELLKNOWN, Status.IGNORED, Status.UNKNOWN)
             or self.show_tooltip
             or self.flash_message is not None
         )
