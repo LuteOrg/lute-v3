@@ -55,6 +55,27 @@ def import_with_settings(create, update):
     os.remove(path)
 
 
+@when(
+    parsers.parse(
+        "import with create {create}, update {update}, new as unknown {newunknowns}"
+    )
+)
+def import_with_settings_and_newunks(create, update, newunknowns):
+    fd, path = tempfile.mkstemp()
+    with os.fdopen(fd, "w") as tmp:
+        # do stuff with temp file
+        tmp.write(content)
+
+    global stats  # pylint: disable=global-statement
+    stats = import_file(
+        path,
+        create.lower() == "true",
+        update.lower() == "true",
+        newunknowns.lower() == "true",
+    )
+    os.remove(path)
+
+
 @then(
     parsers.parse(
         "import should succeed with {created} created, {updated} updated, {skipped} skipped"
