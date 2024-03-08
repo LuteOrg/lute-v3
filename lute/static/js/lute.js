@@ -511,6 +511,34 @@ function toggle_highlight() {
 }
 
 
+function _page_data() {
+  return {
+    bookid: $("#book_id").val(),
+    pagenum: $("#page_num").val()
+  };
+}
+
+function delete_current_page() {
+  if (!confirm("Delete current page?"))
+    return;
+  const d = _page_data()
+  window.location = `/read/delete_page/${d.bookid}/${d.pagenum}`;
+}
+
+function _add_page(position) {
+  const d = _page_data()
+  window.location = `/read/new_page/${d.bookid}/${position}/${d.pagenum}`;
+}
+
+function add_page_before() {
+  _add_page("before");
+}
+
+function add_page_after() {
+  _add_page("after");
+}
+
+
 function handle_keydown (e) {
   if ($('span.word').length == 0) {
     // console.log('no words, exiting');
