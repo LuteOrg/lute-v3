@@ -83,6 +83,7 @@ def export_terms():
         "language",
         "tags",
         "OMIT_status_text",
+        "OMIT_added",
         "OMIT_WoID",
         "OMIT_LgID",
         "OMIT_ImageSource",
