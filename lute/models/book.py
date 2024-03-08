@@ -109,6 +109,42 @@ class Book(
         pagenum = self.page_in_range(n)
         return self.texts[pagenum - 1]
 
+    def _add_page(self, new_pagenum):
+        "Add new page, increment other page orders."
+        pages_after = [t for t in self.texts if t.order >= new_pagenum]
+        for t in pages_after:
+            t.order = t.order + 1
+        t = Text(None, "", new_pagenum)
+        # TODO fix_refs: None first arg is garbage code.  Passing self
+        # as the text's book causes a "SAWarning: Object of type
+        # <Text> not in session, add operation along 'Book.texts' will
+        # not proceed" warning ... so adding the text to the book
+        # manually is needed.  The book's language is required to
+        # correctly parse the Text's text though ...
+        self.texts.append(t)
+        return t
+
+    def add_page_before(self, pagenum):
+        "Add page before page n, renumber all subsequent pages, return new page."
+        return self._add_page(self.page_in_range(pagenum))
+
+    def add_page_after(self, pagenum):
+        "Add page after page n, renumber all subsequent pages, return new page."
+        return self._add_page(self.page_in_range(pagenum) + 1)
+
+    def remove_page(self, pagenum):
+        "Remove page, renumber all subsequent pages."
+        # Don't delete page of single-page books.
+        if len(self.texts) == 1:
+            return
+        texts = [t for t in self.texts if t.order == pagenum]
+        if len(texts) == 0:
+            return
+        texts[0].book = None
+        pages_after = [t for t in self.texts if t.order > pagenum]
+        for t in pages_after:
+            t.order = t.order - 1
+
     @property
     def is_supported(self):
         "True if the book's language's parser is supported."
@@ -209,6 +245,8 @@ class Text(db.Model):
     @text.setter
     def text(self, s):
         self._text = s
+        if s.strip() == "":
+            return
         toks = self._get_parsed_tokens()
         wordtoks = [t for t in toks if t.is_word]
         self.word_count = len(wordtoks)
