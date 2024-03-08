@@ -98,6 +98,7 @@
       <th style="text-align: left">Language</th>
       <th style="text-align: left">Tags</th>
       <th style="text-align: left">Status</th>
+      <th style="text-align: left">Added</th>
       <th style="text-align: left">TermID</th>
       <th style="text-align: left">LanguageID</th>
     </tr>
@@ -146,13 +147,15 @@
         { "name": "LgName", "targets": 4 },
         { "name": "TagList", "targets": 5 },
         { "name": "StID", "targets": 6, "render": render_status },
-        { "name": "WoID", "targets": 7, "visible": false },
-        { "name": "LgID", "targets": 8, "visible": false },
-        { "name": "WiSource", "targets": 9, "visible": false },
-        { "name": "StAbbreviation", "targets": 10, "visible": false },
-        { "name": "SyncStatus", "targets": 11, "visible": false },
-        { "name": "StText", "targets": 12, "visible": false },
-        { "name": "WoRomanization", "targets": 13, "visible": false },
+        { "name": "WoCreated", "targets": 7 },
+
+        { "name": "WoID", "targets": 8, "visible": false },
+        { "name": "LgID", "targets": 9, "visible": false },
+        { "name": "WiSource", "targets": 10, "visible": false },
+        { "name": "StAbbreviation", "targets": 11, "visible": false },
+        { "name": "SyncStatus", "targets": 12, "visible": false },
+        { "name": "StText", "targets": 13, "visible": false },
+        { "name": "WoRomanization", "targets": 14, "visible": false },
       ],
 
       // Ajax call
@@ -188,7 +191,7 @@
   // Use the status ID for sorting, so Well Known comes after Learned (5),
   // but use the status text ("New (1)") for the cell display.
   let render_status = function ( data, type, row, meta ) {
-    return row[12];
+    return row[13];
   };
 
   let render_checkbox = function (data, type, row, meta) {
@@ -199,7 +202,7 @@
   let render_translation = function ( data, type, row, meta ) {
     let tx = row[3] ?? '';
     tx = tx.replaceAll("\r\n", "<br />");
-    let imgsrc = row[9] ?? '';
+    let imgsrc = row[10] ?? '';
     if (imgsrc != '')
       imgsrc = `<img style="margin-top: 5px;" src="${imgsrc}" />`;
     let ret = [ tx, imgsrc ].filter((s) => s != '');
