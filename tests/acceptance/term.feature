@@ -35,8 +35,8 @@ Feature: Creating and managing terms
         When click Export CSV
         And sleep for 1
         Then exported CSV file contains:
-            term,parent,translation,language,tags,status,link_status,pronunciation
-            gato,,cat,Spanish,,1,,GAH-to
+            term,parent,translation,language,tags,added,status,link_status,pronunciation
+            gato,,cat,Spanish,,DATE_HERE,1,,GAH-to
 
 
     Scenario: Import a valid term file

@@ -8,6 +8,7 @@ luteclient: WIPES THE DB and provides helpful wrappers
 """
 
 import os
+import re
 import tempfile
 import time
 import yaml
@@ -301,7 +302,10 @@ def click_export_csv(luteclient):
 
 @then(parsers.parse("exported CSV file contains:\n{content}"))
 def check_exported_file(luteclient, content):
-    assert content == luteclient.get_temp_file_content("export_terms.csv").strip()
+    "Check the exported file, replace all dates with placeholder."
+    actual = luteclient.get_temp_file_content("export_terms.csv").strip()
+    actual = re.sub(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", "DATE_HERE", actual)
+    assert content == actual
 
 
 # Reading
