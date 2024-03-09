@@ -95,6 +95,56 @@ def page_done():
     return jsonify("ok")
 
 
+@bp.route("/delete_page/<int:bookid>/<int:pagenum>", methods=["GET"])
+def delete_page(bookid, pagenum):
+    """
+    Delete page.
+    """
+    book = Book.find(bookid)
+    if book is None:
+        flash(f"No book matching id {bookid}")
+        return redirect("/", 302)
+
+    if len(book.texts) == 1:
+        flash("Cannot delete only page in book.")
+    else:
+        book.remove_page(pagenum)
+        db.session.add(book)
+        db.session.commit()
+
+    url = f"/read/{bookid}/page/{pagenum}"
+    return redirect(url, 302)
+
+
+@bp.route("/new_page/<int:bookid>/<position>/<int:pagenum>", methods=["GET", "POST"])
+def new_page(bookid, position, pagenum):
+    "Create a new page."
+    form = TextForm()
+    book = Book.find(bookid)
+
+    if form.validate_on_submit():
+        t = None
+        if position == "before":
+            t = book.add_page_before(pagenum)
+        else:
+            t = book.add_page_after(pagenum)
+        t.book = book
+        t.text = form.text.data
+        db.session.add(book)
+        db.session.commit()
+
+        book.current_tx_id = t.id
+        db.session.add(book)
+        db.session.commit()
+
+        return redirect(f"/read/{book.id}", 302)
+
+    text_dir = "rtl" if book.language.right_to_left else "ltr"
+    return render_template(
+        "read/page_edit_form.html", hide_top_menu=True, form=form, text_dir=text_dir
+    )
+
+
 @bp.route("/save_player_data", methods=["post"])
 def save_player_data():
     "Save current player position, bookmarks.  Called on a loop by the player."

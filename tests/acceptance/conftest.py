@@ -325,6 +325,51 @@ def when_change_content(luteclient, content):
     b.find_by_id("submit").click()
 
 
+@when(parsers.parse("I add a page {position} current with content:\n{content}"))
+def when_add_page(luteclient, position, content):
+    "Change the content."
+    assert "Reading" in luteclient.browser.title, "sanity check"
+    b = luteclient.browser
+    b.find_by_css("div.hamburger-btn").first.click()
+
+    assert position in ["before", "after"], "sanity check"
+    linkid = "readmenu_add_page_before"
+    if position == "after":
+        linkid = "readmenu_add_page_after"
+    b.find_by_id(linkid).click()
+    b.find_by_id("text").fill(content)
+    b.find_by_id("submit").click()
+    b.reload()
+
+
+@when(parsers.parse("I go to the {position} page"))
+def when_go_to_page(luteclient, position):
+    "Go to page."
+    assert "Reading" in luteclient.browser.title, "sanity check"
+    assert position in ["previous", "next"], "sanity check"
+
+    linkid = "navNext"
+    if position == "previous":
+        linkid = "navPrev"
+    b = luteclient.browser
+    b.find_by_id(linkid).first.click()
+    time.sleep(0.1)  # Assume this is necessary for ajax reload.
+    # Don't reload, as it seems to nullify the nav click.
+    # b.reload()
+
+
+@when(parsers.parse("I delete the current page"))
+def when_delete_current_page(luteclient):
+    "Delete the current page."
+    assert "Reading" in luteclient.browser.title, "sanity check"
+    b = luteclient.browser
+    b.find_by_css("div.hamburger-btn").first.click()
+    b.find_by_id("readmenu_delete_page").first.click()
+    alert = b.get_alert()
+    alert.accept()
+    b.reload()
+
+
 # Reading, terms
 
 
