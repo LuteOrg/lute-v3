@@ -142,6 +142,36 @@ Feature: User can actually read and stuff.
             Tengo/ /otro/ /amigo/.
 
 
+    Scenario: User can add and remove pages.
+        Given a Spanish book "Hola" with content:
+            Hola. Adios amigo.
+        Then the reading pane shows:
+            Hola/. /Adios/ /amigo/.
+
+        When I add a page after current with content:
+            Nuevo.
+        Then the reading pane shows:
+            Nuevo/.
+        When I go to the previous page
+        Then the reading pane shows:
+            Hola/. /Adios/ /amigo/.
+
+        When I add a page before current with content:
+            Viejo.
+        Then the reading pane shows:
+            Viejo/.
+        When I go to the next page
+        Then the reading pane shows:
+            Hola/. /Adios/ /amigo/.
+        When I go to the next page
+        Then the reading pane shows:
+            Nuevo/.
+
+        When I delete the current page
+        Then the reading pane shows:
+            Hola/. /Adios/ /amigo/.
+
+
     Scenario: Hotkey affects hovered element
         Given a Spanish book "Hola" with content:
             Tengo otro amigo.
