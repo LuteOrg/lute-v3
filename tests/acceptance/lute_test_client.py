@@ -208,10 +208,15 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         self.browser.find_by_id("term_index").first.click()
         css = "#termtable tbody tr"
 
+        # The last column of the table is the "date added", but that's
+        # a hassle to check, so ignore it.
         def _to_string(row):
             tds = row.find_by_css("td")
             rowtext = [td.text.strip() for td in tds]
-            return "; ".join(rowtext).strip()
+            ret = "; ".join(rowtext).strip()
+            if ret == "No data available in table":
+                return ret
+            return "; ".join(rowtext[:-1]).strip()
 
         rows = list(self.browser.find_by_css(css))
         return "\n".join([_to_string(row) for row in rows])
