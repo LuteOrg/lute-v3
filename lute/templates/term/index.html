@@ -185,7 +185,7 @@
 
 
   let render_text = function ( data, type, row, meta ) {
-    return `<a href="/term/edit/${row[7]}">${row[1]}</a>`;
+    return `<a href="/term/edit/${row[8]}">${row[1]}</a>`;
   };
 
   // Use the status ID for sorting, so Well Known comes after Learned (5),
@@ -195,7 +195,7 @@
   };
 
   let render_checkbox = function (data, type, row, meta) {
-    return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row[7]}" langid="${row[8]}" onclick="handleChkClick()">`;
+    return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row[8]}" langid="${row[9]}" onclick="handleChkClick()">`;
   };
 
   let render_translation = function ( data, type, row, meta ) {
