@@ -320,6 +320,7 @@ def when_change_content(luteclient, content):
     assert "Reading" in luteclient.browser.title, "sanity check"
     b = luteclient.browser
     b.find_by_css("div.hamburger-btn").first.click()
+    b.find_by_id("page-operations-title").click()
     b.find_by_id("editText").click()
     b.find_by_id("text").fill(content)
     b.find_by_id("submit").click()
@@ -331,6 +332,7 @@ def when_add_page(luteclient, position, content):
     assert "Reading" in luteclient.browser.title, "sanity check"
     b = luteclient.browser
     b.find_by_css("div.hamburger-btn").first.click()
+    b.find_by_id("page-operations-title").click()
 
     assert position in ["before", "after"], "sanity check"
     linkid = "readmenu_add_page_before"
@@ -364,6 +366,7 @@ def when_delete_current_page(luteclient):
     assert "Reading" in luteclient.browser.title, "sanity check"
     b = luteclient.browser
     b.find_by_css("div.hamburger-btn").first.click()
+    b.find_by_id("page-operations-title").click()
     b.find_by_id("readmenu_delete_page").first.click()
     alert = b.get_alert()
     alert.accept()
