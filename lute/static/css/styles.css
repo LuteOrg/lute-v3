@@ -398,13 +398,13 @@ span.hamburger {
     text-decoration: none;
 }
 
-#page-operations-title {
+#page-edit-title {
     display: block;
     position: relative;
     width: 100%;
 }
 
-#page-operations-title::after {
+#page-edit-title::after {
     content: "▶";
     position: absolute;
     right: 0;
@@ -418,11 +418,11 @@ span.hamburger {
     /* color: var(--background-color); */
 }
 
-#page-operations-menu .reading-menu-item:hover {
+#page-edit-menu .reading-menu-item:hover {
     background-color: #e4f2fe;
 }
 
-#page-operations-menu {
+#page-edit-menu {
     display: none;
     position: absolute;
 
@@ -436,13 +436,13 @@ span.hamburger {
     border-bottom-right-radius: 4px;
 }
 
-#page-operations-li {
+#page-edit-li {
     display: flex;
     align-items: center;
     position: relative;
 }
 
-#page-operations-li:hover #page-operations-menu {
+#page-edit-li:hover #page-edit-menu {
     display: block;
 }
 
