@@ -169,11 +169,15 @@ def handle_term_form(
     )
 
 
-def _handle_form(term, repo):
+def _handle_form(term, repo, new_term=False):
     """
     Handle the form post.  Only show lang. selector
     for new terms.
     """
+    if new_term:
+        return handle_term_form(
+            term, repo, "/term/formframes.html", redirect("/term/new", 302)
+        )
     return handle_term_form(
         term, repo, "/term/formframes.html", redirect("/term/index", 302)
     )
@@ -206,7 +210,7 @@ def new():
     """
     repo = Repository(db)
     term = Term()
-    return _handle_form(term, repo)
+    return _handle_form(term, repo, True)
 
 
 @bp.route("/search/<text>/<int:langid>", methods=["GET"])
