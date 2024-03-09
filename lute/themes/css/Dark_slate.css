@@ -109,3 +109,7 @@ textarea,
 span.hamburger {
   background-color: #F3F4F4;
 }
+
+#reading_menu .reading-menu-item:hover {
+  color: var(--background-color);
+}

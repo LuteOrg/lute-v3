@@ -34,37 +34,59 @@
 
 <ul>
   {% if book.source_uri %}
-  <li class="menu-list-item-text">
-    <a href="{{ book.source_uri }}" target="_blank" tabindex="-1">
+  <li>
+    <a class="reading-menu-item" href="{{ book.source_uri }}" target="_blank" tabindex="-1">
       <span>Show source URL</span>
     </a>
   </li>
   {% endif %}
-  <li class="menu-list-item-text">
-    <a id="editText" href="" onclick="edit_current_page(); return false;">
-      <span>Edit page</span>
+  <li id="page-operations-li" class="reading-menu-item">
+    <span id="page-operations-title">Page operations</span>
+    <div id="page-operations-menu">
+      <ul>
+        <li>
+          <a id="editText" class="reading-menu-item" href="" onclick="edit_current_page(); return false;">
+            Edit current page
+          </a>
+        </li>
+        <li>
+          <a id="add-page-after" class="reading-menu-item" href="" onclick="add_page_after(); return false;">
+            Add page after
+          </a>
+        </li>
+        <li>
+          <a id="add-page-before" class="reading-menu-item" href="" onclick="add_page_before(); return false;">
+            Add page before
+          </a>
+        </li>
+        <li>
+          <a id="delete-page" class="reading-menu-item" href="" onclick="delete_current_page(); return false;">
+            Delete current page
+          </a>
+        </li>
+      </ul>
+    </div>
+  </li>
+  <li>
+    <a id="translateText" class="reading-menu-item" href="" onclick="show_page_translation(); return false;">
+      Translate page
     </a>
   </li>
-  <li class="menu-list-item-text">
-    <a id="translateText" href="" onclick="show_page_translation(); return false;">
-      <span>Translate page</span>
+  <li>
+    <a id="next_theme" class="reading-menu-item" onclick="next_theme(); return false;" title="Next theme">
+      Next theme (m)
     </a>
   </li>
-  <li class="menu-list-item-text">
-    <a id="next_theme" onclick="next_theme(); return false;" title="Next theme">
-      <span>Next theme (m)</span>
+  <li>
+    <a id="toggle_highlights" class="reading-menu-item" onclick="toggle_highlight(); return false;" title="Toggle highlights">
+      Toggle highlights (h)
     </a>
   </li>
-  <li class="menu-list-item-text">
-    <a id="toggle_highlights" onclick="toggle_highlight(); return false;" title="Toggle highlights">
-      <span>Toggle highlights (h)</span>
-    </a>
-  </li>
-  <li class="menu-list-item-text">
-    <a id="keyboard_shortcuts" title="Keyboard shortcuts"
+  <li>
+    <a id="keyboard_shortcuts" class="reading-menu-item" title="Keyboard shortcuts"
        href="/hotkeys"
        target="_blank">
-      <span>Keyboard shortcuts</span>
+      Keyboard shortcuts
     </a>
   </li>
 </ul>
