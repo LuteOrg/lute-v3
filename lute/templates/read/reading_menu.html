@@ -1,9 +1,11 @@
 <div class="reading_menu_logo_container">
-  <img
-    src="{{ url_for('static', filename='img/lute.png') }}"
-    class="lutelogo_small"
-    style="cursor: pointer"
-    onclick="window.location='/'" />
+  <a href="/">
+    <img
+      src="{{ url_for('static', filename='img/lute.png') }}"
+      class="lutelogo_small"
+      style="cursor: pointer"
+    />
+  </a>
   <!-- <h2>Lute</h2> -->
   <button class="close-btn reading-menu-close-btn" onclick="closeMenu()"></button>
 </div>
