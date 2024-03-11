@@ -3,6 +3,7 @@ book helper routines.
 """
 
 import os
+from io import StringIO
 from datetime import datetime
 
 # pylint: disable=unused-import
@@ -14,6 +15,7 @@ from openepub import Epub, EpubError
 from pypdf import PdfReader
 from werkzeug.utils import secure_filename
 from lute.book.model import Book
+from subtitle_parser import SrtParser, WebVttParser
 
 
 class BookImportException(Exception):
@@ -95,6 +97,49 @@ def get_pdf_content_from_form(pdf_file_field_data):
         return content
     except Exception as e:
         msg = f"Could not parse {pdf_file_field_data.filename} (error: {str(e)})"
+        raise BookImportException(message=msg, cause=e) from e
+
+
+def get_srt_content(srt_file_field_data):
+    """
+    Get the content of the srt as a single string.
+    """
+    content = ""
+    try:
+        srt_content = srt_file_field_data.read().decode("utf-8-sig")
+
+        parser = SrtParser(StringIO(srt_content))
+        parser.parse()
+
+        content = '\n'.join(subtitle.text for subtitle in parser.subtitles)
+
+        return content
+    except Exception as e:
+        msg = f"Could not parse {srt_file_field_data.filename} (error: {str(e)})"
+        raise BookImportException(message=msg, cause=e) from e
+
+
+def get_vtt_content(vtt_file_field_data):
+    """
+    Get the content of the vtt as a single string.
+    """
+    content = ""
+    try:
+        vtt_content = vtt_file_field_data.read().decode("utf-8-sig")
+
+        # Check if it is from YouTube
+        lines = vtt_content.split('\n')
+        if lines[1].startswith('Kind:') and lines[2].startswith('Language:'):
+            vtt_content = '\n'.join(lines[:1] + lines[3:])
+
+        parser = WebVttParser(StringIO(vtt_content))
+        parser.parse()
+
+        content = '\n'.join(subtitle.text for subtitle in parser.subtitles)
+
+        return content
+    except Exception as e:
+        msg = f"Could not parse {vtt_file_field_data.filename} (error: {str(e)})"
         raise BookImportException(message=msg, cause=e) from e
 
 
