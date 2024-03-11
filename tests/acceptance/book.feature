@@ -65,6 +65,30 @@ Feature: Books and stats are available
         Given a Spanish book "Hola" from file invalid.pdf
         Then the page contains "Could not parse invalid.pdf"
 
+    Scenario: I can import a srt file.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file Hola.srt
+        Then the page title is Reading "Hola"
+        And the reading pane shows:
+            Tengo/ /un/ /amigo/.
+
+    Scenario: Invalid srt files are rejected.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file invalid.srt
+        Then the page contains "Could not parse invalid.srt"
+
+    Scenario: I can import a vtt file.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file Hola.vtt
+        Then the page title is Reading "Hola"
+        And the reading pane shows:
+            Tengo/ /un/ /amigo/.
+
+    Scenario: Invalid vtt files are rejected.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file invalid.vtt
+        Then the page contains "Could not parse invalid.vtt"
+
     Scenario: Books and stats are shown on the first page.
         Given I visit "/"
         Given a Spanish book "Hola" with content:
