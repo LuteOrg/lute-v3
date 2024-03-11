@@ -7,7 +7,7 @@ Feature: Term import
 
     # The scenarios here use parent term 'dog' and child term 'dogs',
     # as documented in the manual.
-    # https://jzohrab.github.io/lute-manual/usage/parent-terms-bulk-mapping.html
+    # https://jzohrab.github.io/lute-manual/usage/terms/parent-terms-bulk-mapping.html
     # The manual is actually slightly out of date (Nov 2023), as Lute now supports
     # multiple parents.
 
