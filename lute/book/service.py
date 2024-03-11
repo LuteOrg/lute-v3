@@ -13,9 +13,9 @@ from bs4 import BeautifulSoup
 from flask import current_app, flash
 from openepub import Epub, EpubError
 from pypdf import PdfReader
+from subtitle_parser import SrtParser, WebVttParser
 from werkzeug.utils import secure_filename
 from lute.book.model import Book
-from subtitle_parser import SrtParser, WebVttParser
 
 
 class BookImportException(Exception):
