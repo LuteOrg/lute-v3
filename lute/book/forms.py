@@ -29,8 +29,8 @@ class NewBookForm(FlaskForm):
         "Text file",
         validators=[
             FileAllowed(
-                ["txt", "epub", "pdf"],
-                "Please upload a valid '.txt', '.epub' or '.pdf' file.",
+                ["txt", "epub", "pdf", "srt", "vtt"],
+                "Please upload a valid '.txt', '.epub', '.pdf', '.srt' or '.vtt' file.",
             )
         ],
     )
