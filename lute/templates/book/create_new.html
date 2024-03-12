@@ -95,6 +95,19 @@
 
     set_field_directions();
     $("#language_id").change(set_field_directions);
+    function getFilenameWithoutExtension(filename) {
+      return filename.split('.').slice(0, -1).join('.');
+    }
+    function autoFillTitle() {
+      var filename = $('#textfile').prop('files')[0].name;
+      var titleField = $('#title');
+      if (titleField.val() === '' && filename !== '') {
+        titleField.val(getFilenameWithoutExtension(filename));
+      }
+    }
+    $('#textfile').on('change', function() {
+      autoFillTitle();
+    });
   });
 </script>
 
