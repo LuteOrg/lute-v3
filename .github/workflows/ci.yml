@@ -13,7 +13,7 @@ permissions:
 
 jobs:
 
-  # Lint, format check, and all tests.
+  # Run all tests.
   base-ci:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -82,14 +82,6 @@ jobs:
         set -e
         inv playwright
 
-    # Code style etc checks after functionality verified.
-    - name: Lint
-      run: inv lint
-
-    - name: Coding style
-      run: |
-        black --check .
-
     - name: Remove mecab for smoke test without mecab
       run: |
         sudo apt-get remove -y mecab mecab-ipadic-utf8
@@ -119,6 +111,33 @@ jobs:
         popd
 
         pkill -f "python -m lute.main"   # Kill that process.
+
+
+  code-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        python_version: [ '3.11' ]
+
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python_version }}
+        cache: 'pip' # caching pip dependencies
+
+    - run: pip install -r requirements.txt
+
+    - name: Lint
+      run: inv lint
+
+    - name: Coding style
+      run: |
+        black --check .
 
 
   # Test build docker container and try running.
