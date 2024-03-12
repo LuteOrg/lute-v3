@@ -192,6 +192,24 @@ def term_form(langid, text):
     )
 
 
+@bp.route("/edit_term/<int:term_id>", methods=["GET", "POST"])
+def edit_term_form(term_id):
+    """
+    Edit a term.
+    """
+    repo = Repository(db)
+    term = repo.load(term_id)
+    if term.status == 0:
+        term.status = 1
+    return handle_term_form(
+        term,
+        repo,
+        "/read/frameform.html",
+        render_template("/read/updated.html", term_text=term.text),
+        embedded_in_reading_frame=True,
+    )
+
+
 @bp.route("/termpopup/<int:termid>", methods=["GET"])
 def term_popup(termid):
     """

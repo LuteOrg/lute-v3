@@ -94,21 +94,27 @@ let tooltip_textitem_hover_content = function (el, setContent) {
 }
 
 
-function showEditFrame(el, extra_args = {}) {
-  const lid = parseInt(el.data('lang-id'));
-
-  let text = extra_args.textparts ?? [ el.data('text') ];
-  const sendtext = text.join('');
-
-  let extras = Object.entries(extra_args).
-      map((p) => `${p[0]}=${encodeURIComponent(p[1])}`).
-      join('&');
-
-  const url = `/read/termform/${lid}/${sendtext}?${extras}`;
-  // console.log('go to url = ' + url);
-
+function _show_wordframe_url(url) {
   top.frames.wordframe.location.href = url;
   applyInitialPaneSizes();  // in resize.js
+}
+
+
+function show_term_edit_form(el) {
+  const wid = parseInt(el.data('wid'));
+  _show_wordframe_url(`/read/edit_term/${wid}`);
+}
+
+
+function show_multiword_term_edit_form(selected) {
+  if (selected.length == 0)
+    return;
+  const textparts = selected.toArray().map((el) => $(el).text());
+  const text = textparts.join('').trim();
+  if (text == "")
+    return;
+  const lid = parseInt(selected.eq(0).data('lang-id'));
+  _show_wordframe_url(`/read/termform/${lid}/${text}`);
 }
 
 
@@ -214,7 +220,7 @@ let word_clicked = function(el, e) {
   if (! e.shiftKey) {
     // Only one element should be marked clicked.
     $('span.kwordmarked').removeClass('kwordmarked');
-    showEditFrame(el);
+    show_term_edit_form(el);
   }
   el.addClass('kwordmarked');
   el.removeClass('hasflash');
@@ -275,15 +281,7 @@ function select_ended(e) {
     return;
   }
 
-  const textparts = selected.toArray().map((el) => $(el).text());
-  const text = textparts.join('').trim();
-  if (text.length > 250) {
-    alert(`Selections can be max length 250 chars ("${text}" is ${text.length} chars)`);
-    start_hover_mode();
-    return;
-  }
-
-  showEditFrame(selection_start_el, { textparts: textparts });
+  show_multiword_term_edit_form(selected);
   selection_start_el = null;
 }
 
@@ -371,7 +369,7 @@ let move_cursor = function(shiftby) {
   save_curr_data_order(target);
   apply_status_class(target);
   $(window).scrollTo(target, { axis: 'y', offset: -150 });
-  showEditFrame(target, { autofocus: false });
+  show_term_edit_form(target, { autofocus: false });
 }
 
 
