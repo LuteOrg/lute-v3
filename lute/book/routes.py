@@ -90,6 +90,10 @@ def _get_file_content(filefielddata):
         """
         flash(msg, "notice")
         return service.get_pdf_content_from_form(filefielddata)
+    if ext == ".srt":
+        return service.get_srt_content(filefielddata)
+    if ext == ".vtt":
+        return service.get_vtt_content(filefielddata)
     raise ValueError(f'Unknown file extension "{ext}"')
 
 
