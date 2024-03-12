@@ -24,6 +24,7 @@ content = None
 stats = None
 
 scenarios("term_import.feature")
+scenarios("term_import_status_0.feature")
 
 
 @given("demo data")
