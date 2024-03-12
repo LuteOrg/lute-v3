@@ -111,7 +111,7 @@ def get_srt_content(srt_file_field_data):
         parser = SrtParser(StringIO(srt_content))
         parser.parse()
 
-        content = '\n'.join(subtitle.text for subtitle in parser.subtitles)
+        content = "\n".join(subtitle.text for subtitle in parser.subtitles)
 
         return content
     except Exception as e:
@@ -128,14 +128,14 @@ def get_vtt_content(vtt_file_field_data):
         vtt_content = vtt_file_field_data.read().decode("utf-8-sig")
 
         # Check if it is from YouTube
-        lines = vtt_content.split('\n')
-        if lines[1].startswith('Kind:') and lines[2].startswith('Language:'):
-            vtt_content = '\n'.join(lines[:1] + lines[3:])
+        lines = vtt_content.split("\n")
+        if lines[1].startswith("Kind:") and lines[2].startswith("Language:"):
+            vtt_content = "\n".join(lines[:1] + lines[3:])
 
         parser = WebVttParser(StringIO(vtt_content))
         parser.parse()
 
-        content = '\n'.join(subtitle.text for subtitle in parser.subtitles)
+        content = "\n".join(subtitle.text for subtitle in parser.subtitles)
 
         return content
     except Exception as e:
