@@ -175,7 +175,17 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                         # <span> within the <tags> with class.
                         '/span[@class="tagify__input"]',
                     ]
-                    span = b.find_by_xpath("".join(xpath))
+                    xpath = "".join(xpath)
+
+                    # Sometimes test runs couldn't find the parent
+                    # tagify input, so hacky loop to get it and retry.
+                    span = None
+                    attempts = 0
+                    while span is None and attempts < 10:
+                        time.sleep(0.2)  # seconds
+                        attempts += 1
+                        span = b.find_by_xpath(xpath)
+
                     span.type(p, slowly=False)
                     span.type(Keys.RETURN)
                     time.sleep(0.3)  # seconds
@@ -319,11 +329,11 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
         should_refresh = False
         with self.browser.get_iframe("wordframe") as iframe:
-            time.sleep(0.2)  # Hack, test failing.
+            time.sleep(0.4)  # Hack, test failing.
             self._fill_term_form(iframe, updates)
-            time.sleep(0.2)  # Hack, test failing.
+            time.sleep(0.4)  # Hack, test failing.
             iframe.find_by_css("#submit").first.click()
-            time.sleep(0.2)  # Hack, test failing.
+            time.sleep(0.4)  # Hack, test failing.
 
             # Only refresh the reading frame if everything was ok.
             # Some submits will fail due to validation errors,
