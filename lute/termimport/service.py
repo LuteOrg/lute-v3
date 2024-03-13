@@ -191,6 +191,12 @@ def _update_term_skip_parents(t, repo, rec):
     if "tags" in rec:
         tags = list(map(str.strip, rec["tags"].split(",")))
         t.term_tags = [t for t in tags if t != ""]
+
+    # If this is a status 0 ("unknown") term, and it's being updated,
+    # then it's no longer unknown!
+    if t.status == 0:
+        t.status = 1
+
     repo.add(t)
 
 
@@ -248,7 +254,10 @@ def _do_import(
             if t is None and create_terms:
                 _import_term_skip_parents(repo, hsh, lang, new_as_unknowns)
                 created_terms.append(ts)
-            elif t is not None and update_terms:
+            elif t is not None and t.status == 0 and create_terms:
+                _update_term_skip_parents(t, repo, hsh)
+                created_terms.append(ts)
+            elif t is not None and t.status != 0 and update_terms:
                 _update_term_skip_parents(t, repo, hsh)
                 updated_terms.append(ts)
             else:
