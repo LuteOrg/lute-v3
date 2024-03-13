@@ -144,6 +144,11 @@
       processing: true,
       serverSide: true,
       stateSave: true,
+      select: {
+        style: 'multi',
+        selector: 'td:first-child input[type="checkbox"]',
+        className: 'row-selected'
+      },
       search: { search: initial_search },
       columnDefs: [
         // "chk" is included in the underlying SQL query.
