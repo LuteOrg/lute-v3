@@ -6,7 +6,6 @@ Feature changes:
 * #84: Add SRT, VTT file imports.  By @imamcr in #320.
 * #89: Add "add/remove" page operations to reading menu.  With nicer UI by @webofpies in #310.
 * #272: Get book title from filename.  By @Jayanth-Parthsarathy in #322.
-* #272: Use book file name as title if not set.  By @Jayanth-Parthsarathy in #322.
 * #301: Saving new term in term listing stays on term form entry page.  By @Jayanth-Parthsarathy in #309.
 * #305: Show date created in term listing page, include in CSV export.
 * #312: Right-click on Lute logo to open new tab.  By @Jayanth-Parthsarathy in #314.
