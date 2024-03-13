@@ -123,13 +123,10 @@ def _add_base_routes(app, app_config):
         language_choices = lute.utils.formutils.language_choices("(all languages)")
         current_language_id = lute.utils.formutils.valid_current_language_id()
 
+        should_run_auto_backup = backupservice.should_run_auto_backup(bkp_settings)
         # Only back up if we have books, otherwise the backup is
         # kicked off when the user empties the demo database.
-        if (
-            is_production
-            and have_books
-            and backupservice.should_run_auto_backup(bkp_settings)
-        ):
+        if is_production and have_books and should_run_auto_backup:
             return redirect("/backup/backup", 302)
 
         refresh_stats()

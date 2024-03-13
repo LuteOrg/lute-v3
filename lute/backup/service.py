@@ -125,8 +125,8 @@ def backup_warning(backup_settings):
     if not backup_settings.backup_warn:
         return ""
 
-    have_books = len(db.session.query(Book).all()) > 0
-    have_terms = len(db.session.query(Term).all()) > 0
+    have_books = db.session.query(db.session.query(Book).exists()).scalar()
+    have_terms = db.session.query(db.session.query(Term).exists()).scalar()
     if have_books is False and have_terms is False:
         return ""
 
