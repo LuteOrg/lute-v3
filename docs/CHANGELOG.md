@@ -1,4 +1,27 @@
 
+# 3.2.5 (2024-03-13)
+
+Feature changes:
+
+* #84: Add SRT, VTT file imports.  By @imamcr in #320.
+* #89: Add "add/remove" page operations to reading menu.  With nicer UI by @webofpies in #310.
+* #272: Get book title from filename.  By @Jayanth-Parthsarathy in #322.
+* #272: Use book file name as title if not set.  By @Jayanth-Parthsarathy in #322.
+* #301: Saving new term in term listing stays on term form entry page.  By @Jayanth-Parthsarathy in #309.
+* #305: Show date created in term listing page, include in CSV export.
+* #312: Right-click on Lute logo to open new tab.  By @Jayanth-Parthsarathy in #314.
+
+Bug fixes:
+
+* #318: Fix broken links to docs.  By @mrzaly in #319.
+
+Back end:
+
+* #307: Move vendored css, js into separate folders in lute/static.  By @Jayanth-Parthsarathy in #308.
+* Hacking at flaky tests.
+* Remove unused static/iui
+
+
 # 3.2.4 (2024-03-03)
 
 Feature changes:
