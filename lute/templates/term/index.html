@@ -140,22 +140,22 @@
         // "chk" is included in the underlying SQL query.
         // Without it, datatables would place the values
         // in the wrong table columns.  Ugly hack, but works.
-        { "name": "chk", "targets": 0, "searchable": false, "orderable": false, "data": null, "render": render_checkbox },
-        { "name": "WoText", "targets": 1, "render": render_text },
-        { "name": "ParentText", "targets": 2 },
-        { "name": "WoTranslation", "targets": 3, width: "40%", "searchable": true, "render": render_translation },
-        { "name": "LgName", "targets": 4 },
-        { "name": "TagList", "targets": 5 },
-        { "name": "StID", "targets": 6, "render": render_status },
-        { "name": "WoCreated", "targets": 7, "render": render_date_created },
+        { name: "chk", targets: 0, searchable: false, orderable: false, data: null, render: render_checkbox },
+        { name: "WoText", targets: 1, render: render_text },
+        { name: "ParentText", targets: 2 },
+        { name: "WoTranslation", targets: 3, width: "40%", searchable: true, render: render_translation },
+        { name: "LgName", targets: 4 },
+        { name: "TagList", targets: 5 },
+        { name: "StID", targets: 6, render: render_status },
+        { name: "WoCreated", targets: 7, render: render_date_created },
 
-        { "name": "WoID", "targets": 8, "visible": false },
-        { "name": "LgID", "targets": 9, "visible": false },
-        { "name": "WiSource", "targets": 10, "visible": false },
-        { "name": "StAbbreviation", "targets": 11, "visible": false },
-        { "name": "SyncStatus", "targets": 12, "visible": false },
-        { "name": "StText", "targets": 13, "visible": false },
-        { "name": "WoRomanization", "targets": 14, "visible": false },
+        { name: "WoID", targets: 8, visible: false },
+        { name: "LgID", targets: 9, visible: false },
+        { name: "WiSource", targets: 10, visible: false },
+        { name: "StAbbreviation", targets: 11, visible: false },
+        { name: "SyncStatus", targets: 12, visible: false },
+        { name: "StText", targets: 13, visible: false },
+        { name: "WoRomanization", targets: 14, visible: false },
       ],
 
       // Ajax call
