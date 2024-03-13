@@ -582,6 +582,7 @@ div#reading-footer span {
 #thetexttitle {
     font-size: 1.5rem;
     margin-bottom: 1rem;
+    word-wrap: break-word;
 }
 
 #thetexttitle,
@@ -791,6 +792,7 @@ img
 div.ui-tooltip {
     max-width: 400px !important;
     z-index: 1000; /*higher than audio because of words on the bottom, but lower than header and side menu */
+    word-wrap: break-word;
 }
 
 .tooltip-image {
