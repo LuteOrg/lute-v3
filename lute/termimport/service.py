@@ -251,17 +251,26 @@ def _do_import(
             lang = langs_dict[hsh["language"]]
             t = repo.find(lang.id, hsh["term"])
             ts = term_string(lang, hsh["term"])
-            if t is None and create_terms:
+
+            if create_terms and t is None:
+                # Create a brand-new term.
                 _import_term_skip_parents(repo, hsh, lang, new_as_unknowns)
                 created_terms.append(ts)
-            elif t is not None and t.status == 0 and create_terms:
+
+            elif create_terms and t is not None and t.status == 0:
+                # A status 0 "unknown" term can be created, but really
+                # it's an update of an existing term.
                 _update_term_skip_parents(t, repo, hsh)
                 created_terms.append(ts)
-            elif t is not None and t.status != 0 and update_terms:
+
+            elif update_terms and t is not None and t.status != 0:
+                # Can only update existing terms.
                 _update_term_skip_parents(t, repo, hsh)
                 updated_terms.append(ts)
+
             else:
                 skipped += 1
+
         repo.commit()
 
     pass_2 = [t for t in import_data if "parent" in t and t["parent"] != ""]
