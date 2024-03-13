@@ -48,16 +48,14 @@ def get_data_tables_list(parameters, is_archived):
         GROUP BY BtBkID
     ) AS tags ON tags.BkID = b.BkID
 
-    LEFT OUTER JOIN (
-      SELECT BkID
-      FROM books B
-      JOIN texts T ON B.BkID = T.TxBkID
-      WHERE T.TxID = (
-        SELECT MAX(TxID)
-        FROM texts
-        WHERE TxBkID = B.BkID
-      )
-      AND T.TxReadDate IS NOT NULL
+    left outer join (
+      select texts.TxBkID as BkID
+      from texts
+      inner join (
+        /* last page in each book */
+        select TxBkID, max(TxOrder) as maxTxOrder from texts group by TxBkID
+      ) last_page on last_page.TxBkID = texts.TxBkID and last_page.maxTxOrder = texts.TxOrder
+      where TxReadDate is not null
     ) completed_books on completed_books.BkID = b.BkID
 
     WHERE b.BkArchived = {archived}
