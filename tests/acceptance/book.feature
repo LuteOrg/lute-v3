@@ -53,6 +53,18 @@ Feature: Books and stats are available
         Given a Spanish book "Hola" from file invalid.epub
         Then the page contains "Could not parse invalid.epub"
 
+    Scenario: I can import an mobi file.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file Hola.mobi
+        Then the page title is Reading "Hola"
+        And the reading pane shows:
+            Tengo/ /un/ /amigo/.
+
+    Scenario: Invalid mobi files are rejected.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file invalid.mobi
+        Then the page contains "Could not parse invalid.mobi"
+
     Scenario: I can import a PDF file.
         Given I visit "/"
         Given a Spanish book "Hola" from file Hola.pdf
