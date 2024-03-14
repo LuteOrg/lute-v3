@@ -106,13 +106,10 @@ def get_popup_data(termid):
     parent_terms = [p.text for p in term.parents]
     parent_terms = ", ".join(parent_terms)
 
-    parent_data = []
-    if len(term.parents) == 1:
-        parent = term.parents[0]
-        if parent.translation != term.translation:
-            parent_data.append(make_array(parent))
-    else:
-        parent_data = [make_array(p) for p in term.parents]
+    parents = term.parents
+    if len(parents) == 1 and parents[0].translation == term.translation:
+        parents = []
+    parent_data = [make_array(p) for p in parents]
 
     components = [
         c for c in find_all_Terms_in_string(term.text, term.language) if c.id != term.id
