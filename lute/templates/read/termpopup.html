@@ -33,6 +33,10 @@
 
 <table>
 
+  {% if componentdata | length > 0 %}
+  <tr><td>Parents</td></tr>
+  {% endif %}
+
   {% for p in parentdata %}
   <tr>
     <td style="vertical-align: top;">
@@ -50,7 +54,38 @@
       </p>
     </td>
   </tr>
-{% endfor %}
+  {% endfor %}
+
+</table>
+
+{% endif %}
+
+{% if componentdata | length > 0 %}
+
+<table>
+
+  {% if parentdata | length > 0 %}
+  <tr><td>Components</td></tr>
+  {% endif %}
+
+  {% for p in componentdata %}
+  <tr>
+    <td style="vertical-align: top;">
+      <b>{{ p.term }}</b>
+      {% if p.roman %}
+      <br /><i>({{ p.roman }})</i>
+      {% endif %}
+    </td>
+    <td style="vertical-align: top;">
+      {{ p.trans | replace("\n", '<br />') | safe }}
+      <p>
+        {% for t in p.tags %}
+        <span class="termpopup-tag">{{ t }}</span>
+        {% endfor %}
+      </p>
+    </td>
+  </tr>
+  {% endfor %}
 
 </table>
 

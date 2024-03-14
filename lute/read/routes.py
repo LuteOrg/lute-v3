@@ -4,12 +4,11 @@
 
 from datetime import datetime
 from flask import Blueprint, flash, request, render_template, redirect, jsonify
-from lute.read.service import set_unknowns_to_known, start_reading
+from lute.read.service import set_unknowns_to_known, start_reading, get_popup_data
 from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
 from lute.models.book import Book, Text
-from lute.models.term import Term as DBTerm
 from lute.models.setting import UserSetting
 from lute.db import db
 
@@ -197,45 +196,16 @@ def term_popup(termid):
     """
     Show a term popup for the given DBTerm.
     """
-    term = DBTerm.query.get(termid)
-
-    term_tags = [tt.text for tt in term.term_tags]
-
-    def make_array(t):
-        ret = {
-            "term": t.text,
-            "roman": t.romanization,
-            "trans": t.translation if t.translation else "-",
-            "tags": [tt.text for tt in t.term_tags],
-        }
-        return ret
-
-    parent_terms = [p.text for p in term.parents]
-    parent_terms = ", ".join(parent_terms)
-
-    parent_data = []
-    if len(term.parents) == 1:
-        parent = term.parents[0]
-        if parent.translation != term.translation:
-            parent_data.append(make_array(parent))
-    else:
-        parent_data = [make_array(p) for p in term.parents]
-
-    images = [term.get_current_image()] if term.get_current_image() else []
-    for p in term.parents:
-        if p.get_current_image():
-            images.append(p.get_current_image())
-
-    images = list(set(images))
-
+    d = get_popup_data(termid)
     return render_template(
         "read/termpopup.html",
-        term=term,
-        flashmsg=term.get_flash_message(),
-        term_tags=term_tags,
-        term_images=images,
-        parentdata=parent_data,
-        parentterms=parent_terms,
+        term=d["term"],
+        flashmsg=d["flashmsg"],
+        term_tags=d["term_tags"],
+        term_images=d["term_images"],
+        parentdata=d["parentdata"],
+        parentterms=d["parentterms"],
+        componentdata=d["components"],
     )
 
 

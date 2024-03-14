@@ -5,7 +5,7 @@ Reading helpers.
 from lute.models.term import Term, Status
 from lute.models.book import Text
 from lute.book.stats import mark_stale
-from lute.read.render.service import get_paragraphs
+from lute.read.render.service import get_paragraphs, find_all_Terms_in_string
 from lute.term.model import Repository
 
 from lute.db import db
@@ -86,3 +86,52 @@ def start_reading(dbbook, pagenum, db_session):
     paragraphs = get_paragraphs(text.text, text.book.language)
 
     return paragraphs
+
+
+def get_popup_data(termid):
+    "Get the data necessary to render a term popup."
+    term = Term.find(termid)
+
+    term_tags = [tt.text for tt in term.term_tags]
+
+    def make_array(t):
+        ret = {
+            "term": t.text,
+            "roman": t.romanization,
+            "trans": t.translation if t.translation else "-",
+            "tags": [tt.text for tt in t.term_tags],
+        }
+        return ret
+
+    parent_terms = [p.text for p in term.parents]
+    parent_terms = ", ".join(parent_terms)
+
+    parents = term.parents
+    if len(parents) == 1 and parents[0].translation == term.translation:
+        parents = []
+    parent_data = [make_array(p) for p in parents]
+
+    components = [
+        c for c in find_all_Terms_in_string(term.text, term.language) if c.id != term.id
+    ]
+    component_data = [make_array(c) for c in components]
+
+    images = [term.get_current_image()] if term.get_current_image() else []
+    for p in term.parents:
+        if p.get_current_image():
+            images.append(p.get_current_image())
+    for c in components:
+        if c.get_current_image():
+            images.append(c.get_current_image())
+
+    images = list(set(images))
+
+    return {
+        "term": term,
+        "flashmsg": term.get_flash_message(),
+        "term_tags": term_tags,
+        "term_images": images,
+        "parentdata": parent_data,
+        "parentterms": parent_terms,
+        "components": component_data,
+    }
