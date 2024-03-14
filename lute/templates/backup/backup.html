@@ -13,7 +13,6 @@
 
 <p id="backupResult" />
 
-<p id="returnHome" style="visibility:hidden;"><a href="/">Back to home.</a></p>
 <div id="failedBackup" style="visibility:hidden;">
   <p>Backup failed:
     <a href="/backup/backup">try again</a>,
@@ -24,11 +23,10 @@
 
 <script>
   $(document).ready(function() {
+    // The route adds a flash message about the new file.
+
     $.post('/backup/do_backup', { type: '{{ backuptype }}' })
-      .done( function(msg) {
-        $('#backupResult').text('Completed: ' + msg);
-        $('#returnHome').css({ visibility: 'visible' })
-      })
+      .done(function(msg) { window.location = "/"; })
       .fail( function(xhr, textStatus, errorThrown) {
         const p = JSON.parse(xhr.responseText);
         const msg = "BACKUP ERROR: " + p.errmsg;
