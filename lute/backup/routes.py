@@ -14,6 +14,7 @@ from flask import (
     jsonify,
     redirect,
     send_file,
+    flash,
 )
 from lute.models.setting import BackupSettings
 from lute.backup.service import create_backup, skip_this_backup, list_backups
@@ -76,6 +77,7 @@ def do_backup():
     is_manual = backuptype.lower() == "manual"
     try:
         f = create_backup(c, settings, is_manual=is_manual)
+        flash(f"Backup created: {f}", "notice")
         return jsonify(f)
     except Exception as e:  # pylint: disable=broad-exception-caught
         tb = traceback.format_exc()
