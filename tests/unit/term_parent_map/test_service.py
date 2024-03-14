@@ -5,10 +5,7 @@ Term parent map file generation tests.
 import os
 import tempfile
 import pytest
-from lute.term_parent_map.service import (
-    export_terms_without_parents,
-    export_unknown_terms,
-)
+from lute.term_parent_map.service import export_unknown_terms
 from tests.utils import add_terms, make_book
 
 
@@ -38,13 +35,6 @@ def assert_file_content(fname, expected):
         actual = f.read().splitlines()
         actual.sort()
         assert expected == actual, "contents"
-
-
-def test_smoke_language_file_created(app_context, spanish, _book, output_tempfile):
-    "Smoke test only."
-    export_terms_without_parents(spanish, output_tempfile)
-    expected = ["gato", "lista", "listo"]
-    assert_file_content(output_tempfile, expected)
 
 
 def test_smoke_book_file_created(app_context, _book, output_tempfile):

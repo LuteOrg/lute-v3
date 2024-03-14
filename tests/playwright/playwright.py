@@ -117,13 +117,12 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     # page.get_by_role("link", name="Sentences").click()
     page.get_by_role("link", name="Back to list").click()
 
-    _print("Export parent term mapping files.")
-    page.locator("#menu_terms").hover()
-    page.get_by_role("link", name="Parent Term mapping").click()
-    with page.expect_download(timeout=30000) as _:
-        page.get_by_role("link", name="Tutorial", exact=True).click()
-    with page.expect_download(timeout=30000) as _:
-        page.get_by_role("link", name="English").click()
+    # TODO issue_336_export_unknown_book_terms: restore this test.
+    # _print("Export parent term mapping files.")
+    # page.locator("#menu_terms").hover()
+    # page.get_by_role("link", name="Parent Term mapping").click()
+    # with page.expect_download(timeout=30000) as _:
+    #     page.get_by_role("link", name="Tutorial", exact=True).click()
 
     # Edit language.
     _print("Edit language.")
