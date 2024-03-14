@@ -75,11 +75,6 @@ def test_parent_data_always_added_if_multiple_parents(spanish, app_context):
     assert d["parentterms"] == "perro, hombre", "parents"
 
 
-# TODO tests:
-# two words single component match
-# multiword with other multiword components
-
-
 def test_single_term_not_included_in_own_components(spanish, app_context):
     "Keep the lights on test, smoke only."
     t = Term(spanish, "gato")
@@ -88,3 +83,34 @@ def test_single_term_not_included_in_own_components(spanish, app_context):
 
     d = get_popup_data(t.id)
     assert d["components"] == [], "no components"
+
+
+def test_component_word_returned(spanish, app_context):
+    "Component word is returned."
+    t = Term(spanish, "un gato")
+    c = Term(spanish, "gato")
+    db.session.add(t)
+    db.session.add(c)
+    db.session.commit()
+
+    d = get_popup_data(t.id)
+    c_data = {"term": "gato", "roman": None, "trans": "-", "tags": []}
+    assert d["components"] == [c_data], "one component"
+
+
+def test_nested_multiword_components(spanish, app_context):
+    "Complete components are returned."
+    t = Term(spanish, "un gato gordo")
+    db.session.add(t)
+    for c in ["gato", "gat", "gato gordo", "un gato"]:
+        ct = Term(spanish, c)
+        db.session.add(ct)
+    db.session.commit()
+
+    d = get_popup_data(t.id)
+    c_data = [
+        {"term": "gato", "roman": None, "trans": "-", "tags": []},
+        {"term": "gato\u200b \u200bgordo", "roman": None, "trans": "-", "tags": []},
+        {"term": "un\u200b \u200bgato", "roman": None, "trans": "-", "tags": []},
+    ]
+    assert d["components"] == c_data, "components"
