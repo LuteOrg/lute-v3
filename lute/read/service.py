@@ -5,7 +5,7 @@ Reading helpers.
 from lute.models.term import Term, Status
 from lute.models.book import Text
 from lute.book.stats import mark_stale
-from lute.read.render.service import get_paragraphs
+from lute.read.render.service import get_paragraphs, find_all_Terms_in_string
 from lute.term.model import Repository
 
 from lute.db import db
@@ -114,10 +114,18 @@ def get_popup_data(termid):
     else:
         parent_data = [make_array(p) for p in term.parents]
 
+    components = [
+        c for c in find_all_Terms_in_string(term.text, term.language) if c.id != term.id
+    ]
+    component_data = [make_array(c) for c in components]
+
     images = [term.get_current_image()] if term.get_current_image() else []
     for p in term.parents:
         if p.get_current_image():
             images.append(p.get_current_image())
+    for c in components:
+        if c.get_current_image():
+            images.append(c.get_current_image())
 
     images = list(set(images))
 
@@ -128,4 +136,5 @@ def get_popup_data(termid):
         "term_images": images,
         "parentdata": parent_data,
         "parentterms": parent_terms,
+        "components": component_data,
     }

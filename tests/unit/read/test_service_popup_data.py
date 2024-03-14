@@ -76,3 +76,15 @@ def test_parent_data_always_added_if_multiple_parents(spanish, app_context):
 
 
 # TODO tests:
+# two words single component match
+# multiword with other multiword components
+
+
+def test_single_term_not_included_in_own_components(spanish, app_context):
+    "Keep the lights on test, smoke only."
+    t = Term(spanish, "gato")
+    db.session.add(t)
+    db.session.commit()
+
+    d = get_popup_data(t.id)
+    assert d["components"] == [], "no components"
