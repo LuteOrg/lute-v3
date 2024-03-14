@@ -120,7 +120,15 @@ def _get_language(f):
 def fixture_test_languages(app_context, demo_yaml_folder):
     "Dict of available languages for tests."
     # Hardcoded = good enough.
-    langs = ["spanish", "english", "japanese", "turkish", "classical_chinese", "german", "hindi"]
+    langs = [
+        "spanish",
+        "english",
+        "japanese",
+        "turkish",
+        "classical_chinese",
+        "german",
+        "hindi",
+    ]
     ret = {}
     for lang in langs:
         f = os.path.join(demo_yaml_folder, f"{lang}.yaml")
