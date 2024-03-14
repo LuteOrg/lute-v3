@@ -11,11 +11,14 @@
   <b>Don't refresh this page, or another backup process will be kicked off!</b>
 </p>
 
-<p id="backupResult" />
-
 <div id="failedBackup" style="visibility:hidden;">
-  <p>Backup failed:
-    <a href="/backup/backup">try again</a>,
+  <br />
+  <p>Backup failed:</p>
+  <br />
+  <pre><code><p id="failureDetails" /></code></pre>
+  <br />
+  <p>
+    <a href="/backup/backup">Try again</a>,
     fix your <a href="/settings/index">backup settings</a>,
     or <a href="/backup/skip_this_backup">skip this backup</a>.
   </p>
@@ -30,7 +33,7 @@
       .fail( function(xhr, textStatus, errorThrown) {
         const p = JSON.parse(xhr.responseText);
         const msg = "BACKUP ERROR: " + p.errmsg;
-        $('#backupResult').html(msg.replace(/__BREAK__/g, '<br />'));
+        $('#failureDetails').html(msg.replace(/__BREAK__/g, '<br />'));
         $('#failedBackup').css({ visibility: 'visible' })
       });
   });
