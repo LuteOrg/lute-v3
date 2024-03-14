@@ -145,3 +145,22 @@ def test_quick_checks(english):
     assert_string_equals("1234", english, "1234")
     assert_string_equals("1234.", english, "1234.")
     assert_string_equals("1234.Hello", english, "1234.[Hello]")
+
+
+def test_zero_width_non_joiner_removed(german):
+    """
+    Verify zero-width non-joiner characters are removed before parsing.
+    Test case from https://en.wikipedia.org/wiki/Zero-width_non-joiner.
+    """
+    assert_string_equals("Brotzeit", german, "[Brotzeit]")
+    assert_string_equals("Brot\u200czeit", german, "[Brotzeit]")
+
+
+def test_zero_width_joiner_removed(hindi):
+    """
+    Verify zero-width joiner characters are removed before parsing.
+    We see them used to replace Hindi conjunct characters with individual consonants.
+    """
+    assert_string_equals("namaste", hindi, "[namaste]")
+    assert_string_equals("नमस्ते", hindi, "[नमस्ते]")
+    assert_string_equals("नमस\u200dते", hindi, "[नमसते]")
