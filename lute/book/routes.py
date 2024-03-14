@@ -83,6 +83,8 @@ def _get_file_content(filefielddata):
         return service.get_textfile_content(filefielddata)
     if ext == ".epub":
         return service.get_epub_content(filefielddata)
+    if ext == ".mobi":
+        return service.get_mobi_content(filefielddata)
     if ext == ".pdf":
         msg = """
         Note: pdf imports can be inaccurate, due to how PDFs are encoded.
