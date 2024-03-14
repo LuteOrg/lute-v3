@@ -137,6 +137,16 @@ def new():
             form.populate_obj(b)
             if form.textfile.data:
                 b.text = _get_file_content(form.textfile.data)
+                if len(b.text.strip()) == 0:
+                    return render_template(
+                        "book/create_new.html",
+                        book=b,
+                        form=form,
+                        text_file_is_empty=True,
+                        tags=repo.get_book_tags(),
+                        rtl_map=json.dumps(_language_is_rtl_map()),
+                        show_language_selector=True,
+                    )
             f = form.audiofile.data
             if f:
                 b.audio_filename = service.save_audio_file(f)
@@ -154,6 +164,7 @@ def new():
         "book/create_new.html",
         book=b,
         form=form,
+        text_file_is_empty=False,
         tags=repo.get_book_tags(),
         rtl_map=json.dumps(_language_is_rtl_map()),
         show_language_selector=True,

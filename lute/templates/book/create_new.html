@@ -10,6 +10,9 @@
 <div class="flash-notice-narrow">{{ error }}</div>
 {% endfor %}
 {% endfor %}
+{% if text_file_is_empty == True %}
+<div class="flash-notice-narrow">Textfile cannot be empty</div>
+{% endif %}
 
 <form method="POST" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
