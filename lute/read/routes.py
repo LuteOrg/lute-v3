@@ -205,6 +205,7 @@ def term_popup(termid):
         term_images=d["term_images"],
         parentdata=d["parentdata"],
         parentterms=d["parentterms"],
+        componentdata=d["components"],
     )
 
 
