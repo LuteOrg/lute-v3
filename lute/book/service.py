@@ -7,12 +7,11 @@ from io import StringIO
 from datetime import datetime
 
 # pylint: disable=unused-import
-from tempfile import TemporaryFile, SpooledTemporaryFile, NamedTemporaryFile
+from tempfile import TemporaryFile, SpooledTemporaryFile
 import requests
 from bs4 import BeautifulSoup
 from flask import current_app, flash
 from openepub import Epub, EpubError
-from mobi import Mobi
 from pypdf import PdfReader
 from subtitle_parser import SrtParser, WebVttParser
 from werkzeug.utils import secure_filename
@@ -84,50 +83,6 @@ def get_epub_content(epub_file_field_data):
         msg = f"Could not parse {epub_file_field_data.filename} (error: {str(e)})"
         raise BookImportException(message=msg, cause=e) from e
     return content
-
-
-def get_mobi_content(mobi_file_field_data):
-    """
-    Get the content of the mobi as a single string.
-    """
-    content = ""
-    try:
-        mobi_content = mobi_file_field_data.read()
-
-        with NamedTemporaryFile() as tmp:
-            tmp.write(mobi_content)
-
-            book = Mobi(tmp.name)
-            book_content = book.read().decode("utf-8")
-
-            soup = BeautifulSoup(book_content, "html.parser")
-
-            # It's a temporary solution, I guess it's not the right way to do it
-            tags = [
-                "p",
-                "div",
-                "h1",
-                "h2",
-                "h3",
-                "h4",
-                "h5",
-                "h6",
-                "br",
-                "ul",
-                "ol",
-                "li",
-                "blockquote",
-            ]
-            for tag in soup.find_all(tags):
-                tag.replace_with(tag.text + "\n")
-
-            content = soup.get_text()
-
-            book.close()
-        return content
-    except Exception as e:
-        msg = f"Could not parse {mobi_file_field_data.filename} (error: {str(e)})"
-        raise BookImportException(message=msg, cause=e) from e
 
 
 def get_pdf_content_from_form(pdf_file_field_data):
