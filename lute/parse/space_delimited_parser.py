@@ -31,9 +31,8 @@ class SpaceDelimitedParser(AbstractParser):
         # Remove extra spaces.
         clean_text = re.sub(r" +", " ", text)
 
-        # Remove zero-width spaces, joiners, and non-joiners.
-        for c in (chr(0x200B), chr(0x200C), chr(0x200D)):
-            clean_text = clean_text.replace(c, "")
+        # Remove zero-width spaces.
+        clean_text = clean_text.replace(chr(0x200B), "")
 
         return self._parse_to_tokens(clean_text, language)
 
