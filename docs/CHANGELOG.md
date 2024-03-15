@@ -1,4 +1,21 @@
 
+# 3.2.6 (2024-03-15)
+
+Feature changes:
+
+* #325: Speed up homepage.
+* #173: Speed up backups.
+* #306 Add .mobi support.  By @imamcr in #338.
+* Add zero-width joiners and non-joiners to some language definitions.  By @mrzaly in #334, #340
+* #251: Show component terms of multi-word terms.
+* #332: remove "bulk parent mapping"
+
+Bug fixes:
+
+* #329: fix term listing "select all" checkbox.
+* Fix title and tooltip overflow.  By @imamcr in #323.
+
+
 # 3.2.5 (2024-03-13)
 
 Feature changes:
