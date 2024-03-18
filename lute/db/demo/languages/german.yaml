@@ -9,6 +9,7 @@ dictionaries:
   - for: sentences
     type: popup
     url: https://www.deepl.com/translator#de/en/###
+word_chars: a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ\u200C\u200D
 # show_romanization: 
 # right_to_left: 
 
