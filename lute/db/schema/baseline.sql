@@ -245,21 +245,22 @@ INSERT INTO languagedicts VALUES(17,7,'terms','embeddedhtml','https://www.wordre
 INSERT INTO languagedicts VALUES(18,7,'terms','embeddedhtml','https://en.wiktionary.org/wiki/###',1,2);
 INSERT INTO languagedicts VALUES(19,7,'sentences','popuphtml','https://www.deepl.com/translator#el/en/###',1,3);
 INSERT INTO languagedicts VALUES(20,8,'terms','embeddedhtml','https://www.boltidictionary.com/en/search?s=###',1,1);
-INSERT INTO languagedicts VALUES(21,8,'sentences','embeddedhtml','https://www.bing.com/translator/?from=hi&to=en&text=###',1,2);
-INSERT INTO languagedicts VALUES(22,9,'terms','embeddedhtml','https://jisho.org/search/###',1,1);
-INSERT INTO languagedicts VALUES(23,9,'sentences','popuphtml','https://www.deepl.com/translator#jp/en/###',1,2);
-INSERT INTO languagedicts VALUES(24,10,'terms','embeddedhtml','https://www.dict.com/Russian-English/###',1,1);
-INSERT INTO languagedicts VALUES(25,10,'terms','embeddedhtml','https://en.openrussian.org/?search=###',1,2);
-INSERT INTO languagedicts VALUES(26,10,'sentences','popuphtml','https://www.deepl.com/translator#ru/en/###',1,3);
-INSERT INTO languagedicts VALUES(27,11,'terms','embeddedhtml','https://dsal.uchicago.edu/cgi-bin/app/sanskrit_query.py?qs=###&searchhws=yes&matchtype=default',1,1);
-INSERT INTO languagedicts VALUES(28,11,'terms','embeddedhtml','https://www.learnsanskrit.cc/translate?search=###&dir=se',1,2);
-INSERT INTO languagedicts VALUES(29,11,'sentences','popuphtml','https://translate.google.com/?hl=en&sl=sa&tl=en&text=###&op=translate',1,3);
-INSERT INTO languagedicts VALUES(30,12,'terms','embeddedhtml','https://es.thefreedictionary.com/###',1,1);
-INSERT INTO languagedicts VALUES(31,12,'terms','popuphtml','https://www.wordreference.com/es/en/translation.asp?spen=###',1,2);
-INSERT INTO languagedicts VALUES(32,12,'sentences','popuphtml','https://www.deepl.com/translator#es/en/###',1,3);
-INSERT INTO languagedicts VALUES(33,13,'terms','embeddedhtml','https://www.wordreference.com/tren/###',1,1);
-INSERT INTO languagedicts VALUES(34,13,'terms','embeddedhtml','https://tr.wiktionary.org/wiki/###',1,2);
-INSERT INTO languagedicts VALUES(35,13,'sentences','popuphtml','https://www.deepl.com/translator#tr/en/###',1,3);
+INSERT INTO languagedicts VALUES(21,8,'terms','popuphtml','https://translate.google.com/?sl=hi&tl=en&text=###',1,2);
+INSERT INTO languagedicts VALUES(22,8,'sentences','embeddedhtml','https://www.bing.com/translator/?from=hi&to=en&text=###',1,3);
+INSERT INTO languagedicts VALUES(23,9,'terms','embeddedhtml','https://jisho.org/search/###',1,1);
+INSERT INTO languagedicts VALUES(24,9,'sentences','popuphtml','https://www.deepl.com/translator#jp/en/###',1,2);
+INSERT INTO languagedicts VALUES(25,10,'terms','embeddedhtml','https://www.dict.com/Russian-English/###',1,1);
+INSERT INTO languagedicts VALUES(26,10,'terms','embeddedhtml','https://en.openrussian.org/?search=###',1,2);
+INSERT INTO languagedicts VALUES(27,10,'sentences','popuphtml','https://www.deepl.com/translator#ru/en/###',1,3);
+INSERT INTO languagedicts VALUES(28,11,'terms','embeddedhtml','https://dsal.uchicago.edu/cgi-bin/app/sanskrit_query.py?qs=###&searchhws=yes&matchtype=default',1,1);
+INSERT INTO languagedicts VALUES(29,11,'terms','embeddedhtml','https://www.learnsanskrit.cc/translate?search=###&dir=se',1,2);
+INSERT INTO languagedicts VALUES(30,11,'sentences','popuphtml','https://translate.google.com/?hl=en&sl=sa&tl=en&text=###&op=translate',1,3);
+INSERT INTO languagedicts VALUES(31,12,'terms','embeddedhtml','https://es.thefreedictionary.com/###',1,1);
+INSERT INTO languagedicts VALUES(32,12,'terms','popuphtml','https://www.wordreference.com/es/en/translation.asp?spen=###',1,2);
+INSERT INTO languagedicts VALUES(33,12,'sentences','popuphtml','https://www.deepl.com/translator#es/en/###',1,3);
+INSERT INTO languagedicts VALUES(34,13,'terms','embeddedhtml','https://www.wordreference.com/tren/###',1,1);
+INSERT INTO languagedicts VALUES(35,13,'terms','embeddedhtml','https://tr.wiktionary.org/wiki/###',1,2);
+INSERT INTO languagedicts VALUES(36,13,'sentences','popuphtml','https://www.deepl.com/translator#tr/en/###',1,3);
 CREATE TABLE IF NOT EXISTS "languages" (
 	"LgID" INTEGER NOT NULL  ,
 	"LgName" VARCHAR(40) NOT NULL  ,
@@ -277,7 +278,7 @@ INSERT INTO languages VALUES(2,'Classical Chinese','´=''|`=''|’=''|‘=''|...
 INSERT INTO languages VALUES(3,'Czech','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,1,'spacedel');
 INSERT INTO languages VALUES(4,'English','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,'spacedel');
 INSERT INTO languages VALUES(5,'French','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,'spacedel');
-INSERT INTO languages VALUES(6,'German','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ\u200C\u200D',0,0,'spacedel');
+INSERT INTO languages VALUES(6,'German','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,'spacedel');
 INSERT INTO languages VALUES(7,'Greek','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?;','Mr.|Mrs.|Dr.|[A-Z].|κτλ.|κλπ.|π.χ.|λ.χ.|κ.ά|δηλ.|Κος.|Κ.|Κα.|μ.Χ.|ΥΓ.|μ.μ.|π.μ.|σελ.|κεφ.|βλ.|αι.','α-ωΑ-ΩάόήέώύίΊΏΈΉΌΆΎϊΪϋΫΐΰ',0,1,'spacedel');
 INSERT INTO languages VALUES(8,'Hindi','´=''|`=''|’=''|‘=''|...=…|..=‥','.?!|।॥','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-Z\u0900-\u0963\u0966-\u097F\u200C\u200D',0,1,'spacedel');
 INSERT INTO languages VALUES(9,'Japanese','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。？！','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','\p{Han}\p{Katakana}\p{Hiragana}',0,1,'japanese');
@@ -373,6 +374,17 @@ WHEN old.WoStatus <> new.WoStatus
 BEGIN
     UPDATE words
     SET WoStatusChanged = CURRENT_TIMESTAMP
+    WHERE WoID = NEW.WoID;
+END
+;
+CREATE TRIGGER trig_words_update_WoCreated_if_no_longer_unknown
+-- created by db/schema/migrations_repeatable/trig_words.sql
+AFTER UPDATE OF WoStatus ON words
+FOR EACH ROW
+WHEN old.WoStatus <> new.WoStatus and old.WoStatus = 0
+BEGIN
+    UPDATE words
+    SET WoCreated = CURRENT_TIMESTAMP
     WHERE WoID = NEW.WoID;
 END
 ;
