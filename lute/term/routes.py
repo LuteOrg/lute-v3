@@ -12,6 +12,7 @@ from flask import (
     redirect,
     current_app,
     send_file,
+    flash,
 )
 from lute.models.language import Language
 from lute.models.term import Term as DBTerm
@@ -327,3 +328,18 @@ def delete(termid):
     repo.delete(term)
     repo.commit()
     return redirect("/term/index", 302)
+
+
+@bp.route("/delete_all_status_0_terms", methods=["GET"])
+def delete_all_status_0():
+    """
+    Delete all status 0 terms.
+
+    This route can only be called directly in the browser, it doesn't have a URL.
+
+    ref https://github.com/jzohrab/lute-v3/issues/99
+    Need to remove all status 0 terms if reverting from the alpha release.
+    """
+    deleted = DBTerm.delete_all_status_0_terms()
+    flash(f"Clean up: deleted {deleted} status 0 terms.")
+    return redirect("/", 302)
