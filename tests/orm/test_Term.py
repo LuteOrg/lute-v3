@@ -259,3 +259,34 @@ def test_changing_text_of_non_saved_Term_is_ok(english):
     "Changing text should throw."
     term = Term(english, "ABC")
     term.text = "DEF"
+
+
+## Status 0 alpha release data cleanup.
+# ref https://github.com/jzohrab/lute-v3/issues/99
+# Need to remove all status 0 terms if reverting from the alpha release.
+
+
+def test_delete_all_status_0_terms(spanish):
+    "Non-status-0 terms are left as-is."
+    term = Term(spanish, "HOLA")
+    term.set_flash_message("hello")
+    term.set_current_image("hello.png")
+    term.status = 0
+    db.session.add(term)
+
+    term2 = Term(spanish, "GATO")
+    term2.status = 0
+    db.session.add(term2)
+
+    other = Term(spanish, "other")
+    other.status = 1
+    db.session.add(other)
+
+    db.session.commit()
+
+    sql_list = "select WoText from words order by WoText"
+    assert_sql_result(sql_list, ["GATO", "HOLA", "other"], "both exist")
+
+    deleted = Term.delete_all_status_0_terms()
+    assert deleted == 2, "2 deleted"
+    assert_sql_result(sql_list, ["other"], "GATO, HOLA del")
