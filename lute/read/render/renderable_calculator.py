@@ -434,9 +434,16 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
 
     @term.setter
     def term(self, t):
+        self.wo_id = None
+        self.wo_status = None
         self._term = t
-        self.wo_id = t.id if t is not None else None
-        self.wo_status = t.status if t is not None else None
+        if t is None:
+            return
+
+        self.wo_id = t.id
+        self.wo_status = t.status
+        if t.status >= 1 and t.status <= 5:
+            self._show_tooltip = True
 
     @property
     def show_tooltip(self):
@@ -449,14 +456,15 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         if self.term is None:
             return False
 
+        def blank_string(s):
+            return s is None or s.strip() == ""
+
         def has_extra(cterm):
             if cterm is None:
                 return False
-            r = cterm.romanization
-            no_romanization = r is None or r.strip() == ""
             no_extra = (
-                cterm.translation is None
-                and no_romanization
+                blank_string(cterm.translation)
+                and blank_string(cterm.romanization)
                 and cterm.get_current_image() is None
             )
             return not no_extra
