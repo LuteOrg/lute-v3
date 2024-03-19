@@ -219,16 +219,23 @@
         return `${txt} (${t})`;
       };
 
+      // Build whitelist from returned ajax data.  Remove current term
+      // since a term should not be assigned as its own parent.
+      let build_whitelist = function(data) {
+        const this_term_text = $("#original_text").val();
+        const whitelist = data.map((a) => ({
+          "value": a.text,
+          "suggestion": make_dropdown(a),
+          "status": a.status,
+        })).filter((hsh) => hsh.value != this_term_text);
+        return whitelist;
+      };
+
       tagify.loading(true);  // spinning animation during fetch.
       fetch(`/term/search/${s}/${langid}`, {signal:controller.signal})
         .then(RES => RES.json())
         .then(function(data) {
-          const newWhitelist = data.map((a) => ({
-            "value": a.text,
-            "suggestion": make_dropdown(a),
-            "status": a.status,
-          }));
-          tagify.whitelist = newWhitelist; // update whitelist Array in-place
+          tagify.whitelist = build_whitelist(data); // update whitelist Array in-place
           const sdecode = decodeURIComponent(s);
           tagify.loading(false).dropdown.show(sdecode); // render the suggestions dropdown
         }).catch(err => {
