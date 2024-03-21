@@ -240,6 +240,22 @@ def test_save_with_new_parent(app_context, repo, hello_term):
     assert parent.parents == []
 
 
+def test_save_with_existing_but_unknown_parent(app_context, repo, english, hello_term):
+    "Existing parent with status 0 is bumped to status 1."
+    p = DBTerm(english, "parent")
+    p.status = 0
+    db.session.add(p)
+    db.session.commit()
+
+    hello_term.parents = ["parent"]
+    hello_term.term_tags = ["a", "b"]
+    repo.add(hello_term)
+    repo.commit()
+
+    sql = "select WoText, WoStatus from words order by WoText"
+    assert_sql_result(sql, ["HELLO; 1", "parent; 1"], "parent status set to 1")
+
+
 def test_save_remove_parent_breaks_link(app_context, repo, hello_term):
     "Parent is left."
     hello_term.parents.append("parent")

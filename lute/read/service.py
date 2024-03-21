@@ -7,8 +7,9 @@ from lute.models.book import Text
 from lute.book.stats import mark_stale
 from lute.read.render.service import get_paragraphs, find_all_Terms_in_string
 from lute.term.model import Repository
-
 from lute.db import db
+
+# from lute.utils.debug_helpers import DebugTimer
 
 
 def set_unknowns_to_known(text: Text):
@@ -17,39 +18,32 @@ def set_unknowns_to_known(text: Text):
     for any new Terms.
     """
     language = text.book.language
+    paragraphs = get_paragraphs(text.text, text.book.language)
+    # Just in case.
+    _add_status_0_terms(paragraphs, language)
 
-    sentences = sum(get_paragraphs(text.text, text.book.language), [])
-
-    tis = []
-    for sentence in sentences:
-        for ti in sentence.textitems:
-            tis.append(ti)
+    tis = [
+        ti
+        for para in paragraphs
+        for sentence in para
+        for ti in sentence.textitems
+        if ti.is_word
+    ]
 
     def is_unknown(ti):
-        return (
-            ti.is_word == 1
-            and (ti.wo_id == 0 or ti.wo_id is None)
-            and ti.token_count == 1
-        )
+        return ti.is_word == 1 and ti.term is not None and ti.wo_status == 0
 
-    unknowns = list(filter(is_unknown, tis))
-    words_lc = [ti.text_lc for ti in unknowns]
-    uniques = list(set(words_lc))
-    uniques.sort()
+    unknown_ids = [t.wo_id for t in tis if is_unknown(t)]
+    uniques = list(set(unknown_ids))
 
     batch_size = 100
     i = 0
 
-    # There is likely a better way to write this using generators and
-    # yield.
     for u in uniques:
-        candidate = Term(language, u)
-        t = Term.find_by_spec(candidate)
-        if t is None:
-            candidate.status = Status.WELLKNOWN
-            db.session.add(candidate)
-            i += 1
-
+        t = Term.find(u)
+        t.status = Status.WELLKNOWN
+        db.session.add(t)
+        i += 1
         if i % batch_size == 0:
             db.session.commit()
 
@@ -71,6 +65,51 @@ def bulk_status_update(text: Text, terms_text_array, new_status):
     repo.commit()
 
 
+def _create_unknown_terms(textitems, lang):
+    "Create any terms required for the page."
+    # dt = DebugTimer("create-unk-terms")
+    toks = [t.text for t in textitems]
+    unique_word_tokens = list(set(toks))
+    all_new_terms = [Term(lang, t) for t in unique_word_tokens]
+    # dt.step("make all_new_terms")
+
+    unique_text_lcs = {}
+    for t in all_new_terms:
+        if t.text_lc not in unique_text_lcs:
+            unique_text_lcs[t.text_lc] = t
+    unique_new_terms = unique_text_lcs.values()
+    # dt.step("find unique_new_terms")
+
+    for t in unique_new_terms:
+        t.status = 0
+        db.session.add(t)
+    db.session.commit()
+    # dt.step("commit")
+    # dt.summary()
+
+    return unique_new_terms
+
+
+def _add_status_0_terms(paragraphs, lang):
+    "Add status 0 terms for new textitems in paragraph."
+    new_textitems = [
+        ti
+        for para in paragraphs
+        for sentence in para
+        for ti in sentence.textitems
+        if ti.is_word and ti.term is None
+    ]
+    # Create new terms for all unknown word tokens in the text.
+    new_terms = _create_unknown_terms(new_textitems, lang)
+
+    # Set the terms for the unknown_textitems
+    textlc_to_term_map = {}
+    for t in new_terms:
+        textlc_to_term_map[t.text_lc] = t
+    for ti in new_textitems:
+        ti.term = textlc_to_term_map[ti.text_lc]
+
+
 def start_reading(dbbook, pagenum, db_session):
     "Start reading a page in the book, getting paragraphs."
 
@@ -83,7 +122,9 @@ def start_reading(dbbook, pagenum, db_session):
     db_session.add(text)
     db_session.commit()
 
-    paragraphs = get_paragraphs(text.text, text.book.language)
+    lang = text.book.language
+    paragraphs = get_paragraphs(text.text, lang)
+    _add_status_0_terms(paragraphs, lang)
 
     return paragraphs
 

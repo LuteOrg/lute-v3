@@ -20,7 +20,7 @@ class BadImportFileError(Exception):
     """
 
 
-def import_file(filename, create_terms=True, update_terms=True):
+def import_file(filename, create_terms=True, update_terms=True, new_as_unknowns=False):
     """
     Validate and import file.
 
@@ -28,7 +28,7 @@ def import_file(filename, create_terms=True, update_terms=True):
     """
     import_data = _load_import_file(filename)
     _validate_data(import_data)
-    return _do_import(import_data, create_terms, update_terms)
+    return _do_import(import_data, create_terms, update_terms, new_as_unknowns)
 
 
 def _load_import_file(filename, encoding="utf-8-sig"):
@@ -152,7 +152,7 @@ def _validate_no_duplicate_terms(import_data):
         raise BadImportFileError(f"Duplicate terms in import: {', '.join(duplicates)}")
 
 
-def _import_term_skip_parents(repo, rec, lang):
+def _import_term_skip_parents(repo, rec, lang, set_to_unknown=False):
     "Add a single record to the repo."
     t = Term()
     t.language = lang
@@ -164,6 +164,8 @@ def _import_term_skip_parents(repo, rec, lang):
         status = _get_status(rec["status"])
         if status is not None:
             t.status = int(status)
+    if set_to_unknown:
+        t.status = 0
     if "pronunciation" in rec:
         t.romanization = rec["pronunciation"]
     if "tags" in rec:
@@ -189,6 +191,12 @@ def _update_term_skip_parents(t, repo, rec):
     if "tags" in rec:
         tags = list(map(str.strip, rec["tags"].split(",")))
         t.term_tags = [t for t in tags if t != ""]
+
+    # If this is a status 0 ("unknown") term, and it's being updated,
+    # then it's no longer unknown!
+    if t.status == 0:
+        t.status = 1
+
     repo.add(t)
 
 
@@ -205,12 +213,15 @@ def _set_term_parents(repo, rec, lang):
     repo.add(t)
 
 
-def _do_import(import_data, create_terms=True, update_terms=True):
+def _do_import(
+    import_data, create_terms=True, update_terms=True, new_as_unknowns=False
+):
     """
     Import records.
 
     If create_terms is True, create new terms.
     If update_terms is True, update existing terms.
+    If new_as_unknowns is True, new terms are given status 0.
 
     The import is done in two passes:
     1. import the basic terms, without setting their parents
@@ -240,14 +251,26 @@ def _do_import(import_data, create_terms=True, update_terms=True):
             lang = langs_dict[hsh["language"]]
             t = repo.find(lang.id, hsh["term"])
             ts = term_string(lang, hsh["term"])
-            if t is None and create_terms:
-                _import_term_skip_parents(repo, hsh, lang)
+
+            if create_terms and t is None:
+                # Create a brand-new term.
+                _import_term_skip_parents(repo, hsh, lang, new_as_unknowns)
                 created_terms.append(ts)
-            elif t is not None and update_terms:
+
+            elif create_terms and t is not None and t.status == 0:
+                # A status 0 "unknown" term can be created, but really
+                # it's an update of an existing term.
+                _update_term_skip_parents(t, repo, hsh)
+                created_terms.append(ts)
+
+            elif update_terms and t is not None and t.status != 0:
+                # Can only update existing terms.
                 _update_term_skip_parents(t, repo, hsh)
                 updated_terms.append(ts)
+
             else:
                 skipped += 1
+
         repo.commit()
 
     pass_2 = [t for t in import_data if "parent" in t and t["parent"] != ""]

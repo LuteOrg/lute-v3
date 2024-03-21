@@ -377,4 +377,15 @@ BEGIN
     WHERE WoID = NEW.WoID;
 END
 ;
+CREATE TRIGGER trig_words_update_WoCreated_if_no_longer_unknown
+-- created by db/schema/migrations_repeatable/trig_words.sql
+AFTER UPDATE OF WoStatus ON words
+FOR EACH ROW
+WHEN old.WoStatus <> new.WoStatus and old.WoStatus = 0
+BEGIN
+    UPDATE words
+    SET WoCreated = CURRENT_TIMESTAMP
+    WHERE WoID = NEW.WoID;
+END
+;
 COMMIT;
