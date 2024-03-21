@@ -17,8 +17,9 @@ bp = Blueprint("termimport", __name__, url_prefix="/termimport")
 class TermImportForm(FlaskForm):
     "Form for imports."
     text_file = FileField("Text File", validators=[DataRequired()])
-    create_terms = BooleanField("Create new Terms")
-    update_terms = BooleanField("Update existing Terms")
+    create_terms = BooleanField("Create new terms")
+    new_as_unknown = BooleanField("Set new terms to Unknown")
+    update_terms = BooleanField("Update existing terms")
 
 
 @bp.route("/index", methods=["GET", "POST"])
@@ -35,7 +36,10 @@ def term_import_index():
             text_file.save(temp_file_name)
             try:
                 stats = import_file(
-                    temp_file_name, form.create_terms.data, form.update_terms.data
+                    temp_file_name,
+                    form.create_terms.data,
+                    form.update_terms.data,
+                    form.new_as_unknown.data,
                 )
                 c = stats["created"]
                 u = stats["updated"]

@@ -10,6 +10,10 @@ Notes:
 - click through etc etc, then stop the code gen, copy-paste
   code here, fix as needed, _then_ shut down
 
+Debugging:
+
+- to debug, can use "page.pause()" to pause the runner.
+
 More notes:
 
 This is _just a smoke test_, it doesn't do any assertions.
@@ -116,6 +120,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     # TODO testing: restore Sentences smoke test check.
     # page.get_by_role("link", name="Sentences").click()
     page.get_by_role("link", name="Back to list").click()
+    # page.pause()
 
     # TODO issue_336_export_unknown_book_terms: restore this test.
     # _print("Export parent term mapping files.")
@@ -126,6 +131,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
 
     # Edit language.
     _print("Edit language.")
+    page.goto("http://localhost:5000/")
     page.locator("#menu_settings").hover()
     page.get_by_role("link", name="Languages").click()
     page.get_by_role("link", name="English").click()

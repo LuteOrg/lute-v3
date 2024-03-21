@@ -145,8 +145,12 @@ class Repository:
         Return a Term business object for the DBTerm with the langid and text.
         If no match, return a new term with the text and language.
 
+        ## TODO verify_identity_map_comment:
         If it's new, don't add to the identity map ... it's not saved yet,
         and so if we search for it again we should hit the db again.
+
+        # the above statement about the identity map was old code, and I'm not
+        # sure it's a valid statement/condition.
         """
         t = self.find(langid, text)
         if t is not None:
@@ -160,6 +164,10 @@ class Repository:
         t.text_lc = spec.text_lc
         t.romanization = spec.language.parser.get_reading(text)
         t.original_text = text
+
+        # TODO verify_identity_map_comment
+        # Adding the term to the map, even though it's new.
+        self._add_to_identity_map(t)
 
         return t
 
@@ -310,6 +318,8 @@ class Repository:
         p = DBTerm.find_by_spec(spec)
 
         if p is not None:
+            if p.status == 0:  # previously unknown, inherits from term.
+                p.status = term.status
             if (p.translation or "") == "":
                 p.translation = term.translation
             if (p.get_current_image() or "") == "":

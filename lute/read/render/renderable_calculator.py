@@ -410,9 +410,8 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         self.is_word: int
         self.text_length: int
 
+        # Calls setter
         self.term = term
-        self.wo_id = term.id if term is not None else None
-        self.wo_status = term.status if term is not None else None
 
         # The tooltip should be shown for well-known/ignored TextItems
         # that merit a tooltip. e.g., if there isn't any actual Term
@@ -426,6 +425,26 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         self._flash_message_loaded: bool = False
         self._flash_message: str = None
 
+    def __repr__(self):
+        return f'<TextItem "{self.text}" (wo_id={self.wo_id})>'
+
+    @property
+    def term(self):
+        return self._term
+
+    @term.setter
+    def term(self, t):
+        self.wo_id = None
+        self.wo_status = None
+        self._term = t
+        if t is None:
+            return
+
+        self.wo_id = t.id
+        self.wo_status = t.status
+        if t.status >= 1 and t.status <= 5:
+            self._show_tooltip = True
+
     @property
     def show_tooltip(self):
         """
@@ -437,12 +456,15 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         if self.term is None:
             return False
 
+        def blank_string(s):
+            return s is None or s.strip() == ""
+
         def has_extra(cterm):
             if cterm is None:
                 return False
             no_extra = (
-                cterm.translation is None
-                and cterm.romanization is None
+                blank_string(cterm.translation)
+                and blank_string(cterm.romanization)
                 and cterm.get_current_image() is None
             )
             return not no_extra
@@ -514,7 +536,7 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         ]
 
         tooltip = (
-            st not in (Status.WELLKNOWN, Status.IGNORED)
+            st not in (Status.WELLKNOWN, Status.IGNORED, Status.UNKNOWN)
             or self.show_tooltip
             or self.flash_message is not None
         )

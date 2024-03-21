@@ -1,10 +1,21 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
 
-{% for field_name, field_errors in form.errors.items() %}
-{% for error in field_errors %}
-<div class="flash-notice-narrow">{{ error }}</div>
-{% endfor %}
-{% endfor %}
+{% if duplicated_term %}
+{#
+  Duplicated term, only show a link to that term.
+  See DUPLICATE_TERM_CHECK comments in other files.
+#}
+<div class="flash-notice-narrow">
+  Term <a href="/term/edit/{{ duplicated_term.id }}">{{ duplicated_term.text }}</a> already exists.
+</div>
+{% else %}
+  {% for field_name, field_errors in form.errors.items() %}
+  {% for error in field_errors %}
+  <div class="flash-notice-narrow">{{ error }}</div>
+  {% endfor %}
+  {% endfor %}
+{% endif %}
+
 
 <div id="term-form-container">
   <form id="term-form" name="term_form" method="POST">

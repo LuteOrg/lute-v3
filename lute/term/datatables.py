@@ -79,7 +79,7 @@ def get_data_tables_list(parameters):
     if age_max:
         wheres.append(f"{sql_age_calc} <= {int(age_max)}")
 
-    status_wheres = ["StID <> 98"]
+    status_wheres = ["StID not in (0, 98)"]
     status_min = int(parameters["filtStatusMin"])
     status_max = int(parameters["filtStatusMax"])
     if status_min > 0:

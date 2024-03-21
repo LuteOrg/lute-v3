@@ -2,6 +2,7 @@
 Term tests.
 """
 
+import datetime
 import pytest
 from sqlalchemy import text
 from lute.models.term import Term, TermImage
@@ -223,3 +224,37 @@ def test_delete_empty_image_records(app_context, spanish):
 
     Term.delete_empty_images()
     assert_sql_result("select wisource from wordimages", ["3.png"], "cleaned images")
+
+
+def test_changing_status_of_status_0_term_resets_WoCreated(app_context, spanish):
+    """
+    New unknown Terms get created with Status = 0 when a page is
+    rendered for reading, but that's not _really_ the date that the
+    term was created.
+    """
+    t = Term(spanish, "hola")
+    t.translation = "hi"
+    t.status = 0
+    db.session.add(t)
+    db.session.commit()
+
+    db.session.execute(text("update words set WoCreated = 'a'"))
+    db.session.commit()
+    sql = "select WoTranslation, WoCreated from words where WoCreated = 'a'"
+    assert_sql_result(sql, ["hi; a"], "created date")
+
+    t.status = 0
+    t.translation = "hello"
+    db.session.add(t)
+    db.session.commit()
+    assert_sql_result(sql, ["hello; a"], "created date still old value")
+
+    t.status = 1
+    t.translation = "howdy"
+    db.session.add(t)
+    db.session.commit()
+
+    assert_sql_result(sql, [], "updated")
+    current_year = str(datetime.datetime.now().year)
+    sql_updated = "select strftime('%Y', WoCreated) from words"
+    assert_sql_result(sql_updated, [f"{current_year}"], "final")
