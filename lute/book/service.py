@@ -49,6 +49,36 @@ def save_audio_file(audio_file_field_data):
     return filename
 
 
+def get_file_content(filefielddata):
+    """
+    Get the content of the file.
+    """
+    content = None
+    _, ext = os.path.splitext(filefielddata.filename)
+    ext = (ext or "").lower()
+    if ext == ".txt":
+        content = get_textfile_content(filefielddata)
+    if ext == ".epub":
+        content = get_epub_content(filefielddata)
+    if ext == ".pdf":
+        msg = """
+        Note: pdf imports can be inaccurate, due to how PDFs are encoded.
+        Please be aware of this while reading.
+        """
+        flash(msg, "notice")
+        content = get_pdf_content_from_form(filefielddata)
+    if ext == ".srt":
+        content = get_srt_content(filefielddata)
+    if ext == ".vtt":
+        content = get_vtt_content(filefielddata)
+
+    if content is None:
+        raise ValueError(f'Unknown file extension "{ext}"')
+    if content.strip() == "":
+        raise BookImportException(f"{filefielddata.filename} is empty.")
+    return content
+
+
 def get_textfile_content(filefielddata):
     "Get content as a single string."
     content = ""
