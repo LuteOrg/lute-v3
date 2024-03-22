@@ -1772,8 +1772,8 @@ input[type="checkbox"][disabled] + label {
 
     #thetexttitle,
     div#thetext {
-        padding: 0 3.2rem;
-        padding: 0 3.2rem;
+        padding: 0 1rem;
+        padding: 0 1rem;
     }
 
     .reading-menu-item {
@@ -1835,9 +1835,9 @@ input[type="checkbox"][disabled] + label {
         top: 0;
         width: 100%;
         background: var(--background-color);
-        height: 7.5rem;
+        height: 4rem; /* Matches the read_pane_left margin-top. */
         z-index: 1001;
-        box-shadow: 0 0 12px 0 #0000002e;
+        margin-bottom: 0.5rem;
     }
 
     div.ui-tooltip {
@@ -1846,13 +1846,15 @@ input[type="checkbox"][disabled] + label {
 
     #read_pane_left {
         width: unset !important;
-        margin-top: 10rem;
+        margin-top: 4rem;
     }
 
     .reading_header_container {
         padding-right: 3.2em;
         padding-left: 3.2em;
         align-items: end;
+        gap: 0.5rem;
+        padding: 0.5rem 0.5rem 0 0.5rem;
     }
 
     .reading_header_left {
@@ -1929,26 +1931,27 @@ input[type="checkbox"][disabled] + label {
     }
 
     #read-slider {
-        height: 1.7rem;
+        height: 0.5rem;
     }
 
     #read-slider::-moz-range-thumb {
         width: 2.2rem;
-        height: 2rem;
+        height: 0.5rem;
     }
 
     #read-slider::-webkit-slider-thumb {
         width: 2.2rem;
-        height: 2rem;
+        height: 0.5rem;
     }
 
     .reading_header_mid_top {
         margin-left: 2.3rem;
         margin-right: 2.3rem;
+        margin-bottom: 0.2rem;
     }
 
     .read_page_nav {
-        font-size: 2.2rem;
+        font-size: 1rem;
     }
 
     #page_indicator,
@@ -1962,7 +1965,7 @@ input[type="checkbox"][disabled] + label {
     }
 
     .lutelogo_small {
-        width: 70px;
+        width: 50px;
     }
 
     #booktable td:nth-child(2),
