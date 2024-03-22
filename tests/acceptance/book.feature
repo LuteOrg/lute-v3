@@ -53,6 +53,11 @@ Feature: Books and stats are available
         Given a Spanish book "Hola" from file invalid.epub
         Then the page contains "Could not parse invalid.epub"
 
+    Scenario: Empty files are rejected.
+        Given I visit "/"
+        Given a Spanish book "Hola" from file invalid_empty.epub
+        Then the page contains "invalid_empty.epub is empty."
+
     Scenario: I can import a PDF file.
         Given I visit "/"
         Given a Spanish book "Hola" from file Hola.pdf
