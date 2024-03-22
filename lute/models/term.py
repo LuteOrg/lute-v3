@@ -168,6 +168,27 @@ class Term(
         if text is not None:
             self.text = text
 
+    @staticmethod
+    def create_term_no_parsing(language, text):
+        """
+        Create a term, but do not reparse it during creation.
+
+        This method is necessary because some parsers return
+        different parsed tokens for a given text string based
+        on its context.  The general __init__() is used for
+        parsing without context, such as creating Terms from
+        the UI or during CSV import.  This method is used
+        when new terms are created from an already-parsed
+        and already-tokenized page of text.
+        """
+        t = Term()
+        t.language = language
+        t._text = text  # pylint: disable=protected-access
+        t.text_lc = language.get_lowercase(text)
+        t.romanization = language.parser.get_reading(text)
+        t._calc_token_count()  # pylint: disable=protected-access
+        return t
+
     def __repr__(self):
         return f"<Term {self.id} '{self.text}'>"
 
@@ -184,12 +205,8 @@ class Term(
         "Get the text."
         return self._text
 
-    @text.setter
-    def text(self, textstring):
-        "Set the text, textlc, and token count."
-        if self.language is None:
-            raise RuntimeError("Must set term language before setting text")
-
+    def _parse_string_add_zws(self, lang, textstring):
+        "Parse the string using the language."
         # Clean up encoding cruft.
         t = textstring.strip()
         zws = "\u200B"  # zero-width space
@@ -197,7 +214,6 @@ class Term(
         nbsp = "\u00A0"  # non-breaking space
         t = t.replace(nbsp, " ")
 
-        lang = self.language
         tokens = lang.get_parsed_tokens(t)
 
         # Terms can't contain paragraph markers.
@@ -205,11 +221,19 @@ class Term(
         tok_strings = [tok.token for tok in tokens]
 
         t = zws.join(tok_strings)
-        old_text_lc = self.text_lc
-        new_text_lc = lang.get_lowercase(t)
+        return t
 
-        text_changed = old_text_lc is not None and new_text_lc != old_text_lc
-        if self.id is not None and text_changed:
+    @text.setter
+    def text(self, textstring):
+        "Set the text, textlc, and token count."
+        if self.language is None:
+            raise RuntimeError("Must set term language before setting text")
+        lang = self.language
+        t = self._parse_string_add_zws(lang, textstring)
+
+        new_text_lc = lang.get_lowercase(t)
+        text_changed = self.id is not None and new_text_lc != self.text_lc
+        if text_changed:
             msg = (
                 f"Cannot change text of term '{self.text}' (id = {self.id}) once saved."
             )

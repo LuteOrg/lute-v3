@@ -114,3 +114,12 @@ Feature: Books and stats are available
             
             韓国から来た人。
         Then the page title is Reading "Jp test"
+
+    # Dealing with production bug.
+    Scenario: Japanese book unique constraint failed bug.
+        Given I visit "/"
+        Given a Japanese book "Jp test" with content:
+            情報さえ集めればどんどんお金も集まってくる。
+        Then the page title is Reading "Jp test"
+        And the reading pane shows:
+            情報/さえ/集めれ/ば/どんどん/お金/も/集まっ/て/くる/。
