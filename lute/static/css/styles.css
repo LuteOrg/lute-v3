@@ -1784,6 +1784,10 @@ input[type="checkbox"][disabled] + label {
         margin-bottom: 2.2rem;
     }
 
+    div#reading-footer span {
+        margin-right: 30px;
+    }
+
     .menu-icon {
         width: 2rem;
         height: 2rem;
@@ -1951,7 +1955,7 @@ input[type="checkbox"][disabled] + label {
     }
 
     .read_page_nav {
-        font-size: 1rem;
+        font-size: 1.5rem;
     }
 
     #page_indicator,
