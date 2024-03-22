@@ -229,6 +229,37 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
     background-image: url("../icn/waiting2.gif");
 }
 
+.book-action-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.book-action-dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 120px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.book-action-dropdown-content a {
+    color: black;
+    padding: 5px 10px;
+    text-decoration: none;
+    display: block;
+}
+
+.book-action-dropdown-content a:hover {
+    background-color: #f0f0f0;
+}
+
+.book-action-dropdown:hover .book-action-dropdown-content {
+    display: block;
+}
+
 /* End book listing */
 
 div.dt-buttons>.dt-button {
