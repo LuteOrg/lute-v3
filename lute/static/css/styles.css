@@ -1835,9 +1835,8 @@ input[type="checkbox"][disabled] + label {
         top: 0;
         width: 100%;
         background: var(--background-color);
-        height: 3rem;
+        height: 4rem; /* Matches the read_pane_left margin-top. */
         z-index: 1001;
-        /* box-shadow: 0 0 12px 0 #0000002e; */
         margin-bottom: 0.5rem;
     }
 
