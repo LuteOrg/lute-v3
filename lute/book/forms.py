@@ -2,13 +2,39 @@
 Book create/edit forms.
 """
 
+import os
 import json
-from flask import request
+from flask import request, flash
 from wtforms import StringField, SelectField, TextAreaField, IntegerField, HiddenField
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
+from lute.book import service
+
+
+def _get_file_content(filefielddata):
+    """
+    Get the content of the file.
+    """
+    _, ext = os.path.splitext(filefielddata.filename)
+    ext = (ext or "").lower()
+    if ext == ".txt":
+        return service.get_textfile_content(filefielddata)
+    if ext == ".epub":
+        return service.get_epub_content(filefielddata)
+    if ext == ".pdf":
+        msg = """
+        Note: pdf imports can be inaccurate, due to how PDFs are encoded.
+        Please be aware of this while reading.
+        """
+        flash(msg, "notice")
+        return service.get_pdf_content_from_form(filefielddata)
+    if ext == ".srt":
+        return service.get_srt_content(filefielddata)
+    if ext == ".vtt":
+        return service.get_vtt_content(filefielddata)
+    raise ValueError(f'Unknown file extension "{ext}"')
 
 
 class NewBookForm(FlaskForm):
@@ -77,6 +103,12 @@ class NewBookForm(FlaskForm):
 
         obj.book_tags = _values(self.book_tags.data)
 
+        if self.textfile.data:
+            obj.text = _get_file_content(self.textfile.data)
+        f = self.audiofile.data
+        if f:
+            obj.audio_filename = service.save_audio_file(f)
+
     def validate_language_id(self, field):  # pylint: disable=unused-argument
         "Language must be set."
         if self.language_id.data in (None, 0):
@@ -140,3 +172,9 @@ class EditBookForm(FlaskForm):
             return ret
 
         obj.book_tags = _values(self.book_tags.data)
+
+        f = self.audiofile.data
+        if f:
+            obj.audio_filename = service.save_audio_file(f)
+            obj.audio_bookmarks = None
+            obj.audio_current_pos = None

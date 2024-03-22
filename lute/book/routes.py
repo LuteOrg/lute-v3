@@ -2,7 +2,6 @@
 /book routes.
 """
 
-import os
 import json
 from flask import (
     Blueprint,
@@ -73,30 +72,6 @@ def datatables_archived_source():
     return datatables_source(True)
 
 
-def _get_file_content(filefielddata):
-    """
-    Get the content of the file.
-    """
-    _, ext = os.path.splitext(filefielddata.filename)
-    ext = (ext or "").lower()
-    if ext == ".txt":
-        return service.get_textfile_content(filefielddata)
-    if ext == ".epub":
-        return service.get_epub_content(filefielddata)
-    if ext == ".pdf":
-        msg = """
-        Note: pdf imports can be inaccurate, due to how PDFs are encoded.
-        Please be aware of this while reading.
-        """
-        flash(msg, "notice")
-        return service.get_pdf_content_from_form(filefielddata)
-    if ext == ".srt":
-        return service.get_srt_content(filefielddata)
-    if ext == ".vtt":
-        return service.get_vtt_content(filefielddata)
-    raise ValueError(f'Unknown file extension "{ext}"')
-
-
 def _book_from_url(url):
     "Create a new book, or flash an error if can't parse."
     b = Book()
@@ -133,11 +108,6 @@ def new():
     if form.validate_on_submit():
         try:
             form.populate_obj(b)
-            if form.textfile.data:
-                b.text = _get_file_content(form.textfile.data)
-            f = form.audiofile.data
-            if f:
-                b.audio_filename = service.save_audio_file(f)
             book = repo.add(b)
             repo.commit()
             return redirect(f"/read/{book.id}/page/1", 302)
@@ -167,11 +137,6 @@ def edit(bookid):
 
     if form.validate_on_submit():
         form.populate_obj(b)
-        f = form.audiofile.data
-        if f:
-            b.audio_filename = service.save_audio_file(f)
-            b.audio_bookmarks = None
-            b.audio_current_pos = None
         repo.add(b)
         repo.commit()
         flash(f"{b.title} updated.")
