@@ -78,7 +78,7 @@
       },
       {% endif %}
       responsive: true,
-      select: true,
+      select: false,
       lengthMenu: [ 10, 25, 50 ],
       pageLength: 25,
       paging: true,
@@ -182,7 +182,8 @@
     do_action_post('archive', bookid);
   }
 
-  function confirm_unarchive(bookid) {
+  function confirm_unarchive(el) {
+    const bookid = $(el).data('bkid');
     do_action_post('unarchive', bookid);
   }
 
@@ -193,7 +194,8 @@
   //    do_action_post('reparse', bookid);
   //  }
 
-  function edit_book(bookid) {
+  function edit_book(el) {
+    const bookid = $(el).data('bkid');
     document.location = `/book/edit/${bookid}`;
   }
 
@@ -205,7 +207,6 @@
     }
     do_action_post('delete', bookid);
   }
-
 
   let render_book_title = function ( data, type, row, meta ) {
     const bkid = parseInt(row[5]);
@@ -283,19 +284,28 @@
 
   let render_book_actions = function ( data, type, row, meta ) {
     // TODO zzfuture fix: security - add CSRF token
-    const ret = [];
     const bkid = row[5];
     const bktitle = encodeURIComponent(row[0]);
-    if (row[6] == 0) {
-      // not archived
-      ret.push(`<img src="{{ url_for('static', filename='icn/document--pencil.png') }}" title="Edit" onclick="edit_book(${bkid})" />`);
-      ret.push(`<img src="{{ url_for('static', filename='icn/inbox-download.png') }}" title="Archive" data-bktitle="${bktitle}" data-bkid="${bkid}" onclick="confirm_archive(this)" />`);
+    const is_active = (row[6] == 0);
+
+    const links = [];
+    const make_link = function(label, func) {
+      const s = `<a href="#" data-bkid="${bkid}" data-bktitle="${bktitle}" onclick="${func}(this)">${label}</a>`;
+      links.push(s);
+    };
+
+    make_link('Edit', "edit_book");
+    if (is_active) {
+      make_link('Archive', "confirm_archive");
     }
     else {
-      ret.push(`<img src="{{ url_for('static', filename='icn/inbox-upload.png') }}" title="Unarchive" onclick="confirm_unarchive(${bkid})" />`);
+      make_link('Unarchive', "confirm_unarchive");
     }
-    ret.push(`<img src="{{ url_for('static', filename='icn/minus-button.png') }}" title="Delete" data-bktitle="${bktitle}" data-bkid="${bkid}" onclick="confirm_delete(this)" />`);
-    return ret.join('&nbsp;');
+    make_link('Delete', "confirm_delete");
+
+    return `<div class="book-action-dropdown"><span>&hellip;</span>
+      <div class="book-action-dropdown-content">${links.join('')}</div>
+    </div>`;
   };
 
   // added class is used for changing static image to rotating arrow animation
