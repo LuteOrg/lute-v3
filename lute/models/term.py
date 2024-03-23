@@ -225,24 +225,29 @@ class Term(
 
     @text.setter
     def text(self, textstring):
-        "Set the text, textlc, and token count."
+        """
+        Set the text, textlc, and token count.
+
+        For new terms, just parse, downcase, and get the count.
+
+        For existing terms, ensure that the actual text content has
+        not changed.
+        """
         if self.language is None:
             raise RuntimeError("Must set term language before setting text")
         lang = self.language
-        t = self._parse_string_add_zws(lang, textstring)
 
-        new_text_lc = lang.get_lowercase(t)
-        text_changed = self.id is not None and new_text_lc != self.text_lc
-        if text_changed:
-            msg = (
-                f"Cannot change text of term '{self.text}' (id = {self.id}) once saved."
-            )
-            raise TermTextChangedException(msg)
-
-        self._text = t
-        self.text_lc = new_text_lc
-        self.romanization = lang.parser.get_reading(t)
-        self._calc_token_count()
+        if self.id is None:
+            t = self._parse_string_add_zws(lang, textstring)
+            self._text = t
+            self.text_lc = lang.get_lowercase(t)
+            self.romanization = lang.parser.get_reading(t)
+            self._calc_token_count()
+        else:
+            if lang.get_lowercase(textstring) != self.text_lc:
+                msg = f'Cannot change text of saved term "{self._text}" (id {self.id}).'
+                raise TermTextChangedException(msg)
+            self._text = textstring
 
     def _calc_token_count(self):
         "Tokens are separated by zero-width space."

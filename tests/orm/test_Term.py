@@ -245,6 +245,52 @@ def test_changing_text_of_saved_Term_throws(english):
 
 
 @pytest.mark.term_case
+def test_changing_text_to_same_thing_does_not_throw(japanese):
+    """
+    New terms get created on page open, and when parsed
+    in full context of the text, the term may be parsed differently
+    than when the form is opened.
+
+    e.g. for Japanese, the term "集めれ" may get created on
+    page load due to the term getting parsed in the full page context,
+    but when parsed individually it's parsed as "集め/れ".
+    Setting a new term with original text "集めれ" to that _same_ text
+    means that the text is really _unchanged_.
+    """
+    term = Term.create_term_no_parsing(japanese, "集めれ")
+    db.session.add(term)
+    db.session.commit()
+
+    sql = f"select wotext, wotextlc from words where woid = {term.id}"
+    assert_sql_result(sql, ["集めれ; 集めれ"], "have term")
+
+    t = Term.find(term.id)
+    t.text = "集めれ"
+    db.session.add(t)
+    db.session.commit()
+    assert_sql_result(sql, ["集めれ; 集めれ"], "have term")
+
+
+@pytest.mark.term_case
+def test_changing_multiword_text_case_does_not_throw(english):
+    """
+    Sanity check.
+    """
+    term = Term(english, "a CAT")
+    db.session.add(term)
+    db.session.commit()
+
+    sql = f"select wotext, wotextlc from words where woid = {term.id}"
+    assert_sql_result(sql, ["a/ /CAT; a/ /cat"], "have term")
+
+    t = Term.find(term.id)
+    t.text = term.text.lower()
+    db.session.add(t)
+    db.session.commit()
+    assert_sql_result(sql, ["a/ /cat; a/ /cat"], "have term")
+
+
+@pytest.mark.term_case
 def test_changing_case_only_of_text_of_saved_Term_is_ok(english):
     "Changing text should throw."
     term = Term(english, "ABC")
@@ -256,7 +302,7 @@ def test_changing_case_only_of_text_of_saved_Term_is_ok(english):
 
 @pytest.mark.term_case
 def test_changing_text_of_non_saved_Term_is_ok(english):
-    "Changing text should throw."
+    "Changing text should not throw if not saved."
     term = Term(english, "ABC")
     term.text = "DEF"
 
