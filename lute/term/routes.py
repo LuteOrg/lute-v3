@@ -265,7 +265,7 @@ def bulk_update_status():
     json:
     {
       langid: x,
-      updates: [ { new_status: 1, terms: [ 'a', ] }, ... }, ]
+      updates: [ { new_status: 1, termids: [ 42, ] }, ... }, ]
     }
     """
     repo = Repository(db)
@@ -276,10 +276,9 @@ def bulk_update_status():
 
     for u in updates:
         new_status = int(u.get("new_status"))
-        terms = u.get("terms")
-        for t in terms:
-            # TODO issue_367: change this to use IDs.
-            term = repo.find_or_new(language_id, t)
+        termids = u.get("termids")
+        for tidstring in termids:
+            term = repo.load(int(tidstring))
             term.status = new_status
             repo.add(term)
     repo.commit()
