@@ -240,6 +240,22 @@ def test_save_with_new_parent(app_context, repo, hello_term):
     assert parent.parents == []
 
 
+def test_save_with_existing_but_unknown_parent(app_context, repo, english, hello_term):
+    "Existing parent with status 0 is bumped to status 1."
+    p = DBTerm(english, "parent")
+    p.status = 0
+    db.session.add(p)
+    db.session.commit()
+
+    hello_term.parents = ["parent"]
+    hello_term.term_tags = ["a", "b"]
+    repo.add(hello_term)
+    repo.commit()
+
+    sql = "select WoText, WoStatus from words order by WoText"
+    assert_sql_result(sql, ["HELLO; 1", "parent; 1"], "parent status set to 1")
+
+
 def test_save_remove_parent_breaks_link(app_context, repo, hello_term):
     "Parent is left."
     hello_term.parents.append("parent")
@@ -487,7 +503,7 @@ def test_find_matches_only_returns_language_matches(spanish, repo, _multiple_ter
         matches = repo.find_matches(spanish.id, c)
         assert len(matches) == 2, c
         assert matches[0].text == "pare"
-        assert matches[0].language.id == spanish.id, "lang object set"
+        assert matches[0].language_id == spanish.id, "language included"
 
 
 @pytest.mark.find_match
@@ -502,12 +518,12 @@ def test_find_matches_returns_empty_if_no_match_or_empty_string(
 
 @pytest.mark.find_match
 def test_find_matches_multiword_respects_zws(spanish, repo, _multiple_terms):
-    "zws are removed from the business objects."
+    "zws handled correctly in search."
     zws = "\u200B"
     for c in [f"tengo{zws} {zws}uno", "tengo uno", "tengo"]:
         matches = repo.find_matches(spanish.id, c)
         assert len(matches) == 1, f'have match for case "{c}"'
-        assert matches[0].text == "tengo uno"
+        assert matches[0].text == f"tengo{zws} {zws}uno"
 
 
 def assert_find_matches_returns(term_repo, spanish, s, expected):
@@ -528,7 +544,7 @@ def test_find_matches_starting_matches_sort_to_top(spanish, repo):
 
 
 @pytest.mark.find_match
-def test_findLikeSpecification_initial_check(spanish, repo):
+def test_find_matches_initial_check(spanish, repo):
     "Searches match any part of string."
     add_terms(spanish, ["abc", "abcd", "bcd"])
 
@@ -539,7 +555,7 @@ def test_findLikeSpecification_initial_check(spanish, repo):
 
 
 @pytest.mark.find_match
-def test_find_like_specification_terms_with_children_go_to_top(spanish, repo):
+def test_find_matches_terms_with_children_go_to_top(spanish, repo):
     """
     Parents go to the top, then the rest ... but exact matches trumps parent.
     """

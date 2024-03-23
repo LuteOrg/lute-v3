@@ -1,10 +1,21 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
 
-{% for field_name, field_errors in form.errors.items() %}
-{% for error in field_errors %}
-<div class="flash-notice-narrow">{{ error }}</div>
-{% endfor %}
-{% endfor %}
+{% if duplicated_term %}
+{#
+  Duplicated term, only show a link to that term.
+  See DUPLICATE_TERM_CHECK comments in other files.
+#}
+<div class="flash-notice-narrow">
+  Term <a href="/term/edit/{{ duplicated_term.id }}">{{ duplicated_term.text }}</a> already exists.
+</div>
+{% else %}
+  {% for field_name, field_errors in form.errors.items() %}
+  {% for error in field_errors %}
+  <div class="flash-notice-narrow">{{ error }}</div>
+  {% endfor %}
+  {% endfor %}
+{% endif %}
+
 
 <div id="term-form-container">
   <form id="term-form" name="term_form" method="POST">
@@ -219,16 +230,23 @@
         return `${txt} (${t})`;
       };
 
+      // Build whitelist from returned ajax data.  Remove current term
+      // since a term should not be assigned as its own parent.
+      let build_whitelist = function(data) {
+        const this_term_text = $("#original_text").val();
+        const whitelist = data.map((a) => ({
+          "value": a.text,
+          "suggestion": make_dropdown(a),
+          "status": a.status,
+        })).filter((hsh) => hsh.value != this_term_text);
+        return whitelist;
+      };
+
       tagify.loading(true);  // spinning animation during fetch.
       fetch(`/term/search/${s}/${langid}`, {signal:controller.signal})
         .then(RES => RES.json())
         .then(function(data) {
-          const newWhitelist = data.map((a) => ({
-            "value": a.text,
-            "suggestion": make_dropdown(a),
-            "status": a.status,
-          }));
-          tagify.whitelist = newWhitelist; // update whitelist Array in-place
+          tagify.whitelist = build_whitelist(data); // update whitelist Array in-place
           const sdecode = decodeURIComponent(s);
           tagify.loading(false).dropdown.show(sdecode); // render the suggestions dropdown
         }).catch(err => {

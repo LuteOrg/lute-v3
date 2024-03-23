@@ -24,11 +24,15 @@
       <td>{{ form.text_file }}</td>
     </tr>
     <tr>
-      <td>Create new terms</td>
+      <td>{{ form.create_terms.label }}</td>
       <td>{{ form.create_terms }}</td>
     </tr>
     <tr>
-      <td>Update existing terms</td>
+      <td>{{ form.new_as_unknown.label }}</td>
+      <td>{{ form.new_as_unknown }}</td>
+    </tr>
+    <tr>
+      <td>{{ form.update_terms.label }}</td>
       <td>{{ form.update_terms }}</td>
     </tr>
   </table>

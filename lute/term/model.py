@@ -6,8 +6,7 @@ them in the database.
 """
 
 import re
-import functools
-from sqlalchemy import and_, text as sqlalchtext
+import sqlalchemy
 
 from lute.models.term import Term as DBTerm, TermTag
 from lute.models.language import Language
@@ -146,8 +145,12 @@ class Repository:
         Return a Term business object for the DBTerm with the langid and text.
         If no match, return a new term with the text and language.
 
+        ## TODO verify_identity_map_comment:
         If it's new, don't add to the identity map ... it's not saved yet,
         and so if we search for it again we should hit the db again.
+
+        # the above statement about the identity map was old code, and I'm not
+        # sure it's a valid statement/condition.
         """
         t = self.find(langid, text)
         if t is not None:
@@ -161,6 +164,10 @@ class Repository:
         t.text_lc = spec.text_lc
         t.romanization = spec.language.parser.get_reading(text)
         t.original_text = text
+
+        # TODO verify_identity_map_comment
+        # Adding the term to the map, even though it's new.
+        self._add_to_identity_map(t)
 
         return t
 
@@ -176,63 +183,41 @@ class Repository:
         if search == "":
             return []
 
-        matches = (
-            self.db.session.query(DBTerm)
-            .filter(
-                and_(
-                    DBTerm.language_id == langid,
-                    DBTerm.text_lc.like("%" + search + "%"),
-                )
-            )
-            .all()
-        )
+        sql_query = """SELECT
+        t.WoID as id,
+        t.WoText as text,
+        t.WoTextLC as text_lc,
+        t.WoTranslation as translation,
+        t.WoStatus as status,
+        t.WoLgID as language_id,
+        CASE WHEN wp.WpParentWoID IS NOT NULL THEN 1 ELSE 0 END AS has_children,
+        CASE WHEN t.WoTextLC = :text_lc THEN 2
+          WHEN t.WoTextLC LIKE :text_lc_starts_with THEN 1
+          ELSE 0
+        END as text_starts_with_search_string
 
-        exact = [t for t in matches if t.text_lc == text_lc]
-        remaining = [t for t in matches if t.text_lc != text_lc]
+        FROM words AS t
+        LEFT JOIN (
+          select WpParentWoID from wordparents group by WpParentWoID
+        ) wp on wp.WpParentWoID = t.WoID
 
-        # Split remaining into things that start with the search term
-        # and the rest.
-        def partition(arr, pred):
-            meets = []
-            notmeets = []
-            for x in arr:
-                if pred(x):
-                    meets.append(x)
-                else:
-                    notmeets.append(x)
-            return (meets, notmeets)
+        WHERE t.WoLgID = :langid AND t.WoTextLC LIKE :text_lc_wildcard
 
-        remain_starts_with, remain_rest = partition(
-            remaining, lambda t: t.text_lc.startswith(search)
-        )
+        ORDER BY text_starts_with_search_string DESC, has_children DESC, t.WoTextLC
+        LIMIT :max_results
+        """
+        # print(sql_query)
+        params = {
+            "text_lc": text_lc,
+            "text_lc_wildcard": f"%{text_lc}%",
+            "text_lc_starts_with": f"{text_lc}%",
+            "langid": langid,
+            "max_results": max_results,
+        }
+        # print(params)
 
-        # Sort terms with children to top,
-        # then alphabetically.
-        def compare(item1, item2):
-            # More children sort to top.
-            c1 = len(item1.children)
-            c2 = len(item2.children)
-            if c1 > c2:
-                return -1
-            if c1 < c2:
-                return 1
-
-            # Equal children sort alphabetically.
-            t1 = item1.text_lc
-            t2 = item2.text_lc
-            if t1 < t2:
-                return -1
-            if t1 > t2:
-                return 1
-
-            # Failsafe, should never get here.
-            return 0
-
-        remain_starts_with.sort(key=functools.cmp_to_key(compare))
-        remain_rest.sort(key=functools.cmp_to_key(compare))
-        ret = exact + remain_starts_with + remain_rest
-        ret = ret[:max_results]
-        return [self._build_business_term(t) for t in ret]
+        alchsql = sqlalchemy.text(sql_query)
+        return self.db.session.execute(alchsql, params).fetchall()
 
     def get_term_tags(self):
         "Get all available term tags, helper method."
@@ -333,6 +318,8 @@ class Repository:
         p = DBTerm.find_by_spec(spec)
 
         if p is not None:
+            if p.status == 0:  # previously unknown, inherits from term.
+                p.status = term.status
             if (p.translation or "") == "":
                 p.translation = term.translation
             if (p.get_current_image() or "") == "":
@@ -413,7 +400,7 @@ class Repository:
             return []
 
         term_lc = term.text_lc
-        query = sqlalchtext(
+        query = sqlalchemy.text(
             f"""
             SELECT DISTINCT
                 texts.TxBkID,

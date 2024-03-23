@@ -9,6 +9,7 @@ from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
+from lute.book import service
 
 
 class NewBookForm(FlaskForm):
@@ -77,6 +78,12 @@ class NewBookForm(FlaskForm):
 
         obj.book_tags = _values(self.book_tags.data)
 
+        if self.textfile.data:
+            obj.text = service.get_file_content(self.textfile.data)
+        f = self.audiofile.data
+        if f:
+            obj.audio_filename = service.save_audio_file(f)
+
     def validate_language_id(self, field):  # pylint: disable=unused-argument
         "Language must be set."
         if self.language_id.data in (None, 0):
@@ -140,3 +147,9 @@ class EditBookForm(FlaskForm):
             return ret
 
         obj.book_tags = _values(self.book_tags.data)
+
+        f = self.audiofile.data
+        if f:
+            obj.audio_filename = service.save_audio_file(f)
+            obj.audio_bookmarks = None
+            obj.audio_current_pos = None

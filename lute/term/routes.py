@@ -12,6 +12,7 @@ from flask import (
     redirect,
     current_app,
     send_file,
+    flash,
 )
 from lute.models.language import Language
 from lute.models.term import Term as DBTerm
@@ -131,19 +132,15 @@ def handle_term_form(
 
     if form.validate_on_submit():
         form.populate_obj(term)
-
-        # parents_list_data = request.form.get("parentslist", "")
-        # parents_list = json.loads(parents_list_data) if parents_list_data else []
-        # parents = [h["value"] for h in parents_list]
-        # term.parents = parents
-
         repo.add(term)
         repo.commit()
         return return_on_success
 
+    # Note: on validation, form.duplicated_term may be set.
+    # See DUPLICATE_TERM_CHECK comments in other files.
+
     hide_pronunciation = False
-    # pylint: disable=protected-access
-    term_language = term._language
+    term_language = term._language  # pylint: disable=protected-access
 
     if term_language is not None:
         hide_pronunciation = not term_language.show_romanization
@@ -163,6 +160,7 @@ def handle_term_form(
         form_template_name,
         form=form,
         term=term,
+        duplicated_term=form.duplicated_term,
         language_dicts=Language.all_dictionaries(),
         hide_pronunciation=hide_pronunciation,
         tags=repo.get_term_tags(),
@@ -186,6 +184,8 @@ def edit(termid):
     """
     repo = Repository(db)
     term = repo.load(termid)
+    if term.status == 0:
+        term.status = 1
     return _handle_form(term, repo)
 
 
@@ -196,6 +196,8 @@ def edit_by_text(langid, text):
     """
     repo = Repository(db)
     term = repo.find_or_new(langid, text)
+    if term.status == 0:
+        term.status = 1
     return _handle_form(term, repo)
 
 
@@ -326,3 +328,18 @@ def delete(termid):
     repo.delete(term)
     repo.commit()
     return redirect("/term/index", 302)
+
+
+@bp.route("/delete_all_status_0_terms", methods=["GET"])
+def delete_all_status_0():
+    """
+    Delete all status 0 terms.
+
+    This route can only be called directly in the browser, it doesn't have a URL.
+
+    ref https://github.com/jzohrab/lute-v3/issues/99
+    Need to remove all status 0 terms if reverting from the alpha release.
+    """
+    deleted = DBTerm.delete_all_status_0_terms()
+    flash(f"Clean up: deleted {deleted} status 0 terms.")
+    return redirect("/", 302)
