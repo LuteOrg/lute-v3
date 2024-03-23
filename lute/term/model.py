@@ -145,6 +145,27 @@ class Repository:
         Return a Term business object for the DBTerm with the langid and text.
         If no match, return a new term with the text and language.
 
+        Note that this does a search by the **tokenized version**
+        of the text; i.e., first the text argument is converted into
+        a "search specification" (spec) using the language with the given id.
+        The db search is then done using this spec.  In most cases, this
+        # will suffice.
+
+        # In some cases, though, it may cause errors.  The parsing here is done
+        # without a fuller context, which in some language parsers can result
+        # in different results.  For example, the Japanese "集めれ" string can
+        # can be parsed with mecab to return one unit ("集めれ") or two ("集め/れ"),
+        # depending on context.
+
+        # So what does this mean?  It means that any context-less searches
+        # for terms that have ambiguous parsing results will, themselves,
+        # also be ambiguous.  This impacts csv imports and term form usage.
+
+        # For regular (reading screen) usage, it probably doesn't matter.
+        # The terms in the reading screen are all created when the page is
+        # opened, and so have ids assigned.  With that, terms are not
+        # searched by text match, they are only searched by id.
+
         ## TODO verify_identity_map_comment:
         If it's new, don't add to the identity map ... it's not saved yet,
         and so if we search for it again we should hit the db again.
@@ -160,10 +181,10 @@ class Repository:
         t = Term()
         t.language = spec.language
         t.language_id = langid
-        t.text = text
+        t.text = spec.text
         t.text_lc = spec.text_lc
         t.romanization = spec.language.parser.get_reading(text)
-        t.original_text = text
+        t.original_text = spec.text
 
         # TODO verify_identity_map_comment
         # Adding the term to the map, even though it's new.
@@ -263,15 +284,20 @@ class Repository:
 
     def _build_db_term(self, term):
         "Convert a term business object to a DBTerm."
+        # print(f"in _build_db_term, term id = {term.id}", flush=True)
         if term.text is None:
             raise ValueError("Text not set for term")
 
-        spec = self._search_spec_term(term.language_id, term.text)
-        t = DBTerm.find_by_spec(spec)
-        if t is None:
-            t = DBTerm()
+        t = None
+        if term.id is not None:
+            # This is an existing term, so use it directly.
+            t = DBTerm.find(term.id)
+        else:
+            # New term, or finding by text.
+            spec = self._search_spec_term(term.language_id, term.text)
+            t = DBTerm.find_by_spec(spec) or DBTerm()
+            t.language = spec.language
 
-        t.language = spec.language
         t.text = term.text
         t.original_text = term.text
         t.status = term.status
@@ -293,7 +319,7 @@ class Repository:
             t.add_term_tag(tt)
 
         termparents = []
-        lang = spec.language
+        lang = t.language
         create_parents = [
             p
             for p in term.parents
@@ -311,6 +337,7 @@ class Repository:
         if len(termparents) != 1:
             t.sync_status = False
 
+        # print(f"in _build_db_term, returning db term with term id = {t.id}", flush=True)
         return t
 
     def _find_or_create_parent(self, pt, language, term, termtags) -> DBTerm:
@@ -342,10 +369,18 @@ class Repository:
         term.language = dbterm.language
         term.language_id = dbterm.language.id
 
-        # Remove zero-width spaces (zws) from strings for user forms.
         text = dbterm.text
-        zws = "\u200B"  # zero-width space
-        text = text.replace(zws, "")
+        ### Remove zero-width spaces (zws) from strings for user forms.
+        ###
+        ### NOTE: disabling this as it creates challenges for editing
+        ### terms.  In some cases, the same term may have a zws
+        ### character as part of it; in other cases, it won't, e.g. "
+        ### 集めれ" sometimes is parsed as one token, and sometimes
+        ### two ("集め/れ").  If we strip the zws from the string, then
+        ### when it's posted back, Lute will think that it has changed.
+        ### ... it gets messy.
+        # zws = "\u200B"  # zero-width space
+        # text = text.replace(zws, "")
         term.text_lc = dbterm.text_lc
         term.original_text = text
         term.text = text

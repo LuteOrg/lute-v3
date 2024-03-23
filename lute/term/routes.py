@@ -120,6 +120,7 @@ def handle_term_form(
     lives in an iframe in the reading frames and returns a different
     template on success.
     """
+    # print(f"in handle_term_form with term.id = {term.id}", flush=True)
     form = TermForm(obj=term)
     # parents = [{"value": p} for p in term.parents]
     # form.parentslist.data = json.dumps(parents)
@@ -263,21 +264,19 @@ def bulk_update_status():
 
     json:
     {
-      langid: x,
-      updates: [ { new_status: 1, terms: [ 'a', ] }, ... }, ]
+      updates: [ { new_status: 1, termids: [ 42, ] }, ... }, ]
     }
     """
     repo = Repository(db)
 
     data = request.get_json()
-    language_id = int(data.get("langid"))
     updates = data.get("updates")
 
     for u in updates:
         new_status = int(u.get("new_status"))
-        terms = u.get("terms")
-        for t in terms:
-            term = repo.find_or_new(language_id, t)
+        termids = u.get("termids")
+        for tidstring in termids:
+            term = repo.load(int(tidstring))
             term.status = new_status
             repo.add(term)
     repo.commit()
