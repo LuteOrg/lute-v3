@@ -145,6 +145,27 @@ class Repository:
         Return a Term business object for the DBTerm with the langid and text.
         If no match, return a new term with the text and language.
 
+        Note that this does a search by the **tokenized version**
+        of the text; i.e., first the text argument is converted into
+        a "search specification" (spec) using the language with the given id.
+        The db search is then done using this spec.  In most cases, this
+        # will suffice.
+
+        # In some cases, though, it may cause errors.  The parsing here is done
+        # without a fuller context, which in some language parsers can result
+        # in different results.  For example, the Japanese "集めれ" string can
+        # can be parsed with mecab to return one unit ("集めれ") or two ("集め/れ"),
+        # depending on context.
+
+        # So what does this mean?  It means that any context-less searches
+        # for terms that have ambiguous parsing results will, themselves,
+        # also be ambiguous.  This impacts csv imports and term form usage.
+
+        # For regular (reading screen) usage, it probably doesn't matter.
+        # The terms in the reading screen are all created when the page is
+        # opened, and so have ids assigned.  With that, terms are not
+        # searched by text match, they are only searched by id.
+
         ## TODO verify_identity_map_comment:
         If it's new, don't add to the identity map ... it's not saved yet,
         and so if we search for it again we should hit the db again.
