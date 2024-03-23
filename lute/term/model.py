@@ -263,15 +263,20 @@ class Repository:
 
     def _build_db_term(self, term):
         "Convert a term business object to a DBTerm."
+        print(f"in _build_db_term, term id = {term.id}", flush=True)
         if term.text is None:
             raise ValueError("Text not set for term")
 
-        spec = self._search_spec_term(term.language_id, term.text)
-        t = DBTerm.find_by_spec(spec)
-        if t is None:
-            t = DBTerm()
+        t = None
+        if term.id is not None:
+            # This is an existing term, so use it directly.
+            t = DBTerm.find(term.id)
+        else:
+            # New term, or finding by text.
+            spec = self._search_spec_term(term.language_id, term.text)
+            t = DBTerm.find_by_spec(spec) or DBTerm()
+            t.language = spec.language
 
-        t.language = spec.language
         t.text = term.text
         t.original_text = term.text
         t.status = term.status
@@ -293,7 +298,7 @@ class Repository:
             t.add_term_tag(tt)
 
         termparents = []
-        lang = spec.language
+        lang = t.language
         create_parents = [
             p
             for p in term.parents
@@ -311,6 +316,7 @@ class Repository:
         if len(termparents) != 1:
             t.sync_status = False
 
+        print(f"in _build_db_term, returning db term with term id = {t.id}", flush=True)
         return t
 
     def _find_or_create_parent(self, pt, language, term, termtags) -> DBTerm:

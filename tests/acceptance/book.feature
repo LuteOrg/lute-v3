@@ -139,6 +139,12 @@ Feature: Books and stats are available
         And the reading pane shows:
             情報/さえ/集めれ/ば/どんどん/お金/も/集まっ/て/くる/。
 
+        When I click "集めれ" and edit the form:
+            translation: hi
+            status: 2
+        Then the reading pane shows:
+            情報/さえ/集めれ (2)/ば/どんどん/お金/も/集まっ/て/くる/。
+
         Given a Japanese book "Jp test3" with content:
             集めれ。
         Then the page title is Reading "Jp test3"
