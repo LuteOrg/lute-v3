@@ -635,11 +635,10 @@ function update_status_for_marked_elements(new_status) {
 
 
 function make_status_update_hash(new_status, elements) {
-  const texts = elements.map(el => $(el).text());
   return {
     new_status: new_status,
-    terms: texts
-  }
+    termids: elements.map(el => $(el).data('wid'))
+  };
 }
 
 
