@@ -199,7 +199,7 @@ def edit_term_form(term_id):
     """
     repo = Repository(db)
     term = repo.load(term_id)
-    print(f"editing term {term_id}", flush=True)
+    # print(f"editing term {term_id}", flush=True)
     if term.status == 0:
         term.status = 1
     return handle_term_form(
