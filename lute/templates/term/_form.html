@@ -22,7 +22,7 @@
   
       {{ form.original_text }}
 
-      <div>{{ form.text(class="form-control", value=(form.original_text.data or ''), autofocus=True) }}</div>
+      <div>{{ form.text(class="form-control", value=(form.original_text.data or ''), autofocus=(not form.original_text.data)) }}</div>
 
       <div>{{ form.parentslist(class="form-control") }}</div>
   
