@@ -1,0 +1,19 @@
+name: Generic
+dictionaries:
+  - for: terms
+    type: embedded
+    url: "https://en.wiktionary.org/wiki/###"
+  - for: terms
+    type: popup
+    url: "https://translate.google.com/?sl=auto&tl=en&text=###"
+  - for: sentences
+    type: embedded
+    url: "https://www.bing.com/translator/?from=tlh&to=en&text=###"
+show_romanization: true
+# right_to_left:
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+split_sentences: ""
+split_sentence_exceptions: Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.
+word_chars: ""

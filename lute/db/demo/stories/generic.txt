@@ -1,0 +1,59 @@
+# title: Generic Parser Demo
+# language: Generic
+#
+
+English:
+
+This story shows how the space-delimited parser uses Unicode categories to identify words in multiple languages.
+
+Arabic:
+
+‏مرحبا، كيف حالك ؟‎
+
+Czech:
+
+V jedné rozpadlé chaloupce žil tatínek, maminka a jejich chlapec Tonda. Byli velmi chudí, do střechy jim teklo a často neměli ani na jídlo.
+
+French:
+
+Il était une fois trois ours: un papa ours, une maman ours et un bébé ours. Ils habitaient tous ensemble dans une maison jaune au milieu d'une grande forêt.
+
+Georgian:
+
+ყველა ადამიანი იბადება თავისუფალი და თანასწორი თავისი ღირსებითა და უფლებებით.
+
+German:
+
+Es hatte ein Mann einen Esel, der schon lange Jahre die Säcke unverdrossen zur Mühle getragen hatte, dessen Kräfte aber nun zu Ende gingen, sodass er zur Arbeit immer untauglicher wurde. Da dachte der Herr daran, ihn aus dem Futter zu schaffen, aber der Esel merkte, dass kein guter Wind wehte, lief fort und machte sich auf den Weg nach Bremen; dort, meinte er, könnte er ja Stadtmusikant werden.
+
+Gothic:
+
+𐌰𐍄𐍄𐌰 𐌿𐌽𐍃𐌰𐍂 𐌸𐌿 𐌹𐌽 𐌷𐌹𐌼𐌹𐌽𐌰𐌼
+
+Greek:
+
+Πέτρος: Γεια σου, Νίκη. Ο Πέτρος είμαι.
+Νίκη: Α, γεια σου Πέτρο. Τι κάνεις;
+Πέτρος: Μια χαρά. Σε παίρνω για να πάμε καμιά βόλτα αργότερα. Τι λες;
+Νίκη: Α, ωραία. Κι εγώ θέλω να βγω λίγο. Συνέχεια διαβάζω για τις εξετάσεις… κουράστηκα πια. Πού λες να πάμε;
+
+Hindi:
+
+अनुच्छेद १(एक): सभी मनुष्य जन्म से स्वतन्त्र तथा मर्यादा और अधिकारों में समान होते हैं। वे तर्क और विवेक से सम्पन्न हैं तथा उन्हें भ्रातृत्व की भावना से परस्पर के प्रति कार्य करना चाहिए।
+
+Russian:
+
+Встреча с медведем может быть очень опасна. Русские люди любят ходить в лес и собирать грибы и ягоды. Они делают это с осторожностью, так как медведи тоже очень любят ягоды и могут напасть на человека. Медведь ест все: ягоды, рыбу, мясо и даже насекомых. Особенно он любит мед.
+
+Sanskrit:
+
+काशीनगरे एकः पण्डितः अस्ति । पण्डितसमीपम् एकः शिष्यः आगच्छति । शिष्यः वदति - "आचार्य!
+विद्याभ्यासार्थम् आगतः ।" पण्डितः शिष्यबुद्धिपरीक्षार्थं पृच्छति - "वत्स, देवः कुत्र अस्ति?" शिष्यः वदति -
+
+Spanish:
+
+— Decid —le repliqué yo, oyendo lo que me decía—: ¿de qué modo pensáis llenar el vacío de mi temor y reducir a claridad el caos de mi confusión?
+
+Turkish:
+
+Büyük ağaç eskiden aşılanmış ve her yıl güzel, iri, pembe şeftaliler verirmiş, insanın eline sığmazmış bu şeftaliler. Öyle güzelmişler ki insan yemeye kıyamazmış onları. Bahçıvan, bu büyük ağacı yabancı bir uzmanın kendi ülkesinden getirdiği bir tohumla aşıladığını söylermiş. Belli ki böyle masraf edilen bir ağaçta yetişen şeftaliler oldukça değerliymiş.
