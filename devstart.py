@@ -5,7 +5,7 @@ This script _always_ uses the config at /lute/config/config.yml.
 
 You can run with:
 
-inv devstart
+inv start
 python -m devstart
 
 If you want to run this with "python", then for some _extremely odd_
