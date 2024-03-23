@@ -120,7 +120,7 @@ def handle_term_form(
     lives in an iframe in the reading frames and returns a different
     template on success.
     """
-    print(f"in handle_term_form with term.id = {term.id}", flush=True)
+    # print(f"in handle_term_form with term.id = {term.id}", flush=True)
     form = TermForm(obj=term)
     # parents = [{"value": p} for p in term.parents]
     # form.parentslist.data = json.dumps(parents)

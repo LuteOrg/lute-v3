@@ -284,7 +284,7 @@ class Repository:
 
     def _build_db_term(self, term):
         "Convert a term business object to a DBTerm."
-        print(f"in _build_db_term, term id = {term.id}", flush=True)
+        # print(f"in _build_db_term, term id = {term.id}", flush=True)
         if term.text is None:
             raise ValueError("Text not set for term")
 
@@ -337,7 +337,7 @@ class Repository:
         if len(termparents) != 1:
             t.sync_status = False
 
-        print(f"in _build_db_term, returning db term with term id = {t.id}", flush=True)
+        # print(f"in _build_db_term, returning db term with term id = {t.id}", flush=True)
         return t
 
     def _find_or_create_parent(self, pt, language, term, termtags) -> DBTerm:

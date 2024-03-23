@@ -244,8 +244,8 @@ class Term(
             self.romanization = lang.parser.get_reading(t)
             self._calc_token_count()
         else:
-            new_lc = lang.get_lowercase(textstring)
-            print(f"new lowercase = '{new_lc}', old = '{self.text_lc}'", flush=True)
+            # new_lc = lang.get_lowercase(textstring)
+            # print(f"new lowercase = '{new_lc}', old = '{self.text_lc}'", flush=True)
             if lang.get_lowercase(textstring) != self.text_lc:
                 msg = f'Cannot change text of saved term "{self._text}" (id {self.id}).'
                 raise TermTextChangedException(msg)
