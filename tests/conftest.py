@@ -128,12 +128,13 @@ def fixture_test_languages(app_context, demo_yaml_folder):
         "classical_chinese",
         "german",
         "hindi",
+        "generic",
     ]
     ret = {}
     for lang in langs:
         f = os.path.join(demo_yaml_folder, f"{lang}.yaml")
         ret[lang] = _get_language(f)
-    yield ret
+    return ret
 
 
 @pytest.fixture(name="spanish")
@@ -169,3 +170,8 @@ def fixture_german(test_languages):
 @pytest.fixture(name="hindi")
 def fixture_hindi(test_languages):
     return test_languages["hindi"]
+
+
+@pytest.fixture(name="generic")
+def fixture_generic(test_languages):
+    return test_languages["generic"]

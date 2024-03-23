@@ -168,3 +168,100 @@ def test_zero_width_joiner_retained(hindi):
     assert_string_equals("namaste", hindi, "[namaste]")
     assert_string_equals("नमस्ते", hindi, "[नमस्ते]")
     assert_string_equals("नमस\u200dते", hindi, "[नमस\u200dते]")
+
+
+def test_default_word_pattern_latin(generic):
+    """
+    Verify the default word pattern handles Latin alphabets (0000..00FF).
+    """
+
+    # Source: https://www.folger.edu/explore/shakespeares-works/henry-v/read/5/2/
+    assert_string_equals(
+        "Saint Denis be my speed!—donc vôtre est France, et vous êtes mienne.",
+        generic,
+        " ".join(
+            [
+                "[Saint]",
+                "[Denis]",
+                "[be]",
+                "[my]",
+                "[speed]!—[donc]",
+                "[vôtre]",
+                "[est]",
+                "[France],",
+                "[et]",
+                "[vous]",
+                "[êtes]",
+                "[mienne].",
+            ]
+        ),
+    )
+
+
+def test_default_word_pattern_devanagari(generic):
+    """
+    Verify the default word pattern handles the Devanagari Unicode block (0900..097F).
+    """
+
+    # Source: https://en.wikipedia.org/wiki/Hindi#Sample_text
+    assert_string_equals(
+        "अनुच्छेद १(एक): सभी मनुष्य जन्म से स्वतन्त्र तथा मर्यादा और अधिकारों में समान होते हैं।",
+        generic,
+        " ".join(
+            [
+                "[अनुच्छेद]",
+                "१([एक]):",
+                "[सभी]",
+                "[मनुष्य]",
+                "[जन्म]",
+                "[से]",
+                "[स्वतन्त्र]",
+                "[तथा]",
+                "[मर्यादा]",
+                "[और]",
+                "[अधिकारों]",
+                "[में]",
+                "[समान]",
+                "[होते]",
+                "[हैं]।",
+            ]
+        ),
+    )
+
+
+def test_default_word_pattern_georgian(generic):
+    """
+    Verify the default word pattern handles the Georgian Unicode block (10A0..10FF).
+    """
+
+    # Source: https://en.wikipedia.org/wiki/Georgian_language#Examples
+    assert_string_equals(
+        "ყველა ადამიანი იბადება თავისუფალი და თანასწორი თავისი ღირსებითა და უფლებებით.",
+        generic,
+        " ".join(
+            [
+                "[ყველა]",
+                "[ადამიანი]",
+                "[იბადება]",
+                "[თავისუფალი]",
+                "[და]",
+                "[თანასწორი]",
+                "[თავისი]",
+                "[ღირსებითა]",
+                "[და]",
+                "[უფლებებით].",
+            ]
+        ),
+    )
+
+
+def test_default_word_pattern_gothic(generic):
+    """
+    Verify the default word pattern handles the Gothic Unicode block (10330..1034F).
+    This is an import test case because it tests larger Unicode values.
+    """
+
+    # Source: https://en.wikipedia.org/wiki/Gothic_language#Examples
+    assert_string_equals(
+        "𐌰𐍄𐍄𐌰 𐌿𐌽𐍃𐌰𐍂 𐌸𐌿 𐌹𐌽 𐌷𐌹𐌼𐌹𐌽𐌰𐌼", generic, "[𐌰𐍄𐍄𐌰] [𐌿𐌽𐍃𐌰𐍂] [𐌸𐌿] [𐌹𐌽] [𐌷𐌹𐌼𐌹𐌽𐌰𐌼]"
+    )

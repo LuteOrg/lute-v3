@@ -7,11 +7,16 @@ perform the actual parsing.
 Includes classes:
 
 - SpaceDelimitedParser
-- Turkish
+- TurkishParser
 """
 
+import functools
 import re
+import sys
+import unicodedata
+
 from typing import List
+
 from lute.parse.base import ParsedToken, AbstractParser
 
 
@@ -24,6 +29,142 @@ class SpaceDelimitedParser(AbstractParser):
     @classmethod
     def name(cls):
         return "Space Delimited"
+
+    @staticmethod
+    @functools.lru_cache
+    def compile_re_pattern(pattern: str, *args, **kwargs) -> re.Pattern:
+        """Compile regular expression pattern, cache result for fast re-use."""
+        return re.compile(pattern, *args, **kwargs)
+
+    @staticmethod
+    @functools.lru_cache
+    def get_default_word_characters() -> str:
+        """Return default value for lang.word_characters."""
+
+        # Unicode categories reference: https://www.compart.com/en/unicode/category
+        categories = set(["Cf", "Ll", "Lm", "Lo", "Lt", "Lu", "Mc", "Mn", "Sk"])
+
+        # There are more than 130,000 characters across all these categories.
+        # Expressing this a single character at a time, mostly using unicode
+        # escape sequences like \u1234 or \U12345678, would require 1 megabyte.
+        # Converting to ranges like \u1234-\u1256 requires only 10K.
+        ranges = []
+        current = None
+        for i in range(1, sys.maxunicode):
+            c = chr(i)
+            category = unicodedata.category(c)
+
+            if category not in categories:
+                continue
+
+            if current is None:
+                current = [i, i]
+                continue
+
+            if current[1] == (i - 1):
+                current[1] = i
+                continue
+
+            s1 = (r"\u{:04x}" if current[0] < 0x10000 else r"\U{:08x}").format(
+                current[0]
+            )
+            if current[0] == current[1]:
+                ranges.append(s1)
+            else:
+                s2 = (r"\u{:04x}" if current[1] < 0x10000 else r"\U{:08x}").format(
+                    current[1]
+                )
+                ranges.append(s1 + "-" + s2)
+            current = [i, i]
+
+        if current is not None:
+            s1 = (r"\u{:04x}" if current[0] < 0x10000 else r"\U{:08x}").format(
+                current[0]
+            )
+            if current[0] == current[1]:
+                ranges.append(s1)
+            else:
+                s2 = (r"\u{:04x}" if current[1] < 0x10000 else r"\U{:08x}").format(
+                    current[1]
+                )
+                ranges.append(s1 + "-" + s2)
+
+        return "".join(ranges)
+
+    @staticmethod
+    @functools.lru_cache
+    def get_default_regexp_split_sentences() -> str:
+        """Return default value for lang.regexp_split_sentences."""
+
+        # Construct pattern from Unicode ATerm and STerm categories.
+        # See: https://www.unicode.org/Public/UNIDATA/auxiliary/SentenceBreakProperty.txt
+        # and: https://unicode.org/reports/tr29/
+
+        # Also include colon, since that is used to separate speakers
+        # and their dialog, and is a reasonable dividing point for
+        # sentence translations.
+
+        return "".join(
+            [
+                re.escape(".!?:"),
+                # ATerm entries (other than ".", covered above):
+                r"\u2024\uFE52\uFF0E",
+                # STerm entries (other than "!" and "?", covered above):
+                r"\u0589",
+                r"\u061D-\u061F\u06D4",
+                r"\u0700-\u0702",
+                r"\u07F9",
+                r"\u0837\u0839\u083D\u083E",
+                r"\u0964\u0965",
+                r"\u104A\u104B",
+                r"\u1362\u1367\u1368",
+                r"\u166E",
+                r"\u1735\u1736",
+                r"\u17D4\u17D5",
+                r"\u1803\u1809",
+                r"\u1944\u1945",
+                r"\u1AA8-\u1AAB",
+                r"\u1B5A\u1B5B\u1B5E\u1B5F\u1B7D\u1B7E",
+                r"\u1C3B\u1C3C",
+                r"\u1C7E\u1C7F",
+                r"\u203C\u203D\u2047-\u2049\u2E2E\u2E3C\u2E53\u2E54\u3002",
+                r"\uA4FF",
+                r"\uA60E\uA60F",
+                r"\uA6F3\uA6F7",
+                r"\uA876\uA877",
+                r"\uA8CE\uA8CF",
+                r"\uA92F",
+                r"\uA9C8\uA9C9",
+                r"\uAA5D\uAA5F",
+                r"\uAAF0\uAAF1\uABEB",
+                r"\uFE56\uFE57\uFF01\uFF1F\uFF61",
+                r"\U00010A56\U00010A57",
+                r"\U00010F55-\U00010F59",
+                r"\U00010F86-\U00010F89",
+                r"\U00011047\U00011048",
+                r"\U000110BE-\U000110C1",
+                r"\U00011141-\U00011143",
+                r"\U000111C5\U000111C6\U000111CD\U000111DE\U000111DF",
+                r"\U00011238\U00011239\U0001123B\U0001123C",
+                r"\U000112A9",
+                r"\U0001144B\U0001144C",
+                r"\U000115C2\U000115C3\U000115C9-\U000115D7",
+                r"\U00011641\U00011642",
+                r"\U0001173C-\U0001173E",
+                r"\U00011944\u00011946",
+                r"\U00011A42\U00011A43",
+                r"\U00011A9B\U00011A9C",
+                r"\U00011C41\U00011C42",
+                r"\U00011EF7\U00011EF8",
+                r"\U00011F43\U00011F44",
+                r"\U00016A6E\U00016A6F",
+                r"\U00016AF5",
+                r"\U00016B37\U00016B38\U00016B44",
+                r"\U00016E98",
+                r"\U0001BC9F",
+                r"\U0001DA88",
+            ]
+        )
 
     def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
         "Return parsed tokens."
@@ -43,7 +184,8 @@ class SpaceDelimitedParser(AbstractParser):
         E.g. search for r'cat' in "there is a CAT and a Cat" returns:
         [['CAT', 11], ['Cat', 21]]
         """
-        matches = re.finditer(pattern, subject, flags=re.IGNORECASE)
+        compiled = SpaceDelimitedParser.compile_re_pattern(pattern, flags=re.IGNORECASE)
+        matches = compiled.finditer(subject)
         result = [[match.group(), match.start()] for match in matches]
         return result
 
@@ -77,11 +219,9 @@ class SpaceDelimitedParser(AbstractParser):
         """
         Parse a string, appending the tokens to the list of tokens.
         """
-        termchar = lang.word_characters
-        if termchar.strip() == "":
-            raise RuntimeError(
-                f"Language {lang.name} has invalid Word Characters specification."
-            )
+        termchar = lang.word_characters.strip()
+        if not termchar:
+            termchar = SpaceDelimitedParser.get_default_word_characters()
 
         splitex = lang.exceptions_split_sentences.replace(".", "\\.")
         pattern = rf"({splitex}|[{termchar}]*)"
@@ -99,7 +239,10 @@ class SpaceDelimitedParser(AbstractParser):
             """
             if not s:
                 return
-            pattern = f"[{re.escape(lang.regexp_split_sentences)}]"
+            splitchar = lang.regexp_split_sentences.strip()
+            if not splitchar:
+                splitchar = SpaceDelimitedParser.get_default_regexp_split_sentences()
+            pattern = f"[{re.escape(splitchar)}]"
             has_eos = False
             if pattern != "[]":  # Should never happen, but ...
                 allmatches = self.preg_match_capture(pattern, s)
