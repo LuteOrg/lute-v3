@@ -160,10 +160,10 @@ class Repository:
         t = Term()
         t.language = spec.language
         t.language_id = langid
-        t.text = text
+        t.text = spec.text
         t.text_lc = spec.text_lc
         t.romanization = spec.language.parser.get_reading(text)
-        t.original_text = text
+        t.original_text = spec.text
 
         # TODO verify_identity_map_comment
         # Adding the term to the map, even though it's new.
