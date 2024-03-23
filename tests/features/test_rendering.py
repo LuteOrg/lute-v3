@@ -56,7 +56,9 @@ def given_term_with_status_and_parent(content, status, parenttext):
 @given(parsers.parse('term "{content}" with status {status}'))
 def given_term_with_status(content, status):
     r = Repository(db)
+    print(f"Calling find_or_new with content = '{content}'", flush=True)
     t = r.find_or_new(language.id, content)
+    print(f"have term find_or_new with text = '{t.text}', id = {t.id}", flush=True)
     t.status = int(status)
     r.add(t)
     r.commit()

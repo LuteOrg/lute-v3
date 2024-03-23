@@ -348,10 +348,18 @@ class Repository:
         term.language = dbterm.language
         term.language_id = dbterm.language.id
 
-        # Remove zero-width spaces (zws) from strings for user forms.
         text = dbterm.text
-        zws = "\u200B"  # zero-width space
-        text = text.replace(zws, "")
+        ### Remove zero-width spaces (zws) from strings for user forms.
+        ###
+        ### NOTE: disabling this as it creates challenges for editing
+        ### terms.  In some cases, the same term may have a zws
+        ### character as part of it; in other cases, it won't, e.g. "
+        ### 集めれ" sometimes is parsed as one token, and sometimes
+        ### two ("集め/れ").  If we strip the zws from the string, then
+        ### when it's posted back, Lute will think that it has changed.
+        ### ... it gets messy.
+        # zws = "\u200B"  # zero-width space
+        # text = text.replace(zws, "")
         term.text_lc = dbterm.text_lc
         term.original_text = text
         term.text = text
