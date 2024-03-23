@@ -429,16 +429,24 @@ def test_find_only_looks_in_specified_language(spanish, english, repo):
 
 
 def test_find_existing_multi_word(spanish, repo):
-    "Domain objects don't have zero-width strings in them."
+    """
+    Domain objects DO have zero-width strings in them.
+
+    This is necessary to disambiguate terms such as
+    "集めれ" and "集め/れ", both of which are valid
+    parser results (though perhaps not *useful* parser
+    results, but that's a different question).
+    """
     add_terms(spanish, ["una bebida"])
     zws = "\u200B"
-    t = repo.find(spanish.id, f"una{zws} {zws}bebida")
+    term_with_zws = f"una{zws} {zws}bebida"
+    t = repo.find(spanish.id, term_with_zws)
     assert t.id > 0
-    assert t.text == "una bebida"
+    assert t.text == term_with_zws
 
     t = repo.find(spanish.id, "una bebida")
     assert t.id > 0
-    assert t.text == "una bebida"
+    assert t.text == term_with_zws
 
 
 ## Find or new tests.
@@ -465,13 +473,14 @@ def test_find_or_new_existing_multi_word(spanish, repo):
     "Spaces etc handled correctly."
     add_terms(spanish, ["una bebida"])
     zws = "\u200B"
+    term_with_zws = f"una{zws} {zws}bebida"
     t = repo.find_or_new(spanish.id, f"una{zws} {zws}bebida")
     assert t.id > 0
-    assert t.text == "una bebida"
+    assert t.text == term_with_zws
 
     t = repo.find_or_new(spanish.id, "una bebida")
     assert t.id > 0
-    assert t.text == "una bebida"
+    assert t.text == term_with_zws
 
 
 def test_find_or_new_new_multi_word(spanish, repo):
@@ -483,7 +492,7 @@ def test_find_or_new_new_multi_word(spanish, repo):
 
     t = repo.find_or_new(spanish.id, "una bebida")
     assert t.id is None
-    assert t.text == "una bebida"
+    assert t.text == f"una{zws} {zws}bebida"
 
 
 ## Matches tests.
