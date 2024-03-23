@@ -495,6 +495,24 @@ def test_find_or_new_new_multi_word(spanish, repo):
     assert t.text == f"una{zws} {zws}bebida"
 
 
+def test_find_or_new_ambiguous_japanese_terms(japanese, repo):
+    """
+    Characterization test only: behaviour of find_or_new for
+    ambiguously parsable 集めれ terms
+
+    See comments in find_or_new for notes.
+    """
+    s = "集めれ"
+    term = DBTerm.create_term_no_parsing(japanese, s)
+    db.session.add(term)
+    db.session.commit()
+
+    t = repo.find_or_new(japanese.id, s)
+    assert t.id is None, "do _not_ have term, searching for string without context"
+    zws = "\u200B"
+    assert t.text == f"集め{zws}れ", "returns a new term"
+
+
 ## Matches tests.
 
 

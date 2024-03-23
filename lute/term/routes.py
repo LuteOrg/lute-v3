@@ -278,6 +278,7 @@ def bulk_update_status():
         new_status = int(u.get("new_status"))
         terms = u.get("terms")
         for t in terms:
+            # TODO issue_367: change this to use IDs.
             term = repo.find_or_new(language_id, t)
             term.status = new_status
             repo.add(term)
