@@ -264,14 +264,12 @@ def bulk_update_status():
 
     json:
     {
-      langid: x,
       updates: [ { new_status: 1, termids: [ 42, ] }, ... }, ]
     }
     """
     repo = Repository(db)
 
     data = request.get_json()
-    language_id = int(data.get("langid"))
     updates = data.get("updates")
 
     for u in updates:
