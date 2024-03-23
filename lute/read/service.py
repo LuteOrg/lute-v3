@@ -69,8 +69,11 @@ def _create_unknown_terms(textitems, lang):
     "Create any terms required for the page."
     # dt = DebugTimer("create-unk-terms")
     toks = [t.text for t in textitems]
+    # print(f"creating toks {toks}", flush=True)
     unique_word_tokens = list(set(toks))
-    all_new_terms = [Term(lang, t) for t in unique_word_tokens]
+    # print(f"creating unique toks {unique_word_tokens}", flush=True)
+    all_new_terms = [Term.create_term_no_parsing(lang, t) for t in unique_word_tokens]
+    # print(f"all_new_terms = {all_new_terms}", flush=True)
     # dt.step("make all_new_terms")
 
     unique_text_lcs = {}
@@ -78,6 +81,7 @@ def _create_unknown_terms(textitems, lang):
         if t.text_lc not in unique_text_lcs:
             unique_text_lcs[t.text_lc] = t
     unique_new_terms = unique_text_lcs.values()
+    # print(f"utlcs keys = {unique_text_lcs.keys()}", flush=True)
     # dt.step("find unique_new_terms")
 
     for t in unique_new_terms:
@@ -106,7 +110,11 @@ def _add_status_0_terms(paragraphs, lang):
     textlc_to_term_map = {}
     for t in new_terms:
         textlc_to_term_map[t.text_lc] = t
+    # print("map: textlc_to_term_map")
+    # for k, v in textlc_to_term_map.items():
+    #     print(f"{k}: {v}", flush=True)
     for ti in new_textitems:
+        # print(f'Assigning term from map to ti with ti.text_lc = "{ti.text_lc}"')
         ti.term = textlc_to_term_map[ti.text_lc]
 
 

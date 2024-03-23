@@ -635,11 +635,10 @@ function update_status_for_marked_elements(new_status) {
 
 
 function make_status_update_hash(new_status, elements) {
-  const texts = elements.map(el => $(el).text());
   return {
     new_status: new_status,
-    terms: texts
-  }
+    termids: elements.map(el => $(el).data('wid'))
+  };
 }
 
 
@@ -653,12 +652,9 @@ function post_bulk_update(updates) {
     return;
   const firstel = $(elements[0]);
   const first_status = updates[0].new_status;
-  const langid = firstel.data('lang-id');
   const selected_ids = $('span.kwordmarked').toArray().map(el => $(el).attr('id'));
 
-  data = JSON.stringify({
-    langid: langid, updates: updates
-  });
+  data = JSON.stringify({ updates: updates });
 
   let re_mark_selected_ids = function() {
     for (let i = 0; i < selected_ids.length; i++) {
