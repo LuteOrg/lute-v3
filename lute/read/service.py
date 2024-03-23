@@ -164,6 +164,7 @@ def get_popup_data(termid):
         c for c in find_all_Terms_in_string(term.text, term.language) if c.id != term.id
     ]
     component_data = [make_array(c) for c in components]
+    component_data = [c for c in component_data if c["trans"] != "-"]
 
     images = [term.get_current_image()] if term.get_current_image() else []
     for p in term.parents:
