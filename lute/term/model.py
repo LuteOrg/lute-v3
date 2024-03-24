@@ -78,6 +78,24 @@ class Repository:
     Maps Term BO to and from lute.model.Term.
     """
 
+    @staticmethod
+    def map_string_to_zws_delimited(s, source_with_zws_delimiters):
+        """
+        Recreate string s with the zero-width-space delimiters present in
+        source_with_zws_delimiters.
+
+        For example, if "/" is the zws delimiter, then "a cat" mapped to
+        "A/ /cat" would return "a/ /cat".
+
+        This is necessary to "re-align" a given string in a Term domain object
+        (presented to the user, doesn't have zero-width-spaces) with its
+        source DBTerm object (the term actually saved to the database, which
+        does have zws).
+        """
+        print(s)
+        print(source_with_zws_delimiters)
+        return s
+
     def __init__(self, _db):
         self.db = _db
 
