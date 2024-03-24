@@ -548,6 +548,27 @@ def test_load_throws_if_bad_id(app_context, repo):
         repo.load(9876)
 
 
+def test_load_term_and_resave_zws_is_restored(spanish, app_context, repo):
+    """
+    Zero-width spaces are removed for domain Term objects (i.e, the
+    Term object used for user forms), but when that's saved back to
+    the source DB Term object again, the zws is restored.
+    """
+    t = DBTerm(spanish, "un gato")
+    db.session.add(t)
+    db.session.commit()
+    assert t.id is not None, "ID assigned"
+    sql = "select WoText, WoTextLC from words"
+    assert_sql_result(sql, ["un/ /gato; un/ /gato"], "word with zws")
+
+    term = repo.load(t.id)
+    assert term.text == "un gato", "No zws in domain term"
+    term.text = "UN GATO"  # changing
+    repo.add(term)
+    repo.commit()
+    assert_sql_result(sql, ["UN/ /GATO; un/ /gato"], "updated, zws restored")
+
+
 def test_find_is_found(spanish, app_context, repo):
     "Find by text finds regardless of case."
     add_terms(spanish, ["PARENT"])
@@ -573,7 +594,7 @@ def test_find_only_looks_in_specified_language(spanish, english, repo):
 
 def test_find_existing_multi_word(spanish, repo):
     """
-    Domain objects DO have zero-width strings in them.
+    Domain objects do not have zero-width strings in them.
 
     This is necessary to disambiguate terms such as
     "集めれ" and "集め/れ", both of which are valid
@@ -585,11 +606,11 @@ def test_find_existing_multi_word(spanish, repo):
     term_with_zws = f"una{zws} {zws}bebida"
     t = repo.find(spanish.id, term_with_zws)
     assert t.id > 0
-    assert t.text == term_with_zws
+    assert t.text == "una bebida"
 
     t = repo.find(spanish.id, "una bebida")
     assert t.id > 0
-    assert t.text == term_with_zws
+    assert t.text == "una bebida"
 
 
 ## Find or new tests.
@@ -616,14 +637,13 @@ def test_find_or_new_existing_multi_word(spanish, repo):
     "Spaces etc handled correctly."
     add_terms(spanish, ["una bebida"])
     zws = "\u200B"
-    term_with_zws = f"una{zws} {zws}bebida"
     t = repo.find_or_new(spanish.id, f"una{zws} {zws}bebida")
     assert t.id > 0
-    assert t.text == term_with_zws
+    assert t.text == "una bebida"
 
     t = repo.find_or_new(spanish.id, "una bebida")
     assert t.id > 0
-    assert t.text == term_with_zws
+    assert t.text == "una bebida"
 
 
 def test_find_or_new_new_multi_word(spanish, repo):
