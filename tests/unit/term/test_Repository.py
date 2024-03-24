@@ -33,8 +33,8 @@ def test_map_string_to_original_zws_delimited():
             expected = c[1]
             cnum = c[2]
             mapped = Repository.map_string_to_zws_delimited(instring, src)
-            zws_expected = zws_string(expected)
-            assert mapped == zws_expected, f'{cnum}: "{c[0]}" to "{expected}"'
+            msg = f'"{source}" {cnum}: "{c[0]}" to "{expected}"'
+            assert mapped == zws_string(expected), msg
 
     src = "A/ /cat"
     cases = [
@@ -51,16 +51,82 @@ def test_map_string_to_original_zws_delimited():
     ]
     run_scenarios(src, cases)
 
-    # "a///// ////cat", "a      cat"
-    # cases: "a/ /cat", "A/ /CAT", "a catch", "ap", "", "axcat", "axcatxxx",
-    # "a///// ////cat", "a      cat"
+    src = "apple"
+    cases = [
+        ("apple", "apple", 1),
+        ("app", "app", 2),
+        ("apples", "apple/s", 3),
+        ("a pple", "a ppl/e", 4),
+        ("/a p/pl/e", "a ppl/e", 4),
+        ("a", "a", 5),
+        ("scott", "scott", 6),
+    ]
+    run_scenarios(src, cases)
 
-    # source string = "apple"
-    # "apple", "app", "apples", "app/le", "a  pple", "a", "scott"
+    src = "a"
+    cases = [
+        ("apple", "a/pple", 1),
+        ("app", "a/pp", 2),
+        ("apples", "a/pples", 3),
+        ("a pple", "a/ pple", 4),
+        ("a p/pl/e", "a/ pple", 4),
+        ("a", "a", 5),
+        ("scott", "s/cott", 6),
+        ("", "", 7),
+    ]
+    run_scenarios(src, cases)
 
-    # source = "app/le"
-    # source = "/app/le/"
-    # source = "//app//le//"
+    src = "app/le"
+    cases = [
+        ("apple", "app/le", 1),
+        ("app", "app", 2),
+        ("apples", "app/le/s", 3),
+        ("a pple", "a p/pl/e", 4),
+        ("/a p/pl/e", "a p/pl/e", 4),
+        ("a", "a", 5),
+        ("scott", "sco/tt", 6),
+    ]
+    run_scenarios(src, cases)
+
+    # NOTE: terms REALLY SHOULD NOT have zero-width-spaces
+    # at the start or end of the term ... but I don't want
+    # to raise an error of they do.  The code will handle
+    # the case of a single zws at the end of the term,
+    # but it gets inconsistent if there are multiple
+    # (i.e., if the data is really, really screwed up).
+    src = "/app/le/"
+    cases = [
+        ("apple", "/app/le/", 1),
+        ("app", "/app", 2),
+        ("apples", "/app/le/s", 3),
+        ("a pple", "/a p/pl/e", 4),
+        ("/a p/pl/e", "/a p/pl/e", 4),
+        ("a", "/a", 5),
+        ("scott", "/sco/tt/", 6),
+    ]
+    run_scenarios(src, cases)
+
+    # These are all inconsistent -- note the dropped
+    # "//" at the end of the expected results in the test
+    # cases.  If the mapping code were correct, then
+    # mapping "apple" onto "//app//le//" would yield
+    # "//app//le//", but I don't _really_ care as
+    # this scenario should never arise.
+    #
+    # ... Of course, now that I've said it should
+    # never arise, it absolutely will.
+    src = "//app//le//"
+    cases = [
+        ("apple", "//app//le", 1),
+        ("app", "//app", 2),
+        ("apples", "//app//le//s", 3),
+        ("a pple", "//a p//pl//e", 4),
+        ("a p/pl/e", "//a p//pl//e", 4),
+        ("a", "//a", 5),
+        ("scott", "//sco//tt", 6),
+        ("", "", 7),
+    ]
+    run_scenarios(src, cases)
 
 
 @pytest.fixture(name="repo")

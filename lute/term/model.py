@@ -79,10 +79,10 @@ class Repository:
     """
 
     @staticmethod
-    def map_string_to_zws_delimited(s, source_with_zws_delimiters):
+    def map_string_to_zws_delimited(s, map_target_with_zws_delims):
         """
         Recreate string s with the zero-width-space delimiters present in
-        source_with_zws_delimiters.
+        map_target_with_zws_delims.
 
         For example, if "/" is the zws delimiter, then "a cat" mapped to
         "A/ /cat" would return "a/ /cat".
@@ -93,19 +93,25 @@ class Repository:
         does have zws).
         """
         zws = "\u200B"
-        source_parts = source_with_zws_delimiters.split(zws)
+        target_parts = map_target_with_zws_delims.split(zws)
         return_parts = []
         remaining = s.replace(zws, "")
-        for length in [len(p) for p in source_parts]:
+        i = 0  # index of target_parts
+        for length in [len(p) for p in target_parts]:
             a = remaining[:length]
-            print(f"Adding: '{a}'", flush=True)
             return_parts.append(a)
             remaining = remaining[length:]
-            print(f"Remaining = '{remaining}'", flush=True)
+            i += 1
             if remaining == "":
                 break
+
         if remaining != "":
-            return_parts.append(remaining)
+            if return_parts[-1] == "":
+                return_parts[-1] = remaining
+            else:
+                return_parts.append(remaining)
+        if len(return_parts) == len(target_parts) - 1 and target_parts[-1] == "":
+            return_parts.append("")
         return zws.join(return_parts)
 
     def __init__(self, _db):
