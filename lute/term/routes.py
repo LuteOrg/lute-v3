@@ -132,10 +132,13 @@ def handle_term_form(
     form.language_id.choices = lute.utils.formutils.language_choices()
 
     if form.validate_on_submit():
-        form.populate_obj(term)
-        repo.add(term)
-        repo.commit()
-        return return_on_success
+        try:
+            form.populate_obj(term)
+            repo.add(term)
+            repo.commit()
+            return return_on_success
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            flash(str(e))
 
     # Note: on validation, form.duplicated_term may be set.
     # See DUPLICATE_TERM_CHECK comments in other files.

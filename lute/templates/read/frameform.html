@@ -27,6 +27,13 @@
   </head>
 
   <body>
+
+    {% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+    <p class="small-flash-notice">{{ message | safe}}</p>
+    {% endfor %}
+    {% endwith %}
+
     {% if term.flash_message %}
     <p class='small-flash-notice'>{{ term.flash_message }}</p>
     {% endif %}
