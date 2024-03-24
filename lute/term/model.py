@@ -59,17 +59,6 @@ class Term:  # pylint: disable=too-many-instance-attributes
             raise ValueError("not a language")
         self._language = lang
 
-    def text_has_changed(self):
-        "Check the downcased original text with the current text."
-        # print(f'checking if changed, orig = "{self.original_text}", text = "{self.text}"')
-        if self.original_text in ("", None):
-            return False
-
-        def get_lc(s):
-            return self.language.get_lowercase(s)
-
-        return get_lc(self.original_text) != get_lc(self.text)
-
 
 class TermReference:
     "Where a Term has been used in books."
