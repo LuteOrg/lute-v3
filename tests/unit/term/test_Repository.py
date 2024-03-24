@@ -22,6 +22,8 @@ def test_map_string_to_original_zws_delimited():
     """
 
     def zws_string(s):
+        if s is None:
+            return s
         zws = "\u200B"
         return s.replace("/", zws)
 
@@ -72,6 +74,33 @@ def test_map_string_to_original_zws_delimited():
         ("a p/pl/e", "a/ pple", 4),
         ("a", "a", 5),
         ("scott", "s/cott", 6),
+        ("", "", 7),
+    ]
+    run_scenarios(src, cases)
+
+    # Strings returned as-is, b/c why not.
+    src = None
+    cases = [
+        ("apple", "apple", 1),
+        ("app", "app", 2),
+        ("apples", "apples", 3),
+        ("a pple", "a pple", 4),
+        ("a p/pl/e", "a p/pl/e", 4),
+        ("a", "a", 5),
+        ("scott", "scott", 6),
+        ("", "", 7),
+    ]
+    run_scenarios(src, cases)
+
+    src = ""
+    cases = [
+        ("apple", "apple", 1),
+        ("app", "app", 2),
+        ("apples", "apples", 3),
+        ("a pple", "a pple", 4),
+        ("a p/pl/e", "a pple", 4),
+        ("a", "a", 5),
+        ("scott", "scott", 6),
         ("", "", 7),
     ]
     run_scenarios(src, cases)

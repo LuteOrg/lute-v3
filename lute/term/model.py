@@ -92,6 +92,9 @@ class Repository:
         source DBTerm object (the term actually saved to the database, which
         does have zws).
         """
+        if map_target_with_zws_delims is None:
+            return s
+
         zws = "\u200B"
         target_parts = map_target_with_zws_delims.split(zws)
         return_parts = []
