@@ -25,30 +25,29 @@ def test_map_string_to_original_zws_delimited():
         zws = "\u200B"
         return s.replace("/", zws)
 
-    # src = zws_string("A/ /cat")
-    # mapped = Repository.map_string_to_zws_delimited("a cat", src)
-    # assert mapped == zws_string("a/ /cat")
-
     def run_scenarios(source, cases):
         "Run the test"
         src = zws_string(source)
         for c in cases:
-            instring = c[0]
+            instring = zws_string(c[0])
             expected = c[1]
+            cnum = c[2]
             mapped = Repository.map_string_to_zws_delimited(instring, src)
-            assert mapped == zws_string(expected), f'"{instring}" to "{source}"'
+            zws_expected = zws_string(expected)
+            assert mapped == zws_expected, f'{cnum}: "{c[0]}" to "{expected}"'
 
     src = "A/ /cat"
     cases = [
-        ("A/ /cat", "A/ /cat"),
-        ("a/ /cat", "a/ /cat"),
-        ("A/ /CAT", "A/ /CAT"),
-        ("a cat", "a/ /cat"),
-        ("a catch", "a/ /catch"),  # longer
-        ("ap", "ap"),  # shorter
-        ("", ""),  # empty
-        ("axcat", "a/x/cat"),  # different
-        ("axcatxxx", "a/x/catxxx"),
+        ("A/ /cat", "A/ /cat", 1),
+        ("a/ /cat", "a/ /cat", 2),
+        ("A/ /CAT", "A/ /CAT", 3),
+        ("a cat", "a/ /cat", 4),
+        ("a catch", "a/ /cat/ch", 5),  # longer
+        ("a", "a", 6),  # shorter
+        ("ap", "a/p", 6.5),  # shorter
+        ("", "", 7),  # empty
+        ("axcat", "a/x/cat", 8),  # different
+        ("axcatxxx", "a/x/cat/xxx", 9),
     ]
     run_scenarios(src, cases)
 
@@ -57,10 +56,11 @@ def test_map_string_to_original_zws_delimited():
     # "a///// ////cat", "a      cat"
 
     # source string = "apple"
-    # "apple", "app", "apples", "app/le", "a  pple"
+    # "apple", "app", "apples", "app/le", "a  pple", "a", "scott"
 
     # source = "app/le"
-    # "apple", "app", "apples", "app/le", "a  pple"
+    # source = "/app/le/"
+    # source = "//app//le//"
 
 
 @pytest.fixture(name="repo")

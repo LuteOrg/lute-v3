@@ -92,9 +92,21 @@ class Repository:
         source DBTerm object (the term actually saved to the database, which
         does have zws).
         """
-        print(s)
-        print(source_with_zws_delimiters)
-        return s
+        zws = "\u200B"
+        source_parts = source_with_zws_delimiters.split(zws)
+        return_parts = []
+        remaining = s.replace(zws, "")
+        for length in [len(p) for p in source_parts]:
+            a = remaining[:length]
+            print(f"Adding: '{a}'", flush=True)
+            return_parts.append(a)
+            remaining = remaining[length:]
+            print(f"Remaining = '{remaining}'", flush=True)
+            if remaining == "":
+                break
+        if remaining != "":
+            return_parts.append(remaining)
+        return zws.join(return_parts)
 
     def __init__(self, _db):
         self.db = _db
