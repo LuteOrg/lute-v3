@@ -150,3 +150,20 @@ Feature: Books and stats are available
         Then the page title is Reading "Jp test3"
         And the reading pane shows:
             集め/れ/。
+
+
+    # Production bug https://github.com/jzohrab/lute-v3/issues/375
+    Scenario: Japanese production bug 375.
+        Given I visit "/"
+        Given a new Japanese term:
+            text: だけど
+            translation: but
+        Given a Japanese book "Jp test" with content:
+            最初はね難しい。
+
+            だけども、間違えますよね。
+        Then the page title is Reading "Jp test"
+        And the reading pane shows:
+            最初/はね/難しい/。/
+
+            だけど (1)/も/、/間違え/ます/よ/ね/。
