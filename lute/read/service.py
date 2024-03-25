@@ -132,7 +132,6 @@ def start_reading(dbbook, pagenum, db_session):
 
     lang = text.book.language
     paragraphs = get_paragraphs(text.text, lang)
-
     _add_status_0_terms(paragraphs, lang)
 
     return paragraphs

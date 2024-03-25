@@ -22,14 +22,8 @@ def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     This would return the terms "cat" and "a cat".
     """
 
-    # Extract word tokens from the input string
     cleaned = re.sub(r" +", " ", s)
     tokens = language.get_parsed_tokens(cleaned)
-    # print("ALL TOKENS: --------------------")
-    # for t in tokens:
-    #     print(t)
-    # print("END ALL TOKENS: --------------------")
-
     return _find_all_terms_in_tokens(tokens, language)
 
 
@@ -58,10 +52,6 @@ def _find_all_terms_in_tokens(tokens, language):
     word_tokens = filter(lambda t: t.is_word, tokens)
     tok_strings = [parser.get_lowercase(t.token) for t in word_tokens]
     tok_strings = list(set(tok_strings))
-    # print("FINDING SINGLE WORD MATCHES FOR TOKENS: --------------------")
-    # for t in tok_strings:
-    #     print(t)
-    # print("END FINDING SINGLE WORD MATCHES FOR TOKENS: --------------------")
     terms_matching_tokens = (
         db.session.query(Term)
         .filter(
@@ -126,10 +116,6 @@ def get_paragraphs(s, language):
 
     cleaned = re.sub(r" +", " ", s)
     tokens = language.get_parsed_tokens(cleaned)
-    # print("IN GET_PARAGRAPHS, ALL TOKENS: --------------------")
-    # for t in tokens:
-    #     print(t)
-    # print("END IN GET_PARAGRAPHS, ALL TOKENS: --------------------")
 
     # Brutal hack ... for some reason the tests fail in
     # CI, but _inconsistently_, with the token order numbers.  The
@@ -144,10 +130,6 @@ def get_paragraphs(s, language):
             n += 1
 
     terms = _find_all_terms_in_tokens(tokens, language)
-    # print("FOUND TERMS: ----------------")
-    # for t in terms:
-    #     print(t, flush=True)
-    # print("END FOUND TERMS -------------")
 
     # Split into paragraphs.
     paragraphs = []
