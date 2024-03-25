@@ -315,7 +315,7 @@ def check_exported_file(luteclient, content):
 def then_read_content(luteclient, content):
     "Check rendered content."
     displayed = luteclient.displayed_text()
-    assert content == displayed
+    assert content.replace("\n", "/") == displayed
 
 
 @when(parsers.parse("I change the current text content to:\n{content}"))
