@@ -28,7 +28,7 @@ def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     """
 
     # Extract word tokens from the input string
-    cleaned = re.sub(r"\s+", " ", s)
+    cleaned = re.sub(r" +", " ", s)
     tokens = language.get_parsed_tokens(cleaned)
     print("ALL TOKENS: --------------------")
     for t in tokens:
