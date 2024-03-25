@@ -30,6 +30,10 @@ def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     # Extract word tokens from the input string
     cleaned = re.sub(r"\s+", " ", s)
     tokens = language.get_parsed_tokens(cleaned)
+    print("ALL TOKENS: --------------------")
+    for t in tokens:
+        print(t)
+    print("END ALL TOKENS: --------------------")
 
     parser = language.parser
 
@@ -40,6 +44,10 @@ def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     word_tokens = filter(lambda t: t.is_word, tokens)
     tok_strings = [parser.get_lowercase(t.token) for t in word_tokens]
     tok_strings = list(set(tok_strings))
+    print("FINDING SINGLE WORD MATCHES FOR TOKENS: --------------------")
+    for t in tok_strings:
+        print(t)
+    print("END FINDING SINGLE WORD MATCHES FOR TOKENS: --------------------")
     terms_matching_tokens = (
         db.session.query(Term)
         .filter(
@@ -99,11 +107,19 @@ def get_paragraphs(s, language):
     Get array of arrays of RenderableSentences for the given string s.
     """
     terms = find_all_Terms_in_string(s, language)
+    print("FOUND TERMS: ----------------")
+    for t in terms:
+        print(t, flush=True)
+    print("END FOUND TERMS -------------")
 
     # Hacky reset of state of ParsedToken state.
     # _Shouldn't_ matter ... :-(
     ParsedToken.reset_counters()
     tokens = language.get_parsed_tokens(s)
+    print("IN GET_PARAGRAPHS AGAIN, ALL TOKENS: --------------------")
+    for t in tokens:
+        print(t)
+    print("END IN GET_PARAGRAPHS AGAIN, ALL TOKENS: --------------------")
 
     # Brutal hack ... for some reason the tests fail in
     # CI, but _inconsistently_, with the token order numbers.  The
