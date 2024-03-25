@@ -69,11 +69,11 @@ def _create_unknown_terms(textitems, lang):
     "Create any terms required for the page."
     # dt = DebugTimer("create-unk-terms")
     toks = [t.text for t in textitems]
-    print(f"creating toks {toks}", flush=True)
+    # print(f"creating toks {toks}", flush=True)
     unique_word_tokens = list(set(toks))
-    print(f"creating unique toks {unique_word_tokens}", flush=True)
+    # print(f"creating unique toks {unique_word_tokens}", flush=True)
     all_new_terms = [Term.create_term_no_parsing(lang, t) for t in unique_word_tokens]
-    print(f"all_new_terms = {all_new_terms}", flush=True)
+    # print(f"all_new_terms = {all_new_terms}", flush=True)
     # dt.step("make all_new_terms")
 
     unique_text_lcs = {}
@@ -81,7 +81,7 @@ def _create_unknown_terms(textitems, lang):
         if t.text_lc not in unique_text_lcs:
             unique_text_lcs[t.text_lc] = t
     unique_new_terms = unique_text_lcs.values()
-    print(f"utlcs keys = {unique_text_lcs.keys()}", flush=True)
+    # print(f"utlcs keys = {unique_text_lcs.keys()}", flush=True)
     # dt.step("find unique_new_terms")
 
     for t in unique_new_terms:
@@ -122,7 +122,6 @@ def start_reading(dbbook, pagenum, db_session):
     "Start reading a page in the book, getting paragraphs."
 
     text = dbbook.text_at_page(pagenum)
-    print(f"starting reading for text id = {text.id}", flush=True)
     text.load_sentences()
 
     mark_stale(dbbook)
@@ -133,11 +132,6 @@ def start_reading(dbbook, pagenum, db_session):
 
     lang = text.book.language
     paragraphs = get_paragraphs(text.text, lang)
-    print(f"paras = {paragraphs}", flush=True)
-    for para in paragraphs:
-        for sentence in para:
-            for ti in sentence.textitems:
-                print(ti, flush=True)
 
     _add_status_0_terms(paragraphs, lang)
 
