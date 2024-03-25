@@ -1,4 +1,8 @@
 
+# 3.3.1 (2024-03-26)
+
+Fix for issue #375, Japanese production bug.
+
 # 3.3.0 (2024-03-25)
 
 This is a minor version bump (from 3.2.7 to 3.3.0) because Lute now
