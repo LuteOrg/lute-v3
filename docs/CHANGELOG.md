@@ -1,4 +1,27 @@
 
+# 3.3.0 (2024-03-25)
+
+This is a minor version bump (from 3.2.7 to 3.3.0) because Lute now
+creates "status 0" terms for any page opened for reading.  These terms
+are effectively "pending terms" that the user processes as they read.
+This change fixes some parsing inconsistencies, and allows for import
+of "status 0" terms as unknown terms.
+
+Feature changes/tweaks:
+
+* #327: autofocus to term input box for new terms.  By @imamcr in #368.
+* #335: prevent empty book creation.
+* #352: don't show empty component terms in popup.
+* #353: speed up parent search query.
+* #361: tighten up mobile CSS.
+* #364: change book listing actions from icons to drop down.
+* Allow importing new Terms as "unknown", to pre-populate vocab lists.
+
+Back end changes:
+
+* #99: create new terms on open page for reading.
+* #117: don't reparse terms created from reading screen.
+
 # 3.2.7 (2024-03-15)
 
 Feature changes:
