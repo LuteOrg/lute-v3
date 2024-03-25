@@ -20,11 +20,6 @@ def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     - given terms in the db: [ "cat", "a cat", "dog" ]
 
     This would return the terms "cat" and "a cat".
-
-    The code first queries for exact single-token matches,
-    and then multiword matches, because that's much faster
-    than querying for everthing at once.  (This may no longer
-    be true, can change it later.)
     """
 
     # Extract word tokens from the input string
@@ -34,6 +29,25 @@ def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     for t in tokens:
         print(t)
     print("END ALL TOKENS: --------------------")
+
+    return _find_all_terms_in_tokens(tokens, language)
+
+
+def _find_all_terms_in_tokens(tokens, language):
+    """
+    Find all terms contained in the (ordered) parsed tokens tokens.
+
+    For example
+    - given tokens = "Here", " ", "is", " ", "a", " ", "cat"
+    - given terms in the db: [ "cat", "a/ /cat", "dog" ]
+
+    This would return the terms "cat" and "a/ /cat".
+
+    The code first queries for exact single-token matches,
+    and then multiword matches, because that's much faster
+    than querying for everthing at once.  (This may no longer
+    be true, can change it later.)
+    """
 
     parser = language.parser
 
@@ -106,20 +120,16 @@ def get_paragraphs(s, language):
     """
     Get array of arrays of RenderableSentences for the given string s.
     """
-    terms = find_all_Terms_in_string(s, language)
-    print("FOUND TERMS: ----------------")
-    for t in terms:
-        print(t, flush=True)
-    print("END FOUND TERMS -------------")
-
     # Hacky reset of state of ParsedToken state.
-    # _Shouldn't_ matter ... :-(
+    # _Shouldn't_ be needed but doesn't hurt, even if it's lame.
     ParsedToken.reset_counters()
-    tokens = language.get_parsed_tokens(s)
-    print("IN GET_PARAGRAPHS AGAIN, ALL TOKENS: --------------------")
+
+    cleaned = re.sub(r" +", " ", s)
+    tokens = language.get_parsed_tokens(cleaned)
+    print("IN GET_PARAGRAPHS, ALL TOKENS: --------------------")
     for t in tokens:
         print(t)
-    print("END IN GET_PARAGRAPHS AGAIN, ALL TOKENS: --------------------")
+    print("END IN GET_PARAGRAPHS, ALL TOKENS: --------------------")
 
     # Brutal hack ... for some reason the tests fail in
     # CI, but _inconsistently_, with the token order numbers.  The
@@ -132,6 +142,12 @@ def get_paragraphs(s, language):
         for t in tokens:
             t.order = n
             n += 1
+
+    terms = _find_all_terms_in_tokens(tokens, language)
+    print("FOUND TERMS: ----------------")
+    for t in terms:
+        print(t, flush=True)
+    print("END FOUND TERMS -------------")
 
     # Split into paragraphs.
     paragraphs = []
