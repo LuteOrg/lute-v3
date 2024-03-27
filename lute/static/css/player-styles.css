@@ -22,6 +22,11 @@
   --button-size-small: 28px;
   --button-size-big: 64px;
 
+  /* use variables to fix marker placement in the bookmark container*/
+  --padding-top-val: 0.2rem;
+  --padding-sides-val: 0.5rem;
+  --timeline-height: 0.7rem;
+
   position: relative;
 }
 
@@ -43,11 +48,6 @@
   border-radius: 5px;
   box-sizing: border-box;
   margin-bottom: 6px;
-
-  /* use variables to fix marker placement in the bookmark container*/
-  --padding-top-val: 0.2rem;
-  --padding-sides-val: 0.5rem;
-  --timeline-height: 0.7rem;
 }
 
 .audio-player-central-container {
@@ -80,8 +80,8 @@
 
 #play-btn {
   background-image: url("/static/icn/play.svg");
-  height: 64px;
-  width: 64px;
+  height: var(--button-size-big);
+  width: var(--button-size-big);
   display: block;
 
   transition: all 50ms;
@@ -236,6 +236,7 @@
 }
 
 #rewind-option {
+  background-color: #d6edff;
   border: none;
   border-radius: 5px;
   /* width: 90%; */
@@ -349,4 +350,77 @@
 
 .audio-button:active {
   filter: brightness(70%);
+}
+
+@media screen and (max-width: 480px) {
+  #read_pane_container {
+    --player-height: 90px;
+  }
+
+  .audio-player-container {
+    min-width: unset;
+    padding: 0.4rem;
+    --button-size-big: 36px;
+    --button-size-small: 22px;
+    --padding-top-val: 0px;
+    --padding-sides-val: 0px;
+  }
+  
+  .duration-container {
+    font-size: 0.8rem;
+  }
+
+  .audio-player-timeline-container {
+    background-color: var(--audio-color-5);
+  }
+
+  .audio-player-central-container {
+    padding: 0.3rem;
+  }
+
+  .audio-player-top-container {
+    gap: 0.2rem;
+  }
+
+  .audio-player-controls-container {
+    gap: 1rem;
+  }
+
+  .rewind-container {
+    background-color: unset;
+    padding: 0;
+    gap: 0.4rem;
+  }
+
+  .rewind-btn-container {
+    gap: 0.5rem;
+  }
+
+  .bookmark-buttons-container {
+    background-color: unset;
+    padding: 0;
+    column-gap: 0;
+    row-gap: 0.6rem;
+  }
+  
+  #bkm-save-btn {
+    grid-column: 1 / 3;
+    justify-self: center;
+  }
+
+  #rewind-option {
+    background-color: aliceblue;
+    padding-left: 0.2rem;
+    min-width: 2.3rem;
+    font-size: 0.6rem;
+  }
+
+  .volume {
+    display: none;
+    width: 90%;
+  }
+
+  #pin {
+    display: none;
+  }
 }
