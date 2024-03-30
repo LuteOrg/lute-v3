@@ -9,11 +9,11 @@ assignees: ''
 
 **Description**
 
-Brief description of documentation edit/creation requirement for https://jzohrab.github.io/lute-manual/.
+Brief description of documentation edit/creation requirement for https://luteorg.github.io/lute-manual/.
 
 **For broken/incorrect documentation:**
 
-* specify page in https://jzohrab.github.io/lute-manual/, section, and link
+* specify page in https://luteorg.github.io/lute-manual/, section, and link
 * Take a first shot at correcting the issue.  I'll edit it for tone/consistency.
 
 **For new documentation:**
