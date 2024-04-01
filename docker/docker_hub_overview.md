@@ -4,9 +4,9 @@
 
 LUTE (Learning Using Texts) is an application for learning foreign languages through reading.
 
-<img src="https://github.com/jzohrab/lute-manual/assets/1637133/7e7f5f66-20bb-4e94-a11c-7b7ffc43255a" width="700">
+<img src="https://luteorg.github.io/lute-manual/assets/intro.gif" width="700">
 
-For more information, see the [Lute manual](https://jzohrab.github.io/lute-manual/).
+For more information, see the [Lute manual](https://luteorg.github.io/lute-manual/).
 
 # How to use this image
 
@@ -103,14 +103,14 @@ docker compose stop lute
 
 # Source code and building your own images
 
-Lute v3 is on [GitHub](https://github.com/jzohrab/lute-v3/).
+Lute v3 is on [GitHub](https://github.com/luteorg/lute-v3/).
 
 The Dockerfile used to build the images, and docs, are in `/docker` in that repo.
 
 # Help
 
-If you encounter any issues or have questions, please check the [GitHub Issues](https://github.com/jzohrab/lute-v3/issues) or join the [Discord](https://discord.gg/CzFUQP5m8u).
+If you encounter any issues or have questions, please check the [GitHub Issues](https://github.com/luteorg/lute-v3/issues) or join the [Discord](https://discord.gg/CzFUQP5m8u).
 
 # License
 
-Lute v3 and its Docker image are under the [MIT license](https://github.com/jzohrab/lute-v3/blob/master/LICENSE.txt).
+Lute v3 and its Docker image are under the [MIT license](https://github.com/luteorg/lute-v3/blob/master/LICENSE.txt).
