@@ -2,8 +2,7 @@
 
 Learning Using Texts v3.
 
-Lute is for learning foreign languages through reading.  `lute3` is a rewrite of the original Lute PHP application in Python and Flask.
-
+Lute is for learning foreign languages through reading.  `lute3` is a rewrite of the original Lute PHP application in Python and Flask.  See the [Lute manual](https://luteorg.github.io/lute-manual/) for more detail, and notes about installation.
 
 
 ## Requirements
