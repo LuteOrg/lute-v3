@@ -56,4 +56,4 @@ dev = [
 ]
 
 [project.urls]
-Home = "https://github.com/jzohrab/lute-v3"
+Home = "https://github.com/luteorg/lute-v3"
