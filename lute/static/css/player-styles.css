@@ -10,7 +10,7 @@
   width: 80%;
   margin: 0 auto;
   margin-bottom: 1.6rem;
-  min-width: 520px;
+  min-width: fit-content;
   box-sizing: border-box;
   z-index: 999;
 
@@ -19,6 +19,7 @@
   --audio-color-3: aliceblue;
   --audio-color-4: #79b7e7;
   --audio-color-5: #d6edff;
+  --button-size-smaller: 22px;
   --button-size-small: 28px;
   --button-size-big: 64px;
 
@@ -87,24 +88,23 @@
   transition: all 50ms;
 }
 
-#playback-rate-btn {
-  background-image: url("/static/icn/speed.svg");
-  height: var(--button-size-small);
-  width: var(--button-size-small);
-  display: block;
-  position: relative;
-  font-family: inherit;
+#playback-rate-container {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
 }
 
-#playback-rate-btn span {
-  position: absolute;
-  bottom: 0;
-
-  left: 50%;
-  transform: translate(-50%, 0);
-  font-family: inherit;
+.rate-btn {
+  width: var(--button-size-smaller);
+  height: var(--button-size-smaller);
+  display: block;
+  background-color: #79b7e7;
   color: #fff;
-  font-size: .6rem;
+}
+
+#playback-rate-indicator {
+  font-size: 0.9rem;
+  cursor: pointer;
 }
 
 #skip-back-btn {
@@ -383,7 +383,7 @@
   }
 
   .audio-player-controls-container {
-    gap: 1rem;
+    gap: 0.7rem;
   }
 
   .rewind-container {
@@ -394,6 +394,10 @@
 
   .rewind-btn-container {
     gap: 0.5rem;
+  }
+
+  #playback-rate-indicator {
+    font-size: 0.8rem;
   }
 
   .bookmark-buttons-container {
