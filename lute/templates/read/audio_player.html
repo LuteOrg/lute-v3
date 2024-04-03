@@ -34,7 +34,11 @@
             <option value="60">60 sec</option>
           </select>
         </div>
-        <button id="playback-rate-btn" class="audio-button"><span>1.0</span></button>
+        <div id="playback-rate-container" title="Playback rate controls. Click on the indicator to reset">
+          <button id="playback-rate-decrease" class="audio-button rate-btn"><span>-</span></button>
+          <div id="playback-rate-indicator">1.0</div>
+          <button id="playback-rate-increase" class="audio-button rate-btn"><span>+</span></button>
+        </div>
       </div>
     </div>
     <div class="audio-player-right-container">
