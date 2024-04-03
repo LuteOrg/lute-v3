@@ -208,8 +208,16 @@ def _set_term_parents(repo, rec, lang):
     if "link_status" in rec and len(parents) == 1:
         sync_status = rec["link_status"] or ""
         t.sync_status = sync_status.strip().lower() == "y"
-    if len(parents) != 1:
+    if len(t.parents) != 1:
         t.sync_status = False
+
+    # If syncing to parent, and the term status was not explicitly set,
+    # then "inherit" the parent status.
+    if t.sync_status and len(t.parents) == 1 and "status" not in rec:
+        p = repo.find(lang.id, t.parents[0])
+        if p is not None:
+            t.status = p.status
+
     repo.add(t)
 
 
