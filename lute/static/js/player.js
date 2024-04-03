@@ -8,18 +8,18 @@ const durationElement = document.querySelector(".duration-container .duration");
 const currentTimeElement = document.querySelector(
   ".duration-container .current-time"
 );
+const playbackRateIncButton = document.getElementById("playback-rate-increase");
+const playbackRateDecButton = document.getElementById("playback-rate-decrease");
+const playbackRateIndicator = document.getElementById("playback-rate-indicator");
 const rewindButton = document.querySelector("#rewind-btn");
 const ffButton = document.querySelector("#ff-btn");
-const skipbackButton = document.querySelector("#skip-back-btn");
-const playbackRateButton = document.querySelector("#playback-rate-btn");
-const playbackRateIndicator = document.querySelector("#playback-rate-btn span");
 const rewindAmountOption = document.querySelector("#rewind-option");
+const skipbackButton = document.querySelector("#skip-back-btn");
 
 const pinButton = document.querySelector("#pin");
 
 const playerContainer = document.querySelector(".audio-player-container");
 const bookmarkContainer = document.querySelector(".bookmark-markers-container");
-// const timelineContainer = document.querySelector("#timeline-container");
 const bookmarkSaveDeleteBtn = document.querySelector("#bkm-save-btn");
 const bookmarkPrevBtn = document.querySelector("#bkm-prev-btn");
 const bookmarkNextBtn = document.querySelector("#bkm-next-btn");
@@ -181,36 +181,28 @@ skipbackButton.addEventListener("click", function () {
 });
 
 /* ****************************
- * Playback rate.
+ Playback rate.
  */
-
-playbackRateButton.addEventListener("mouseover", function() {
-  const scrollLeft = document.documentElement.scrollLeft;
-  const scrollTop = document.documentElement.scrollTop;
-  window.onscroll = function () {
-    window.scrollTo(scrollLeft, scrollTop);
-  };
+playbackRateIncButton.addEventListener("click", () => {
+  setPlaybackRateDelta(0.1);
+});
+playbackRateDecButton.addEventListener("click", () => {
+  setPlaybackRateDelta(-0.1);
 });
 
-playbackRateButton.addEventListener("mouseleave", function() {
-  window.onscroll = function () {};
-});
+playbackRateIndicator.addEventListener("click", resetPlaybackRate);
 
-playbackRateButton.addEventListener("wheel", function (e) {
+function setPlaybackRateDelta(delta) {
   let r = player.playbackRate;
-  if (e.deltaY < 0)
-    r += 0.1;
-  else
-    r -= 0.1;
-  if (r < 0.1)
-    r = 0.1;
+  r += delta;
   if (r > 10)
     r = 10;
+  if (r < 0.1)
+    r = 0.1;
+
   player.playbackRate = r;
   playbackRateIndicator.textContent = player.playbackRate.toFixed(1);
-});
-
-playbackRateButton.addEventListener("click", resetPlaybackRate);
+}
 
 function resetPlaybackRate() {
   player.playbackRate = 1.0;
