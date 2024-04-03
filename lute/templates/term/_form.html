@@ -325,6 +325,19 @@
       }
     });
 
+    // Set term form focus
+    const langId = $("#language_id")
+    const text = $("#text")
+    const translation = $("#translation")
+
+    if(langId.val() == "0"){
+      langId.focus();
+    }else if(text.val() == ""){
+      text.focus();
+    }else{
+      translation.focus();
+    }
+
     // Term image events.
     var term_image = $("#term_image");
 
