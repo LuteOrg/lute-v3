@@ -217,6 +217,7 @@ def given_update_language(luteclient, lang, content):
 def given_book(luteclient, lang, title, c):
     "Make a book."
     luteclient.make_book(title, c, lang)
+    _sleep(1)  # Hack!
 
 
 @given(parsers.parse('a {lang} book "{title}" from file {filename}'))
