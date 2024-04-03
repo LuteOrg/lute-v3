@@ -341,6 +341,53 @@ Feature: Term import
             d; 4; 0
 
 
+    Scenario: Issue 387 child without status inherits parent status if linked
+        Given import file:
+            language,term,status
+            Spanish,a,3
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+        And sql "select WoText, WoStatus, WoSyncStatus from words order by WoText" should return:
+            a; 3; 0
+
+        Given import file:
+            language,term,parent,link_status
+            Spanish,achild,a,y
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+        And sql "select WoText, WoStatus, WoSyncStatus from words order by WoText" should return:
+            a; 3; 0
+            achild; 3; 1
+
+
+    Scenario: Issue 387 updating previously unknown child without status inherits parent status if linked
+        Given import file:
+            language,term,status
+            Spanish,a,3
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+        And sql "select WoText, WoStatus, WoSyncStatus from words order by WoText" should return:
+            a; 3; 0
+
+        Given import file:
+            language,term,parent,link_status
+            Spanish,achild,a,y
+        When import with create true, update false, new as unknown true
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+        And sql "select WoText, WoStatus, WoSyncStatus from words order by WoText" should return:
+            a; 3; 0
+            achild; 3; 0
+
+        Given import file:
+            language,term,parent,link_status
+            Spanish,achild,a,y
+        When import with create true, update false, new as unknown false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+        And sql "select WoText, WoStatus, WoSyncStatus from words order by WoText" should return:
+            a; 3; 0
+            achild; 3; 1
+
+    
     Scenario: Import file fields can be in any order
         Given import file:
             language,translation,term,parent,status,tags,pronunciation
