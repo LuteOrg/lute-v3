@@ -360,7 +360,7 @@ Feature: Term import
             achild; 3; 1
 
 
-    Scenario: Issue 387 updating previously unknown child without status inherits parent status if linked
+    Scenario: Issue 387 child with status overrides parent status if linked
         Given import file:
             language,term,status
             Spanish,a,3
@@ -370,18 +370,34 @@ Feature: Term import
             a; 3; 0
 
         Given import file:
-            language,term,parent,link_status
-            Spanish,achild,a,y
-        When import with create true, update false, new as unknown true
+            language,term,parent,status,link_status
+            Spanish,achild,a,2,y
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+        And sql "select WoText, WoStatus, WoSyncStatus from words order by WoText" should return:
+            a; 2; 0
+            achild; 2; 1
+
+
+    Scenario: Issue 387 importing an unknown child of a parent sets its status to parent
+        Given import file:
+            language,term,status
+            Spanish,a,3
+        When import with create true, update false
         Then import should succeed with 1 created, 0 updated, 0 skipped
         And sql "select WoText, WoStatus, WoSyncStatus from words order by WoText" should return:
             a; 3; 0
-            achild; 3; 0
 
+        # Importing a term as "unknown" really imports it as "known" (with non-0 status)
+        # if it's associated with a known parent!
+        # This may seem counter-intuitive, but it's really the only thing that makes sense.
+        # The parent is "known" (non-0 status), so if the child is associated with that
+        # parent then really it's known too.  Having such a child be an exception to the
+        # parent-status following rules is so hairy that I'm not going to bother doing it.
         Given import file:
             language,term,parent,link_status
             Spanish,achild,a,y
-        When import with create true, update false, new as unknown false
+        When import with create true, update false, new as unknown true
         Then import should succeed with 1 created, 0 updated, 0 skipped
         And sql "select WoText, WoStatus, WoSyncStatus from words order by WoText" should return:
             a; 3; 0
