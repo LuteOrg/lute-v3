@@ -102,14 +102,12 @@ def fixture_demo_client(app):
 def fixture_test_languages(app_context):
     "Dict of available languages for tests."
 
-    def _get_language(lang):
+    def _get_language(langname):
         """
         Return language from the db if it already exists,
         or create it from the file.
         """
-        d = lute.db.demo.demo_data_path()
-        f = os.path.join(d, "languages", f"{lang}.yaml")
-        lang = lute.db.demo.get_demo_language(f)
+        lang = lute.db.demo.get_language_by_name(langname)
         dblang = db.session.query(Language).filter(Language.name == lang.name).first()
         if dblang is None:
             return lang

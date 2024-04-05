@@ -81,6 +81,16 @@ def demo_data_path():
     return os.path.abspath(demo_dir)
 
 
+def get_language_by_name(langname):
+    """
+    Create a new language object from its yaml definition.
+
+    Note this isn't coded quite right ... it's really using the file path ...
+    """
+    filename = os.path.join(demo_data_path(), "languages", f"{langname}.yaml")
+    return get_demo_language(filename)
+
+
 def get_demo_language(filename):
     """
     Create a new Language object from a yaml definition.
