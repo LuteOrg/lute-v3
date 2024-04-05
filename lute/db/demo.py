@@ -72,7 +72,7 @@ def delete_demo_data():
 # Loading demo data.
 
 
-def demo_data_path():
+def _demo_data_path():
     """
     Path to the demo data yaml files.
     """
@@ -87,11 +87,11 @@ def get_language_by_name(langname):
 
     Note this isn't coded quite right ... it's really using the file path ...
     """
-    filename = os.path.join(demo_data_path(), "languages", f"{langname}.yaml")
-    return get_demo_language(filename)
+    filename = os.path.join(_demo_data_path(), "languages", f"{langname}.yaml")
+    return _get_language_from_file(filename)
 
 
-def get_demo_language(filename):
+def _get_language_from_file(filename):
     """
     Create a new Language object from a yaml definition.
     """
@@ -154,8 +154,8 @@ def get_demo_language(filename):
 
 def predefined_languages():
     "Languages that have yaml files."
-    demo_glob = os.path.join(demo_data_path(), "languages", "*.yaml")
-    langs = [get_demo_language(f) for f in glob(demo_glob)]
+    demo_glob = os.path.join(_demo_data_path(), "languages", "*.yaml")
+    langs = [_get_language_from_file(f) for f in glob(demo_glob)]
     langs.sort(key=lambda x: x.name)
     return langs
 
@@ -174,7 +174,7 @@ def load_demo_languages():
 
 def load_demo_stories():
     "Load the stories."
-    demo_glob = os.path.join(demo_data_path(), "stories", "*.txt")
+    demo_glob = os.path.join(_demo_data_path(), "stories", "*.txt")
     for filename in glob(demo_glob):
         with open(filename, "r", encoding="utf-8") as f:
             content = f.read()
