@@ -98,27 +98,23 @@ def fixture_demo_client(app):
     return app.test_client()
 
 
-@pytest.fixture(name="demo_yaml_folder")
-def fixture_yaml_folder():
-    "Path to the demo files."
-    return os.path.join(lute.db.demo.demo_data_path(), "languages")
-
-
-def _get_language(f):
-    """
-    Return language from the db if it already exists,
-    or create it from the file.
-    """
-    lang = lute.db.demo.get_demo_language(f)
-    db_language = db.session.query(Language).filter(Language.name == lang.name).first()
-    if db_language is None:
-        return lang
-    return db_language
-
-
 @pytest.fixture(name="test_languages")
-def fixture_test_languages(app_context, demo_yaml_folder):
+def fixture_test_languages(app_context):
     "Dict of available languages for tests."
+
+    def _get_language(lang):
+        """
+        Return language from the db if it already exists,
+        or create it from the file.
+        """
+        d = lute.db.demo.demo_data_path()
+        f = os.path.join(d, "languages", f"{lang}.yaml")
+        lang = lute.db.demo.get_demo_language(f)
+        dblang = db.session.query(Language).filter(Language.name == lang.name).first()
+        if dblang is None:
+            return lang
+        return dblang
+
     # Hardcoded = good enough.
     langs = [
         "spanish",
@@ -129,10 +125,10 @@ def fixture_test_languages(app_context, demo_yaml_folder):
         "german",
         "hindi",
     ]
+
     ret = {}
     for lang in langs:
-        f = os.path.join(demo_yaml_folder, f"{lang}.yaml")
-        ret[lang] = _get_language(f)
+        ret[lang] = _get_language(lang)
     yield ret
 
 
