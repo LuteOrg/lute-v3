@@ -162,11 +162,27 @@ def predefined_languages():
 
 def load_demo_languages():
     """
-    Load predefined languages.  Assume everything is supported.
+    Load selected predefined languages.  Assume everything is supported.
 
-    This method will also be called during acceptance tests, so it's "public".
+    This method will also be called during acceptance tests, so it's public.
     """
-    supported = [lang for lang in predefined_languages() if lang.is_supported]
+    demo_langs = [
+        "arabic",
+        "classical_chinese",
+        "czech",
+        "english",
+        "french",
+        "german",
+        "greek",
+        "hindi",
+        "japanese",
+        "russian",
+        "sanskrit",
+        "spanish",
+        "turkish",
+    ]
+    langs = [get_language_by_name(langname) for langname in demo_langs]
+    supported = [lang for lang in langs if lang.is_supported]
     for lang in supported:
         db.session.add(lang)
     db.session.commit()
