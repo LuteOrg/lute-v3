@@ -1,0 +1,20 @@
+name: German
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://de.thefreedictionary.com/###
+  - for: terms
+    type: embedded
+    url: https://www.wordreference.com/deen/###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#de/en/###
+word_chars: a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ\u200C\u200D
+# show_romanization: 
+# right_to_left: 
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+# split_sentences: 
+# split_sentence_exceptions:
+# word_chars: 

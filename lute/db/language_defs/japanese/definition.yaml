@@ -1,0 +1,19 @@
+name: Japanese
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://jisho.org/search/###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#jp/en/###
+show_romanization: true
+# right_to_left: 
+
+parser_type: japanese
+# character_substitutions:
+split_sentences: .!?。？！
+# split_sentence_exceptions:
+
+# Ref https://stackoverflow.com/questions/5797505/php-regex-expression-involving-japanese
+# This shouldn't ever be used due to use of MeCab (parser_type).
+word_chars: \p{Han}\p{Katakana}\p{Hiragana}
