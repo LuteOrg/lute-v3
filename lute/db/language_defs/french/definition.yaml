@@ -1,0 +1,16 @@
+name: French
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://fr.thefreedictionary.com/###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#fr/en/###
+# show_romanization: 
+# right_to_left: 
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+# split_sentences: 
+# split_sentence_exceptions:
+# word_chars: 

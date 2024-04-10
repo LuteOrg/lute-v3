@@ -77,7 +77,7 @@ def _demo_data_path():
     Path to the demo data yaml files.
     """
     thisdir = os.path.dirname(__file__)
-    demo_dir = os.path.join(thisdir, "demo")
+    demo_dir = os.path.join(thisdir, "language_defs")
     return os.path.abspath(demo_dir)
 
 
@@ -87,7 +87,7 @@ def get_language_by_name(langname):
 
     Note this isn't coded quite right ... it's really using the file path ...
     """
-    filename = os.path.join(_demo_data_path(), "languages", f"{langname}.yaml")
+    filename = os.path.join(_demo_data_path(), langname, "definition.yaml")
     return _get_language_from_file(filename)
 
 
@@ -154,7 +154,7 @@ def _get_language_from_file(filename):
 
 def predefined_languages():
     "Languages that have yaml files."
-    demo_glob = os.path.join(_demo_data_path(), "languages", "*.yaml")
+    demo_glob = os.path.join(_demo_data_path(), "**", "definition.yaml")
     langs = [_get_language_from_file(f) for f in glob(demo_glob)]
     langs.sort(key=lambda x: x.name)
     return langs
@@ -190,15 +190,20 @@ def load_demo_languages():
 
 def load_demo_stories():
     "Load the stories."
-    demo_glob = os.path.join(_demo_data_path(), "stories", "*.txt")
+    demo_glob = os.path.join(_demo_data_path(), "**", "*.txt")
     for filename in glob(demo_glob):
+        d, f = os.path.split(filename)
+        b = os.path.splitext(f)[0]
+        langname = ""
+        langdeffile = os.path.join(d, "definition.yaml")
+        with open(langdeffile, "r", encoding="utf-8") as file:
+            data = yaml.safe_load(file)
+            langname = data["name"]
+
         with open(filename, "r", encoding="utf-8") as f:
             content = f.read()
 
-        langpatt = r"language:\s*(.*)\n"
-        lang = re.search(langpatt, content).group(1).strip()
-        lang = Language.find_by_name(lang)
-
+        lang = Language.find_by_name(langname)
         if lang is None or not lang.is_supported:
             pass
         else:
@@ -207,6 +212,7 @@ def load_demo_stories():
             content = re.sub(r"#.*\n", "", content)
             b = Book.create_book(title, lang, content)
             db.session.add(b)
+
     SystemSetting.set_value("IsDemoData", True)
     db.session.commit()
     refresh_stats()

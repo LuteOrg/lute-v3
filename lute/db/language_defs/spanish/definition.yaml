@@ -1,0 +1,19 @@
+name: Spanish
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://es.thefreedictionary.com/###
+  - for: terms
+    type: popup
+    url: https://www.wordreference.com/es/en/translation.asp?spen=###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#es/en/###
+# show_romanization: false
+# right_to_left: false
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+# split_sentences: .!?؟۔‎
+# split_sentence_exceptions:
+# word_chars: \x{0600}-\x{06FF}\x{FE70}-\x{FEFC}

@@ -1,0 +1,16 @@
+name: Classical Chinese
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://www.archchinese.com/chinese_english_dictionary.html?find=###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#ch/en/###
+show_romanization: true
+# right_to_left: 
+
+parser_type: classicalchinese
+# character_substitutions:
+split_sentences: .!?。！？
+# split_sentence_exceptions:
+word_chars: 一-龥

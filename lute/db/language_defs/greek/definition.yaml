@@ -1,0 +1,19 @@
+name: Greek
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://www.wordreference.com/gren/###
+  - for: terms
+    type: embedded
+    url: https://en.wiktionary.org/wiki/###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#el/en/###
+show_romanization: true
+# right_to_left:
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+split_sentences: .!?;
+split_sentence_exceptions: Mr.|Mrs.|Dr.|[A-Z].|κτλ.|κλπ.|π.χ.|λ.χ.|κ.ά|δηλ.|Κος.|Κ.|Κα.|μ.Χ.|ΥΓ.|μ.μ.|π.μ.|σελ.|κεφ.|βλ.|αι.
+word_chars: α-ωΑ-ΩάόήέώύίΊΏΈΉΌΆΎϊΪϋΫΐΰ

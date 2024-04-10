@@ -1,0 +1,19 @@
+name: English
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://en.thefreedictionary.com/###
+  - for: terms
+    type: popup
+    url: https://www.collinsdictionary.com/dictionary/english/###
+  - for: sentences
+    type: popup
+    url: https://www.deepl.com/translator#en/en/###
+# show_romanization: 
+# right_to_left: 
+
+# parser_type: defaults to space delimited.
+# character_substitutions:
+# split_sentences: 
+# split_sentence_exceptions:
+# word_chars: 

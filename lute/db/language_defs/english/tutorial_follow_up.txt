@@ -1,0 +1,34 @@
+# title: Tutorial follow-up
+
+Hopefully you've gone through the Tutorial, and created some Terms.
+From the Tutorial, you've already told Lute that you know most of the words on this page.  You can hover over words to see information about them, such as your information you might have added about dogs.
+There are still a few blue words, which according to Lute are still "unknown" to you.  You can process them like you did on the last text.
+(fyi - If a text has a spelling mikstaske, you can edit it by clicking the "hamburger menu" -- three lines -- in the top left corner of this screen, and click "Edit page".  If you'd like, correct the mistake now, and resave this text.)
+Now we'll do a brief spin through a few other things Lute does.  You can read about them and other features in the manual too.
+
+1. The Menus
+In case you missed it, on the Home screen there are some menu bar items on the top right.  Go back there and hover over them to see what you can do.  This is all demo data, so you can do what you want.  (But don't delete the tutorials until you've gone through them.)
+
+2. Term Sentences
+In the "Term" edit form, you can click on the "Sentences" tab to see where that term or its relations have been used.  Click on "elephant", and then click the Sentences tab to see where that term has been used.
+You're only shown sentences on pages that have been marked "Read", using the controls in the footer of the reading screen, i.e. the green checkmark or the ">".  This ensures that you only see references that you have already seen before, so you don't get overwhelmed with new vocabulary, and avoids spoilers of the material you're reading.
+
+3. Archiving, Unarchiving, and Deleting Books
+When you're done reading a book, you can Archive or Delete it.
+Archiving just removes the book from your book listing on the home screen, and you can unarchive at any time.  The sentences for archived books are still available for searching with the Term "Sentences" link.
+On the last page of every book, Lute shows a link for you to archive the book.  You can also archive it from the Home screen by clicking on the "Archive" action (the image with the little down arrow) in the right-most column.  To unarchive the text, go to Home, Book Archive, and click the "Unarchive" action (the little up arrow).
+Deleting a book completely removes it and its sentences.
+Neither archiving nor deleting touch any Terms you've created.
+
+4. Audio
+You can add an audio file (mp3, wav, or ogg) to your books, so you can read along to an audio track.  See the Lute manual for more notes on usage and tips.
+
+5. Themes and toggling highlighting
+Lute has a few themes to make reading more pleasant.  From the "hamburger menu" on the reading screen you can switch to the next theme, or hit the hotkey (m).  You can also toggle highlights, because sometimes they get distracting.
+
+===
+
+Those are the the core feature of Lute!  There are some sample stories for other languages.  Try those out or create your own.
+When you're done with the demo, go back to the Home screen and click the link to clear out the database.  Lute will delete all of the demo data, and you can get started.  You'll be prompted to create your first language, and then you can create your first book.  Lute will then ask you to specify your backup preferences, and with that all done, you'll be off and running.
+There is a Lute Discord and manual as well -- see the "About" menu bar.
+I hope that you find Lute a fun tool to use for learning languages.  Cheers and best wishes!

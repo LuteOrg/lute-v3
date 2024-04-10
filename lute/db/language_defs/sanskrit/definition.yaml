@@ -1,0 +1,14 @@
+name: Sanskrit
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://dsal.uchicago.edu/cgi-bin/app/sanskrit_query.py?qs=###&searchhws=yes&matchtype=default
+  - for: terms
+    type: embedded
+    url: https://www.learnsanskrit.cc/translate?search=###&dir=se
+  - for: sentences
+    type: popup
+    url: https://translate.google.com/?hl=en&sl=sa&tl=en&text=###&op=translate
+show_romanization: true
+split_sentences: .?!।॥
+word_chars: a-zA-Z\u0900-\u0963\u0966-\u097F
