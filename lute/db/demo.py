@@ -144,7 +144,8 @@ def _get_language_from_file(filename):
         ld.usefor = ld_data["for"]
         ld.dicttype = dtype
         ld.dicturi = ld_data["url"]
-        ld.is_active = True
+        ld.is_active = ld_data.get("active", True)
+
         ld.sort_order = ld_sort
         ld_sort += 1
         lang.dictionaries.append(ld)
