@@ -36,7 +36,9 @@ jobs:
         # actual=`readlink -f /usr/bin/mecab`
         # ldd $actual
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
 
     - uses: actions/setup-python@v4
       with:
@@ -121,7 +123,10 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
 
     - uses: actions/setup-python@v4
       with:
@@ -145,7 +150,10 @@ jobs:
     timeout-minutes: 30
     needs: base-ci
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
     - uses: actions/setup-python@v4
       with:
         python-version: 3.11
@@ -175,7 +183,10 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
 
     - uses: actions/setup-python@v4
       with:
