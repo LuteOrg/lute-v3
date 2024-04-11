@@ -2,7 +2,6 @@
 Tests for managing the demo data.
 """
 
-import os
 from sqlalchemy import text
 import pytest
 from lute.db import db
@@ -11,10 +10,9 @@ from lute.db.demo import (
     remove_flag,
     delete_demo_data,
     tutorial_book_id,
-    demo_data_path,
+    get_language_by_name,
     load_demo_data,
     predefined_languages,
-    get_demo_language,
 )
 import lute.parse.registry
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
@@ -69,8 +67,7 @@ def test_new_english_from_yaml_file():
     """
     Smoke test, can load a new language from yaml definition.
     """
-    f = os.path.join(demo_data_path(), "languages", "english.yaml")
-    lang = get_demo_language(f)
+    lang = get_language_by_name("english")
 
     assert lang.name == "English"
     assert lang.show_romanization is False, "uses default"
