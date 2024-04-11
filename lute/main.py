@@ -116,4 +116,5 @@ if __name__ == "__main__":
         print("Error during startup:")
         print(e)
         print("Please try again, or report an issue on GitHub.")
+        print("Additionally, help is available with --help.")
         print("-" * 50)
