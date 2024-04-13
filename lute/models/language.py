@@ -179,3 +179,82 @@ class Language(
             .filter(func.lower(Language.name) == func.lower(name))
             .first()
         )
+
+    def to_dict(self):
+        "Return dictionary of data, for serialization."
+        ret = {}
+        ret["name"] = self.name
+        ret["dictionaries"] = []
+        for d in self.dictionaries:
+            dd = {}
+            dd["for"] = d.usefor
+            dd["type"] = d.dicttype.replace("html", "")
+            dd["url"] = d.dicturi
+            dd["active"] = d.is_active
+            ret["dictionaries"].append(dd)
+        ret["show_romanization"] = self.show_romanization
+        ret["right_to_left"] = self.right_to_left
+        ret["parser_type"] = self.parser_type
+        ret["character_substitutions"] = self.character_substitutions
+        ret["split_sentences"] = self.regexp_split_sentences
+        ret["split_sentence_exceptions"] = self.exceptions_split_sentences
+        ret["word_chars"] = self.word_characters
+        return ret
+
+    @staticmethod
+    def from_dict(d):
+        "Create new Language from dictionary d."
+
+        lang = Language()
+
+        def load(key, method):
+            if key in d:
+                val = d[key]
+                # Handle boolean values
+                if isinstance(val, str):
+                    temp = val.lower()
+                    if temp == "true":
+                        val = True
+                    elif temp == "false":
+                        val = False
+                setattr(lang, method, val)
+
+        # Define mappings for fields
+        mappings = {
+            "name": "name",
+            "show_romanization": "show_romanization",
+            "right_to_left": "right_to_left",
+            "parser_type": "parser_type",
+            "character_substitutions": "character_substitutions",
+            "split_sentences": "regexp_split_sentences",
+            "split_sentence_exceptions": "exceptions_split_sentences",
+            "word_chars": "word_characters",
+        }
+
+        for key in d.keys():
+            funcname = mappings.get(key, "")
+            if funcname:
+                load(key, funcname)
+
+        ld_sort = 1
+        for ld_data in d["dictionaries"]:
+            dtype = ld_data["type"]
+            if dtype == "embedded":
+                dtype = "embeddedhtml"
+            elif dtype == "popup":
+                dtype = "popuphtml"
+            else:
+                raise ValueError(f"Invalid dictionary type {dtype}")
+
+            ld = LanguageDictionary()
+            # ld.language = lang -- if you do this, the dict is added twice.
+            ld.usefor = ld_data["for"]
+            ld.dicttype = dtype
+            ld.dicturi = ld_data["url"]
+            ld.is_active = ld_data.get("active", True)
+
+            ld.sort_order = ld_sort
+            ld_sort += 1
+            lang.dictionaries.append(ld)
+
+        return lang
