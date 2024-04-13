@@ -369,7 +369,7 @@ let move_cursor = function(shiftby) {
   save_curr_data_order(target);
   apply_status_class(target);
   $(window).scrollTo(target, { axis: 'y', offset: -150 });
-  show_term_edit_form(target, { autofocus: false });
+  show_term_edit_form(target);
 }
 
 
