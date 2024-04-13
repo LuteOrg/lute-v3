@@ -33,7 +33,7 @@
   
       {{ form.original_text }}
 
-      <div>{{ form.text(class="form-control", value=(form.original_text.data or ''), autofocus=(not form.original_text.data)) }}</div>
+      <div>{{ form.text(class="form-control", value=(form.original_text.data or '')) }}</div>
 
       <div>{{ form.parentslist(class="form-control") }}</div>
   
@@ -297,22 +297,6 @@
       enforceWhitelist: false,
       whitelist: TAGS
     });  // end tagify
-  };
-
-  // TODO zzfuture fix: check term autofocus
-  // lute.js should send an "autofocus" flag, I believe.
-  let handleAutofocus = function() {
-    const wordfield = $('#text');
-    const transfield = $('#translation');
-
-    if ($('#autofocus').val() != 'false') {
-      if (wordfield.val()) {
-        transfield.focus();
-      }
-      else {
-        wordfield.focus();
-      }
-    }
   };
 
   $(document).ready(function () {
