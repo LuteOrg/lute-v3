@@ -14,7 +14,7 @@ from glob import glob
 import yaml
 from sqlalchemy import text
 
-from lute.models.language import Language, LanguageDictionary
+from lute.models.language import Language
 from lute.models.book import Book
 from lute.book.stats import refresh_stats
 from lute.models.setting import SystemSetting
@@ -97,60 +97,7 @@ def _get_language_from_file(filename):
     """
     with open(filename, "r", encoding="utf-8") as file:
         d = yaml.safe_load(file)
-
-    lang = Language()
-
-    def load(key, method):
-        if key in d:
-            val = d[key]
-            # Handle boolean values
-            if isinstance(val, str):
-                temp = val.lower()
-                if temp == "true":
-                    val = True
-                elif temp == "false":
-                    val = False
-            setattr(lang, method, val)
-
-    # Define mappings for fields
-    mappings = {
-        "name": "name",
-        "show_romanization": "show_romanization",
-        "right_to_left": "right_to_left",
-        "parser_type": "parser_type",
-        "character_substitutions": "character_substitutions",
-        "split_sentences": "regexp_split_sentences",
-        "split_sentence_exceptions": "exceptions_split_sentences",
-        "word_chars": "word_characters",
-    }
-
-    for key in d.keys():
-        funcname = mappings.get(key, "")
-        if funcname:
-            load(key, funcname)
-
-    ld_sort = 1
-    for ld_data in d["dictionaries"]:
-        dtype = ld_data["type"]
-        if dtype == "embedded":
-            dtype = "embeddedhtml"
-        elif dtype == "popup":
-            dtype = "popuphtml"
-        else:
-            raise ValueError(f"Invalid dictionary type {dtype}")
-
-        ld = LanguageDictionary()
-        # ld.language = lang -- if you do this, the dict is added twice.
-        ld.usefor = ld_data["for"]
-        ld.dicttype = dtype
-        ld.dicturi = ld_data["url"]
-        ld.is_active = ld_data.get("active", True)
-
-        ld.sort_order = ld_sort
-        ld_sort += 1
-        lang.dictionaries.append(ld)
-
-    return lang
+        return Language.from_dict(d)
 
 
 def predefined_languages():
