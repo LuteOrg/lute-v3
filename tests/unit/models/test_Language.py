@@ -63,3 +63,16 @@ def test_language_word_char_regex_returns_python_compatible_regex(app_context):
     """
     a = Language.find_by_name("Arabic")
     assert a.word_characters == r"\u0600-\u06FF\uFE70-\uFEFC"
+
+
+def test_lang_to_dict_from_dict_returns_same_thing(app_context):
+    """
+    Lang can be exported to yaml and imported from yaml.
+    A dictionary is used as the intermediary form, so the
+    same language should return the same data.
+    """
+    e = Language.find_by_name("English")
+    e_dict = e.to_dict()
+    e_from_dict = Language.from_dict(e_dict)
+    e_back_to_dict = e_from_dict.to_dict()
+    assert e_dict == e_back_to_dict, "Same thing returned"
