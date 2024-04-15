@@ -14,7 +14,7 @@ def test_get_all_lang_defs(app_context):
     assert len(engs) == 1, "have english"
 
 
-def test_load_def_loads_lang_and_stories(app_context):
+def test_load_def_loads_lang_and_stories(empty_db):
     "Can load a language."
     story_sql = "select bktitle from books"
     lang_sql = "select LgName from languages"
