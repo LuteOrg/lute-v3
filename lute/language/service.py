@@ -1,17 +1,11 @@
 "Language helper methods."
 
-
 import os
 import re
 from glob import glob
 import yaml
-
-# from sqlalchemy import text
-
 from lute.models.language import Language
 from lute.book.model import Book, Repository
-
-# from lute.book.stats import refresh_stats
 from lute.db import db
 
 
@@ -26,6 +20,7 @@ def get_defs():
             entry["language"] = Language.from_dict(d)
         entry["books"] = _get_books(f)
         ret.append(entry)
+    ret.sort(key=lambda x: x["language"].name)
     return ret
 
 
