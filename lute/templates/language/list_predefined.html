@@ -1,45 +1,31 @@
 {% extends 'base.html' %}
 
-{% block title %}Languages{% endblock %}
+{% block title %}Predefined Languages{% endblock %}
 
-{% block header %}Languages{% endblock %}
+{% block header %}Predefined Languages{% endblock %}
 
 {% block body %}
-
-{% if language_data|length == 0 %}
-  <p>No languages defined.</p>
-{% else %}
 
 <div style="width: 70%">
 <table id="languagetable" class="table dataTable no-footer" style="margin: 0;">
   <thead>
     <tr>
       <th>Language</th>
-      <th>Books</th>
-      <th>Terms</th>
     </tr>
   </thead>
   <tbody>
-    {% for language, book_count, term_count in language_data %}
+    {% for language in predefined %}
     <tr>
       <td>
-        <a href="/language/edit/{{ language.id }}">
+        <a href="/language/load_predefined/{{ language.name }}">
           {{ language.name }}
         </a>
       </td>
-      <td>{{ book_count or '-' }}</td>
-      <td>{{ term_count or '-' }}</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
 </div>
-
-{% endif %}
-
-<br />
-<p><a href="{{ url_for('language.list_predefined') }}">Load predefined language and sample stories</a></p>
-<p><a href="{{ url_for('language.new') }}">Create new</a></p>
 
 <script>
   var language_listing_table;
@@ -54,7 +40,6 @@
       info: true,
       searching: true,
       processing: true,
-      stateSave: true,
     });
   }; // end setup_lang_datatable
 

@@ -170,3 +170,20 @@ def delete(langid):
         flash(f"Language {langid} not found")
     Language.delete(language)
     return redirect(url_for("language.index"))
+
+
+@bp.route("/list_predefined", methods=["GET"])
+def list_predefined():
+    "Show predefined languages that are not already in the db."
+    predefined = lute.language.service.predefined_languages()
+    existing_langs = db.session.query(Language).all()
+    existing_names = [l.name for l in existing_langs]
+    new_langs = [p for p in predefined if p.name not in existing_names]
+    return render_template("language/list_predefined.html", predefined=new_langs)
+
+
+@bp.route("/load_predefined/<langname>", methods=["GET"])
+def load_predefined(langname):
+    "Load a predefined language and its stories."
+    lute.language.service.load_language_def(langname)
+    return redirect("/")
