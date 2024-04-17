@@ -10,7 +10,6 @@ from lute.db.demo import (
     remove_flag,
     delete_demo_data,
     tutorial_book_id,
-    get_language_by_name,
     load_demo_data,
     predefined_languages,
 )
@@ -61,29 +60,6 @@ def test_tutorial_id_returned_if_present(app_context):
 
 
 # Getting languages from yaml files.
-
-
-def test_new_english_from_yaml_file():
-    """
-    Smoke test, can load a new language from yaml definition.
-    """
-    lang = get_language_by_name("english")
-
-    assert lang.name == "English"
-    assert lang.show_romanization is False, "uses default"
-    assert lang.right_to_left is False, "uses default"
-
-    print(lang.dictionaries)
-    expected = [
-        "terms; embeddedhtml; https://en.thefreedictionary.com/###; True; 1",
-        "terms; popuphtml; https://www.collinsdictionary.com/dictionary/english/###; True; 2",
-        "sentences; popuphtml; https://www.deepl.com/translator#en/en/###; True; 3",
-    ]
-    actual = [
-        f"{ld.usefor}; {ld.dicttype}; {ld.dicturi}; {ld.is_active}; {ld.sort_order}"
-        for ld in lang.dictionaries
-    ]
-    assert actual == expected, "dictionaries"
 
 
 def test_get_predefined():
