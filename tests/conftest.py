@@ -8,6 +8,7 @@ import pytest
 
 from lute.config.app_config import AppConfig
 from lute.db import db
+from lute.language.service import get_language_def
 import lute.db.demo
 from lute.app_factory import create_app
 
@@ -98,68 +99,48 @@ def fixture_demo_client(app):
     return app.test_client()
 
 
-@pytest.fixture(name="test_languages")
-def fixture_test_languages(app_context):
-    "Dict of available languages for tests."
-
-    def _get_language(langname):
-        """
-        Return language from the db if it already exists,
-        or create it from the file.
-        """
-        lang = lute.db.demo.get_language_by_name(langname)
-        dblang = db.session.query(Language).filter(Language.name == lang.name).first()
-        if dblang is None:
-            return lang
-        return dblang
-
-    # Hardcoded = good enough.
-    langs = [
-        "spanish",
-        "english",
-        "japanese",
-        "turkish",
-        "classical_chinese",
-        "german",
-        "hindi",
-    ]
-
-    ret = {}
-    for lang in langs:
-        ret[lang] = _get_language(lang)
-    yield ret
+def _get_test_language(lang_name):
+    """
+    Return language from the db if it already exists,
+    or create it from the file.
+    """
+    lang = db.session.query(Language).filter(Language.name == lang_name).first()
+    if lang is not None:
+        return lang
+    lang = get_language_def(lang_name)["language"]
+    return lang
 
 
 @pytest.fixture(name="spanish")
-def fixture_spanish(test_languages):
-    return test_languages["spanish"]
+def fixture_spanish():
+    return _get_test_language("Spanish")
 
 
 @pytest.fixture(name="english")
-def fixture_english(test_languages):
-    return test_languages["english"]
+def fixture_english():
+    return _get_test_language("English")
 
 
 @pytest.fixture(name="japanese")
-def fixture_japanese(test_languages):
-    return test_languages["japanese"]
+def fixture_japanese():
+    return _get_test_language("Japanese")
 
 
 @pytest.fixture(name="turkish")
-def fixture_turkish(test_languages):
-    return test_languages["turkish"]
+def fixture_turkish():
+    return _get_test_language("Turkish")
 
 
 @pytest.fixture(name="classical_chinese")
-def fixture_cl_chinese(test_languages):
-    return test_languages["classical_chinese"]
+def fixture_cl_chinese():
+    return _get_test_language("Classical Chinese")
 
 
 @pytest.fixture(name="german")
-def fixture_german(test_languages):
-    return test_languages["german"]
+def fixture_german():
+    return _get_test_language("German")
 
 
 @pytest.fixture(name="hindi")
-def fixture_hindi(test_languages):
-    return test_languages["hindi"]
+def fixture_hindi():
+    return _get_test_language("Hindi")
