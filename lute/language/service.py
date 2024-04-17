@@ -15,16 +15,18 @@ def get_defs():
     def_glob = os.path.join(_language_defs_path(), "**", "definition.yaml")
     for f in glob(def_glob):
         entry = {}
+        d = {}
         with open(f, "r", encoding="utf-8") as df:
             d = yaml.safe_load(df)
-            entry["language"] = Language.from_dict(d)
-        entry["books"] = _get_books(f)
+        lang = Language.from_dict(d)
+        entry["language"] = lang
+        entry["books"] = _get_books(f, lang.name)
         ret.append(entry)
     ret.sort(key=lambda x: x["language"].name)
     return ret
 
 
-def _get_books(lang_definition_filename):
+def _get_books(lang_definition_filename, lang_name):
     "Get the stories in the same directory as the definition.yaml."
     books = []
     d, f = os.path.split(lang_definition_filename)
@@ -36,6 +38,7 @@ def _get_books(lang_definition_filename):
         title = title_match.group(1).strip()
         content = re.sub(r"#.*\n", "", content)
         b = Book()
+        b.language_name = lang_name
         b.title = title
         b.text = content
         books.append(b)
@@ -55,7 +58,6 @@ def load_language_def(lang_name):
 
     r = Repository(db)
     for b in load_def["books"]:
-        b.language_id = lang.id
         r.add(b)
     r.commit()
 
