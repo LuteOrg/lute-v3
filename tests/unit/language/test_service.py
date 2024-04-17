@@ -18,6 +18,28 @@ def test_get_all_lang_defs(app_context):
     assert titles == ["Tutorial", "Tutorial follow-up"], "book titles"
 
 
+def test_get_language_def():
+    """
+    Smoke test, can load a new language from yaml definition.
+    """
+    lang = service.get_language_def("English")["language"]
+
+    assert lang.name == "English"
+    assert lang.show_romanization is False, "uses default"
+    assert lang.right_to_left is False, "uses default"
+
+    expected = [
+        "terms; embeddedhtml; https://en.thefreedictionary.com/###; True; 1",
+        "terms; popuphtml; https://www.collinsdictionary.com/dictionary/english/###; True; 2",
+        "sentences; popuphtml; https://www.deepl.com/translator#en/en/###; True; 3",
+    ]
+    actual = [
+        f"{ld.usefor}; {ld.dicttype}; {ld.dicturi}; {ld.is_active}; {ld.sort_order}"
+        for ld in lang.dictionaries
+    ]
+    assert actual == expected, "dictionaries"
+
+
 def test_load_def_loads_lang_and_stories(empty_db):
     "Can load a language."
     story_sql = "select bktitle from books"
