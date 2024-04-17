@@ -56,13 +56,8 @@ def get_language_def(lang_name):
 
 def load_language_def(lang_name):
     "Load a language def and its stories, save to database."
-    defs = get_defs()
-    load_def = [d for d in defs if d["language"].name == lang_name]
-    if len(load_def) == 0:
-        raise RuntimeError(f"Missing language def name {lang_name}")
-    load_def = load_def[0]
-    lang = load_def["language"]
-    db.session.add(lang)
+    load_def = get_language_def(lang_name)
+    db.session.add(load_def["language"])
     db.session.commit()
 
     r = Repository(db)
