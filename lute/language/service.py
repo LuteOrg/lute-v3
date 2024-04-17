@@ -62,13 +62,16 @@ def get_language_def(lang_name):
 def load_language_def(lang_name):
     "Load a language def and its stories, save to database."
     load_def = get_language_def(lang_name)
-    db.session.add(load_def["language"])
+    lang = load_def["language"]
+    db.session.add(lang)
     db.session.commit()
 
     r = Repository(db)
     for b in load_def["books"]:
         r.add(b)
     r.commit()
+
+    return lang.id
 
 
 def _language_defs_path():
