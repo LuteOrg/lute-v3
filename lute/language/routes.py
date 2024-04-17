@@ -185,5 +185,7 @@ def list_predefined():
 @bp.route("/load_predefined/<langname>", methods=["GET"])
 def load_predefined(langname):
     "Load a predefined language and its stories."
-    lute.language.service.load_language_def(langname)
+    lang_id = lute.language.service.load_language_def(langname)
+    UserSetting.set_value("current_language_id", lang_id)
+    db.session.commit()
     return redirect("/")

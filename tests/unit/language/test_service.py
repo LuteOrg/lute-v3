@@ -47,6 +47,7 @@ def test_load_def_loads_lang_and_stories(empty_db):
     assert_sql_result(lang_sql, [], "no langs")
     assert_sql_result(story_sql, [], "nothing loaded")
 
-    service.load_language_def("English")
+    lang_id = service.load_language_def("English")
+    assert lang_id > 0, "ID returned, used for filtering"
     assert_sql_result(lang_sql, ["English"], "eng loaded")
     assert_sql_result(story_sql, ["Tutorial", "Tutorial follow-up"], "stories loaded")
