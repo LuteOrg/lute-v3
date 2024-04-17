@@ -49,6 +49,25 @@ def test_save_new(app_context, new_book, repo):
     assert book.book_tags == ["tag1", "tag2"], "tags filled"
 
 
+def test_can_save_new_book_by_language_name(app_context, new_book, repo):
+    """
+    Can save a book with language name, useful for api access.
+    """
+    sql = "select BkTitle from books where BkTitle = 'HELLO'"
+    assert_sql_result(sql, [], "empty table")
+
+    new_book.language_id = None
+    new_book.language_name = "English"
+    b = repo.add(new_book)
+    repo.commit()
+    assert_sql_result(sql, ["HELLO"], "Saved")
+    assert b.texts[0].text == "greeting"
+
+    book = repo.load(b.id)
+    assert book.title == new_book.title, "found book"
+    assert book.book_tags == ["tag1", "tag2"], "tags filled"
+
+
 def test_save_new_respects_book_words_per_page_count(app_context, new_book, repo):
     """
     Saving a simple Book object loads the database.
