@@ -9,9 +9,9 @@ from lute.models.language import Language
 from lute.models.setting import UserSetting
 from lute.models.book import Book
 from lute.models.term import Term
+import lute.language.service
 from lute.language.forms import LanguageForm
 from lute.db import db
-from lute.db.demo import predefined_languages
 from lute.parse.registry import supported_parsers
 
 bp = Blueprint("language", __name__, url_prefix="/language")
@@ -130,7 +130,7 @@ def new(langname):
     """
     Create a new language.
     """
-    predefined = predefined_languages()
+    predefined = lute.language.service.predefined_languages()
     language = Language()
     if langname is not None:
         candidates = [lang for lang in predefined if lang.name == langname]

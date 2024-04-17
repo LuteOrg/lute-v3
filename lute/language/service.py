@@ -26,6 +26,11 @@ def get_defs():
     return ret
 
 
+def predefined_languages():
+    "Languages defined in yaml files."
+    return [d["language"] for d in get_defs()]
+
+
 def _get_books(lang_definition_filename, lang_name):
     "Get the stories in the same directory as the definition.yaml."
     books = []
