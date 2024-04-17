@@ -11,7 +11,6 @@ from lute.db.demo import (
     delete_demo_data,
     tutorial_book_id,
     load_demo_data,
-    predefined_languages,
 )
 import lute.parse.registry
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
@@ -57,19 +56,6 @@ def test_tutorial_id_returned_if_present(app_context):
 
     delete_demo_data()
     assert tutorial_book_id() is None, "no tutorial"
-
-
-# Getting languages from yaml files.
-
-
-def test_get_predefined():
-    """
-    Returns all the languages using the files in the demo folder.
-    """
-    langs = predefined_languages()
-    langnames = [lang.name for lang in langs]
-    for expected in ["English", "French", "Turkish"]:
-        assert expected in langnames, expected
 
 
 # Loading.

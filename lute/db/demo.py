@@ -8,12 +8,7 @@ The db settings table contains a record, StKey = 'IsDemoData', if the
 data is demo.
 """
 
-import os
-from glob import glob
-import yaml
 from sqlalchemy import text
-
-from lute.models.language import Language
 import lute.language.service
 from lute.book.model import Repository
 from lute.book.stats import refresh_stats
@@ -92,32 +87,6 @@ def delete_demo_data():
 
 
 # Loading demo data.
-
-
-def _demo_data_path():
-    """
-    Path to the demo data yaml files.
-    """
-    thisdir = os.path.dirname(__file__)
-    demo_dir = os.path.join(thisdir, "language_defs")
-    return os.path.abspath(demo_dir)
-
-
-def _get_language_from_file(filename):
-    """
-    Create a new Language object from a yaml definition.
-    """
-    with open(filename, "r", encoding="utf-8") as file:
-        d = yaml.safe_load(file)
-        return Language.from_dict(d)
-
-
-def predefined_languages():
-    "Languages that have yaml files."
-    demo_glob = os.path.join(_demo_data_path(), "**", "definition.yaml")
-    langs = [_get_language_from_file(f) for f in glob(demo_glob)]
-    langs.sort(key=lambda x: x.name)
-    return langs
 
 
 def load_demo_languages():
