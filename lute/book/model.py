@@ -9,11 +9,16 @@ from lute.models.language import Language
 class Book:  # pylint: disable=too-many-instance-attributes
     """
     A book domain object, to create/edit lute.models.book.Books.
+
+    Book language can be specified either by language_id, or
+    language_name.  language_name is useful for loading books via
+    scripts/api.  language_id takes precedence.
     """
 
     def __init__(self):
         self.id = None
         self.language_id = None
+        self.language_name = None
         self.title = None
         self.text = None
         self.max_page_tokens = 250
@@ -78,7 +83,11 @@ class Repository:
     def _build_db_book(self, book):
         "Convert a book business object to a DBBook."
 
-        lang = Language.find(book.language_id)
+        lang = None
+        if book.language_id:
+            lang = Language.find(book.language_id)
+        elif book.language_name:
+            lang = Language.find_by_name(book.language_name)
 
         b = None
         if book.id is None:
@@ -105,6 +114,7 @@ class Repository:
         b = Book()
         b.id = dbbook.id
         b.language_id = dbbook.language.id
+        b.language_name = dbbook.language.name
         b.title = dbbook.title
         b.text = None  # Not returning this for now
         b.source_uri = dbbook.source_uri
