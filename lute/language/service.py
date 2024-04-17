@@ -45,6 +45,15 @@ def _get_books(lang_definition_filename, lang_name):
     return books
 
 
+def get_language_def(lang_name):
+    "Get a lang def and its stories."
+    defs = get_defs()
+    ret = [d for d in defs if d["language"].name == lang_name]
+    if len(ret) == 0:
+        raise RuntimeError(f"Missing language def name {lang_name}")
+    return ret[0]
+
+
 def load_language_def(lang_name):
     "Load a language def and its stories, save to database."
     defs = get_defs()
