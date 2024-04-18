@@ -188,4 +188,5 @@ def load_predefined(langname):
     lang_id = lute.language.service.load_language_def(langname)
     UserSetting.set_value("current_language_id", lang_id)
     db.session.commit()
+    flash(f"Loaded {langname} and sample book(s)")
     return redirect("/")
