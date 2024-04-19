@@ -1,5 +1,5 @@
 """
-Export language definition and first two pages of all books to zzoutput/<langname>
+Export language definition and first two pages of all books to lute/db/language_defs/
 
 Run this as a module from the root directory, with languages to export as args:
 
@@ -18,7 +18,14 @@ from lute.db import db
 import lute.app_factory
 
 
-def partial_book_content(b):
+def _language_defs_path():
+    "Path to the definitions and stories."
+    thisdir = os.path.dirname(__file__)
+    d = os.path.join(thisdir, "..", "lute", "db", "language_defs")
+    return os.path.abspath(d)
+
+
+def _partial_book_content(b):
     "Get book content as string."
     fulltext = [t.text for t in b.texts]
     first_two_pages = fulltext[:2]
@@ -26,7 +33,7 @@ def partial_book_content(b):
     return f"# title: {b.title}\n\n{s}"
 
 
-def write_langs(language_names, outdir):
+def _write_langs(language_names, outdir):
     "Write all langs and books."
     langs = db.session.query(Language).all()
     langs = [lang for lang in langs if lang.name.lower() in language_names]
@@ -47,7 +54,7 @@ def write_langs(language_names, outdir):
             filename = b.title.lower().replace(" ", "_")
             file_path = os.path.join(langdir, f"{filename}.txt")
             with open(file_path, "w", encoding="utf-8") as f:
-                f.write(partial_book_content(b))
+                f.write(_partial_book_content(b))
             file_size_bytes = os.path.getsize(file_path)
             file_size_kb = file_size_bytes / 1024
             print(f"- {filename} ({file_size_kb:.2f} KB)")
@@ -55,17 +62,14 @@ def write_langs(language_names, outdir):
 
 def main(langnames):
     "Entry point."
-    outputdir = os.path.join(os.getcwd(), "zzoutput")
-    if not os.path.exists(outputdir):
-        os.mkdir(outputdir)
+    outputdir = _language_defs_path()
     print(f"Outputting to {outputdir}")
 
     langnames = [n.lower() for n in langnames]
     langnames = list(set(langnames))
-
     app = lute.app_factory.create_app()
     with app.app_context():
-        write_langs(langnames, outputdir)
+        _write_langs(langnames, outputdir)
 
 
 #####################
