@@ -12,7 +12,6 @@ import sys
 import os
 import yaml
 
-from lute.config.app_config import AppConfig
 from lute.models.book import Book
 from lute.models.language import Language
 from lute.db import db
@@ -59,14 +58,12 @@ def main(langnames):
     outputdir = os.path.join(os.getcwd(), "zzoutput")
     if not os.path.exists(outputdir):
         os.mkdir(outputdir)
+    print(f"Outputting to {outputdir}")
 
     langnames = [n.lower() for n in langnames]
     langnames = list(set(langnames))
 
-    config_file_path = "config.yml"
-    if not os.path.exists("config.yml"):
-        config_file_path = AppConfig.default_config_filename()
-    app = lute.app_factory.create_app(config_file_path)
+    app = lute.app_factory.create_app()
     with app.app_context():
         write_langs(langnames, outputdir)
 
