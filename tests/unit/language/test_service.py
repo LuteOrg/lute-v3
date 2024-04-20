@@ -51,3 +51,17 @@ def test_load_def_loads_lang_and_stories(empty_db):
     assert lang_id > 0, "ID returned, used for filtering"
     assert_sql_result(lang_sql, ["English"], "eng loaded")
     assert_sql_result(story_sql, ["Tutorial", "Tutorial follow-up"], "stories loaded")
+
+
+def test_load_all_defs_loads_lang_and_stories(empty_db):
+    "Smoke test, load everything."
+    story_sql = "select bktitle from books"
+    lang_sql = "select LgName from languages"
+    assert_sql_result(lang_sql, [], "no langs")
+    assert_sql_result(story_sql, [], "nothing loaded")
+
+    defs = service.get_defs()
+    langnames = [d["language"].name for d in defs]
+    for n in langnames:
+        lang_id = service.load_language_def(n)
+        assert lang_id > 0, "Loaded"
