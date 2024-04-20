@@ -29,7 +29,7 @@ def _partial_book_content(b):
     "Get book content as string."
     fulltext = [t.text for t in b.texts]
     first_two_pages = fulltext[:2]
-    s = "\n".join(first_two_pages).strip()
+    s = "\n".join(first_two_pages).replace("\r", "").strip()
     return f"# title: {b.title}\n\n{s}"
 
 
