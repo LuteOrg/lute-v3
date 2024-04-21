@@ -15,6 +15,7 @@ def test_get_all_lang_defs(app_context):
     eng = engs[0]
     assert len(eng["books"]) == 2, "tutorial and follow-up"
     titles = [b.title for b in eng["books"]]
+    titles.sort()
     assert titles == ["Tutorial", "Tutorial follow-up"], "book titles"
 
 
@@ -42,7 +43,7 @@ def test_get_language_def():
 
 def test_load_def_loads_lang_and_stories(empty_db):
     "Can load a language."
-    story_sql = "select bktitle from books"
+    story_sql = "select bktitle from books order by BkTitle"
     lang_sql = "select LgName from languages"
     assert_sql_result(lang_sql, [], "no langs")
     assert_sql_result(story_sql, [], "nothing loaded")
