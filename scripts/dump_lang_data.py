@@ -50,6 +50,7 @@ def _write_langs(language_names, outdir):
         print(lang.name)
 
         books = db.session.query(Book).filter(Book.language == lang).all()
+        books = [b for b in books if not b.archived]
         story_count = 1
         for b in books:
             filename = f"story_{story_count}"
