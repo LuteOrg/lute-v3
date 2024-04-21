@@ -362,19 +362,6 @@ class Term(
             return None
         return terms[0]
 
-    @staticmethod
-    def delete_all_status_0_terms():
-        """
-        Data clean up, in case alpha release of
-        https://github.com/jzohrab/lute-v3/issues/99
-        doesn't go well.
-        """
-        terms = db.session.query(Term).filter(Term.status == 0).all()
-        for t in terms:
-            db.session.delete(t)
-        db.session.commit()
-        return len(terms)
-
 
 class Status:
     """
