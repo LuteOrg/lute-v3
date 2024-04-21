@@ -8,18 +8,35 @@ The db settings table contains a record, StKey = 'IsDemoData', if the
 data is demo.
 """
 
-import os
-import re
-from glob import glob
-import yaml
 from sqlalchemy import text
-
-from lute.models.language import Language
-from lute.models.book import Book
+import lute.language.service
+from lute.book.model import Repository
 from lute.book.stats import refresh_stats
 from lute.models.setting import SystemSetting
 from lute.db import db
 import lute.db.management
+
+
+def _demo_languages():
+    """
+    Demo languages to be loaded for new users.
+    Also loaded during tests.
+    """
+    return [
+        "Arabic",
+        "Classical Chinese",
+        "Czech",
+        "English",
+        "French",
+        "German",
+        "Greek",
+        "Hindi",
+        "Japanese",
+        "Russian",
+        "Sanskrit",
+        "Spanish",
+        "Turkish",
+    ]
 
 
 def contains_demo_data():
@@ -72,64 +89,17 @@ def delete_demo_data():
 # Loading demo data.
 
 
-def _demo_data_path():
-    """
-    Path to the demo data yaml files.
-    """
-    thisdir = os.path.dirname(__file__)
-    demo_dir = os.path.join(thisdir, "language_defs")
-    return os.path.abspath(demo_dir)
-
-
-def get_language_by_name(langname):
-    """
-    Create a new language object from its yaml definition.
-
-    Note this isn't coded quite right ... it's really using the file path ...
-    """
-    filename = os.path.join(_demo_data_path(), langname, "definition.yaml")
-    return _get_language_from_file(filename)
-
-
-def _get_language_from_file(filename):
-    """
-    Create a new Language object from a yaml definition.
-    """
-    with open(filename, "r", encoding="utf-8") as file:
-        d = yaml.safe_load(file)
-        return Language.from_dict(d)
-
-
-def predefined_languages():
-    "Languages that have yaml files."
-    demo_glob = os.path.join(_demo_data_path(), "**", "definition.yaml")
-    langs = [_get_language_from_file(f) for f in glob(demo_glob)]
-    langs.sort(key=lambda x: x.name)
-    return langs
-
-
 def load_demo_languages():
     """
     Load selected predefined languages.  Assume everything is supported.
 
     This method will also be called during acceptance tests, so it's public.
     """
-    demo_langs = [
-        "arabic",
-        "classical_chinese",
-        "czech",
-        "english",
-        "french",
-        "german",
-        "greek",
-        "hindi",
-        "japanese",
-        "russian",
-        "sanskrit",
-        "spanish",
-        "turkish",
+    demo_langs = _demo_languages()
+    langs = [
+        lute.language.service.get_language_def(langname)["language"]
+        for langname in demo_langs
     ]
-    langs = [get_language_by_name(langname) for langname in demo_langs]
     supported = [lang for lang in langs if lang.is_supported]
     for lang in supported:
         db.session.add(lang)
@@ -138,28 +108,17 @@ def load_demo_languages():
 
 def load_demo_stories():
     "Load the stories."
-    demo_glob = os.path.join(_demo_data_path(), "**", "*.txt")
-    for filename in glob(demo_glob):
-        d, f = os.path.split(filename)
-        b = os.path.splitext(f)[0]
-        langname = ""
-        langdeffile = os.path.join(d, "definition.yaml")
-        with open(langdeffile, "r", encoding="utf-8") as file:
-            data = yaml.safe_load(file)
-            langname = data["name"]
+    demo_langs = _demo_languages()
+    langdefs = [
+        lute.language.service.get_language_def(langname) for langname in demo_langs
+    ]
+    langdefs = [d for d in langdefs if d["language"].is_supported]
 
-        with open(filename, "r", encoding="utf-8") as f:
-            content = f.read()
-
-        lang = Language.find_by_name(langname)
-        if lang is None or not lang.is_supported:
-            pass
-        else:
-            title_match = re.search(r"title:\s*(.*)\n", content)
-            title = title_match.group(1).strip()
-            content = re.sub(r"#.*\n", "", content)
-            b = Book.create_book(title, lang, content)
-            db.session.add(b)
+    r = Repository(db)
+    for d in langdefs:
+        for b in d["books"]:
+            r.add(b)
+    r.commit()
 
     SystemSetting.set_value("IsDemoData", True)
     db.session.commit()

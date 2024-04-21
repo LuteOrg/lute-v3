@@ -105,14 +105,20 @@ def _site_is_running(useport=None):
     help={
         "port": "optional port to run on; creates server if needed.",
         "show": "print data",
-        "headless": "run as headless",
+        "noheadless": "run as non-headless (default is headless, i.e. not shown)",
         "kflag": "optional -k flag argument",
         "exitfirst": "exit on first failure",
         "verbose": "make verbose",
     },
 )
 def accept(  # pylint: disable=too-many-arguments
-    c, port=5000, show=False, headless=False, kflag=None, exitfirst=False, verbose=False
+    c,
+    port=5000,
+    show=False,
+    noheadless=False,
+    kflag=None,
+    exitfirst=False,
+    verbose=False,
 ):
     """
     Start lute, run tests/acceptance tests, screenshot fails.
@@ -131,7 +137,7 @@ def accept(  # pylint: disable=too-many-arguments
 
     if show:
         run_test.append("-s")
-    if headless:
+    if not noheadless:
         run_test.append("--headless")
     if kflag:
         run_test.append("-k")
