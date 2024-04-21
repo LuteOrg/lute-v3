@@ -68,7 +68,7 @@ jobs:
         set -e
         # Have to explicitly set MECAB_PATH for natto-py.
         export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
-        inv accept --headless --show --verbose
+        inv accept --show --verbose
 
     # Playwright tests were hanging far too often on github ci,
     # but not consistently.  No idea what was going wrong.
@@ -93,7 +93,7 @@ jobs:
     # comes with _all_ stories pre-loaded and the invalid ones
     # are deleted ...
     - name: Smoke test no mecab
-      run: inv accept --headless -s -k disabled_data_is_hidden
+      run: inv accept -s -k disabled_data_is_hidden
 
     - name: Check flit package
       run: |
@@ -218,11 +218,11 @@ jobs:
     # Run specific sanity check.
     # Old tests no longer run -- datatables may have timing issues on Windows tests,
     # tests were far too flaky.
-    # inv accept --headless -s -k test_unsupported_language_not_shown || exit /b
-    # inv accept --headless -s -k import_a_valid_term_file || exit /b
+    # inv accept -s -k test_unsupported_language_not_shown || exit /b
+    # inv accept -s -k import_a_valid_term_file || exit /b
     - name: Smoke tests
       run: |
-        inv accept --headless -s -k test_updating_term_status_updates_the_reading_frame || exit /b
+        inv accept -s -k test_updating_term_status_updates_the_reading_frame || exit /b
 
     - name: Remove config to force using prod config
       run: del ${{ github.workspace }}\lute\config\config.yml

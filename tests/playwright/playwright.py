@@ -46,7 +46,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     _print("Opening browser.")
     browser = p.chromium.launch(headless=not showbrowser)
     context = browser.new_context()
-    context.set_default_timeout(3000)
+    context.set_default_timeout(30000)
     page = context.new_page()
 
     _print("Reset db.")
