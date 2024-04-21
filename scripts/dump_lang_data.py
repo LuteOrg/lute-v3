@@ -50,13 +50,14 @@ def _write_langs(language_names, outdir):
         print(lang.name)
 
         books = db.session.query(Book).filter(Book.language == lang).all()
+        story_count = 1
         for b in books:
-            filename = b.title.lower().replace(" ", "_")
+            filename = f"story_{story_count}"
+            story_count += 1
             file_path = os.path.join(langdir, f"{filename}.txt")
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(_partial_book_content(b))
-            file_size_bytes = os.path.getsize(file_path)
-            file_size_kb = file_size_bytes / 1024
+            file_size_kb = os.path.getsize(file_path) / 1024
             print(f"- {filename} ({file_size_kb:.2f} KB)")
 
 
