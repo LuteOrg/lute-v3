@@ -1,4 +1,25 @@
 
+# 3.3.2 (2024-04-25)
+
+Feature changes:
+
+* Add many predefined languages: Afrikaans, Albanian, Amharic, Armenian, Azerbaijani, Basque, Belarusian, Bengali, Breton, Bulgarian, Catalan, Croatian, Danish, Dutch, Esperanto, Estonian, Farsi, Finnish, Galician, Georgian, Gothic, Hebrew, Hungarian, Icelandic, Indonesian, Italian, Latin, Latvian, Lithuanian, Norwegian, Polish, Portuguese, Punjabi, Romanian, Serbian, Slovak, Slovenian, Swahili, Swedish, Tibetan, Ukrainian, Vietnamese
+* Add "load predefined language and sample story" link.
+* Redesign audio playback rate control.  By @webofpies in #388
+
+Bug fixes:
+
+* Issue #377: fix audio player style for smaller views.  By @webofpies in #378
+* Issue #387: importing Term csv shouldn't update parent term status to "new".
+* Issue #344: bump openepub dependency to handle parsing error
+
+Back end changes:
+
+* Move all repos to new GitHub org, https://github.com/LuteOrg
+* Move language definitions to https://github.com/LuteOrg/lute-language-defs, include via git submodule
+* Change data loads to use language definitions submodule
+
+
 # 3.3.1 (2024-03-26)
 
 Fix for issue #375, Japanese production bug.
