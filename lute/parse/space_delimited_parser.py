@@ -106,17 +106,17 @@ class SpaceDelimitedParser(AbstractParser):
         ranges = []
         current = None
 
-        def make_ucode(n):
-            "Make unicode code point for regex."
-            return (r"\u{:04x}" if n < 0x10000 else r"\U{:08x}").format(n)
-
         def add_current_to_ranges():
-            "Add the current range."
-            start_code = make_ucode(current[0])
+            def ucode(n):
+                "Unicode point for integer."
+                fstring = r"\u{:04x}" if n < 0x10000 else r"\U{:08x}"
+                return (fstring).format(n)
+
+            start_code = ucode(current[0])
             if current[0] == current[1]:
                 range_string = start_code
             else:
-                endcode = make_ucode(current[1])
+                endcode = ucode(current[1])
                 range_string = f"{start_code}-{endcode}"
             ranges.append(range_string)
 
@@ -125,18 +125,12 @@ class SpaceDelimitedParser(AbstractParser):
                 if current is not None:
                     add_current_to_ranges()
                     current = None
-                continue
-
-            if current is None:
+            elif current is None:
+                # Starting a new range.
                 current = [i, i]
-                continue
-
-            if current[1] == (i - 1):
+            else:
+                # Extending existing range.
                 current[1] = i
-                continue
-
-            add_current_to_ranges()
-            current = None
 
         if current is not None:
             add_current_to_ranges()

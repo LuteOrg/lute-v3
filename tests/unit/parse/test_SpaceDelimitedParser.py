@@ -275,7 +275,6 @@ def test_get_default_word_characters_refactor():
     old_dwc = SpaceDelimitedParser.get_default_word_characters()
     refactored_dwc = SpaceDelimitedParser.refactored_get_default_word_characters()
     assert refactored_dwc == old_dwc
-    print(old_dwc)
 
 
 def test_all_chars_in_categories_match_default_word_chars():
