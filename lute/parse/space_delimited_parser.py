@@ -38,7 +38,7 @@ class SpaceDelimitedParser(AbstractParser):
 
     @staticmethod
     @functools.lru_cache
-    def get_default_word_characters() -> str:
+    def old_get_default_word_characters() -> str:
         """Return default value for lang.word_characters."""
 
         # Unicode categories reference: https://www.compart.com/en/unicode/category
@@ -93,7 +93,7 @@ class SpaceDelimitedParser(AbstractParser):
 
     @staticmethod
     @functools.lru_cache
-    def refactored_get_default_word_characters() -> str:
+    def get_default_word_characters() -> str:
         """Return default value for lang.word_characters."""
 
         # Unicode categories reference: https://www.compart.com/en/unicode/category

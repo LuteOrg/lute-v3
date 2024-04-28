@@ -272,9 +272,9 @@ def test_default_word_pattern_gothic(generic):
 
 def test_get_default_word_characters_refactor():
     "Refactoring tough method."
-    old_dwc = SpaceDelimitedParser.get_default_word_characters()
-    refactored_dwc = SpaceDelimitedParser.refactored_get_default_word_characters()
-    assert refactored_dwc == old_dwc
+    old_dwc = SpaceDelimitedParser.old_get_default_word_characters()
+    dwc = SpaceDelimitedParser.get_default_word_characters()
+    assert dwc == old_dwc
 
 
 def test_all_chars_in_categories_match_default_word_chars():
