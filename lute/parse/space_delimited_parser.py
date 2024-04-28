@@ -120,10 +120,7 @@ class SpaceDelimitedParser(AbstractParser):
                 ranges.append(s1 + "-" + s2)
 
         for i in range(1, sys.maxunicode):
-            c = chr(i)
-            category = unicodedata.category(c)
-
-            if category not in categories:
+            if unicodedata.category(chr(i)) not in categories:
                 continue
 
             if current is None:
