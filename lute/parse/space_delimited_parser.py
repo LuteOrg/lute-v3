@@ -114,10 +114,11 @@ class SpaceDelimitedParser(AbstractParser):
             "Add the current range."
             start_code = make_ucode(current[0])
             if current[0] == current[1]:
-                ranges.append(start_code)
+                range_string = start_code
             else:
                 endcode = make_ucode(current[1])
-                ranges.append(f"{start_code}-{endcode}")
+                range_string = f"{start_code}-{endcode}"
+            ranges.append(range_string)
 
         for i in range(1, sys.maxunicode):
             if unicodedata.category(chr(i)) not in categories:
