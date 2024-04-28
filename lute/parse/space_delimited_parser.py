@@ -121,6 +121,9 @@ class SpaceDelimitedParser(AbstractParser):
 
         for i in range(1, sys.maxunicode):
             if unicodedata.category(chr(i)) not in categories:
+                if current is not None:
+                    add_current_to_ranges()
+                    current = None
                 continue
 
             if current is None:
@@ -132,7 +135,7 @@ class SpaceDelimitedParser(AbstractParser):
                 continue
 
             add_current_to_ranges()
-            current = [i, i]
+            current = None
 
         if current is not None:
             add_current_to_ranges()
