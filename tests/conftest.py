@@ -147,5 +147,5 @@ def fixture_hindi(app_context):
 
 
 @pytest.fixture(name="generic")
-def fixture_generic(test_languages):
+def fixture_generic(app_context):
     return _get_test_language("Generic")
