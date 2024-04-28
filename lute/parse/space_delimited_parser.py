@@ -105,6 +105,20 @@ class SpaceDelimitedParser(AbstractParser):
         # Converting to ranges like \u1234-\u1256 requires only 10K.
         ranges = []
         current = None
+
+        def add_current_to_ranges():
+            "Add the current range."
+            s1 = (r"\u{:04x}" if current[0] < 0x10000 else r"\U{:08x}").format(
+                current[0]
+            )
+            if current[0] == current[1]:
+                ranges.append(s1)
+            else:
+                s2 = (r"\u{:04x}" if current[1] < 0x10000 else r"\U{:08x}").format(
+                    current[1]
+                )
+                ranges.append(s1 + "-" + s2)
+
         for i in range(1, sys.maxunicode):
             c = chr(i)
             category = unicodedata.category(c)
@@ -120,29 +134,11 @@ class SpaceDelimitedParser(AbstractParser):
                 current[1] = i
                 continue
 
-            s1 = (r"\u{:04x}" if current[0] < 0x10000 else r"\U{:08x}").format(
-                current[0]
-            )
-            if current[0] == current[1]:
-                ranges.append(s1)
-            else:
-                s2 = (r"\u{:04x}" if current[1] < 0x10000 else r"\U{:08x}").format(
-                    current[1]
-                )
-                ranges.append(s1 + "-" + s2)
+            add_current_to_ranges()
             current = [i, i]
 
         if current is not None:
-            s1 = (r"\u{:04x}" if current[0] < 0x10000 else r"\U{:08x}").format(
-                current[0]
-            )
-            if current[0] == current[1]:
-                ranges.append(s1)
-            else:
-                s2 = (r"\u{:04x}" if current[1] < 0x10000 else r"\U{:08x}").format(
-                    current[1]
-                )
-                ranges.append(s1 + "-" + s2)
+            add_current_to_ranges()
 
         return "".join(ranges)
 
