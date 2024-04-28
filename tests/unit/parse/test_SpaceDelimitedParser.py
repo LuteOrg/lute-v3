@@ -270,13 +270,6 @@ def test_default_word_pattern_gothic(generic):
     )
 
 
-def test_get_default_word_characters_refactor():
-    "Refactoring tough method."
-    old_dwc = SpaceDelimitedParser.old_get_default_word_characters()
-    dwc = SpaceDelimitedParser.get_default_word_characters()
-    assert dwc == old_dwc
-
-
 def test_all_chars_in_categories_match_default_word_chars():
     "Default_word_chars builds a range of characters ... ensure chars in categories are all found."
     categories = set(["Cf", "Ll", "Lm", "Lo", "Lt", "Lu", "Mc", "Mn", "Sk"])
