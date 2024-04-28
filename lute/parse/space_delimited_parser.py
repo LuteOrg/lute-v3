@@ -106,18 +106,18 @@ class SpaceDelimitedParser(AbstractParser):
         ranges = []
         current = None
 
+        def make_ucode(n):
+            "Make unicode code point for regex."
+            return (r"\u{:04x}" if n < 0x10000 else r"\U{:08x}").format(n)
+
         def add_current_to_ranges():
             "Add the current range."
-            s1 = (r"\u{:04x}" if current[0] < 0x10000 else r"\U{:08x}").format(
-                current[0]
-            )
+            start_code = make_ucode(current[0])
             if current[0] == current[1]:
-                ranges.append(s1)
+                ranges.append(start_code)
             else:
-                s2 = (r"\u{:04x}" if current[1] < 0x10000 else r"\U{:08x}").format(
-                    current[1]
-                )
-                ranges.append(s1 + "-" + s2)
+                endcode = make_ucode(current[1])
+                ranges.append(f"{start_code}-{endcode}")
 
         for i in range(1, sys.maxunicode):
             if unicodedata.category(chr(i)) not in categories:
