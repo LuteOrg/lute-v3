@@ -93,6 +93,61 @@ class SpaceDelimitedParser(AbstractParser):
 
     @staticmethod
     @functools.lru_cache
+    def refactored_get_default_word_characters() -> str:
+        """Return default value for lang.word_characters."""
+
+        # Unicode categories reference: https://www.compart.com/en/unicode/category
+        categories = set(["Cf", "Ll", "Lm", "Lo", "Lt", "Lu", "Mc", "Mn", "Sk"])
+
+        # There are more than 130,000 characters across all these categories.
+        # Expressing this a single character at a time, mostly using unicode
+        # escape sequences like \u1234 or \U12345678, would require 1 megabyte.
+        # Converting to ranges like \u1234-\u1256 requires only 10K.
+        ranges = []
+        current = None
+        for i in range(1, sys.maxunicode):
+            c = chr(i)
+            category = unicodedata.category(c)
+
+            if category not in categories:
+                continue
+
+            if current is None:
+                current = [i, i]
+                continue
+
+            if current[1] == (i - 1):
+                current[1] = i
+                continue
+
+            s1 = (r"\u{:04x}" if current[0] < 0x10000 else r"\U{:08x}").format(
+                current[0]
+            )
+            if current[0] == current[1]:
+                ranges.append(s1)
+            else:
+                s2 = (r"\u{:04x}" if current[1] < 0x10000 else r"\U{:08x}").format(
+                    current[1]
+                )
+                ranges.append(s1 + "-" + s2)
+            current = [i, i]
+
+        if current is not None:
+            s1 = (r"\u{:04x}" if current[0] < 0x10000 else r"\U{:08x}").format(
+                current[0]
+            )
+            if current[0] == current[1]:
+                ranges.append(s1)
+            else:
+                s2 = (r"\u{:04x}" if current[1] < 0x10000 else r"\U{:08x}").format(
+                    current[1]
+                )
+                ranges.append(s1 + "-" + s2)
+
+        return "".join(ranges)
+
+    @staticmethod
+    @functools.lru_cache
     def get_default_regexp_split_sentences() -> str:
         """Return default value for lang.regexp_split_sentences."""
 

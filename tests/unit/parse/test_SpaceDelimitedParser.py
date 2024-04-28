@@ -265,3 +265,11 @@ def test_default_word_pattern_gothic(generic):
     assert_string_equals(
         "𐌰𐍄𐍄𐌰 𐌿𐌽𐍃𐌰𐍂 𐌸𐌿 𐌹𐌽 𐌷𐌹𐌼𐌹𐌽𐌰𐌼", generic, "[𐌰𐍄𐍄𐌰] [𐌿𐌽𐍃𐌰𐍂] [𐌸𐌿] [𐌹𐌽] [𐌷𐌹𐌼𐌹𐌽𐌰𐌼]"
     )
+
+
+def test_get_default_word_characters_refactor():
+    "Refactoring tough method."
+    old_dwc = SpaceDelimitedParser.get_default_word_characters()
+    refactored_dwc = SpaceDelimitedParser.refactored_get_default_word_characters()
+    assert refactored_dwc == old_dwc
+    print(old_dwc)
