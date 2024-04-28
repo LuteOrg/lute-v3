@@ -2,6 +2,9 @@
 SpaceDelimitedParser tests.
 """
 
+import sys
+import re
+import unicodedata
 from lute.parse.space_delimited_parser import SpaceDelimitedParser
 from lute.parse.base import ParsedToken
 
@@ -273,3 +276,16 @@ def test_get_default_word_characters_refactor():
     refactored_dwc = SpaceDelimitedParser.refactored_get_default_word_characters()
     assert refactored_dwc == old_dwc
     print(old_dwc)
+
+
+def test_all_chars_in_categories_match_default_word_chars():
+    "Default_word_chars builds a range of characters ... ensure chars in categories are all found."
+    categories = set(["Cf", "Ll", "Lm", "Lo", "Lt", "Lu", "Mc", "Mn", "Sk"])
+
+    word_chars = SpaceDelimitedParser.get_default_word_characters()
+    pattern = rf"[{word_chars}]"
+    regex = re.compile(pattern, flags=re.IGNORECASE)
+    for i in range(1, sys.maxunicode):
+        c = chr(i)
+        if unicodedata.category(c) in categories:
+            assert regex.match(c), f"Match for {c}"
