@@ -74,6 +74,9 @@ class RenderableCalculator:
         4. Starting with the shortest terms first (fewest text tokens),
         and starting _at the end_ of the string, "write" the candidate
         ID to the output "rendered array", for each token in the candidate.
+        Note we start at the _end_ because overlapping multiword terms
+        closer to the front of the string should be written _last_,
+        so that they "hide" the start of the other multiword terms.
 
         At the end of this process, each position in the "rendered array"
         should be filled with the ID of the corresponding candidate
@@ -166,12 +169,11 @@ class RenderableCalculator:
 
         termcandidates.sort(key=functools.cmp_to_key(compare))
 
-        # The termcandidates should now be sorted such that longest
-        # are first, with items of equal length being sorted by
-        # position.  By traversing this in reverse and "writing"
-        # their IDs to the "rendered" array, we should end up with
-        # the final IDs in each position.
+        # Later elements in the array should be written _first_,
+        # because they are lower "priority."
         termcandidates.reverse()
+
+        # Write the ids of the candidates to the rendered array.
         for tc in termcandidates:
             for i in range(tc.length):
                 rendered[tc.pos + i] = tc.id
