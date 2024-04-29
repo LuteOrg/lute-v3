@@ -127,3 +127,32 @@ def test_nested_multiword_components(spanish, app_context):
         {"term": "un\u200b \u200bgato", "roman": None, "trans": "a cat", "tags": []},
     ]
     assert d["components"] == c_data, "components"
+
+
+def test_multiword_components_returned_in_order_of_appearance(spanish, app_context):
+    "Complete components are returned."
+    t = Term(spanish, "un gato gordo")
+    db.session.add(t)
+    for c in [
+        ("gato", "cat"),
+        ("gat", "x"),
+        ("gato gordo", "fat cat"),
+        ("un gato", "a cat"),
+    ]:
+        ct = Term(spanish, c[0])
+        ct.translation = c[1]
+        db.session.add(ct)
+    db.session.commit()
+
+    d = get_popup_data(t.id)
+    c_data = [
+        {"term": "un\u200b \u200bgato", "roman": None, "trans": "a cat", "tags": []},
+        {"term": "gato", "roman": None, "trans": "cat", "tags": []},
+        {
+            "term": "gato\u200b \u200bgordo",
+            "roman": None,
+            "trans": "fat cat",
+            "tags": [],
+        },
+    ]
+    assert d["components"] == c_data, "components"
