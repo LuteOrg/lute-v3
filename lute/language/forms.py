@@ -67,10 +67,12 @@ class LanguageForm(FlaskForm):
     character_substitutions = StringField("Character substitutions")
 
     regexp_split_sentences = StringField(
-        "Split sentences at", validators=[DataRequired()]
+        "Split sentences at (default: all Unicode sentence terminators)"
     )
     exceptions_split_sentences = StringField("Split sentence exceptions")
-    word_characters = StringField("Word characters", validators=[DataRequired()])
+    word_characters = StringField(
+        "Word characters (default: all Unicode letters and marks)"
+    )
 
     def validate_dictionaries(self, field):  # pylint: disable=unused-argument
         "Dictionaries must be valid."
