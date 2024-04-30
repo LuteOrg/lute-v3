@@ -125,22 +125,6 @@ class RenderableCalculator:
           => "A [B-C][C-D-E][E-F-G-H-I]"
         """
 
-        # All the candidates to be considered for rendering.
-        candidates = {}
-
-        # Step 1.  Map of the token position to the id of the
-        # candidate that should be rendered there.
-        rendered = {}
-
-        def _candidate_from_texttoken(tok):
-            rc = RenderableCandidate()
-            rc.display_text = tok.token
-            rc.text = tok.token
-            rc.pos = tok.order
-            rc.is_word = tok.is_word
-            rc.length = 1
-            return rc
-
         # 3.  Create candidates for all the terms.
         termcandidates = []
 
@@ -170,7 +154,16 @@ class RenderableCalculator:
 
         termcandidates.sort(key=functools.cmp_to_key(compare))
 
-        # Add the original tokens.
+        # Add the original tokens at the end of the array.
+        def _candidate_from_texttoken(tok):
+            rc = RenderableCandidate()
+            rc.display_text = tok.token
+            rc.text = tok.token
+            rc.pos = tok.order
+            rc.is_word = tok.is_word
+            rc.length = 1
+            return rc
+
         for tok in texttokens:
             rc = _candidate_from_texttoken(tok)
             termcandidates.append(rc)
@@ -180,14 +173,17 @@ class RenderableCalculator:
         termcandidates.reverse()
 
         # Write the ids of the candidates to the rendered array.
+        rendered = {}
         for tc in termcandidates:
             for i in range(tc.length):
                 rendered[tc.pos + i] = tc.id
 
+        # Get final list of candidates.
         rcids = list(set(rendered.values()))
+        id_to_candidate = {}
         for rc in termcandidates:
-            candidates[rc.id] = rc
-        return [candidates[rcid] for rcid in rcids]
+            id_to_candidate[rc.id] = rc
+        return [id_to_candidate[rcid] for rcid in rcids]
 
     def _sort_by_order_and_tokencount(self, items):
         items.sort(key=lambda x: (x.pos, -x.length))
