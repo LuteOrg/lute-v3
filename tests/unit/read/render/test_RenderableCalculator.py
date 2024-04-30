@@ -30,8 +30,7 @@ def assert_renderable_equals(
     rcs = rc.main(language, terms, tokens)
     res = ""
     for rc in rcs:
-        if rc.render:
-            res += f"[{rc.text}-{rc.length}]"
+        res += f"[{rc.text}-{rc.length}]"
 
     zws = chr(0x200B)
     res = res.replace(zws, "")
@@ -41,8 +40,7 @@ def assert_renderable_equals(
     if expected_displayed is not None:
         res = ""
         for rc in rcs:
-            if rc.render:
-                res += f"[{rc.display_text}-{rc.length}]"
+            res += f"[{rc.display_text}-{rc.length}]"
 
         res = res.replace(zws, "")
         assert res == expected_displayed
