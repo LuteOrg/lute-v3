@@ -126,8 +126,6 @@ class RenderableCalculator:
         """
 
         # 3.  Create candidates for all the terms.
-        termcandidates = []
-
         def _candidate_from_term_loc(term, loc):
             rc = RenderableCandidate()
             rc.term = term
@@ -138,11 +136,12 @@ class RenderableCalculator:
             rc.is_word = 1
             return rc
 
-        foundterms = [t for t in terms if t.text_lc in tokenlocator.subjLC]
-        for term in foundterms:
-            for loc in tokenlocator.locate_string(term.text_lc):
-                rc = _candidate_from_term_loc(term, loc)
-                termcandidates.append(rc)
+        termcandidates = [
+            _candidate_from_term_loc(term, loc)
+            for term in terms
+            if term.text_lc in tokenlocator.subjLC
+            for loc in tokenlocator.locate_string(term.text_lc)
+        ]
 
         # 4a.  Sort the term candidates: first by length, then by position.
         def compare(a, b):
@@ -166,13 +165,12 @@ class RenderableCalculator:
 
         termcandidates += map(_candidate_from_texttoken, texttokens)
 
-        # Later elements in the array should be written _first_,
-        # because they are lower "priority."
-        termcandidates.reverse()
-
         # Write the ids of the candidates to the rendered array.
+        # Later elements in the array are written _first_,
+        # because they are lower priority and will be overwritten
+        # by earlier ones.
         rendered = {}
-        for tc in termcandidates:
+        for tc in reversed(termcandidates):
             for i in range(tc.length):
                 rendered[tc.pos + i] = tc.id
 
