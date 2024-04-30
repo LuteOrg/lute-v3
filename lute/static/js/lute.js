@@ -56,9 +56,13 @@ function prepareTextInteractions(pos) {
   // Using "t.on" here because .word elements
   // are added and removed dynamically, and "t.on"
   // ensures that events remain for each element.
-  t.on('mousedown', '.word', select_started);
-  t.on('mouseover', '.word', select_over);
-  t.on('mouseup', '.word', select_ended);
+  t.on('mousedown', '.word', handle_select_started);
+  t.on('mouseover', '.word', handle_select_over);
+  t.on('mouseup', '.word', handle_select_ended);
+
+  // Mobile screens have touch events.
+  t.on('touchstart', '.word', touch_started);
+  t.on('touchend', '.word', touch_ended);
 
   t.on('mouseover', '.word', hover_over);
   t.on('mouseout', '.word', hover_out);
@@ -237,11 +241,15 @@ let clear_newmultiterm_elements = function() {
   selection_start_el = null;
 }
 
-function select_started(e) {
+function handle_select_started(e) {
+  select_started($(this), e);
+}
+
+function select_started(el, e) {
   clear_newmultiterm_elements();
-  $(this).addClass('newmultiterm');
-  selection_start_el = $(this);
-  save_curr_data_order($(this));
+  el.addClass('newmultiterm');
+  selection_start_el = el;
+  save_curr_data_order(el);
 }
 
 let get_selected_in_range = function(start_el, end_el) {
@@ -256,25 +264,33 @@ let get_selected_in_range = function(start_el, end_el) {
   return selected;
 };
 
-function select_over(e) {
+function handle_select_over(e) {
+  select_over($(this), e);
+}
+  
+function select_over(el, e) {
   if (selection_start_el == null)
     return;  // Not selecting
   $('.newmultiterm').removeClass('newmultiterm');
-  const selected = get_selected_in_range(selection_start_el, $(this));
+  const selected = get_selected_in_range(selection_start_el, el);
   selected.addClass('newmultiterm');
 }
 
-function select_ended(e) {
+function handle_select_ended(e) {
+  select_ended($(this), e);
+}
+
+function select_ended(el, e) {
   // Handle single word click.
-  if (selection_start_el.attr('id') == $(this).attr('id')) {
+  if (selection_start_el.attr('id') == el.attr('id')) {
     clear_newmultiterm_elements();
-    word_clicked($(this), e);
+    word_clicked(el, e);
     return;
   }
 
   $('span.kwordmarked').removeClass('kwordmarked');
 
-  const selected = get_selected_in_range(selection_start_el, $(this));
+  const selected = get_selected_in_range(selection_start_el, el);
   if (e.shiftKey) {
     copy_text_to_clipboard(selected.toArray());
     start_hover_mode(false);
@@ -283,6 +299,46 @@ function select_ended(e) {
 
   show_multiword_term_edit_form(selected);
   selection_start_el = null;
+}
+
+
+/********************************************/
+// Mobile events.
+//
+// Ref https://borstch.com/blog/javascript-touch-events-and-mobile-specific-considerations
+// Touch start is recorded in _touchStartTime.  Short taps are handled regularly,
+// like "clicks".  "Long taps", where the touch ends 200ms after the start,
+// is treated like a "multi-word term" start or end.
+
+let _touchStartTime;
+
+function touch_started(e) {
+  _touchStartTime = Date.now();
+}
+
+function touch_ended(e) {
+  const touchTimeLength = Date.now() - _touchStartTime;
+  if (touchTimeLength < 200) {
+    // Short tap, handled as regular click.
+    return;
+  }
+
+  // Cancelling the event so that "click" isn't called
+  // for long tap.
+  e.preventDefault();
+
+  // The touch_ended handler is attached with t.on in
+  // prepareTextInteractions, so the clicked element is just
+  // $(this).
+  const el = $(this);
+  if (selection_start_el == null) {
+    select_started(el, e);
+    select_over(el, e);
+  }
+  else {
+    select_over(el, e);
+    select_ended(el, e);
+  }
 }
 
 
