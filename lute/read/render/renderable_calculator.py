@@ -138,13 +138,8 @@ class RenderableCalculator:
             rc.text = tok.token
             rc.pos = tok.order
             rc.is_word = tok.is_word
+            rc.length = 1
             return rc
-
-        # Step 2 - fill with the original texttokens.
-        for tok in texttokens:
-            rc = _candidate_from_texttoken(tok)
-            candidates[rc.id] = rc
-            rendered[rc.pos] = rc.id
 
         # 3.  Create candidates for all the terms.
         termcandidates = []
@@ -174,6 +169,11 @@ class RenderableCalculator:
             return -1 if (a.pos < b.pos) else 1
 
         termcandidates.sort(key=functools.cmp_to_key(compare))
+
+        # Add the original tokens.
+        for tok in texttokens:
+            rc = _candidate_from_texttoken(tok)
+            termcandidates.append(rc)
 
         # Later elements in the array should be written _first_,
         # because they are lower "priority."
