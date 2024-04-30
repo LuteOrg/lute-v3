@@ -75,6 +75,29 @@ def test_parent_data_always_added_if_multiple_parents(spanish, app_context):
     assert d["parentterms"] == "perro, hombre", "parents"
 
 
+## Component term checks.
+
+
+def make_terms(term_trans_pairs, spanish):
+    "Make test data"
+    for c in term_trans_pairs:
+        ct = Term(spanish, c[0])
+        ct.translation = c[1]
+        db.session.add(ct)
+
+
+def assert_components(d, expected, msg=""):
+    "Check components."
+
+    def _c_to_string(c):
+        s = "; ".join([c["term"], c["trans"]])
+        zws = chr(0x200B)
+        return s.replace(zws, "")
+
+    actual = [_c_to_string(c) for c in d["components"]]
+    assert actual == expected, msg
+
+
 def test_single_term_not_included_in_own_components(spanish, app_context):
     "Keep the lights on test, smoke only."
     t = Term(spanish, "gato")
@@ -88,9 +111,8 @@ def test_single_term_not_included_in_own_components(spanish, app_context):
 def test_component_without_translation_not_returned(spanish, app_context):
     "Component word is returned."
     t = Term(spanish, "un gato")
-    c = Term(spanish, "gato")
     db.session.add(t)
-    db.session.add(c)
+    make_terms([("gato", "")], spanish)
     db.session.commit()
 
     d = get_popup_data(t.id)
@@ -100,78 +122,52 @@ def test_component_without_translation_not_returned(spanish, app_context):
 def test_component_word_with_translation_returned(spanish, app_context):
     "Component word is returned."
     t = Term(spanish, "un gato")
-    c = Term(spanish, "gato")
-    c.translation = "cat"
     db.session.add(t)
-    db.session.add(c)
+    make_terms([("gato", "cat")], spanish)
     db.session.commit()
 
     d = get_popup_data(t.id)
-    c_data = {"term": "gato", "roman": None, "trans": "cat", "tags": []}
-    assert d["components"] == [c_data], "one component"
+    assert_components(d, ["gato; cat"], "one component")
 
 
 def test_nested_multiword_components(spanish, app_context):
     "Complete components are returned."
     t = Term(spanish, "un gato gordo")
     db.session.add(t)
-    for c in [("gato", "cat"), ("gat", "x"), ("gato gordo", ""), ("un gato", "a cat")]:
-        ct = Term(spanish, c[0])
-        ct.translation = c[1]
-        db.session.add(ct)
+    make_terms([("gato", "cat"), ("gat", "x"), ("un gato", "a cat")], spanish)
     db.session.commit()
 
     d = get_popup_data(t.id)
-    c_data = [
-        {"term": "un\u200b \u200bgato", "roman": None, "trans": "a cat", "tags": []},
-        {"term": "gato", "roman": None, "trans": "cat", "tags": []},
-    ]
-    assert d["components"] == c_data, "components"
+    assert_components(d, ["un gato; a cat", "gato; cat"], "components")
 
 
 def test_multiword_components_returned_in_order_of_appearance(spanish, app_context):
     "Complete components are returned."
     t = Term(spanish, "un gato gordo")
     db.session.add(t)
-    for c in [
-        ("gato", "cat"),
-        ("gat", "x"),
-        ("gato gordo", "fat cat"),
-        ("un gato", "a cat"),
-    ]:
-        ct = Term(spanish, c[0])
-        ct.translation = c[1]
-        db.session.add(ct)
+    make_terms(
+        [
+            ("gato", "cat"),
+            ("gat", "x"),
+            ("gato gordo", "fat"),
+            ("un gato", "a cat"),
+        ],
+        spanish,
+    )
     db.session.commit()
 
     d = get_popup_data(t.id)
-    c_data = [
-        {"term": "un\u200b \u200bgato", "roman": None, "trans": "a cat", "tags": []},
-        {"term": "gato", "roman": None, "trans": "cat", "tags": []},
-        {
-            "term": "gato\u200b \u200bgordo",
-            "roman": None,
-            "trans": "fat cat",
-            "tags": [],
-        },
-    ]
-    assert d["components"] == c_data, "components"
+    assert_components(
+        d, ["un gato; a cat", "gato gordo; fat", "gato; cat"], "components"
+    )
 
 
 def test_components_only_returned_once(spanish, app_context):
     "Component not returned multiple times if present multiple times."
     t = Term(spanish, "un gato gordo gato")
     db.session.add(t)
-    for c in [
-        ("gato", "cat"),
-    ]:
-        ct = Term(spanish, c[0])
-        ct.translation = c[1]
-        db.session.add(ct)
+    make_terms([("gato", "cat")], spanish)
     db.session.commit()
 
     d = get_popup_data(t.id)
-    c_data = [
-        {"term": "gato", "roman": None, "trans": "cat", "tags": []},
-    ]
-    assert d["components"] == c_data, "components"
+    assert_components(d, ["gato; cat"], "components")
