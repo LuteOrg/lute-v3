@@ -164,7 +164,6 @@ class RenderableCalculator:
             for loc in tokenlocator.locate_string(term.text_lc):
                 rc = _candidate_from_term_loc(term, loc)
                 termcandidates.append(rc)
-                candidates[rc.id] = rc
 
         # 4a.  Sort the term candidates: first by length, then by position.
         def compare(a, b):
@@ -186,6 +185,8 @@ class RenderableCalculator:
                 rendered[tc.pos + i] = tc.id
 
         rcids = list(set(rendered.values()))
+        for rc in termcandidates:
+            candidates[rc.id] = rc
         return [candidates[rcid] for rcid in rcids]
 
     def _sort_by_order_and_tokencount(self, items):
