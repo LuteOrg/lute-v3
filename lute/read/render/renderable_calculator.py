@@ -132,30 +132,37 @@ class RenderableCalculator:
         # candidate that should be rendered there.
         rendered = {}
 
-        # Step 2 - fill with the original texttokens.
-        for tok in texttokens:
+        def _candidate_from_texttoken(tok):
             rc = RenderableCandidate()
             rc.display_text = tok.token
             rc.text = tok.token
             rc.pos = tok.order
             rc.is_word = tok.is_word
+            return rc
+
+        # Step 2 - fill with the original texttokens.
+        for tok in texttokens:
+            rc = _candidate_from_texttoken(tok)
             candidates[rc.id] = rc
             rendered[rc.pos] = rc.id
 
         # 3.  Create candidates for all the terms.
         termcandidates = []
 
+        def _candidate_from_term_loc(term, loc):
+            rc = RenderableCandidate()
+            rc.term = term
+            rc.display_text = loc["text"]
+            rc.text = loc["text"]
+            rc.pos = texttokens[0].order + loc["index"]
+            rc.length = term.token_count
+            rc.is_word = 1
+            return rc
+
         foundterms = [t for t in terms if t.text_lc in tokenlocator.subjLC]
         for term in foundterms:
             for loc in tokenlocator.locate_string(term.text_lc):
-                rc = RenderableCandidate()
-                rc.term = term
-                rc.display_text = loc["text"]
-                rc.text = loc["text"]
-                rc.pos = texttokens[0].order + loc["index"]
-                rc.length = term.token_count
-                rc.is_word = 1
-
+                rc = _candidate_from_term_loc(term, loc)
                 termcandidates.append(rc)
                 candidates[rc.id] = rc
 
