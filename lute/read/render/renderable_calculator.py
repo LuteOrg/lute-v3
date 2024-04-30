@@ -177,21 +177,20 @@ class RenderableCalculator:
         # Later elements in the array are written _first_,
         # because they are lower priority and will be overwritten
         # by earlier ones.
-        rendered = {}
+        render_position_to_candidate = {}
         for rc in reversed(candidates):
             for i in range(rc.length):
-                rendered[rc.pos + i] = rc.id
+                render_position_to_candidate[rc.pos + i] = rc.id
 
-        # 5. Get final list of candidates.
-        rcids = list(set(rendered.values()))
+        # 5. Get final list of candidates, these will actually be rendered.
+        rcids = list(set(render_position_to_candidate.values()))
         id_to_candidate = {}
         for rc in candidates:
             id_to_candidate[rc.id] = rc
-        return [id_to_candidate[rcid] for rcid in rcids]
+        rendered = [id_to_candidate[rcid] for rcid in rcids]
 
-    def _sort_by_order_and_tokencount(self, items):
-        items.sort(key=lambda x: (x.pos, -x.length))
-        return items
+        rendered.sort(key=lambda x: x.pos)
+        return rendered
 
     def _calc_overlaps(self, items):
         for i in range(1, len(items)):
@@ -223,9 +222,7 @@ class RenderableCalculator:
         tocloc = TokenLocator(language, subject)
 
         renderable = self._get_renderable(tocloc, words, texttokens)
-        items = self._sort_by_order_and_tokencount(renderable)
-        items = self._calc_overlaps(items)
-        return items
+        return self._calc_overlaps(renderable)
 
     @staticmethod
     def get_renderable(lang, words, texttokens):
