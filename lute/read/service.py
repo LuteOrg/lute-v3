@@ -197,9 +197,12 @@ def get_popup_data(termid):
     for p in term.parents:
         if p.get_current_image():
             images.append(p.get_current_image())
-    for c in components:
-        if c.get_current_image():
-            images.append(c.get_current_image())
+    # DISABLED CODE: Don't include component images in the hover for now,
+    # it can get confusing!
+    # ref https://github.com/LuteOrg/lute-v3/issues/355
+    # for c in components:
+    #     if c.get_current_image():
+    #         images.append(c.get_current_image())
 
     images = list(set(images))
 
