@@ -56,30 +56,29 @@ class RenderableCalculator:
     def _get_renderable(
         self, tokenlocator, terms, texttokens
     ):  # pylint: disable=too-many-locals
-        """
-        Return RenderableCandidates that will **actually be rendered**.
+        """Return RenderableCandidates that will **actually be rendered**.
 
         Method to determine what should be rendered:
 
-        1. Create a "rendered array".  On completion of this algorithm,
-        each position in the array will be filled with the ID of the
-        RenderableCandidate that should actually appear there (and
-        which might hide other candidates).
+        1. Create candidates for all the terms found in the subject string.
 
-        2. Start by saying that all the original texttokens will be
-        rendered by writing each candidate ID in the rendered array.
+        2. Sort the term candidates: first by length, then by position.
 
-        3. Create candidates for all the terms.
+        3. Add candidates for all of the original text tokens at the end of the
+        list of candidates.
 
-        4. Starting with the shortest terms first (fewest text tokens),
-        and starting _at the end_ of the string, "write" the candidate
-        ID to the output "rendered array", for each token in the candidate.
+        4. Now, in *reverse order*, write the candidate IDs to a
+        "rendered array". Note we start at the _end_ because
+        overlapping multiword terms closer to the front of the string
+        should be written _last_, so that they "hide" the start of the
+        other multiword terms.
 
-        At the end of this process, each position in the "rendered array"
-        should be filled with the ID of the corresponding candidate
-        that will actually appear in that position.  By getting the
-        unique IDs and returning just their candidates, we should have
-        the list of candidates that would be "visible" on render.
+        On completion of this, each position in the array will be
+        filled with the ID of the RenderableCandidate that should
+        actually appear there (and which might hide other candidates).
+        By getting the unique IDs and returning just their candidates,
+        we will have the list of candidates that would be "visible" on
+        render.
 
         Applying the above algorithm to the example given in the class
         header:
@@ -88,75 +87,71 @@ class RenderableCalculator:
 
          a b c d e f g h i
 
-        And the following terms, arranged from shortest to longest:
+        Step 1:
+
+        Given the following terms:
           "B C"
-          "F G"
           "C D E"
           "E F G H I"
+          "F G"
 
-        First, terms are created for each individual token in the
-        original string:
-
-        A B C D E F G H I
-
-        Then the positions for each of the terms are calculated:
+        The positions for each of the terms are calculated:
 
         [A B C D E F G H I]
-
+                "E F G H I"
+            "C D E"
           "B C"
                   "F G"
-            "C D E"
-                "E F G H I"
 
-        Then, "writing" terms order by their length, and then by their
-        distance from the *end* of the string:
+        Step 2: Sorting by length, and then position:
 
-        - "F G" is written first, because it's short, and is nearest
-          the end:
-          => "A B C D E [F-G] H I"
-        - "B C" is next:
-          => "A [B-C] D E [F-G] H I"
-        - then "C D E":
-          => "A [B-C][C-D-E] [F-G] H I"
-        then "E F G H I":
-          => "A [B-C][C-D-E][E-F-G-H-I]"
+          "E F G H I"
+          "C D E"
+          "F G"
+          "B C"   <<< now at end of list
+
+        Step 3: Add candidates for all other original text tokens:
+          "E F G H I"
+          "C D E"
+          "F G"
+          "B C"
+          "A"
+          "B"
+          "C" ... etc through to "H", "I"
+
+        Step 4: "writing" these in reverse order:
+
+          "I": "A B C D E F G H [I]"
+          "H": "A B C D E F G [H] [I]"
+          ... etc through to "A":
+          "A": "[A] [B] [C] [D] [E] [F] [G] [H] [I]"
+          "F G": "[A] [B] [C] [D] [E] [F G] [H] [I]"
+          "B C": "[A] [B C] [D] [E] [F G] [H] [I]"
+          "C D E": "[A] [B C][C D E] [F G] [H] [I]"
+          "E F G H I": "[A] [B C][C D E][E F G H I]"
+
         """
 
-        # All the candidates to be considered for rendering.
-        candidates = {}
-
-        # Step 1.  Map of the token position to the id of the
-        # candidate that should be rendered there.
-        rendered = {}
-
-        # Step 2 - fill with the original texttokens.
-        for tok in texttokens:
+        # 1. Create candidates for all the terms found in the subject
+        # string.
+        def _candidate_from_term_loc(term, loc):
             rc = RenderableCandidate()
-            rc.display_text = tok.token
-            rc.text = tok.token
-            rc.pos = tok.order
-            rc.is_word = tok.is_word
-            candidates[rc.id] = rc
-            rendered[rc.pos] = rc.id
+            rc.term = term
+            rc.display_text = loc["text"]
+            rc.text = loc["text"]
+            rc.pos = texttokens[0].order + loc["index"]
+            rc.length = term.token_count
+            rc.is_word = 1
+            return rc
 
-        # 3.  Create candidates for all the terms.
-        termcandidates = []
+        candidates = [
+            _candidate_from_term_loc(term, loc)
+            for term in terms
+            if term.text_lc in tokenlocator.subjLC
+            for loc in tokenlocator.locate_string(term.text_lc)
+        ]
 
-        foundterms = [t for t in terms if t.text_lc in tokenlocator.subjLC]
-        for term in foundterms:
-            for loc in tokenlocator.locate_string(term.text_lc):
-                rc = RenderableCandidate()
-                rc.term = term
-                rc.display_text = loc["text"]
-                rc.text = loc["text"]
-                rc.pos = texttokens[0].order + loc["index"]
-                rc.length = term.token_count
-                rc.is_word = 1
-
-                termcandidates.append(rc)
-                candidates[rc.id] = rc
-
-        # 4a.  Sort the term candidates: first by length, then by position.
+        # 2. Sort the term candidates: first by length, then by position.
         def compare(a, b):
             # Longest sorts first.
             if a.length != b.length:
@@ -164,24 +159,38 @@ class RenderableCalculator:
             # Lowest position (closest to front of string) sorts first.
             return -1 if (a.pos < b.pos) else 1
 
-        termcandidates.sort(key=functools.cmp_to_key(compare))
+        candidates.sort(key=functools.cmp_to_key(compare))
 
-        # The termcandidates should now be sorted such that longest
-        # are first, with items of equal length being sorted by
-        # position.  By traversing this in reverse and "writing"
-        # their IDs to the "rendered" array, we should end up with
-        # the final IDs in each position.
-        termcandidates.reverse()
-        for tc in termcandidates:
-            for i in range(tc.length):
-                rendered[tc.pos + i] = tc.id
+        # 3. Add the original tokens at the end of the array.
+        def _candidate_from_texttoken(tok):
+            rc = RenderableCandidate()
+            rc.display_text = tok.token
+            rc.text = tok.token
+            rc.pos = tok.order
+            rc.is_word = tok.is_word
+            rc.length = 1
+            return rc
 
-        rcids = list(set(rendered.values()))
-        return [candidates[rcid] for rcid in rcids]
+        candidates += map(_candidate_from_texttoken, texttokens)
 
-    def _sort_by_order_and_tokencount(self, items):
-        items.sort(key=lambda x: (x.pos, -x.length))
-        return items
+        # 4. Write the ids of the candidates to the rendered array.
+        # Later elements in the array are written _first_,
+        # because they are lower priority and will be overwritten
+        # by earlier ones.
+        render_position_to_candidate = {}
+        for rc in reversed(candidates):
+            for i in range(rc.length):
+                render_position_to_candidate[rc.pos + i] = rc.id
+
+        # 5. Get final list of candidates, these will actually be rendered.
+        rcids = list(set(render_position_to_candidate.values()))
+        id_to_candidate = {}
+        for rc in candidates:
+            id_to_candidate[rc.id] = rc
+        rendered = [id_to_candidate[rcid] for rcid in rcids]
+
+        rendered.sort(key=lambda x: x.pos)
+        return rendered
 
     def _calc_overlaps(self, items):
         for i in range(1, len(items)):
@@ -213,9 +222,7 @@ class RenderableCalculator:
         tocloc = TokenLocator(language, subject)
 
         renderable = self._get_renderable(tocloc, words, texttokens)
-        items = self._sort_by_order_and_tokencount(renderable)
-        items = self._calc_overlaps(items)
-        return items
+        return self._calc_overlaps(renderable)
 
     @staticmethod
     def get_renderable(lang, words, texttokens):
@@ -231,10 +238,6 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
     Given some Terms contained in a text, the RenderableCalculator
     creates RenderableCandidates for each Term in the text, as well as
     the original text tokens.
-
-    When the final set of actually rendered RenderableCandidates is
-    found (with self.render is True), these are convered into TextItems
-    for the final render.
     """
 
     # ID incremented for each instance.
@@ -251,10 +254,9 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
         self.pos: int = None
         self.length: int = 1
         self.is_word: int = None
-        self.render: bool = True
 
     def __repr__(self):
-        parts = [f"pos {self.pos}", f"render {self.render}" f"(id {self.id})"]
+        parts = [f"pos {self.pos}", f"(id {self.id})"]
         parts = " ".join(parts)
         return f'<RenderableCandidate "{self.text}", {parts}>'
 
