@@ -238,10 +238,6 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
     Given some Terms contained in a text, the RenderableCalculator
     creates RenderableCandidates for each Term in the text, as well as
     the original text tokens.
-
-    When the final set of actually rendered RenderableCandidates is
-    found (with self.render is True), these are convered into TextItems
-    for the final render.
     """
 
     # ID incremented for each instance.
@@ -258,10 +254,9 @@ class RenderableCandidate:  # pylint: disable=too-many-instance-attributes
         self.pos: int = None
         self.length: int = 1
         self.is_word: int = None
-        self.render: bool = True
 
     def __repr__(self):
-        parts = [f"pos {self.pos}", f"render {self.render}" f"(id {self.id})"]
+        parts = [f"pos {self.pos}", f"(id {self.id})"]
         parts = " ".join(parts)
         return f'<RenderableCandidate "{self.text}", {parts}>'
 
