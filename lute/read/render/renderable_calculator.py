@@ -164,9 +164,7 @@ class RenderableCalculator:
             rc.length = 1
             return rc
 
-        for tok in texttokens:
-            rc = _candidate_from_texttoken(tok)
-            termcandidates.append(rc)
+        termcandidates += map(_candidate_from_texttoken, texttokens)
 
         # Later elements in the array should be written _first_,
         # because they are lower "priority."
