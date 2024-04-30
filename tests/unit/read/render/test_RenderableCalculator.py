@@ -55,6 +55,20 @@ def test_simple_render(english):
     assert_renderable_equals(english, data, [], expected)
 
 
+def test_non_matching_terms_are_ignored(english):
+    "Non-match ignored."
+    data = ["some", " ", "data", " ", "here", "."]
+    expected = "[some-1][ -1][data-1][ -1][here-1][.-1]"
+    assert_renderable_equals(english, data, ["ignoreme"], expected)
+
+
+def test_partial_matching_terms_are_ignored(english):
+    "Partial match is not the same as a match."
+    data = ["some", " ", "data", " ", "here", "."]
+    expected = "[some-1][ -1][data-1][ -1][here-1][.-1]"
+    assert_renderable_equals(english, data, ["data he"], expected)
+
+
 def test_tokens_must_be_contiguous(english):
     """
     If tokens aren't contiguous, the algorithm gets confused.
@@ -77,6 +91,33 @@ def test_multiword_items_cover_other_items(english):
     ]
     expected = "[some-1][ -1][data here-3][.-1]"
     assert_renderable_equals(english, data, words, expected)
+
+
+def test_case_not_considered_for_matches(english):
+    "Case doesnt matter."
+    data = ["some", " ", "data", " ", "here", "."]
+    expected = "[some-1][ -1][data here-3][.-1]"
+    assert_renderable_equals(english, data, ["DATA HERE"], expected)
+
+
+def test_term_found_in_multiple_places(english):
+    "Term can be in a few places."
+    data = [
+        "some",
+        " ",
+        "data",
+        " ",
+        "here",
+        " ",
+        "more",
+        " ",
+        "data",
+        " ",
+        "here",
+        ".",
+    ]
+    expected = "[some-1][ -1][data here-3][ -1][more-1][ -1][data here-3][.-1]"
+    assert_renderable_equals(english, data, ["DATA HERE"], expected)
 
 
 def test_overlapping_multiwords(english):
