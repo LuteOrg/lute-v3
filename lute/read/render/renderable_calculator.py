@@ -56,33 +56,29 @@ class RenderableCalculator:
     def _get_renderable(
         self, tokenlocator, terms, texttokens
     ):  # pylint: disable=too-many-locals
-        """
-        Return RenderableCandidates that will **actually be rendered**.
+        """Return RenderableCandidates that will **actually be rendered**.
 
         Method to determine what should be rendered:
 
-        1. Create a "rendered array".  On completion of this algorithm,
-        each position in the array will be filled with the ID of the
-        RenderableCandidate that should actually appear there (and
-        which might hide other candidates).
+        1. Create candidates for all the terms found in the subject string.
 
-        2. Start by saying that all the original texttokens will be
-        rendered by writing each candidate ID in the rendered array.
+        2. Sort the term candidates: first by length, then by position.
 
-        3. Create candidates for all the terms.
+        3. Add candidates for all of the original text tokens at the end of the
+        list of candidates.
 
-        4. Starting with the shortest terms first (fewest text tokens),
-        and starting _at the end_ of the string, "write" the candidate
-        ID to the output "rendered array", for each token in the candidate.
-        Note we start at the _end_ because overlapping multiword terms
-        closer to the front of the string should be written _last_,
-        so that they "hide" the start of the other multiword terms.
+        4. Now, in *reverse order*, write the candidate IDs to a
+        "rendered array". Note we start at the _end_ because
+        overlapping multiword terms closer to the front of the string
+        should be written _last_, so that they "hide" the start of the
+        other multiword terms.
 
-        At the end of this process, each position in the "rendered array"
-        should be filled with the ID of the corresponding candidate
-        that will actually appear in that position.  By getting the
-        unique IDs and returning just their candidates, we should have
-        the list of candidates that would be "visible" on render.
+        On completion of this, each position in the array will be
+        filled with the ID of the RenderableCandidate that should
+        actually appear there (and which might hide other candidates).
+        By getting the unique IDs and returning just their candidates,
+        we will have the list of candidates that would be "visible" on
+        render.
 
         Applying the above algorithm to the example given in the class
         header:
@@ -91,41 +87,53 @@ class RenderableCalculator:
 
          a b c d e f g h i
 
-        And the following terms, arranged from shortest to longest:
+        Step 1:
+
+        Given the following terms:
           "B C"
-          "F G"
           "C D E"
           "E F G H I"
+          "F G"
 
-        First, terms are created for each individual token in the
-        original string:
-
-        A B C D E F G H I
-
-        Then the positions for each of the terms are calculated:
+        The positions for each of the terms are calculated:
 
         [A B C D E F G H I]
-
+                "E F G H I"
+            "C D E"
           "B C"
                   "F G"
-            "C D E"
-                "E F G H I"
 
-        Then, "writing" terms order by their length, and then by their
-        distance from the *end* of the string:
+        Step 2: Sorting by length, and then position:
 
-        - "F G" is written first, because it's short, and is nearest
-          the end:
-          => "A B C D E [F-G] H I"
-        - "B C" is next:
-          => "A [B-C] D E [F-G] H I"
-        - then "C D E":
-          => "A [B-C][C-D-E] [F-G] H I"
-        then "E F G H I":
-          => "A [B-C][C-D-E][E-F-G-H-I]"
+          "E F G H I"
+          "C D E"
+          "F G"
+          "B C"   <<< now at end of list
+
+        Step 3: Add candidates for all other original text tokens:
+          "E F G H I"
+          "C D E"
+          "F G"
+          "B C"
+          "A"
+          "B"
+          "C" ... etc through to "H", "I"
+
+        Step 4: "writing" these in reverse order:
+
+          "I": "A B C D E F G H [I]"
+          "H": "A B C D E F G [H] [I]"
+          ... etc through to "A":
+          "A": "[A] [B] [C] [D] [E] [F] [G] [H] [I]"
+          "F G": "[A] [B] [C] [D] [E] [F G] [H] [I]"
+          "B C": "[A] [B C] [D] [E] [F G] [H] [I]"
+          "C D E": "[A] [B C][C D E] [F G] [H] [I]"
+          "E F G H I": "[A] [B C][C D E][E F G H I]"
+
         """
 
-        # 3.  Create candidates for all the terms.
+        # 1. Create candidates for all the terms found in the subject
+        # string.
         def _candidate_from_term_loc(term, loc):
             rc = RenderableCandidate()
             rc.term = term
@@ -136,14 +144,14 @@ class RenderableCalculator:
             rc.is_word = 1
             return rc
 
-        termcandidates = [
+        candidates = [
             _candidate_from_term_loc(term, loc)
             for term in terms
             if term.text_lc in tokenlocator.subjLC
             for loc in tokenlocator.locate_string(term.text_lc)
         ]
 
-        # 4a.  Sort the term candidates: first by length, then by position.
+        # 2. Sort the term candidates: first by length, then by position.
         def compare(a, b):
             # Longest sorts first.
             if a.length != b.length:
@@ -151,9 +159,9 @@ class RenderableCalculator:
             # Lowest position (closest to front of string) sorts first.
             return -1 if (a.pos < b.pos) else 1
 
-        termcandidates.sort(key=functools.cmp_to_key(compare))
+        candidates.sort(key=functools.cmp_to_key(compare))
 
-        # Add the original tokens at the end of the array.
+        # 3. Add the original tokens at the end of the array.
         def _candidate_from_texttoken(tok):
             rc = RenderableCandidate()
             rc.display_text = tok.token
@@ -163,21 +171,21 @@ class RenderableCalculator:
             rc.length = 1
             return rc
 
-        termcandidates += map(_candidate_from_texttoken, texttokens)
+        candidates += map(_candidate_from_texttoken, texttokens)
 
-        # Write the ids of the candidates to the rendered array.
+        # 4. Write the ids of the candidates to the rendered array.
         # Later elements in the array are written _first_,
         # because they are lower priority and will be overwritten
         # by earlier ones.
         rendered = {}
-        for tc in reversed(termcandidates):
-            for i in range(tc.length):
-                rendered[tc.pos + i] = tc.id
+        for rc in reversed(candidates):
+            for i in range(rc.length):
+                rendered[rc.pos + i] = rc.id
 
-        # Get final list of candidates.
+        # 5. Get final list of candidates.
         rcids = list(set(rendered.values()))
         id_to_candidate = {}
-        for rc in termcandidates:
+        for rc in candidates:
             id_to_candidate[rc.id] = rc
         return [id_to_candidate[rcid] for rcid in rcids]
 
