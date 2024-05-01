@@ -57,20 +57,18 @@ def get_current_css():
     if current_theme == default_entry[0]:
         return ""
 
-    base = ""
-    built_in_css_filename = os.path.join(_css_path(), current_theme)
-    if os.path.exists(built_in_css_filename):
-        with open(built_in_css_filename, "r", encoding="utf-8") as f:
-            base = f.read()
+    def _get_theme_css_in_dir(d):
+        "Get css, or '' if no file."
+        fname = os.path.join(d, current_theme)
+        if not os.path.exists(fname):
+            return ""
+        with open(fname, "r", encoding="utf-8") as f:
+            return f.read()
 
-    add = ""
-    user_css = os.path.join(current_app.env_config.userthemespath, current_theme)
-    if os.path.exists(user_css):
-        with open(user_css, "r", encoding="utf-8") as f:
-            add = "\n\n/* Additional user css */\n\n"
-            add += f.read()
-
-    ret = base + add
+    ret = _get_theme_css_in_dir(_css_path())
+    add = _get_theme_css_in_dir(current_app.env_config.userthemespath)
+    if add != "":
+        ret += f"\n\n/* Additional user css */\n\n{add}"
     return ret
 
 
