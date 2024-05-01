@@ -8,7 +8,7 @@ from lute.db import db
 from lute.models.setting import UserSetting
 
 
-def test_list_themes():
+def test_list_themes(app_context):
     "Smoke test only."
     lst = svc.list_themes()
     assert len(lst) > 0, "have themes"
