@@ -42,7 +42,7 @@ class UserSettingsForm(FlaskForm):
         },
     )
 
-    current_theme = SelectField("Theme", choices=list_themes())
+    current_theme = SelectField("Theme")
     custom_styles = TextAreaField("Custom styles")
     show_highlights = BooleanField("Highlight terms by status")
 
@@ -82,6 +82,9 @@ bp = Blueprint("settings", __name__, url_prefix="/settings")
 def edit_settings():
     "Edit settings."
     form = UserSettingsForm()
+
+    with current_app.app_context():
+        form.current_theme.choices = list_themes()
 
     ac = current_app.env_config
     if ac.is_docker:

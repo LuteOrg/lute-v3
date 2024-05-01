@@ -47,8 +47,7 @@ def test_next_theme_cycles_themes(app_context):
     assert UserSetting.get_value("current_theme") == lst[0][0]
     svc.next_theme()
     assert UserSetting.get_value("current_theme") == lst[1][0]
-    for i in range(0, len(lst) + 10):  # pylint: disable=consider-using-enumerate
-        print(i)
+    for _ in range(0, len(lst) + 10):  # pylint: disable=consider-using-enumerate
         svc.next_theme()
         svc.next_theme()
     # OK
@@ -80,7 +79,7 @@ def test_custom_theme_in_theme_dir_is_available(app, app_context):
     assert mytheme_content in svc.get_current_css(), "my theme used"
 
 
-def test_custom_theme_in_theme_dir_overrides_existing_theme(app, app_context):
+def test_custom_theme_in_theme_dir_appends_to_existing_theme(app, app_context):
     "Can use .css file in theme dir."
     theme_dir = app.env_config.userthemespath
     _delete_custom_theme_files(theme_dir)
@@ -102,6 +101,6 @@ def test_custom_theme_in_theme_dir_overrides_existing_theme(app, app_context):
     UserSetting.set_value("current_theme", "Apple_Books.css")
     db.session.commit()
 
-    new_css = old_content + "\n\n/* Addition user css */\n\n" + mytheme_content
+    new_css = old_content + "\n\n/* Additional user css */\n\n" + mytheme_content
     new_content = svc.get_current_css()
     assert new_css in new_content, "my theme used in addition to built-in"
