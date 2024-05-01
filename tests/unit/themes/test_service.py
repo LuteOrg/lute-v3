@@ -2,6 +2,7 @@
 Theme service tests.
 """
 
+import os
 import lute.themes.service as svc
 from lute.db import db
 from lute.models.setting import UserSetting
@@ -51,3 +52,56 @@ def test_next_theme_cycles_themes(app_context):
         svc.next_theme()
         svc.next_theme()
     # OK
+
+
+def _delete_custom_theme_files(theme_dir):
+    "Delete custom file."
+    for filename in os.listdir(theme_dir):
+        filepath = os.path.join(theme_dir, filename)
+        if os.path.isfile(filepath):
+            os.remove(filepath)
+
+
+def test_custom_theme_in_theme_dir_is_available(app, app_context):
+    "Can use .css file in theme dir."
+    theme_dir = app.env_config.userthemespath
+    _delete_custom_theme_files(theme_dir)
+
+    mytheme_content = "p { font-size: 30pt; }"
+    themefile = os.path.join(theme_dir, "my_theme.css")
+    with open(themefile, "w", encoding="utf-8") as f:
+        f.write(mytheme_content)
+
+    lst = svc.list_themes()
+    assert ("my_theme.css", "my theme") in lst, "Have my theme"
+
+    UserSetting.set_value("current_theme", "my_theme.css")
+    db.session.commit()
+    assert mytheme_content in svc.get_current_css(), "my theme used"
+
+
+def test_custom_theme_in_theme_dir_overrides_existing_theme(app, app_context):
+    "Can use .css file in theme dir."
+    theme_dir = app.env_config.userthemespath
+    _delete_custom_theme_files(theme_dir)
+
+    lst = svc.list_themes()
+    assert ("Apple_Books.css", "Apple Books") in lst
+    UserSetting.set_value("current_theme", "Apple_Books.css")
+    db.session.commit()
+    old_content = svc.get_current_css()
+
+    mytheme_content = "p { font-size: 30pt; }"
+    themefile = os.path.join(theme_dir, "Apple_Books.css")
+    with open(themefile, "w", encoding="utf-8") as f:
+        f.write(mytheme_content)
+
+    lst = svc.list_themes()
+    assert ("Apple_Books.css", "Apple Books") in lst, "Have my theme"
+
+    UserSetting.set_value("current_theme", "Apple_Books.css")
+    db.session.commit()
+
+    new_css = old_content + "\n\n/* Addition user css */\n\n" + mytheme_content
+    new_content = svc.get_current_css()
+    assert new_css in new_content, "my theme used in addition to built-in"

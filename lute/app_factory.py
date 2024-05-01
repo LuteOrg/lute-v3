@@ -72,6 +72,10 @@ def _setup_app_dirs(app_config):
             "readme": "User images.  Each subfolder is a language's ID.",
         },
         {
+            "d": app_config.userthemespath,
+            "readme": "User themes.  <theme_name>.css files for your personal themes.",
+        },
+        {
             "d": app_config.useraudiopath,
             "readme": "User audio.  Each file is a book's audio.",
         },
