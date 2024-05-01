@@ -7,6 +7,7 @@ UserSetting.
 
 import os
 from glob import glob
+from flask import current_app
 from lute.models.setting import UserSetting
 from lute.db import db
 
@@ -26,15 +27,24 @@ def list_themes():
     """
     List of theme file names and user-readable name.
     """
-    theme_glob = os.path.join(_css_path(), "*.css")
 
     def _make_display_name(s):
         ret = os.path.basename(s)
         ret = ret.replace(".css", "").replace("_", " ")
         return ret
 
-    glob_results = glob(theme_glob)
-    themes = [(os.path.basename(f), _make_display_name(f)) for f in glob_results]
+    g = glob(os.path.join(_css_path(), "*.css"))
+    themes = [(os.path.basename(f), _make_display_name(f)) for f in g]
+    theme_basenames = [t[0] for t in themes]
+
+    g = glob(os.path.join(current_app.env_config.userthemespath, "*.css"))
+    additional_user_themes = [
+        (os.path.basename(f), _make_display_name(f))
+        for f in g
+        if os.path.basename(f) not in theme_basenames
+    ]
+
+    themes += additional_user_themes
     sorted_themes = sorted(themes, key=lambda x: x[1])
     return [default_entry] + sorted_themes
 
@@ -46,12 +56,22 @@ def get_current_css():
     current_theme = UserSetting.get_value("current_theme")
     if current_theme == default_entry[0]:
         return ""
-    theme_css = os.path.join(_css_path(), current_theme)
-    if not os.path.exists(theme_css):
-        # _Probably_ should raise an error here ...
-        return ""
-    with open(theme_css, "r", encoding="utf-8") as f:
-        return f.read()
+
+    base = ""
+    built_in_css_filename = os.path.join(_css_path(), current_theme)
+    if os.path.exists(built_in_css_filename):
+        with open(built_in_css_filename, "r", encoding="utf-8") as f:
+            base = f.read()
+
+    add = ""
+    user_css = os.path.join(current_app.env_config.userthemespath, current_theme)
+    if os.path.exists(user_css):
+        with open(user_css, "r", encoding="utf-8") as f:
+            add = "\n\n/* Additional user css */\n\n"
+            add += f.read()
+
+    ret = base + add
+    return ret
 
 
 def next_theme():
