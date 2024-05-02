@@ -440,6 +440,18 @@ Feature: Term import
             gatos
 
 
+    Scenario: Field named added is ignored
+        Given import file:
+            language,term,added
+            Spanish,gato,27-July-2020
+            spanish,gatos,27-July-2020
+        When import with create true, update false
+        Then import should succeed with 2 created, 0 updated, 0 skipped
+        And words table should contain:
+            gato
+            gatos
+
+
     Scenario: Missing required field throws
         Given import file:
             language,thing
