@@ -47,11 +47,8 @@ function start_hover_mode(should_clear_frames = true) {
 
 /** 
  * Prepare the interaction events with the text.
- *
- * pos = position hash, e.g.
- * {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'}
  */
-function prepareTextInteractions(pos) {
+function prepareTextInteractions() {
   const t = $('#thetext');
   // Using "t.on" here because .word elements
   // are added and removed dynamically, and "t.on"
@@ -75,13 +72,24 @@ function prepareTextInteractions(pos) {
   $(document).on('keydown', handle_keydown);
 
   $('#thetext').tooltip({
-    position: pos,
+    position: _get_tooltip_pos(),
     items: '.word.showtooltip',
     show: { easing: 'easeOutCirc' },
     content: function (setContent) { tooltip_textitem_hover_content($(this), setContent); }
   });
 }
 
+
+/* ========================================= */
+/** Tooltip (term detail hover). */
+
+let _get_tooltip_pos = function() {
+  let ret = {my: 'left top+10', at: 'left bottom', collision: 'flipfit flip'};
+  if (window.matchMedia("(max-width: 980px)").matches) {
+    ret = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
+  }
+  return ret;
+}
 
 /**
  * Build the html content for jquery-ui tooltip.
@@ -97,6 +105,9 @@ let tooltip_textitem_hover_content = function (el, setContent) {
   });
 }
 
+
+/* ========================================= */
+/** Showing the edit form. */
 
 function _show_wordframe_url(url) {
   top.frames.wordframe.location.href = url;
