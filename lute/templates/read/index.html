@@ -188,7 +188,6 @@
   let mouseY;
   let scrollY;
   let scrollYBeforeReload;
-  let tooltipPos = {my: 'left top+10', at: 'left bottom', collision: 'flipfit flip'};
   const mediaTablet = window.matchMedia("(max-width: 980px)");
   const readPaneRight = document.getElementById("read_pane_right");
   const btmMarginCont = document.querySelector(".btm-margin-container");
@@ -230,9 +229,6 @@
     
     theTextReloadObs.observe(theText, {childList: true, subtree: true});
 
-    if (mediaTablet.matches) {
-      tooltipPos = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
-    }
     // do not load focus state if in tablet mode
     if (!mediaTablet.matches) {
       const book_id = $('#book_id').val();
@@ -476,7 +472,7 @@
         $("html, body").animate({ scrollTop: 0 });
 
         if (initial_page_load) {
-          prepareTextInteractions(tooltipPos);
+          prepareTextInteractions();
         }
 
         // Magic hack for player source to load consistently
