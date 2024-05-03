@@ -51,7 +51,21 @@ function resizePaneRight(e) {
   const dy = mouse_pos - e.y;
   mouse_pos = e.y;
 
-  const currentTy = parseFloat(readPaneRight.style.transform.split("(")[1].split(")")[0]);
+  // Hack!!!  Currently, when you open a page and long-click two terms
+  // to create a multiword term, the term edit handles appear right at
+  // the bottom of the screen, and dragging throws an error ("Cannot
+  // read properties of undefined (reading 'split')") ... I can't
+  // figure out why.  Setting the currentTy to 80 at least lets the
+  // thing be draggable.
+  let currentTy = 80;
+  try {
+    currentTy = parseFloat(readPaneRight.style.transform.split("(")[1].split(")")[0]);
+  }
+  catch (error) {
+    console.log("Error on settingTy: " + error.message);
+  }
+  // console.log(`current ty = ${currentTy}`);
+
   let resultTy = currentTy - (dy / document.documentElement.clientHeight * 100);
   resultTy = clamp(resultTy, 5, 95);
   readPaneRight.style.transform = `translateY(${resultTy}%)`;
@@ -173,9 +187,11 @@ function applyInitialPaneSizes() {
 
   const width = getFromLocalStorage("textWidth", widthDefault);
   const height = getFromLocalStorage("trHeight", trHeightDefault);
+  const ratio = getReadPaneWidthRatio();
+  const pane_right_width = (100 - width) * ratio;
 
   readPaneLeft.style.width = `${width}%`;
-  readPaneRight.style.width = `${(100 - width) * getReadPaneWidthRatio()}%`;
+  readPaneRight.style.width = `${pane_right_width}%`;
   readPaneRight.style.gridTemplateRows = `${height}% 1fr`;
 }
 

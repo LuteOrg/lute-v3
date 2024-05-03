@@ -205,7 +205,10 @@
     }
   })
 
-  document.addEventListener("click", (event) => {
+  // This must be "pointerup", and not "click", to properly display
+  // the term form when a multi-word term is created on mobile,
+  // because the "touchend" event cancels the click event.
+  document.addEventListener("pointerup", (event) => {
       mouseY = event.clientY;
       scrollY = window.scrollY;
   });
