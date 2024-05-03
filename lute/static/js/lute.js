@@ -58,8 +58,15 @@ function prepareTextInteractions() {
   t.on('mouseup', '.word', handle_select_ended);
 
   // Mobile screens have touch events.
+  /*
   t.on('touchstart', '.word', touch_started);
   t.on('touchend', '.word', touch_ended);
+  */
+
+  // singletap, doubletap, taphold
+  t.on('singletap', '.word', function(e) { console.log('single tap'); });
+  t.on('doubletap', '.word', function(e) { console.log('double tap'); });
+  t.on('taphold', '.word', function(e) { console.log('hold tap'); });
 
   t.on('mouseover', '.word', hover_over);
   t.on('mouseout', '.word', hover_out);
