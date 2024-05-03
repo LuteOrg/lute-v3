@@ -150,6 +150,7 @@ def fixture_hindi(app_context):
 def fixture_mandarin_chinese(app_context):
     return _get_test_language("Mandarin Chinese")
 
+
 @pytest.fixture(name="generic")
 def fixture_generic(app_context):
     return _get_test_language("Generic")
