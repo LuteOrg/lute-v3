@@ -1,4 +1,4 @@
-﻿astroid==2.15.6
+astroid==2.15.6
 attrs==23.1.0
 beautifulsoup4==4.12.2
 black==23.10.1
@@ -30,6 +30,7 @@ invoke==2.2.0
 isort==5.12.0
 itsdangerous==2.1.2
 jaconv==0.3.4
+jieba==0.42.1
 Jinja2==3.1.2
 lazy-object-proxy==1.9.0
 Mako==1.2.4
@@ -53,6 +54,7 @@ pycparser==2.21
 pyee==11.0.1
 pylint==2.17.5
 pypdf==3.17.4
+pypinyin==0.51.0
 PySocks==1.7.1
 pytest==7.4.2
 pytest-base-url==2.0.0
