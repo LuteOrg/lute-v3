@@ -44,19 +44,61 @@ function start_hover_mode(should_clear_frames = true) {
   $(window).focus();
 }
 
+/* ========================================= */
+/** Interactions. */
+
+
+/**
+ * Find if on mobile.
+ * This appears to still be a big hassle.  Various posts
+ * say to not use the userAgent sniffing, and use feature tests
+ * instead.
+ * ref: https://stackoverflow.com/questions/72502079/
+ *   how-can-i-check-if-the-device-which-is-using-my-website-is-a-mobile-user-or-no
+ * From the above, using answer from marc_s: https://stackoverflow.com/a/76055222/1695066
+ */
+const _isUserUsingMobile = () => {
+  // User agent string method
+  let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  // Screen resolution method
+  if (!isMobile) {
+    const s = window.screen
+    isMobile = (s.width < 768 || s.height < 768);
+  }
+
+  // Touch events method
+  if (!isMobile) {
+    isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0));
+  }
+
+  // CSS media queries method
+  if (!isMobile) {
+    let bodyElement = document.getElementsByTagName('body')[0];
+    isMobile = window.getComputedStyle(bodyElement).getPropertyValue('content').indexOf('mobile') !== -1;
+  }
+
+  return isMobile
+}
+
 
 /** 
  * Prepare the interaction events with the text.
  */
 function prepareTextInteractions() {
-  const t = $('#thetext');
-  // Using "t.on" here because .word elements
-  // are added and removed dynamically, and "t.on"
-  // ensures that events remain for each element.
-  t.on('mousedown', '.word', handle_select_started);
-  t.on('mouseover', '.word', handle_select_over);
-  t.on('mouseup', '.word', handle_select_ended);
+  if (_isUserUsingMobile()) {
+    console.log('Using mobile interactions');
+    _add_mobile_interactions();
+  }
+  else {
+    console.log('Using desktop interactions');
+    _add_desktop_interactions();
+  }
+}
 
+
+function _add_mobile_interactions() {
+  const t = $('#thetext');
   // Mobile screens have touch events.
   /*
   t.on('touchstart', '.word', touch_started);
@@ -64,9 +106,22 @@ function prepareTextInteractions() {
   */
 
   // singletap, doubletap, taphold
+  $.touch.setDoubleTapInt(250);
+  $.touch.setTapHoldThreshold(400);
   t.on('singletap', '.word', function(e) { console.log('single tap'); });
   t.on('doubletap', '.word', function(e) { console.log('double tap'); });
   t.on('taphold', '.word', function(e) { console.log('hold tap'); });
+}
+
+
+function _add_desktop_interactions() {
+  const t = $('#thetext');
+  // Using "t.on" here because .word elements
+  // are added and removed dynamically, and "t.on"
+  // ensures that events remain for each element.
+  t.on('mousedown', '.word', handle_select_started);
+  t.on('mouseover', '.word', handle_select_over);
+  t.on('mouseup', '.word', handle_select_ended);
 
   t.on('mouseover', '.word', hover_over);
   t.on('mouseout', '.word', hover_out);
@@ -85,7 +140,6 @@ function prepareTextInteractions() {
     content: function (setContent) { tooltip_textitem_hover_content($(this), setContent); }
   });
 }
-
 
 /* ========================================= */
 /** Tooltip (term detail hover). */
