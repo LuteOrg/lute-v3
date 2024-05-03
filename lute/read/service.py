@@ -2,10 +2,12 @@
 Reading helpers.
 """
 
+import functools
 from lute.models.term import Term, Status
 from lute.models.book import Text
 from lute.book.stats import mark_stale
 from lute.read.render.service import get_paragraphs, find_all_Terms_in_string
+from lute.read.render.renderable_calculator import TokenLocator
 from lute.term.model import Repository
 from lute.db import db
 
@@ -160,9 +162,34 @@ def get_popup_data(termid):
         parents = []
     parent_data = [make_array(p) for p in parents]
 
+    def sort_components(components):
+        # Sort components by min position in string and length.
+        subj = TokenLocator.make_string(term.text)
+        tocloc = TokenLocator(term.language, subj)
+        component_and_pos = []
+        for c in components:
+            locs = tocloc.locate_string(c.text)
+            # pylint: disable=consider-using-generator
+            index = min([loc["index"] for loc in locs])
+            component_and_pos.append([c, index])
+
+        def compare(a, b):
+            # Lowest position (closest to front of string) sorts first.
+            if a[1] != b[1]:
+                return -1 if (a[1] < b[1]) else 1
+            # Longest sorts first.
+            alen = len(a[0].text)
+            blen = len(b[0].text)
+            return -1 if (alen > blen) else 1
+
+        component_and_pos.sort(key=functools.cmp_to_key(compare))
+        return [c[0] for c in component_and_pos]
+
     components = [
         c for c in find_all_Terms_in_string(term.text, term.language) if c.id != term.id
     ]
+    components = sort_components(components)
+
     component_data = [make_array(c) for c in components]
     component_data = [c for c in component_data if c["trans"] != "-"]
 
@@ -170,9 +197,12 @@ def get_popup_data(termid):
     for p in term.parents:
         if p.get_current_image():
             images.append(p.get_current_image())
-    for c in components:
-        if c.get_current_image():
-            images.append(c.get_current_image())
+    # DISABLED CODE: Don't include component images in the hover for now,
+    # it can get confusing!
+    # ref https://github.com/LuteOrg/lute-v3/issues/355
+    # for c in components:
+    #     if c.get_current_image():
+    #         images.append(c.get_current_image())
 
     images = list(set(images))
 

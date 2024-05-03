@@ -66,8 +66,9 @@ def _validate_data_fields(field_list):
         "pronunciation",
         "link_status",
     ]
+    ignored = ["added"]
     for k in field_list:
-        if k not in allowed:
+        if k not in allowed and k not in ignored:
             raise BadImportFileError(f"Unknown field '{k}'")
 
 
