@@ -94,6 +94,15 @@ function prepareTextInteractions() {
     console.log('Using desktop interactions');
     _add_desktop_interactions();
   }
+
+  $(document).on('keydown', handle_keydown);
+
+  $('#thetext').tooltip({
+    position: _get_tooltip_pos(),
+    items: '.word.showtooltip',
+    show: { easing: 'easeOutCirc' },
+    content: function (setContent) { tooltip_textitem_hover_content($(this), setContent); }
+  });
 }
 
 
@@ -105,11 +114,10 @@ function _add_mobile_interactions() {
   t.on('touchend', '.word', touch_ended);
   */
 
-  // singletap, doubletap, taphold
   $.touch.setDoubleTapInt(250);
   $.touch.setTapHoldThreshold(400);
   t.on('singletap', '.word', function(e) { console.log('single tap'); });
-  t.on('doubletap', '.word', function(e) { console.log('double tap'); });
+  t.on('doubletap', '.word', function(e) { console.log('double tap'); t.tooltip("close"); $(".ui-tooltip").css("display", "none"); });
   t.on('taphold', '.word', function(e) { console.log('hold tap'); });
 }
 
@@ -130,15 +138,6 @@ function _add_desktop_interactions() {
     t.on('mouseover', '.word', hover_over_add_status_class);
     t.on('mouseout', '.word', remove_status_highlights);
   }
-
-  $(document).on('keydown', handle_keydown);
-
-  $('#thetext').tooltip({
-    position: _get_tooltip_pos(),
-    items: '.word.showtooltip',
-    show: { easing: 'easeOutCirc' },
-    content: function (setContent) { tooltip_textitem_hover_content($(this), setContent); }
-  });
 }
 
 /* ========================================= */
