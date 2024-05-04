@@ -254,7 +254,10 @@
         const pagenum = $('#page_num').val();
         const url = `/read/renderpage/${bookid}/${pagenum}`;
         const marked = $('.kwordmarked');
-        const marked_id = $(marked[0]).attr('id');
+        let marked_id = "nomatches"
+        if (marked.length != 0) {
+          marked_id = $(marked[0]).attr('id');
+        }
 
         // Force remove the old popup.
         // ref https://stackoverflow.com/questions/19266886/
@@ -264,7 +267,6 @@
         $(".dictcontainer").css('display', 'none');
 
         $('#thetext').load(url, function() {
-          // console.log(`adding hover class to id ${marked_id}`);
           const re_marked = $(`#${marked_id}`);
           re_marked.removeClass('kwordmarked');
           re_marked.addClass('wordhover');
