@@ -389,8 +389,10 @@ function touch_started(e) {
 
 function touch_ended(e) {
   const touchTimeLength = Date.now() - _touchStartTime;
+  const el = $(this);
   if (touchTimeLength < 200) {
     // Short tap, handled as regular click.
+    show_term_edit_form(el);
     return;
   }
 
@@ -401,7 +403,6 @@ function touch_ended(e) {
   // The touch_ended handler is attached with t.on in
   // prepareTextInteractions, so the clicked element is just
   // $(this).
-  const el = $(this);
   if (selection_start_el == null) {
     select_started(el, e);
     select_over(el, e);
