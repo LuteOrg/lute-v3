@@ -368,23 +368,30 @@ function select_ended(el, e) {
 /********************************************/
 // Mobile events.
 //
+// Distinguishing between single/double/long taps.
 // Ref https://borstch.com/blog/javascript-touch-events-and-mobile-specific-considerations
-// Touch start is recorded in _touchStartTime.  Short taps are handled regularly,
-// like "clicks".  "Long taps", where the touch ends 200ms after the start,
-// is treated like a "multi-word term" start or end.
 //
-// TODO comment about using https://github.com/benmajor/jQuery-Touch-Events
+// I had used https://github.com/benmajor/jQuery-Touch-Events, but
+// during development was running into problems with chrome dev tool
+// mobile emulation freezing.  I thought it was the library but the
+// problem occurred with the vanilla js below.
+//
+// https://stackoverflow.com/questions/22722727/
+// chrome-devtools-mobile-emulation-scroll-not-working suggests that
+// it's a devtools problem, and I agree, as it occurred at random.
+// I'm still sticking with the vanilla js below though: it's very
+// simple, and there's no need to add another dependency just to
+// distinguish single/double/long taps.
 
-let _touchStartTime;
+// _touch_start_time needed to calc the duration of a click.
+let _touch_start_time;
 
+// _last_touch_end_time needed to determine if this is a single- or
+// double-click.
 let _last_touch_end_time;
 
 function touch_started(e) {
-  _touchStartTime = Date.now();
-}
-
-function _ms_since(start_ref) {
-  return Date.now() - start_ref;
+  _touch_start_time = Date.now();
 }
 
 function touch_ended(e) {
@@ -393,10 +400,11 @@ function touch_ended(e) {
   // $(this).
   const el = $(this);
 
+  const _ms_since = function(start_ref) { return Date.now() - start_ref; };
   const is_double_click = _last_touch_end_time != null &&
         _ms_since(_last_touch_end_time) <= 200;
 
-  if (_ms_since(_touchStartTime) > 500) {
+  if (_ms_since(_touch_start_time) > 500) {
     _tap_hold(el, e);
     _last_touch_end_time = null;
   }
@@ -411,10 +419,9 @@ function touch_ended(e) {
 
 }
 
-
 // Hover, or show the form.
 function _single_tap(el, e) {
-  console.log('single tap');
+  // console.log('single tap');
   clear_newmultiterm_elements();
   const term_is_status_0 = (el.data("status-class") == "status0");
   if (term_is_status_0) {
@@ -425,7 +432,7 @@ function _single_tap(el, e) {
 
 // Show the form.
 function _double_tap(el, e) {
-  console.log('double tap');
+  // console.log('double tap');
   $(".ui-tooltip").css("display", "none");
   clear_newmultiterm_elements();
   show_term_edit_form(el);
@@ -433,7 +440,7 @@ function _double_tap(el, e) {
 
 // Tap-holds define the start and end of a multi-word term.
 function _tap_hold(el, e) {
-  console.log('hold tap');
+  // console.log('hold tap');
   if (selection_start_el == null) {
     select_started(el, e);
     select_over(el, e);
@@ -442,7 +449,6 @@ function _tap_hold(el, e) {
     select_over(el, e);
     select_ended(el, e);
   }
-
 }
 
 
