@@ -415,6 +415,7 @@ function touch_ended(e) {
 // Hover, or show the form.
 function _single_tap(el, e) {
   console.log('single tap');
+  clear_newmultiterm_elements();
   const term_is_status_0 = (el.data("status-class") == "status0");
   if (term_is_status_0) {
     // word_clicked(el);
@@ -426,6 +427,7 @@ function _single_tap(el, e) {
 function _double_tap(el, e) {
   console.log('double tap');
   $(".ui-tooltip").css("display", "none");
+  clear_newmultiterm_elements();
   show_term_edit_form(el);
 }
 
