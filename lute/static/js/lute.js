@@ -88,7 +88,8 @@ const _isUserUsingMobile = () => {
 function prepareTextInteractions() {
   if (_isUserUsingMobile()) {
     console.log('Using mobile interactions');
-    _add_mobile_interactions();
+    // _add_mobile_interactions();
+    console.log('DISABLED for now');
   }
   else {
     console.log('Using desktop interactions');
