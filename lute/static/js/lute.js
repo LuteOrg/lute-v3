@@ -106,19 +106,15 @@ function prepareTextInteractions() {
 }
 
 
+// Mobile screens have tap/double-tap/long tap events.
 function _add_mobile_interactions() {
   const t = $('#thetext');
-  // Mobile screens have touch events.
-  /*
-  t.on('touchstart', '.word', touch_started);
-  t.on('touchend', '.word', touch_ended);
-  */
-
   $.touch.setDoubleTapInt(250);
   $.touch.setTapHoldThreshold(400);
-  t.on('singletap', '.word', function(e) { console.log('single tap'); });
-  t.on('doubletap', '.word', function(e) { console.log('double tap'); t.tooltip("close"); $(".ui-tooltip").css("display", "none"); });
-  t.on('taphold', '.word', function(e) { console.log('hold tap'); });
+  t.on('singletap', '.word', handle_single_tap);
+  t.on('doubletap', '.word', handle_double_tap);
+  t.on('taphold', '.word', handle_tap_hold);
+  console.log('added mobile interactions.');
 }
 
 
@@ -130,10 +126,8 @@ function _add_desktop_interactions() {
   t.on('mousedown', '.word', handle_select_started);
   t.on('mouseover', '.word', handle_select_over);
   t.on('mouseup', '.word', handle_select_ended);
-
   t.on('mouseover', '.word', hover_over);
   t.on('mouseout', '.word', hover_out);
-
   if (!_show_highlights()) {
     t.on('mouseover', '.word', hover_over_add_status_class);
     t.on('mouseout', '.word', remove_status_highlights);
@@ -375,32 +369,32 @@ function select_ended(el, e) {
 
 /********************************************/
 // Mobile events.
-//
-// Ref https://borstch.com/blog/javascript-touch-events-and-mobile-specific-considerations
-// Touch start is recorded in _touchStartTime.  Short taps are handled regularly,
-// like "clicks".  "Long taps", where the touch ends 200ms after the start,
-// is treated like a "multi-word term" start or end.
 
-let _touchStartTime;
-
-function touch_started(e) {
-  _touchStartTime = Date.now();
+// Hover, or show the form.
+function handle_single_tap(e) {
+  console.log('single tap');
+  const el = $(this);
+  let _term_is_status_0 = function(el) {
+    return el.data("status-class") == "status0";
+  };
+  if (_term_is_status_0(el)) {
+    // word_clicked(el);
+    show_term_edit_form(el);
+  }
 }
 
-function touch_ended(e) {
-  const touchTimeLength = Date.now() - _touchStartTime;
-  if (touchTimeLength < 200) {
-    // Short tap, handled as regular click.
-    return;
-  }
+// Show the form.
+function handle_double_tap(e) {
+  console.log('double tap');
+  $(".ui-tooltip").css("display", "none");
+  const el = $(this);
+  // word_clicked(el);
+  show_term_edit_form(el);
+}
 
-  // Cancelling the event so that "click" isn't called
-  // for long tap.
-  e.preventDefault();
-
-  // The touch_ended handler is attached with t.on in
-  // prepareTextInteractions, so the clicked element is just
-  // $(this).
+// Tap-holds define the start and end of a multi-word term.
+function handle_tap_hold(e) {
+  console.log('hold tap');
   const el = $(this);
   if (selection_start_el == null) {
     select_started(el, e);
@@ -410,6 +404,7 @@ function touch_ended(e) {
     select_over(el, e);
     select_ended(el, e);
   }
+
 }
 
 
