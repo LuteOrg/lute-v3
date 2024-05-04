@@ -255,8 +255,12 @@
         const pagenum = $('#page_num').val();
         const url = `/read/renderpage/${bookid}/${pagenum}`;
         const marked = $('.kwordmarked');
-        const marked_id = $(marked[0]).attr('id');
+        let marked_id = "nomatches"
+        if (marked.length != 0) {
+          marked_id = $(marked[0]).attr('id');
+        }
         console.log(`got marked_id = ${marked_id}`);
+
         // Force remove the old popup.
         // ref https://stackoverflow.com/questions/19266886/
         //   tooltip-not-disappearing
@@ -268,11 +272,10 @@
         $('#thetext').load(url, function() {
           console.log(`Done reload, adding hover class to id ${marked_id}`);
           const re_marked = $(`#${marked_id}`);
-          console.log('got re-marked');
+          console.log(`got re-marked, length = ${re_marked.length}`);
           re_marked.removeClass('kwordmarked');
-          console.log('remove kwordmarked');
           re_marked.addClass('wordhover');
-          console.log('added word hover');
+          console.log('remove and add classes');
         });
       };
 

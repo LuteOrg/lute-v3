@@ -109,9 +109,10 @@ function prepareTextInteractions() {
 
 // Mobile screens have tap/double-tap/long tap events.
 function _add_mobile_interactions() {
-  const t = $('#thetext');
   $.touch.setDoubleTapInt(250);
   $.touch.setTapHoldThreshold(400);
+  const t = $('#thetext');
+  t.off(); // Remove all handlers.
   t.on('singletap', '.word', handle_single_tap);
   t.on('doubletap', '.word', handle_double_tap);
   t.on('taphold', '.word', handle_tap_hold);
@@ -124,6 +125,7 @@ function _add_desktop_interactions() {
   // Using "t.on" here because .word elements
   // are added and removed dynamically, and "t.on"
   // ensures that events remain for each element.
+  t.off(); // Remove all handlers.
   t.on('mousedown', '.word', handle_select_started);
   t.on('mouseover', '.word', handle_select_over);
   t.on('mouseup', '.word', handle_select_ended);
