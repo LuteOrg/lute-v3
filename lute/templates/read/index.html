@@ -250,12 +250,13 @@
       // When term form posts data (either updating or deleting terms),
       // reload the full reading screen.
       if (event.data.event === "LuteTermFormPosted") {
+        console.log('got form posted');
         const bookid = $('#book_id').val();
         const pagenum = $('#page_num').val();
         const url = `/read/renderpage/${bookid}/${pagenum}`;
         const marked = $('.kwordmarked');
         const marked_id = $(marked[0]).attr('id');
-
+        console.log(`got marked_id = ${marked_id}`);
         // Force remove the old popup.
         // ref https://stackoverflow.com/questions/19266886/
         //   tooltip-not-disappearing
@@ -263,11 +264,15 @@
 
         $(".dictcontainer").css('display', 'none');
 
+        console.log(`reloading text at ${url}`);
         $('#thetext').load(url, function() {
-          // console.log(`adding hover class to id ${marked_id}`);
+          console.log(`Done reload, adding hover class to id ${marked_id}`);
           const re_marked = $(`#${marked_id}`);
+          console.log('got re-marked');
           re_marked.removeClass('kwordmarked');
+          console.log('remove kwordmarked');
           re_marked.addClass('wordhover');
+          console.log('added word hover');
         });
       };
 
