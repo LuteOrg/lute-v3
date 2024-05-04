@@ -44,29 +44,59 @@ function start_hover_mode(should_clear_frames = true) {
   $(window).focus();
 }
 
+/* ========================================= */
+/** Interactions. */
+
+
+/**
+ * Find if on mobile.
+ * This appears to still be a big hassle.  Various posts
+ * say to not use the userAgent sniffing, and use feature tests
+ * instead.
+ * ref: https://stackoverflow.com/questions/72502079/
+ *   how-can-i-check-if-the-device-which-is-using-my-website-is-a-mobile-user-or-no
+ * From the above, using answer from marc_s: https://stackoverflow.com/a/76055222/1695066
+ */
+const _isUserUsingMobile = () => {
+  // User agent string method
+  let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  // Screen resolution method.
+  // Using the same arbitrary width check (980) as used
+  // by the various window.matchMedia checks elsewhere in the code.
+  // The original method in the SO post had width, height < 768,
+  // but that broke playwright tests which opens a smaller browser window.
+  if (!isMobile) {
+    const s = window.screen
+    isMobile = (s.width < 980);
+  }
+
+  // Touch events method
+  if (!isMobile) {
+    isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0));
+  }
+
+  // CSS media queries method
+  if (!isMobile) {
+    let bodyElement = document.getElementsByTagName('body')[0];
+    isMobile = window.getComputedStyle(bodyElement).getPropertyValue('content').indexOf('mobile') !== -1;
+  }
+
+  return isMobile
+}
+
 
 /** 
  * Prepare the interaction events with the text.
  */
 function prepareTextInteractions() {
-  const t = $('#thetext');
-  // Using "t.on" here because .word elements
-  // are added and removed dynamically, and "t.on"
-  // ensures that events remain for each element.
-  t.on('mousedown', '.word', handle_select_started);
-  t.on('mouseover', '.word', handle_select_over);
-  t.on('mouseup', '.word', handle_select_ended);
-
-  // Mobile screens have touch events.
-  t.on('touchstart', '.word', touch_started);
-  t.on('touchend', '.word', touch_ended);
-
-  t.on('mouseover', '.word', hover_over);
-  t.on('mouseout', '.word', hover_out);
-
-  if (!_show_highlights()) {
-    t.on('mouseover', '.word', hover_over_add_status_class);
-    t.on('mouseout', '.word', remove_status_highlights);
+  if (_isUserUsingMobile()) {
+    console.log('Using mobile interactions');
+    _add_mobile_interactions();
+  }
+  else {
+    console.log('Using desktop interactions');
+    _add_desktop_interactions();
   }
 
   $(document).on('keydown', handle_keydown);
@@ -79,6 +109,29 @@ function prepareTextInteractions() {
   });
 }
 
+
+function _add_mobile_interactions() {
+  const t = $('#thetext');
+  t.on('touchstart', '.word', touch_started);
+  t.on('touchend', '.word', touch_ended);
+}
+
+
+function _add_desktop_interactions() {
+  const t = $('#thetext');
+  // Using "t.on" here because .word elements
+  // are added and removed dynamically, and "t.on"
+  // ensures that events remain for each element.
+  t.on('mousedown', '.word', handle_select_started);
+  t.on('mouseover', '.word', handle_select_over);
+  t.on('mouseup', '.word', handle_select_ended);
+  t.on('mouseover', '.word', hover_over);
+  t.on('mouseout', '.word', hover_out);
+  if (!_show_highlights()) {
+    t.on('mouseover', '.word', hover_over_add_status_class);
+    t.on('mouseout', '.word', remove_status_highlights);
+  }
+}
 
 /* ========================================= */
 /** Tooltip (term detail hover). */
@@ -316,32 +369,76 @@ function select_ended(el, e) {
 /********************************************/
 // Mobile events.
 //
+// 1. Regular vs long taps.
+//
 // Ref https://borstch.com/blog/javascript-touch-events-and-mobile-specific-considerations
-// Touch start is recorded in _touchStartTime.  Short taps are handled regularly,
-// like "clicks".  "Long taps", where the touch ends 200ms after the start,
-// is treated like a "multi-word term" start or end.
+//
+// I had used https://github.com/benmajor/jQuery-Touch-Events, but
+// during development was running into problems with chrome dev tool
+// mobile emulation freezing.  I thought it was the library but the
+// problem occurred with the vanilla js below.
+//
+// https://stackoverflow.com/questions/22722727/
+// chrome-devtools-mobile-emulation-scroll-not-working suggests that
+// it's a devtools problem, and I agree, as it occurred at random.
+// I'm still sticking with the vanilla js below though: it's very
+// simple, and there's no need to add another dependency just to
+// distinguish regular and long taps.
+//
+// 2. Single tap vs double tap
+//
+// For my iphone at least, double-tap didn't seem to work, even though
+// it did in chrome devtools emulation.  For my iphone, the phone
+// browser seemed to add a delay after each click, so the double
+// clicks were never fast enough to be distinguishable.  For that
+// reason, instead of using click time differences to distinguish
+// between single and double clicks, the code tracks the
+// _last_touched_element: if the second tap is the same as the first,
+// it's treated as a double tap, regardless of the duration.  This is
+// fine for Lute since the first tap only opens the term pop-up.
 
-let _touchStartTime;
+// _touch_start_time needed to calc the duration of a click.
+let _touch_start_time;
+
+let _last_touched_element_id = null;
 
 function touch_started(e) {
-  _touchStartTime = Date.now();
+  _touch_start_time = Date.now();
 }
 
 function touch_ended(e) {
-  const touchTimeLength = Date.now() - _touchStartTime;
-  if (touchTimeLength < 200) {
-    // Short tap, handled as regular click.
-    return;
-  }
-
-  // Cancelling the event so that "click" isn't called
-  // for long tap.
-  e.preventDefault();
-
   // The touch_ended handler is attached with t.on in
   // prepareTextInteractions, so the clicked element is just
   // $(this).
   const el = $(this);
+  const this_id = el.attr("id")
+
+  $('span.kwordmarked').removeClass('kwordmarked');
+  $('span.wordhover').removeClass('wordhover');
+
+  const touch_duration = Date.now() - _touch_start_time;
+  const is_long_touch = (touch_duration >= 500);
+  const is_double_click = (this_id === _last_touched_element_id);
+
+  if (is_long_touch) {
+    _tap_hold(el, e);
+    _last_touched_element_id = null;
+  }
+  else if (is_double_click) {
+    _double_tap(el);
+    _last_touched_element_id = null;
+  }
+  else {
+    _single_tap(el);
+    _last_touched_element_id = this_id;
+    el.addClass('kwordmarked');
+  }
+}
+
+
+// Tap-holds define the start and end of a multi-word term.
+function _tap_hold(el, e) {
+  // console.log('hold tap');
   if (selection_start_el == null) {
     select_started(el, e);
     select_over(el, e);
@@ -349,6 +446,23 @@ function touch_ended(e) {
   else {
     select_over(el, e);
     select_ended(el, e);
+  }
+}
+
+// Show the form.
+function _double_tap(el, e) {
+  // console.log('double tap');
+  $(".ui-tooltip").css("display", "none");
+  clear_newmultiterm_elements();
+  show_term_edit_form(el);
+}
+
+function _single_tap(el, e) {
+  // console.log('single tap');
+  clear_newmultiterm_elements();
+  const term_is_status_0 = (el.data("status-class") == "status0");
+  if (term_is_status_0) {
+    show_term_edit_form(el);
   }
 }
 
@@ -365,7 +479,10 @@ let get_textitems_spans = function(e) {
     return elements;
 
   const w = elements[0];
-  const attr_name = e.shiftKey ? 'paragraph-id' : 'sentence-id';
+  let attr_name = 'sentence-id';
+  if (e && e.shiftKey) {
+    attr_name = 'paragraph-id';
+  }
   const attr_value = $(w).data(attr_name);
   return $(`span.textitem[data-${attr_name}="${attr_value}"]`).toArray();
 };
@@ -505,7 +622,7 @@ let show_translation_for_text = function(text) {
 
 
 /** Show the translation using the next dictionary. */
-let show_sentence_translation = function(e) {
+function show_sentence_translation(e) {
   const tis = get_textitems_spans(e);
   const sentence = tis.map(s => $(s).text()).join('');
   show_translation_for_text(sentence);
@@ -606,7 +723,6 @@ function add_page_after() {
 
 function handle_keydown (e) {
   if ($('span.word').length == 0) {
-    // console.log('no words, exiting');
     return; // Nothing to do.
   }
 
