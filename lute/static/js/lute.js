@@ -112,11 +112,6 @@ function _add_mobile_interactions() {
   $.touch.setDoubleTapInt(250);
   $.touch.setTapHoldThreshold(400);
   const t = $('#thetext');
-  /*
-  t.on('singletap', '.word', handle_single_tap);
-  t.on('doubletap', '.word', handle_double_tap);
-  t.on('taphold', '.word', handle_tap_hold);
-  */
   t.on('touchstart', '.word', touch_started);
   t.on('touchend', '.word', touch_ended);
   console.log('added mobile interactions.');
@@ -383,63 +378,62 @@ function select_ended(el, e) {
 // TODO comment about using https://github.com/benmajor/jQuery-Touch-Events
 
 let _touchStartTime;
+
+let _last_touch_end_time;
+
 function touch_started(e) {
   _touchStartTime = Date.now();
 }
 
+function _ms_since(start_ref) {
+  return Date.now() - start_ref;
+}
+
 function touch_ended(e) {
-  const touchTimeLength = Date.now() - _touchStartTime;
-  const el = $(this);
-  if (touchTimeLength < 200) {
-    // Short tap, handled as regular click.
-    show_term_edit_form(el);
-    return;
-  }
-
-  // Cancelling the event so that "click" isn't called
-  // for long tap.
-  e.preventDefault();
-
   // The touch_ended handler is attached with t.on in
   // prepareTextInteractions, so the clicked element is just
   // $(this).
-  if (selection_start_el == null) {
-    select_started(el, e);
-    select_over(el, e);
+  const el = $(this);
+
+  const is_double_click = _last_touch_end_time != null &&
+        _ms_since(_last_touch_end_time) <= 200;
+
+  if (_ms_since(_touchStartTime) > 500) {
+    _tap_hold(el, e);
+    _last_touch_end_time = null;
+  }
+  else if (is_double_click) {
+    _double_tap(el);
+    _last_touch_end_time = null;
   }
   else {
-    select_over(el, e);
-    select_ended(el, e);
+    _single_tap(el);
+    _last_touch_end_time = Date.now();
   }
+
 }
 
 
 // Hover, or show the form.
-function handle_single_tap(e) {
+function _single_tap(el, e) {
   console.log('single tap');
-  const el = $(this);
-  let _term_is_status_0 = function(el) {
-    return el.data("status-class") == "status0";
-  };
-  if (_term_is_status_0(el)) {
+  const term_is_status_0 = (el.data("status-class") == "status0");
+  if (term_is_status_0) {
     // word_clicked(el);
     show_term_edit_form(el);
   }
 }
 
 // Show the form.
-function handle_double_tap(e) {
+function _double_tap(el, e) {
   console.log('double tap');
   $(".ui-tooltip").css("display", "none");
-  const el = $(this);
-  // word_clicked(el);
   show_term_edit_form(el);
 }
 
 // Tap-holds define the start and end of a multi-word term.
-function handle_tap_hold(e) {
+function _tap_hold(el, e) {
   console.log('hold tap');
-  const el = $(this);
   if (selection_start_el == null) {
     select_started(el, e);
     select_over(el, e);
