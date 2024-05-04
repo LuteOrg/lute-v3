@@ -112,9 +112,13 @@ function _add_mobile_interactions() {
   $.touch.setDoubleTapInt(250);
   $.touch.setTapHoldThreshold(400);
   const t = $('#thetext');
+  /*
   t.on('singletap', '.word', handle_single_tap);
   t.on('doubletap', '.word', handle_double_tap);
   t.on('taphold', '.word', handle_tap_hold);
+  */
+  t.on('touchstart', '.word', touch_started);
+  t.on('touchend', '.word', touch_ended);
   console.log('added mobile interactions.');
 }
 
@@ -370,6 +374,44 @@ function select_ended(el, e) {
 
 /********************************************/
 // Mobile events.
+//
+// Ref https://borstch.com/blog/javascript-touch-events-and-mobile-specific-considerations
+// Touch start is recorded in _touchStartTime.  Short taps are handled regularly,
+// like "clicks".  "Long taps", where the touch ends 200ms after the start,
+// is treated like a "multi-word term" start or end.
+//
+// TODO comment about using https://github.com/benmajor/jQuery-Touch-Events
+
+let _touchStartTime;
+function touch_started(e) {
+  _touchStartTime = Date.now();
+}
+
+function touch_ended(e) {
+  const touchTimeLength = Date.now() - _touchStartTime;
+  if (touchTimeLength < 200) {
+    // Short tap, handled as regular click.
+    return;
+  }
+
+  // Cancelling the event so that "click" isn't called
+  // for long tap.
+  e.preventDefault();
+
+  // The touch_ended handler is attached with t.on in
+  // prepareTextInteractions, so the clicked element is just
+  // $(this).
+  const el = $(this);
+  if (selection_start_el == null) {
+    select_started(el, e);
+    select_over(el, e);
+  }
+  else {
+    select_over(el, e);
+    select_ended(el, e);
+  }
+}
+
 
 // Hover, or show the form.
 function handle_single_tap(e) {
