@@ -112,7 +112,6 @@ function _add_mobile_interactions() {
   const t = $('#thetext');
   t.on('touchstart', '.word', touch_started);
   t.on('touchend', '.word', touch_ended);
-  console.log('added mobile interactions.');
 }
 
 
@@ -412,6 +411,9 @@ function touch_ended(e) {
   const el = $(this);
   const this_id = el.attr("id")
 
+  $('span.kwordmarked').removeClass('kwordmarked');
+  $('span.wordhover').removeClass('wordhover');
+
   const touch_duration = Date.now() - _touch_start_time;
   const is_long_touch = (touch_duration >= 500);
   const is_double_click = (this_id === _last_touched_element_id);
@@ -427,6 +429,7 @@ function touch_ended(e) {
   else {
     _single_tap(el);
     _last_touched_element_id = this_id;
+    el.addClass('kwordmarked');
   }
 }
 
@@ -474,7 +477,10 @@ let get_textitems_spans = function(e) {
     return elements;
 
   const w = elements[0];
-  const attr_name = e.shiftKey ? 'paragraph-id' : 'sentence-id';
+  let attr_name = 'sentence-id';
+  if (e && e.shiftKey) {
+    attr_name = 'paragraph-id';
+  }
   const attr_value = $(w).data(attr_name);
   return $(`span.textitem[data-${attr_name}="${attr_value}"]`).toArray();
 };
@@ -614,7 +620,7 @@ let show_translation_for_text = function(text) {
 
 
 /** Show the translation using the next dictionary. */
-let show_sentence_translation = function(e) {
+function show_sentence_translation(e) {
   const tis = get_textitems_spans(e);
   const sentence = tis.map(s => $(s).text()).join('');
   show_translation_for_text(sentence);
@@ -715,7 +721,6 @@ function add_page_after() {
 
 function handle_keydown (e) {
   if ($('span.word').length == 0) {
-    // console.log('no words, exiting');
     return; // Nothing to do.
   }
 
