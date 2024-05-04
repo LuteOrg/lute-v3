@@ -388,7 +388,7 @@ let _touch_start_time;
 
 // _last_touch_end_time needed to determine if this is a single- or
 // double-click.
-let _last_touch_end_time;
+let _last_touch_end_time = null;
 
 function touch_started(e) {
   _touch_start_time = Date.now();
@@ -400,15 +400,19 @@ function touch_ended(e) {
   // $(this).
   const el = $(this);
 
-  const _ms_since = function(start_ref) { return Date.now() - start_ref; };
-  const is_double_click = _last_touch_end_time != null &&
-        _ms_since(_last_touch_end_time) <= 200;
+  const _ms_since = function(start_ref) { return Date.now() - (start_ref ?? 0); };
 
   if (_ms_since(_touch_start_time) > 500) {
     _tap_hold(el, e);
     _last_touch_end_time = null;
+    return;
   }
-  else if (is_double_click) {
+
+  const since_last = _ms_since(_last_touch_end_time);
+  const is_double_click = _last_touch_end_time != null && since_last <= 200;
+  $('#thetexttitle').text(`is_double_click = ${is_double_click}; since_last = ${since_last}; null last = ${_last_touch_end_time == null}`);
+
+  if (is_double_click) {
     _double_tap(el);
     _last_touch_end_time = null;
   }
