@@ -382,9 +382,16 @@ function select_ended(el, e) {
 // I'm still sticking with the vanilla js below though: it's very
 // simple, and there's no need to add another dependency just to
 // distinguish single/double/long taps.
+//
+// Finally: for my iphone at least, double-tap didn't seem to work,
+// even though it did in chrome devtools emulation.  For this reason,
+// the code tracks the _last_touched_element -- if the second tap is
+// the same as the first, it's treated as a double tap, regardless of the duration.
 
 // _touch_start_time needed to calc the duration of a click.
 let _touch_start_time;
+
+let _last_touched_element_id = null;
 
 // _last_touch_end_time needed to determine if this is a single- or
 // double-click.
@@ -405,20 +412,23 @@ function touch_ended(e) {
   if (_ms_since(_touch_start_time) > 500) {
     _tap_hold(el, e);
     _last_touch_end_time = null;
+    _last_touched_element_id = null;
     return;
   }
 
-  const since_last = _ms_since(_last_touch_end_time);
-  const is_double_click = _last_touch_end_time != null && since_last <= 200;
-  $('#thetexttitle').text(`is_double_click = ${is_double_click}; since_last = ${since_last}; null last = ${_last_touch_end_time == null}`);
+  const this_id = el.attr("id")
+  const is_double_click = (this_id === _last_touched_element_id);
+  $('#thetexttitle').text(`is_double_click = ${is_double_click};`);
 
   if (is_double_click) {
     _double_tap(el);
     _last_touch_end_time = null;
+    _last_touched_element_id = null;
   }
   else {
     _single_tap(el);
     _last_touch_end_time = Date.now();
+    _last_touched_element_id = this_id;
   }
 
 }
