@@ -61,10 +61,14 @@ const _isUserUsingMobile = () => {
   // User agent string method
   let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-  // Screen resolution method
+  // Screen resolution method.
+  // Using the same arbitrary width check (980) as used
+  // by the various window.matchMedia checks elsewhere in the code.
+  // The original method in the SO post had width, height < 768,
+  // but that broke playwright tests which opens a smaller browser window.
   if (!isMobile) {
     const s = window.screen
-    isMobile = (s.width < 768 || s.height < 768);
+    isMobile = (s.width < 980);
   }
 
   // Touch events method
