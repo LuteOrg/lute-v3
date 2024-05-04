@@ -368,7 +368,8 @@ function select_ended(el, e) {
 /********************************************/
 // Mobile events.
 //
-// Distinguishing between single/double/long taps.
+// 1. Regular vs long taps.
+//
 // Ref https://borstch.com/blog/javascript-touch-events-and-mobile-specific-considerations
 //
 // I had used https://github.com/benmajor/jQuery-Touch-Events, but
@@ -381,21 +382,24 @@ function select_ended(el, e) {
 // it's a devtools problem, and I agree, as it occurred at random.
 // I'm still sticking with the vanilla js below though: it's very
 // simple, and there's no need to add another dependency just to
-// distinguish single/double/long taps.
+// distinguish regular and long taps.
 //
-// Finally: for my iphone at least, double-tap didn't seem to work,
-// even though it did in chrome devtools emulation.  For this reason,
-// the code tracks the _last_touched_element -- if the second tap is
-// the same as the first, it's treated as a double tap, regardless of the duration.
+// 2. Single tap vs double tap
+//
+// For my iphone at least, double-tap didn't seem to work, even though
+// it did in chrome devtools emulation.  For my iphone, the phone
+// browser seemed to add a delay after each click, so the double
+// clicks were never fast enough to be distinguishable.  For that
+// reason, instead of using click time differences to distinguish
+// between single and double clicks, the code tracks the
+// _last_touched_element: if the second tap is the same as the first,
+// it's treated as a double tap, regardless of the duration.  This is
+// fine for Lute since the first tap only opens the term pop-up.
 
 // _touch_start_time needed to calc the duration of a click.
 let _touch_start_time;
 
 let _last_touched_element_id = null;
-
-// _last_touch_end_time needed to determine if this is a single- or
-// double-click.
-let _last_touch_end_time = null;
 
 function touch_started(e) {
   _touch_start_time = Date.now();
@@ -406,51 +410,26 @@ function touch_ended(e) {
   // prepareTextInteractions, so the clicked element is just
   // $(this).
   const el = $(this);
-
-  const _ms_since = function(start_ref) { return Date.now() - (start_ref ?? 0); };
-
-  if (_ms_since(_touch_start_time) > 500) {
-    _tap_hold(el, e);
-    _last_touch_end_time = null;
-    _last_touched_element_id = null;
-    return;
-  }
-
   const this_id = el.attr("id")
-  const is_double_click = (this_id === _last_touched_element_id);
-  $('#thetexttitle').text(`is_double_click = ${is_double_click};`);
 
-  if (is_double_click) {
+  const touch_duration = Date.now() - _touch_start_time;
+  const is_long_touch = (touch_duration >= 500);
+  const is_double_click = (this_id === _last_touched_element_id);
+
+  if (is_long_touch) {
+    _tap_hold(el, e);
+    _last_touched_element_id = null;
+  }
+  else if (is_double_click) {
     _double_tap(el);
-    _last_touch_end_time = null;
     _last_touched_element_id = null;
   }
   else {
     _single_tap(el);
-    _last_touch_end_time = Date.now();
     _last_touched_element_id = this_id;
   }
-
 }
 
-// Hover, or show the form.
-function _single_tap(el, e) {
-  // console.log('single tap');
-  clear_newmultiterm_elements();
-  const term_is_status_0 = (el.data("status-class") == "status0");
-  if (term_is_status_0) {
-    // word_clicked(el);
-    show_term_edit_form(el);
-  }
-}
-
-// Show the form.
-function _double_tap(el, e) {
-  // console.log('double tap');
-  $(".ui-tooltip").css("display", "none");
-  clear_newmultiterm_elements();
-  show_term_edit_form(el);
-}
 
 // Tap-holds define the start and end of a multi-word term.
 function _tap_hold(el, e) {
@@ -462,6 +441,23 @@ function _tap_hold(el, e) {
   else {
     select_over(el, e);
     select_ended(el, e);
+  }
+}
+
+// Show the form.
+function _double_tap(el, e) {
+  // console.log('double tap');
+  $(".ui-tooltip").css("display", "none");
+  clear_newmultiterm_elements();
+  show_term_edit_form(el);
+}
+
+function _single_tap(el, e) {
+  // console.log('single tap');
+  clear_newmultiterm_elements();
+  const term_is_status_0 = (el.data("status-class") == "status0");
+  if (term_is_status_0) {
+    show_term_edit_form(el);
   }
 }
 
