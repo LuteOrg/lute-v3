@@ -109,8 +109,6 @@ function prepareTextInteractions() {
 
 // Mobile screens have tap/double-tap/long tap events.
 function _add_mobile_interactions() {
-  $.touch.setDoubleTapInt(250);
-  $.touch.setTapHoldThreshold(400);
   const t = $('#thetext');
   t.on('touchstart', '.word', touch_started);
   t.on('touchend', '.word', touch_ended);
