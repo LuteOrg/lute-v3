@@ -92,6 +92,7 @@ def load_term_data(langid, terms, repo):
         t["children"] = "-"
         t["familycount"] = t["count"]
         t["childbooks"] = []
+        t["tags"] = ", ".join(term.term_tags)
 
 
 def load_parent_data(langid, terms, repo):
@@ -116,6 +117,7 @@ def load_parent_data(langid, terms, repo):
         t["children"] = "-"
         t["familycount"] = 0
         t["childbooks"] = []
+        t["tags"] = ", ".join(term.term_tags)
         terms[p] = t
 
     totcount = len(parents)
@@ -175,7 +177,16 @@ def generate_file(language_name, outfile_name):
     outdata = get_output_data(terms)
 
     ptsorted = sorted(outdata, key=lambda c: c["familycount"], reverse=True)
-    keys = ["term", "count", "familycount", "books", "definition", "status", "children"]
+    keys = [
+        "term",
+        "count",
+        "familycount",
+        "books",
+        "definition",
+        "status",
+        "children",
+        "tags",
+    ]
     print(f"Writing to {outfile_name}")
     with open(outfile_name, "w", newline="", encoding="utf-8") as outfile:
         writer = csv.DictWriter(outfile, fieldnames=keys, extrasaction="ignore")
