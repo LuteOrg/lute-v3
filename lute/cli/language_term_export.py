@@ -75,6 +75,16 @@ def get_dist(book, collector, termrepo, language_id):  # pylint: disable=too-man
             collector[p] = pentry
 
 
+def _load_hash_from_term(t, term):
+    "Load common data to hash."
+    t["parent"] = ", ".join(term.parents)
+    t["definition"] = term.translation or "-"
+    t["status"] = term.status if term.id is not None else "-"
+    t["children"] = "-"
+    t["childbooks"] = []
+    t["tags"] = ", ".join(term.term_tags)
+
+
 def load_term_data(langid, terms, repo):
     "Load basic data."
     totcount = len(terms.keys())
@@ -86,13 +96,8 @@ def load_term_data(langid, terms, repo):
             print(f"  {i} of {totcount}", end="\r")
 
         term = repo.find_or_new(langid, t["term"])
-        t["parent"] = ", ".join(term.parents)
-        t["definition"] = term.translation or "-"
-        t["status"] = term.status if term.id is not None else "-"
-        t["children"] = "-"
+        _load_hash_from_term(t, term)
         t["familycount"] = t["count"]
-        t["childbooks"] = []
-        t["tags"] = ", ".join(term.term_tags)
 
 
 def load_parent_data(langid, terms, repo):
@@ -111,13 +116,8 @@ def load_parent_data(langid, terms, repo):
 
         term = repo.find_or_new(langid, p)
         t = {"term": p, "count": 0, "books": []}
-        t["parent"] = ", ".join(term.parents)
-        t["definition"] = term.translation or "-"
-        t["status"] = term.status if term.id is not None else "-"
-        t["children"] = "-"
+        _load_hash_from_term(t, term)
         t["familycount"] = 0
-        t["childbooks"] = []
-        t["tags"] = ", ".join(term.term_tags)
         terms[p] = t
 
     totcount = len(parents)
