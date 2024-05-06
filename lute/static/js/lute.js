@@ -396,17 +396,49 @@ function select_ended(el, e) {
 // _last_touched_element: if the second tap is the same as the first,
 // it's treated as a double tap, regardless of the duration.  This is
 // fine for Lute since the first tap only opens the term pop-up.
+//
+// 3. Scroll/swipe
+//
+// Swipes have to be tracked because each swipe starts with a touch,
+// which gets confused with the other events.  If the touch start and
+// end differ by a threshold amount, assume the user is scrolling.
 
-// _touch_start_time needed to calc the duration of a click.
+// Tracking if long tap.
 let _touch_start_time;
+const _long_touch_min_duration_ms = 500;
 
+// Tracking if double-click.
 let _last_touched_element_id = null;
 
+// Tracking if swipe.
+let _touch_start_coords = null;
+const _swipe_min_threshold_pixels = 15;
+
+function _get_coords(touch) {
+  var touchX = touch.clientX;
+  var touchY = touch.clientY;
+  // console.log('X: ' + touchX + ', Y: ' + touchY);
+  return [ touchX, touchY ];
+}
+
+function _swipe_distance(e) {
+  const curr_coords = _get_coords(e.originalEvent.changedTouches[0]);
+  const dX = curr_coords[0] - _touch_start_coords[0];
+  const dY = curr_coords[1] - _touch_start_coords[1];
+  return Math.sqrt((dX * dX) + (dY * dY));
+}
+
 function touch_started(e) {
+  _touch_start_coords = _get_coords(e.originalEvent.touches[0]);
   _touch_start_time = Date.now();
 }
 
 function touch_ended(e) {
+  if (_swipe_distance(e) >= _swipe_min_threshold_pixels) {
+    // Do nothing else if this was a swipe.
+    return;
+  }
+
   // The touch_ended handler is attached with t.on in
   // prepareTextInteractions, so the clicked element is just
   // $(this).
@@ -417,16 +449,19 @@ function touch_ended(e) {
   $('span.wordhover').removeClass('wordhover');
 
   const touch_duration = Date.now() - _touch_start_time;
-  const is_long_touch = (touch_duration >= 500);
+  const is_long_touch = (touch_duration >= _long_touch_min_duration_ms);
   const is_double_click = (this_id === _last_touched_element_id);
+  _last_touched_element_id = null;  // Already checked in is_double_click.
 
   if (is_long_touch) {
     _tap_hold(el, e);
-    _last_touched_element_id = null;
+  }
+  else if (selection_start_el != null) {
+    select_over(el, e);
+    select_ended(el, e);
   }
   else if (is_double_click) {
     _double_tap(el);
-    _last_touched_element_id = null;
   }
   else {
     _single_tap(el);
