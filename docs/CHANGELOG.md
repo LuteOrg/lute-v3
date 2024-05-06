@@ -1,4 +1,20 @@
 
+# 3.3.3 (2024-05-05)
+
+Feature changes:
+
+* Issue #287: Read custom theme .css files from `userthemes` data directory.  See [the manual](https://luteorg.github.io/lute-manual/usage/themes/themes.html#custom-themes) for notes.
+
+Code tweaks:
+
+* Issue #409: tweak mobile screen interactions.  See [the manual](https://luteorg.github.io/lute-manual/usage/reading-on-mobile.html) for notes.
+* Issue #410: include term tags in language export CLI job.	
+* Term CSV import ignores "added" field, and field names are case-insensitive.
+* Issue #355: Remove component term images from hover detail (too many images were getting shown, was confusing)
+* Issue #372: Show component terms in hover in the (rough) order they appear in the multiword term.
+* Issue #349: Provide default values for sentence terminators and word characters.  By @mzraly in #366.
+
+
 # 3.3.2 (2024-04-25)
 
 Feature changes:
