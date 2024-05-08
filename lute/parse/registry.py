@@ -35,22 +35,23 @@ def _supported_parsers():
             ret[k] = v
     custom_parser_eps = entry_points().get('lute.plugin.parser', [])
     for custom_parser_ep in custom_parser_eps:
-         print(custom_parser_ep.load())
          if _is_valid(custom_parser_ep.load()):
               ret[custom_parser_ep.name] = custom_parser_ep.load()
+    print(ret)
     return ret
 
 def get_parser(parser_name) -> AbstractParser:
     "Return the supported parser with the given name."
-    if parser_name in _supported_parsers():
-        pclass = parsers[parser_name]
+    supported_parsers = _supported_parsers()
+    if parser_name in supported_parsers:
+        pclass = supported_parsers[parser_name]
         return pclass()
     raise ValueError(f"Unknown parser type '{parser_name}'")
 
 
 def is_supported(parser_name) -> bool:
     "Return True if the specified parser is supported, false otherwise or if not found."
-    if parser_name not in parsers:
+    if parser_name not in _supported_parsers():
         return False
     p = parsers[parser_name]
     return p.is_supported()
