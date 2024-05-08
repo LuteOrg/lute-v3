@@ -13,6 +13,7 @@ import argparse
 import shutil
 import logging
 from waitress import serve
+from lute.parse.registry import init_parsers, parsers
 from lute.app_factory import create_app
 from lute.config.app_config import AppConfig
 
@@ -60,6 +61,12 @@ def _create_app(config_file_path=None):
         _print(["Using default config"])
         _create_prod_config_if_needed()
         config_file_path = AppConfig.default_config_filename()
+
+    _print(["", "initializing parsers"])
+    init_parsers()
+    _print([f"{k}: {v.name()}" for k, v in parsers.items()])
+
+
 
     app_config = AppConfig(config_file_path)
 
