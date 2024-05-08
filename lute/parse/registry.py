@@ -23,6 +23,9 @@ parsers = {
     "mandarinchinese": MandarinParser
 }
 
+def init_parsers():
+    parsers = _supported_parsers()
+
 def _is_valid(custom_parser):
     return issubclass(custom_parser, AbstractParser)
 
@@ -36,22 +39,20 @@ def _supported_parsers():
     custom_parser_eps = entry_points().get('lute.plugin.parser', [])
     for custom_parser_ep in custom_parser_eps:
          if _is_valid(custom_parser_ep.load()):
-              ret[custom_parser_ep.name] = custom_parser_ep.load()
-    print(ret)
+            ret[custom_parser_ep.name] = custom_parser_ep.load()
     return ret
 
 def get_parser(parser_name) -> AbstractParser:
     "Return the supported parser with the given name."
-    supported_parsers = _supported_parsers()
-    if parser_name in supported_parsers:
-        pclass = supported_parsers[parser_name]
+    if parser_name in parsers.keys():
+        pclass = parsers[parser_name]
         return pclass()
     raise ValueError(f"Unknown parser type '{parser_name}'")
 
 
 def is_supported(parser_name) -> bool:
     "Return True if the specified parser is supported, false otherwise or if not found."
-    if parser_name not in _supported_parsers():
+    if parser_name not in parsers:
         return False
     p = parsers[parser_name]
     return p.is_supported()
@@ -64,7 +65,7 @@ def supported_parsers():
     For select list entries, use supported_parsers().items().
     """
     ret = []
-    for k, v in _supported_parsers().items():
+    for k, v in parsers.items():
         ret.append([k, v.name()])
     return ret
 
@@ -73,4 +74,4 @@ def supported_parser_types():
     """
     List of supported Language.parser_types
     """
-    return list(_supported_parsers().keys())
+    return list(parsers.keys())
