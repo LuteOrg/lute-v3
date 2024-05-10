@@ -62,9 +62,10 @@ def _create_app(config_file_path=None):
         _create_prod_config_if_needed()
         config_file_path = AppConfig.default_config_filename()
 
-    _print(["", "Initializing parsers from plugins...", "Enabled Parsers:"])
+    _print(["", "Initializing parsers from plugins..."])
     init_parser_plugins()
-    _print([f"* ({v.name()})" for k, v in supported_parsers()])
+    _print(["Enabled Parsers:" ])
+    _print([f"* ({v})" for k, v in supported_parsers()])
 
     app_config = AppConfig(config_file_path)
 
