@@ -221,7 +221,7 @@ Feature: Term import
         Then import should succeed with 0 created, 0 updated, 1 skipped
 
 
-    Scenario: Import is case-insensitive
+    Scenario: Import statuses are mapped to status IDs
         Given import file:
             language,term,status
             Spanish,a,1
@@ -249,6 +249,22 @@ Feature: Term import
             e; 5
             f; 99
             g; 98
+
+
+    Scenario: Import field names are case-insensitive
+        Given import file:
+            LANGUAGE,Term,TRANSLATION,paRENT,statUS,TAGS,Pronunciation
+            Spanish,gato,cat,,1,"animal, noun",GA-toh
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+        And words table should contain:
+            gato
+        And Spanish term "gato" should be:
+            translation: cat
+            pronunciation: GA-toh
+            status: 1
+            parents: -
+            tags: animal, noun
 
 
     Scenario: Parent created on import
@@ -414,6 +430,7 @@ Feature: Term import
         And words table should contain:
             gato
             gatos
+
 
 
     Scenario: Term can have multiple parents
