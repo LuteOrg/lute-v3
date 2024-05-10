@@ -188,7 +188,6 @@
   let mouseY;
   let scrollY;
   let scrollYBeforeReload;
-  let tooltipPos = {my: 'left top+10', at: 'left bottom', collision: 'flipfit flip'};
   const mediaTablet = window.matchMedia("(max-width: 980px)");
   const readPaneRight = document.getElementById("read_pane_right");
   const btmMarginCont = document.querySelector(".btm-margin-container");
@@ -230,9 +229,6 @@
     
     theTextReloadObs.observe(theText, {childList: true, subtree: true});
 
-    if (mediaTablet.matches) {
-      tooltipPos = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
-    }
     // do not load focus state if in tablet mode
     if (!mediaTablet.matches) {
       const book_id = $('#book_id').val();
@@ -258,7 +254,10 @@
         const pagenum = $('#page_num').val();
         const url = `/read/renderpage/${bookid}/${pagenum}`;
         const marked = $('.kwordmarked');
-        const marked_id = $(marked[0]).attr('id');
+        let marked_id = "nomatches"
+        if (marked.length != 0) {
+          marked_id = $(marked[0]).attr('id');
+        }
 
         // Force remove the old popup.
         // ref https://stackoverflow.com/questions/19266886/
@@ -268,7 +267,6 @@
         $(".dictcontainer").css('display', 'none');
 
         $('#thetext').load(url, function() {
-          // console.log(`adding hover class to id ${marked_id}`);
           const re_marked = $(`#${marked_id}`);
           re_marked.removeClass('kwordmarked');
           re_marked.addClass('wordhover');
@@ -476,7 +474,7 @@
         $("html, body").animate({ scrollTop: 0 });
 
         if (initial_page_load) {
-          prepareTextInteractions(tooltipPos);
+          prepareTextInteractions();
         }
 
         // Magic hack for player source to load consistently
