@@ -11,6 +11,7 @@ from lute.db import db
 from lute.language.service import get_language_def
 import lute.db.demo
 from lute.app_factory import create_app
+from lute.parse.registry import init_parser_plugins
 
 from lute.models.language import Language
 
@@ -39,6 +40,7 @@ def pytest_sessionstart(session):  # pylint: disable=unused-argument
         failures.append("DATAPATH not in config file")
 
     ac = AppConfig(configfile)
+    init_parser_plugins()
 
     if not ac.is_test_db:
         failures.append("DBNAME in config.yml must start with test_")

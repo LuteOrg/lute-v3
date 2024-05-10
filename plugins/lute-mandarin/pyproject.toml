@@ -6,7 +6,7 @@ build-backend = "flit_core.buildapi"
 name = "lute_mandarin_parser"
 
 [project]
-name = "lute-chinese-parser"
+name = "lute-mandarin"
 
 dynamic = ['version']
 
@@ -19,15 +19,15 @@ authors = [
 # readme = "README_PyPi.md"
 
 dependencies = [
-  "lute3>=3.3.3",
+  "lute3>=3.4.0",
   "jieba>=0.42.1",
   "pypinyin>=0.51.0"
 ]
 
 
 
-[project.entry-points."lute.plugin.parser"]
-lute_chinese_parser = "lute_mandarin_parser.parser:MandarinParser"
+[project.entry-points."lute.plugin.parse"]
+lute_mandarin = "lute_mandarin_parser.parser:MandarinParser"
 
 # [project.scripts]
 # lute = "lute.main:start"

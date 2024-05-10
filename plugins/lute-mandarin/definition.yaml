@@ -9,7 +9,7 @@ dictionaries:
 show_romanization: true
 # right_to_left:
 
-parser_type: lute_chinese_parser
+parser_type: lute_mandarin
 # character_substitutions:
 split_sentences: .!?。！？
 # split_sentence_exceptions:

@@ -157,7 +157,6 @@ INSERT INTO texts VALUES(19,11,1,'Встреча с медведем может 
 INSERT INTO texts VALUES(20,12,1,replace('काशीनगरे एकः पण्डितः अस्ति । पण्डितसमीपम् एकः शिष्यः आगच्छति । शिष्यः वदति - "आचार्य!\nविद्याभ्यासार्थम् आगतः ।" पण्डितः शिष्यबुद्धिपरीक्षार्थं पृच्छति - "वत्स, देवः कुत्र अस्ति?" शिष्यः वदति -\n''गुरो! देवः कुत्र नास्ति? कृपया भवान् एव समाधानं वदतु ।" सन्तुष्टः गुरुः वदति - "दैवः सर्वत्र अस्ति । देवः\nसर्वव्यापी । त्वं बुद्धिमान ।अतः विद्याभ्यासार्थम् अत्रैव वस।"','\n',char(10)),NULL,45);
 INSERT INTO texts VALUES(21,13,1,replace('Érase una vez un muchacho llamado Aladino que vivía en el lejano Oriente con su madre, en una casa sencilla y humilde. Tenían lo justo para vivir, así que cada día, Aladino recorría el centro de la ciudad en busca de algún alimento que llevarse a la boca.\n\nEn una ocasión paseaba entre los puestos de fruta del mercado, cuando se cruzó con un hombre muy extraño con pinta de extranjero. Aladino se quedó sorprendido al escuchar que le llamaba por su nombre.','\n',char(10)),NULL,83);
 INSERT INTO texts VALUES(22,14,1,replace('Büyük ağaç eskiden aşılanmış ve her yıl güzel, iri, pembe şeftaliler verirmiş, insanın eline sığmazmış bu şeftaliler. Öyle güzelmişler ki insan yemeye kıyamazmış onları. Bahçıvan, bu büyük ağacı yabancı bir uzmanın kendi ülkesinden getirdiği bir tohumla aşıladığını söylermiş. Belli ki böyle masraf edilen bir ağaçta yetişen şeftaliler oldukça değerliymiş.\n\nİki ağacın da gövdelerine nazar değmesin diye birer nazarlık asılıymış.\n\nAğaçlardan küçük olanında her yıl bin tane çiçek açarmış ama bir tek şeftali bile yetişmezmiş üzerinde. Ya çiçekleri dökülürmüş, ya da ham şeftaliler kuruyup dallardan düşermiş. Bahçıvan küçük ağaç için elinden geleni yapmış ama değişen bir şey olmamış. Yıllar geçtikçe dalları ve yaprakları çoğalmış ama bir tek şeftali bile görünmemiş üzerinde.','\n',char(10)),NULL,110);
-INSERT INTO texts VALUES(23,15,1,replace('欢迎来到 Lute！祝您在 Lute 上玩得愉快！','\n',char(10)),NULL, 8);
 CREATE TABLE IF NOT EXISTS "settings" (
 	"StKey" VARCHAR(40) NOT NULL,
         "StKeyType" TEXT NOT NULL,
@@ -192,7 +191,6 @@ INSERT INTO books VALUES(11,10,'медведь',NULL,0,0,NULL,NULL,NULL);
 INSERT INTO books VALUES(12,11,'बुद्धिमान् शिष्यः',NULL,0,0,NULL,NULL,NULL);
 INSERT INTO books VALUES(13,12,'Aladino y la lámpara maravillosa',NULL,0,0,NULL,NULL,NULL);
 INSERT INTO books VALUES(14,13,'Büyük ağaç',NULL,0,0,NULL,NULL,NULL);
-INSERT INTO books VALUES(15,14,'欢迎',NULL,0,0,NULL,NULL,NULL);
 CREATE TABLE IF NOT EXISTS "bookstats" (
 	"BkID" INTEGER NOT NULL  ,
 	"distinctterms" INTEGER NULL  ,
@@ -216,7 +214,6 @@ INSERT INTO bookstats VALUES(11,40,40,100,'{"0": 40, "1": 0, "2": 0, "3": 0, "4"
 INSERT INTO bookstats VALUES(12,33,33,100,'{"0": 33, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
 INSERT INTO bookstats VALUES(13,63,63,100,'{"0": 63, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
 INSERT INTO bookstats VALUES(14,85,85,100,'{"0": 85, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
-INSERT INTO bookstats VALUES(15,8,8,100,'{"0": 85, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
 CREATE TABLE languagedicts (
   "LdID" INTEGER NOT NULL,
   "LdLgID" INTEGER NOT NULL,
@@ -264,8 +261,6 @@ INSERT INTO languagedicts VALUES(33,12,'sentences','popuphtml','https://www.deep
 INSERT INTO languagedicts VALUES(34,13,'terms','embeddedhtml','https://www.wordreference.com/tren/###',1,1);
 INSERT INTO languagedicts VALUES(35,13,'terms','embeddedhtml','https://tr.wiktionary.org/wiki/###',1,2);
 INSERT INTO languagedicts VALUES(36,13,'sentences','popuphtml','https://www.deepl.com/translator#tr/en/###',1,3);
-INSERT INTO languagedicts VALUES(37,14,'terms','embeddedhtml','https://chinese.yabla.com/chinese-english-pinyin-dictionary.php?define=###',1,2);
-INSERT INTO languagedicts VALUES(38,14,'sentences','popuphtml','https://www.deepl.com/translator#ch/en/###',1,3);
 CREATE TABLE IF NOT EXISTS "languages" (
 	"LgID" INTEGER NOT NULL  ,
 	"LgName" VARCHAR(40) NOT NULL  ,
@@ -291,7 +286,6 @@ INSERT INTO languages VALUES(10,'Russian','´=''|`=''|’=''|‘=''|...=…|..=�
 INSERT INTO languages VALUES(11,'Sanskrit','´=''|`=''|’=''|‘=''|...=…|..=‥','.?!।॥','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-Z\u0900-\u0963\u0966-\u097F',0,1,'spacedel');
 INSERT INTO languages VALUES(12,'Spanish','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,'spacedel');
 INSERT INTO languages VALUES(13,'Turkish','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑğĞıİöÖüÜşŞçÇ',0,1,'turkish');
-INSERT INTO languages VALUES(14,'Mandarin Chinese','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。！？','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','一-龥',0,1,'mandarinchinese');
 CREATE UNIQUE INDEX "TgText" ON "tags" ("TgText");
 CREATE UNIQUE INDEX "T2Text" ON "tags2" ("T2Text");
 CREATE INDEX "BtT2ID" ON "booktags" ("BtT2ID");
