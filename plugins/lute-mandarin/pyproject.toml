@@ -7,17 +7,12 @@ name = "lute_mandarin_parser"
 
 [project]
 name = "lute-mandarin"
-
 dynamic = ['version']
-
-
 description = "Learning Using Texts - Chinese Parser"
 requires-python = ">=3.8"
 authors = [
   {name = "Chris Ghyzel"}
 ]
-# readme = "README_PyPi.md"
-
 dependencies = [
   "lute3>=3.4.0",
   "jieba>=0.42.1",
@@ -25,28 +20,5 @@ dependencies = [
 ]
 
 
-
 [project.entry-points."lute.plugin.parse"]
 lute_mandarin = "lute_mandarin_parser.parser:MandarinParser"
-
-# [project.scripts]
-# lute = "lute.main:start"
-
-# [package_data]
-#lute.config = ["config/config.yml"]
-
-# [project.optional-dependencies]
-#dev = [
-#  "coverage>=7.3.1,<8",
-#  "invoke>=2.2.0,<3",
-#  "pip>=23.0.1",
-#  "pipdeptree>=2.13.0,<3",
-#  "pylint>=2.17.5,<3",
-#  "pytest-bdd>=7.0.0,<8",
-#  "pytest-splinter>=3.3.2,<4",
-#  "pre-commit>=3.5.0,<4",
-#  "black>=23.10.1,<24",
-#]
-#
-#[project.urls]
-#Home = "https://github.com/luteorg/lute-v3"

@@ -2,9 +2,11 @@
 MandarinParser tests.
 """
 
-from lute_mandarin_parser.parser import MandarinParser
 from lute.models.term import Term
 from lute.parse.base import ParsedToken
+
+from lute_mandarin_parser.parser import MandarinParser
+
 
 
 def test_token_count(mandarin_chinese):
