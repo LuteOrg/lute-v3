@@ -40,7 +40,6 @@ def pytest_sessionstart(session):  # pylint: disable=unused-argument
         failures.append("DATAPATH not in config file")
 
     ac = AppConfig(configfile)
-    init_parser_plugins()
 
     if not ac.is_test_db:
         failures.append("DBNAME in config.yml must start with test_")
