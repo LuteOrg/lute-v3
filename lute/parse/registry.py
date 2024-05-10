@@ -66,11 +66,11 @@ def supported_parsers():
 
     For select list entries, use supported_parsers().items().
     """
-    return [(k, v.name())for k, v in _supported_parsers()]
+    return [[k, v.name()]for k, v in _supported_parsers().items()]
 
 
 def supported_parser_types():
     """
     List of supported Language.parser_types
     """
-    return [k for k in _supported_parsers()]
+    return list(_supported_parsers().keys())
