@@ -121,7 +121,7 @@ def dummy_language_dict(langname, term):
 @bp.route("/disable_parser/<string:parsername>/<string:renameto>", methods=["GET"])
 def disable_parser(parsername, renameto):
     "Hack: rename a parser in the registry so that languages can't find it."
-    p = lute.parse.registry.parsers
+    p = lute.parse.registry.__LUTE_PARSERS__
     if parsername in p:
         p[renameto] = p.pop(parsername)
     langs = db.session.query(Language).all()

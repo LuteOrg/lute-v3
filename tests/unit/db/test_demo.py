@@ -99,10 +99,10 @@ def fixture_restore_mecab_support():
     "Teardown" method to restore jp parser if it was removed.
     """
     k = "japanese"
-    assert k in lute.parse.registry.parsers, "have jp parser, sanity check"
-    old_val = lute.parse.registry.parsers[k]
+    assert k in lute.parse.registry.__LUTE_PARSERS__, "have jp parser, sanity check"
+    old_val = lute.parse.registry.__LUTE_PARSERS__[k]
 
     yield
 
-    if k not in lute.parse.registry.parsers:
-        lute.parse.registry.parsers[k] = old_val
+    if k not in lute.parse.registry.__LUTE_PARSERS__:
+        lute.parse.registry.__LUTE_PARSERS__[k] = old_val

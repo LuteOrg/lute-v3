@@ -4,7 +4,7 @@ Parser registry tests.
 
 import pytest
 
-from lute.parse.registry import parsers, get_parser, supported_parsers, is_supported
+from lute.parse.registry import __LUTE_PARSERS__, get_parser, supported_parsers, is_supported
 from lute.parse.space_delimited_parser import SpaceDelimitedParser
 
 
@@ -27,7 +27,7 @@ def test_supported_parsers():
     assert p == ["spacedel", "Space Delimited"], "sanity check"
 
 
-class DummyParser(SpaceDelimitedParser):
+class DummyParser:
     "Dummy unsupported parser."
 
     @classmethod
@@ -42,9 +42,9 @@ class DummyParser(SpaceDelimitedParser):
 @pytest.fixture(name="_load_dummy")
 def fixture_load_dummy():
     "Add the dummy parser for the test."
-    parsers["dummy"] = DummyParser
+    __LUTE_PARSERS__["dummy"] = DummyParser
     yield
-    del parsers["dummy"]
+    del __LUTE_PARSERS__["dummy"]
 
 
 def test_unavailable_parser_not_included_in_lists(_load_dummy):
