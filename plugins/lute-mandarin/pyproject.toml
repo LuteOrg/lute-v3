@@ -14,7 +14,7 @@ authors = [
   {name = "Chris Ghyzel"}
 ]
 dependencies = [
-  "lute3>=3.4.0",
+  "lute3>=3.4.0dev1",
   "jieba>=0.42.1",
   "pypinyin>=0.51.0"
 ]
