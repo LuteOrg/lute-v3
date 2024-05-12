@@ -4,7 +4,12 @@ Parser registry tests.
 
 import pytest
 
-from lute.parse.registry import __LUTE_PARSERS__, get_parser, supported_parsers, is_supported
+from lute.parse.registry import (
+    __LUTE_PARSERS__,
+    get_parser,
+    supported_parsers,
+    is_supported,
+)
 from lute.parse.space_delimited_parser import SpaceDelimitedParser
 
 
@@ -24,7 +29,7 @@ def test_supported_parsers():
     assert isinstance(d, list), "returns a list"
 
     p = [n for n in d if n[0] == "spacedel"][0]
-    assert p == ["spacedel", "Space Delimited"], "sanity check"
+    assert p == ("spacedel", "Space Delimited"), "sanity check"
 
 
 class DummyParser:
