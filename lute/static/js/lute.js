@@ -71,10 +71,12 @@ const _isUserUsingMobile = () => {
     isMobile = (s.width < 980);
   }
 
+  // Disabling this check - see https://stackoverflow.com/a/4819886/1695066
+  // for the many cases where this fails.
   // Touch events method
-  if (!isMobile) {
-    isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0));
-  }
+  // if (!isMobile) {
+  //   isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0));
+  //  }
 
   // CSS media queries method
   if (!isMobile) {
