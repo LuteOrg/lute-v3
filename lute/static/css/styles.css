@@ -3,7 +3,7 @@
  * \brief Main stylesheet for the default theme.
  */
 
-* {
+ * {
     margin: 0;
     padding: 0;
 }
@@ -526,14 +526,14 @@ span.hamburger {
   padding: 0.9rem 1.5rem;
 }
 
-#focus-container {
+.checkbox-container {
     display: flex;
     justify-content: center;
     gap: 1rem;
     align-items: center;
 }
 
-#focus {
+.checkbox-input {
     appearance: none;
     display: block;
     background-color: #ffffff;
@@ -546,11 +546,11 @@ span.hamburger {
     transition: background-color 0.2s
 }
 
-#focus-container label {
+.checkbox-container label {
     font-weight: bold;
 }
 
-#focus::after {
+.checkbox-input::after {
     content: "";
     display: block;
     background-color: #616161;
@@ -559,6 +559,16 @@ span.hamburger {
     border-radius: 50%;
 
     transition: transform 0.2s;
+}
+
+.mobile-mode-active #mobile::after {
+    transform: translate(100%, 0);
+    background-color: #7950f2;
+}
+
+.mobile-mode-active #mobile{
+    background-color: #b197fc;
+    border-color: #b197fc;
 }
 
 .focus-mode-active #focus::after {

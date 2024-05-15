@@ -193,6 +193,7 @@
   const btmMarginCont = document.querySelector(".btm-margin-container");
   const theText = document.getElementById("thetext");
   const focusChk = document.getElementById("focus");
+  const mobileChk = document.getElementById("mobile");
 
   // fixes the "bug" where if right pane is opened in mobile view and after the screen is resized up,
   // right pane doesn't translate up to 0 because of inline transform property
@@ -216,6 +217,11 @@
     scrollYBeforeReload = window.scrollY;
   });
 
+  mobileChk.addEventListener("change", () => {
+    readPaneContainer.classList.toggle("mobile-mode-active");
+    localStorage.setItem("mobileMode", `${mobileChk.checked}`)
+  })
+
   focusChk.addEventListener("change", () => {
     const book_id = $('#book_id').val();
     readPaneContainer.classList.toggle("focus-mode-active");
@@ -228,6 +234,11 @@
     });
     
     theTextReloadObs.observe(theText, {childList: true, subtree: true});
+
+    if (_isUserUsingMobile()) {
+      readPaneContainer.classList.add("mobile-mode-active");
+      mobileChk.checked = true;
+    }
 
     // do not load focus state if in tablet mode
     if (!mediaTablet.matches) {

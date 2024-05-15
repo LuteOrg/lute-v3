@@ -58,8 +58,13 @@ function start_hover_mode(should_clear_frames = true) {
  * From the above, using answer from marc_s: https://stackoverflow.com/a/76055222/1695066
  */
 const _isUserUsingMobile = () => {
+  let isMobile = localStorage.getItem('mobileMode');
+  if (isMobile !== null) {
+    return isMobile === "true";
+  }
+
   // User agent string method
-  let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   // Screen resolution method.
   // Using the same arbitrary width check (980) as used
@@ -71,10 +76,12 @@ const _isUserUsingMobile = () => {
     isMobile = (s.width < 980);
   }
 
+  // Disabling this check - see https://stackoverflow.com/a/4819886/1695066
+  // for the many cases where this fails.
   // Touch events method
-  if (!isMobile) {
-    isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0));
-  }
+  // if (!isMobile) {
+  //   isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0));
+  //  }
 
   // CSS media queries method
   if (!isMobile) {
