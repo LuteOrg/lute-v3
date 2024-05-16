@@ -56,7 +56,7 @@ def get_parser(parser_name) -> AbstractParser:
 
 
 def is_supported(parser_name) -> bool:
-    "Return True if the specified parser is supported, false otherwise or if not found."
+    "Return True if the specified parser is present and supported."
     if parser_name not in __LUTE_PARSERS__:
         return False
     p = __LUTE_PARSERS__[parser_name]
