@@ -14,14 +14,12 @@ def get_supported_defs():
     ret = []
     def_glob = os.path.join(_language_defs_path(), "**", "definition.yaml")
     for f in glob(def_glob):
-        entry = {}
-        d = {}
+        lang = None
         with open(f, "r", encoding="utf-8") as df:
             d = yaml.safe_load(df)
-        lang = Language.from_dict(d)
+            lang = Language.from_dict(d)
         if lang.is_supported:
-            entry["language"] = lang
-            entry["books"] = _get_books(f, lang.name)
+            entry = {"language": lang, "books": _get_books(f, lang.name)}
             ret.append(entry)
     ret.sort(key=lambda x: x["language"].name)
     return ret
