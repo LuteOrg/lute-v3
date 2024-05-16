@@ -32,28 +32,27 @@ def start(port):
     """
     Start the dev server with reloads on port.
     """
+
+    def dev_print(s):
+        "Print info on first load only."
+        if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+            # https://stackoverflow.com/questions/25504149/
+            #  why-does-running-the-flask-dev-server-run-itself-twice
+            # Reloading, do nothing.
+            return
+        print(s)
+
     config_file = AppConfig.default_config_filename()
+    dev_print("")
+    app = create_app(config_file, output_func=dev_print)
+
     ac = AppConfig(config_file)
+    dev_print("")
+    dev_print(f"db name: {ac.dbname}")
+    dev_print(f"data: {ac.datapath}")
+    dev_print(f"Running at: http://localhost:{port}")
+    dev_print("")
 
-    # https://stackoverflow.com/questions/25504149/
-    #  why-does-running-the-flask-dev-server-run-itself-twice
-    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        # Reloading.
-        pass
-    else:
-        # First run
-        msg = f"""
-        db name: {ac.dbname}
-        data: {ac.datapath}
-
-        Running at:
-
-        http://localhost:{port}
-
-        """
-        print(msg)
-
-    app = create_app(config_file, output_func=print)
     app.run(debug=True, port=port)
 
 
