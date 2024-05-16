@@ -47,11 +47,9 @@ def start(port):
     app = create_app(config_file, output_func=dev_print)
 
     ac = AppConfig(config_file)
-    dev_print("")
-    dev_print(f"db name: {ac.dbname}")
+    dev_print(f"\ndb name: {ac.dbname}")
     dev_print(f"data: {ac.datapath}")
-    dev_print(f"Running at: http://localhost:{port}")
-    dev_print("")
+    dev_print(f"Running at: http://localhost:{port}\n")
 
     app.run(debug=True, port=port)
 
