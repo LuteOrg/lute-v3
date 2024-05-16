@@ -13,7 +13,6 @@ import argparse
 import shutil
 import logging
 from waitress import serve
-from lute.parse.registry import init_parser_plugins, supported_parsers
 from lute.app_factory import create_app
 from lute.config.app_config import AppConfig
 
@@ -62,14 +61,8 @@ def _create_app(config_file_path=None):
         _create_prod_config_if_needed()
         config_file_path = AppConfig.default_config_filename()
 
-    _print(["", "Initializing parsers from plugins..."])
-    init_parser_plugins()
-    _print(["Enabled Parsers:" ])
-    _print([f"* ({v})" for k, v in supported_parsers()])
-
     app_config = AppConfig(config_file_path)
 
-    _print(["", "Initializing app."])
     app = create_app(config_file_path, output_func=_print)
     _print(f"data path: {app_config.datapath}")
     _print(f"database: {app_config.dbfilename}")
