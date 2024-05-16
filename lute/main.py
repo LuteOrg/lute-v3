@@ -12,6 +12,7 @@ import os
 import argparse
 import shutil
 import logging
+import textwrap
 from waitress import serve
 from lute.app_factory import create_app
 from lute.config.app_config import AppConfig
@@ -26,7 +27,7 @@ def _print(s):
     """
     if isinstance(s, str):
         s = s.split("\n")
-    msg = "\n".join(["  " + lin.strip() for lin in s])
+    msg = "\n".join(f"  {lin}" for lin in s)
     print(msg, flush=True)
 
 
@@ -49,25 +50,26 @@ def _create_app(config_file_path=None):
     otherwise, uses the prod config, creating a prod config
     if necessary.
     """
-    _print(["", "Starting Lute:"])
+    _print("\nStarting Lute:")
 
     if config_file_path is not None:
-        _print([f"Using specified config: {config_file_path}"])
+        _print(f"Using specified config: {config_file_path}")
     elif os.path.exists("config.yml"):
-        _print(["Using config.yml found in root"])
+        _print("Using config.yml found in root")
         config_file_path = "config.yml"
     else:
-        _print(["Using default config"])
+        _print("Using default config")
         _create_prod_config_if_needed()
         config_file_path = AppConfig.default_config_filename()
 
     app_config = AppConfig(config_file_path)
-
-    app = create_app(config_file_path, output_func=_print)
-    _print(f"data path: {app_config.datapath}")
-    _print(f"database: {app_config.dbfilename}")
+    _print(f"  data path: {app_config.datapath}")
+    _print(f"  database:  {app_config.dbfilename}")
     if app_config.is_docker:
         _print("(Note these are container paths, not host paths.)")
+    _print("")
+
+    app = create_app(config_file_path, output_func=_print)
 
     close_msg = """
     When you're finished reading, stop this process
@@ -79,7 +81,7 @@ def _create_app(config_file_path=None):
         with Ctrl-C, docker compose stop, or docker stop <containerid>
         as appropriate.
         """
-    _print(close_msg)
+    _print(textwrap.dedent(close_msg))
 
     return app
 
@@ -88,13 +90,11 @@ def _start(args):
     "Configure and start the app."
     app = _create_app(args.config)
 
-    _print(
-        f"""
-    Lute is running.  Open a web browser, and go to:
+    msg = f"""Lute is running.  Open a web browser, and go to:
 
     http://localhost:{args.port}
     """
-    )
+    _print(textwrap.dedent(msg))
     serve(app, host="0.0.0.0", port=args.port)
 
 
