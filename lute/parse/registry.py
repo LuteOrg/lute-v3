@@ -16,7 +16,7 @@ __LUTE_PARSERS__ = {
     "spacedel": SpaceDelimitedParser,
     "turkish": TurkishParser,
     "japanese": JapaneseParser,
-    "classicalchinese": ClassicalChineseParser
+    "classicalchinese": ClassicalChineseParser,
 }
 
 
@@ -24,12 +24,14 @@ def init_parser_plugins():
     """
     Initialize parsers from plugins
     """
-    custom_parser_eps = entry_points().get('lute.plugin.parse', [])
+    custom_parser_eps = entry_points().get("lute.plugin.parse", [])
     for custom_parser_ep in custom_parser_eps:
         if _is_valid(custom_parser_ep.load()):
             __LUTE_PARSERS__[custom_parser_ep.name] = custom_parser_ep.load()
         else:
-            raise ValueError(f"{custom_parser_ep.name} is not a a subclass of AbstractParser")
+            raise ValueError(
+                f"{custom_parser_ep.name} is not a subclass of AbstractParser"
+            )
 
 
 def _is_valid(custom_parser):
@@ -43,6 +45,7 @@ def _supported_parsers():
         if v.is_supported():
             ret[k] = v
     return ret
+
 
 def get_parser(parser_name) -> AbstractParser:
     "Return the supported parser with the given name."
