@@ -53,7 +53,7 @@ class MandarinParser(AbstractParser):
         # Flatten the list of lists to a single list
         pinyin_list = (item for sublist in pinyin_list for item in sublist)
         # Join the pinyin into a single string
-        ret = ' '.join(pinyin_list)
+        ret = " ".join(pinyin_list)
         if ret in ("", text):
             return None
         return ret
