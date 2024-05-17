@@ -7,7 +7,7 @@ e.g.
 
 python -m lute.main --port 5001
 """
-
+import errno
 import os
 import argparse
 import shutil
@@ -96,7 +96,16 @@ def _start(args):
     """
     _print(textwrap.dedent(msg))
 
-    serve(app, host="0.0.0.0", port=args.port)
+    try:
+        serve(app, host="0.0.0.0", port=args.port)
+    except OSError as err:
+        if err.errno == errno.EADDRINUSE:
+            print(
+                f"address :{args.port} already in use, please try adding a --port parameter "
+                f"(eg python -m lute.main --port 9876)"
+            )
+        else:
+            raise
 
 
 if __name__ == "__main__":
