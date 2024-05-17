@@ -25,7 +25,7 @@ def _get_test_language():
     """
     thisdir = os.path.dirname(os.path.realpath(__file__))
     definition_file = os.path.join(thisdir, "..", "definition.yaml")
-    with open(definition_file, "r", encoding="utf-8")  as df:
+    with open(definition_file, "r", encoding="utf-8") as df:
         d = yaml.safe_load(df)
     lang = Language.from_dict(d)
     return lang

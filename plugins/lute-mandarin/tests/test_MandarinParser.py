@@ -2,18 +2,24 @@
 MandarinParser tests.
 """
 
+# pylint: disable=wrong-import-order
 from lute.models.term import Term
 from lute.parse.base import ParsedToken
 
 from lute_mandarin_parser.parser import MandarinParser
 
 
-
 def test_token_count(mandarin_chinese):
     """
     token_count checks.
     """
-    cases = [("我", 1), ("运气", 1), ("你说", 2), ("我不相信", 3), ("我冒了严寒 ，回到相隔二千馀里，别了二十馀年的故乡去。", 21)]
+    cases = [
+        ("我", 1),
+        ("运气", 1),
+        ("你说", 2),
+        ("我不相信", 3),
+        ("我冒了严寒 ，回到相隔二千馀里，别了二十馀年的故乡去。", 21),
+    ]
     for text, expected_count in cases:
         t = Term(mandarin_chinese, text)
         assert t.token_count == expected_count, text
@@ -38,7 +44,6 @@ def test_end_of_sentence_stored_in_parsed_tokens(mandarin_chinese):
     ParsedToken is marked as EOS=True at ends of sentences.
     """
     s = "你好。吃饭了吗？现在是2024年。"
-
 
     expected = [
         ("你好", True),
@@ -67,11 +72,7 @@ def test_readings():
     for c in no_reading:
         assert p.get_reading(c) is None, c
 
-    cases = [
-        ("你好", "nǐ hǎo"),
-        ("欢迎", "huān yíng"),
-        ("中国", "zhōng guó")
-    ]
+    cases = [("你好", "nǐ hǎo"), ("欢迎", "huān yíng"), ("中国", "zhōng guó")]
 
     for c in cases:
         assert p.get_reading(c[0]) == c[1], c[0]
