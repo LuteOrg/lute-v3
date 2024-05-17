@@ -48,16 +48,32 @@ function start_hover_mode(should_clear_frames = true) {
 /** Interactions. */
 
 
+/* User can explicitly set the screen type from the reading_menu. (templates/read/reading_menu) */
+function set_screen_type(screen_type) {
+  localStorage.setItem("screen_interactions_type", screen_type);
+  window.location.reload();
+}
+
 /**
  * Find if on mobile.
+ *
  * This appears to still be a big hassle.  Various posts
  * say to not use the userAgent sniffing, and use feature tests
  * instead.
  * ref: https://stackoverflow.com/questions/72502079/
  *   how-can-i-check-if-the-device-which-is-using-my-website-is-a-mobile-user-or-no
  * From the above, using answer from marc_s: https://stackoverflow.com/a/76055222/1695066
+ *
+ * The various answers posted are still incorrect in certain cases,
+ * so Lute users can set the screen_interactions_type for the session.
  */
 const _isUserUsingMobile = () => {
+  const s = localStorage.getItem('screen_interactions_type');
+  if (s == 'desktop')
+    return false;
+  if (s == 'mobile')
+    return true;
+
   // User agent string method
   let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
@@ -67,14 +83,15 @@ const _isUserUsingMobile = () => {
   // The original method in the SO post had width, height < 768,
   // but that broke playwright tests which opens a smaller browser window.
   if (!isMobile) {
-    const s = window.screen
-    isMobile = (s.width < 980);
+    isMobile = (window.screen < 980);
   }
 
+  // Disabling this check - see https://stackoverflow.com/a/4819886/1695066
+  // for the many cases where this fails.
   // Touch events method
-  if (!isMobile) {
-    isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0));
-  }
+  // if (!isMobile) {
+  //   isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0));
+  //  }
 
   // CSS media queries method
   if (!isMobile) {

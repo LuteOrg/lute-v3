@@ -429,52 +429,12 @@ span.hamburger {
     text-decoration: none;
 }
 
-#page-operations-title {
-    display: block;
-    position: relative;
-    width: 100%;
-}
-
-#page-operations-title::after {
-    content: "▶";
-    position: absolute;
-    right: 0;
-}
-
 .close-btn:hover,
 #reading_menu .reading-menu-item:hover,
 .text-options-button:hover {
     background-color: #d5e9fa;
     cursor: pointer;
     /* color: var(--background-color); */
-}
-
-#page-operations-menu .reading-menu-item:hover {
-    background-color: #e4f2fe;
-}
-
-#page-operations-menu {
-    display: none;
-    position: absolute;
-
-    left: 100%;
-    width: 100%;
-    background-color: #d5e9fa;
-    top: 0;
-    border-right: 4px solid #a9cfef;
-    border-left: none;
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-}
-
-#page-operations-li {
-    display: flex;
-    align-items: center;
-    position: relative;
-}
-
-#page-operations-li:hover #page-operations-menu {
-    display: block;
 }
 
 .close-btn {
@@ -578,6 +538,47 @@ span.hamburger {
 .focus-mode-active #read_pane_left {
     margin: 0 auto;
 }
+
+.reading-menu-top-level {
+    display: block;
+    position: relative;
+    width: 100%;
+}
+
+.reading-menu-top-level::after {
+    content: "\232A";  /* right angle bracket code. */
+    position: absolute;
+    right: 0;
+}
+
+.reading-menu-top-level-li {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.reading-menu-sublist {
+    display: none;
+    position: absolute;
+
+    left: 100%;
+    width: 100%;
+    background-color: #d5e9fa;
+    top: 0;
+    border-right: 4px solid #a9cfef;
+    border-left: none;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+#page-operations-li:hover #page-operations-menu, #screen-interactions-li:hover #screen-interactions-menu {
+    display: block;
+}
+
+#page-operations-menu .reading-menu-item:hover, #screen-interactions-menu .reading-menu-item:hover {
+    background-color: #e4f2fe;
+}
+
 
 /* End reader slide-in hamburger menu. *********************/
 
