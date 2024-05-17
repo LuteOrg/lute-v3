@@ -11,7 +11,6 @@ from lute.db import db
 from lute.language.service import get_language_def
 import lute.db.demo
 from lute.app_factory import create_app
-from lute.parse.registry import init_parser_plugins
 
 from lute.models.language import Language
 
