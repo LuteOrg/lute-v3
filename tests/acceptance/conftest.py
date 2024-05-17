@@ -41,14 +41,27 @@ def fixture_env_check(request):
         # Acceptance tests run using 'inv accept' sort this out automatically.
         pytest.exit("--port not set")
 
+    # Try connecting a few times.
+    success = False
+    max_attempts = 5
+    curr_attempt = 0
     url = f"http://localhost:{useport}/"
-    try:
-        requests.get(url, timeout=10)
-    except requests.exceptions.ConnectionError:
-        pytest.exit(
-            f"Unable to reach {url} ... is it running?  Use inv accept to auto-start it"
-        )
+
+    while curr_attempt < max_attempts and not success:
+        curr_attempt += 1
+        try:
+            requests.get(url, timeout=3)
+            success = True
+        except requests.exceptions.ConnectionError:
+            pass
+
+    if not success:
+        msg = f"Unable to reach {url} after {curr_attempt} tries ... "
+        msg += "is it running?  Use inv accept to auto-start it."
+        pytest.exit(msg)
         print()
+    else:
+        print(f"Connected successfully after {curr_attempt} tries")
 
 
 @pytest.fixture(name="chromebrowser", scope="session")
