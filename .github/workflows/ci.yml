@@ -4,7 +4,7 @@ on:
   push:
     # A branch github-ci-updates can be created and used for ci
     # experiments and tweaks.
-    branches: [ "develop", "master", "github-ci", "windows" ]
+    branches: [ "develop", "master", "github-ci", "windows", "pr_413_continued_plugins" ]
   pull_request:
     branches: [ "develop", "master" ]
 
@@ -141,6 +141,66 @@ jobs:
     - name: Smoke test no mecab
       run: inv accept -s -k disabled_data_is_hidden
 
+
+  # Run all plugin tests.
+  #
+  # For each plugin:
+  #   - install Lute requirements
+  #   - install plugin reqs
+  #   - run tests.
+  #
+  # The Lute requirements are installed first b/c the plugins may come
+  # with their own conflicting requirements.  Doing a full req install
+  # will (hopefully) uncover conflicts.
+  plugins:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        python_version: [ '3.8', '3.9', '3.10', '3.11' ]
+
+    steps:
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python_version }}
+        cache: 'pip' # caching pip dependencies
+
+    # Plugins likely won't need this config file, but just in case ...
+    - name: Setup config
+      run: |
+        mkdir ${{ github.workspace }}/data
+        echo "ENV: dev" > ${{ github.workspace }}/lute/config/config.yml
+        echo "DATAPATH: ${{ github.workspace }}/data" >> ${{ github.workspace }}/lute/config/config.yml
+        echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/lute/config/config.yml
+        ls ${{ github.workspace }}
+        cat ${{ github.workspace }}/lute/config/config.yml
+
+    - name: test all plugins
+      run: |
+        for plugin in $(ls plugins); do
+          # Lute reqs
+          pip install .
+          pushd plugins/$plugin
+            pip install .
+            # Note for future: some plugins may have extra reqs not covered by pip
+            # (e.g. mecab uses apt-get and exports etc).  Idea for future: plugin
+            # could have a .github folder as well with additional setup scripts.
+
+            pytest tests
+
+            # pip uninstall $plugin -y
+            # NOTE: Not bothering to do an uninstall!
+            # if multiple plugins have different/clashing version requirements,
+            # perhaps it is best to run into problems in ci.
+            # This may ultimately come back to haunt me, but it will do for now.
+          popd
+        done
 
 
   code-quality:
