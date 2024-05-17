@@ -184,8 +184,13 @@ jobs:
     - name: test all plugins
       run: |
         for plugin in $(ls plugins); do
-          # Lute reqs
+          # Lute reqs, such as pytest.
+          pip install -r requirements.txt
+
+          # Lute itself, via toml, so that it can be found
+          # by each plugin's own "pip install ."
           pip install .
+
           pushd plugins/$plugin
             pip install .
             # Note for future: some plugins may have extra reqs not covered by pip
