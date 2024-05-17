@@ -82,19 +82,6 @@ jobs:
         set -e
         inv playwright
 
-    - name: Remove mecab for smoke test without mecab
-      run: |
-        sudo apt-get remove -y mecab mecab-ipadic-utf8
-
-    # Run one particular sanity check.
-    #
-    # Note this isn't _completely_ valid because the test loads
-    # only supported language stories, whereas a prod release
-    # comes with _all_ stories pre-loaded and the invalid ones
-    # are deleted ...
-    - name: Smoke test no mecab
-      run: inv accept -s -k disabled_data_is_hidden
-
     - name: Check flit package
       run: |
         mkdir ${{ github.workspace }}/../lute_flit
@@ -111,6 +98,49 @@ jobs:
         popd
 
         pkill -f "python -m lute.main"   # Kill that process.
+
+
+  # Lute should still work if the user doesn't have mecab installed.
+  no-mecab-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        # Only checking early and late versions.
+        python_version: [ '3.8', '3.11' ]
+
+    steps:
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python_version }}
+        cache: 'pip' # caching pip dependencies
+
+    - run: pip install -r requirements.txt
+
+    - name: Setup config
+      run: |
+        mkdir ${{ github.workspace }}/data
+        echo "ENV: dev" > ${{ github.workspace }}/lute/config/config.yml
+        echo "DATAPATH: ${{ github.workspace }}/data" >> ${{ github.workspace }}/lute/config/config.yml
+        echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/lute/config/config.yml
+        ls ${{ github.workspace }}
+        cat ${{ github.workspace }}/lute/config/config.yml
+
+    # Run one particular sanity check.
+    #
+    # Note this isn't _completely_ valid because the test loads
+    # only supported language stories, whereas a prod release
+    # comes with _all_ stories pre-loaded and the invalid ones
+    # are deleted ...
+    - name: Smoke test no mecab
+      run: inv accept -s -k disabled_data_is_hidden
+
 
 
   code-quality:
