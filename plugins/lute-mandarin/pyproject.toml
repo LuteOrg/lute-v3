@@ -6,7 +6,7 @@ build-backend = "flit_core.buildapi"
 name = "lute_mandarin_parser"
 
 [project]
-name = "lute-mandarin"
+name = "lute3-mandarin"
 dynamic = ['version']
 description = "Learning Using Texts - Chinese Parser"
 requires-python = ">=3.8"
