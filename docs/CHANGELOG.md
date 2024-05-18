@@ -1,4 +1,17 @@
 
+# 3.4.0 (2024-05-17)
+
+Feature changes:
+
+* Add (first) language parser plugin for Mandarin.  By @cghyzel in #413.  See [the manual](https://luteorg.github.io/lute-manual/install/plugins.html) for installation notes if you want to study Mandarin.
+* Issue #418: let users specify if on mobile or desktop.  See [the faq](https://luteorg.github.io/lute-manual/faq/reading/click-not-working.html)
+* Allow Opus audio files.  By @yue-dongchen in #420
+
+Back end changes:
+
+* Add language parser plugin capability!  By @cghyzel in #413
+
+
 # 3.3.3 (2024-05-05)
 
 Feature changes:
