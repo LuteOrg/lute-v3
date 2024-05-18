@@ -9,7 +9,7 @@ from tests.dbasserts import assert_sql_result
 
 def test_get_all_lang_defs(app_context):
     "Can get all predefined languages."
-    defs = service.get_defs()
+    defs = service.get_supported_defs()
     engs = [d for d in defs if d["language"].name == "English"]
     assert len(engs) == 1, "have english"
     eng = engs[0]
@@ -61,7 +61,7 @@ def test_load_all_defs_loads_lang_and_stories(empty_db):
     assert_sql_result(lang_sql, [], "no langs")
     assert_sql_result(story_sql, [], "nothing loaded")
 
-    defs = service.get_defs()
+    defs = service.get_supported_defs()
     langnames = [d["language"].name for d in defs]
     for n in langnames:
         lang_id = service.load_language_def(n)
