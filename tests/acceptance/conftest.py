@@ -53,7 +53,7 @@ def fixture_env_check(request):
             requests.get(url, timeout=10)
             success = True
         except requests.exceptions.ConnectionError:
-            pass
+            time.sleep(5)
 
     if not success:
         msg = f"Unable to reach {url} after {curr_attempt} tries ... "
