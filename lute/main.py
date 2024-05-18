@@ -101,7 +101,7 @@ def _start(args):
     except OSError as err:
         if err.errno == errno.EADDRINUSE:
             print(
-                f"address :{args.port} already in use, please try adding a --port parameter "
+                f"port :{args.port} already in use, please try adding a --port parameter "
                 f"(eg python -m lute.main --port 9876)"
             )
         else:
