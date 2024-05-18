@@ -61,6 +61,22 @@ def test_end_of_sentence_stored_in_parsed_tokens(mandarin_chinese):
     assert_tokens_equals(s, mandarin_chinese, expected)
 
 
+def test_carriage_returns_treated_as_reverse_p_character(mandarin_chinese):
+    """
+    Returns need to be marked with the backwards P for rendering etc.
+    """
+    s = "你好。\n现在。"
+
+    expected = [
+        ("你好", True),
+        ("。", False, True),
+        ("¶", False, True),
+        ("现在", True),
+        ("。", False, True),
+    ]
+    assert_tokens_equals(s, mandarin_chinese, expected)
+
+
 def test_readings():
     """
     Parser returns readings if they add value.

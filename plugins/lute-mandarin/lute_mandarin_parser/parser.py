@@ -30,13 +30,22 @@ class MandarinParser(AbstractParser):
         """
         Returns ParsedToken array for given language.
         """
+
+        # Ensure standard carriage returns so that paragraph
+        # markers are used correctly.  Lute uses paragraph markers
+        # for rendering.
+        text = text.replace("\r\n", "\n")
+
         words = list(jieba.cut(text))
         tokens = []
         pattern = f"[{language.word_characters}]"
         for word in words:
             is_word_char = re.match(pattern, word) is not None
             is_end_of_sentence = word in language.regexp_split_sentences
+            if word == "\n":
+                word = "¶"
             if word == "¶":
+                is_word_char = False
                 is_end_of_sentence = True
             p = ParsedToken(word, is_word_char, is_end_of_sentence)
             tokens.append(p)
