@@ -9,26 +9,25 @@ from lute.book.model import Book, Repository
 from lute.db import db
 
 
-def get_defs():
-    "Return language definitions."
+def get_supported_defs():
+    "Return supported language definitions."
     ret = []
     def_glob = os.path.join(_language_defs_path(), "**", "definition.yaml")
     for f in glob(def_glob):
-        entry = {}
-        d = {}
+        lang = None
         with open(f, "r", encoding="utf-8") as df:
             d = yaml.safe_load(df)
-        lang = Language.from_dict(d)
-        entry["language"] = lang
-        entry["books"] = _get_books(f, lang.name)
-        ret.append(entry)
+            lang = Language.from_dict(d)
+        if lang.is_supported:
+            entry = {"language": lang, "books": _get_books(f, lang.name)}
+            ret.append(entry)
     ret.sort(key=lambda x: x["language"].name)
     return ret
 
 
 def predefined_languages():
     "Languages defined in yaml files."
-    return [d["language"] for d in get_defs()]
+    return [d["language"] for d in get_supported_defs()]
 
 
 def _get_books(lang_definition_filename, lang_name):
@@ -52,7 +51,7 @@ def _get_books(lang_definition_filename, lang_name):
 
 def get_language_def(lang_name):
     "Get a lang def and its stories."
-    defs = get_defs()
+    defs = get_supported_defs()
     ret = [d for d in defs if d["language"].name == lang_name]
     if len(ret) == 0:
         raise RuntimeError(f"Missing language def name {lang_name}")

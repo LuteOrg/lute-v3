@@ -30,6 +30,8 @@ import lute.backup.service as backupservice
 import lute.db.demo
 import lute.utils.formutils
 
+from lute.parse.registry import init_parser_plugins, supported_parsers
+
 from lute.models.book import Book
 from lute.models.language import Language
 from lute.models.setting import BackupSettings, UserSetting
@@ -339,6 +341,11 @@ def create_app(
     - extra_config: dict, e.g. pass { 'TESTING': True } during unit tests.
     """
 
+    def null_print(s):  # pylint: disable=unused-argument
+        pass
+
+    outfunc = output_func or null_print
+
     if app_config_path is None:
         if os.path.exists("config.yml"):
             app_config_path = "config.yml"
@@ -351,6 +358,13 @@ def create_app(
 
     if extra_config is None:
         extra_config = {}
+    outfunc("Initializing app.")
     app = _create_app(app_config, extra_config)
+
+    outfunc("Initializing parsers from plugins ...")
+    init_parser_plugins()
+    outfunc("Enabled parsers:")
+    for _, v in supported_parsers():
+        outfunc(f"  * {v}")
 
     return app
