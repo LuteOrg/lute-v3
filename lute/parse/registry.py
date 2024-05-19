@@ -5,6 +5,7 @@ List of available parsers.
 """
 
 from importlib.metadata import entry_points
+from sys import version_info
 
 from lute.parse.base import AbstractParser
 from lute.parse.space_delimited_parser import SpaceDelimitedParser, TurkishParser
@@ -24,14 +25,20 @@ def init_parser_plugins():
     """
     Initialize parsers from plugins
     """
-    custom_parser_eps = entry_points().get("lute.plugin.parse", [])
+
+    if version_info.major == 3 and version_info.minor in (8, 9, 10, 11):
+        custom_parser_eps = entry_points().get('lute.plugin.parse')
+    elif version_info.major == 3 and version_info.minor == 12:
+        custom_parser_eps = entry_points().select(group='lute.plugin.parse')
+    else:
+        custom_parser_eps = None
+    if custom_parser_eps is None:
+        return
     for custom_parser_ep in custom_parser_eps:
         if _is_valid(custom_parser_ep.load()):
             __LUTE_PARSERS__[custom_parser_ep.name] = custom_parser_ep.load()
         else:
-            raise ValueError(
-                f"{custom_parser_ep.name} is not a subclass of AbstractParser"
-            )
+            raise ValueError(f"{custom_parser_ep.name} is not a a subclass of AbstractParser")
 
 
 def _is_valid(custom_parser):
