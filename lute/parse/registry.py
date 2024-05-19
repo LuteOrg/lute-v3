@@ -41,6 +41,9 @@ def init_parser_plugins():
         print(msg, flush=True)
         return
 
+    if custom_parser_eps is None:
+        return
+
     for custom_parser_ep in custom_parser_eps:
         if _is_valid(custom_parser_ep.load()):
             __LUTE_PARSERS__[custom_parser_ep.name] = custom_parser_ep.load()
