@@ -100,11 +100,16 @@ def _start(args):
         serve(app, host="0.0.0.0", port=args.port)
     except OSError as err:
         if err.errno == errno.EADDRINUSE:
-            print(
-                f"port :{args.port} already in use, please try adding a --port parameter "
-                f"(eg python -m lute.main --port 9876)"
-            )
+            msg = [
+                f"ERROR: port {args.port} is already in use.",
+                "please try adding a --port parameter, e.g.:",
+                "",
+                "  python -m lute.main --port 9876",
+                "",
+            ]
+            _print(msg)
         else:
+            # Throw back up, to get general error message
             raise
 
 
