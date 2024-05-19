@@ -1,4 +1,12 @@
 
+# 3.4.1 (2024-05-19)
+
+Tweaks/fixes:
+
+* #424: Fix parser plugin loads for python 3.12.  By @cghyzel in #426.
+* #414: Add better startup error message if port already in use.  By @barash-asenov in #423.
+
+
 # 3.4.0 (2024-05-17)
 
 Feature changes:
