@@ -5,6 +5,7 @@ List of available parsers.
 """
 
 from importlib.metadata import entry_points
+from sys import version_info
 
 from lute.parse.base import AbstractParser
 from lute.parse.space_delimited_parser import SpaceDelimitedParser, TurkishParser
@@ -24,7 +25,25 @@ def init_parser_plugins():
     """
     Initialize parsers from plugins
     """
-    custom_parser_eps = entry_points().get("lute.plugin.parse", [])
+
+    vmaj = version_info.major
+    vmin = version_info.minor
+    if vmaj == 3 and vmin in (8, 9, 10, 11):
+        custom_parser_eps = entry_points().get("lute.plugin.parse")
+    elif (vmaj == 3 and vmin >= 12) or (vmaj >= 4):
+        # Can't be sure this will always work, API may change again,
+        # but can't plan for the unforseeable everywhere.
+        custom_parser_eps = entry_points().select(group="lute.plugin.parse")
+    else:
+        # earlier version of python than 3.8?  What madness is this?
+        # Not going to throw, just print and hope the user sees it.
+        msg = f"Unable to load plugins for python {vmaj}.{vmin}, please upgrade to 3.8+"
+        print(msg, flush=True)
+        return
+
+    if custom_parser_eps is None:
+        return
+
     for custom_parser_ep in custom_parser_eps:
         if _is_valid(custom_parser_ep.load()):
             __LUTE_PARSERS__[custom_parser_ep.name] = custom_parser_ep.load()
