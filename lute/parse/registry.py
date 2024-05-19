@@ -38,7 +38,9 @@ def init_parser_plugins():
         if _is_valid(custom_parser_ep.load()):
             __LUTE_PARSERS__[custom_parser_ep.name] = custom_parser_ep.load()
         else:
-            raise ValueError(f"{custom_parser_ep.name} is not a a subclass of AbstractParser")
+            raise ValueError(
+                f"{custom_parser_ep.name} is not a a subclass of AbstractParser"
+            )
 
 
 def _is_valid(custom_parser):
