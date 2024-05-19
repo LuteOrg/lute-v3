@@ -125,10 +125,17 @@ if __name__ == "__main__":
     try:
         _start(parser.parse_args())
     except Exception as e:  # pylint: disable=broad-exception-caught
-        print("\n")
-        print("-" * 50)
-        print("Error during startup:")
-        print(e)
-        print("Please try again, or report an issue on GitHub.")
-        print("Additionally, help is available with --help.")
-        print("-" * 50)
+        dashes = "-" * 50
+        failmsg = f"""
+        {dashes}
+        Error during startup:
+        Type: {type(e)}
+        {e}
+
+        Please check your setup and try again.
+        Ask for help on Discord, or report an issue on GitHub.
+        Additionally, help is available with --help.
+        {dashes}
+        """
+
+        print(textwrap.dedent(failmsg))
