@@ -26,20 +26,27 @@ def init_parser_plugins():
     Initialize parsers from plugins
     """
 
-    if version_info.major == 3 and version_info.minor in (8, 9, 10, 11):
-        custom_parser_eps = entry_points().get('lute.plugin.parse')
-    elif version_info.major == 3 and version_info.minor == 12:
-        custom_parser_eps = entry_points().select(group='lute.plugin.parse')
+    vmaj = version_info.major
+    vmin = version_info.minor
+    if vmaj == 3 and vmin in (8, 9, 10, 11):
+        custom_parser_eps = entry_points().get("lute.plugin.parse")
+    elif (vmaj == 3 and vmin >= 12) or (vmaj >= 4):
+        # Can't be sure this will always work, API may change again,
+        # but can't plan for the unforseeable everywhere.
+        custom_parser_eps = entry_points().select(group="lute.plugin.parse")
     else:
-        custom_parser_eps = None
-    if custom_parser_eps is None:
+        # earlier version of python than 3.8?  What madness is this?
+        # Not going to throw, just print and hope the user sees it.
+        msg = f"Unable to load plugins for python {vmaj}.{vmin}, please upgrade to 3.8+"
+        print(msg, flush=True)
         return
+
     for custom_parser_ep in custom_parser_eps:
         if _is_valid(custom_parser_ep.load()):
             __LUTE_PARSERS__[custom_parser_ep.name] = custom_parser_ep.load()
         else:
             raise ValueError(
-                f"{custom_parser_ep.name} is not a a subclass of AbstractParser"
+                f"{custom_parser_ep.name} is not a subclass of AbstractParser"
             )
 
 
