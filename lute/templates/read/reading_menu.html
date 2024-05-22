@@ -69,6 +69,23 @@
       </ul>
     </div>
   </li>
+  <li id="page-operations-li" class="reading-menu-item reading-menu-top-level-li">
+    <span id="page-operations-title" class="reading-menu-top-level">Bookmarks</span>
+    <div id="page-operations-menu" class="reading-menu-sublist">
+      <ul>
+        <li>
+          <a id="readmenu_bookmark_index" class="reading-menu-item" href="/bookmarks/{{ book.id }}" title="Index">
+            List
+          </a>
+        </li>
+        <li>
+          <a id="readmenu_add_bookmark" class="reading-menu-item" href="" onclick="add_bookmark(); return false;" title="Add bookmark">
+            Add bookmark
+          </a>
+        </li>
+      </ul>
+    </div>
+  </li>
   <li>
     <!-- mobile users need this link, since they don't have keyboard shortcuts. -->
     <a id="translateSentence" class="reading-menu-item" href="" onclick="show_sentence_translation(null); return false;">

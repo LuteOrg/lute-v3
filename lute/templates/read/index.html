@@ -529,6 +529,33 @@
     });
   }
 
+  function add_bookmark() {
+    const bookid = $('#book_id').val();
+    const page_indicator = document.querySelector('#page_indicator');
+    // TODO: fix this hacky pagenum parsing
+    const pagenum = parseInt(page_indicator.textContent.split("/")[0])
+    let title = prompt(`Enter a bookmark title for page ${pagenum}`);
+
+    if (!bookid || !pagenum || !title) {
+      alert(`Missing bookmark data. No bookmark added.`)
+      return
+    }
+
+    fetch(`/bookmarks/add/${bookid}`, {
+      method: "POST",
+      cache: "no-cache",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        title: title,
+        pagenum: pagenum,
+      })
+    })
+
+    // TODO: notify user that bookmark was added
+  }
 
 </script>
 
