@@ -45,6 +45,7 @@ INSERT INTO _migrations VALUES('20240125_drop_BkWordCount.sql');
 INSERT INTO _migrations VALUES('20240125_drop_bookstats_wordcount.sql');
 INSERT INTO _migrations VALUES('20240207_01_create_languagedicts.sql');
 INSERT INTO _migrations VALUES('20240207_02_drop_old_language_fields.sql');
+INSERT INTO _migrations VALUES('20240525_create_textbookmarks.sql');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
