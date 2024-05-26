@@ -365,6 +365,6 @@ def create_app(
     init_parser_plugins()
     outfunc("Enabled parsers:")
     for _, v in supported_parsers():
-        outfunc(f"  * {v}")
+        outfunc(f"  * {v.name()}")
 
     return app
