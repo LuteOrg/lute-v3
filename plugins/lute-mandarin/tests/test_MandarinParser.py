@@ -142,4 +142,7 @@ def test_term_found_in_exceptions_file_is_split(mandarin_chinese, _datadir):
     assert ["清华", "大", "学"] == parsed_tokens(), "Recursive splitting"
 
     set_parse_exceptions(["大,学", "清华,大学"])
-    assert ["清华", "大", "学"] == parsed_tokens(), "Recursive splitting"
+    assert ["清华", "大", "学"] == parsed_tokens(), "Order doesn't matter"
+
+    set_parse_exceptions(["清华, 大学", " 大 ,  学 "])
+    assert ["清华", "大", "学"] == parsed_tokens(), "Spaces are ignored"

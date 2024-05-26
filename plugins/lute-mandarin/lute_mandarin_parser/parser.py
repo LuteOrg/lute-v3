@@ -79,7 +79,7 @@ class MandarinParser(AbstractParser):
                 stripped_line = line.strip()
                 if stripped_line.startswith("#"):
                     continue
-                parts = stripped_line.split(",")
+                parts = [p.strip() for p in stripped_line.split(",")]
                 orig_token = "".join(parts)
                 ret[orig_token] = parts
         return ret
