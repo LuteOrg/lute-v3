@@ -90,7 +90,7 @@ def supported_parsers():
 
     For select list entries, use supported_parsers().items().
     """
-    return [(k, v.name()) for k, v in _supported_parsers().items()]
+    return [(k, v.name()) for k, v in __LUTE_PARSERS__.items() if v.is_supported()]
 
 
 def supported_parser_types():
