@@ -97,4 +97,4 @@ def supported_parser_types():
     """
     List of supported Language.parser_types
     """
-    return list(_supported_parsers().keys())
+    return list(a[0] for a in supported_parsers())

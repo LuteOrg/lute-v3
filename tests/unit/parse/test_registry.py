@@ -8,6 +8,7 @@ from lute.parse.registry import (
     __LUTE_PARSERS__,
     get_parser,
     supported_parsers,
+    supported_parser_types,
     is_supported,
 )
 from lute.parse.space_delimited_parser import SpaceDelimitedParser
@@ -36,6 +37,13 @@ def test_supported_parsers():
 
     p = [n for n in d if n[0] == "spacedel"][0]
     assert p == ("spacedel", "Space Delimited"), "sanity check"
+
+
+def test_supported_parser_types():
+    "Sanity check only."
+    d = supported_parser_types()
+    assert isinstance(d, list), "returns a list"
+    assert "spacedel" in d, "sanity check"
 
 
 class DummyParser:
