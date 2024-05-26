@@ -10,6 +10,7 @@ Includes classes:
 """
 
 import re
+import os
 from typing import List
 import jieba
 from pypinyin import pinyin
@@ -20,11 +21,51 @@ class MandarinParser(AbstractParser):
     """
     A parser for Mandarin Chinese,
     using the jieba library for text segmentation.
+
+    The user can add some exceptions to the "parsing_exceptions.txt"
+    data file.
     """
 
     @classmethod
     def name(cls):
         return "Lute Mandarin Chinese"
+
+    @classmethod
+    def uses_data_directory(cls):
+        "Uses the data_directory (defined in the AbstractParser)."
+        return True
+
+    @classmethod
+    def parser_exceptions_file(cls):
+        """Full path to an exceptions file (in the parser's
+        data_directory) to indicate which terms should be broken up
+        differently than what jieba suggests.  For example, jieba
+        parses "清华大学" as a single token; however the user can
+        specify different parsing for this group:
+
+        "清华,大学" says "parse 清华大学 into two tokens, 清华/大学."
+        "清,华,大学" says "parse 清华大学 into three tokens, 清/华/大学."
+
+        Each rule is placed on a separate line in the
+        parser_exceptions file, e.g, the following file content
+        defines two rules:
+
+        清华,大学
+        学,华,大
+        """
+        return os.path.join(cls.data_directory, "parser_exceptions.txt")
+
+    @classmethod
+    def init_data_directory(cls):
+        "Set up necessary files."
+        fp = cls.parser_exceptions_file()
+        if not os.path.exists(fp):
+            with open(fp, "w", encoding="utf8") as f:
+                f.write("# Parsing exceptions.")
+                f.write("# Place each rule on a separate line.")
+                f.write("# e.g.:")
+                f.write("# 清华,大学")
+                f.write("# Lines preceded with # are ignored.")
 
     def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
         """
