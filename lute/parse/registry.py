@@ -57,15 +57,6 @@ def _is_valid(custom_parser):
     return issubclass(custom_parser, AbstractParser)
 
 
-def _supported_parsers():
-    "Get the supported parsers."
-    ret = {}
-    for k, v in __LUTE_PARSERS__.items():
-        if v.is_supported():
-            ret[k] = v
-    return ret
-
-
 def get_parser(parser_name) -> AbstractParser:
     "Return the supported parser with the given name."
     if parser_name not in __LUTE_PARSERS__:
