@@ -36,7 +36,7 @@ def test_supported_parsers():
     assert isinstance(d, list), "returns a list"
 
     p = [n for n in d if n[0] == "spacedel"][0]
-    assert p == ("spacedel", "Space Delimited"), "sanity check"
+    assert [p[0], p[1].name()] == ["spacedel", "Space Delimited"], "sanity check"
 
 
 def test_supported_parser_types():

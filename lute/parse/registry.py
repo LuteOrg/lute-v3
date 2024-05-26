@@ -73,11 +73,9 @@ def is_supported(parser_name) -> bool:
 
 def supported_parsers():
     """
-    List of supported parser strings and class names, for UI.
-
-    For select list entries, use supported_parsers().items().
+    List of supported parser strings and classes.
     """
-    return [(k, v.name()) for k, v in __LUTE_PARSERS__.items() if v.is_supported()]
+    return [(k, v) for k, v in __LUTE_PARSERS__.items() if v.is_supported()]
 
 
 def supported_parser_types():
