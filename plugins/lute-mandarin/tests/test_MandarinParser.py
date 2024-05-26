@@ -98,7 +98,7 @@ def test_readings():
 
 
 def test_term_found_in_exceptions_file_is_split(mandarin_chinese):
-    "User can sepecify parsing exceptions in file."
+    "User can specify parsing exceptions in file."
     s = "清华大学"
 
     def parsed_tokens():

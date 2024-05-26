@@ -67,10 +67,44 @@ class MandarinParser(AbstractParser):
                 f.write("# 清华,大学")
                 f.write("# Lines preceded with # are ignored.")
 
+    @classmethod
+    def _build_parser_exceptions_map(cls):
+        "Convert exceptions file to map."
+        if cls.data_directory is None:
+            return {}
+
+        ret = {}
+        with open(cls.parser_exceptions_file(), "r", encoding="utf8") as f:
+            for line in f:
+                stripped_line = line.strip()
+                if stripped_line.startswith("#"):
+                    continue
+                parts = stripped_line.split(",")
+                orig_token = "".join(parts)
+                ret[orig_token] = parts
+        return ret
+
+    def _reparse_with_exceptions_map(self, original_token, exceptions_map):
+        "Check the token s against the map, break down further if needed."
+
+        def _get_mapped(tok, accum):
+            if tok not in exceptions_map:
+                accum.append(tok)
+            else:
+                for p in exceptions_map[tok]:
+                    _get_mapped(p, accum)
+            return accum
+
+        ret = []
+        _get_mapped(original_token, ret)
+        return ret
+
     def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
         """
         Returns ParsedToken array for given language.
         """
+
+        exceptions_map = self._build_parser_exceptions_map()
 
         # Ensure standard carriage returns so that paragraph
         # markers are used correctly.  Lute uses paragraph markers
@@ -88,8 +122,10 @@ class MandarinParser(AbstractParser):
             if word == "¶":
                 is_word_char = False
                 is_end_of_sentence = True
-            p = ParsedToken(word, is_word_char, is_end_of_sentence)
-            tokens.append(p)
+            parts = self._reparse_with_exceptions_map(word, exceptions_map)
+            for p in parts:
+                t = ParsedToken(p, is_word_char, is_end_of_sentence)
+                tokens.append(t)
         return tokens
 
     def get_reading(self, text: str):
