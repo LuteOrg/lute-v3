@@ -68,10 +68,12 @@ def _supported_parsers():
 
 def get_parser(parser_name) -> AbstractParser:
     "Return the supported parser with the given name."
-    if parser_name in _supported_parsers():
-        pclass = __LUTE_PARSERS__[parser_name]
-        return pclass()
-    raise ValueError(f"Unknown parser type '{parser_name}'")
+    if parser_name not in __LUTE_PARSERS__:
+        raise ValueError(f"Unknown parser type '{parser_name}'")
+    pclass = __LUTE_PARSERS__[parser_name]
+    if not pclass.is_supported():
+        raise ValueError(f"Unsupported parser type '{parser_name}'")
+    return pclass()
 
 
 def is_supported(parser_name) -> bool:
