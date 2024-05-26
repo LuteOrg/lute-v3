@@ -19,8 +19,14 @@ def test_get_parser_by_name():
 
 
 def test_get_parser_throws_if_not_found():
-    with pytest.raises(ValueError):
-        get_parser("trash")
+    "Check error message thrown."
+    e = None
+    try:
+        _ = get_parser("trash")
+    except ValueError as ex:
+        e = ex
+    assert e is not None, "Have ValueError"
+    assert str(e) == "Unknown parser type 'trash'", "message"
 
 
 def test_supported_parsers():
@@ -59,3 +65,14 @@ def test_unavailable_parser_not_included_in_lists(_load_dummy):
     assert is_supported("dummy") is False, "no"
     with pytest.raises(ValueError):
         get_parser("dummy")
+
+
+def test_get_parser_throws_if_parser_not_supported(_load_dummy):
+    "Check throw."
+    e = None
+    try:
+        _ = get_parser("dummy")
+    except ValueError as ex:
+        e = ex
+    assert e is not None, "Have ValueError"
+    assert str(e) == "Unsupported parser type 'dummy'", "message"

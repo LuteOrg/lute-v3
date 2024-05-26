@@ -153,6 +153,7 @@ class Language(
 
     @property
     def parser(self):
+        "Note: this throws if the parser is not supported!!!"
         return get_parser(self.parser_type)
 
     @property
