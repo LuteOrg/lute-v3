@@ -119,6 +119,11 @@ class AbstractParser(ABC):
     data_directory = None
 
     @classmethod
+    def uses_data_directory(cls):
+        "True if the parser needs user-supplied data."
+        return False
+
+    @classmethod
     def init_data_directory(cls):
         """
         Initialize the data_directory if needed.  Not

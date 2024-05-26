@@ -61,11 +61,10 @@ class MandarinParser(AbstractParser):
         fp = cls.parser_exceptions_file()
         if not os.path.exists(fp):
             with open(fp, "w", encoding="utf8") as f:
-                f.write("# Parsing exceptions.")
-                f.write("# Place each rule on a separate line.")
-                f.write("# e.g.:")
-                f.write("# 清华,大学")
-                f.write("# Lines preceded with # are ignored.")
+                f.write("# Parsing exceptions.\n")
+                f.write("# Place each rule on a separate line. e.g.:\n")
+                f.write("# 清华,大学\n")
+                f.write("# Lines preceded with # are ignored.\n")
 
     @classmethod
     def _build_parser_exceptions_map(cls):
