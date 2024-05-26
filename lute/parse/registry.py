@@ -45,16 +45,12 @@ def init_parser_plugins():
         return
 
     for custom_parser_ep in custom_parser_eps:
-        if _is_valid(custom_parser_ep.load()):
-            __LUTE_PARSERS__[custom_parser_ep.name] = custom_parser_ep.load()
+        name = custom_parser_ep.name
+        klass = custom_parser_ep.load()
+        if issubclass(klass, AbstractParser):
+            __LUTE_PARSERS__[name] = klass
         else:
-            raise ValueError(
-                f"{custom_parser_ep.name} is not a subclass of AbstractParser"
-            )
-
-
-def _is_valid(custom_parser):
-    return issubclass(custom_parser, AbstractParser)
+            raise ValueError(f"{name} is not a subclass of AbstractParser")
 
 
 def get_parser(parser_name) -> AbstractParser:
