@@ -2,6 +2,9 @@
 MandarinParser tests.
 """
 
+import tempfile
+import os
+
 # pylint: disable=wrong-import-order
 from lute.models.term import Term
 from lute.parse.base import ParsedToken
@@ -92,3 +95,25 @@ def test_readings():
 
     for c in cases:
         assert p.get_reading(c[0]) == c[1], c[0]
+
+
+def test_term_found_in_exceptions_file_is_split(mandarin_chinese):
+    "User can sepecify parsing exceptions in file."
+    s = "清华大学"
+
+    def parsed_tokens():
+        p = MandarinParser()
+        return [t.token for t in p.get_parsed_tokens(s, mandarin_chinese)]
+
+    assert ["清华大学"] == parsed_tokens(), "No exceptions"
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        MandarinParser.data_directory = temp_dir
+        MandarinParser.init_data_directory()
+
+        exceptions_file = os.path.join(temp_dir, "parser_exceptions.txt")
+        assert os.path.exists(exceptions_file), "File should exist after init"
+        with open(exceptions_file, "w", encoding="utf8") as ef:
+            ef.write("清华,大学")
+
+        assert ["清华", "大学"] == parsed_tokens(), "Exceptions consulted during parse"
