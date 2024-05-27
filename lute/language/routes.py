@@ -102,6 +102,11 @@ def _add_hidden_dictionary_template_entry(form):
     form.dictionaries.append_entry({"dicturi": "__TEMPLATE__"})
 
 
+def _dropdown_parser_choices():
+    "Get dropdown list of parser type name to name."
+    return [(a[0], a[1].name()) for a in supported_parsers()]
+
+
 @bp.route("/edit/<int:langid>", methods=["GET", "POST"])
 def edit(langid):
     """
@@ -114,7 +119,7 @@ def edit(langid):
         return redirect(url_for("language.index"))
 
     form = LanguageForm(obj=language)
-    form.parser_type.choices = supported_parsers()
+    form.parser_type.choices = _dropdown_parser_choices()
 
     if _handle_form(language, form):
         return redirect("/")
@@ -138,7 +143,7 @@ def new(langname):
             language = candidates[0]
 
     form = LanguageForm(obj=language)
-    form.parser_type.choices = supported_parsers()
+    form.parser_type.choices = _dropdown_parser_choices()
 
     if _handle_form(language, form):
         # New language, so show everything b/c user should re-choose

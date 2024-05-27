@@ -109,7 +109,27 @@ class SentenceGroupIterator:
 class AbstractParser(ABC):
     """
     Abstract parser, inherited from by all parsers.
+
+    Attributes:
+        data_directory: Optional.  A full path to a
+            directory that the parser uses.  Should be
+            initialized with init_data_directory().
     """
+
+    data_directory = None
+
+    @classmethod
+    def uses_data_directory(cls):
+        "True if the parser needs user-supplied data."
+        return False
+
+    @classmethod
+    def init_data_directory(cls):
+        """
+        Initialize the data_directory if needed.  Not
+        necessary for all parsers.
+        """
+        return
 
     @classmethod
     def is_supported(cls):

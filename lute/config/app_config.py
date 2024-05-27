@@ -49,6 +49,7 @@ class AppConfig:  # pylint: disable=too-many-instance-attributes
 
         # Path to user data.
         self.datapath = config.get("DATAPATH", self._get_appdata_dir())
+        self.plugin_datapath = os.path.join(self.datapath, "plugins")
         self.userimagespath = os.path.join(self.datapath, "userimages")
         self.useraudiopath = os.path.join(self.datapath, "useraudio")
         self.userthemespath = os.path.join(self.datapath, "userthemes")

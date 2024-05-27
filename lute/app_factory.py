@@ -54,46 +54,50 @@ from lute.stats.routes import bp as stats_bp
 from lute.cli.commands import bp as cli_bp
 
 
+def _setup_app_dir(dirname, readme_content):
+    "Create one app directory."
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+    readme = os.path.join(dirname, "README.md")
+    if not os.path.exists(readme):
+        with open(readme, "w", encoding="utf-8") as f:
+            f.write(readme_content)
+
+
 def _setup_app_dirs(app_config):
     """
     App needs the data dir, backups, and other directories.
     """
     dp = app_config.datapath
     required_dirs = [
-        {"d": dp, "readme": "Lute data folder."},
-        {
-            "d": app_config.default_user_backup_path,
-            "readme": "Default path for user backups, can be overridden in settings.",
-        },
-        {
-            "d": app_config.system_backup_path,
-            "readme": "Database backups created by Lute at app start, just in case.",
-        },
-        {
-            "d": app_config.userimagespath,
-            "readme": "User images.  Each subfolder is a language's ID.",
-        },
-        {
-            "d": app_config.userthemespath,
-            "readme": "User themes.  <theme_name>.css files for your personal themes.",
-        },
-        {
-            "d": app_config.useraudiopath,
-            "readme": "User audio.  Each file is a book's audio.",
-        },
-        {
-            "d": app_config.temppath,
-            "readme": "Temp directory for export file writes, to avoid permissions issues.",
-        },
+        [dp, "Lute data folder."],
+        [
+            app_config.default_user_backup_path,
+            "Default path for user backups, can be overridden in settings.",
+        ],
+        [
+            app_config.system_backup_path,
+            "Database backups created by Lute at app start, just in case.",
+        ],
+        [
+            app_config.userimagespath,
+            "User images.  Each subfolder is a language's ID.",
+        ],
+        [
+            app_config.userthemespath,
+            "User themes.  <theme_name>.css files for your personal themes.",
+        ],
+        [
+            app_config.useraudiopath,
+            "User audio.  Each file is a book's audio.",
+        ],
+        [
+            app_config.temppath,
+            "Temp directory for export file writes, to avoid permissions issues.",
+        ],
     ]
     for rec in required_dirs:
-        d = rec["d"]
-        if not os.path.exists(d):
-            os.makedirs(d)
-        readme = os.path.join(d, "README.md")
-        if not os.path.exists(readme):
-            with open(readme, "w", encoding="utf-8") as f:
-                f.write(rec["readme"])
+        _setup_app_dir(rec[0], rec[1])
 
 
 def _add_base_routes(app, app_config):
@@ -328,6 +332,33 @@ def _create_app(app_config, extra_config):
     return app
 
 
+def _init_parser_plugins(plugin_data_path, outfunc):
+    "Load and init plugins."
+    outfunc("Initializing parsers from plugins ...")
+    init_parser_plugins()
+
+    parsers = supported_parsers()
+    parsers_with_extra_data = [
+        (typename, klass) for typename, klass in parsers if klass.uses_data_directory()
+    ]
+    if len(parsers_with_extra_data) > 0:
+        outfunc("Creating data folders for plugins ...")
+        _setup_app_dir(plugin_data_path, "Data files for plugins.")
+    for pair in parsers_with_extra_data:
+        typename, klass = pair
+        dirname = os.path.join(plugin_data_path, typename)
+        klass.data_directory = dirname
+
+        readme_content = f"Extra data for {klass.name()} plugin."
+        _setup_app_dir(dirname, readme_content)
+        klass.init_data_directory()
+        outfunc(f"  * {klass.name()}: {dirname}")
+
+    outfunc("Enabled parsers:")
+    for _, v in supported_parsers():
+        outfunc(f"  * {v.name()}")
+
+
 def create_app(
     app_config_path=None,
     extra_config=None,
@@ -361,10 +392,6 @@ def create_app(
     outfunc("Initializing app.")
     app = _create_app(app_config, extra_config)
 
-    outfunc("Initializing parsers from plugins ...")
-    init_parser_plugins()
-    outfunc("Enabled parsers:")
-    for _, v in supported_parsers():
-        outfunc(f"  * {v}")
+    _init_parser_plugins(app_config.plugin_datapath, outfunc)
 
     return app
