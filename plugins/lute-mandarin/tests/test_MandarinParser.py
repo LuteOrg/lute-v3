@@ -113,18 +113,21 @@ def test_term_found_in_exceptions_file_is_split(mandarin_chinese, _datadir):
     "User can specify parsing exceptions in file."
     s = "清华大学"
 
-    exceptions_file = MandarinParser.parser_exceptions_file()
-    assert os.path.exists(exceptions_file), "File should exist after init"
-
-    def set_parse_exceptions(array_of_exceptions):
-        with open(exceptions_file, "w", encoding="utf8") as ef:
-            ef.write("\n".join(array_of_exceptions))
-
     def parsed_tokens():
         p = MandarinParser()
         return [t.token for t in p.get_parsed_tokens(s, mandarin_chinese)]
 
     assert ["清华大学"] == parsed_tokens(), "No exceptions"
+
+    exceptions_file = MandarinParser.parser_exceptions_file()
+    assert os.path.exists(exceptions_file), "Sanity check only."
+
+    def set_parse_exceptions(array_of_exceptions):
+        with open(exceptions_file, "w", encoding="utf8") as ef:
+            ef.write("\n".join(array_of_exceptions))
+
+    set_parse_exceptions(["清华大学"])
+    assert ["清华大学"] == parsed_tokens(), "mapped to self"
 
     set_parse_exceptions(["清华,大学"])
     assert ["清华", "大学"] == parsed_tokens(), "Exceptions consulted during parse"
