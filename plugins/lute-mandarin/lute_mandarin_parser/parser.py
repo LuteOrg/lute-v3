@@ -86,17 +86,17 @@ class MandarinParser(AbstractParser):
     def _reparse_with_exceptions_map(self, original_token, exceptions_map):
         "Check the token s against the map, break down further if needed."
 
-        def _get_mapped(tok, accum):
-            if tok not in exceptions_map:
+        # pylint: disable=dangerous-default-value
+        def _get_mapped(tok, accum=[]):
+            parts = exceptions_map.get(tok)
+            if parts is None or len(parts) == 1:
                 accum.append(tok)
             else:
-                for p in exceptions_map[tok]:
+                for p in parts:
                     _get_mapped(p, accum)
             return accum
 
-        ret = []
-        _get_mapped(original_token, ret)
-        return ret
+        return _get_mapped(original_token)
 
     def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
         """
