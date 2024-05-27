@@ -2,6 +2,10 @@
 MandarinParser tests.
 """
 
+import tempfile
+import os
+import pytest
+
 # pylint: disable=wrong-import-order
 from lute.models.term import Term
 from lute.parse.base import ParsedToken
@@ -92,3 +96,56 @@ def test_readings():
 
     for c in cases:
         assert p.get_reading(c[0]) == c[1], c[0]
+
+
+@pytest.fixture(name="_datadir")
+def datadir():
+    "The data_directory for the plugin."
+    with tempfile.TemporaryDirectory() as temp_dir:
+        MandarinParser.data_directory = temp_dir
+        MandarinParser.init_data_directory()
+        exceptions_file = os.path.join(temp_dir, "parser_exceptions.txt")
+        assert os.path.exists(exceptions_file), "File should exist after init"
+        yield
+
+
+def test_term_found_in_exceptions_file_is_split(mandarin_chinese, _datadir):
+    "User can specify parsing exceptions in file."
+    s = "清华大学"
+
+    def parsed_tokens():
+        p = MandarinParser()
+        return [t.token for t in p.get_parsed_tokens(s, mandarin_chinese)]
+
+    assert ["清华大学"] == parsed_tokens(), "No exceptions"
+
+    exceptions_file = MandarinParser.parser_exceptions_file()
+    assert os.path.exists(exceptions_file), "Sanity check only."
+
+    def set_parse_exceptions(array_of_exceptions):
+        with open(exceptions_file, "w", encoding="utf8") as ef:
+            ef.write("\n".join(array_of_exceptions))
+
+    set_parse_exceptions(["清华大学"])
+    assert ["清华大学"] == parsed_tokens(), "mapped to self"
+
+    set_parse_exceptions(["清华,大学"])
+    assert ["清华", "大学"] == parsed_tokens(), "Exceptions consulted during parse"
+
+    set_parse_exceptions(["清华,大,学"])
+    assert ["清华", "大", "学"] == parsed_tokens(), "multiple splits tokens"
+
+    set_parse_exceptions(["清华,大,学", "清华,大学"])
+    assert ["清华", "大学"] == parsed_tokens(), "Last rule takes precedence"
+
+    set_parse_exceptions(["清学"])
+    assert ["清华大学"] == parsed_tokens(), "no match = parsed as-is"
+
+    set_parse_exceptions(["清华,大学", "大,学"])
+    assert ["清华", "大", "学"] == parsed_tokens(), "Recursive splitting"
+
+    set_parse_exceptions(["大,学", "清华,大学"])
+    assert ["清华", "大", "学"] == parsed_tokens(), "Order doesn't matter"
+
+    set_parse_exceptions(["清华, 大学", " 大 ,  学 "])
+    assert ["清华", "大", "学"] == parsed_tokens(), "Spaces are ignored"
