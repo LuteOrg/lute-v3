@@ -2,7 +2,6 @@
 Render service tests.
 """
 
-from lute.models.term import Term
 from lute.parse.base import ParsedToken
 from lute.read.render.service import find_all_Terms_in_string, get_paragraphs
 from lute.db import db
@@ -29,11 +28,7 @@ def _run_scenario(language, content, expected_found):
 
 def test_spanish_find_all_in_string(spanish, app_context):
     "Given various pre-saved terms, find_all returns those in the string."
-    terms = ["perro", "gato", "un gato"]
-    for term in terms:
-        t = Term(spanish, term)
-        db.session.add(t)
-    db.session.commit()
+    add_terms(spanish, ["perro", "gato", "un gato"])
 
     _run_scenario(spanish, "Hola tengo un gato", ["gato", "un gato"])
     _run_scenario(spanish, "gato gato gato", ["gato"])
@@ -41,11 +36,7 @@ def test_spanish_find_all_in_string(spanish, app_context):
     _run_scenario(spanish, "Hola tengo un    gato", ["gato", "un gato"])
     _run_scenario(spanish, "No tengo nada", [])
 
-    terms = ["échalo", "ábrela"]
-    for term in terms:
-        t = Term(spanish, term)
-        db.session.add(t)
-    db.session.commit()
+    add_terms(spanish, ["échalo", "ábrela"])
 
     _run_scenario(spanish, '"Échalo", me dijo.', ["échalo"])
     _run_scenario(spanish, "gato ábrela Ábrela", ["gato", "ábrela"])
@@ -53,25 +44,16 @@ def test_spanish_find_all_in_string(spanish, app_context):
 
 def test_english_find_all_in_string(english, app_context):
     "Can find a term with an apostrophe in string."
-    terms = ["the cat's pyjamas"]
-    for term in terms:
-        t = Term(english, term)
-        db.session.add(t)
-    db.session.commit()
+    add_terms(english, ["the cat's pyjamas"])
 
     _run_scenario(english, "This is the cat's pyjamas.", ["the cat's pyjamas"])
 
 
 def test_turkish_find_all_in_string(turkish, app_context):
     "Finds terms, handling case conversion."
-    terms = ["ışık", "için"]
-    for term in terms:
-        t = Term(turkish, term)
-        db.session.add(t)
-    db.session.commit()
+    add_terms(turkish, ["ışık", "için"])
 
-    content = "Işık İçin."
-    _run_scenario(turkish, content, ["ışık", "için"])
+    _run_scenario(turkish, "Işık İçin.", ["ışık", "için"])
 
 
 def test_smoke_get_paragraphs(spanish, app_context):
