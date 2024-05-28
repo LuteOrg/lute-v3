@@ -72,10 +72,10 @@ def _find_all_terms_in_tokens(tokens, language):
         """
         SELECT WoID FROM words
         WHERE WoLgID=:language_id and WoTokenCount>1
-        AND :content LIKE '%' || WoTextLC || '%'
+        AND :content LIKE '%' || :zws || WoTextLC || :zws || '%'
         """
     )
-    sql = sql.bindparams(language_id=language.id, content=content)
+    sql = sql.bindparams(language_id=language.id, content=content, zws=zws)
     idlist = db.session.execute(sql).all()
     woids = [int(p[0]) for p in idlist]
     contained_terms = db.session.query(Term).filter(Term.id.in_(woids)).all()
