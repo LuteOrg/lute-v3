@@ -342,7 +342,7 @@ def _init_parser_plugins(plugin_data_path, outfunc):
         (typename, klass) for typename, klass in parsers if klass.uses_data_directory()
     ]
     if len(parsers_with_extra_data) > 0:
-        outfunc("Creating data folders for plugins ...")
+        # outfunc("Creating data folders for plugins ...")
         _setup_app_dir(plugin_data_path, "Data files for plugins.")
     for pair in parsers_with_extra_data:
         typename, klass = pair
@@ -352,7 +352,7 @@ def _init_parser_plugins(plugin_data_path, outfunc):
         readme_content = f"Extra data for {klass.name()} plugin."
         _setup_app_dir(dirname, readme_content)
         klass.init_data_directory()
-        outfunc(f"  * {klass.name()}: {dirname}")
+        # outfunc(f"  * {klass.name()}: {dirname}")
 
     outfunc("Enabled parsers:")
     for _, v in supported_parsers():
