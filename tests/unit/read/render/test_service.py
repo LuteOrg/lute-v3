@@ -9,21 +9,46 @@ from lute.db import db
 from tests.utils import add_terms, make_text, assert_rendered_text_equals
 
 
-def _run_scenario(language, content, expected_found):
+def _run_scenario(language, content, expected_found, msg=""):
     """
     Given some pre-saved terms in language,
     find_all method returns the expected_found terms that
     exist in the content string.
     """
     found_terms = find_all_Terms_in_string(content, language)
-    assert len(found_terms) == len(expected_found), "found count"
+    assert len(found_terms) == len(expected_found), "found count, " + msg
     zws = "\u200B"  # zero-width space
     found_terms = [t.text.replace(zws, "") for t in found_terms]
-    assert found_terms is not None
-    assert expected_found is not None
+    assert found_terms is not None, msg
+    assert expected_found is not None, msg
     found_terms.sort()
     expected_found.sort()
-    assert found_terms == expected_found
+    assert found_terms == expected_found, msg
+
+
+def test_smoke_tests(english, app_context):
+    "Check bounds, ensure no false matches, etc."
+    add_terms(english, ["a", "at", "xyz"])
+
+    _run_scenario(english, "attack cat", [], "no matches, not standalone")
+    _run_scenario(english, "at", ["at"], "a doesn't match, not standalone")
+    _run_scenario(english, "A", ["a"], "case ignored")
+    _run_scenario(english, "AT A", ["a", "at"], "case, order ignored")
+    _run_scenario(english, "aatt", [], "no match")
+    _run_scenario(english, "Xyz", ["xyz"], "case ignored 2")
+    _run_scenario(english, "XyZ", ["xyz"], "case ignored 3")
+    _run_scenario(english, "      A     at    x", ["a", "at"], "spaces ignored")
+
+    _run_scenario(english, "a dog here", ["a"], "bounds check, found at start")
+    _run_scenario(english, "dog a here", ["a"], "bounds check, found at start")
+    _run_scenario(english, "dog here a", ["a"], "bounds check, found at end")
+    _run_scenario(english, "a a a a a a a", ["a"], "return once only")
+
+    add_terms(english, ["ab xy"])
+    _run_scenario(english, "ab xy", ["ab xy"], "with space")
+    _run_scenario(english, "cab xy", [], "extra at start")
+    _run_scenario(english, "cab xyq", [], "no match, not the same")
+    _run_scenario(english, "ab xyq", [], "extra stuff at end")
 
 
 def test_spanish_find_all_in_string(spanish, app_context):
