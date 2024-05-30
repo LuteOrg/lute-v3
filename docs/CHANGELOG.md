@@ -1,4 +1,15 @@
 
+# 3.4.2 (2024-05-28)
+
+Feature changes:
+
+* #430: add "parser exceptions file" for Mandarin.  See the [Readme on pypi](https://pypi.org/project/lute3-mandarin/) for notes.
+
+Bug fix:
+
+* #436: popup not showing due to Term search error.
+
+
 # 3.4.1 (2024-05-19)
 
 Tweaks/fixes:
