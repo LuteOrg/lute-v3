@@ -1,17 +1,18 @@
 # The Dockerfile can be used to create two variants
-# by using "--build-arg INSTALL_MECAB=[true|false]":
-# - "true": with mecab and dictionary (800+ MB)
+# by using "--build-arg INSTALL_EVERYTHING=[true|false]":
+# - "true": with mecab and dictionary, mandarin parser (800+ MB)
 # - "false": without (300 MB)
+#
+# e.g.  docker build --build-arg INSTALL_EVERYTHING=true -t lute3 .
 
 # Official python base image.
 FROM python:3.11-slim-bookworm
 
 # Define a build argument with a default value.
-ARG INSTALL_MECAB=false
+ARG INSTALL_EVERYTHING=false
 
-# Install mecab for Japanese support if INSTALL_MECAB is true, e.g.
-#   docker build --build-arg INSTALL_MECAB=true -t lute3 .
-RUN if [ "$INSTALL_MECAB" = "true" ]; then \
+# Mecab.
+RUN if [ "$INSTALL_EVERYTHING" = "true" ]; then \
     apt-get update -y && \
     apt-get install -y mecab mecab-ipadic-utf8 && \
     apt-get clean && rm -rf /var/lib/apt/lists/*; \
