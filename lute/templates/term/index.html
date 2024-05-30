@@ -217,7 +217,7 @@
     tx = tx.replaceAll("\r\n", "<br />");
     let imgsrc = row[IMG_COL] ?? '';
     if (imgsrc != '')
-      imgsrc = `<img style="margin-top: 5px;" src="${imgsrc}" />`;
+      imgsrc = `<img class="term-listing-image" style="margin-top: 5px;" src="${imgsrc}" />`;
     let ret = [ tx, imgsrc ].filter((s) => s != '');
     return ret.join('<br />');
   };
