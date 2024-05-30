@@ -16,7 +16,7 @@ authors = [
 readme = "README_PyPi.md"
 
 dependencies = [
-  "lute3>=3.4.2b1",
+  "lute3>=3.4.2",
   "jieba>=0.42.1",
   "pypinyin>=0.51.0"
 ]
