@@ -256,7 +256,7 @@ jobs:
     - run: pip install -r requirements.txt
     - name: Test docker build
       run: |
-        docker build -f docker/Dockerfile --build-arg INSTALL_MECAB=false -t lute3 .
+        docker build -f docker/Dockerfile --build-arg INSTALL_EVERYTHING=false -t lute3 .
         # Run container in the background, and check.
         docker run -d -p 5000:5000 -v ./my_data:/lute_data -v ./my_backups:/lute_backup --name my-lute lute3:latest
         sleep 10  # Give it a moment to start.
