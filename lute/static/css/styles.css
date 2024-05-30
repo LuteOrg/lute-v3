@@ -2084,6 +2084,11 @@ input[type="checkbox"][disabled] + label {
 }
 
 
+.term-listing-image {
+    max-width: 250px;
+    max-height: 250px;
+}
+
 /** Term listing (/term) action dropdown. ********************/
 
 .term-action-container {
