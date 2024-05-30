@@ -68,10 +68,10 @@ def test_readings(app_context):
 
     zws = "\u200B"
     cases = [
-        ("強い", "ツヨイ"),
-        ("二人", "ニニン"),  # ah well, not perfect :-)
-        ("強いか", "ツヨイカ"),
-        (f"強い{zws}か", f"ツヨイ{zws}カ"),  # zero-width-space ignored
+        ("強い", "つよい"),
+        ("二人", "ににん"),  # ah well, not perfect :-)
+        ("強いか", "つよいか"),
+        (f"強い{zws}か", f"つよい{zws}か"),  # zero-width-space ignored
     ]
 
     for c in cases:
