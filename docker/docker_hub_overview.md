@@ -98,8 +98,8 @@ docker compose stop lute
 
 `lute3` has two variants:
 
-* `lute3:<version>` (or `lute3:latest`): Lute v3 and all requirements, plus [MeCab](https://en.wikipedia.org/wiki/MeCab) and a MeCab dictionary for Japanese. ~830 MB.
-* `lute3:<version>-lean` (or `lute3:latest-lean`): The same as the above, but without MeCab (Japanese parsing and the Japanese demo are disabled). ~300 MB
+* `lute3:<version>` (or `lute3:latest`): Lute v3 and all extra supported parsers (Japanese and Mecab, Mandarin). ~800 MB.
+* `lute3:<version>-lean` (or `lute3:latest-lean`): Lute, without extra parsers. If you're not studying Japanese or Mandarin, this will suffice.  ~250 MB
 
 # Source code and building your own images
 
