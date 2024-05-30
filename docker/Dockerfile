@@ -1,32 +1,31 @@
 # The Dockerfile can be used to create two variants
-# by using "--build-arg INSTALL_MECAB=[true|false]":
-# - "true": with mecab and dictionary (800+ MB)
-# - "false": without (300 MB)
+# by using "--build-arg INSTALL_EVERYTHING=[true|false]":
+# - "true": with mecab and dictionary, mandarin parser (800+ MB)
+# - "false": without (230 MB)
+#
+# e.g.  docker build --build-arg INSTALL_EVERYTHING=true -t lute3 .
 
 # Official python base image.
 FROM python:3.11-slim-bookworm
 
-# Define a build argument with a default value.
-ARG INSTALL_MECAB=false
+WORKDIR /lute
 
-# Install mecab for Japanese support if INSTALL_MECAB is true, e.g.
-#   docker build --build-arg INSTALL_MECAB=true -t lute3 .
-RUN if [ "$INSTALL_MECAB" = "true" ]; then \
-    apt-get update -y && \
-    apt-get install -y mecab mecab-ipadic-utf8 && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*; \
-    fi
-
-# Lute code and config.
-COPY requirements.txt .
+# Install base.
 ENV PIP_ROOT_USER_ACTION=ignore
-RUN pip install -r requirements.txt
-COPY lute /lute
-RUN mv /lute/config/config.yml.docker /lute/config/config.yml
+RUN pip install lute3
+COPY lute/config/config.yml.docker ./config.yml
+
+# Build arg, defaults to false.
+ARG INSTALL_EVERYTHING=false
+
+COPY docker/Dockerfile_scripts/install_everything.sh ./install_all.sh
+RUN chmod +x ./install_all.sh
+
+RUN if [ "$INSTALL_EVERYTHING" = "true" ]; then ./install_all.sh; fi
 
 EXPOSE 5000
 
 # Start script.
-COPY docker/check_mounts_and_start.sh /lute/start.sh
-RUN chmod +x /lute/start.sh
+COPY docker/Dockerfile_scripts/start.sh ./start.sh
+RUN chmod +x ./start.sh
 ENTRYPOINT ["/lute/start.sh"]

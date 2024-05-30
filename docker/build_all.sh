@@ -46,7 +46,7 @@ docker buildx build \
        --push \
        --platform linux/amd64,linux/arm64 \
        -f docker/Dockerfile "$@" \
-       --build-arg INSTALL_MECAB=true \
+       --build-arg INSTALL_EVERYTHING=true \
        -t $TAG -t $LATEST .
 
 echo
@@ -57,7 +57,7 @@ docker buildx build \
        --push \
        --platform linux/amd64,linux/arm64 \
        -f docker/Dockerfile "$@" \
-       --build-arg INSTALL_MECAB=false \
+       --build-arg INSTALL_EVERYTHING=false \
        -t $LEANTAG -t $LEANLATEST .
 
 echo

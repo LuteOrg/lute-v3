@@ -42,7 +42,7 @@ docker buildx build \
        --push \
        --platform linux/amd64,linux/arm64 \
        -f docker/Dockerfile "$@" \
-       --build-arg INSTALL_MECAB=true \
+       --build-arg INSTALL_EVERYTHING=true \
        -t $TAG .
 
 # Remove the current builder
