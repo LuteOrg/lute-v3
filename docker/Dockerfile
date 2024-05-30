@@ -15,19 +15,17 @@ ENV PIP_ROOT_USER_ACTION=ignore
 RUN pip install lute3
 COPY lute/config/config.yml.docker ./config.yml
 
-# Define a build argument with a default value.
+# Build arg, defaults to false.
 ARG INSTALL_EVERYTHING=false
 
-# Add mecab.
-RUN if [ "$INSTALL_EVERYTHING" = "true" ]; then \
-    apt-get update -y && \
-    apt-get install -y mecab mecab-ipadic-utf8 && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*; \
-    fi
+COPY docker/Dockerfile_scripts/install_everything.sh ./install_all.sh
+RUN chmod +x ./install_all.sh
+
+RUN if [ "$INSTALL_EVERYTHING" = "true" ]; then ./install_all.sh; fi
 
 EXPOSE 5000
 
 # Start script.
-COPY docker/check_mounts_and_start.sh ./start.sh
+COPY docker/Dockerfile_scripts/start.sh ./start.sh
 RUN chmod +x ./start.sh
 ENTRYPOINT ["/lute/start.sh"]
