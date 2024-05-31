@@ -57,6 +57,9 @@
         { "name": "TxOrder", "targets": 0, "width": "5%", className: "colVisToggled" },
         { "name": "TbTitle", "targets": 1, "width": "70%", className: "colVisToggled", "render": render_page_link },
         { "targets": 2, "data": null, "width": "15%", "searchable": false, "orderable": false, "render": render_bookmark_actions, className: "colVisToggled" },
+
+        // Hidden data for processing bookmark actions
+        { "name": "TbTxID", "targets": 3, "data": null, "visible": false },
       ],
       buttons: [
         {
@@ -103,12 +106,11 @@
   });
 
   const edit_bookmark = async function(e) {
-    let page = e.dataset.page;
     let title = e.dataset.title;
     const new_title = prompt("Update the bookmark description.", title);
 
     if (new_title) {
-      await fetch("/bookmarks/edit/{{ book.id }}", {
+      await fetch("/bookmarks/edit", {
         method: "POST",
         cache: "no-cache",
         credentials: "same-origin",
@@ -116,21 +118,25 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          page: e.dataset.page,
+          text_id: e.dataset.textid,
           title: title,
           new_title: new_title,
         })
+      }).then((resp) => resp.json()).then((json) => {
+        if (json?.success) {
+          // TODO: fix this hacky page reload
+          window.location = ""
+        } else {
+          alert(`Unable to edit bookmark. ${json?.reason || "Unknown reason"}`);
+        }
       })
-
-      // TODO: fix this hacky page reload
-      window.location = ""
     }
   }
 
   const delete_bookmark = async function(e) {
     let confirmed = confirm("Delete bookmark?")
     if (confirmed) {
-      await fetch("/bookmarks/delete/{{ book.id }}", {
+      await fetch("/bookmarks/delete", {
         method: "POST",
         cache: "no-cache",
         credentials: "same-origin",
@@ -138,13 +144,18 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          page: e.dataset.page,
+          text_id: e.dataset.textid,
           title: e.dataset.title,
         })
+      }).then((resp) => resp.json()).then((json) => {
+        if (json?.success) {
+          // TODO: fix this hacky page reload
+          window.location = ""
+        } else {
+          alert(`Unable to delete bookmark. ${json?.reason || "Unknown reason"}`);
+        }
       })
 
-      // TODO: fix this hacky page reload
-      window.location = ""
     }
   }
 
@@ -153,7 +164,7 @@
 
     const links = [];
     const make_link = function(label, func) {
-      const s = `<a href="#" data-page="${row[0]}" data-title="${row[1]}" onclick="${func}(this)">${label}</a>`;
+      const s = `<a href="#" data-textid="${row[2]}" data-title="${row[1]}" onclick="${func}(this)">${label}</a>`;
       links.push(s);
     };
 
