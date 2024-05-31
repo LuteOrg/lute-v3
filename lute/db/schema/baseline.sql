@@ -320,20 +320,6 @@ BEGIN
     );
 END
 ;
-CREATE TRIGGER trig_wordparents_after_delete_change_WoSyncStatus
--- created by db/schema/migrations_repeatable/trig_wordparents.sql
-BEFORE DELETE ON wordparents
-FOR EACH ROW
-BEGIN
-    UPDATE words
-    SET WoSyncStatus = 0
-    WHERE WoID IN
-    (
-      select WpWoID from wordparents
-      where WpParentWoID = old.WpParentWoID
-    );
-END
-;
 CREATE TRIGGER trig_words_after_update_WoStatus_if_following_parent
 -- created by db/schema/migrations_repeatable/trig_words.sql
 AFTER UPDATE OF WoStatus, WoSyncStatus ON words
@@ -386,6 +372,18 @@ BEGIN
     UPDATE words
     SET WoCreated = CURRENT_TIMESTAMP
     WHERE WoID = NEW.WoID;
+END
+;
+CREATE TRIGGER trig_word_after_delete_change_WoSyncStatus_for_orphans
+-- created by db/schema/migrations_repeatable/trig_words.sql
+--
+-- If a term is deleted, any orphaned children must
+-- be updated to have WoSyncStatus = 0.
+AFTER DELETE ON words
+BEGIN
+    UPDATE words
+    SET WoSyncStatus = 0
+    WHERE WoID NOT IN (SELECT WpWoID FROM wordparents);
 END
 ;
 COMMIT;

@@ -59,3 +59,18 @@ BEGIN
     SET WoCreated = CURRENT_TIMESTAMP
     WHERE WoID = NEW.WoID;
 END;
+
+
+DROP TRIGGER IF EXISTS trig_word_after_delete_change_WoSyncStatus_for_orphans;
+
+CREATE TRIGGER trig_word_after_delete_change_WoSyncStatus_for_orphans
+-- created by db/schema/migrations_repeatable/trig_words.sql
+--
+-- If a term is deleted, any orphaned children must
+-- be updated to have WoSyncStatus = 0.
+AFTER DELETE ON words
+BEGIN
+    UPDATE words
+    SET WoSyncStatus = 0
+    WHERE WoID NOT IN (SELECT WpWoID FROM wordparents);
+END;

@@ -281,6 +281,8 @@ class Term(
             return
         if parent not in self.parents:
             self.parents.append(parent)
+        if len(self.parents) > 1:
+            self.sync_status = False
 
     def get_current_image(self, strip_jpeg=True):
         "Get the current (first) image for the term."
