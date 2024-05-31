@@ -309,14 +309,109 @@ def test_adding_new_term_does_not_change_family_if_multiple_parents(
     assert_statuses(expected, "updated")
 
 
+def assert_sync_statuses(expected, msg):
+    "Check the sync statuses of terms."
+    lines = [
+        s.strip().replace(":", ";") for s in expected.split("\n") if s.strip() != ""
+    ]
+    sql = "select WoText from words where WoSyncStatus = 1 order by WoText"
+    assert_sql_result(sql, lines, msg)
+
+
 def test_deleting_parent_deactivates_sync_status(term_family, app_context):
     "No more parent = no more follow."
 
-    sql = "select WoText from words where WoSyncStatus = 1"
-    assert_sql_result(sql, ["Byes", "b/1/yes", "c/1/yes"], "before delete")
+    expected = """
+    Byes
+    b/1/yes
+    c/1/yes
+    """
+    assert_sync_statuses(expected, "before delete")
 
     f = term_family
     db.session.delete(f.A)
     db.session.commit()
 
-    assert_sql_result(sql, ["b/1/yes", "c/1/yes"], "only direct children changed")
+    expected = """
+    b/1/yes
+    c/1/yes
+    """
+    assert_sync_statuses(expected, "after delete")
+
+
+def test_adding_extra_parents_unsets_sync_status(term_family, app_context):
+    "Can't follow multiple people."
+    c1 = DBTerm.find(term_family.c1.id)
+    assert c1.sync_status is True, "following C"
+
+    c1.add_parent(term_family.B)
+    assert c1.sync_status is False, "Can't follow 2 parents"
+
+
+def test_changing_parent_keeps_sync_status(term_family, app_context):
+    "Can't follow multiple people."
+    c1 = DBTerm.find(term_family.c1.id)
+    assert c1.sync_status is True, "following C"
+
+    c1.remove_all_parents()
+    c1.add_parent(term_family.B)
+    assert c1.sync_status is True, "Still following"
+
+    db.session.add(c1)
+    db.session.commit()
+
+    expected = """
+    Byes
+    b/1/yes
+    c/1/yes
+    """
+    assert_sync_statuses(expected, "after change")
+
+
+def test_remove_parent_doesnt_affect_other_linked_terms(term_family, app_context):
+    "Issue 417."
+
+    b3 = DBTerm(term_family.B.language, "b3yes")
+    b3.add_parent(term_family.B)
+    b3.sync_status = True
+    db.session.add(b3)
+    db.session.commit()
+
+    expected = """
+    Byes
+    b/1/yes
+    b/3/yes
+    c/1/yes
+    """
+    assert_sync_statuses(expected, "set up")
+
+    b1 = term_family.b1
+    b1.remove_all_parents()
+    b1.sync_status = False
+    db.session.add(b1)
+    db.session.commit()
+
+    expected = """
+    Byes
+    b/3/yes
+    c/1/yes
+    """
+    assert_sync_statuses(expected, "set up")
+
+
+def test_remove_non_linked_parent_leaves_other_linked_terms(term_family, app_context):
+    "Issue 417."
+
+    # term b2 is not linked to its parent b
+    b2 = term_family.b2
+    b2.remove_all_parents()
+    b2.sync_status = False
+    db.session.add(b2)
+    db.session.commit()
+
+    expected = """
+    Byes
+    b/1/yes
+    c/1/yes
+    """
+    assert_sync_statuses(expected, "b1 still linked")
