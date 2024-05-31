@@ -28,65 +28,87 @@ def bookmarks(bookid):
     return render_template("bookmarks/list.html", book=book, text_dir=text_dir)
 
 
-@bp.route("/add/<int:bookid>", methods=["POST"])
-def add_bookmark(bookid):
+@bp.route("/add", methods=["POST"])
+def add_bookmark():
     "Add bookmark"
     data = request.json
-    pagenum = data.get("pagenum")
     title = data.get("title")
+    try:
+        book_id = int(data.get("book_id"))
+        page_num = int(data.get("page_num"))
+    except ValueError:
+        return jsonify(success=False, reason="Invalid Text ID provided.", status=200)
+
+    if book_id is None or page_num is None or title is None:
+        return jsonify(
+            success=False,
+            reason="Missing value for required parameter 'title' or 'book_id' or page_num.",
+            status=200,
+        )
 
     tx = (
         db.session.query(Text)
-        .filter(Text.bk_id == bookid, Text.order == pagenum)
+        .filter(Text.bk_id == book_id)
+        .filter(Text.order == page_num)
         .first()
     )
+    bookmark = TextBookmark(title=title, tx_id=tx.id)
 
-    bookmark = TextBookmark()
-    bookmark.title = title
-    bookmark.tx_id = tx.id
-
-    if bookmark.title and bookmark.tx_id:
-        db.session.add(bookmark)
-        db.session.commit()
-        return jsonify({"success": True}, 200, {"ContentType": "application/json"})
-
-    return jsonify({"success": False}, 200, {"ContentType": "application/json"})
+    db.session.add(bookmark)
+    db.session.commit()
+    return jsonify(success=True, status=200)
 
 
-@bp.route("/delete/<int:bookid>", methods=["POST"])
-def delete_bookmark(bookid):
+@bp.route("/delete", methods=["POST"])
+def delete_bookmark():
     "Delete bookmark"
     data = request.json
-    pagenum = data.get("page")
     title = data.get("title")
+    try:
+        text_id = int(data.get("text_id"))
+    except ValueError:
+        return jsonify(
+            success=False,
+            reason=f"Invalid Text ID ({data.get('text_id')}) provided.",
+            status=200,
+        )
 
-    if title and pagenum and bookid:
-        db.session.query(TextBookmark).filter(
-            TextBookmark.title == title,
-            TextBookmark.text.has(order=pagenum),
-            TextBookmark.text.has(bk_id=bookid),
-        ).delete()
-        db.session.commit()
-        return jsonify({"success": True}, 200, {"ContentType": "application/json"})
+    if not title or not text_id:
+        return jsonify(
+            success=False,
+            reason="Missing value for required parameter 'title' or 'text_id'.",
+            status=200,
+        )
 
-    return jsonify({"success": False}, 200, {"ContentType": "application/json"})
+    db.session.query(TextBookmark).filter(
+        TextBookmark.title == title,
+        TextBookmark.text.has(id=text_id),
+    ).delete()
+    db.session.commit()
+    return jsonify(success=True, status=200)
 
 
-@bp.route("/edit/<int:bookid>", methods=["POST"])
-def edit_bookmark(bookid):
+@bp.route("/edit", methods=["POST"])
+def edit_bookmark():
     "Edit bookmark"
     data = request.json
-    pagenum = data.get("page")
+    try:
+        text_id = int(data.get("text_id"))
+    except ValueError:
+        return jsonify(success=False, reason="Invalid Text ID provided.", status=200)
     title = data.get("title")
     new_title = data.get("new_title")
 
-    if title and pagenum and bookid:
-        db.session.query(TextBookmark).filter(
-            TextBookmark.title == title,
-            TextBookmark.text.has(order=pagenum),
-            TextBookmark.text.has(bk_id=bookid),
-        ).update({"title": new_title})
-        db.session.commit()
-        return jsonify({"success": True}, 200, {"ContentType": "application/json"})
+    if not title or not text_id:
+        return jsonify(
+            success=False,
+            reason="Missing value for required parameter 'title' or 'text_id'.",
+            status=200,
+        )
 
-    return jsonify({"success": False}, 200, {"ContentType": "application/json"})
+    db.session.query(TextBookmark).filter(
+        TextBookmark.title == title,
+        TextBookmark.text.has(id=text_id),
+    ).update({"title": new_title})
+    db.session.commit()
+    return jsonify(success=True, status=200)
