@@ -67,23 +67,6 @@ def bulk_status_update(text: Text, terms_text_array, new_status):
     repo.commit()
 
 
-def _create_unknown_terms(textitems, lang):
-    "Create any terms required for the page."
-    toks = [t.text for t in textitems]
-    unique_word_tokens = list(set(toks))
-    all_new_terms = [Term.create_term_no_parsing(lang, t) for t in unique_word_tokens]
-
-    unique_text_lcs = {t.text_lc: t for t in all_new_terms}
-    unique_new_terms = unique_text_lcs.values()
-
-    for t in unique_new_terms:
-        t.status = 0
-        db.session.add(t)
-    db.session.commit()
-
-    return unique_new_terms
-
-
 def _add_status_0_terms(paragraphs, lang):
     "Add status 0 terms for new textitems in paragraph."
     new_textitems = [
@@ -93,18 +76,17 @@ def _add_status_0_terms(paragraphs, lang):
         for ti in sentence.textitems
         if ti.is_word and ti.term is None
     ]
-    # Create new terms for all unknown word tokens in the text.
-    new_terms = _create_unknown_terms(new_textitems, lang)
 
-    # Set the terms for the unknown_textitems
-    textlc_to_term_map = {}
-    for t in new_terms:
-        textlc_to_term_map[t.text_lc] = t
-    # print("map: textlc_to_term_map")
-    # for k, v in textlc_to_term_map.items():
-    #     print(f"{k}: {v}", flush=True)
+    new_terms_needed = {t.text for t in new_textitems}
+    new_terms = [Term.create_term_no_parsing(lang, t) for t in new_terms_needed]
+    textlc_to_term_map = {t.text_lc: t for t in new_terms}
+
+    for t in textlc_to_term_map.values():
+        t.status = 0
+        db.session.add(t)
+    db.session.commit()
+
     for ti in new_textitems:
-        # print(f'Assigning term from map to ti with ti.text_lc = "{ti.text_lc}"')
         ti.term = textlc_to_term_map[ti.text_lc]
 
 
