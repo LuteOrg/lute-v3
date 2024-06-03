@@ -4,7 +4,7 @@ Book mapping checks.
 
 from datetime import datetime
 import pytest
-from lute.models.book import Book, BookTag
+from lute.models.book import Book, BookTag, TextBookmark
 from lute.book.stats import BookStats
 from lute.db import db
 from tests.dbasserts import assert_sql_result, assert_record_count_equals
@@ -101,3 +101,28 @@ def test_load_book_loads_lang(empty_db, simple_book):
     )
     for b in books_to_update:
         assert b.language is not None, "have lang object"
+
+
+def test_delete_book_cascade_deletes_bookmarks(empty_db, simple_book):
+    """
+    All associated TextBookmark(s) should be deleted when their
+    associated Book entry is deleted.
+    """
+    b = simple_book
+
+    TextBookmark(title="hello", text=b.texts[0])
+    db.session.add(b)
+    db.session.commit()
+
+    sql = "select BkID, BkTitle, BkLgID from books"
+    assert_sql_result(sql, ["1; hi; 1"], "book")
+    sql = "select TxID, TxBkID, TxText from texts"
+    assert_sql_result(sql, ["1; 1; some text"], "texts")
+    sql = "select TbID, TbTxID, TbTitle from textbookmarks"
+    assert_sql_result(sql, ["1; 1; hello"], "bookmarks")
+
+    db.session.delete(b)
+    db.session.commit()
+
+    for t in ["books", "texts", "textbookmarks"]:
+        assert_record_count_equals(t, 0, f"{t} deleted")
