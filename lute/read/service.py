@@ -81,6 +81,9 @@ def _add_status_0_terms(paragraphs, lang):
     new_terms = [Term.create_term_no_parsing(lang, t) for t in new_terms_needed]
     textlc_to_term_map = {t.text_lc: t for t in new_terms}
 
+    # Use the map.values() here as the new_terms may contain duplicate
+    # text values, if the same text appears twice or with different
+    # case in the new_textitems.
     for t in textlc_to_term_map.values():
         t.status = 0
         db.session.add(t)
