@@ -73,10 +73,7 @@ def _create_unknown_terms(textitems, lang):
     unique_word_tokens = list(set(toks))
     all_new_terms = [Term.create_term_no_parsing(lang, t) for t in unique_word_tokens]
 
-    unique_text_lcs = {}
-    for t in all_new_terms:
-        if t.text_lc not in unique_text_lcs:
-            unique_text_lcs[t.text_lc] = t
+    unique_text_lcs = {t.text_lc: t for t in all_new_terms}
     unique_new_terms = unique_text_lcs.values()
 
     for t in unique_new_terms:
