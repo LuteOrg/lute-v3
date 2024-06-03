@@ -21,8 +21,6 @@ def fixture_temp_file():
 @pytest.fixture(name="_book")
 def fixture_terms_and_book(spanish):
     "Create a book."
-    spanish_terms = ["gato", "lista", "tiene una", "listo"]
-    add_terms(spanish, spanish_terms)
     content = "Hola tengo un gato.  No tengo una lista.\nElla tiene una bebida."
     book = make_book("Hola", content, spanish)
     yield book
@@ -40,5 +38,31 @@ def assert_file_content(fname, expected):
 def test_smoke_book_file_created(app_context, _book, output_tempfile):
     "Smoke test only."
     export_unknown_terms(_book, output_tempfile)
-    expected = ["hola", "tengo", "un", "no", "una", "ella", "tiene", "bebida"]
+    expected = [
+        "hola",
+        "gato",
+        "lista",
+        "tengo",
+        "un",
+        "no",
+        "una",
+        "ella",
+        "tiene",
+        "bebida",
+    ]
     assert_file_content(output_tempfile, expected)
+
+
+def test_known_multiword_terms_can_hide_unknown_terms(
+    spanish, app_context, _book, output_tempfile
+):
+    "See what terms would show up as blue 'unknown' for a book."
+    spanish_terms = ["gato", "lista", "tiene una", "listo"]
+    add_terms(spanish, spanish_terms)
+    export_unknown_terms(_book, output_tempfile)
+    expected = ["hola", "tengo", "un", "no", "ella", "tiene", "una", "bebida"]
+    assert_file_content(output_tempfile, expected)
+
+
+# def test_book_file_contains_status_0_words(app_context, _book, output_tempfile):
+#    "Status 0 words are created as 'placeholders', and should be included."

@@ -434,15 +434,20 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
     def term(self):
         return self._term
 
+    @property
+    def wo_id(self):
+        "The term id is the wo_id."
+        if self._term is None:
+            return None
+        return self._term.id
+
     @term.setter
     def term(self, t):
-        self.wo_id = None
         self.wo_status = None
         self._term = t
         if t is None:
             return
 
-        self.wo_id = t.id
         self.wo_status = t.status
         if t.status >= 1 and t.status <= 5:
             self._show_tooltip = True

@@ -58,6 +58,18 @@ def test_single_word(spanish):
     )
 
 
+def test_new_terms_are_not_created(spanish):
+    "No new terms created accidentally on calc stats."
+    scenario(
+        spanish,
+        "Tengo un gato.  Tengo un perro.",
+        [["gato", 3], ["un", 0]],
+        {0: 3, 1: 0, 2: 0, 3: 1, 4: 0, 5: 0, 98: 0, 99: 0},
+    )
+    sql = "select WoText from words order by WoText"
+    assert_sql_result(sql, ["gato", "un"], "no new terms.")
+
+
 def test_with_multiword(spanish):
     scenario(
         spanish,
