@@ -215,7 +215,11 @@ class Text(db.Model):
     word_count = db.Column("TxWordCount", db.Integer, nullable=True)
 
     book = db.relationship("Book", back_populates="texts")
-    bookmarks = db.relationship("TextBookmark", back_populates="text")
+    bookmarks = db.relationship(
+        "TextBookmark",
+        back_populates="text",
+        cascade="all, delete-orphan",
+    )
     sentences = db.relationship(
         "Sentence",
         back_populates="text",
@@ -367,10 +371,7 @@ class TextBookmark(db.Model):
     __tablename__ = "textbookmarks"
 
     id = db.Column("TbID", db.Integer, primary_key=True)
-    tx_id = db.Column("TbTxID", db.Integer, db.ForeignKey("texts.TxID"))
-    title = db.Column("TbTitle", db.Text)
+    tx_id = db.Column("TbTxID", db.Integer, db.ForeignKey("texts.TxID", ondelete="CASCADE"), nullable=False)
+    title = db.Column("TbTitle", db.Text, nullable=False)
 
     text = db.relationship("Text", back_populates="bookmarks")
-
-    def __init__(self, title=""):
-        self.title = title
