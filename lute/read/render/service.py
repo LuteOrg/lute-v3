@@ -106,6 +106,42 @@ class RenderableSentence:
         return f'<RendSent {self.sentence_id}, {len(self.textitems)} items, "{s}">'
 
 
+## Getting paragraphs ##############################
+
+
+def _split_tokens_by_paragraph(tokens):
+    "Split tokens by ¶"
+    ret = []
+    curr_para = []
+    for t in tokens:
+        if t.token == "¶":
+            ret.append(curr_para)
+            curr_para = []
+        else:
+            curr_para.append(t)
+    if len(curr_para) > 0:
+        ret.append(curr_para)
+    return ret
+
+
+def _make_renderable_sentence(language, pnum, sentence_num, tokens, terms):
+    """
+    Make a RenderableSentences using the tokens present in
+    that sentence.
+    """
+    sentence_tokens = [t for t in tokens if t.sentence_number == sentence_num]
+    renderable = RenderableCalculator.get_renderable(language, terms, sentence_tokens)
+    textitems = [i.make_text_item(pnum, sentence_num, language) for i in renderable]
+    ret = RenderableSentence(sentence_num, textitems)
+    return ret
+
+
+def _sentence_nums(paratokens):
+    "Sentence numbers in the paragraph tokens."
+    senums = [t.sentence_number for t in paratokens]
+    return sorted(list(set(senums)))
+
+
 def get_paragraphs(s, language):
     """
     Get array of arrays of RenderableSentences for the given string s.
@@ -131,42 +167,15 @@ def get_paragraphs(s, language):
 
     terms = _find_all_terms_in_tokens(tokens, language)
 
-    # Split into paragraphs.
-    paragraphs = []
-    curr_para = []
-    for t in tokens:
-        if t.token == "¶":
-            paragraphs.append(curr_para)
-            curr_para = []
-        else:
-            curr_para.append(t)
-    if len(curr_para) > 0:
-        paragraphs.append(curr_para)
-
-    def make_RenderableSentence(pnum, sentence_num, tokens, terms):
-        """
-        Make a RenderableSentences using the tokens present in
-        that sentence.  The current text and language are pulled
-        into the function from the closure.
-        """
-        sentence_tokens = [t for t in tokens if t.sentence_number == sentence_num]
-        renderable = RenderableCalculator.get_renderable(
-            language, terms, sentence_tokens
-        )
-        textitems = [i.make_text_item(pnum, sentence_num, language) for i in renderable]
-        ret = RenderableSentence(sentence_num, textitems)
-        return ret
-
-    def unique(arr):
-        return list(set(arr))
+    paragraphs = _split_tokens_by_paragraph(tokens)
 
     renderable_paragraphs = []
     pnum = 0
-    for paratokens in paragraphs:
+    for p in paragraphs:
         # A renderable paragraph is a collection of RenderableSentences.
         renderable_sentences = [
-            make_RenderableSentence(pnum, senum, paratokens, terms)
-            for senum in sorted(unique([t.sentence_number for t in paratokens]))
+            _make_renderable_sentence(language, pnum, senum, p, terms)
+            for senum in _sentence_nums(p)
         ]
         renderable_paragraphs.append(renderable_sentences)
         pnum += 1
