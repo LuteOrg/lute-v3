@@ -19,30 +19,21 @@ def set_unknowns_to_known(text: Text):
     Given a text, create new Terms with status Well-Known
     for any new Terms.
     """
-    language = text.book.language
     paragraphs = get_paragraphs(text.text, text.book.language)
-    # Just in case.
-    _add_status_0_terms(paragraphs, language)
+    _save_new_status_0_terms(paragraphs)
 
-    tis = [
-        ti
+    unknowns = [
+        ti.term
         for para in paragraphs
         for sentence in para
         for ti in sentence.textitems
-        if ti.is_word
+        if ti.is_word and ti.term.status == 0
     ]
-
-    def is_unknown(ti):
-        return ti.is_word == 1 and ti.term is not None and ti.wo_status == 0
-
-    unknown_ids = [t.wo_id for t in tis if is_unknown(t)]
-    uniques = list(set(unknown_ids))
 
     batch_size = 100
     i = 0
 
-    for u in uniques:
-        t = Term.find(u)
+    for t in unknowns:
         t.status = Status.WELLKNOWN
         db.session.add(t)
         i += 1
@@ -67,30 +58,19 @@ def bulk_status_update(text: Text, terms_text_array, new_status):
     repo.commit()
 
 
-def _add_status_0_terms(paragraphs, lang):
+def _save_new_status_0_terms(paragraphs):
     "Add status 0 terms for new textitems in paragraph."
-    new_textitems = [
+    tis_with_new_terms = [
         ti
         for para in paragraphs
         for sentence in para
         for ti in sentence.textitems
-        if ti.is_word and ti.term is None
+        if ti.is_word and ti.term.id is None and ti.term.status == 0
     ]
 
-    new_terms_needed = {t.text for t in new_textitems}
-    new_terms = [Term.create_term_no_parsing(lang, t) for t in new_terms_needed]
-    textlc_to_term_map = {t.text_lc: t for t in new_terms}
-
-    # Use the map.values() here as the new_terms may contain duplicate
-    # text values, if the same text appears twice or with different
-    # case in the new_textitems.
-    for t in textlc_to_term_map.values():
-        t.status = 0
-        db.session.add(t)
+    for ti in tis_with_new_terms:
+        db.session.add(ti.term)
     db.session.commit()
-
-    for ti in new_textitems:
-        ti.term = textlc_to_term_map[ti.text_lc]
 
 
 def start_reading(dbbook, pagenum, db_session):
@@ -107,7 +87,7 @@ def start_reading(dbbook, pagenum, db_session):
 
     lang = text.book.language
     paragraphs = get_paragraphs(text.text, lang)
-    _add_status_0_terms(paragraphs, lang)
+    _save_new_status_0_terms(paragraphs)
 
     return paragraphs
 
