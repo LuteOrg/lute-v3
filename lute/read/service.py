@@ -19,30 +19,21 @@ def set_unknowns_to_known(text: Text):
     Given a text, create new Terms with status Well-Known
     for any new Terms.
     """
-    language = text.book.language
     paragraphs = get_paragraphs(text.text, text.book.language)
-    # Just in case.
-    _add_status_0_terms(paragraphs, language)
+    _save_new_status_0_terms(paragraphs)
 
-    tis = [
-        ti
+    unknowns = [
+        ti.term
         for para in paragraphs
         for sentence in para
         for ti in sentence.textitems
-        if ti.is_word
+        if ti.is_word and ti.term.status == 0
     ]
-
-    def is_unknown(ti):
-        return ti.is_word == 1 and ti.term is not None and ti.wo_status == 0
-
-    unknown_ids = [t.wo_id for t in tis if is_unknown(t)]
-    uniques = list(set(unknown_ids))
 
     batch_size = 100
     i = 0
 
-    for u in uniques:
-        t = Term.find(u)
+    for t in unknowns:
         t.status = Status.WELLKNOWN
         db.session.add(t)
         i += 1
@@ -67,57 +58,19 @@ def bulk_status_update(text: Text, terms_text_array, new_status):
     repo.commit()
 
 
-def _create_unknown_terms(textitems, lang):
-    "Create any terms required for the page."
-    # dt = DebugTimer("create-unk-terms")
-    toks = [t.text for t in textitems]
-    # print(f"creating toks {toks}", flush=True)
-    unique_word_tokens = list(set(toks))
-    # print(f"creating unique toks {unique_word_tokens}", flush=True)
-    all_new_terms = [Term.create_term_no_parsing(lang, t) for t in unique_word_tokens]
-    # print(f"all_new_terms = {all_new_terms}", flush=True)
-    # dt.step("make all_new_terms")
-
-    unique_text_lcs = {}
-    for t in all_new_terms:
-        if t.text_lc not in unique_text_lcs:
-            unique_text_lcs[t.text_lc] = t
-    unique_new_terms = unique_text_lcs.values()
-    # print(f"utlcs keys = {unique_text_lcs.keys()}", flush=True)
-    # dt.step("find unique_new_terms")
-
-    for t in unique_new_terms:
-        t.status = 0
-        db.session.add(t)
-    db.session.commit()
-    # dt.step("commit")
-    # dt.summary()
-
-    return unique_new_terms
-
-
-def _add_status_0_terms(paragraphs, lang):
+def _save_new_status_0_terms(paragraphs):
     "Add status 0 terms for new textitems in paragraph."
-    new_textitems = [
+    tis_with_new_terms = [
         ti
         for para in paragraphs
         for sentence in para
         for ti in sentence.textitems
-        if ti.is_word and ti.term is None
+        if ti.is_word and ti.term.id is None and ti.term.status == 0
     ]
-    # Create new terms for all unknown word tokens in the text.
-    new_terms = _create_unknown_terms(new_textitems, lang)
 
-    # Set the terms for the unknown_textitems
-    textlc_to_term_map = {}
-    for t in new_terms:
-        textlc_to_term_map[t.text_lc] = t
-    # print("map: textlc_to_term_map")
-    # for k, v in textlc_to_term_map.items():
-    #     print(f"{k}: {v}", flush=True)
-    for ti in new_textitems:
-        # print(f'Assigning term from map to ti with ti.text_lc = "{ti.text_lc}"')
-        ti.term = textlc_to_term_map[ti.text_lc]
+    for ti in tis_with_new_terms:
+        db.session.add(ti.term)
+    db.session.commit()
 
 
 def start_reading(dbbook, pagenum, db_session):
@@ -134,7 +87,7 @@ def start_reading(dbbook, pagenum, db_session):
 
     lang = text.book.language
     paragraphs = get_paragraphs(text.text, lang)
-    _add_status_0_terms(paragraphs, lang)
+    _save_new_status_0_terms(paragraphs)
 
     return paragraphs
 
