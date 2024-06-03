@@ -142,6 +142,28 @@ def _sentence_nums(paratokens):
     return sorted(list(set(senums)))
 
 
+def _add_status_0_terms(paragraphs, lang):
+    "Add status 0 terms for new textitems in paragraph."
+    new_textitems = [
+        ti
+        for para in paragraphs
+        for sentence in para
+        for ti in sentence.textitems
+        if ti.is_word and ti.term is None
+    ]
+
+    new_terms_needed = {t.text for t in new_textitems}
+    new_terms = [Term.create_term_no_parsing(lang, t) for t in new_terms_needed]
+    for t in new_terms:
+        t.status = 0
+
+    # new_terms may contain some dups (e.g. "cat" and "CAT" are both
+    # created), so use a map with lowcase text to disambiguate.
+    textlc_to_term_map = {t.text_lc: t for t in new_terms}
+    for ti in new_textitems:
+        ti.term = textlc_to_term_map[ti.text_lc]
+
+
 def get_paragraphs(s, language):
     """
     Get array of arrays of RenderableSentences for the given string s.
@@ -179,5 +201,7 @@ def get_paragraphs(s, language):
         ]
         renderable_paragraphs.append(renderable_sentences)
         pnum += 1
+
+    _add_status_0_terms(renderable_paragraphs, language)
 
     return renderable_paragraphs
