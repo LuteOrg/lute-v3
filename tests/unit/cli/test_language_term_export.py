@@ -1,6 +1,6 @@
 "Smoke test only."
 
-from lute.cli.language_term_export import generate_file
+from lute.cli.language_term_export import generate_language_file, generate_book_file
 
 from lute.models.term import Term, TermTag
 from lute.models.book import Book
@@ -18,7 +18,7 @@ def test_smoke_test(app_context, tmp_path, english):
     db.session.commit()
 
     outfile = tmp_path / "outfile.csv"
-    generate_file("English", outfile)
+    generate_language_file("English", outfile)
     with open(outfile, "r", encoding="utf-8") as ofhandle:
         text = ofhandle.read()
     print(text)
@@ -67,7 +67,7 @@ def test_single_book_export(app_context, empty_db, tmp_path, english):
     db.session.commit()
 
     outfile = tmp_path / "outfile.csv"
-    generate_file("English", outfile)
+    generate_language_file("English", outfile)
     with open(outfile, "r", encoding="utf-8") as ofhandle:
         text = ofhandle.read()
     print(text)
@@ -97,3 +97,9 @@ def test_single_book_export(app_context, empty_db, tmp_path, english):
     # .lower() because sometimes the text file returned B, and
     # sometimes b ...  which is _very_ odd, but don't really care.
     assert text.lower() == "\n".join(expected).lower(), "content"
+
+    generate_book_file(b.id, outfile)
+    with open(outfile, "r", encoding="utf-8") as ofhandle:
+        text = ofhandle.read()
+    print(text)
+    assert text.lower() == "\n".join(expected).lower(), "book file"

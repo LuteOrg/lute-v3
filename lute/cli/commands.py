@@ -5,7 +5,7 @@ Simple CLI commands.
 import click
 from flask import Blueprint
 
-from lute.cli.language_term_export import generate_file
+from lute.cli.language_term_export import generate_language_file, generate_book_file
 
 bp = Blueprint("cli", __name__)
 
@@ -32,7 +32,18 @@ def hello():
 @click.argument("output_path")
 def language_export(language, output_path):
     """
-    Get all terms from active books in the language, and write a
+    Get all terms from all books in the language, and write a
     data file of term frequencies and children.
     """
-    generate_file(language, output_path)
+    generate_language_file(language, output_path)
+
+
+@bp.cli.command("book_term_export")
+@click.argument("bookid")
+@click.argument("output_path")
+def book_term_export(bookid, output_path):
+    """
+    Get all terms for the given book, and write a
+    data file of term frequencies and children.
+    """
+    generate_book_file(bookid, output_path)
