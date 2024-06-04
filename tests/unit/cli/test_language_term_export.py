@@ -1,6 +1,5 @@
 "Smoke test only."
 
-import textwrap
 from lute.cli.language_term_export import generate_file
 
 from lute.models.term import Term, TermTag
