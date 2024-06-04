@@ -46,12 +46,12 @@ def _add_term_to_dict(t, terms):
 
 def _process_book(b, terms):
     "Process pages in book, add to output."
-    print(f"Loading data for book {b.title} ...")
+    print(f"Processing {b.title} ...")
     i = 0
     for text in b.texts:
         i += 1
         if i % 10 == 0:
-            print(f"  page {i} of {b.page_count()}", end="\r")
+            print(f"  page {i} of {b.page_count}", end="\r")
         paragraphs = get_paragraphs(text.text, b.language)
         displayed_terms = [
             ti.term
@@ -76,10 +76,22 @@ def _process_book(b, terms):
                     p["children"].append(t.text_lc)
 
 
+def _book_list_truncated(title_array):
+    "Return first 5 books, + count of rest."
+    titles = list(set(title_array))
+    first_5 = titles[:5]
+    ret = ", ".join(first_5)
+    count_rest = len(titles) - len(first_5)
+    if count_rest > 0:
+        ret += f" [... +{count_rest} more]"
+    return ret
+
+
 def _finalize_output(terms):
     "Convert terms hash to usable output."
     for _, hsh in terms.items():
-        hsh["books"] = ", ".join(list(set(hsh["books"])))
+        hsh["books"] = _book_list_truncated(hsh["books"])
+
         # children to child (count)
         children = []
         for key in hsh["children"]:
@@ -132,4 +144,4 @@ def generate_file(language_name, outfile_name):
     else:
         print(f"Writing to {outfile_name}")
         _generate_file(books, outfile_name)
-        print("Done.")
+        print("Done.                     ")  # extra space overwrites old output.
