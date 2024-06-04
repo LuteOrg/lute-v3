@@ -37,15 +37,17 @@ def generate_file(language_name, outfile_name):
     lang = books[0].language
     terms = {}
 
-    def _add_term_if_needed(t):
-        if t.text_lc in terms:
-            return
+    def _add_term_to_dict(t):
+        key = t.text_lc
+        if key in terms:
+            return terms[key]
+
         tag_list = ", ".join([tg.text for tg in t.term_tags])
         if tag_list == "":
             tag_list = "-"
 
         zws = "\u200B"
-        terms[t.text_lc] = {
+        hsh = {
             "sourceterm": t,
             "term": t.text.replace(zws, ""),
             "count": 0,
@@ -56,6 +58,8 @@ def generate_file(language_name, outfile_name):
             "children": [],
             "tags": tag_list,
         }
+        terms[key] = hsh
+        return hsh
 
     for b in books:
         print(f"Loading data for book {b.title} ...")
@@ -73,16 +77,14 @@ def generate_file(language_name, outfile_name):
                 if ti.is_word and ti.term is not None
             ]
             for t in displayed_terms:
-                _add_term_if_needed(t)
-                e = terms[t.text_lc]
+                e = _add_term_to_dict(t)
                 e["count"] += 1
                 e["familycount"] += 1
                 if b.title not in e["books"]:
                     e["books"].append(b.title)
 
                 for parent in t.parents:
-                    _add_term_if_needed(parent)
-                    p = terms[parent.text_lc]
+                    p = _add_term_to_dict(parent)
                     p["familycount"] += 1
                     if b.title not in p["books"]:
                         p["books"].append(b.title)
