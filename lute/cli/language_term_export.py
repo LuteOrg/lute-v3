@@ -131,16 +131,28 @@ def _generate_file(books, outfile_name):
             writer.writerow(r)
 
 
-def generate_file(language_name, outfile_name):
+def generate_language_file(language_name, outfile_name):
     """
     Generate the datafile for the language.
     """
-    # pylint: disable=too-many-locals
-
     books = db.session.query(Book).all()
     books = [b for b in books if b.language.name == language_name]
     if len(books) == 0:
         print(f"No books for given language {language_name}, quitting.")
+    else:
+        print(f"Writing to {outfile_name}")
+        _generate_file(books, outfile_name)
+        print("Done.                     ")  # extra space overwrites old output.
+
+
+def generate_book_file(bookid, outfile_name):
+    """
+    Generate the datafile for the book.
+    """
+    books = db.session.query(Book).all()
+    books = [b for b in books if f"{b.id}" == f"{bookid}"]
+    if len(books) == 0:
+        print(f"No book with id = {bookid}.")
     else:
         print(f"Writing to {outfile_name}")
         _generate_file(books, outfile_name)
