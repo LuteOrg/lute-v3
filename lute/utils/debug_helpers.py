@@ -16,7 +16,8 @@ class DebugTimer:
         self.name = name
         self.step_map = {}
         self.display = display
-        print(f"{name} timer started")
+        if display:
+            print(f"{name} timer started")
 
     def step(self, s):
         "Dump time spent in step, total time since start."
