@@ -14,6 +14,13 @@
 
 {% endfor %}
 
+
+{% if use_tts %}
+  <p>
+    <audio controls src="/read/tts/{{ bookid }}/{{ pagenum }}"></audio>
+  </p>
+{% endif %}
+
 <script>
   // Defined in lute.js
   parent.start_hover_mode(false);
