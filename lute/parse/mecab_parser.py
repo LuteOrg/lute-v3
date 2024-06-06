@@ -18,7 +18,7 @@ from typing import List
 from natto import MeCab
 import jaconv
 from lute.parse.base import ParsedToken, AbstractParser
-from lute.models.setting import UserSetting
+from lute.models.setting import UserSetting, MissingUserSettingKeyException
 
 
 class JapaneseParser(AbstractParser):
@@ -128,6 +128,15 @@ class JapaneseParser(AbstractParser):
         if self._string_is_hiragana(text):
             return None
 
+        jp_reading_setting = ""
+        try:
+            jp_reading_setting = UserSetting.get_value("japanese_reading")
+        except MissingUserSettingKeyException:
+            # During loading of demo data, the key isn't set, but the
+            # reading isn't needed either, as this is only called when
+            # calculating stats.
+            return None
+
         flags = r"-O yomi"
         readings = []
         with MeCab(flags) as nm:
@@ -139,7 +148,6 @@ class JapaneseParser(AbstractParser):
         if ret in ("", text):
             return None
 
-        jp_reading_setting = UserSetting.get_value("japanese_reading")
         if jp_reading_setting == "katakana":
             return ret
         if jp_reading_setting == "hiragana":

@@ -5,8 +5,10 @@ Render service tests.
 from lute.parse.base import ParsedToken
 from lute.read.render.service import find_all_Terms_in_string, get_paragraphs
 from lute.db import db
+from lute.models.term import Term
 
 from tests.utils import add_terms, make_text, assert_rendered_text_equals
+from tests.dbasserts import assert_sql_result
 
 
 def _run_scenario(language, content, expected_found, msg=""):
@@ -86,11 +88,17 @@ def test_smoke_get_paragraphs(spanish, app_context):
     Smoke test to get paragraph information.
     """
     add_terms(spanish, ["tengo un", "un gato"])
+    perro = Term(spanish, "perro")
+    perro.status = 0
+    db.session.add(perro)
 
     content = "Tengo un gato. Hay un perro.\nTengo un perro."
     t = make_text("Hola", content, spanish)
     db.session.add(t)
     db.session.commit()
+
+    sql = "select WoText from words order by WoText"
+    assert_sql_result(sql, ["perro", "tengo/ /un", "un/ /gato"], "initial")
 
     ParsedToken.reset_counters()
     paras = get_paragraphs(t.text, t.book.language)
@@ -116,6 +124,8 @@ def test_smoke_get_paragraphs(spanish, app_context):
         "[Tengo/ /un(1.3)][ (1.3)][perro(1.3)][.(1.3)]",
     ]
     assert actual == expected
+
+    assert_sql_result(sql, ["perro", "tengo/ /un", "un/ /gato"], "No new terms")
 
 
 def test_smoke_rendered(spanish, app_context):
