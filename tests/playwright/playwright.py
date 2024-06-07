@@ -57,6 +57,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
 
     # Open Tutorial
     _print("Tutorial check.")
+    page.goto("http://localhost:5000")
     page.get_by_role("link", name="Tutorial", exact=True).click()
     page.locator("#ID-176-1").click()
     page.frame_locator('iframe[name="wordframe"]').get_by_placeholder(
@@ -74,10 +75,40 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     page.get_by_title("Mark page as read, then go to next page", exact=True).click()
     page.get_by_title("Home").click()
 
+    # Bookmarks
+    _print("Bookmarks.")
+    page.goto("http://localhost:5000")
+    page.get_by_role("link", name="Tutorial follow-up", exact=True).click()
+    page.locator(".hamburger-btn").click()
+    page.once("dialog", lambda dialog: dialog.accept(prompt_text="Page 1"))
+    page.get_by_text("Bookmarks", exact=True).hover()
+    page.get_by_role("link", name="Add bookmark").hover()
+    page.get_by_role("link", name="Add bookmark").click()
+
+    page.get_by_text("▶").click()
+
+    page.locator(".hamburger-btn").click()
+    page.once("dialog", lambda dialog: dialog.accept(prompt_text="Page 2"))
+    page.get_by_text("Bookmarks", exact=True).hover()
+    page.get_by_role("link", name="Add bookmark").hover()
+    page.get_by_role("link", name="Add bookmark").click()
+
+    page.get_by_role("link", name="List").click()
+    page.get_by_text("…").first.hover()
+    page.once("dialog", lambda dialog: dialog.accept())
+    page.get_by_role("link", name="Delete").click()
+
+    page.get_by_text("…").last.hover()
+    page.once("dialog", lambda dialog: dialog.accept(prompt_text="Page 2 - edit"))
+    page.get_by_role("link", name="Edit").click()
+    expect(page.get_by_role("link", name="Page 2 - edit")).to_be_visible()
+    expect(page.get_by_role("link", name="Page 1")).not_to_be_visible()
+
     # Open and archive book.
     _print("Archive.")
+    page.goto("http://localhost:5000")
     page.get_by_role("link", name="Büyük ağaç").click()
-    page.on("dialog", lambda dialog: dialog.accept())
+    page.once("dialog", lambda dialog: dialog.accept())
     page.get_by_role("link", name="Archive book").click()
 
     # Make a new book
@@ -113,6 +144,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
 
     # Open term listing.
     _print("Term listing.")
+    page.goto("http://localhost:5000/")
     page.locator("#menu_terms").hover()
     page.get_by_role("link", name="Terms", exact=True).click()
     page.get_by_role("link", name="Hello").click()
