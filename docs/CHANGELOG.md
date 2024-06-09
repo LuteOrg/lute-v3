@@ -1,4 +1,15 @@
 
+# 3.4.3 (2024-06-08)
+
+Feature changes:
+
+* Add `book_term_export` cli job (see [the manual](https://luteorg.github.io/lute-manual/usage/command-line-jobs.html#book_term_export))
+* Issue #416: fix "sync parent" bugs, add more tests.
+Back end changes:
+
+* Refactoring get_paragraphs, slight simplifications and performance fixes
+
+
 # 3.4.2 (2024-05-28)
 
 Feature changes:
