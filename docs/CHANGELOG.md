@@ -5,6 +5,7 @@ Feature changes:
 
 * Add `book_term_export` cli job (see [the manual](https://luteorg.github.io/lute-manual/usage/command-line-jobs.html#book_term_export))
 * Issue #416: fix "sync parent" bugs, add more tests.
+
 Back end changes:
 
 * Refactoring get_paragraphs, slight simplifications and performance fixes
