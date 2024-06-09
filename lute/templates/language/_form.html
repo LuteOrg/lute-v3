@@ -12,7 +12,7 @@
   {% endfor %}
 {% endfor %}
 
-<form method="POST">
+<form id="edit-lang" method="POST">
   {{ form.hidden_tag() }}
 
   <table id="language">
@@ -75,6 +75,42 @@
 
 <script>
   $(document).ready(function() {
+    // Add leave page confirmation
+    let dirty = false;
+    function confirm_leave_page(event) {
+      if (dirty) {
+        event.returnValue = "Are you sure you want to leave this page without saving it? If you do all progress will be lost."
+        event.preventDefault();
+      }
+    }
+    window.addEventListener('beforeunload', confirm_leave_page);
+
+    // Disable leave page confirmation for form save
+    let edit_form = document.querySelector("form#edit-lang");
+    edit_form.addEventListener("submit", e => {
+      window.removeEventListener("beforeunload", confirm_leave_page);
+    })
+
+    let edit_inputs = edit_form.querySelectorAll("input");
+    edit_inputs.forEach(ele => {
+      ele.addEventListener("change", e => {
+        dirty = true;
+      })
+    });
+
+    // Disable leave page confirmation for delete lang form
+    let del_form = document.querySelector("form#delete-lang");
+    if (del_form) {
+      del_form.addEventListener("submit", event => {
+        window.removeEventListener("beforeunload", confirm_leave_page);
+
+        // Use custom delete confirmation
+        if (!confirm('WARNING: deleting a language deletes all its books and defined terms.  Are you *absolutely* sure you want to delete this item?')) {
+          event.preventDefault();
+        }
+      });
+    }
+
     // Make the list of entities sortable
     let add_sort_values = function() {
       // console.log('sort called');
@@ -207,8 +243,8 @@ if not, change the type to "Pop-up window".</p>
 </script>
 
 {% if language.id %}
-<form method="post" action="/language/delete/{{ language.id }}" onsubmit="return confirm('WARNING: deleting a language deletes all its books and defined terms.  Are you *absolutely* sure you want to delete this item?');">
-    <button class="btn">Delete</button>
+<form id="delete-lang" method="post" action="/language/delete/{{ language.id }}">
+  <button type="submit" class="btn">Delete</button>
 </form>
 {% endif %}
 
