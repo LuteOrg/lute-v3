@@ -10,6 +10,8 @@ from lute.parse.base import ParsedToken
 from lute.read.render.renderable_calculator import RenderableCalculator
 from lute.db import db
 
+# from lute.utils.debug_helpers import DebugTimer
+
 
 def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     """
@@ -39,28 +41,69 @@ def _find_all_terms_in_tokens(tokens, language):
 
     The code first queries for exact single-token matches,
     and then multiword matches, because that's much faster
-    than querying for everthing at once.  (This may no longer
-    be true, can change it later.)
+    than querying for everything at once.
     """
+
+    # Future performance improvement considerations:
+    #
+    # 1. I considered keeping a cache of multiword terms strings and
+    # IDs, but IMO the payoff isn't worth the extra complexity at this
+    # time.
+    #
+    # 2. Maybe a different search method like Aho-Corasick (ref
+    # https://github.com/abusix/ahocorapy) would be useful ... again
+    # it would imply that all keywords (existing Terms) are loaded
+    # into the Aho-Corasick automaton.  This could be cached, but would
+    # again need methods for cache invalidation and reload etc.
+
+    # dt = DebugTimer("_find_all_terms_in_tokens", False)
 
     parser = language.parser
 
-    # fyi - Manually searching for terms was slow (i.e., querying for
-    # all terms, and checking if the strings were in the string s).
-
-    # Query for terms with a single token that match the unique word tokens
+    # Single word terms
+    #
+    # Build query for terms with a single token that match the unique
+    # word tokens.  Note it's much faster to use a query for this,
+    # rather than loading all term text and checking for the strings
+    # using python, as we can rely on the database indexes.
     word_tokens = filter(lambda t: t.is_word, tokens)
     tok_strings = [parser.get_lowercase(t.token) for t in word_tokens]
     tok_strings = list(set(tok_strings))
-    terms_matching_tokens = (
-        db.session.query(Term)
-        .filter(
-            Term.language == language,
-            Term.text_lc.in_(tok_strings),
-            Term.token_count == 1,
-        )
-        .all()
+    terms_matching_tokens_qry = db.session.query(Term).filter(
+        Term.text_lc.in_(tok_strings), Term.language == language
     )
+    # dt.step("single, query prep")
+
+    # Multiword terms
+    #
+    # Multiword terms are harder to find as we have to do a full text
+    # match.
+    #
+    # The "obvious" method of using the model is quite slow:
+    #
+    #   contained_term_qry = db.session.query(Term).filter(
+    #     Term.language == language,
+    #     Term.token_count > 1,
+    #     func.instr(content, Term.text_lc) > 0,
+    #   )
+    #   contained_terms = contained_term_qry.all()
+    #
+    # This code first finds the IDs of the terms that are in the content,
+    # and then loads the terms.
+    #
+    # Note that querying using 'LIKE' is again slow, i.e:
+    #   sql = sqltext(
+    #     """
+    #     SELECT WoID FROM words
+    #     WHERE WoLgID=:lid and WoTokenCount>1
+    #     AND :content LIKE '%' || :zws || WoTextLC || :zws || '%'
+    #     """
+    #   )
+    #   sql = sql.bindparams(lid=language.id, content=content, zws=zws)
+    #
+    # It is actually faster to load all Term text_lc and use python to
+    # check if the strings are in the content string, and only then
+    # load the terms.
 
     # Multiword terms have zws between all tokens.
     # Create content string with zws between all tokens for the match.
@@ -70,26 +113,27 @@ def _find_all_terms_in_tokens(tokens, language):
 
     sql = sqltext(
         """
-        SELECT WoID FROM words
+        SELECT WoID, WoTextLC FROM words
         WHERE WoLgID=:language_id and WoTokenCount>1
-        AND :content LIKE '%' || :zws || WoTextLC || :zws || '%'
         """
     )
-    sql = sql.bindparams(language_id=language.id, content=content, zws=zws)
-    idlist = db.session.execute(sql).all()
-    woids = [int(p[0]) for p in idlist]
-    contained_terms = db.session.query(Term).filter(Term.id.in_(woids)).all()
+    sql = sql.bindparams(language_id=language.id)
+    reclist = db.session.execute(sql).all()
+    # dt.step(f"mwords, loaded {len(reclist)} records")
+    woids = [int(p[0]) for p in reclist if f"{zws}{p[1]}{zws}" in content]
+    # dt.step("mwords, filtered ids")
+    # dt.step("mword ids")
 
-    # Note that the above method (querying for ids, then getting terms)
-    # is faster than using the model as shown below!
-    ### contained_term_query = db.session.query(Term).filter(
-    ###     Term.language == language,
-    ###     Term.token_count > 1,
-    ###     func.instr(content, Term.text_lc) > 0,
-    ### )
-    ### contained_terms = contained_term_query.all()
+    contained_terms_qry = db.session.query(Term).filter(Term.id.in_(woids))
 
-    return terms_matching_tokens + contained_terms
+    # Some term entity relationship objects (tags, parents) could be
+    # eagerly loaded using ".options(joinedload(Term.term_tags),
+    # joinedload(Term.parents))", but any gains in subsequent usage
+    # are offset by the slower query!
+    all_terms = terms_matching_tokens_qry.union(contained_terms_qry).all()
+    # dt.step("union, exec query")
+
+    return all_terms
 
 
 class RenderableSentence:
@@ -168,12 +212,16 @@ def get_paragraphs(s, language):
     """
     Get array of arrays of RenderableSentences for the given string s.
     """
+    # dt = DebugTimer("get_paragraphs", False)
+
     # Hacky reset of state of ParsedToken state.
     # _Shouldn't_ be needed but doesn't hurt, even if it's lame.
     ParsedToken.reset_counters()
 
     cleaned = re.sub(r" +", " ", s)
+    # dt.step("start get_parsed_tokens")
     tokens = language.get_parsed_tokens(cleaned)
+    # dt.step("done get_parsed_tokens")
 
     # Brutal hack ... for some reason the tests fail in
     # CI, but _inconsistently_, with the token order numbers.  The
@@ -186,10 +234,13 @@ def get_paragraphs(s, language):
         for t in tokens:
             t.order = n
             n += 1
+    # dt.step("done token.sort")
 
     terms = _find_all_terms_in_tokens(tokens, language)
+    # dt.step("done _find_all_terms_in_tokens")
 
     paragraphs = _split_tokens_by_paragraph(tokens)
+    # dt.step("done _split_tokens_by_paragraph")
 
     renderable_paragraphs = []
     pnum = 0
@@ -201,7 +252,9 @@ def get_paragraphs(s, language):
         ]
         renderable_paragraphs.append(renderable_sentences)
         pnum += 1
+    # dt.step("done renderable_paragraphs load")
 
     _add_status_0_terms(renderable_paragraphs, language)
+    # dt.step("done add status 0 terms")
 
     return renderable_paragraphs
