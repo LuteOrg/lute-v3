@@ -554,13 +554,11 @@
       })
     }).then((resp) => resp.json()).then(json => {
       if (json?.success === true) {
-        alert("Bookmark added!")
+        alert(`Bookmark "${title}" added.`)
       } else {
         alert(`Unable to add bookmark. ${json?.reason || "Unknown reason"}`)
       }
     })
-
-    // TODO: notify user that bookmark was added
   }
 
 </script>
