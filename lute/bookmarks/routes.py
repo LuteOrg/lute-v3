@@ -52,7 +52,7 @@ def add_bookmark():
         .filter(Text.order == page_num)
         .first()
     )
-    bookmark = TextBookmark(title=title, tx_id=tx.id)
+    bookmark = TextBookmark(title=title, text=tx)
 
     db.session.add(bookmark)
     db.session.commit()
@@ -65,25 +65,22 @@ def delete_bookmark():
     data = request.json
     title = data.get("title")
     try:
-        text_id = int(data.get("text_id"))
+        bookmark_id = int(data.get("bookmark_id"))
     except ValueError:
         return jsonify(
             success=False,
-            reason=f"Invalid Text ID ({data.get('text_id')}) provided.",
+            reason=f"Invalid Text ID ({data.get('bookmark_id')}) provided.",
             status=200,
         )
 
-    if not title or not text_id:
+    if not title or not bookmark_id:
         return jsonify(
             success=False,
-            reason="Missing value for required parameter 'title' or 'text_id'.",
+            reason="Missing value for required parameter 'title' or 'bookmark_id'.",
             status=200,
         )
 
-    db.session.query(TextBookmark).filter(
-        TextBookmark.title == title,
-        TextBookmark.text.has(id=text_id),
-    ).delete()
+    db.session.query(TextBookmark).filter(TextBookmark.id == bookmark_id).delete()
     db.session.commit()
     return jsonify(success=True, status=200)
 
@@ -93,22 +90,23 @@ def edit_bookmark():
     "Edit bookmark"
     data = request.json
     try:
-        text_id = int(data.get("text_id"))
+        bookmark_id = int(data.get("bookmark_id"))
     except ValueError:
-        return jsonify(success=False, reason="Invalid Text ID provided.", status=200)
+        return jsonify(
+            success=False, reason="Invalid TextBookmark ID provided.", status=200
+        )
     title = data.get("title")
     new_title = data.get("new_title")
 
-    if not title or not text_id:
+    if not title or not bookmark_id:
         return jsonify(
             success=False,
-            reason="Missing value for required parameter 'title' or 'text_id'.",
+            reason="Missing value for required parameter 'title' or 'bookmark_id'.",
             status=200,
         )
 
-    db.session.query(TextBookmark).filter(
-        TextBookmark.title == title,
-        TextBookmark.text.has(id=text_id),
-    ).update({"title": new_title})
+    db.session.query(TextBookmark).filter(TextBookmark.id == bookmark_id).update(
+        {"title": new_title}
+    )
     db.session.commit()
     return jsonify(success=True, status=200)
