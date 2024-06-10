@@ -371,7 +371,12 @@ class TextBookmark(db.Model):
     __tablename__ = "textbookmarks"
 
     id = db.Column("TbID", db.Integer, primary_key=True)
-    tx_id = db.Column("TbTxID", db.Integer, db.ForeignKey("texts.TxID", ondelete="CASCADE"), nullable=False)
+    tx_id = db.Column(
+        "TbTxID",
+        db.Integer,
+        db.ForeignKey("texts.TxID", ondelete="CASCADE"),
+        nullable=False,
+    )
     title = db.Column("TbTitle", db.Text, nullable=False)
 
     text = db.relationship("Text", back_populates="bookmarks")
