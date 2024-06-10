@@ -59,7 +59,7 @@
         { "targets": 2, "data": null, "width": "15%", "searchable": false, "orderable": false, "render": render_bookmark_actions, className: "colVisToggled" },
 
         // Hidden data for processing bookmark actions
-        { "name": "TbTxID", "targets": 3, "data": null, "visible": false },
+        { "name": "TbID", "targets": 3, "data": null, "visible": false },
       ],
       buttons: [
         {
@@ -118,7 +118,7 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          text_id: e.dataset.textid,
+          bookmark_id: e.dataset.bookmark_id,
           title: title,
           new_title: new_title,
         })
@@ -144,7 +144,7 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          text_id: e.dataset.textid,
+          bookmark_id: e.dataset.bookmark_id,
           title: e.dataset.title,
         })
       }).then((resp) => resp.json()).then((json) => {
@@ -164,7 +164,7 @@
 
     const links = [];
     const make_link = function(label, func) {
-      const s = `<a href="#" data-textid="${row[2]}" data-title="${row[1]}" onclick="${func}(this)">${label}</a>`;
+      const s = `<a href="#" data-bookmark_id="${row[2]}" data-title="${row[1]}" onclick="${func}(this)">${label}</a>`;
       links.push(s);
     };
 
