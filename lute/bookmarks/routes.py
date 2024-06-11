@@ -37,7 +37,9 @@ def add_bookmark():
         book_id = int(data.get("book_id"))
         page_num = int(data.get("page_num"))
     except ValueError:
-        return jsonify(success=False, reason="Invalid Text ID provided.", status=200)
+        return jsonify(
+            success=False, reason="Invalid book_id or page_num provided.", status=200
+        )
 
     if book_id is None or page_num is None or title is None:
         return jsonify(
@@ -63,20 +65,20 @@ def add_bookmark():
 def delete_bookmark():
     "Delete bookmark"
     data = request.json
-    title = data.get("title")
+    bookmark_id = None
     try:
         bookmark_id = int(data.get("bookmark_id"))
     except ValueError:
         return jsonify(
             success=False,
-            reason=f"Invalid Text ID ({data.get('bookmark_id')}) provided.",
+            reason=f"Invalid bookmark_id ({data.get('bookmark_id')}) provided.",
             status=200,
         )
 
-    if not title or not bookmark_id:
+    if bookmark_id is None:
         return jsonify(
             success=False,
-            reason="Missing value for required parameter 'title' or 'bookmark_id'.",
+            reason="Missing required parameter 'bookmark_id'.",
             status=200,
         )
 
@@ -89,19 +91,19 @@ def delete_bookmark():
 def edit_bookmark():
     "Edit bookmark"
     data = request.json
+    bookmark_id = None
     try:
         bookmark_id = int(data.get("bookmark_id"))
     except ValueError:
         return jsonify(
-            success=False, reason="Invalid TextBookmark ID provided.", status=200
+            success=False, reason="Invalid bookmark_id provided.", status=200
         )
-    title = data.get("title")
-    new_title = data.get("new_title")
+    new_title = data.get("new_title", "").strip()
 
-    if not title or not bookmark_id:
+    if bookmark_id is None or new_title == "":
         return jsonify(
             success=False,
-            reason="Missing value for required parameter 'title' or 'bookmark_id'.",
+            reason="Missing value for required parameter 'new_title' or 'bookmark_id'.",
             status=200,
         )
 
