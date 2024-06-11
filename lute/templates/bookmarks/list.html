@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}Bookmarks{% endblock %}
+{% block header %}Bookmarks{% endblock %}
+
+{% block body %}
+
+<h1>{{ book.title }}</h1>
+
+<table id="bookmarkstable" class="table dataTable stripe">
+  <thead>
+    <tr>
+      <th style="text-align: left">Page</th>
+      <th style="text-align: left">Description</th>
+      <th style="text-align: left">Actions</th>
+    </tr>
+  </thead>
+</table>
+
+<!-- the config widget for datatables.  Moved into the datatables table footer during setup. -->
+<div id="datatables_config_widget">
+  <img
+    src="{{ url_for('static', filename='icn/settings-gear-icon.svg') }}"
+    title="configuration"
+    id="datatables_config_toggle"
+    style="width: 1rem"
+    />
+</div>
+
+<div id="datatables_config_items" style="display: none;"></div>
+
+<p>Return to <a href="/read/{{ book.id }}">{{ book.title }}</a></p>
+
+<script>
+  var bookmark_listing_table;
+  let setup_bookmark_datatable = function(initial_search) {
+    bookmark_listing_table = $('#bookmarkstable').DataTable({
+      layout: {
+        topStart: 'pageLength',
+        topEnd: [
+          'search'
+        ],
+        bottomStart: [
+          function() {
+            return $('#datatables_config_widget');
+          },
+          {
+            info: {
+              callback: function (s, start, end, max, total, result) {
+                return `${start} to ${end} of ${max}`;
+              }
+            }
+          },
+          'buttons'
+        ],
+        bottomEnd: 'paging'
+      },
+      columnDefs: [
+        { "name": "TxOrder", "targets": 0, "width": "5%", className: "colVisToggled" },
+        { "name": "TbTitle", "targets": 1, "width": "70%", className: "colVisToggled", "render": render_page_link },
+        { "targets": 2, "data": null, "width": "15%", "searchable": false, "orderable": false, "render": render_bookmark_actions, className: "colVisToggled" },
+
+        // Hidden data for processing bookmark actions
+        { "name": "TbID", "targets": 3, "data": null, "visible": false },
+      ],
+      buttons: [
+        {
+          extend: 'colvis',
+          columns: '.colVisToggled'
+        }
+      ],
+      responsive: true,
+      select: false,
+      lengthMenu: [ 10, 25, 50 ],
+      pageLength: 25,
+      paging: true,
+      info: true,
+      processing: true,
+      serverSide: true,
+      stateSave: true,
+      searching: true,
+      search: { search: initial_search },
+      ajax: {
+        url: "/bookmarks/{{book.id}}/datatables",
+        type: "POST",
+        dataType: "json",
+      }
+    })
+  }
+
+  let move_datatables_controls_to_config_widget = function() {
+    const widget = $('#datatables_config_items');
+    const append_children = [ '.dt-buttons', '.dt-length' ];
+    for (let c of append_children) {
+      const el = $(`div${c}`);
+      el.css({ padding: '0.2rem', margin: '0rem', display: 'inline' });
+      widget.append(el);
+    }
+  }
+
+  $(document).ready(function () {
+    setup_bookmark_datatable("{{ initial_search or '' }}");
+    move_datatables_controls_to_config_widget();
+
+    $("#datatables_config_toggle").click(function() {
+      $("#datatables_config_items").toggle();
+    });
+  });
+
+  const edit_bookmark = async function(e) {
+    let title = e.dataset.title;
+    const new_title = prompt("Update the bookmark description.", title);
+
+    if (new_title) {
+      await fetch("/bookmarks/edit", {
+        method: "POST",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          bookmark_id: e.dataset.bookmark_id,
+          title: title,
+          new_title: new_title,
+        })
+      }).then((resp) => resp.json()).then((json) => {
+        if (json?.success) {
+          // TODO: fix this hacky page reload
+          window.location = ""
+        } else {
+          alert(`Unable to edit bookmark. ${json?.reason || "Unknown reason"}`);
+        }
+      })
+    }
+  }
+
+  const delete_bookmark = async function(e) {
+    let confirmed = confirm("Delete bookmark?")
+    if (confirmed) {
+      await fetch("/bookmarks/delete", {
+        method: "POST",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          bookmark_id: e.dataset.bookmark_id,
+          title: e.dataset.title,
+        })
+      }).then((resp) => resp.json()).then((json) => {
+        if (json?.success) {
+          // TODO: fix this hacky page reload
+          window.location = ""
+        } else {
+          alert(`Unable to delete bookmark. ${json?.reason || "Unknown reason"}`);
+        }
+      })
+
+    }
+  }
+
+  let render_bookmark_actions = function(data, type, row, meta) {
+    // TODO zzfuture fix: security - add CSRF token
+
+    const links = [];
+    const make_link = function(label, func) {
+      const s = `<a href="#" data-bookmark_id="${row[2]}" data-title="${row[1]}" onclick="${func}(this)">${label}</a>`;
+      links.push(s);
+    };
+
+    make_link('Edit', "edit_bookmark", row);
+    make_link('Delete', "delete_bookmark", row);
+
+    return `<div class="book-action-dropdown"><span>&hellip;</span>
+      <div class="book-action-dropdown-content">${links.join('')}</div>
+    </div>`;
+  };
+
+  const render_page_link = function(data, type, row, meta) {
+    page_num = row[0];
+    return `<a href=/read/{{book.id}}/page/${page_num}>${row[1]}</a>`
+  }
+
+  /**
+   * Clearing the state is required for acceptance tests,
+   * because otherwise state is accidentally applied to
+   * following tests, messing up test results.
+   * I tried various things such as setting and clearing
+   * the filter input box, but this was the only method
+   * that worked reliably.
+   * This is called from the lute_test_client.py.
+   */
+  function clear_datatable_state() {
+    bookmark_listing_table.state.clear();
+  }
+</script>
+
+{% endblock %}
