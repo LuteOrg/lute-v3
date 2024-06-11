@@ -29,6 +29,7 @@ def test_get_language_def():
     assert lang.show_romanization is False, "uses default"
     assert lang.right_to_left is False, "uses default"
 
+    # pylint: disable=line-too-long
     expected = [
         "terms; embeddedhtml; https://simple.wiktionary.org/wiki/###; True; 1",
         "terms; popuphtml; https://www.collinsdictionary.com/dictionary/english/###; True; 2",
