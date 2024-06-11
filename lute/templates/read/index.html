@@ -529,6 +529,37 @@
     });
   }
 
+  function add_bookmark() {
+    const text_id = document.querySelector('#text_id')?.value;
+    const book_id = document.querySelector('#book_id')?.value;
+    const page_num = document.querySelector('#page_num')?.value;
+    let title = prompt(`Enter a bookmark title for page ${page_num}`);
+
+    if (!book_id || !page_num || !title) {
+      alert(`Missing bookmark data. No bookmark added.`);
+      return
+    }
+
+    fetch(`/bookmarks/add`, {
+      method: "POST",
+      cache: "no-cache",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        title: title,
+        book_id: book_id,
+        page_num: page_num,
+      })
+    }).then((resp) => resp.json()).then(json => {
+      if (json?.success === true) {
+        alert(`Bookmark "${title}" added.`)
+      } else {
+        alert(`Unable to add bookmark. ${json?.reason || "Unknown reason"}`)
+      }
+    })
+  }
 
 </script>
 
