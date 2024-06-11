@@ -25,8 +25,11 @@ from lute.config.app_config import AppConfig
 def lint(c):
     "Run pylint on lute/ and tests/."
     # Formats: https://pylint.pycqa.org/en/latest/user_guide/usage/output.html
-    msgfmt = "--msg-template='{path} ({line:03d}): {msg} ({msg_id} {symbol})'"
-    c.run(f"pylint {msgfmt} tasks.py lute/ tests/")
+    msgfmt = [
+        "--ignore-patterns='zz_.*.py'",
+        "--msg-template='{path} ({line:03d}): {msg} ({msg_id} {symbol})'",
+    ]
+    c.run(f"pylint {' '.join(msgfmt)} tasks.py lute/ tests/")
 
 
 @task
