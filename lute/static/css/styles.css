@@ -867,7 +867,6 @@ div.code pre {
     border-radius: 5px;
     padding: 15px;
     overflow: auto;
-    max-height: 500px;
     font-size: 14px;
     color: #212529;
 }

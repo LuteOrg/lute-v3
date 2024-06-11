@@ -11,10 +11,13 @@
   <p>Platform: {{ platform }}</p>
   <p>Version: {{ version }}</p>
   <p>In docker?: {{ is_docker }}</p>
-  <p>Stack trace:</p>
-  <div class="code">
-    <code><pre>{{ exception_info }}</pre></code>
-  </div>
+  <br />
+  <details>
+    <summary>Stack trace</summary>
+    <div class="code">
+      <code><pre>{{ exception_info }}</pre></code>
+    </div>
+  </details>
 </div>
 
 {% if "CERTIFICATE_VERIFY_FAILED" in exception_info %}
@@ -28,9 +31,16 @@
 </blockquote>
 {% endif %}
 
+<p>Please check
+the <a href="https://luteorg.github.io/lute-manual/">Lute manual</a>
+to see if there are reports and solutions for this problem, and also
+check Discord to see if other users have encountered and solved it as
+well.</p>
+
 <p>If this issue persists, please open a
   <a href="https://github.com/jzohrab/lute-v3/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=500%20error"
-     target="_blank">GitHub Issue</a>, including all of the above information in the issue.
+     target="_blank">GitHub Issue</a>, including all of the above
+     information, plus the full stack trace.
 </p>
 
 {% endblock %}
