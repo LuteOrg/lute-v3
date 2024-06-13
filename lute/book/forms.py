@@ -40,7 +40,7 @@ class NewBookForm(FlaskForm):
         validators=[NumberRange(min=10, max=1500)],
         default=250,
     )
-    source_uri = StringField("Text source", validators=[Length(max=255)])
+    source_uri = StringField("Text source", validators=[Length(max=1000)])
     audiofile = FileField(
         "Audio file",
         validators=[
@@ -107,7 +107,7 @@ class EditBookForm(FlaskForm):
     """
 
     title = StringField("Title", validators=[DataRequired(), Length(max=255)])
-    source_uri = StringField("Source URI", validators=[Length(max=255)])
+    source_uri = StringField("Source URI", validators=[Length(max=1000)])
     book_tags = StringField("Tags")
     audiofile = FileField(
         "Audio file",
