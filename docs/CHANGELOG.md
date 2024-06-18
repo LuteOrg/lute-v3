@@ -1,4 +1,14 @@
 
+# 3.5.0 (2024-06-12)
+
+Feature changes:
+
+* Feature #391: add "leave page" confirmation dialog to language edit form.  By @cblanken in #444
+* Feature #86: add text bookmarks.  By @cblanken in #439.
+* Issue #449: increase source_uri book form field max length.
+* Add preconfigured languages: Ainu, Bosnian, Kazakh, Macedonian, Nahuatl, Navajo, Okinawan
+
+
 # 3.4.3 (2024-06-08)
 
 Feature changes:
