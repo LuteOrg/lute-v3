@@ -2,13 +2,11 @@
 /language endpoints.
 """
 
-from sqlalchemy import func
+from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
 from lute.models.language import Language
 from lute.models.setting import UserSetting
-from lute.models.book import Book
-from lute.models.term import Term
 import lute.language.service
 from lute.language.forms import LanguageForm
 from lute.db import db
@@ -20,47 +18,29 @@ bp = Blueprint("language", __name__, url_prefix="/language")
 @bp.route("/index")
 def index():
     """
-    List all languages.
-
-    This includes the Book and Term count for each Language.  These
-    counts are pulled in by subqueries, because Language doesn't have
-    "books" and "terms" members ... I was having trouble with session
-    management when these were added, and they're only used here, so
-    this is good enough for now.
+    List all languages, with book and term counts.
     """
 
-    def create_count_subquery(class_, count_column):
-        # Re the pylint disable, ref
-        # https://github.com/pylint-dev/pylint/issues/8138 ...
-        ret = (
-            db.session.query(
-                class_.language_id,
-                # pylint: disable=not-callable
-                func.count(class_.id).label(count_column),
-            )
-            .group_by(class_.language_id)
-            .subquery()
-        )
-        return ret
-
-    # Create subqueries for counting books and terms
-    book_subquery = create_count_subquery(Book, "book_count")
-    term_subquery = create_count_subquery(Term, "term_count")
-
-    # Query to join Language with book and term counts
-    query = (
-        db.session.query(
-            Language, book_subquery.c.book_count, term_subquery.c.term_count
-        )
-        .outerjoin(book_subquery, Language.id == book_subquery.c.language_id)
-        .outerjoin(term_subquery, Language.id == term_subquery.c.language_id)
-    )
-
-    results = query.all()
-
-    results = [rec for rec in results if rec[0].is_supported is True]
-
-    return render_template("language/index.html", language_data=results)
+    # Using plain sql, easier to get bulk quantities.
+    sql = """
+    select LgID, LgName, book_count, term_count from languages
+    left outer join (
+      select BkLgID, count(BkLgID) as book_count from books
+      group by BkLgID
+    ) bc on bc.BkLgID = LgID
+    left outer join (
+      select WoLgID, count(WoLgID) as term_count from words
+      where WoStatus != 0
+      group by WoLgID
+    ) tc on tc.WoLgID = LgID
+    order by LgName
+    """
+    result = db.session.execute(text(sql)).all()
+    languages = [
+        {"LgID": row[0], "LgName": row[1], "book_count": row[2], "term_count": row[3]}
+        for row in result
+    ]
+    return render_template("language/index.html", language_data=languages)
 
 
 def _handle_form(language, form) -> bool:
