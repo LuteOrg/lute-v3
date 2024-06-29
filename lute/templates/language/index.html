@@ -20,15 +20,15 @@
     </tr>
   </thead>
   <tbody>
-    {% for language, book_count, term_count in language_data %}
+    {% for lang in language_data %}
     <tr>
       <td>
-        <a href="/language/edit/{{ language.id }}">
-          {{ language.name }}
+        <a href="/language/edit/{{ lang.LgID }}">
+          {{ lang.LgName }}
         </a>
       </td>
-      <td>{{ book_count or '-' }}</td>
-      <td>{{ term_count or '-' }}</td>
+      <td>{{ lang.book_count or '-' }}</td>
+      <td>{{ lang.term_count or '-' }}</td>
     </tr>
     {% endfor %}
   </tbody>
