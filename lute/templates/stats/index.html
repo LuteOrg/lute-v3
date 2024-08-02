@@ -33,7 +33,7 @@
 </ul>
 </table>
 
-<div style="width:60%;">
+<div style="position: relative; aspect-ratio: 3">
   <canvas id="wordCountChart"></canvas>
 </div>
 
@@ -86,6 +86,7 @@
         datasets: datasets
       },
       options: {
+        maintainAspectRatio: false,
         scales: {
           // Unable to get the "time" scale working correctly,
           // so now the data just has all of the dates.
