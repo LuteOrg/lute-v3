@@ -31,7 +31,7 @@ class NewBookForm(FlaskForm):
         validators=[
             FileAllowed(
                 ["txt", "epub", "pdf", "srt", "vtt"],
-                "Please upload a valid '.txt', '.epub', '.pdf', '.srt' or '.vtt' file.",
+                "Please upload a valid text (txt, epub, pdf, srt, vtt)",
             )
         ],
     )
@@ -45,8 +45,8 @@ class NewBookForm(FlaskForm):
         "Audio file",
         validators=[
             FileAllowed(
-                ["mp3", "wav", "ogg", "opus"],
-                "Please upload a valid audio file (mp3, wav, ogg, opus)",
+                ["mp3", "m4a", "wav", "ogg", "opus"],
+                "Please upload a valid audio file (mp3, m4a, wav, ogg, opus)",
             )
         ],
     )

@@ -30,8 +30,7 @@
     </tr>
 
     <tr>
-      <td>{{ form.audiofile.label }}</td>
-      <td>
+      <td>{{ form.audiofile.label }}  <i>(.mp3, .m4a, .wav, .ogg, .opus)</i></td>
         {{ form.audiofile() }}
         {{ form.audio_filename() }}
         {% if book.audio_filename %}
