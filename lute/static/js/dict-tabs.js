@@ -35,10 +35,8 @@ class LookupButton {
 
     this.frame.addEventListener("load", (e) => {
       if (this.frame.src && this.frame.src !== "about:blank" && this.is_active) {
-        if (!this.frame.classList.contains("dict-activate")) {
-          this.frame.classList.add("dict-active");
-          readPaneLeft.focus();
-        }
+        this.frame.classList.add("dict-active");
+        readPaneLeft.focus();
       }
     });
 
