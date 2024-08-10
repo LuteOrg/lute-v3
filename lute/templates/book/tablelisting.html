@@ -156,13 +156,17 @@
     const current_language_id = {{ current_language_id }};
     // Language filter is set up first, because its value
     // is used during the initial datatable draw.
+
     setup_language_filter(current_language_id);
-    setup_book_datatable("{{ initial_search or '' }}");
 
-    move_datatables_controls_to_config_widget();
+    fetch("/refresh_stale_stats", { "cache": "no-store" })
+    .then(() => {
+      setup_book_datatable("{{ initial_search or '' }}");
+      move_datatables_controls_to_config_widget();
 
-    $("#datatables_config_toggle").click(function() {
-      $("#datatables_config_items").toggle();
+      $("#datatables_config_toggle").click(function() {
+        $("#datatables_config_items").toggle();
+      });
     });
   });
 

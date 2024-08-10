@@ -33,9 +33,6 @@
   <p>To get started using Lute, first <a href="/language/list_predefined">load a predefined language and sample text</a>, or <a href="/language/new">create your language.</a>
 </p>
 {% else %}
-  <script>
-    fetch("/refresh_stale_stats", { "cache": "no-store" });
-  </script>
   {% include "book/tablelisting.html" %}
 {% endif %}
 
