@@ -139,7 +139,6 @@ def _add_base_routes(app, app_config):
         if is_production and have_books and should_run_auto_backup:
             return redirect("/backup/backup", 302)
 
-        refresh_stats()
         warning_msg = backupservice.backup_warning(bkp_settings)
         backup_show_warning = (
             bkp_settings.backup_warn
@@ -162,6 +161,12 @@ def _add_base_routes(app, app_config):
             backup_show_warning=backup_show_warning,
             backup_warning_msg=warning_msg,
         )
+
+    @app.route("/refresh_stale_stats")
+    def refresh_stale_stats():
+        refresh_stats()
+        return {}, 200
+
 
     @app.route("/refresh_all_stats")
     def refresh_all_stats():
