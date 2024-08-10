@@ -167,7 +167,6 @@ def _add_base_routes(app, app_config):
         refresh_stats()
         return {}, 200
 
-
     @app.route("/refresh_all_stats")
     def refresh_all_stats():
         books_to_update = db.session.query(Book).filter(Book.archived == 0).all()
