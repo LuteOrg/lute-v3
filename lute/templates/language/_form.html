@@ -1,14 +1,18 @@
 {% for field_name, field_errors in form.errors.items() %}
   {% for error in field_errors %}
-    <div class="flash-notice-narrow">
-      {% if error is mapping %}
+    {% if error is mapping %}
+      {% if error|length > 0 %}
         {% for err_field, err_msg in error.items() %}
-          {{ err_msg }}
+          <div class="flash-notice-narrow">
+            {{ err_msg }}
+          </div>
         {% endfor %}
-      {% else %}
-        {{ error }}
       {% endif %}
-    </div>
+    {% else %}
+      <div class="flash-notice-narrow">
+        {{ error }}
+      </div>
+    {% endif %}
   {% endfor %}
 {% endfor %}
 
