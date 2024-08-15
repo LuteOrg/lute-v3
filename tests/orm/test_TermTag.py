@@ -1,0 +1,50 @@
+"""
+TermTage mapping tests.
+"""
+
+from sqlalchemy import text
+import pytest
+from lute.models.term import Term, TermTag
+from lute.db import db
+from tests.dbasserts import assert_record_count_equals
+
+
+def test_deleting_termtag_removes_wordtags_table_record(empty_db, spanish):
+    "Association record should be deleted if tag is deleted."
+    tg = TermTag("tag")
+    db.session.add(tg)
+    db.session.commit()
+
+    term = Term(spanish, "HOLA")
+    term.add_term_tag(tg)
+    db.session.add(term)
+    db.session.commit()
+
+    # The tag association for HOLA is getting deleted correctly
+    # when the "tag" tag is deleted, which is odd because it's
+    # not getting deleted when the action is called from the UI
+    # (ref https://github.com/LuteOrg/lute-v3/issues/455).
+    #
+    # Trying adding another term, with directly inserting
+    # the data in the table, to see if that is deleted correctly ...
+    # ... and it is.
+    perro = Term(spanish, "perro")
+    db.session.add(perro)
+    db.session.commit()
+
+    sql = f"insert into wordtags (WtWoID, WtTgID) values ({perro.id}, {tg.id})"
+    db.session.execute(text(sql))
+    db.session.commit()
+
+    sqltags = "select * from tags"
+    assert_record_count_equals(sqltags, 1, "tag sanity check on save")
+
+    sqlassoc = "select * from wordtags"
+    assert_record_count_equals(sqlassoc, 2, "word tag associations exist")
+
+    termtag = TermTag.find(tg.id)
+    db.session.delete(termtag)
+    db.session.commit()
+
+    assert_record_count_equals(sqltags, 0, "tag removed")
+    assert_record_count_equals(sqlassoc, 0, "associations removed")
