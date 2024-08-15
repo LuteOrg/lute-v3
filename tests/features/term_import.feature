@@ -251,6 +251,38 @@ Feature: Term import
             g; 98
 
 
+    Scenario: Import should not update status if status not included
+        Given import file:
+            language,term,translation
+            Spanish,a,aa
+        When import with create true, update false, new as unknown true
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+
+        Given import file:
+            language,term,translation,status
+            Spanish,b,bb,1
+            Spanish,c,cc,2
+        When import with create true, update false
+        Then import should succeed with 2 created, 0 updated, 0 skipped
+
+        Then sql "select WoText, WoTranslation, WoStatus from words order by WoText" should return:
+            a; aa; 0
+            b; bb; 1
+            c; cc; 2
+
+        Given import file:
+            language,term,translation
+            Spanish,a,aaNEW
+            Spanish,b,bbNEW
+            Spanish,c,ccNEW
+        When import with create false, update true, new as unknown true
+        Then import should succeed with 0 created, 3 updated, 0 skipped
+        And sql "select WoText, WoTranslation, WoStatus from words order by WoText" should return:
+            a; aaNEW; 0
+            b; bbNEW; 1
+            c; ccNEW; 2
+
+
     Scenario: Import field names are case-insensitive
         Given import file:
             LANGUAGE,Term,TRANSLATION,paRENT,statUS,TAGS,Pronunciation
