@@ -2,11 +2,10 @@
 TermTage mapping tests.
 """
 
-from sqlalchemy import text
 from lute.models.term import Term, TermTag
 from lute.db import db
-from tests.dbasserts import assert_record_count_equals
 from lute.termtag.routes import delete as route_delete
+from tests.dbasserts import assert_record_count_equals
 
 
 def test_deleting_termtag_removes_wordtags_table_record(empty_db, spanish):
@@ -30,7 +29,6 @@ def test_deleting_termtag_removes_wordtags_table_record(empty_db, spanish):
     sqlassoc = "select * from wordtags"
     assert_record_count_equals(sqlassoc, 1, "word tag associations exist")
 
-    termtag = TermTag.find(tg.id)
     route_delete(tg.id)
 
     assert_record_count_equals(sqlterms, 1, "term stays")
