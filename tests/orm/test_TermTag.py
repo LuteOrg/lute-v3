@@ -3,7 +3,6 @@ TermTage mapping tests.
 """
 
 from sqlalchemy import text
-import pytest
 from lute.models.term import Term, TermTag
 from lute.db import db
 from tests.dbasserts import assert_record_count_equals
