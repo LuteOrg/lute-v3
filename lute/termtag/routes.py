@@ -2,6 +2,7 @@
 /termtag routes.
 """
 
+from sqlalchemy import text
 from flask import Blueprint, request, jsonify, render_template, redirect
 from lute.models.term import TermTag
 from lute.utils.data_tables import DataTablesFlaskParamParser
@@ -67,5 +68,16 @@ def delete(termtagid):
     """
     termtag = TermTag.find(termtagid)
     db.session.delete(termtag)
+
+    # ANNOYING HACK.  Per GitHub issue 455, the records
+    # in the wordtags table were not getting deleted when
+    # the tags were deleted with this method in the UI,
+    # even though they were getting deleted during unit
+    # testing.  I spent a short time looking, but am adding
+    # this hack for now.
+    # TODO fix_relationships: have wordtags records get deleted.
+    sql = f"""delete from wordtags where WtTgID = {termtagid}"""
+    db.session.execute(text(sql))
+
     db.session.commit()
     return redirect("/termtag/index", 302)
