@@ -147,21 +147,33 @@ def _add_base_routes(app, app_config):
             and warning_msg != ""
         )
 
-        return render_template(
-            "index.html",
-            hide_homelink=True,
-            dbname=app_config.dbname,
-            datapath=app_config.datapath,
-            tutorial_book_id=lute.db.demo.tutorial_book_id(),
-            have_books=have_books,
-            have_languages=have_languages,
-            language_choices=language_choices,
-            current_language_id=current_language_id,
-            is_production_data=is_production,
-            # Backup stats
-            backup_show_warning=backup_show_warning,
-            backup_warning_msg=warning_msg,
+        # Disabling caching on this page so that book stats
+        # are recalculated, even if the user hits the browser
+        # "back" button after updating some terms.
+        # ref https://stackoverflow.com/questions/28627324/
+        #   disable-cache-on-a-specific-page-using-flask
+        response = make_response(
+            render_template(
+                "index.html",
+                hide_homelink=True,
+                dbname=app_config.dbname,
+                datapath=app_config.datapath,
+                tutorial_book_id=lute.db.demo.tutorial_book_id(),
+                have_books=have_books,
+                have_languages=have_languages,
+                language_choices=language_choices,
+                current_language_id=current_language_id,
+                is_production_data=is_production,
+                # Backup stats
+                backup_show_warning=backup_show_warning,
+                backup_warning_msg=warning_msg,
+            )
         )
+        cc = "no-cache, no-store, must-revalidate, public, max-age=0"
+        response.headers["Cache-Control"] = cc
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
 
     @app.route("/refresh_all_stats")
     def refresh_all_stats():
