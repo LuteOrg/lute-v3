@@ -1,4 +1,22 @@
 
+# 3.5.1 (2024-08-15)
+
+Tweaks:
+
+* Never cache main page, always recalc book stats as needed.
+* #466: strip whitespace from jinja comment.
+* #497: allow .m4a audio files.
+* #437: exclude unknown terms from language term counts.
+
+Bug fixes:
+
+* #455: handle TermTag associations when tags are deleted.
+* #465: term import fix, only change statuses if explicitly specified.
+* #458: omit empty error messages on language save.
+* #464: prevent dictionary tabs from stealing focus.  By @cblanken in #459.
+* #293: fix stats chart shrinking.  By @cblanken in #456.
+
+
 # 3.5.0 (2024-06-12)
 
 Feature changes:
