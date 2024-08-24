@@ -28,6 +28,11 @@ def _add_term_to_dict(t, terms):
     if tag_list == "":
         tag_list = "-"
 
+    parents_text = sorted([p.text_lc for p in t.parents])
+    parents_text = "; ".join(parents_text)
+    if parents_text == "":
+        parents_text = "-"
+
     zws = "\u200B"
     hsh = {
         "sourceterm": t,
@@ -37,6 +42,7 @@ def _add_term_to_dict(t, terms):
         "books": [],
         "definition": t.translation or "-",
         "status": t.status,
+        "parents": parents_text,
         "children": [],
         "tags": tag_list,
     }
@@ -122,6 +128,7 @@ def _generate_file(books, outfile_name):
             "books",
             "definition",
             "status",
+            "parents",
             "children",
             "tags",
         ]

@@ -74,23 +74,23 @@ def test_single_book_export(app_context, empty_db, tmp_path, english):
 
     expected = [
         # Headings
-        "term,count,familycount,books,definition,status,children,tags",
+        "term,count,familycount,books,definition,status,parents,children,tags",
         # a has two children, e and h
-        "a,2,5,hi,-,1,e (2); h (1),-",
+        "a,2,5,hi,-,1,-,e (2); h (1),-",
         # b occurs twice.
-        "b,2,2,hi,-,0,-,-",
+        "b,2,2,hi,-,0,-,-,-",
         # 'c d' occurs twice
-        "c d,2,2,hi,-,1,-,-",
+        "c d,2,2,hi,-,1,-,-,-",
         # e is a new term
-        "e,2,2,hi,-,0,-,-",
+        "e,2,2,hi,-,0,a,-,-",
         # c is a new term, status 0.
         # Occurs once as c, once as C.
-        "C,1,1,hi,-,0,-,-",
-        "I,1,1,hi,-,0,-,-",
-        "d,1,1,hi,-,1,-,-",
+        "C,1,1,hi,-,0,-,-,-",
+        "I,1,1,hi,-,0,-,-,-",
+        "d,1,1,hi,-,1,-,-,-",
         # g and h are new
-        "g,1,1,hi,-,0,-,-",
-        "h,1,1,hi,-,0,-,-",
+        "g,1,1,hi,-,0,-,-,-",
+        "h,1,1,hi,-,0,a,-,-",
         "",
     ]
 
