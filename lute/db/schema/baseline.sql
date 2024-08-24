@@ -46,6 +46,7 @@ INSERT INTO _migrations VALUES('20240125_drop_bookstats_wordcount.sql');
 INSERT INTO _migrations VALUES('20240207_01_create_languagedicts.sql');
 INSERT INTO _migrations VALUES('20240207_02_drop_old_language_fields.sql');
 INSERT INTO _migrations VALUES('20240525_create_textbookmarks.sql');
+INSERT INTO _migrations VALUES('20240815_clean_up_bad_wordtags.sql');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
@@ -156,8 +157,10 @@ INSERT INTO texts VALUES(17,9,1,'अनुच्छेद १(एक): सभ�
 INSERT INTO texts VALUES(18,10,1,replace('北風と太陽\n\n「おれの方が強い。」「いいや、ぼくの方が強い。」\n北風と太陽の声が聞こえます。二人はどちらの力が強いかでケンカをしているようです。\n「太陽が毎日元気だから、暑くてみんな困っているよ。おれが涼しい風を吹くと、みんな嬉しそうだ。」','\n',char(10)),NULL,64);
 INSERT INTO texts VALUES(19,11,1,'Встреча с медведем может быть очень опасна. Русские люди любят ходить в лес и собирать грибы и ягоды. Они делают это с осторожностью, так как медведи тоже очень любят ягоды и могут напасть на человека. Медведь ест все: ягоды, рыбу, мясо и даже насекомых. Особенно он любит мед.',NULL,48);
 INSERT INTO texts VALUES(20,12,1,replace('काशीनगरे एकः पण्डितः अस्ति । पण्डितसमीपम् एकः शिष्यः आगच्छति । शिष्यः वदति - "आचार्य!\nविद्याभ्यासार्थम् आगतः ।" पण्डितः शिष्यबुद्धिपरीक्षार्थं पृच्छति - "वत्स, देवः कुत्र अस्ति?" शिष्यः वदति -\n''गुरो! देवः कुत्र नास्ति? कृपया भवान् एव समाधानं वदतु ।" सन्तुष्टः गुरुः वदति - "दैवः सर्वत्र अस्ति । देवः\nसर्वव्यापी । त्वं बुद्धिमान ।अतः विद्याभ्यासार्थम् अत्रैव वस।"','\n',char(10)),NULL,45);
-INSERT INTO texts VALUES(21,13,1,replace('Érase una vez un muchacho llamado Aladino que vivía en el lejano Oriente con su madre, en una casa sencilla y humilde. Tenían lo justo para vivir, así que cada día, Aladino recorría el centro de la ciudad en busca de algún alimento que llevarse a la boca.\n\nEn una ocasión paseaba entre los puestos de fruta del mercado, cuando se cruzó con un hombre muy extraño con pinta de extranjero. Aladino se quedó sorprendido al escuchar que le llamaba por su nombre.','\n',char(10)),NULL,83);
-INSERT INTO texts VALUES(22,14,1,replace('Büyük ağaç eskiden aşılanmış ve her yıl güzel, iri, pembe şeftaliler verirmiş, insanın eline sığmazmış bu şeftaliler. Öyle güzelmişler ki insan yemeye kıyamazmış onları. Bahçıvan, bu büyük ağacı yabancı bir uzmanın kendi ülkesinden getirdiği bir tohumla aşıladığını söylermiş. Belli ki böyle masraf edilen bir ağaçta yetişen şeftaliler oldukça değerliymiş.\n\nİki ağacın da gövdelerine nazar değmesin diye birer nazarlık asılıymış.\n\nAğaçlardan küçük olanında her yıl bin tane çiçek açarmış ama bir tek şeftali bile yetişmezmiş üzerinde. Ya çiçekleri dökülürmüş, ya da ham şeftaliler kuruyup dallardan düşermiş. Bahçıvan küçük ağaç için elinden geleni yapmış ama değişen bir şey olmamış. Yıllar geçtikçe dalları ve yaprakları çoğalmış ama bir tek şeftali bile görünmemiş üzerinde.','\n',char(10)),NULL,110);
+INSERT INTO texts VALUES(21,13,1,replace('dhṛtarāṣṭro rājā.\nkiṃ dhṛtarāṣṭro mantrī?\ndhṛtarāṣṭro na mantrī.\ndhṛtarāṣṭro rājā.\n\nsaṃjayaḥ kaḥ?\nkiṃ saṃjayo rājā?\nsaṃjayo na rājā.\nsaṃjayo mantrī.\nsaṃjayo dhṛtarāṣṭrasya mantrī.\n\nsaṃjayo dhṛtarāṣṭraṃ gacchati.\nsaṃjayo rājānaṃ dhṛtarāṣṭraṃ gacchati.\ndhṛtarāṣṭraḥ:\n saṃjaya!\n duryodhanaḥ kiṃ karoti?\n\nduryodhanaḥ kaḥ?\nkiṃ duryodhano mantrī?\nduryodhano na mantrī.\nduryodhano dhṛtarāṣṭrasya putraḥ.\nduryodhano rāja­putraḥ.','\n',char(10)),NULL,49);
+INSERT INTO texts VALUES(22,14,1,replace('धृतराष्ट्रो राजा।\nकिं धृतराष्ट्रो मन्त्री?\nधृतराष्ट्रो न मन्त्री।\nधृतराष्ट्रो राजा।\n\nसंजयः कः?\nकिं संजयो राजा?\nसंजयो न राजा।\nसंजयो मन्त्री।\nसंजयो धृतराष्ट्रस्य मन्त्री।\n\nसंजयो धृतराष्ट्रं गच्छति।\nसंजयो राजानं धृतराष्ट्रं गच्छति।\nधृतराष्ट्रः —\n संजय !\n दुर्योधनः किं करोति?\n\nदुर्योधनः कः?\nकिं दुर्योधनो मन्त्री?\nदुर्योधनो न मन्त्री।\nदुर्योधनो धृतराष्ट्रस्य पुत्रः।\nदुर्योधनो राज­पुत्रः।','\n',char(10)),NULL,49);
+INSERT INTO texts VALUES(23,15,1,replace('Érase una vez un muchacho llamado Aladino que vivía en el lejano Oriente con su madre, en una casa sencilla y humilde. Tenían lo justo para vivir, así que cada día, Aladino recorría el centro de la ciudad en busca de algún alimento que llevarse a la boca.\n\nEn una ocasión paseaba entre los puestos de fruta del mercado, cuando se cruzó con un hombre muy extraño con pinta de extranjero. Aladino se quedó sorprendido al escuchar que le llamaba por su nombre.','\n',char(10)),NULL,83);
+INSERT INTO texts VALUES(24,16,1,replace('Büyük ağaç eskiden aşılanmış ve her yıl güzel, iri, pembe şeftaliler verirmiş, insanın eline sığmazmış bu şeftaliler. Öyle güzelmişler ki insan yemeye kıyamazmış onları. Bahçıvan, bu büyük ağacı yabancı bir uzmanın kendi ülkesinden getirdiği bir tohumla aşıladığını söylermiş. Belli ki böyle masraf edilen bir ağaçta yetişen şeftaliler oldukça değerliymiş.\n\nİki ağacın da gövdelerine nazar değmesin diye birer nazarlık asılıymış.\n\nAğaçlardan küçük olanında her yıl bin tane çiçek açarmış ama bir tek şeftali bile yetişmezmiş üzerinde. Ya çiçekleri dökülürmüş, ya da ham şeftaliler kuruyup dallardan düşermiş. Bahçıvan küçük ağaç için elinden geleni yapmış ama değişen bir şey olmamış. Yıllar geçtikçe dalları ve yaprakları çoğalmış ama bir tek şeftali bile görünmemiş üzerinde.','\n',char(10)),NULL,110);
 CREATE TABLE IF NOT EXISTS "settings" (
 	"StKey" VARCHAR(40) NOT NULL,
         "StKeyType" TEXT NOT NULL,
@@ -190,8 +193,10 @@ INSERT INTO books VALUES(9,8,'Universal Declaration of Human Rights',NULL,0,0,NU
 INSERT INTO books VALUES(10,9,'北風と太陽 - きたかぜたいよう',NULL,0,0,NULL,NULL,NULL);
 INSERT INTO books VALUES(11,10,'медведь',NULL,0,0,NULL,NULL,NULL);
 INSERT INTO books VALUES(12,11,'बुद्धिमान् शिष्यः',NULL,0,0,NULL,NULL,NULL);
-INSERT INTO books VALUES(13,12,'Aladino y la lámpara maravillosa',NULL,0,0,NULL,NULL,NULL);
-INSERT INTO books VALUES(14,13,'Büyük ağaç',NULL,0,0,NULL,NULL,NULL);
+INSERT INTO books VALUES(13,11,'Bhagavad Ghita (Latin)',NULL,0,0,NULL,NULL,NULL);
+INSERT INTO books VALUES(14,11,'Bhagavad Ghita (Devanagari)',NULL,0,0,NULL,NULL,NULL);
+INSERT INTO books VALUES(15,12,'Aladino y la lámpara maravillosa',NULL,0,0,NULL,NULL,NULL);
+INSERT INTO books VALUES(16,13,'Büyük ağaç',NULL,0,0,NULL,NULL,NULL);
 CREATE TABLE IF NOT EXISTS "bookstats" (
 	"BkID" INTEGER NOT NULL  ,
 	"distinctterms" INTEGER NULL  ,
@@ -213,8 +218,10 @@ INSERT INTO bookstats VALUES(9,30,30,100,'{"0": 30, "1": 0, "2": 0, "3": 0, "4":
 INSERT INTO bookstats VALUES(10,41,41,100,'{"0": 41, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
 INSERT INTO bookstats VALUES(11,40,40,100,'{"0": 40, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
 INSERT INTO bookstats VALUES(12,33,33,100,'{"0": 33, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
-INSERT INTO bookstats VALUES(13,63,63,100,'{"0": 63, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
-INSERT INTO bookstats VALUES(14,85,85,100,'{"0": 85, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(13,19,19,100,'{"0": 19, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(14,19,19,100,'{"0": 19, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(15,63,63,100,'{"0": 63, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
+INSERT INTO bookstats VALUES(16,85,85,100,'{"0": 85, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}');
 CREATE TABLE languagedicts (
   "LdID" INTEGER NOT NULL,
   "LdLgID" INTEGER NOT NULL,
@@ -234,34 +241,54 @@ INSERT INTO languagedicts VALUES(5,2,'sentences','popuphtml','https://www.deepl.
 INSERT INTO languagedicts VALUES(6,3,'terms','embeddedhtml','https://slovniky.lingea.cz/Anglicko-cesky/###',1,1);
 INSERT INTO languagedicts VALUES(7,3,'terms','popuphtml','https://slovnik.seznam.cz/preklad/cesky_anglicky/###',1,2);
 INSERT INTO languagedicts VALUES(8,3,'sentences','popuphtml','https://www.deepl.com/translator#cs/en/###',1,3);
-INSERT INTO languagedicts VALUES(9,4,'terms','embeddedhtml','https://en.thefreedictionary.com/###',1,1);
+INSERT INTO languagedicts VALUES(9,4,'terms','embeddedhtml','https://simple.wiktionary.org/wiki/###',1,1);
 INSERT INTO languagedicts VALUES(10,4,'terms','popuphtml','https://www.collinsdictionary.com/dictionary/english/###',1,2);
 INSERT INTO languagedicts VALUES(11,4,'sentences','popuphtml','https://www.deepl.com/translator#en/en/###',1,3);
-INSERT INTO languagedicts VALUES(12,5,'terms','embeddedhtml','https://fr.thefreedictionary.com/###',1,1);
-INSERT INTO languagedicts VALUES(13,5,'sentences','popuphtml','https://www.deepl.com/translator#fr/en/###',1,2);
-INSERT INTO languagedicts VALUES(14,6,'terms','embeddedhtml','https://de.thefreedictionary.com/###',1,1);
-INSERT INTO languagedicts VALUES(15,6,'terms','embeddedhtml','https://www.wordreference.com/deen/###',1,2);
-INSERT INTO languagedicts VALUES(16,6,'sentences','popuphtml','https://www.deepl.com/translator#de/en/###',1,3);
-INSERT INTO languagedicts VALUES(17,7,'terms','embeddedhtml','https://www.wordreference.com/gren/###',1,1);
-INSERT INTO languagedicts VALUES(18,7,'terms','embeddedhtml','https://en.wiktionary.org/wiki/###',1,2);
-INSERT INTO languagedicts VALUES(19,7,'sentences','popuphtml','https://www.deepl.com/translator#el/en/###',1,3);
-INSERT INTO languagedicts VALUES(20,8,'terms','embeddedhtml','https://www.boltidictionary.com/en/search?s=###',1,1);
-INSERT INTO languagedicts VALUES(21,8,'terms','popuphtml','https://translate.google.com/?sl=hi&tl=en&text=###',1,2);
-INSERT INTO languagedicts VALUES(22,8,'sentences','embeddedhtml','https://www.bing.com/translator/?from=hi&to=en&text=###',1,3);
-INSERT INTO languagedicts VALUES(23,9,'terms','embeddedhtml','https://jisho.org/search/###',1,1);
-INSERT INTO languagedicts VALUES(24,9,'sentences','popuphtml','https://www.deepl.com/translator#jp/en/###',1,2);
-INSERT INTO languagedicts VALUES(25,10,'terms','embeddedhtml','https://www.dict.com/Russian-English/###',1,1);
-INSERT INTO languagedicts VALUES(26,10,'terms','embeddedhtml','https://en.openrussian.org/?search=###',1,2);
-INSERT INTO languagedicts VALUES(27,10,'sentences','popuphtml','https://www.deepl.com/translator#ru/en/###',1,3);
-INSERT INTO languagedicts VALUES(28,11,'terms','embeddedhtml','https://dsal.uchicago.edu/cgi-bin/app/sanskrit_query.py?qs=###&searchhws=yes&matchtype=default',1,1);
-INSERT INTO languagedicts VALUES(29,11,'terms','embeddedhtml','https://www.learnsanskrit.cc/translate?search=###&dir=se',1,2);
-INSERT INTO languagedicts VALUES(30,11,'sentences','popuphtml','https://translate.google.com/?hl=en&sl=sa&tl=en&text=###&op=translate',1,3);
-INSERT INTO languagedicts VALUES(31,12,'terms','embeddedhtml','https://es.thefreedictionary.com/###',1,1);
-INSERT INTO languagedicts VALUES(32,12,'terms','popuphtml','https://www.wordreference.com/es/en/translation.asp?spen=###',1,2);
-INSERT INTO languagedicts VALUES(33,12,'sentences','popuphtml','https://www.deepl.com/translator#es/en/###',1,3);
-INSERT INTO languagedicts VALUES(34,13,'terms','embeddedhtml','https://www.wordreference.com/tren/###',1,1);
-INSERT INTO languagedicts VALUES(35,13,'terms','embeddedhtml','https://tr.wiktionary.org/wiki/###',1,2);
-INSERT INTO languagedicts VALUES(36,13,'sentences','popuphtml','https://www.deepl.com/translator#tr/en/###',1,3);
+INSERT INTO languagedicts VALUES(12,4,'terms','popuphtml','https://conjugator.reverso.net/conjugation-english-verb-###.html',1,4);
+INSERT INTO languagedicts VALUES(13,5,'terms','embeddedhtml','https://www.wordreference.com/fren/###',1,1);
+INSERT INTO languagedicts VALUES(14,5,'terms','embeddedhtml','https://en.wiktionary.org/wiki/####French',1,2);
+INSERT INTO languagedicts VALUES(15,5,'sentences','popuphtml','https://www.deepl.com/translator#fr/en/###',1,3);
+INSERT INTO languagedicts VALUES(16,5,'terms','popuphtml','https://www.larousse.fr/dictionnaires/francais/###',1,4);
+INSERT INTO languagedicts VALUES(17,5,'terms','popuphtml','https://conjugator.reverso.net/conjugation-french-verb-###.html',1,5);
+INSERT INTO languagedicts VALUES(18,6,'terms','embeddedhtml','https://www.dict.cc/?s=###',1,1);
+INSERT INTO languagedicts VALUES(19,6,'terms','embeddedhtml','https://en.wiktionary.org/wiki/####German',1,2);
+INSERT INTO languagedicts VALUES(20,6,'sentences','popuphtml','https://www.deepl.com/translator#de/en/###',1,3);
+INSERT INTO languagedicts VALUES(21,6,'terms','popuphtml','https://www.duden.de/suchen/dudenonline/###',1,4);
+INSERT INTO languagedicts VALUES(22,6,'terms','popuphtml','https://conjugator.reverso.net/conjugation-german-verb-###.html',1,5);
+INSERT INTO languagedicts VALUES(23,7,'terms','embeddedhtml','https://www.wordreference.com/gren/###',1,1);
+INSERT INTO languagedicts VALUES(24,7,'terms','embeddedhtml','https://en.wiktionary.org/wiki/####Greek',1,2);
+INSERT INTO languagedicts VALUES(25,7,'sentences','popuphtml','https://www.deepl.com/translator#el/en/###',1,3);
+INSERT INTO languagedicts VALUES(26,7,'terms','embeddedhtml','https://www.greek-language.gr/greekLang/modern_greek/tools/lexica/search.html?sin=all&lq=###',1,4);
+INSERT INTO languagedicts VALUES(27,7,'terms','embeddedhtml','https://cooljugator.com/gr/###',1,5);
+INSERT INTO languagedicts VALUES(28,8,'terms','embeddedhtml','https://www.boltidictionary.com/en/search?s=###',1,1);
+INSERT INTO languagedicts VALUES(29,8,'terms','embeddedhtml','https://en.wiktionary.org/wiki/####Hindi',1,2);
+INSERT INTO languagedicts VALUES(30,8,'sentences','popuphtml','https://translate.google.com/?sl=hi&tl=en&text=###',1,3);
+INSERT INTO languagedicts VALUES(31,8,'terms','embeddedhtml','https://verbix.com/webverbix/go.php?&D1=47&T1=###',1,4);
+INSERT INTO languagedicts VALUES(32,9,'terms','embeddedhtml','https://jisho.org/search/###',1,1);
+INSERT INTO languagedicts VALUES(33,9,'terms','popuphtml','https://www.japandict.com/?s=###&lang=eng',1,2);
+INSERT INTO languagedicts VALUES(34,9,'terms','embeddedhtml','https://en.wiktionary.org/wiki/####Japanese',1,3);
+INSERT INTO languagedicts VALUES(35,9,'sentences','popuphtml','https://www.deepl.com/translator#jp/en/###',1,4);
+INSERT INTO languagedicts VALUES(36,9,'terms','embeddedhtml','https://www.weblio.jp/content/###',1,5);
+INSERT INTO languagedicts VALUES(37,9,'terms','popuphtml','https://conjugator.reverso.net/conjugation-japanese-verb-###.html',1,6);
+INSERT INTO languagedicts VALUES(38,10,'terms','embeddedhtml','https://en.openrussian.org/?search=###',1,1);
+INSERT INTO languagedicts VALUES(39,10,'terms','embeddedhtml','https://en.wiktionary.org/wiki/####Russian',1,2);
+INSERT INTO languagedicts VALUES(40,10,'sentences','popuphtml','https://www.deepl.com/translator#ru/en/###',1,3);
+INSERT INTO languagedicts VALUES(41,10,'terms','embeddedhtml','https://gramota.ru/poisk?query=###&mode=all',1,4);
+INSERT INTO languagedicts VALUES(42,10,'terms','popuphtml','https://conjugator.reverso.net/conjugation-russian-verb-###.html',1,5);
+INSERT INTO languagedicts VALUES(43,11,'terms','embeddedhtml','https://www.learnsanskrit.cc/translate?search=###&dir=se',1,1);
+INSERT INTO languagedicts VALUES(44,11,'terms','embeddedhtml','https://dsal.uchicago.edu/cgi-bin/app/sanskrit_query.py?qs=###&searchhws=yes&matchtype=default',1,2);
+INSERT INTO languagedicts VALUES(45,11,'terms','embeddedhtml','https://en.wiktionary.org/wiki/####Sanskrit',1,3);
+INSERT INTO languagedicts VALUES(46,11,'sentences','popuphtml','https://translate.google.com/?hl=en&sl=sa&tl=en&text=###&op=translate',1,4);
+INSERT INTO languagedicts VALUES(47,12,'terms','popuphtml','https://www.spanishdict.com/translate/###',1,1);
+INSERT INTO languagedicts VALUES(48,12,'terms','embeddedhtml','https://en.wiktionary.org/wiki/####Spanish',1,2);
+INSERT INTO languagedicts VALUES(49,12,'sentences','popuphtml','https://www.deepl.com/translator#es/en/###',1,3);
+INSERT INTO languagedicts VALUES(50,12,'terms','popuphtml','https://dle.rae.es/###?m=form',1,4);
+INSERT INTO languagedicts VALUES(51,12,'terms','popuphtml','https://conjugator.reverso.net/conjugation-spanish-verb-###.html',1,5);
+INSERT INTO languagedicts VALUES(52,13,'terms','embeddedhtml','https://tureng.com/tr/turkce-ingilizce/###',1,1);
+INSERT INTO languagedicts VALUES(53,13,'terms','embeddedhtml','https://en.wiktionary.org/wiki/####Turkish',1,2);
+INSERT INTO languagedicts VALUES(54,13,'sentences','popuphtml','https://www.deepl.com/translator#tr/en/###',1,3);
+INSERT INTO languagedicts VALUES(55,13,'terms','embeddedhtml','https://sozluk.gov.tr/?lute=###',1,4);
+INSERT INTO languagedicts VALUES(56,13,'terms','embeddedhtml','https://www.verbix.com/webverbix/go.php?&D1=31&T1=###',1,5);
 CREATE TABLE IF NOT EXISTS "languages" (
 	"LgID" INTEGER NOT NULL  ,
 	"LgName" VARCHAR(40) NOT NULL  ,
@@ -277,16 +304,23 @@ CREATE TABLE IF NOT EXISTS "languages" (
 INSERT INTO languages VALUES(1,'Arabic','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?؟۔‎','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','\u0600-\u06FF\uFE70-\uFEFC',1,1,'spacedel');
 INSERT INTO languages VALUES(2,'Classical Chinese','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。！？','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','一-龥',0,1,'classicalchinese');
 INSERT INTO languages VALUES(3,'Czech','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,1,'spacedel');
-INSERT INTO languages VALUES(4,'English','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,'spacedel');
-INSERT INTO languages VALUES(5,'French','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,'spacedel');
-INSERT INTO languages VALUES(6,'German','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ\u200C\u200D',0,0,'spacedel');
-INSERT INTO languages VALUES(7,'Greek','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?;','Mr.|Mrs.|Dr.|[A-Z].|κτλ.|κλπ.|π.χ.|λ.χ.|κ.ά|δηλ.|Κος.|Κ.|Κα.|μ.Χ.|ΥΓ.|μ.μ.|π.μ.|σελ.|κεφ.|βλ.|αι.','α-ωΑ-ΩάόήέώύίΊΏΈΉΌΆΎϊΪϋΫΐΰ',0,1,'spacedel');
-INSERT INTO languages VALUES(8,'Hindi','´=''|`=''|’=''|‘=''|...=…|..=‥','.?!|।॥','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-Z\u0900-\u0963\u0966-\u097F\u200C\u200D',0,1,'spacedel');
-INSERT INTO languages VALUES(9,'Japanese','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。？！','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','\p{Han}\p{Katakana}\p{Hiragana}',0,1,'japanese');
-INSERT INTO languages VALUES(10,'Russian','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','А-Яа-яЁё',0,0,'spacedel');
-INSERT INTO languages VALUES(11,'Sanskrit','´=''|`=''|’=''|‘=''|...=…|..=‥','.?!।॥','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-Z\u0900-\u0963\u0966-\u097F',0,1,'spacedel');
-INSERT INTO languages VALUES(12,'Spanish','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,'spacedel');
-INSERT INTO languages VALUES(13,'Turkish','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑğĞıİöÖüÜşŞçÇ',0,1,'turkish');
+INSERT INTO languages VALUES(4,'English','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','Mr.|Mrs.|Dr.|[A-Z].|Vd.|Vds.|U.S.|St.|No.|pp.|Jr.|p.m.|a.m.|Inc.|Gov.|Rep.|Ms.|Sen.|in.|Co.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,'spacedel');
+INSERT INTO languages VALUES(5,'French','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','[A-Z].|etc.|sens.|fin.|St.|sûr.|sol.|nom.|point.|Dr.|bout.|dos.|haut.|pp.|vol.|av.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,'spacedel');
+INSERT INTO languages VALUES(6,'German','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','[A-Z].|Dr.|St.|bzw.|Mio.|Co.|ca.|Mrd.|u.a.|Prof.|Nr.|Hrsg.|Chr.|II.|III.|z.B.|usw.|usf.|d.h.|e.V.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ\u200C\u200D',0,0,'spacedel');
+INSERT INTO languages VALUES(7,'Greek','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?;','[A-Z].|[Α-Ω].|κτλ.|κλπ.|π.χ.|λ.χ.|κ.ά|δηλ.|Κος.|Κ.|Κα.|μ.Χ.|ΥΓ.|μ.μ.|π.μ.|σελ.|κεφ.|βλ.|αι.|Ε.Ε.|Δ.Σ.|Α.Ε.|Γ.Σ.|π.Χ.|τ.χλμ.|τ.μ.|κ.λπ.','α-ωΑ-ΩάόήέώύίΊΏΈΉΌΆΎϊΪϋΫΐΰ',0,1,'spacedel');
+INSERT INTO languages VALUES(8,'Hindi','´=''|`=''|’=''|‘=''|...=…|..=‥','.?!|।॥','[A-Z].|[\u0900-\u0963].|[\u0966-\u097F].|[\u200C\u200D].|है.|ए.|हैं.|ई.|ओ.|हूं.|था.|चाहिए.|म.प्र.|होगा.|थी.|स.|ए.एस.आई.|उ.प्र.|न.|ए.टी.एम.|जाएगा.|प.|हो.|ए.के.|ई.पू.|सल्ल.|मी.|सी.|ए.एस.|एम.|इ.|डी.|रजि.|पू.|टी.','a-zA-Z\u0900-\u0963\u0966-\u097F\u200C\u200D',0,1,'spacedel');
+INSERT INTO languages VALUES(9,'Japanese','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?。？！','..|→.|、.|...|「.|〜.|○○○.|『.|』.|㌶.|.....|‐.|℡.|①.|②.|③.|・・・','\p{Han}\p{Katakana}\p{Hiragana}',0,1,'japanese');
+INSERT INTO languages VALUES(10,'Russian','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','[A-Z].|[А-Я].|тыс.|млн.|руб.|ул.|млрд.|год.|им.|ст.|т.д.|гг.|др.|кв.|т.е.|ред.|все.|прим.|нас.|грн.','А-Яа-яЁё',0,1,'spacedel');
+INSERT INTO languages VALUES(11,'Sanskrit','´=''|`=''|’=''|‘=''|...=…|..=‥','.?!।॥','[\u0900-\u0963].|[\u0966-\u097F].|[A-Z].|श.|ई.|स.|अ.|ए.|उ.|च.कि.मी.|मी.|ई.पू.|इ.|p.|ऐ.|ओ.|च.|आ.|ड.|वा.','a-zA-Zāīūṣḥṃṛṭṇḍṝḹḻśṅñ\u0900-\u0963\u0966-\u097F',0,1,'spacedel');
+INSERT INTO languages VALUES(12,'Spanish','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?¡','Dr.|Dra.|Drs.|[A-Z].|Ud.|Vd.|Vds.|Sr.|Sra.|Srta.|a. C.|d.C.|Pte.|etc.|UU.|p.m.|a.m.|vs.|Jr.|pp.|St.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ',0,0,'spacedel');
+INSERT INTO languages VALUES(13,'Turkish','´=''|`=''|’=''|‘=''|...=…|..=‥','.!?','[A-Z].|[À-Ö].|vb.|M.Ö.|Sh.|A.Ş.|T.C.|vs.|var.|Ş.|M.A.','a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑğĞıİöÖüÜşŞçÇ',0,1,'turkish');
+CREATE TABLE textbookmarks (
+	"TbID" INTEGER NOT NULL, 
+	"TbTxID" INTEGER NOT NULL, 
+	"TbTitle" TEXT NOT NULL, 
+	PRIMARY KEY ("TbID"), 
+	FOREIGN KEY("TbTxID") REFERENCES texts ("TxID") ON DELETE CASCADE
+);
 CREATE UNIQUE INDEX "TgText" ON "tags" ("TgText");
 CREATE UNIQUE INDEX "T2Text" ON "tags2" ("T2Text");
 CREATE INDEX "BtT2ID" ON "booktags" ("BtT2ID");
