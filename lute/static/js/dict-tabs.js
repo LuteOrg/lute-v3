@@ -33,13 +33,6 @@ class LookupButton {
     this.btn.classList.add("dict-btn");
     this.btn.onclick = () => this.do_lookup();
 
-    this.frame.addEventListener("load", (e) => {
-      if (this.frame.src && this.frame.src !== "about:blank" && this.is_active) {
-        this.frame.classList.add("dict-active");
-        readPaneLeft.focus();
-      }
-    });
-
     LookupButton.all.push(this);
   }
 
@@ -61,7 +54,9 @@ class LookupButton {
     DictButton.all.forEach(button => button.deactivate());
     this.is_active = true;
     this.btn.classList.add("dict-btn-active");
+    this.frame.classList.add("dict-active");
   }
+
 };
 
 

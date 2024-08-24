@@ -308,10 +308,6 @@ div#read_pane_left {
     width: 50%;
 }
 
-#read_pane_left:focus {
-    outline: none;
-}
-
 div#read_pane_right {
     display: grid;
     grid-template-rows: 18rem 1fr;
