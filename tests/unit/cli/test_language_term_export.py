@@ -23,12 +23,13 @@ def test_smoke_test(app_context, tmp_path, english):
         text = ofhandle.read()
     print(text)
     lines = text.split("\n")
+    head = lines[0]
     assert (
-        lines[0] == "term,count,familycount,books,definition,status,children,tags"
+        head == "term,count,familycount,books,definition,status,parents,children,tags"
     ), "headings"
     firstline = lines[1]
     assert firstline.startswith("the,"), "the is most common"
-    assert firstline.endswith('article,1,-,"a, b"'), "ending data"
+    assert firstline.endswith('article,1,-,-,"a, b"'), "ending data"
 
 
 def test_single_book_export(app_context, empty_db, tmp_path, english):
