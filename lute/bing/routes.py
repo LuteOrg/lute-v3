@@ -40,33 +40,30 @@ def bing_search(langid, text, searchstring):
     # or
     # <img class="mimg rms_img" ... src="https://tse4.mm.bing ..." >
 
-    images = list(re.findall(r"(<img .*?>)", content, re.I))
-
     def is_search_img(img):
         return not ('src="/' in img) and ("rms_img" in img or "vimgld" in img)
 
-    def fix_data_src(img):
-        return img.replace("data-src=", "src=")
-
-    images = [fix_data_src(i) for i in images if is_search_img(i)]
-
-    # Reduce image load count so we don't kill subpage loading.
-    images = images[:25]
-
     def build_struct(image):
         src = "missing"
-        m = re.search(r'src="(.*?)"', image)
+        normalized_source = image.replace("data-src=", "src=")
+        m = re.search(r'src="(.*?)"', normalized_source)
         if m:
             src = m.group(1)
         return {"html": image, "src": src}
 
-    data = [build_struct(i) for i in images]
+    raw_images = list(re.findall(r"(<img .*?>)", content, re.I))
+
+    images = [build_struct(i) for i in raw_images if is_search_img(i)]
+
+    # Reduce image load count so we don't kill subpage loading.
+    # Also bing seems to throttle images if the count is higher (??).
+    images = images[:25]
 
     return render_template(
         "imagesearch/index.html",
         langid=langid,
         text=text,
-        images=data,
+        images=images,
         error_message=error_msg,
     )
 
