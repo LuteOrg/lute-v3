@@ -27,8 +27,13 @@ def bing_search(langid, text, searchstring):
     searchparams = searchstring.replace("###", search)
     url = "https://www.bing.com/images/search?" + searchparams
     content = ""
-    with urllib.request.urlopen(url) as s:
-        content = s.read().decode("utf-8")
+    error_msg = ""
+    try:
+        with urllib.request.urlopen(url) as s:
+            content = s.read().decode("utf-8")
+    except urllib.error.URLError as e:
+        content = ""
+        error_msg = e.reason
 
     # Samples
     # <img class="mimg vimgld" ... data-src="https:// ...">
@@ -61,7 +66,11 @@ def bing_search(langid, text, searchstring):
     data = [build_struct(i) for i in images]
 
     return render_template(
-        "imagesearch/index.html", langid=langid, text=text, images=data
+        "imagesearch/index.html",
+        langid=langid,
+        text=text,
+        images=data,
+        error_message=error_msg,
     )
 
 
