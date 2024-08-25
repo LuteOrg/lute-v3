@@ -35,15 +35,12 @@ def bing_search(langid, text, searchstring):
         content = ""
         error_msg = e.reason
 
-    # Samples
+    # Sample data returned by bing image search:
     # <img class="mimg vimgld" ... data-src="https:// ...">
     # or
     # <img class="mimg rms_img" ... src="https://tse4.mm.bing ..." >
 
-    pattern = r"(<img .*?>)"
-    matches = re.findall(pattern, content, re.I)
-
-    images = list(matches)
+    images = list(re.findall(r"(<img .*?>)", content, re.I))
 
     def is_search_img(img):
         return not ('src="/' in img) and ("rms_img" in img or "vimgld" in img)
