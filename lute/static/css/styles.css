@@ -2177,6 +2177,10 @@ div#termimagesearch span > img {
     display:inline;
 }
 
+div#termimagesearch span.imageAction {
+    text-decoration: underline;
+}
+
 div#termimagesearch span.imageAction:hover {
     color: #C00000;
     cursor: pointer;
