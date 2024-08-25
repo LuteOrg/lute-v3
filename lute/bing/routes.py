@@ -27,41 +27,44 @@ def bing_search(langid, text, searchstring):
     searchparams = searchstring.replace("###", search)
     url = "https://www.bing.com/images/search?" + searchparams
     content = ""
-    with urllib.request.urlopen(url) as s:
-        content = s.read().decode("utf-8")
+    error_msg = ""
+    try:
+        with urllib.request.urlopen(url) as s:
+            content = s.read().decode("utf-8")
+    except urllib.error.URLError as e:
+        content = ""
+        error_msg = e.reason
 
-    # Samples
+    # Sample data returned by bing image search:
     # <img class="mimg vimgld" ... data-src="https:// ...">
     # or
     # <img class="mimg rms_img" ... src="https://tse4.mm.bing ..." >
 
-    pattern = r"(<img .*?>)"
-    matches = re.findall(pattern, content, re.I)
-
-    images = list(matches)
-
     def is_search_img(img):
         return not ('src="/' in img) and ("rms_img" in img or "vimgld" in img)
 
-    def fix_data_src(img):
-        return img.replace("data-src=", "src=")
-
-    images = [fix_data_src(i) for i in images if is_search_img(i)]
-
-    # Reduce image load count so we don't kill subpage loading.
-    images = images[:25]
-
     def build_struct(image):
         src = "missing"
-        m = re.search(r'src="(.*?)"', image)
+        normalized_source = image.replace("data-src=", "src=")
+        m = re.search(r'src="(.*?)"', normalized_source)
         if m:
             src = m.group(1)
         return {"html": image, "src": src}
 
-    data = [build_struct(i) for i in images]
+    raw_images = list(re.findall(r"(<img .*?>)", content, re.I))
+
+    images = [build_struct(i) for i in raw_images if is_search_img(i)]
+
+    # Reduce image load count so we don't kill subpage loading.
+    # Also bing seems to throttle images if the count is higher (??).
+    images = images[:25]
 
     return render_template(
-        "imagesearch/index.html", langid=langid, text=text, images=data
+        "imagesearch/index.html",
+        langid=langid,
+        text=text,
+        images=images,
+        error_message=error_msg,
     )
 
 

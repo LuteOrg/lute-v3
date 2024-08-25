@@ -36,6 +36,10 @@
         {{ image['html'] | safe }}
       </span>
       {% endfor %}
+
+      {% if error_message != "" %}
+      <p><i>Error contacting image server: {{ error_message }}</i></p>
+      {% endif %}
     </div>
   </body>
 
