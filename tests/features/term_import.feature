@@ -379,7 +379,7 @@ Feature: Term import
             Spanish,a,,1,
             Spanish,b,a,2,y
             Spanish,c,a,3,y
-            Spanish,d,a,4
+            Spanish,d,a,4,
         When import with create false, update true
         Then import should succeed with 0 created, 4 updated, 0 skipped
         And sql "select WoText, WoStatus, WoSyncStatus from words order by WoText" should return:
@@ -580,3 +580,19 @@ Feature: Term import
             language,term,status
         Then import should fail with message:
             No terms in file
+
+
+    Scenario: Fix issue 454 too many fields in data line fails
+        Given import file:
+            language,translation,term,parent,status,tags,pronunciation
+            Spanish,cat,gato,,1,animal,GAH-toh,EXTRA_STUFF
+        Then import should fail with message:
+            Extra values on line 1
+
+
+    Scenario: Fix issue 454 too few fields in data line fails
+        Given import file:
+            language,translation,term,parent,status,tags,pronunciation
+            Spanish,cat,gato,,1,animal
+        Then import should fail with message:
+            Missing values on line 1
