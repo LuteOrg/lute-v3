@@ -116,7 +116,7 @@ def then_term_tags(language, term, expected):
     pstring = ", ".join([p.text for p in t.parents])
     if pstring == "":
         pstring = "-"
-    tstring = ", ".join([p.text for p in t.term_tags])
+    tstring = ", ".join(sorted([p.text for p in t.term_tags]))
     if tstring == "":
         tstring = "-"
     actual = [
