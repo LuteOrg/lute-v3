@@ -44,7 +44,13 @@ def _load_import_file(filename, encoding="utf-8-sig"):
             raise BadImportFileError("No terms in file")
         _validate_data_fields(fieldnames)
 
+        line_num = 0
         for line in reader:
+            line_num += 1
+            if None in line.values():
+                raise BadImportFileError(f"Missing values on line {line_num}")
+            if None in line.keys():
+                raise BadImportFileError(f"Extra values on line {line_num}")
             importdata.append(line)
 
     if len(importdata) == 0:
