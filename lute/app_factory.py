@@ -303,6 +303,11 @@ def _create_app(app_config, extra_config):
         # ref https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
         # Don't track mods.
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+        # Disable CSRF -- this is a local app, and it's highly
+        # unlikely that a malicious site will try to hack anyone's Lute data.
+        # ref https://stackoverflow.com/questions/5207160/
+        #   what-is-a-csrf-token-what-is-its-importance-and-how-does-it-work
+        "WTF_CSRF_ENABLED": False,
     }
 
     final_config = {**config, **extra_config}
