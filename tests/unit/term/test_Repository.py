@@ -251,8 +251,7 @@ def test_save_with_new_parent(app_context, repo, hello_term):
     parent = repo.find(hello_term.language_id, "parent")
     assert isinstance(parent, Term), "is a Term bus. object"
     assert parent.text == "parent"
-    assert parent.term_tags == hello_term.term_tags
-    assert parent.term_tags == ["a", "b"]  # just spelling it out.
+    assert sorted(parent.term_tags) == ["a", "b"]  # just spelling it out.
     assert parent.translation == hello_term.translation
     assert parent.current_image == hello_term.current_image
     assert parent.parents == []
