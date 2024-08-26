@@ -301,7 +301,7 @@ class Repository:
             t.pop_flash_message()
 
         termtags = []
-        for s in term.term_tags:
+        for s in list(set(term.term_tags)):
             termtags.append(TermTag.find_or_create_by_text(s))
         t.remove_all_term_tags()
         for tt in termtags:

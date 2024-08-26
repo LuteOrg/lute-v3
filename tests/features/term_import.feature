@@ -543,6 +543,16 @@ Feature: Term import
             Duplicate terms in import: Classical chinese: 啊
 
 
+    Scenario: Fix issue 454 duplicate tags ok
+        Given import file:
+            language,translation,term,parent,status,tags,pronunciation
+            Spanish,cat,gato,,1,"animal,animal",GAH-toh
+        When import with create true, update false
+        Then import should succeed with 1 created, 0 updated, 0 skipped
+        And words table should contain:
+            gato
+
+
     Scenario: Bad status throws
         Given import file:
             language,term,status

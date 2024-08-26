@@ -139,6 +139,24 @@ def test_save_uses_existing_TermTags(app_context, repo, hello_term):
     assert_sql_result(sql, ["1; a; HELLO", "2; b; HELLO"], "a used, b created")
 
 
+def test_fix_issue_454_handle_duplicate_tags(app_context, repo, hello_term):
+    "Same new tag added twice should be handled ok."
+    db.session.add(TermTag("a"))
+    db.session.commit()
+
+    sql = """select TgID, TgText, WoText
+    from tags
+    left join wordtags on WtTgID = TgID
+    left join words on WoID = WtWoID
+    order by TgText"""
+    assert_sql_result(sql, ["1; a; None"], "a tag exists")
+
+    hello_term.term_tags = ["a", "b", "b"]
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result(sql, ["1; a; HELLO", "2; b; HELLO"], "a used, b created")
+
+
 def test_save_with_no_flash_message(app_context, repo, hello_term):
     "Saving with flash = None removes the flash record."
     hello_term.flash_message = "hi there"
