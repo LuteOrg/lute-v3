@@ -1,4 +1,20 @@
 
+# 3.5.2 (2024-08-26)
+
+Tweaks:
+
+* Issue #472: add parents to term export.
+* Fail import terms if too many or few fields in data.
+* Disable CSRF check for form posts.
+
+Fixes:
+
+* #454: ignore duplicate tag added to Term.
+* Show underline for links in error screen, was confusing.
+* Allow offline images upload, don't throw 500 error.
+* Revert PR #459 (cblanken/issue-379-dictionary-tab-autofocus).
+
+
 # 3.5.1 (2024-08-15)
 
 Tweaks:
