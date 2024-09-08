@@ -209,7 +209,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         updates["language_id"] = self.language_ids[lang]
         b = self.browser
         self._fill_term_form(b, updates)
-        b.find_by_css("#submit").first.click()
+        b.find_by_css("#btnsubmit").first.click()
 
     def get_term_table_content(self):
         "Get term table content."
@@ -332,7 +332,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             time.sleep(0.4)  # Hack, test failing.
             self._fill_term_form(iframe, updates)
             time.sleep(0.4)  # Hack, test failing.
-            iframe.find_by_css("#submit").first.click()
+            iframe.find_by_css("#btnsubmit").first.click()
             time.sleep(0.4)  # Hack, test failing.
 
             # Only refresh the reading frame if everything was ok.
