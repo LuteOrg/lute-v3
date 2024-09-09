@@ -121,10 +121,13 @@ def get_popup_data(termid):
         tocloc = TokenLocator(term.language, subj)
         component_and_pos = []
         for c in components:
-            locs = tocloc.locate_string(c.text)
-            # pylint: disable=consider-using-generator
-            index = min([loc["index"] for loc in locs])
-            component_and_pos.append([c, index])
+            c_indices = [loc["index"] for loc in tocloc.locate_string(c.text)]
+
+            # Sometimes the components aren't found
+            # in the string, which makes no sense ...
+            # ref https://github.com/LuteOrg/lute-v3/issues/474
+            if len(c_indices) > 0:
+                component_and_pos.append([c, min(c_indices)])
 
         def compare(a, b):
             # Lowest position (closest to front of string) sorts first.
