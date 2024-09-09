@@ -239,12 +239,14 @@ def given_book_from_file(luteclient, lang, title, filename):
     thisdir = os.path.dirname(os.path.realpath(__file__))
     fullpath = os.path.join(thisdir, "sample_files", filename)
     luteclient.make_book_from_file(title, fullpath, lang)
+    _sleep(1)  # Hack!
 
 
 @given(parsers.parse("a {lang} book from url {url}"))
 def given_book_from_url(luteclient, lang, url):
     "Book is made from url in dev_api."
     luteclient.make_book_from_url(url, lang)
+    _sleep(1)  # Hack!
 
 
 @given(parsers.parse('the book table loads "{title}"'))
