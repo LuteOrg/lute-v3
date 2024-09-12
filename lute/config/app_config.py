@@ -36,7 +36,7 @@ class AppConfig:  # pylint: disable=too-many-instance-attributes
         if self.env not in ["prod", "dev"]:
             raise ValueError(f"ENV must be prod or dev, was {self.env}.")
 
-        self.is_docker = "IS_DOCKER" in config
+        self.is_docker = bool(config.get("IS_DOCKER", False))
 
         # Database name.
         self.dbname = config.get("DBNAME", None)
