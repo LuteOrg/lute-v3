@@ -113,7 +113,8 @@ def _start(args):
             raise
 
 
-if __name__ == "__main__":
+def start():
+    "Main entry point.  Called via scripts and pyproject.toml."
     parser = argparse.ArgumentParser(description="Start lute.")
     parser.add_argument(
         "--port", type=int, default=5000, help="Port number (default: 5000)"
@@ -139,3 +140,10 @@ if __name__ == "__main__":
         """
 
         print(textwrap.dedent(failmsg))
+
+
+###############################
+
+
+if __name__ == "__main__":
+    start()
