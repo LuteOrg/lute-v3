@@ -38,6 +38,14 @@
   <script type="text/javascript" src="{{ url_for('static', filename='vendor/datatables/datatables.button.download.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.hoverIntent.js') }}" charset="utf-8"></script>
 
+  <script type="importmap">
+    {
+        "imports": {
+            "jquery": "https://esm.sh/jquery@3.6.3",
+            "datatables.net": "https://cdn.datatables.net/1.13.3/js/jquery.dataTables.min.mjs"
+        }
+    }
+  </script>
   <!-- this calls a route defined in app_factory to never cache this file -->
   <script type="text/javascript" src="/static/js/never_cache/lute.js" charset="utf-8"></script>
 
