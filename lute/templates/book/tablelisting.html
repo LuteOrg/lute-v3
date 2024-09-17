@@ -36,7 +36,7 @@
 <form id="actionposter" method="post" action="">
 </form>
 
-<script>
+<script type="module">
 
   /* The book listing. */
   var book_listing_table;
@@ -273,7 +273,7 @@
       "1": 1, "2": 2, "3": 3, "4": 4, "5": 5,
       "99": "Well Known or Ignored"
     };
-    ret = `<div class="status-bar-container">`;
+    let ret = `<div class="status-bar-container">`;
     Object.entries(bar_titles).forEach(([key, title]) => {
       ret += make_bar(key, title);
     });
