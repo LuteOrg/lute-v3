@@ -79,7 +79,7 @@
       {% endif %}
       responsive: true,
       select: false,
-      lengthMenu: [ 10, 25, 50 ],
+      lengthMenu: [ 10, 25, 50, 100 ],
       pageLength: 25,
       paging: true,
       info: true,
@@ -87,6 +87,7 @@
       processing: true,
       serverSide: true,
       stateSave: true,
+      stateDuration: 0,  /* never expire saved state. */
       search: { search: initial_search },
       columnDefs: [
         { "name": "BkTitle", "targets": 0, "width": "40%", "render": render_book_title, className: "colVisToggled" },
