@@ -502,7 +502,7 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         Content to be rendered to browser.
         """
         zws = chr(0x200B)
-        return self.display_text.replace(zws, "").replace(" ", "&nbsp;")
+        return self.display_text.replace(zws, "")
 
     @property
     def span_id(self):
