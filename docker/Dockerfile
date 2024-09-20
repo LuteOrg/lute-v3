@@ -12,7 +12,7 @@ WORKDIR /lute
 
 # Install base.
 ENV PIP_ROOT_USER_ACTION=ignore
-RUN pip install lute3
+RUN pip install --upgrade --force-reinstall --no-deps --no-cache-dir lute3
 COPY lute/config/config.yml.docker ./config.yml
 
 # Build arg, defaults to false.
