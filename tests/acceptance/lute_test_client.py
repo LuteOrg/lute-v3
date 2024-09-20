@@ -240,16 +240,23 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
         def _to_string(t):
             "Create string for token, eg 'cat (2)'."
+
+            # Note that selenium's t.text accessor strips leading/trailing whitespace,
+            # so if a span contains " ", t.text returns "".  We need the actual
+            # inner html.
+            inner_html = t._element.get_attribute("innerHTML")
+            zws = "\u200B"
+            inner_html = inner_html.replace(zws, "")
+
             status = [
                 c.replace("status", "")
                 for c in t["class"].split(" ")
                 if c.startswith("status") and c != "status0"
             ]
             if len(status) == 0:
-                return t.text
-            assert len(status) == 1, f"should only have 1 status on {t.text}"
-            status = status[0]
-            return f"{t.text} ({status})"
+                return inner_html
+            assert len(status) == 1, f"should only have 1 status on {inner_html}"
+            return f"{inner_html} ({status[0]})"
 
         etext = [_to_string(e) for e in elements]
         ret = "/".join(etext)
