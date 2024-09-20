@@ -1,4 +1,20 @@
 
+# 3.5.3 (2024-09-20)
+
+Tweaks:
+
+* #324: convert pending term parent text to tag on save, if not a real tag yet.
+* #480: persist user book table settings.
+* #482: don't rearrange whole reading page when adding multiword term.
+
+Fixes:
+
+* #483: docker build always uses latest pypi lute.
+* #479: fix pyproject.toml start script reference.
+* Interpret IS_DOCKER flag correctly.
+* #474: fix missing component term error.
+
+
 # 3.5.2 (2024-08-26)
 
 Tweaks:
