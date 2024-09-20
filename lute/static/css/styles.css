@@ -729,7 +729,6 @@ span.textsentence {
 span.textitem {
     font-size: 16px;
     color: var(--font-color);
-    display:inline-block;
 
     /* disallow select, only allow mouse-down-drag-up to define multiword
    terms. */

@@ -1,149 +1,87 @@
 "use strict";
 
-let textItems;
-let fontDefault;
-let lhDefault;
-let columnDefault;
-
-const fontPlusButton = document.querySelector(".font-plus");
-const fontMinusButton = document.querySelector(".font-minus");
-
-const lhPlusButton = document.querySelector(".lh-plus");
-const lhMinusButton = document.querySelector(".lh-minus");
-
-const widthPlusButton = document.querySelector(".width-plus");
-const widthMinusButton = document.querySelector(".width-minus");
-
-const oneColButton = document.querySelector(".column-one");
-const twoColButton = document.querySelector(".column-two");
-
-// const theText = document.querySelector("#thetext");
+/* NOTE: this code uses some globals from resize.js */
+// TODO refactor: remove js global state!
 
 const domObserver = new MutationObserver((mutationList, observer) => {
-  textItems = document.querySelectorAll("span.textitem");
-
-  fontDefault = getFontSize(textItems[0]);
-  lhDefault = getLineHeight(textItems[0]);
-  columnDefault = getColumnCount();
-
-  const fontSize = getFromLocalStorage("fontSize", fontDefault);
-  const lhSize = getFromLocalStorage("lineHeight", lhDefault);
-  const columnCount = getFromLocalStorage("columnCount", columnDefault);
-
-  textItems.forEach((item) => {
-    setFontSize(item, `${convertPixelsToRem(fontSize)}rem`);
-    setLineHeight(item, Number(lhSize.toPrecision(2)));
-  });
-
-  theText.style.columnCount = columnCount;
+  incrementFontSize(0);
+  incrementLineHeight(0);
+  setColumnCount(null);
 });
 
 domObserver.observe(theText, {childList: true, subtree: true});
 
-fontPlusButton.addEventListener("click", () => {
-  resizeFont("+");
-});
-
-fontMinusButton.addEventListener("click", () => {
-  resizeFont("-");
-});
-
-lhPlusButton.addEventListener("click", () => {
-  resizeLineHeight("+");
-});
-
-lhMinusButton.addEventListener("click", () => {
-  resizeLineHeight("-");
-});
-
-widthPlusButton.addEventListener("click", () => {
-  changeTextWidth("+");
-});
-
-widthMinusButton.addEventListener("click", () => {
-  changeTextWidth("-");
-});
-
-oneColButton.addEventListener("click", () => {
-  changeColumnCount(1);
-});
-
-twoColButton.addEventListener("click", () => {
-  changeColumnCount(2);
-});
-
-function changeColumnCount(num) {
-  theText.style.columnCount = num;
-  localStorage.setItem("columnCount", num);
+// Helper function to add event listeners
+function addClickHandler(selector, callback, value) {
+  const button = document.querySelector(selector);
+  button.addEventListener("click", () => callback(value));
 }
 
-function getFontSize(element) {
-  const elementComputedStyle = window.getComputedStyle(element);
-  return parseFloat(elementComputedStyle.fontSize);
-}
+// Add button handlers.
+addClickHandler(".font-plus", incrementFontSize, 1);
+addClickHandler(".font-minus", incrementFontSize, -1);
+addClickHandler(".lh-plus", incrementLineHeight, 0.1);
+addClickHandler(".lh-minus", incrementLineHeight, -0.1);
+addClickHandler(".width-plus", setTextWidth, 1.05);
+addClickHandler(".width-minus", setTextWidth, 0.95);
+addClickHandler(".column-one", setColumnCount, 1);
+addClickHandler(".column-two", setColumnCount, 2);
 
-function getLineHeight(element) {
-  const elementComputedStyle = window.getComputedStyle(element);
-  return Number(((parseFloat(elementComputedStyle.marginBottom) * 2 + getFontSize(element)) / getFontSize(element)).toPrecision(2));
-  // return parseFloat(elementComputedStyle.marginBottom);
-}
 
-function getColumnCount() {
-  const elementComputedStyle = window.getComputedStyle(theText);
-  return elementComputedStyle.columnCount;
-}
+function incrementFontSize(delta) {
+  const textItems = document.querySelectorAll("span.textitem");
+  const s = window.getComputedStyle(textItems[0]);
+  const fontDefault = parseFloat(s.fontSize);
+  const STORAGE_KEY = "fontSize";
+  const fontSize = getFromLocalStorage(STORAGE_KEY, fontDefault);
 
-function setFontSize(element, size) {
-  element.style.fontSize = size;
-}
+  const newSize = clamp(fontSize + delta, 1, 50);
 
-function setLineHeight(element, size) {
-  const marginVal = (getFontSize(element) * size - getFontSize(element)) * 0.5;
-  element.style.marginBottom = `${marginVal}px`;
-}
-
-function resizeLineHeight(operation) {
-  const currentSize = getFromLocalStorage("lineHeight", lhDefault);
-  const add = (operation === "+");
-  let newSize = add ? currentSize + 0.1 : currentSize - 0.1;
-  newSize = clamp(newSize, 1, 5);
-
+  const sizeRem = `${convertPixelsToRem(newSize)}rem`;
   textItems.forEach((item) => {
-    setLineHeight(item, Number(newSize.toPrecision(2)));
+    item.style.fontSize = sizeRem;
   });
 
-  localStorage.setItem("lineHeight", newSize.toPrecision(2));
-}
-
-function resizeFont(operation) {
-  const currentSize = getFromLocalStorage("fontSize", fontDefault);
-  const add = (operation === "+");
-  let newSize = add ? currentSize + 1 : currentSize - 1;
-  newSize = clamp(newSize, 1, 50);
-
-  textItems.forEach((item) => {
-    setFontSize(item, `${convertPixelsToRem(newSize)}rem`);
-  });
-
-  localStorage.setItem("fontSize", newSize);
-}
-
-function changeTextWidth(operation) {
-  const currentWidth = getFromLocalStorage("textWidth", widthDefault);
-  const add = (operation === "+");
-
-  let newWidth = add ? currentWidth + currentWidth * 0.05 : currentWidth - currentWidth * 0.05;
-
-  newWidth = clamp(newWidth, 25, 95);
-
-  readPaneLeft.style.width = `${newWidth}%`;
-  readPaneRight.style.width = `${(100 - newWidth) * getReadPaneWidthRatio()}%`;
-
-  localStorage.setItem("textWidth", newWidth);
+  localStorage.setItem(STORAGE_KEY, newSize);
 }
 
 function convertPixelsToRem(sizePx) {
   const bodyFontSize =  window.getComputedStyle(document.querySelector("body")).fontSize;
   const sizeRem = sizePx / parseFloat(bodyFontSize);
   return sizeRem;
+}
+
+function incrementLineHeight(delta) {
+  const paras = document.querySelectorAll("#thetext p");
+  const s = window.getComputedStyle(paras[0]);
+  const lhDefault = parseFloat(s.getPropertyValue('line-height'));
+
+  const STORAGE_KEY = "paraLineHeight";
+  let current_h = getFromLocalStorage(STORAGE_KEY, lhDefault);
+  current_h = Number(current_h.toPrecision(2));
+  let new_h = clamp(current_h + delta, 1.3, 5);
+
+  paras.forEach((p) => { p.style.lineHeight = new_h; });
+  localStorage.setItem(STORAGE_KEY, new_h);
+}
+
+function setTextWidth(factor) {
+  const STORAGE_KEY = "textWidth";
+  const currentWidth = getFromLocalStorage(STORAGE_KEY, widthDefault);
+  const newWidth = clamp(currentWidth * factor, 25, 95);
+
+  readPaneLeft.style.width = `${newWidth}%`;
+  readPaneRight.style.width = `${(100 - newWidth) * getReadPaneWidthRatio()}%`;
+
+  localStorage.setItem(STORAGE_KEY, newWidth);
+}
+
+function setColumnCount(num) {
+  let columnCount = num;
+  if (columnCount == null) {
+    const s = window.getComputedStyle(theText);
+    columnCount = getFromLocalStorage("columnCount", s.columnCount);
+  }
+  theText.style.columnCount = columnCount;
+  localStorage.setItem("columnCount", columnCount);
 }
