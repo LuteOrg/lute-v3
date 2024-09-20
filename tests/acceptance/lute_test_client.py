@@ -244,6 +244,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             # Note that selenium's t.text accessor strips leading/trailing whitespace,
             # so if a span contains " ", t.text returns "".  We need the actual
             # inner html.
+            # pylint: disable=protected-access
             inner_html = t._element.get_attribute("innerHTML")
             zws = "\u200B"
             inner_html = inner_html.replace(zws, "")
