@@ -72,39 +72,31 @@ def export_terms():
     parameters["length"] = 1000000
     outfile = os.path.join(current_app.env_config.temppath, "export_terms.csv")
     data = get_data_tables_list(parameters)
-    render_data = data["data"]
+    term_data = data["data"]
 
-    # Fields as returned from the datatables query.
-    headings = [
-        "OMIT_Checkbox",
-        "term",
-        "parent",
-        "translation",
-        "language",
-        "tags",
-        "OMIT_status_text",
-        "added",
-        "OMIT_WoID",
-        "OMIT_LgID",
-        "OMIT_ImageSource",
-        "status",
-        "link_status",
-        "OMIT_status_text",
-        "pronunciation",
+    # Term data is an array of dicts, with the sql field name as dict
+    # keys.  These need to be mapped to headings.
+    heading_to_fieldname = {
+        "term": "WoText",
+        "parent": "ParentText",
+        "translation": "WoTranslation",
+        "language": "LgName",
+        "tags": "TagList",
+        "added": "WoCreated",
+        "status": "StID",
+        "link_status": "SyncStatus",
+        "pronunciation": "WoRomanization",
+    }
+
+    headings = heading_to_fieldname.keys()
+    output_data = [
+        [r[heading_to_fieldname[fieldname]] for fieldname in headings]
+        for r in term_data
     ]
-    columns_to_exclude = []
-    for i, h in enumerate(headings):
-        if h.startswith("OMIT_"):
-            columns_to_exclude.append(i)
-
-    output_data = [headings] + render_data
     with open(outfile, "w", encoding="utf-8", newline="") as f:
         csv_writer = csv.writer(f)
-        for row in output_data:
-            filtered_row = [
-                value for i, value in enumerate(row) if i not in columns_to_exclude
-            ]
-            csv_writer.writerow(filtered_row)
+        csv_writer.writerow(headings)
+        csv_writer.writerows(output_data)
 
     return send_file(outfile, as_attachment=True, download_name="Terms.csv")
 

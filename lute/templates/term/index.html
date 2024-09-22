@@ -107,15 +107,6 @@
 
 <script>
 
-  // Column indexes returned in the datatables json.
-  const WORD_COL = 1;
-  const TRANSLATION_COL = 3;
-  const CREATED_DATE_COL = 7;
-  const WID_COL = 8;
-  const LID_COL = 9;
-  const IMG_COL = 10;
-  const STATUS_TEXT_COL = 13;
-
   let setup_term_datatable = function(initial_search) {
     var table = $('#termtable').DataTable({
       layout: {
@@ -150,26 +141,17 @@
         className: 'row-selected'
       },
       search: { search: initial_search },
-      columnDefs: [
-        // "chk" is included in the underlying SQL query.
-        // Without it, datatables would place the values
-        // in the wrong table columns.  Ugly hack, but works.
-        { name: "chk", targets: 0, searchable: false, orderable: false, data: null, render: render_checkbox },
-        { name: "WoText", targets: WORD_COL, render: render_text },
-        { name: "ParentText", targets: 2 },
-        { name: "WoTranslation", targets: TRANSLATION_COL, width: "40%", searchable: true, render: render_translation },
-        { name: "LgName", targets: 4 },
-        { name: "TagList", targets: 5 },
-        { name: "StID", targets: 6, render: render_status },
-        { name: "WoCreated", targets: CREATED_DATE_COL, render: render_date_created },
-
-        { name: "WoID", targets: WID_COL, visible: false },
-        { name: "LgID", targets: LID_COL, visible: false },
-        { name: "WiSource", targets: IMG_COL, visible: false },
-        { name: "StAbbreviation", targets: 11, visible: false },
-        { name: "SyncStatus", targets: 12, visible: false },
-        { name: "StText", targets: STATUS_TEXT_COL, visible: false },
-        { name: "WoRomanization", targets: 14, visible: false },
+      columns: [
+        { searchable: false, orderable: false, render: render_checkbox },
+        { name: "WoText", render: render_text },
+        { name: "ParentText", data: "ParentText" },
+        { name: "WoTranslation", width: "40%", searchable: true, render: render_translation },
+        { name: "LgName", data: "LgName" },
+        { name: "TagList", data: "TagList" },
+        { name: "StID", render: render_status },
+        { name: "WoCreated", render: render_date_created },
+        { name: "WoID", data: "WoID", visible: false },
+        { name: "LgID", data: "LgID", visible: false },
       ],
 
       // Ajax call
@@ -199,23 +181,23 @@
 
 
   let render_text = function ( data, type, row, meta ) {
-    return `<a href="/term/edit/${row[WID_COL]}">${row[WORD_COL]}</a>`;
+    return `<a href="/term/edit/${row['WoID']}">${row['WoText']}</a>`;
   };
 
   // Use the status ID for sorting, so Well Known comes after Learned (5),
   // but use the status text ("New (1)") for the cell display.
   let render_status = function ( data, type, row, meta ) {
-    return row[STATUS_TEXT_COL];
+    return row["StText"];
   };
 
   let render_checkbox = function (data, type, row, meta) {
-    return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row[WID_COL]}" langid="${row[LID_COL]}" onclick="handleChkClick()">`;
+    return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row['WoID']}" langid="${row['LgID']}" onclick="handleChkClick()">`;
   };
 
   let render_translation = function ( data, type, row, meta ) {
-    let tx = row[TRANSLATION_COL] ?? '';
+    let tx = row["WoTranslation"] ?? '';
     tx = tx.replaceAll("\r\n", "<br />");
-    let imgsrc = row[IMG_COL] ?? '';
+    let imgsrc = row["WiSource"] ?? '';
     if (imgsrc != '')
       imgsrc = `<img class="term-listing-image" style="margin-top: 5px;" src="${imgsrc}" />`;
     let ret = [ tx, imgsrc ].filter((s) => s != '');
@@ -223,7 +205,7 @@
   };
 
   let render_date_created = function (data, type, row, meta) {
-    const dt = row[CREATED_DATE_COL];
+    const dt = row["WoCreated"];
     const datepart = dt.split(' ')[0];
     return `<span title="${dt}">${datepart}</span>`;
   };

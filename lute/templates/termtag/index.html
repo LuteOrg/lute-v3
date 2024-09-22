@@ -37,35 +37,11 @@
       processing: true,
       serverSide: true,
       stateSave: true,
-      columnDefs: [
-        {
-          "name": "TgText", "targets": 0,
-          "render": function ( data, type, row, meta ) {
-            return `<a href="/termtag/edit/${row[3]}">${row[0]}</a>`;
-          }
-        },
-        { "name": "TgComment", "targets": 1 },
-        { "name": "TermCount", "targets": 2,
-          "render": function ( data, type, row, meta ) {
-            const count = parseInt(row[2]);
-            if (count == 0)
-              return '-';
-            return `<a href="/term/index/${row[0]}">${count}</a>`;
-          }
-        },
-        {
-          "targets": 3,
-          "data": null,
-          "searchable": false,
-          "orderable": false,
-          "render": function ( data, type, row, meta ) {
-            // TODO zzfuture fix: security - add CSRF token
-            const tgid = row[3];
-            return `<span id="deltermtag${tgid}" onclick="confirm_delete(${tgid})"><img src="{{ url_for('static', filename='/icn/minus-button.png') }}" title="Delete" /></span>`;
-          }
-        },
-        /* Extra data that is returned in the row for rendering, but not shown. */
-        { "name": "TgID", "targets": 4, "data": null, "visible": false }
+      columns: [
+        { name: "TgText", render: render_tag_text },
+        { name: "TgComment", data: "TgComment" },
+        { name: "TermCount", render: render_term_count },
+        { data: null, searchable: false, orderable: false, render: render_delete },
       ],
 
       // Ajax call
@@ -79,6 +55,22 @@
 
   } // end setup datatable
 
+  let render_tag_text = function ( data, type, row, meta ) {
+    return `<a href="/termtag/edit/${row['TgID']}">${row['TgText']}</a>`;
+  }
+
+  let render_term_count = function ( data, type, row, meta ) {
+    const count = parseInt(row['TermCount']);
+    if (count == 0)
+      return '-';
+    return count;
+  }
+
+  let render_delete = function ( data, type, row, meta ) {
+    // TODO zzfuture fix: security - add CSRF token
+    const tgid = row['TgID'];
+    return `<span id="deltermtag${tgid}" onclick="confirm_delete(${tgid})"><img src="{{ url_for('static', filename='/icn/minus-button.png') }}" title="Delete" /></span>`;
+  }
 
   $(document).ready(function () {
     setup_datatable();

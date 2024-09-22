@@ -68,8 +68,7 @@
       },
       buttons: [
         {
-          extend: 'colvis',
-          columns: '.colVisToggled'
+          extend: 'colvis'
         }
       ],
       {% if status != 'Archived' %}
@@ -89,24 +88,15 @@
       stateSave: true,
       stateDuration: 0,  /* never expire saved state. */
       search: { search: initial_search },
-      columnDefs: [
-        { "name": "BkTitle", "targets": 0, "width": "40%", "render": render_book_title, className: "colVisToggled" },
-        { "name": "LgName", "targets": 1, "width": "10%", className: "colVisToggled" },
-        { "name": "TagList", "targets": 2, "width": "10%", className: "colVisToggled" },
-        { "name": "WordCount", "targets": 3, "width": "10%", className: "colVisToggled" },
-        { "name": "UnknownPercent", "targets": 4, "data": null, "searchable": true, "orderable": true, "render": render_book_stats_graph, className: "colVisToggled" },
-        { "targets": 5, "data": null, "width": "8%", "searchable": false, "orderable": false, "render": render_book_actions, className: "colVisToggled" },
-
-        /* Extra data that is returned in the row for rendering, but not shown, not changed by colvis. */
-        { "name": "BkID", "targets": 6, "data": null, "visible": false },
-        { "name": "BkArchived", "targets": 7, "data": null, "visible": false },
-        { "name": "PageCount", "targets": 8, "data": null, "visible": false },
-        { "name": "PageNum", "targets": 9, "data": null, "visible": false },
-        { "name": "IsCompleted", "targets": 10, "data": null, "visible": false },
-        { "name": "StatusDistribution", "targets": 11, "data": null, "visible": false },
+      columns: [
+        { name: "BkTitle", width: "40%", render: render_book_title },
+        { name: "LgName", width: "10%", data: "LgName" },
+        { name: "TagList", width: "10%", data: "TagList" },
+        { name: "WordCount", width: "10%", data: "WordCount" },
+        { name: "UnknownPercent", render: render_book_stats_graph },
+        { width: "8%", "searchable": false, "orderable": false, render: render_book_actions },
       ],
 
-      // Ajax call
       ajax: {
         url: "/book/datatables/{{ status or 'active' }}",
         // Additional filters.  func calls are required to get the
@@ -121,9 +111,6 @@
       },
 
     });
-
-    // var dropdown = $('#defaultLanguageSelect');
-    // $('div.toolbar').append(dropdown);
   } // end setup_book_datatable
 
 
@@ -209,13 +196,16 @@
     do_action_post('delete', bookid);
   }
 
+  // Rendering helpers. =================================================
+  // each row in the table is a json dict, the keys are the SQL column names.
+
   let render_book_title = function ( data, type, row, meta ) {
-    const bkid = parseInt(row[5]);
-    const pgnum = parseInt(row[8]);
-    const pgcount = parseInt(row[7]);
+    const bkid = parseInt(row['BkID']);
+    const pgnum = parseInt(row['PageNum']);
+    const pgcount = parseInt(row['PageCount']);
     let pgfraction = '';
 
-    const completed = (parseInt(row[9]) == 1);
+    const completed = (parseInt(row['IsCompleted']) == 1);
     let book_title_classes = ['book-title'];
     if (completed) {
       book_title_classes.push('completed_book');
@@ -224,13 +214,13 @@
       pgfraction = ` (${pgnum}/${pgcount})`;
     }
 
-    return `<a class="${book_title_classes.join(' ')}" href="/read/${bkid}">${row[0]}${pgfraction}</a>`;
+    return `<a class="${book_title_classes.join(' ')}" href="/read/${bkid}">${row['BkTitle']}${pgfraction}</a>`;
   };
 
 
   let render_book_stats_graph = function(data, type, row, meta) {
     const empty_stats = `<div title="Please open the book to calculate stats">&nbsp;</div>`;
-    let statuscounts = row[10];
+    let statuscounts = row['StatusDistribution'];
     if ((statuscounts ?? '')== '') {
       return empty_stats;
     }
@@ -285,9 +275,9 @@
 
   let render_book_actions = function ( data, type, row, meta ) {
     // TODO zzfuture fix: security - add CSRF token
-    const bkid = row[5];
-    const bktitle = encodeURIComponent(row[0]);
-    const is_active = (row[6] == 0);
+    const bkid = row['BkID'];
+    const bktitle = encodeURIComponent(row['BkTitle']);
+    const is_active = (row['BkArchived'] == 0);
 
     const links = [];
     const make_link = function(label, func) {
