@@ -65,11 +65,13 @@ def test_book_data_says_completed_if_last_page_has_been_read(
     _dt_params["search"] = {"value": "title", "regex": False}
     d = get_data_tables_list(_dt_params, False)
     actual = d["data"][0]
-    assert actual == [b.id, "title", 0], "not completed"
+    assert actual["BkID"] == b.id, "correct book"
+    assert actual["IsCompleted"] == 0, "not completed"
     t = b.texts[0]
     t.read_date = datetime.now()
     db.session.add(t)
     db.session.commit()
     d = get_data_tables_list(_dt_params, False)
     actual = d["data"][0]
-    assert actual == [b.id, "title", 1], "completed"
+    assert actual["BkID"] == b.id, "correct book"
+    assert actual["IsCompleted"] == 1, "completed"

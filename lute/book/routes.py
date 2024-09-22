@@ -39,6 +39,10 @@ def _load_term_custom_filters(request_form, parameters):
 
 def datatables_source(is_archived):
     "Get datatables json for books."
+    # In the future, we might want to create an API such as
+    # get_books(sort_order, search_string, length, index, language_id).
+    # See DataTablesFlaskParamParser.parse_params_2(request.form)
+    # (currently unused)
     parameters = DataTablesFlaskParamParser.parse_params(request.form)
     _load_term_custom_filters(request.form, parameters)
     data = get_data_tables_list(parameters, is_archived)

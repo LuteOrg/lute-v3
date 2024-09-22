@@ -55,18 +55,14 @@
         ],
         bottomEnd: 'paging'
       },
-      columnDefs: [
-        { "name": "TxOrder", "targets": 0, "width": "5%", className: "colVisToggled" },
-        { "name": "TbTitle", "targets": 1, "width": "70%", className: "colVisToggled", "render": render_page_link },
-        { "targets": 2, "data": null, "width": "15%", "searchable": false, "orderable": false, "render": render_bookmark_actions, className: "colVisToggled" },
-
-        // Hidden data for processing bookmark actions
-        { "name": "TbID", "targets": 3, "data": null, "visible": false },
+      columns: [
+        { name: "TxOrder", data: "TxOrder", width: "5%" },
+        { name: "TbTitle", width: "70%", render: render_page_link },
+        { data: null, width: "15%", searchable: false, orderable: false, render: render_bookmark_actions },
       ],
       buttons: [
         {
-          extend: 'colvis',
-          columns: '.colVisToggled'
+          extend: 'colvis'
         }
       ],
       responsive: true,
@@ -162,11 +158,9 @@
   }
 
   let render_bookmark_actions = function(data, type, row, meta) {
-    // TODO zzfuture fix: security - add CSRF token
-
     const links = [];
     const make_link = function(label, func) {
-      const s = `<a href="#" data-bookmark_id="${row[2]}" data-title="${row[1]}" onclick="${func}(this)">${label}</a>`;
+      const s = `<a href="#" data-bookmark_id="${row['TbID']}" data-title="${row['TbTitle']}" onclick="${func}(this)">${label}</a>`;
       links.push(s);
     };
 
@@ -179,8 +173,8 @@
   };
 
   const render_page_link = function(data, type, row, meta) {
-    page_num = row[0];
-    return `<a href=/read/{{book.id}}/page/${page_num}>${row[1]}</a>`
+    page_num = row['TxOrder'];
+    return `<a href=/read/{{book.id}}/page/${page_num}>${row['TbTitle']}</a>`
   }
 
   /**

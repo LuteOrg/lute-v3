@@ -45,7 +45,7 @@ def test_smoke_test(basesql, parameters):
     expected = {
         "recordsTotal": "select count(*) from (select CatID, Color, Food from Cats) realbase",
         "recordsFiltered": "select count(*) from (select CatID, Color, Food from Cats) realbase ",
-        "data": "SELECT CatID, Color, Food FROM (select * from (select CatID, Color, Food from Cats) realbase  ORDER BY Color asc, Color, Food LIMIT 10, 50) src ORDER BY Color asc, Color, Food",
+        "data": "SELECT * FROM (select * from (select CatID, Color, Food from Cats) realbase  ORDER BY Color asc, Color, Food LIMIT 10, 50) src ORDER BY Color asc, Color, Food",
         "params": {},
         "draw": 1,
     }
@@ -61,7 +61,7 @@ def test_sorting(basesql, parameters):
     expected = {
         "recordsTotal": "select count(*) from (select CatID, Color, Food from Cats) realbase",
         "recordsFiltered": "select count(*) from (select CatID, Color, Food from Cats) realbase ",
-        "data": "SELECT CatID, Color, Food FROM (select * from (select CatID, Color, Food from Cats) realbase  ORDER BY Food desc, Color, Food LIMIT 10, 50) src ORDER BY Food desc, Color, Food",
+        "data": "SELECT * FROM (select * from (select CatID, Color, Food from Cats) realbase  ORDER BY Food desc, Color, Food LIMIT 10, 50) src ORDER BY Food desc, Color, Food",
         "params": {},
         "draw": 1,
     }
@@ -77,7 +77,7 @@ def test_single_search(basesql, parameters):
     expected = {
         "recordsTotal": "select count(*) from (select CatID, Color, Food from Cats) realbase",
         "recordsFiltered": "select count(*) from (select CatID, Color, Food from Cats) realbase WHERE (Color LIKE '%' || :s0 || '%' OR Food LIKE '%' || :s0 || '%')",
-        "data": "SELECT CatID, Color, Food FROM (select * from (select CatID, Color, Food from Cats) realbase WHERE (Color LIKE '%' || :s0 || '%' OR Food LIKE '%' || :s0 || '%') ORDER BY Color asc, Color, Food LIMIT 10, 50) src ORDER BY Color asc, Color, Food",
+        "data": "SELECT * FROM (select * from (select CatID, Color, Food from Cats) realbase WHERE (Color LIKE '%' || :s0 || '%' OR Food LIKE '%' || :s0 || '%') ORDER BY Color asc, Color, Food LIMIT 10, 50) src ORDER BY Color asc, Color, Food",
         "params": {"s0": "XXX"},
         "draw": 1,
     }
@@ -93,7 +93,7 @@ def test_multiple_search_terms(basesql, parameters):
     expected = {
         "recordsTotal": "select count(*) from (select CatID, Color, Food from Cats) realbase",
         "recordsFiltered": "select count(*) from (select CatID, Color, Food from Cats) realbase WHERE (Color LIKE '%' || :s0 || '%' OR Food LIKE '%' || :s0 || '%') AND (Color LIKE '%' || :s1 || '%' OR Food LIKE '%' || :s1 || '%')",
-        "data": "SELECT CatID, Color, Food FROM (select * from (select CatID, Color, Food from Cats) realbase WHERE (Color LIKE '%' || :s0 || '%' OR Food LIKE '%' || :s0 || '%') AND (Color LIKE '%' || :s1 || '%' OR Food LIKE '%' || :s1 || '%') ORDER BY Color asc, Color, Food LIMIT 10, 50) src ORDER BY Color asc, Color, Food",
+        "data": "SELECT * FROM (select * from (select CatID, Color, Food from Cats) realbase WHERE (Color LIKE '%' || :s0 || '%' OR Food LIKE '%' || :s0 || '%') AND (Color LIKE '%' || :s1 || '%' OR Food LIKE '%' || :s1 || '%') ORDER BY Color asc, Color, Food LIMIT 10, 50) src ORDER BY Color asc, Color, Food",
         "params": {"s0": "XXX", "s1": "YYY"},
         "draw": 1,
     }

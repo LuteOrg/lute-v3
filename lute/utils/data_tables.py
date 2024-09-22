@@ -105,6 +105,37 @@ class DataTablesFlaskParamParser:
             "order": DataTablesFlaskParamParser._parse_order(request_params),
         }
 
+    @staticmethod
+    def parse_params_2(requestform) -> dict:
+        """Parse the request (query) parameters."""
+
+        # This method is currently unused, but may be used in the
+        # future.  The idea is to extract all params from the
+        # datatables request, and then have a separate method that
+        # takes these params explicitly as arguments, i.e. something
+        # like book_routes.get_data(start, length, search, order).
+        # This would allow for other front-end clients using something
+        # other than datatables.
+        request_params = requestform.to_dict(flat=True)
+
+        # Need the columns to get the name of the "order" field, as
+        # datatables only deals with the column indexes, not names.
+        columns = DataTablesFlaskParamParser._parse_columns(request_params)
+        order = DataTablesFlaskParamParser._parse_order(request_params)
+        real_order = []
+        for o in order:
+            col = [c["name"] for c in columns if c["index"] == o["column"]]
+            if len(col) == 1:
+                real_order.append({"column": col[0], "dir": o["dir"]})
+
+        return {
+            "draw": int(request_params.get("draw", 1)),
+            "start": int(request_params.get("start", 0)),
+            "length": int(request_params.get("length", -1)),
+            "search": request_params.get("search[value]"),
+            "order": real_order,
+        }
+
 
 class DataTablesSqliteQuery:
     "Get data for datatables rendering."
@@ -148,11 +179,16 @@ class DataTablesSqliteQuery:
         def cols_with(attr):
             return [c["name"] for c in columns if c[attr] is True]
 
+        # Default sorting order is all cols marked orderable.
         orderby = ", ".join(cols_with("orderable"))
+
+        # Prepend indicated sorting.
         for order in parameters["order"]:
             col_index = int(order["column"])
-            sort_field = columns[col_index]["name"]
-            orderby = f"{sort_field} {order['dir']}, {orderby}"
+            col = columns[col_index]
+            sort_field = col["name"] or ""
+            if col["orderable"] is True and sort_field != "":
+                orderby = f"{sort_field} {order['dir']}, {orderby}"
         orderby = f"ORDER BY {orderby}"
 
         [where, params] = DataTablesSqliteQuery.where_and_params(
@@ -160,12 +196,10 @@ class DataTablesSqliteQuery:
         )
 
         realbase = f"({base_sql}) realbase".replace("\n", " ")
-        select_field_list = ", ".join([c["name"] for c in columns if c["name"] != ""])
-
         start = parameters["start"]
         length = parameters["length"]
         # pylint: disable=line-too-long
-        data_sql = f"SELECT {select_field_list} FROM (select * from {realbase} {where} {orderby} LIMIT {start}, {length}) src {orderby}"
+        data_sql = f"SELECT * FROM (select * from {realbase} {where} {orderby} LIMIT {start}, {length}) src {orderby}"
 
         return {
             "recordsTotal": f"select count(*) from {realbase}",
@@ -194,7 +228,10 @@ class DataTablesSqliteQuery:
             recordsTotal = runqry("recordsTotal", False).fetchone()[0]
             recordsFiltered = runqry("recordsFiltered").fetchone()[0]
             res = runqry("data")
-            ret = [list(row) for row in res.fetchall()]
+            column_names = res.keys()
+            # Convert each row into a dict, { fieldname: value ... }
+            ret = [dict(zip(column_names, row)) for row in res.fetchall()]
+
         except Exception as e:
             raise e
 

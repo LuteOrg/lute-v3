@@ -10,7 +10,7 @@ def get_data_tables_list(parameters):
     "Term json data for datatables."
 
     base_sql = """SELECT
-    0 as chk, w.WoID as WoID, LgName, L.LgID as LgID, w.WoText as WoText, parents.parentlist as ParentText, w.WoTranslation,
+    w.WoID as WoID, LgName, L.LgID as LgID, w.WoText as WoText, parents.parentlist as ParentText, w.WoTranslation,
     w.WoRomanization,
     replace(wi.WiSource, '.jpeg', '') as WiSource,
     ifnull(tags.taglist, '') as TagList,

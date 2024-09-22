@@ -10,7 +10,7 @@ def get_data_tables_list(parameters, book_id):
     "Bookmark json data for datatables."
 
     base_sql = f"""
-      SELECT tb.TbID, tb.TbTxID, tb.TbTitle, tx.TxText, tx.TxOrder
+      SELECT tb.TbID, tb.TbTxID, tb.TbTitle, tx.TxOrder
       FROM textbookmarks as tb
       INNER JOIN texts as tx ON tb.TbTxID = tx.TxID
       WHERE tx.TxBkID = { book_id }

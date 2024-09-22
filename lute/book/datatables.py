@@ -70,7 +70,6 @@ def get_data_tables_list(parameters, is_archived):
     if language_id != 0:
         base_sql += f" and LgID = {language_id}"
 
-    # print(base_sql)
     session = db.session
     connection = session.connection()
 
