@@ -7,6 +7,8 @@ import functools
 from lute.models.language import Language
 from lute.models.term import Term, Status
 
+# from lute.utils.debug_helpers import DebugTimer
+
 
 class RenderableCalculator:
     """
@@ -132,6 +134,8 @@ class RenderableCalculator:
 
         """
 
+        # dt = DebugTimer("get_renderable", display=False)
+
         # 1. Create candidates for all the terms found in the subject
         # string.
         def _candidate_from_term_loc(term, loc):
@@ -144,12 +148,29 @@ class RenderableCalculator:
             rc.is_word = 1
             return rc
 
+        # Don't do this -- first filter by things that are in the text.
+        # dtc2 = DebugTimer("candidates_alt_2", display=False)
+        # dtc2.step("0 filter terms")
+        # candidates = []
+        # for t in terms:
+        #     locs = tokenlocator.locate_string(t.text_lc)
+        #     dtc2.step("0 get locs")
+        #     for loc in locs:
+        #         c = _candidate_from_term_loc(t, loc)
+        #         dtc2.step("0 _candidate_from_term_loc")
+        #         candidates.append(c)
+        # # alternative 2: DIES, takes way too long.
+        # dt.step("create candidates alternative 2")
+
+        # ~85% of the time in this line is spent in the
+        # tokenlocator.locate_string(t.text_lc) step.
         candidates = [
             _candidate_from_term_loc(term, loc)
             for term in terms
             if term.text_lc in tokenlocator.subjLC
             for loc in tokenlocator.locate_string(term.text_lc)
         ]
+        # dt.step("1 create candidates")
 
         # 2. Sort the term candidates: first by length, then by position.
         def compare(a, b):
@@ -160,6 +181,7 @@ class RenderableCalculator:
             return -1 if (a.pos < b.pos) else 1
 
         candidates.sort(key=functools.cmp_to_key(compare))
+        # dt.step("2 sort")
 
         # 3. Add the original tokens at the end of the array.
         def _candidate_from_texttoken(tok):
@@ -172,6 +194,7 @@ class RenderableCalculator:
             return rc
 
         candidates += map(_candidate_from_texttoken, texttokens)
+        # dt.step("3 add originals")
 
         # 4. Write the ids of the candidates to the rendered array.
         # Later elements in the array are written _first_,
@@ -181,15 +204,18 @@ class RenderableCalculator:
         for rc in reversed(candidates):
             for i in range(rc.length):
                 render_position_to_candidate[rc.pos + i] = rc.id
+        # dt.step("4 ids")
 
         # 5. Get final list of candidates, these will actually be rendered.
         rcids = list(set(render_position_to_candidate.values()))
         id_to_candidate = {}
         for rc in candidates:
             id_to_candidate[rc.id] = rc
-        rendered = [id_to_candidate[rcid] for rcid in rcids]
+        # dt.step("5 ids")
 
+        rendered = [id_to_candidate[rcid] for rcid in rcids]
         rendered.sort(key=lambda x: x.pos)
+        # dt.step("6 final build")
         return rendered
 
     def _calc_overlaps(self, items):
@@ -320,10 +346,15 @@ class TokenLocator:
         """
         Find the string s in the subject self.subject.
         """
+        # dt = DebugTimer("TokenLocator", display=False)
         find_lc = self.language.get_lowercase(s)
         find_lc = TokenLocator.make_string(find_lc)
+        # time = 0.489277
+        # dt.step("setup")
 
         matches = self.preg_match_capture(find_lc, self.subjLC)
+        # time = 2.856459
+        # dt.step("matches")
 
         # The matches were performed with the lowercased subject,
         # because some languages (Turkish!) have funny cases.
@@ -344,6 +375,8 @@ class TokenLocator:
             return {"text": t, "index": index}
 
         termmatches = list(map(make_text_index_pair, matches))
+        # time = 0.536291
+        # dt.step("build term matches")
 
         return termmatches
 

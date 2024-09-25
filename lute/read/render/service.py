@@ -29,6 +29,35 @@ def find_all_Terms_in_string(s, language):  # pylint: disable=too-many-locals
     return _find_all_terms_in_tokens(tokens, language)
 
 
+# TODO cache_multiword_terms.
+#
+# Caching all multiword terms cuts down stats calculation time.
+# e.g. when calculating stats on 100 pages, the time goes from 0.7s to 0.01s.
+#
+# Have to sort out cache invalidation (esp for unit tests), and
+# separate caches for each language.
+# _cached_multiword_terms = None
+
+
+def _get_multiword_terms(language):
+    "Get all multiword terms."
+
+    # TODO cache_multiword_terms.
+    # global _cached_multiword_terms
+    # if _cached_multiword_terms is not None:
+    #    return _cached_multiword_terms
+
+    sql = sqltext(
+        """
+        SELECT WoID, WoTextLC FROM words
+        WHERE WoLgID=:language_id and WoTokenCount>1
+        """
+    )
+    sql = sql.bindparams(language_id=language.id)
+    _cached_multiword_terms = db.session.execute(sql).all()
+    return _cached_multiword_terms
+
+
 def _find_all_terms_in_tokens(tokens, language):
     """
     Find all terms contained in the (ordered) parsed tokens tokens.
@@ -44,6 +73,13 @@ def _find_all_terms_in_tokens(tokens, language):
     than querying for everything at once.
     """
 
+    # Performance breakdown:
+    #
+    # About half of the time is spent in "performance hit 1",
+    # filtering the multiword terms to find those contained in the
+    # text.  A bit less than half is spent is "performance hit 2", the
+    # actual query.
+    #
     # Future performance improvement considerations:
     #
     # 1. I considered keeping a cache of multiword terms strings and
@@ -56,7 +92,7 @@ def _find_all_terms_in_tokens(tokens, language):
     # into the Aho-Corasick automaton.  This could be cached, but would
     # again need methods for cache invalidation and reload etc.
 
-    # dt = DebugTimer("_find_all_terms_in_tokens", False)
+    # dt = DebugTimer("_find_all_terms_in_tokens", display=False)
 
     parser = language.parser
 
@@ -111,18 +147,20 @@ def _find_all_terms_in_tokens(tokens, language):
     lctokens = [parser.get_lowercase(t.token) for t in tokens]
     content = zws + zws.join(lctokens) + zws
 
-    sql = sqltext(
-        """
-        SELECT WoID, WoTextLC FROM words
-        WHERE WoLgID=:language_id and WoTokenCount>1
-        """
-    )
-    sql = sql.bindparams(language_id=language.id)
-    reclist = db.session.execute(sql).all()
+    # sql = sqltext(
+    #     """
+    #     SELECT WoID, WoTextLC FROM words
+    #     WHERE WoLgID=:language_id and WoTokenCount>1
+    #     # """
+    # )
+    # sql = sql.bindparams(language_id=language.id)
+    # reclist = db.session.execute(sql).all()
+    reclist = _get_multiword_terms(language)
     # dt.step(f"mwords, loaded {len(reclist)} records")
+
+    # Performance hit 1
     woids = [int(p[0]) for p in reclist if f"{zws}{p[1]}{zws}" in content]
     # dt.step("mwords, filtered ids")
-    # dt.step("mword ids")
 
     contained_terms_qry = db.session.query(Term).filter(Term.id.in_(woids))
 
@@ -130,6 +168,7 @@ def _find_all_terms_in_tokens(tokens, language):
     # eagerly loaded using ".options(joinedload(Term.term_tags),
     # joinedload(Term.parents))", but any gains in subsequent usage
     # are offset by the slower query!
+    # Performance hit 2
     all_terms = terms_matching_tokens_qry.union(contained_terms_qry).all()
     # dt.step("union, exec query")
 
@@ -173,9 +212,12 @@ def _make_renderable_sentence(language, pnum, sentence_num, tokens, terms):
     Make a RenderableSentences using the tokens present in
     that sentence.
     """
+    # dt = DebugTimer("_make_renderable_sentence", display=False)
     sentence_tokens = [t for t in tokens if t.sentence_number == sentence_num]
     renderable = RenderableCalculator.get_renderable(language, terms, sentence_tokens)
+    # dt.step("get_renderable")
     textitems = [i.make_text_item(pnum, sentence_num, language) for i in renderable]
+    # dt.step("textitems")
     ret = RenderableSentence(sentence_num, textitems)
     return ret
 
@@ -212,16 +254,15 @@ def get_paragraphs(s, language):
     """
     Get array of arrays of RenderableSentences for the given string s.
     """
-    # dt = DebugTimer("get_paragraphs", False)
+    # dt = DebugTimer("get_paragraphs", display=False)
 
     # Hacky reset of state of ParsedToken state.
     # _Shouldn't_ be needed but doesn't hurt, even if it's lame.
     ParsedToken.reset_counters()
 
     cleaned = re.sub(r" +", " ", s)
-    # dt.step("start get_parsed_tokens")
     tokens = language.get_parsed_tokens(cleaned)
-    # dt.step("done get_parsed_tokens")
+    # dt.step("get_parsed_tokens")
 
     # Brutal hack ... for some reason the tests fail in
     # CI, but _inconsistently_, with the token order numbers.  The
@@ -234,13 +275,13 @@ def get_paragraphs(s, language):
         for t in tokens:
             t.order = n
             n += 1
-    # dt.step("done token.sort")
+    # dt.step("token.sort")
 
     terms = _find_all_terms_in_tokens(tokens, language)
-    # dt.step("done _find_all_terms_in_tokens")
+    # dt.step("_find_all_terms_in_tokens")
 
     paragraphs = _split_tokens_by_paragraph(tokens)
-    # dt.step("done _split_tokens_by_paragraph")
+    # dt.step("_split_tokens_by_paragraph")
 
     renderable_paragraphs = []
     pnum = 0
@@ -252,7 +293,7 @@ def get_paragraphs(s, language):
         ]
         renderable_paragraphs.append(renderable_sentences)
         pnum += 1
-    # dt.step("done renderable_paragraphs load")
+    # dt.step("renderable_paragraphs load")
 
     _add_status_0_terms(renderable_paragraphs, language)
     # dt.step("done add status 0 terms")

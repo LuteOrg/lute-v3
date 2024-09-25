@@ -7,13 +7,15 @@ from lute.read.render.service import get_paragraphs
 from lute.db import db
 from lute.models.book import Book
 
+# from lute.utils.debug_helpers import DebugTimer
 
-def _last_5_pages(book, txindex):
-    "Get next 5 pages, or at least 5 pages."
-    start_index = max(0, txindex - 5)
-    end_index = txindex + 5
+
+def _last_n_pages(book, txindex, n):
+    "Get next n pages, or at least n pages."
+    start_index = max(0, txindex - n)
+    end_index = txindex + n
     texts = book.texts[start_index:end_index]
-    return texts[-5:]
+    return texts[-n:]
 
 
 def get_status_distribution(book):
@@ -25,18 +27,27 @@ def get_status_distribution(book):
     """
     txindex = 0
 
+    # dt = DebugTimer("get_status_distribution", display=True)
+
     if (book.current_tx_id or 0) != 0:
         for t in book.texts:
             if t.id == book.current_tx_id:
                 break
             txindex += 1
 
-    # get next 5 pages, a good enough sample ...
-    # min 5 pages.
-    text_sample = [t.text for t in _last_5_pages(book, txindex)]
-    text_sample = "\n".join(text_sample)
+    # Use a sample of pages to speed up stats count.
+    sample_size = 5
+    texts = _last_n_pages(book, txindex, sample_size)
 
-    paras = get_paragraphs(text_sample, book.language)
+    # Getting the individual paragraphs per page, and then combining,
+    # is much faster than combining all pages into one giant page.
+    paras = [get_paragraphs(t.text, book.language) for t in texts]
+    # # Old slower code:
+    # text_sample = "\n".join([t.text for t in texts])
+    # paras = get_paragraphs(text_sample, book.language)
+
+    # dt.step("get_paragraphs")
+    # DebugTimer.total_summary()
 
     def flatten_list(nested_list):
         result = []
