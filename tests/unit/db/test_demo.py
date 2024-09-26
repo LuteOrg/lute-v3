@@ -73,13 +73,6 @@ def test_load_demo_loads_language_yaml_files(app_context):
     assert contains_demo_data() is False, "not a demo."
     assert_record_count_equals("languages", 0, "wiped out")
 
-    # Wipe out all settings!!!
-    # When user installs, the settings need to be loaded
-    # with values from _their_ config and environment.
-    sql = "delete from settings"
-    db.session.execute(text(sql))
-    db.session.commit()
-
     load_demo_data()
     assert contains_demo_data() is True, "demo loaded"
     checks = [
@@ -89,8 +82,15 @@ def test_load_demo_loads_language_yaml_files(app_context):
     for c in checks:
         assert_record_count_equals(c, 1, c + " returned 1")
 
-    sql = "select distinct stkeytype from settings"
-    assert_sql_result(sql, ["system"], "only system settings remain")
+    # Wipe out all user settings!!!  When user installs and first
+    # starts up, the user settings need to be loaded with values from
+    # _their_ config and environment.
+    sql = "delete from settings where StKeyType = 'user'"
+    db.session.execute(text(sql))
+    db.session.commit()
+
+    sql = "select stkeytype, stkey, stvalue from settings"
+    assert_sql_result(sql, ["system; IsDemoData; 1"], "only this key is set.")
 
 
 @pytest.fixture(name="_restore_japanese_parser")
