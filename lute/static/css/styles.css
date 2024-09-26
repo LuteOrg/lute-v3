@@ -1774,7 +1774,8 @@ input[type="checkbox"][disabled] + label {
 
 #current_theme, 
 #japanese_reading, 
-#backup_count, 
+#backup_count,
+#stats_calc_sample_size,
 #test_mecab_btn,
 #parser_type,
 #language_id,

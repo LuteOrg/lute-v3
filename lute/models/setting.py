@@ -162,6 +162,7 @@ class UserSetting(SettingBase):
             # Behaviour:
             "open_popup_in_new_tab": False,
             "stop_audio_on_term_form_open": True,
+            "stats_calc_sample_size": 5,
         }
         for k, v in keys_and_defaults.items():
             if not UserSetting.key_exists(k):
