@@ -6,6 +6,7 @@ import json
 from lute.read.render.service import get_paragraphs
 from lute.db import db
 from lute.models.book import Book
+from lute.models.setting import UserSetting
 
 # from lute.utils.debug_helpers import DebugTimer
 
@@ -36,7 +37,7 @@ def get_status_distribution(book):
             txindex += 1
 
     # Use a sample of pages to speed up stats count.
-    sample_size = 5
+    sample_size = int(UserSetting.get_value("stats_calc_sample_size") or 5)
     texts = _last_n_pages(book, txindex, sample_size)
 
     # Getting the individual paragraphs per page, and then combining,
