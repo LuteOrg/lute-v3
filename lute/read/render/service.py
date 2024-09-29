@@ -68,9 +68,10 @@ def _find_all_terms_in_tokens(tokens, language):
 
     This would return the terms "cat" and "a/ /cat".
 
-    The code first queries for exact single-token matches,
-    and then multiword matches, because that's much faster
-    than querying for everything at once.
+    Method:
+    - build list of lowercase text in the tokens
+    - append all multword term strings that exist in the content
+    - query for Terms that exist in the list
     """
 
     # Performance breakdown:
@@ -96,19 +97,8 @@ def _find_all_terms_in_tokens(tokens, language):
 
     parser = language.parser
 
-    # Single word terms
-    #
-    # Build query for terms with a single token that match the unique
-    # word tokens.  Note it's much faster to use a query for this,
-    # rather than loading all term text and checking for the strings
-    # using python, as we can rely on the database indexes.
-    word_tokens = filter(lambda t: t.is_word, tokens)
-    tok_strings = [parser.get_lowercase(t.token) for t in word_tokens]
-    tok_strings = list(set(tok_strings))
-    terms_matching_tokens_qry = db.session.query(Term).filter(
-        Term.text_lc.in_(tok_strings), Term.language == language
-    )
-    # dt.step("single, query prep")
+    # Each token can map to a single-word Term.
+    text_lcs = [parser.get_lowercase(t.token) for t in tokens]
 
     # Multiword terms
     #
@@ -124,10 +114,7 @@ def _find_all_terms_in_tokens(tokens, language):
     #   )
     #   contained_terms = contained_term_qry.all()
     #
-    # This code first finds the IDs of the terms that are in the content,
-    # and then loads the terms.
-    #
-    # Note that querying using 'LIKE' is again slow, i.e:
+    # Note that querying using 'LIKE' is also slow, i.e:
     #   sql = sqltext(
     #     """
     #     SELECT WoID FROM words
@@ -142,35 +129,29 @@ def _find_all_terms_in_tokens(tokens, language):
     # load the terms.
 
     # Multiword terms have zws between all tokens.
-    # Create content string with zws between all tokens for the match.
-    zws = "\u200B"  # zero-width space
-    lctokens = [parser.get_lowercase(t.token) for t in tokens]
-    content = zws + zws.join(lctokens) + zws
-
-    # sql = sqltext(
-    #     """
-    #     SELECT WoID, WoTextLC FROM words
-    #     WHERE WoLgID=:language_id and WoTokenCount>1
-    #     # """
-    # )
-    # sql = sql.bindparams(language_id=language.id)
-    # reclist = db.session.execute(sql).all()
     reclist = _get_multiword_terms(language)
     # dt.step(f"mwords, loaded {len(reclist)} records")
 
     # Performance hit 1
-    woids = [int(p[0]) for p in reclist if f"{zws}{p[1]}{zws}" in content]
-    # dt.step("mwords, filtered ids")
-
-    contained_terms_qry = db.session.query(Term).filter(Term.id.in_(woids))
+    zws = "\u200B"  # zero-width space
+    content = zws + zws.join(text_lcs) + zws
+    mword_terms = [p[1] for p in reclist if f"{zws}{p[1]}{zws}" in content]
+    # dt.step("mword terms")
+    text_lcs.extend(mword_terms)
 
     # Some term entity relationship objects (tags, parents) could be
     # eagerly loaded using ".options(joinedload(Term.term_tags),
     # joinedload(Term.parents))", but any gains in subsequent usage
     # are offset by the slower query!
     # Performance hit 2
-    all_terms = terms_matching_tokens_qry.union(contained_terms_qry).all()
-    # dt.step("union, exec query")
+    tok_strings = list(set(text_lcs))
+    terms_matching_tokens_qry = db.session.query(Term).filter(
+        Term.text_lc.in_(tok_strings), Term.language == language
+    )
+    # dt.step("query prep")
+
+    all_terms = terms_matching_tokens_qry.all()
+    # dt.step("exec query")
 
     return all_terms
 
