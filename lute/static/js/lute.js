@@ -120,7 +120,7 @@ function prepareTextInteractions() {
 
   $('#thetext').tooltip({
     position: _get_tooltip_pos(),
-    items: '.word.showtooltip',
+    items: '.word',
     show: { easing: 'easeOutCirc' },
     content: function (setContent) { tooltip_textitem_hover_content($(this), setContent); }
   });
