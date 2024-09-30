@@ -5,7 +5,7 @@ Calculating what items should be rendered in the browser.
 import re
 import functools
 from lute.models.language import Language
-from lute.models.term import Term, Status
+from lute.models.term import Term
 
 # from lute.utils.debug_helpers import DebugTimer
 
@@ -528,7 +528,6 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
             classes = ["textitem", "click", "word"]
             return " ".join(classes)
 
-        st = self.wo_status
         classes = [
             "textitem",
             "click",
