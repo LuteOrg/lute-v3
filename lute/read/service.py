@@ -93,8 +93,21 @@ def start_reading(dbbook, pagenum, db_session):
 
 
 def get_popup_data(termid):
-    "Get the data necessary to render a term popup."
+    "Get popup data, or None if popup shouldn't be shown."
     term = Term.find(termid)
+
+    if term.status in [Status.UNKNOWN, Status.WELLKNOWN, Status.IGNORED]:
+        return None
+
+    def has_popup_data(cterm):
+        return (
+            (cterm.translation or "").strip() != ""
+            or (cterm.romanization or "").strip() != ""
+            or cterm.get_current_image() is not None
+        )
+
+    if not any(has_popup_data(t) for t in (term, *term.parents)):
+        return None
 
     term_tags = [tt.text for tt in term.term_tags]
 

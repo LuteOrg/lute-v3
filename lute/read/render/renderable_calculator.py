@@ -5,7 +5,7 @@ Calculating what items should be rendered in the browser.
 import re
 import functools
 from lute.models.language import Language
-from lute.models.term import Term, Status
+from lute.models.term import Term
 
 # from lute.utils.debug_helpers import DebugTimer
 
@@ -448,13 +448,6 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         # Calls setter
         self.term = term
 
-        # The tooltip should be shown for well-known/ignored TextItems
-        # that merit a tooltip. e.g., if there isn't any actual Term
-        # entity associated with this TextItem, nothing more is needed.
-        # Also, if there is a Term entity but it's mostly empty, a
-        # tooltip isn't useful.
-        self._show_tooltip: bool = None
-
         # The flash message can be None, so we need an extra flag
         # to determine if it has been loaded or not.
         self._flash_message_loaded: bool = False
@@ -480,39 +473,7 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         self._term = t
         if t is None:
             return
-
         self.wo_status = t.status
-        if t.status >= 1 and t.status <= 5:
-            self._show_tooltip = True
-
-    @property
-    def show_tooltip(self):
-        """
-        Show the tooltip if there is anything to show.
-        Lazy loaded as needed.
-        """
-        if self._show_tooltip is not None:
-            return self._show_tooltip
-        if self.term is None:
-            return False
-
-        def blank_string(s):
-            return s is None or s.strip() == ""
-
-        def has_extra(cterm):
-            if cterm is None:
-                return False
-            no_extra = (
-                blank_string(cterm.translation)
-                and blank_string(cterm.romanization)
-                and cterm.get_current_image() is None
-            )
-            return not no_extra
-
-        self._show_tooltip = has_extra(self.term)
-        for p in self.term.parents:
-            self._show_tooltip = self._show_tooltip or has_extra(p)
-        return self._show_tooltip
 
     @property
     def flash_message(self):
@@ -567,21 +528,12 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
             classes = ["textitem", "click", "word"]
             return " ".join(classes)
 
-        st = self.wo_status
         classes = [
             "textitem",
             "click",
             "word",
             "word" + str(self.wo_id),
         ]
-
-        tooltip = (
-            st not in (Status.WELLKNOWN, Status.IGNORED, Status.UNKNOWN)
-            or self.show_tooltip
-            or self.flash_message is not None
-        )
-        if tooltip:
-            classes.append("showtooltip")
 
         if self.flash_message is not None:
             classes.append("hasflash")
