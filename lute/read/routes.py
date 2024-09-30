@@ -214,9 +214,11 @@ def edit_term_form(term_id):
 @bp.route("/termpopup/<int:termid>", methods=["GET"])
 def term_popup(termid):
     """
-    Show a term popup for the given DBTerm.
+    Get popup html for DBTerm, or None if nothing should be shown.
     """
     d = get_popup_data(termid)
+    if d is None:
+        return ""
     return render_template(
         "read/termpopup.html",
         term=d["term"],
