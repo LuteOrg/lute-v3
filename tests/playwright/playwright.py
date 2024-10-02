@@ -59,7 +59,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     _print("Tutorial check.")
     page.goto("http://localhost:5000")
     page.get_by_role("link", name="Tutorial", exact=True).click()
-    page.locator("#ID-176-1").click()
+    page.locator("#ID-14-172").click()
     page.frame_locator('iframe[name="wordframe"]').get_by_placeholder(
         "Translation"
     ).click()
@@ -124,7 +124,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
 
     # Edit a term.
     _print("Edit term.")
-    page.locator("#ID-1-1").click()
+    page.locator("#ID-0-0").click()
     page.frame_locator('iframe[name="wordframe"]').get_by_placeholder(
         "Translation"
     ).click()

@@ -76,7 +76,7 @@ def test_start_reading_creates_Terms_for_unknown_words(english, app_context):
         ti
         for para in paragraphs
         for sentence in para
-        for ti in sentence.textitems
+        for ti in sentence
         if ti.is_word and ti.wo_id is None
     ]
     assert (

@@ -67,12 +67,6 @@ def test_single_book_export(app_context, empty_db, tmp_path, english):
         db.session.add(t)
     db.session.commit()
 
-    outfile = tmp_path / "outfile.csv"
-    generate_language_file("English", outfile)
-    with open(outfile, "r", encoding="utf-8") as ofhandle:
-        text = ofhandle.read()
-    print(text)
-
     expected = [
         # Headings
         "term,count,familycount,books,definition,status,parents,children,tags",
@@ -95,12 +89,27 @@ def test_single_book_export(app_context, empty_db, tmp_path, english):
         "",
     ]
 
-    # .lower() because sometimes the text file returned B, and
-    # sometimes b ...  which is _very_ odd, but don't really care.
-    assert text.lower() == "\n".join(expected).lower(), "content"
+    def _lowersort(arr):
+        "Lowercase and sort strings."
+        return sorted([a.lower() for a in arr])
 
+    def _assert_text_matches_expected(file_text, expected_array):
+        "Avoid sorting, case issues."
+
+        # Converting the text to lower because sometimes the text file
+        # returned B, and sometimes b ...  which is _very_ odd, but I
+        # don't really care.
+        assert _lowersort(file_text.split("\n")) == _lowersort(expected_array)
+
+    # Generate for english.
+    outfile = tmp_path / "outfile.csv"
+    generate_language_file("English", outfile)
+    with open(outfile, "r", encoding="utf-8") as ofhandle:
+        text = ofhandle.read()
+    _assert_text_matches_expected(text, expected)
+
+    # Generate for book.
     generate_book_file(b.id, outfile)
     with open(outfile, "r", encoding="utf-8") as ofhandle:
         text = ofhandle.read()
-    print(text)
-    assert text.lower() == "\n".join(expected).lower(), "book file"
+    _assert_text_matches_expected(text, expected)

@@ -48,7 +48,7 @@ def get_rendered_string(text, imploder="/", overridestringize=None):
     ret = []
     paras = get_paragraphs(text.text, text.book.language)
     for p in paras:
-        tis = [t for s in p for t in s.textitems]
+        tis = [t for s in p for t in s]
         ss = [usestringize(ti) for ti in tis]
         ret.append(imploder.join(ss))
     return "/<PARA>/".join(ret)

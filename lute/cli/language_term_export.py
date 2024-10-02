@@ -63,7 +63,7 @@ def _process_book(b, terms):
             ti.term
             for para in paragraphs
             for sentence in para
-            for ti in sentence.textitems
+            for ti in sentence
             if ti.is_word and ti.term is not None
         ]
         for t in displayed_terms:

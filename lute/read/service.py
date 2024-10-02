@@ -7,7 +7,7 @@ from lute.models.term import Term, Status
 from lute.models.book import Text
 from lute.book.stats import mark_stale
 from lute.read.render.service import get_paragraphs, find_all_Terms_in_string
-from lute.read.render.renderable_calculator import TokenLocator
+from lute.read.render.calculate_textitems import get_string_indexes
 from lute.term.model import Repository
 from lute.db import db
 
@@ -26,7 +26,7 @@ def set_unknowns_to_known(text: Text):
         ti.term
         for para in paragraphs
         for sentence in para
-        for ti in sentence.textitems
+        for ti in sentence
         if ti.is_word and ti.term.status == 0
     ]
 
@@ -64,7 +64,7 @@ def _save_new_status_0_terms(paragraphs):
         ti
         for para in paragraphs
         for sentence in para
-        for ti in sentence.textitems
+        for ti in sentence
         if ti.is_word and ti.term.id is None and ti.term.status == 0
     ]
 
@@ -130,11 +130,11 @@ def get_popup_data(termid):
 
     def sort_components(components):
         # Sort components by min position in string and length.
-        subj = TokenLocator.make_string(term.text)
-        tocloc = TokenLocator(term.language, subj)
         component_and_pos = []
         for c in components:
-            c_indices = [loc["index"] for loc in tocloc.locate_string(c.text)]
+            c_indices = [
+                loc[1] for loc in get_string_indexes([c.text_lc], term.text_lc)
+            ]
 
             # Sometimes the components aren't found
             # in the string, which makes no sense ...

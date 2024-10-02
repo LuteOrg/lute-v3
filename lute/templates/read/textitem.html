@@ -2,11 +2,11 @@
 <span id="{{ item.span_id }}"
       class="{{ item.html_class_string }}"
       data-lang-id="{{ item.lang_id }}"
-      data-paragraph-id="{{ item.para_id }}"
-      data-sentence-id="{{ item.se_id }}"
+      data-paragraph-id="{{ item.paragraph_number }}"
+      data-sentence-id="{{ item.sentence_number }}"
       data-text="{{ item.text }}"
       data-status-class="{{ item.status_class }}"
-      data-order="{{ item.order }}"
-{% if item.wo_id is not none %}
+      data-order="{{ item.index }}"
+      {% if item.wo_id is not none -%}
       data-wid="{{ item.wo_id }}"
-{% endif %}>{{ item.html_display_text | safe }}</span>
+      {% endif %}>{{ item.html_display_text | safe }}</span>

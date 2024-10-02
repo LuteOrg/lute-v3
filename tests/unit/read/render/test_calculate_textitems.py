@@ -1,11 +1,10 @@
 """
-RenderableCalculator tests.
+Tests for getting TextItems.
 """
 
-import pytest
 from lute.models.term import Term
 from lute.parse.base import ParsedToken
-from lute.read.render.renderable_calculator import RenderableCalculator
+from lute.read.render.calculate_textitems import get_textitems
 
 
 def make_tokens(token_data):
@@ -26,11 +25,10 @@ def assert_renderable_equals(
     tokens = make_tokens(token_data)
     terms = [Term(language, t) for t in term_data]
 
-    rc = RenderableCalculator()
-    rcs = rc.main(language, terms, tokens)
+    tis = get_textitems(tokens, terms, language)
     res = ""
-    for rc in rcs:
-        res += f"[{rc.text}-{rc.length}]"
+    for ti in tis:
+        res += f"[{ti.text}-{ti.token_count}]"
 
     zws = chr(0x200B)
     res = res.replace(zws, "")
@@ -39,8 +37,8 @@ def assert_renderable_equals(
 
     if expected_displayed is not None:
         res = ""
-        for rc in rcs:
-            res += f"[{rc.display_text}-{rc.length}]"
+        for ti in tis:
+            res += f"[{ti.display_text}-{ti.token_count}]"
 
         res = res.replace(zws, "")
         assert res == expected_displayed
@@ -65,18 +63,6 @@ def test_partial_matching_terms_are_ignored(english):
     data = ["some", " ", "data", " ", "here", "."]
     expected = "[some-1][ -1][data-1][ -1][here-1][.-1]"
     assert_renderable_equals(english, data, ["data he"], expected)
-
-
-def test_tokens_must_be_contiguous(english):
-    """
-    If tokens aren't contiguous, the algorithm gets confused.
-    """
-    data = ["some", " ", "data", " ", "here", "."]
-    tokens = make_tokens(data)
-    tokens[1].order = 99
-    rc = RenderableCalculator()
-    with pytest.raises(Exception):
-        rc.main(english, [], tokens)
 
 
 def test_multiword_items_cover_other_items(english):

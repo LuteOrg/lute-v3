@@ -5,7 +5,7 @@ Feature: Rendering
         Given demo data
 
 
-    Scenario: Smoke test
+    Scenario: Rendering smoke test
         Given language English
         And terms:
             lines
@@ -18,7 +18,7 @@ Feature: Rendering
         Then rendered should be:
             Several/ /lines(1)/ /of/ /text/,
             and(1)/ /also/ /a/ /blank/ /line/.
-            
+
             And(1)/ /some/ /more/.
 
     Scenario: No terms
@@ -48,6 +48,42 @@ Feature: Rendering
             Tengo un gato.
         Then rendered should be:
             Tengo un(1)/ gato(1)/.
+
+
+    Scenario: Overlapping terms starting at same position, longer wins
+        Given language Spanish
+        And terms:
+            tengo un
+            tengo un gato
+        And text:
+            Tengo un gato.
+        Then rendered should be:
+            Tengo un gato(1)/.
+
+
+    # Checking the scenario given in the code comments.
+    # Adding "t" to the fake terms since "I" is ignored
+    # during parsing (roman numeral!).
+    Scenario: Documentation example
+        Given language Spanish
+        And terms:
+            At
+            Bt
+            Ct
+            Dt
+            Et
+            Ft
+            Gt
+            Ht
+            It
+            Bt Ct
+            Et Ft Gt Ht It
+            Ft Gt
+            Ct Dt Et
+        And text:
+            At Bt Ct Dt Et Ft Gt Ht It.
+        Then rendered should be:
+            At(1)/ /Bt Ct(1)/ Dt Et(1)/ Ft Gt Ht It(1)/.
 
 
     Scenario: Non overlapping terms

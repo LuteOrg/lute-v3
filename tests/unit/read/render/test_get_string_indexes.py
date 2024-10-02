@@ -1,11 +1,11 @@
 """
-TokenLocator tests.
+get_string_indexes tests.
 """
 
-from lute.read.render.renderable_calculator import TokenLocator
+from lute.read.render.calculate_textitems import get_string_indexes
 
 
-def test_token_locator_scenario(english):
+def test_get_string_indexes_scenario(english):
     """
     Run test scenarios.
     """
@@ -17,34 +17,34 @@ def test_token_locator_scenario(english):
         #   word sought
         #   matches [ [ as_found_in_text, position ], ... ])
         # Finds b
-        (["a", "b", "c", "d"], "b", [{"text": "b", "index": 1}]),
+        (["a", "b", "c", "d"], "b", [("b", 1)]),
         # Case doesn't matter
         # The original case is returned
-        (["A", "B", "C", "D"], "b", [{"text": "B", "index": 1}]),
+        (["A", "B", "C", "D"], "b", [("b", 1)]),
         # Original case returned
-        (["a", "b", "c", "d"], "B", [{"text": "b", "index": 1}]),
+        (["a", "b", "c", "d"], "B", [("b", 1)]),
         # No match
         (["a", "bb", "c", "d"], "B", []),
         # Found in multiple places
         (
             ["b", "b", "c", "d"],
             "b",
-            [{"text": "b", "index": 0}, {"text": "b", "index": 1}],
+            [("b", 0), ("b", 1)],
         ),
         # Multiword, found in multiple
         (
             ["b", "B", "b", "d"],
             f"b{zws}b",
-            [{"text": f"b{zws}B", "index": 0}, {"text": f"B{zws}b", "index": 1}],
+            [(f"b{zws}b", 0), (f"b{zws}b", 1)],
         ),
         # Multiword, found in multiple
         (
             ["b", "B", "c", "b", "b", "x", "b"],
             f"b{zws}b",
-            [{"text": f"b{zws}B", "index": 0}, {"text": f"b{zws}b", "index": 3}],
+            [(f"b{zws}b", 0), (f"b{zws}b", 3)],
         ),
-        (["a", " ", "cat", " ", "here"], "cat", [{"text": "cat", "index": 2}]),
-        (["a", " ", "CAT", " ", "here"], "cat", [{"text": "CAT", "index": 2}]),
+        (["a", " ", "cat", " ", "here"], "cat", [("cat", 2)]),
+        (["a", " ", "CAT", " ", "here"], "cat", [("cat", 2)]),
         # No match
         (["a", " ", "CAT", " ", "here"], "ca", []),
         # No match
@@ -54,8 +54,8 @@ def test_token_locator_scenario(english):
     casenum = 0
     for tokens, word, expected in cases:
         casenum += 1
-        sentence = TokenLocator.make_string(tokens)
-        tocloc = TokenLocator(english, sentence)
-        actual = tocloc.locate_string(word)
+        p = english.parser
+        sentence = p.get_lowercase(zws.join(tokens))
+        actual = get_string_indexes([p.get_lowercase(word)], sentence)
         msg = f"case {casenum} - tokens: {', '.join(tokens)}; word: {word}"
         assert actual == expected, msg

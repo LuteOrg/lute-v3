@@ -59,10 +59,7 @@ def get_status_distribution(book):
                 result.append(item)
         return result
 
-    text_items = []
-    for s in flatten_list(paras):
-        text_items.extend(s.textitems)
-    text_items = [ti for ti in text_items if ti.is_word]
+    text_items = [ti for ti in flatten_list(paras) if ti.is_word]
 
     statterms = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 98: [], 99: []}
 
