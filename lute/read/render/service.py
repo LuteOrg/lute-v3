@@ -2,12 +2,13 @@
 Reading rendering helpers.
 """
 
+import itertools
 import re
 from sqlalchemy import text as sqltext
 
 from lute.models.term import Term
 from lute.parse.base import ParsedToken
-from lute.read.render.renderable_calculator import RenderableCalculator
+from lute.read.render.calculate_textitems import get_textitems
 from lute.db import db
 
 # from lute.utils.debug_helpers import DebugTimer
@@ -156,84 +157,12 @@ def _find_all_terms_in_tokens(tokens, language):
     return all_terms
 
 
-class RenderableSentence:
-    """
-    A collection of TextItems to be rendered.
-    """
-
-    def __init__(self, sentence_id, textitems):
-        self.sentence_id = sentence_id
-        self.textitems = textitems
-
-    def __repr__(self):
-        s = "".join([t.display_text for t in self.textitems])
-        return f'<RendSent {self.sentence_id}, {len(self.textitems)} items, "{s}">'
-
-
 ## Getting paragraphs ##############################
-
-
-def _split_tokens_by_paragraph(tokens):
-    "Split tokens by ¶"
-    ret = []
-    curr_para = []
-    for t in tokens:
-        if t.token == "¶":
-            ret.append(curr_para)
-            curr_para = []
-        else:
-            curr_para.append(t)
-    if len(curr_para) > 0:
-        ret.append(curr_para)
-    return ret
-
-
-def _make_renderable_sentence(language, pnum, sentence_num, tokens, terms):
-    """
-    Make a RenderableSentences using the tokens present in
-    that sentence.
-    """
-    # dt = DebugTimer("_make_renderable_sentence", display=False)
-    sentence_tokens = [t for t in tokens if t.sentence_number == sentence_num]
-    renderable = RenderableCalculator.get_renderable(language, terms, sentence_tokens)
-    # dt.step("get_renderable")
-    textitems = [i.make_text_item(pnum, sentence_num, language) for i in renderable]
-    # dt.step("textitems")
-    ret = RenderableSentence(sentence_num, textitems)
-    return ret
-
-
-def _sentence_nums(paratokens):
-    "Sentence numbers in the paragraph tokens."
-    senums = [t.sentence_number for t in paratokens]
-    return sorted(list(set(senums)))
-
-
-def _add_status_0_terms(paragraphs, lang):
-    "Add status 0 terms for new textitems in paragraph."
-    new_textitems = [
-        ti
-        for para in paragraphs
-        for sentence in para
-        for ti in sentence.textitems
-        if ti.is_word and ti.term is None
-    ]
-
-    new_terms_needed = {t.text for t in new_textitems}
-    new_terms = [Term.create_term_no_parsing(lang, t) for t in new_terms_needed]
-    for t in new_terms:
-        t.status = 0
-
-    # new_terms may contain some dups (e.g. "cat" and "CAT" are both
-    # created), so use a map with lowcase text to disambiguate.
-    textlc_to_term_map = {t.text_lc: t for t in new_terms}
-    for ti in new_textitems:
-        ti.term = textlc_to_term_map[ti.text_lc]
 
 
 def get_paragraphs(s, language):
     """
-    Get array of arrays of RenderableSentences for the given string s.
+    Get array of arrays of TextItems for the given string s.
     """
     # dt = DebugTimer("get_paragraphs", display=False)
 
@@ -245,38 +174,33 @@ def get_paragraphs(s, language):
     tokens = language.get_parsed_tokens(cleaned)
     # dt.step("get_parsed_tokens")
 
-    # Brutal hack ... for some reason the tests fail in
-    # CI, but _inconsistently_, with the token order numbers.  The
-    # order sometimes jumps by 2 ... I really can't explain it.  So,
-    # as a _complete hack_, I'm re-numbering the tokens now, to ensure
-    # they're in order.
-    tokens.sort(key=lambda x: x.order)
-    if len(tokens) > 0:
-        n = tokens[0].order
-        for t in tokens:
-            t.order = n
-            n += 1
-    # dt.step("token.sort")
-
     terms = _find_all_terms_in_tokens(tokens, language)
-    # dt.step("_find_all_terms_in_tokens")
 
-    paragraphs = _split_tokens_by_paragraph(tokens)
-    # dt.step("_split_tokens_by_paragraph")
+    textitems = get_textitems(tokens, terms, language)
 
-    renderable_paragraphs = []
-    pnum = 0
-    for p in paragraphs:
-        # A renderable paragraph is a collection of RenderableSentences.
-        renderable_sentences = [
-            _make_renderable_sentence(language, pnum, senum, p, terms)
-            for senum in _sentence_nums(p)
+    def _split_textitems_by_paragraph(textitems):
+        "Split by ¶"
+        ret = []
+        curr_para = []
+        for t in textitems:
+            if t.text == "¶":
+                ret.append(curr_para)
+                curr_para = []
+            else:
+                curr_para.append(t)
+        if len(curr_para) > 0:
+            ret.append(curr_para)
+        return ret
+
+    def _split_by_sentence_number(p):
+        return [
+            list(sentence)
+            for _, sentence in itertools.groupby(p, key=lambda t: t.sentence_number)
         ]
-        renderable_paragraphs.append(renderable_sentences)
-        pnum += 1
-    # dt.step("renderable_paragraphs load")
 
-    _add_status_0_terms(renderable_paragraphs, language)
-    # dt.step("done add status 0 terms")
+    paras = [
+        _split_by_sentence_number(list(sentences))
+        for sentences in _split_textitems_by_paragraph(textitems)
+    ]
 
-    return renderable_paragraphs
+    return paras

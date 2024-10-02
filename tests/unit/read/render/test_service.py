@@ -108,15 +108,15 @@ def test_smoke_get_paragraphs(spanish, app_context):
         zws = chr(0x200B)
         parts = [
             f"[{t.display_text.replace(zws, '/')}(",
-            f"{t.para_id}.{t.se_id}",
+            f"{t.paragraph_number}.{t.sentence_number}",
             ")]",
         ]
         return "".join(parts)
 
     sentences = [item for sublist in paras for item in sublist]
     actual = []
-    for sent in sentences:
-        actual.append("".join(map(stringize, sent.textitems)))
+    for sentence in sentences:
+        actual.append("".join(map(stringize, sentence)))
 
     expected = [
         "[Tengo/ /un(0.0)][ /gato(0.0)][. (0.0)]",

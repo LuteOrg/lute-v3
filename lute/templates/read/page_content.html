@@ -1,11 +1,14 @@
+{% set sentence_id = 1 %}
+
 {% for para in paragraphs %}
 
 <p>
   {% for sentence in para %}
-  <span class="textsentence" id="sent_{{ sentence.sentence_id }}">
+  <span class="textsentence" id="sent_{{ sentence_id }}">
     {# Note: do not add paragraphs between the renders, it messes up some online chinese dictionary tools. #}
-    {% for item in sentence.textitems %}{% include 'read/textitem.html' %}{% endfor %}
+    {% for item in sentence %}{% include 'read/textitem.html' %}{% endfor %}
   </span>
+  {% set sentence_id = sentence_id + 1 %}
   {% endfor %}
 
   {# Add a blank element for empty paragraphs (blank lines) to show up. #}

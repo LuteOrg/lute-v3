@@ -86,15 +86,19 @@ def _assert_stringized_equals(stringizer, joiner, expected):
     join and assert equals expected.
     """
     paras = get_paragraphs(text.text, text.book.language)
+    # print("TOKENS", flush=True)
+    # print(paras, flush=True)
     ret = []
     for p in paras:
-        tis = [t for s in p for t in s.textitems]
+        tis = [t for s in p for t in s]
         ss = [stringizer(ti) for ti in tis]
         ret.append(joiner.join(ss))
     actual = "/<PARA>/".join(ret)
 
-    expected = expected.split("\n")
-    assert actual == "/<PARA>/".join(expected)
+    # print("", flush=True)
+    # print(expected, flush=True)
+    expected = "/<PARA>/".join(expected.split("\n"))
+    assert actual == expected
 
 
 @then(parsers.parse("rendered should be:\n{expected}"))
