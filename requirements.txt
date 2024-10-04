@@ -1,3 +1,4 @@
+ahocorapy==1.6.2
 astroid==2.15.6
 attrs==23.1.0
 beautifulsoup4==4.12.2
@@ -20,6 +21,7 @@ Flask-SQLAlchemy==3.1.1
 Flask-WTF==1.2.1
 flit==3.9.0
 flit_core==3.9.0
+future==1.0.0
 greenlet==3.0.0
 h11==0.14.0
 identify==2.5.31
