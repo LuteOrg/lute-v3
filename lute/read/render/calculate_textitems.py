@@ -20,8 +20,11 @@ with some of the Terms overlapping:
 """
 
 import re
+from collections import Counter
 from lute.models.term import Term
 from lute.read.render.text_item import TextItem
+
+# from lute.utils.debug_helpers import DebugTimer
 
 zws = "\u200B"  # zero-width space
 
@@ -55,13 +58,14 @@ def get_string_indexes(strings, content):
     return ret
 
 
-def _make_textitem(index, text, text_lc, sentence_number, term):
+# pylint: disable=too-many-arguments
+def _make_textitem(index, text, text_lc, count, sentence_number, term):
     "Make a TextItem."
     r = TextItem()
     r.text = text
     r.sentence_number = sentence_number
     r.text_lc = text_lc
-    r.token_count = text.count(zws) + 1
+    r.token_count = count
     r.display_count = r.token_count
     r.index = index
     r.is_word = term is not None
@@ -91,7 +95,7 @@ def _create_missing_status_0_terms(tokens, terms, language):
     return new_terms
 
 
-def get_textitems(tokens, terms, language):
+def get_textitems(tokens, terms, language, multiword_term_indexer=None):
     """
     Return TextItems that will **actually be rendered**.
 
@@ -185,34 +189,48 @@ def get_textitems(tokens, terms, language):
     """
     # pylint: disable=too-many-locals
 
+    # dt = DebugTimer("get_textitems", display=False)
+
     new_unknown_terms = _create_missing_status_0_terms(tokens, terms, language)
+    # dt.step("new_unknown_terms")
 
     all_terms = terms + new_unknown_terms
-
     text_to_term = {dt.text_lc: dt for dt in all_terms}
 
-    tokens_lc = [language.parser.get_lowercase(t.token) for t in tokens]
+    tokens_orig = [t.token for t in tokens]
+    tokens_lc = [language.parser.get_lowercase(t) for t in tokens_orig]
 
     textitems = []
 
-    def _add_textitem(index, text_lc):
+    def _add_textitem(index, text_lc, count):
         "Add a TextItem for position index in tokens."
-        count = text_lc.count(zws) + 1
-        text_orig = zws.join([t.token for t in tokens[index : index + count]])
+        text_orig = tokens_orig[index]
+        if count > 1:
+            text_orig = zws.join(tokens_orig[index : index + count])
         text_lc = zws.join(tokens_lc[index : index + count])
         sentence_number = tokens[index].sentence_number
         term = text_to_term.get(text_lc, None)
-        ti = _make_textitem(index, text_orig, text_lc, sentence_number, term)
+        ti = _make_textitem(index, text_orig, text_lc, count, sentence_number, term)
         textitems.append(ti)
 
     # Single-word terms.
     for index, _ in enumerate(tokens):
-        _add_textitem(index, tokens_lc[index])
+        _add_textitem(index, tokens_lc[index], 1)
+    # dt.step("single word textitems")
 
     # Multiword terms.
-    multiword_terms = [t.text_lc for t in all_terms if t.token_count > 1]
-    for e in get_string_indexes(multiword_terms, zws.join(tokens_lc)):
-        _add_textitem(e[1], e[0])
+    if multiword_term_indexer is not None:
+        for r in multiword_term_indexer.search_all(tokens_lc):
+            mwt = text_to_term[r[0]]
+            count = mwt.token_count
+            _add_textitem(r[1], r[0], count)
+        # dt.step(f"get mw textitems w indexer")
+    else:
+        multiword_terms = [t.text_lc for t in all_terms if t.token_count > 1]
+        for e in get_string_indexes(multiword_terms, zws.join(tokens_lc)):
+            count = e[0].count(zws) + 1
+            _add_textitem(e[1], e[0], count)
+        # dt.step("mw textitems without indexer")
 
     # Sorting by index, then decreasing token count.
     textitems = sorted(textitems, key=lambda x: (x.index, -x.token_count))
@@ -225,8 +243,10 @@ def get_textitems(tokens, terms, language):
 
     # Calc display_counts; e.g. if a textitem's id shows up 3 times
     # in the output_textitem_ids, it should display 3 tokens.
+    id_counts = dict(Counter(output_textitem_ids))
     for ti in textitems:
-        ti.display_count = output_textitem_ids.count(id(ti))
+        ti.display_count = id_counts.get(id(ti), 0)
+    # dt.step("display_count")
 
     textitems = [ti for ti in textitems if ti.display_count > 0]
 
@@ -235,5 +255,7 @@ def get_textitems(tokens, terms, language):
         ti.paragraph_number = current_paragraph
         if ti.text == "¶":
             current_paragraph += 1
+    # dt.step("paragraphs")
+    # dt.step("done")
 
     return textitems
