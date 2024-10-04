@@ -15,6 +15,7 @@ from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.book import service
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm
+from lute.book.stats import get_stats
 import lute.utils.formutils
 from lute.db import db
 
@@ -188,3 +189,17 @@ def delete(bookid):
     db.session.delete(b)
     db.session.commit()
     return redirect("/", 302)
+
+
+@bp.route("/table_stats/<int:bookid>", methods=["GET"])
+def table_stats(bookid):
+    "Get the stats, return ajax."
+    b = DBBook.find(bookid)
+    stats = get_stats(b)
+    ret = {
+        "distinctterms": stats.distinctterms,
+        "distinctunknowns": stats.distinctunknowns,
+        "unknownpercent": stats.unknownpercent,
+        "status_distribution": stats.status_distribution,
+    }
+    return jsonify(ret)

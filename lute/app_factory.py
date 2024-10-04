@@ -139,7 +139,6 @@ def _add_base_routes(app, app_config):
         if is_production and have_books and should_run_auto_backup:
             return redirect("/backup/backup", 302)
 
-        refresh_stats()
         warning_msg = backupservice.backup_warning(bkp_settings)
         backup_show_warning = (
             bkp_settings.backup_warn
@@ -147,11 +146,6 @@ def _add_base_routes(app, app_config):
             and warning_msg != ""
         )
 
-        # Disabling caching on this page so that book stats
-        # are recalculated, even if the user hits the browser
-        # "back" button after updating some terms.
-        # ref https://stackoverflow.com/questions/28627324/
-        #   disable-cache-on-a-specific-page-using-flask
         response = make_response(
             render_template(
                 "index.html",
@@ -164,26 +158,18 @@ def _add_base_routes(app, app_config):
                 language_choices=language_choices,
                 current_language_id=current_language_id,
                 is_production_data=is_production,
-                # Backup stats
                 backup_show_warning=backup_show_warning,
                 backup_warning_msg=warning_msg,
             )
         )
-        cc = "no-cache, no-store, must-revalidate, public, max-age=0"
-        response.headers["Cache-Control"] = cc
-        response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "0"
         return response
 
     @app.route("/refresh_all_stats")
     def refresh_all_stats():
         books_to_update = db.session.query(Book).filter(Book.archived == 0).all()
-
         for book in books_to_update:
             mark_stale(book)
-
         refresh_stats()
-
         return redirect("/", 302)
 
     @app.route("/wipe_database")
