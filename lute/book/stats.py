@@ -26,11 +26,11 @@ def calc_status_distribution(book):
     Does a full render of a small number of pages
     to calculate the distribution.
     """
-    txindex = 0
 
     # DebugTimer.clear_total_summary()
     # dt = DebugTimer("get_status_distribution", display=False)
 
+    txindex = 0
     if (book.current_tx_id or 0) != 0:
         for t in book.texts:
             if t.id == book.current_tx_id:
@@ -42,19 +42,17 @@ def calc_status_distribution(book):
 
     # Getting the individual paragraphs per page, and then combining,
     # is much faster than combining all pages into one giant page.
-    lang = book.language
-    mw = get_multiword_indexer(lang)
+    mw = get_multiword_indexer(book.language)
     textitems = []
     for tx in texts:
-        add_tis = [ti for ti in get_textitems(tx.text, lang, mw) if ti.is_word]
-        textitems.extend(add_tis)
+        textitems.extend(get_textitems(tx.text, book.language, mw))
     # # Old slower code:
     # text_sample = "\n".join([t.text for t in texts])
     # paras = get_paragraphs(text_sample, book.language) ... etc.
     # dt.step("get_paragraphs")
 
+    textitems = [ti for ti in textitems if ti.is_word]
     statterms = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 98: [], 99: []}
-
     for ti in textitems:
         statterms[ti.wo_status or 0].append(ti.text_lc)
 
