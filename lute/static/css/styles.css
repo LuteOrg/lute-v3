@@ -227,6 +227,7 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
 
 .refreshed {
     background-image: url("../icn/waiting2.gif");
+    background-repeat: no-repeat;
 }
 
 .book-action-dropdown {
@@ -2032,6 +2033,10 @@ input[type="checkbox"][disabled] + label {
 
 #booktable td:has(.status-bar-container) {
     padding-right: 1.5rem;
+}
+
+.book-stats-ajax-cell {
+    font-style: italic;
 }
 
 .status-bar-container-empty {

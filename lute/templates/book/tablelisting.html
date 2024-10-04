@@ -93,10 +93,10 @@
         { name: "LgName", width: "10%", data: "LgName" },
         { name: "TagList", width: "10%", data: "TagList" },
         { name: "WordCount", width: "10%", data: "WordCount" },
-        { name: "UnknownPercent", render: render_book_stats_graph },
+        { name: "UnknownPercent", "searchable": false, render: render_book_stats_graph_placeholder },
         { width: "8%", "searchable": false, "orderable": false, render: render_book_actions },
       ],
-
+      createdRow: function(row, data, dataIndex) { ajax_in_book_stats(row, data, dataIndex); },
       ajax: {
         url: "/book/datatables/{{ status or 'active' }}",
         // Additional filters.  func calls are required to get the
@@ -217,21 +217,32 @@
     return `<a class="${book_title_classes.join(' ')}" href="/read/${bkid}">${row['BkTitle']}${pgfraction}</a>`;
   };
 
+  /* Replaced by the status graph after the ajax call kicked off by createdRow. */
+  let render_book_stats_graph_placeholder = function(data, type, row, meta) {
+    return `<span class="book-stats-ajax-cell"><img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." /></span>`;
+  };
 
-  let render_book_stats_graph = function(data, type, row, meta) {
-    const empty_stats = `<div title="Please open the book to calculate stats">&nbsp;</div>`;
-    let statuscounts = row['StatusDistribution'];
-    if ((statuscounts ?? '')== '') {
-      return empty_stats;
-    }
-    try {
-      statuscounts = JSON.parse(statuscounts);
-    }
-    catch(err) {
-      console.log(`Invalid json: ${statuscounts}`);
-      return empty_stats;
-    }
+  /* Ajax called from createdRow datatables hook. */
+  let ajax_in_book_stats = function(row, data, dataIndex) {
+    var cell = $(row).find('.book-stats-ajax-cell');
+    $.ajax({
+      url: '/book/table_stats/' + data['BkID'],
+      method: 'GET',
+      success: function(response) {
+        cell.removeClass("refreshed");
+        const result = JSON.parse(response.status_distribution);
+        const graph = render_stats_graph(result);
+        cell.html(graph);
+      },
+      error: function() {
+        cell.text('Error loading data');
+        cell.removeClass("refreshed");
+      }
+    });
+  };
 
+  /* Generate stats graph <div> from statuscounts JSON. */
+  let render_stats_graph = function(statuscounts) {
     statuscounts["99"] = statuscounts["98"] + statuscounts["99"];
     delete statuscounts['98'];
     const totalcount = Object.values(statuscounts).reduce((acc, val) => acc + val, 0);
