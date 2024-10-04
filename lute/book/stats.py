@@ -3,7 +3,7 @@ Book statistics.
 """
 
 import json
-from lute.read.render.service import get_paragraphs
+from lute.read.render.service import get_multiword_indexer, get_textitems
 from lute.db import db
 from lute.models.book import Book
 from lute.models.setting import UserSetting
@@ -19,16 +19,17 @@ def _last_n_pages(book, txindex, n):
     return texts[-n:]
 
 
-def get_status_distribution(book):
+def calc_status_distribution(book):
     """
-    Return statuses and count of unique words per status.
+    Calculate statuses and count of unique words per status.
 
     Does a full render of a small number of pages
     to calculate the distribution.
     """
     txindex = 0
 
-    # dt = DebugTimer("get_status_distribution", display=True)
+    # DebugTimer.clear_total_summary()
+    # dt = DebugTimer("get_status_distribution", display=False)
 
     if (book.current_tx_id or 0) != 0:
         for t in book.texts:
@@ -36,34 +37,25 @@ def get_status_distribution(book):
                 break
             txindex += 1
 
-    # Use a sample of pages to speed up stats count.
     sample_size = int(UserSetting.get_value("stats_calc_sample_size") or 5)
     texts = _last_n_pages(book, txindex, sample_size)
 
     # Getting the individual paragraphs per page, and then combining,
     # is much faster than combining all pages into one giant page.
-    paras = [get_paragraphs(t.text, book.language) for t in texts]
+    lang = book.language
+    mw = get_multiword_indexer(lang)
+    textitems = []
+    for tx in texts:
+        add_tis = [ti for ti in get_textitems(tx.text, lang, mw) if ti.is_word]
+        textitems.extend(add_tis)
     # # Old slower code:
     # text_sample = "\n".join([t.text for t in texts])
-    # paras = get_paragraphs(text_sample, book.language)
-
+    # paras = get_paragraphs(text_sample, book.language) ... etc.
     # dt.step("get_paragraphs")
-    # DebugTimer.total_summary()
-
-    def flatten_list(nested_list):
-        result = []
-        for item in nested_list:
-            if isinstance(item, list):
-                result.extend(flatten_list(item))
-            else:
-                result.append(item)
-        return result
-
-    text_items = [ti for ti in flatten_list(paras) if ti.is_word]
 
     statterms = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 98: [], 99: []}
 
-    for ti in text_items:
+    for ti in textitems:
         statterms[ti.wo_status or 0].append(ti.text_lc)
 
     stats = {}
@@ -71,6 +63,9 @@ def get_status_distribution(book):
         uniques = list(set(allterms))
         statterms[statusval] = uniques
         stats[statusval] = len(uniques)
+
+    # dt.step("compiled")
+    # DebugTimer.total_summary()
 
     return stats
 
@@ -83,8 +78,7 @@ class BookStats(db.Model):
     "The stats table."
     __tablename__ = "bookstats"
 
-    id = db.Column(db.Integer, primary_key=True)
-    BkID = db.Column(db.Integer)
+    BkID = db.Column(db.Integer, primary_key=True)
     distinctterms = db.Column(db.Integer)
     distinctunknowns = db.Column(db.Integer)
     unknownpercent = db.Column(db.Integer)
@@ -100,7 +94,7 @@ def refresh_stats():
     )
     books = [b for b in books_to_update if b.is_supported]
     for book in books:
-        stats = _get_stats(book)
+        stats = _calculate_stats(book)
         _update_stats(book, stats)
 
 
@@ -111,9 +105,20 @@ def mark_stale(book):
     db.session.commit()
 
 
-def _get_stats(book):
+def get_stats(book):
+    "Gets stats from the cache if available, or calculates."
+    bk_id = book.id
+    stats = db.session.query(BookStats).filter_by(BkID=bk_id).first()
+    if stats is None:
+        newstats = _calculate_stats(book)
+        _update_stats(book, newstats)
+        stats = db.session.query(BookStats).filter_by(BkID=bk_id).first()
+    return stats
+
+
+def _calculate_stats(book):
     "Calc stats for the book using the status distribution."
-    status_distribution = get_status_distribution(book)
+    status_distribution = calc_status_distribution(book)
     unknowns = status_distribution[0]
     allunique = sum(status_distribution.values())
 
@@ -121,21 +126,22 @@ def _get_stats(book):
     if allunique > 0:  # In case not parsed.
         percent = round(100.0 * unknowns / allunique)
 
-    sd = json.dumps(status_distribution)
-
-    # Any change in the below fields requires a change to
-    # update_stats as well, query insert doesn't check field order.
-    return [allunique, unknowns, percent, sd]
+    return {
+        "allunique": allunique,
+        "unknowns": unknowns,
+        "percent": percent,
+        "distribution": json.dumps(status_distribution),
+    }
 
 
 def _update_stats(book, stats):
     "Update BookStats for the given book."
-    new_stats = BookStats(
-        BkID=book.id,
-        distinctterms=stats[0],
-        distinctunknowns=stats[1],
-        unknownpercent=stats[2],
-        status_distribution=stats[3],
-    )
-    db.session.add(new_stats)
+    s = db.session.query(BookStats).filter_by(BkID=book.id).first()
+    if s is None:
+        s = BookStats(BkID=book.id)
+    s.distinctterms = stats["allunique"]
+    s.distinctunknowns = stats["unknowns"]
+    s.unknownpercent = stats["percent"]
+    s.status_distribution = stats["distribution"]
+    db.session.add(s)
     db.session.commit()
