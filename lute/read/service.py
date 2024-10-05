@@ -96,7 +96,7 @@ def get_popup_data(termid):
     "Get popup data, or None if popup shouldn't be shown."
     term = Term.find(termid)
 
-    if term.status in [Status.UNKNOWN, Status.WELLKNOWN, Status.IGNORED]:
+    if term.status in [Status.UNKNOWN, Status.IGNORED]:
         return None
 
     def has_popup_data(cterm):
@@ -106,7 +106,7 @@ def get_popup_data(termid):
             or cterm.get_current_image() is not None
         )
 
-    if not any(has_popup_data(t) for t in (term, *term.parents)):
+    if not has_popup_data(term) and len(term.parents) == 0:
         return None
 
     term_tags = [tt.text for tt in term.term_tags]

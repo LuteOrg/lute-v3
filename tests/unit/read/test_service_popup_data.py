@@ -20,13 +20,24 @@ def test_popup_data_is_none_if_no_data(spanish, app_context):
     d = get_popup_data(t.id)
     assert d is not None, "Have data, popup"
 
-    for s in [Status.UNKNOWN, Status.WELLKNOWN, Status.IGNORED]:
-        t.status = s
-        d = get_popup_data(t.id)
-        assert d is None, "No popup for these statuses"
+
+def test_popup_shown_if_parent_exists_even_if_no_other_data(spanish, app_context):
+    "I always want to know if a parent has been set."
+    t = Term(spanish, "gato")
+    db.session.add(t)
+    db.session.commit()
+    d = get_popup_data(t.id)
+    assert d is None, "No data, no popup"
+
+    p = Term(spanish, "perro")
+    t.parents.append(p)
+    db.session.add(t)
+    db.session.commit()
+    d = get_popup_data(t.id)
+    assert d is not None, "Has parent, popup, even if no other data."
 
 
-def test_popup_data_is_none_for_some_statuses(spanish, app_context):
+def test_popup_data_is_none_for_unknown_and_ignored(spanish, app_context):
     "Return None if no-popup statuses."
     t = Term(spanish, "gato")
     db.session.add(t)
@@ -35,7 +46,7 @@ def test_popup_data_is_none_for_some_statuses(spanish, app_context):
     d = get_popup_data(t.id)
     assert d is not None, "Have data, popup"
 
-    for s in [Status.UNKNOWN, Status.WELLKNOWN, Status.IGNORED]:
+    for s in [Status.UNKNOWN, Status.IGNORED]:
         t.status = s
         d = get_popup_data(t.id)
         assert d is None, "No popup for these statuses"
