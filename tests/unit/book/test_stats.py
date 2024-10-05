@@ -6,7 +6,12 @@ import pytest
 
 from lute.db import db
 from lute.term.model import Term, Repository
-from lute.book.stats import get_status_distribution, refresh_stats, mark_stale
+from lute.book.stats import (
+    calc_status_distribution,
+    refresh_stats,
+    mark_stale,
+    get_stats,
+)
 
 from tests.utils import make_text, make_book
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
@@ -35,7 +40,7 @@ def scenario(language, fulltext, terms_and_statuses, expected):
     for ts in terms_and_statuses:
         add_term(language, ts[0], ts[1])
 
-    stats = get_status_distribution(b)
+    stats = calc_status_distribution(b)
 
     assert stats == expected
 
@@ -138,6 +143,34 @@ def test_stats_smoke_test(_test_book, spanish):
     refresh_stats()
     assert_stats(
         ["4; 2; 50; {'0': 2, '1': 2, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"]
+    )
+
+
+def test_get_stats_calculates_and_caches_stats(_test_book, spanish):
+    "Calculating stats is expensive, so store them on get."
+    add_terms(spanish, ["gato", "TENGO"])
+    assert_record_count_equals("bookstats", 0, "cache not loaded")
+    assert_stats([], "No stats cached at start.")
+
+    stats = get_stats(_test_book)
+    assert stats.BkID == _test_book.id
+    assert stats.distinctterms == 4
+    assert stats.distinctunknowns == 2
+    assert stats.unknownpercent == 50
+    assert (
+        stats.status_distribution
+        == '{"0": 2, "1": 2, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}'
+    )
+
+    assert_record_count_equals("bookstats", 1, "cache loaded")
+    assert_stats(
+        ["4; 2; 50; {'0': 2, '1': 2, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"]
+    )
+    stats = get_stats(_test_book)
+    assert stats.BkID == _test_book.id
+    assert (
+        stats.status_distribution
+        == '{"0": 2, "1": 2, "2": 0, "3": 0, "4": 0, "5": 0, "98": 0, "99": 0}'
     )
 
 

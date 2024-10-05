@@ -50,10 +50,8 @@ class UserSettingsForm(FlaskForm):
     stop_audio_on_term_form_open = BooleanField("Stop audio on term form open")
     stats_calc_sample_size = IntegerField(
         "Book stats page sample size",
-        validators=[InputRequired(), NumberRange(min=1, max=200)],
-        render_kw={
-            "title": "Number of pages to use for book stats calculation.  Max 200 for performance."
-        },
+        validators=[InputRequired(), NumberRange(min=1, max=500)],
+        render_kw={"title": "Number of pages to use for book stats calculation."},
     )
 
     mecab_path = StringField("MECAB_PATH environment variable")
