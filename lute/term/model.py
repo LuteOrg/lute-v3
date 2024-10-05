@@ -248,11 +248,14 @@ class Repository:
         """
         Add term to be deleted to session.
         """
-        spec = self._search_spec_term(term.language_id, term.text)
-        dbt = DBTerm.find_by_spec(spec)
-        if dbt is None:
-            return
-        self.db.session.delete(dbt)
+        dbt = None
+        if term.id is not None:
+            dbt = DBTerm.find(term.id)
+        else:
+            spec = self._search_spec_term(term.language_id, term.text)
+            dbt = DBTerm.find_by_spec(spec)
+        if dbt is not None:
+            self.db.session.delete(dbt)
 
     def commit(self):
         """
