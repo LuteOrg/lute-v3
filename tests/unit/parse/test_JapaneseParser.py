@@ -54,6 +54,24 @@ def test_end_of_sentence_stored_in_parsed_tokens(japanese):
     assert_tokens_equals(s, japanese, expected)
 
 
+def test_issue_488_repeat_character_handled(japanese):
+    "Repeat sometimes needs explicit check, can be returned as own word."
+    s = "聞こえる行く先々。少々お待ちください。"
+
+    expected = [
+        ("聞こえる", True),
+        ("行く先", True),
+        ("々", True),
+        ("。", False, True),
+        ("少々", True),
+        ("お待ち", True),
+        ("ください", True),
+        ("。", False, True),
+        ("¶", False, True),
+    ]
+    assert_tokens_equals(s, japanese, expected)
+
+
 def test_readings(app_context):
     """
     Parser returns readings if they add value.

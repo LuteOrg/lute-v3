@@ -103,7 +103,14 @@ class JapaneseParser(AbstractParser):
             is_eos = term in language.regexp_split_sentences
             if term == "EOP" and third == "7":
                 term = "¶"
-            is_word = node_type in "2678"
+
+            # Node type values ref
+            # https://github.com/buruzaemon/natto-py/wiki/
+            #    Node-Parsing-char_type
+            #
+            # The repeat character is sometimes returned as a "symbol"
+            # (node type = 3), so handle that specifically.
+            is_word = node_type in "2678" or term == "々"
             return ParsedToken(term, is_word, is_eos or term == "¶")
 
         tokens = [line_to_token(lin) for lin in lines]
