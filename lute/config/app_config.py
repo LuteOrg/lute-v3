@@ -53,8 +53,10 @@ class AppConfig:  # pylint: disable=too-many-instance-attributes
         self.userimagespath = os.path.join(self.datapath, "userimages")
         self.useraudiopath = os.path.join(self.datapath, "useraudio")
         self.userthemespath = os.path.join(self.datapath, "userthemes")
+        self.ttsoutputpath = os.path.join(self.datapath, "ttsout")
         self.temppath = os.path.join(self.datapath, "temp")
         self.dbfilename = os.path.join(self.datapath, self.dbname)
+        self.tts_configs = config.get("TTS", {})
 
         # Path to db backup.
         # When Lute starts up, it backs up the db
