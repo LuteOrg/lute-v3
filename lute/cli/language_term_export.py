@@ -15,7 +15,7 @@ haber; 100; 1500; book1,book2; to exist; 99; hay (500), he (200), has (150) ...
 import csv
 from lute.db import db
 from lute.models.book import Book
-from lute.read.render.service import get_paragraphs
+from lute.read.render.service import get_textitems, get_multiword_indexer
 
 
 def _add_term_to_dict(t, terms):
@@ -50,7 +50,7 @@ def _add_term_to_dict(t, terms):
     return hsh
 
 
-def _process_book(b, terms):
+def _process_book(b, terms, multiword_indexer):
     "Process pages in book, add to output."
     print(f"Processing {b.title} ...")
     i = 0
@@ -58,13 +58,9 @@ def _process_book(b, terms):
         i += 1
         if i % 10 == 0:
             print(f"  page {i} of {b.page_count}", end="\r")
-        paragraphs = get_paragraphs(text.text, b.language)
+        textitems = get_textitems(text.text, b.language, multiword_indexer)
         displayed_terms = [
-            ti.term
-            for para in paragraphs
-            for sentence in para
-            for ti in sentence
-            if ti.is_word and ti.term is not None
+            ti.term for ti in textitems if ti.is_word and ti.term is not None
         ]
         for t in displayed_terms:
             e = _add_term_to_dict(t, terms)
@@ -113,11 +109,21 @@ def _finalize_output(terms):
     return sorted(ret, key=lambda x: (-x["familycount"], x["term"]))
 
 
+def _load_indexers(books):
+    "Load multiword indexers for book languages."
+    ret = {}
+    lang_map = {book.language.id: book.language for book in books}
+    for langid, lang in lang_map.items():
+        ret[langid] = get_multiword_indexer(lang)
+    return ret
+
+
 def _generate_file(books, outfile_name):
     "Write data file for books to outfile_name."
+    indexers = _load_indexers(books)
     terms = {}
     for b in books:
-        _process_book(b, terms)
+        _process_book(b, terms, indexers[b.language.id])
     outdata = _finalize_output(terms)
 
     with open(outfile_name, "w", newline="", encoding="utf-8") as outfile:
