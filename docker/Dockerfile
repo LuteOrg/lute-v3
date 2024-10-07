@@ -8,15 +8,16 @@
 # Official python base image.
 FROM python:3.11-slim-bookworm
 
+# Build args
+ARG INSTALL_EVERYTHING=false
+ARG LUTE_VERSION
+
 WORKDIR /lute
 
 # Install base.
 ENV PIP_ROOT_USER_ACTION=ignore
-RUN pip install --upgrade --force-reinstall --no-cache-dir lute3
+RUN pip install --upgrade --force-reinstall --no-cache-dir lute3=="$LUTE_VERSION"
 COPY lute/config/config.yml.docker ./config.yml
-
-# Build arg, defaults to false.
-ARG INSTALL_EVERYTHING=false
 
 COPY docker/Dockerfile_scripts/install_everything.sh ./install_all.sh
 RUN chmod +x ./install_all.sh
