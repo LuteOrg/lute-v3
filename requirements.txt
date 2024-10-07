@@ -1,3 +1,7 @@
+# IMPORTANT: if any new requirements are added,
+# you MUST also change pyproject.toml.
+# If you don't, the pypi release will not be correct.
+
 ahocorapy==1.6.2
 astroid==2.15.6
 attrs==23.1.0

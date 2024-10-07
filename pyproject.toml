@@ -33,7 +33,8 @@ dependencies = [
   "waitress>=2.1.2,<3",
   "openepub>=0.0.8,<1",
   "pypdf>=3.17.4",
-  "subtitle-parser>=1.3.0"
+  "subtitle-parser>=1.3.0",
+  "ahocorapy>=1.6.2"
 ]
 
 [project.scripts]
