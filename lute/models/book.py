@@ -198,6 +198,11 @@ class Book(
         "Get by ID."
         return db.session.query(Book).filter(Book.id == book_id).first()
 
+    @staticmethod
+    def find_by_title(book_title):
+        "Get by title."
+        return db.session.query(Book).filter(Book.title == book_title).first()
+
 
 # TODO zzfuture fix: rename class and table to Page/pages
 class Text(db.Model):
