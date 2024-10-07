@@ -1,5 +1,5 @@
 
-# 3.5.4 (2024-10-06)
+# 3.5.5 (2024-10-06)
 
 Feature changes:
 
@@ -19,6 +19,11 @@ Fixes:
 
 * #487: Use term IDs for deletes.
 * #488: Handle Japanese "repeat" kanji character.
+
+
+# 3.5.4 (2024-10-06)
+
+Botched release: forgot to update `pyproject.toml`, process updated.
 
 
 # 3.5.3 (2024-09-20)
