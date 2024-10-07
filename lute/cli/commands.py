@@ -6,6 +6,7 @@ import click
 from flask import Blueprint
 
 from lute.cli.language_term_export import generate_language_file, generate_book_file
+from lute.cli.import_books import import_books_from_csv
 
 bp = Blueprint("cli", __name__)
 
@@ -47,3 +48,35 @@ def book_term_export(bookid, output_path):
     data file of term frequencies and children.
     """
     generate_book_file(bookid, output_path)
+
+
+@bp.cli.command("import_books_from_csv")
+@click.option("--commit", is_flag=True)
+@click.option("--tags", default="")
+@click.argument("language")
+@click.argument("file")
+def import_books_from_csv_cmd(language, file, tags, commit):
+    """
+    Import books from a CSV file.
+
+    The CSV file must have a header row with the following, case-sensitive,
+    column names. The order of the columns does not matter. The CSV file may
+    include additional columns, which will be ignored.
+
+      - title: the title of the book
+
+      - text: the text of the book
+
+      - url: [optional] the source URL for the book
+
+      - tags: [optional] a comma-separated list of tags to apply to the book
+      (e.g., "audiobook,beginner")
+
+      - audio: [optional] the path to the audio file of the book. This should
+      either be an absolute path, or a path relative to the CSV file.
+
+      - bookmarks: [optional] a semicolon-separated list of audio bookmark
+      positions, in seconds (decimals permitted; e.g., "12.34;42.89;89.00").
+    """
+    tags = [tag for tag in tags.split(',')] if tags else []
+    import_books_from_csv(language, file, tags, commit)
