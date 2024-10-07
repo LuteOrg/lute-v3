@@ -1,4 +1,26 @@
 
+# 3.5.4 (2024-10-06)
+
+Feature changes:
+
+* #405: add UserSetting for book stats sample size.
+
+There was a big refactor/rewrite of much of the book stats
+calculation code.  The calculation isn't instantaneous,
+but as the graphs are ajaxed in now, it should suffice.
+
+Tweaks:
+
+* Show term popup if parent is set.
+* Ajax in book stats on home page for speed.
+* Simplify datatables rendering.
+
+Fixes:
+
+* #487: Use term IDs for deletes.
+* #488: Handle Japanese "repeat" kanji character.
+
+
 # 3.5.3 (2024-09-20)
 
 Tweaks:
