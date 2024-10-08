@@ -10,23 +10,22 @@ FROM python:3.11-slim-bookworm
 
 # Build args
 ARG INSTALL_EVERYTHING=false
-ARG LUTE_VERSION
-
-WORKDIR /lute
 
 # Install base.
+COPY requirements.txt .
 ENV PIP_ROOT_USER_ACTION=ignore
-RUN pip install --upgrade --force-reinstall --no-cache-dir lute3=="$LUTE_VERSION"
-COPY lute/config/config.yml.docker ./config.yml
+RUN pip install -r requirements.txt
+COPY lute /lute
+COPY lute/config/config.yml.docker /lute/config/config.yml
 
-COPY docker/Dockerfile_scripts/install_everything.sh ./install_all.sh
-RUN chmod +x ./install_all.sh
+COPY docker/Dockerfile_scripts/install_everything.sh /lute/install_all.sh
+RUN chmod +x /lute/install_all.sh
 
-RUN if [ "$INSTALL_EVERYTHING" = "true" ]; then ./install_all.sh; fi
+RUN if [ "$INSTALL_EVERYTHING" = "true" ]; then /lute/install_all.sh; fi
 
 EXPOSE 5000
 
 # Start script.
-COPY docker/Dockerfile_scripts/start.sh ./start.sh
-RUN chmod +x ./start.sh
+COPY docker/Dockerfile_scripts/start.sh /lute/start.sh
+RUN chmod +x /lute/start.sh
 ENTRYPOINT ["/lute/start.sh"]
