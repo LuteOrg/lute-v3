@@ -47,7 +47,6 @@ docker buildx build \
        --platform linux/amd64,linux/arm64 \
        -f docker/Dockerfile "$@" \
        --build-arg INSTALL_EVERYTHING=true \
-       --build-arg LUTE_VERSION="$VERSION" \
        -t $TAG -t $LATEST .
 
 echo
@@ -59,7 +58,6 @@ docker buildx build \
        --platform linux/amd64,linux/arm64 \
        -f docker/Dockerfile "$@" \
        --build-arg INSTALL_EVERYTHING=false \
-       --build-arg LUTE_VERSION="$VERSION" \
        -t $LEANTAG -t $LEANLATEST .
 
 echo
