@@ -238,36 +238,30 @@ jobs:
         black --check .
 
 
-  ## DISABLING DOCKER BUILD CHECK.
-  ## Docker build scripts now pull down the appropriate lute version
-  ## from pypi, but during regular CI runs that information is not available.
-  ##
-  ## TODO ci: come up with method to test docker containers.
-  ##
-  ## # Test build docker container and try running.
-  ## # Slightly wasteful re-setup of node.
-  ## docker-build:
-  ##   runs-on: ubuntu-latest
-  ##   timeout-minutes: 30
-  ##   needs: base-ci
-  ##   steps:
-  ##   - uses: actions/checkout@v4
-  ##     with:
-  ##       submodules: true
-  ##   - uses: actions/setup-python@v4
-  ##     with:
-  ##       python-version: 3.11
-  ##       cache: 'pip' # caching pip dependencies
-  ##   - run: pip install -r requirements.txt
-  ##   - name: Test docker build
-  ##     run: |
-  ##       docker build -f docker/Dockerfile --build-arg INSTALL_EVERYTHING=false -t lute3 .
-  ##       # Run container in the background, and check.
-  ##       docker run -d -p 5000:5000 -v ./my_data:/lute_data -v ./my_backups:/lute_backup --name my-lute lute3:latest
-  ##       sleep 10  # Give it a moment to start.
-  ##       python -m utils.verify 5000
-  ##       docker stop my-lute
-  ##       docker rm my-lute
+  # Test build docker container and try running.
+  # Slightly wasteful re-setup of node.
+  docker-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: base-ci
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+    - uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+        cache: 'pip' # caching pip dependencies
+    - run: pip install -r requirements.txt
+    - name: Test docker build
+      run: |
+        docker build -f docker/Dockerfile --build-arg INSTALL_EVERYTHING=false -t lute3 .
+        # Run container in the background, and check.
+        docker run -d -p 5000:5000 -v ./my_data:/lute_data -v ./my_backups:/lute_backup --name my-lute lute3:latest
+        sleep 10  # Give it a moment to start.
+        python -m utils.verify 5000
+        docker stop my-lute
+        docker rm my-lute
 
 
   # Ensure that basic things work correctly on Windows,
