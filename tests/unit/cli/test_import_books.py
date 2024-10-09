@@ -11,14 +11,18 @@ from lute.db import db
 
 def test_smoke_test(app_context, tmp_path, english, german):
     """Test importing books from CSV file"""
-    csv_contents = """title,language,url,tags,an extra column,text
-A Book,English,http://www.example.com/book,"foo,bar,baz",extra information,"Lorem ipsum, dolor sit amet."
-Another Book,,,,,The quick brown fox jumps over the lazy dog.
-A Book,German,,,,Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich.
+    csv_contents = """title,language,url,tags,audio,bookmarks,an extra column,text
+A Book,English,http://www.example.com/book,"foo,bar,baz",book.mp3,1.00;3.14;42.00,extra information,"Lorem ipsum, dolor sit amet."
+Another Book,,,,,,,The quick brown fox jumps over the lazy dog.
+A Book,German,,,,,,Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich.
 """
     csv_file = tmp_path / 'books.csv'
     with open(csv_file, 'w') as f:
         f.write(csv_contents)
+    mp3_file = tmp_path / 'book.mp3'
+    with open(mp3_file, 'w') as f:
+        pass
+
     common_tags = ["bar", "qux"]
 
     # Check that no changes are made if not committing.
@@ -35,6 +39,8 @@ A Book,German,,,,Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter D
     assert(book.title == "A Book")
     assert(book.language_id == english.id)
     assert(book.source_uri == "http://www.example.com/book")
+    assert(book.audio_filename == str(mp3_file))
+    assert(book.audio_bookmarks == "1.00;3.14;42.00")
     assert(len(book.texts) == 1)
     assert(book.texts[0].text == "Lorem ipsum, dolor sit amet.")
     assert(sorted([tag.text for tag in book.book_tags]) == ["bar", "baz", "foo", "qux"])
@@ -44,6 +50,8 @@ A Book,German,,,,Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter D
     assert(book.title == "Another Book")
     assert(book.language_id == english.id)
     assert(book.source_uri is None)
+    assert(book.audio_filename is None)
+    assert(book.audio_bookmarks is None)
     assert(len(book.texts) == 1)
     assert(book.texts[0].text == "The quick brown fox jumps over the lazy dog.")
     assert(sorted([tag.text for tag in book.book_tags]) == ["bar", "qux"])
@@ -53,6 +61,8 @@ A Book,German,,,,Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter D
     assert(book.title == "A Book")
     assert(book.language_id == german.id)
     assert(book.source_uri is None)
+    assert(book.audio_filename is None)
+    assert(book.audio_bookmarks is None)
     assert(len(book.texts) == 1)
     assert(book.texts[0].text == "Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich.")
     assert(sorted([tag.text for tag in book.book_tags]) == ["bar", "qux"])
