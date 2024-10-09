@@ -53,7 +53,7 @@ def book_term_export(bookid, output_path):
 @bp.cli.command("import_books_from_csv")
 @click.option("--commit", is_flag=True)
 @click.option("--tags", default="")
-@click.argument("language")
+@click.option("--language", default="")
 @click.argument("file")
 def import_books_from_csv_cmd(language, file, tags, commit):
     """
@@ -67,6 +67,10 @@ def import_books_from_csv_cmd(language, file, tags, commit):
 
       - text: the text of the book
 
+      - language: [optional] the name of the language of book, as it appears in
+      your language settings. If unspecified, the language specified on the
+      command line (using the --language option) will be used.
+
       - url: [optional] the source URL for the book
 
       - tags: [optional] a comma-separated list of tags to apply to the book
@@ -79,4 +83,4 @@ def import_books_from_csv_cmd(language, file, tags, commit):
       positions, in seconds (decimals permitted; e.g., "12.34;42.89;89.00").
     """
     tags = [tag for tag in tags.split(',')] if tags else []
-    import_books_from_csv(language, file, tags, commit)
+    import_books_from_csv(file, language, tags, commit)

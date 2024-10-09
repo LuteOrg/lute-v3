@@ -2,6 +2,7 @@
 Book entity.
 """
 
+from sqlalchemy import and_
 from lute.db import db
 from lute.parse.base import SentenceGroupIterator
 
@@ -199,9 +200,11 @@ class Book(
         return db.session.query(Book).filter(Book.id == book_id).first()
 
     @staticmethod
-    def find_by_title(book_title):
+    def find_by_title(book_title, language_id):
         "Get by title."
-        return db.session.query(Book).filter(Book.title == book_title).first()
+        return db.session.query(Book).filter(and_(
+            Book.title == book_title,
+            Book.language_id == language_id)).first()
 
 
 # TODO zzfuture fix: rename class and table to Page/pages
