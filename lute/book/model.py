@@ -50,9 +50,9 @@ class Repository:
             raise ValueError(f"No book with id {book_id} found")
         return self._build_business_book(dbb)
 
-    def find_by_title(self, book_title):
+    def find_by_title(self, book_title, language_id):
         "Loads a Book business object for the book with a given title."
-        dbb = DBBook.find_by_title(book_title)
+        dbb = DBBook.find_by_title(book_title, language_id)
         if dbb is None:
             return None
         return self._build_business_book(dbb)
