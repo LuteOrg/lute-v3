@@ -91,5 +91,5 @@ def import_books_from_csv_cmd(language, file, tags, commit):
       - bookmarks: [optional] a semicolon-separated list of audio bookmark
       positions, in seconds (decimals permitted; e.g., "12.34;42.89;89.00").
     """
-    tags = [tag for tag in tags.split(',')] if tags else []
+    tags = list(tags.split(',')) if tags else []
     import_books_from_csv(file, language, tags, commit)

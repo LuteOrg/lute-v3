@@ -28,23 +28,21 @@ def import_books_from_csv(file, language, tags, commit):
     """
     repo = Repository(db)
     count = 0
-    with open(file, newline='') as f:
+    with open(file, newline='', encoding='utf-8') as f:
         r = csv.DictReader(f)
         for row in r:
             book = Book()
             book.title = row['title']
-            book.language_name = language
-            if 'language' in row and row['language']:
-                book.language_name = row['language']
+            book.language_name = row.get('language') or language
             if not book.language_name:
-                print("Skipping book with unspecified language: {}".format(book.title))
+                print(f"Skipping book with unspecified language: {book.title}")
                 continue
             lang = Language.find_by_name(book.language_name)
             if not lang:
-                print("Skipping book with unknown language ({}): {}".format(book.language_name, book.title))
+                print(f"Skipping book with unknown language ({book.language_name}): {book.title}")
                 continue
             if repo.find_by_title(book.title, lang.id) is not None:
-                print("Already exists in {}: {}".format(book.language_name, book.title))
+                print(f"Already exists in {book.language_name}: {book.title}")
                 continue
             count += 1
             all_tags = []
@@ -54,19 +52,17 @@ def import_books_from_csv(file, language, tags, commit):
                 for tag in row['tags'].split(','):
                     if tag and tag not in all_tags:
                         all_tags.append(tag)
-            book.text = row['text']
-            if 'url' in row and row['url']:
-                book.source_uri = row['url']
             book.book_tags = all_tags
+            book.text = row['text']
+            book.source_uri = row.get('url') or None
             if 'audio' in row and row['audio']:
                 book.audio_filename = os.path.join(os.path.dirname(file), row['audio'])
-            if 'bookmarks' in row and row['bookmarks']:
-                book.audio_bookmarks = row['bookmarks']
+            book.audio_bookmarks = row.get('bookmarks') or None
             repo.add(book)
-            print("Added {} book (tags={}): {}".format(book.language_name, ','.join(all_tags), book.title))
+            print(f"Added {book.language_name} book (tags={','.join(all_tags)}): {book.title}")
 
     print()
-    print("Added {} books".format(count))
+    print(f"Added {count} books")
     print()
 
     if not commit:
