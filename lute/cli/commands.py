@@ -51,18 +51,30 @@ def book_term_export(bookid, output_path):
 
 
 @bp.cli.command("import_books_from_csv")
-@click.option("--commit", is_flag=True, help="""
+@click.option(
+    "--commit",
+    is_flag=True,
+    help="""
     Commit the changes to the database. If not set, import in dry-run mode. A
     list of changes will be printed out but not applied.
-""")
-@click.option("--tags", default="", help="""
+""",
+)
+@click.option(
+    "--tags",
+    default="",
+    help="""
     A comma-separated list of tags to apply to all books.
-""")
-@click.option("--language", default="", help="""
+""",
+)
+@click.option(
+    "--language",
+    default="",
+    help="""
     The name of the default language to apply to each book, as it appears in
     your language settings. If unset, the language must be indicated in the
     "language" column of the CSV file.
-""")
+""",
+)
 @click.argument("file")
 def import_books_from_csv_cmd(language, file, tags, commit):
     """
@@ -91,5 +103,5 @@ def import_books_from_csv_cmd(language, file, tags, commit):
       - bookmarks: [optional] a semicolon-separated list of audio bookmark
       positions, in seconds (decimals permitted; e.g., "12.34;42.89;89.00").
     """
-    tags = list(tags.split(',')) if tags else []
+    tags = list(tags.split(",")) if tags else []
     import_books_from_csv(file, language, tags, commit)

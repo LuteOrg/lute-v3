@@ -15,11 +15,11 @@ A Book,English,http://www.example.com/book,"foo,bar,baz",book.mp3,1.00;3.14;42.0
 Another Book,,,,,,,The quick brown fox jumps over the lazy dog.
 A Book,German,,,,,,Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich.
 """
-    csv_file = tmp_path / 'books.csv'
-    with open(csv_file, 'w', encoding='utf-8') as f:
+    csv_file = tmp_path / "books.csv"
+    with open(csv_file, "w", encoding="utf-8") as f:
         f.write(csv_contents)
-    mp3_file = tmp_path / 'book.mp3'
-    with open(mp3_file, 'w', encoding='utf-8') as f:
+    mp3_file = tmp_path / "book.mp3"
+    with open(mp3_file, "w", encoding="utf-8") as f:
         pass
 
     common_tags = ["bar", "qux"]
@@ -63,18 +63,30 @@ A Book,German,,,,,,Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter
     assert book.audio_filename is None
     assert book.audio_bookmarks is None
     assert len(book.texts) == 1
-    assert book.texts[0].text == "Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich."
+    assert (
+        book.texts[0].text
+        == "Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich."
+    )
     assert sorted([tag.text for tag in book.book_tags]) == ["bar", "qux"]
 
     # Check that duplicate books are not added.
     import_books_from_csv(csv_file, "English", common_tags, True)
 
-    assert(db.session.query(Book).filter(and_(
-        Book.title == "A Book",
-        Book.language_id == english.id)).count() == 1)
-    assert(db.session.query(Book).filter(and_(
-        Book.title == "Another Book",
-        Book.language_id == english.id)).count() == 1)
-    assert(db.session.query(Book).filter(and_(
-        Book.title == "A Book",
-        Book.language_id == german.id)).count() == 1)
+    assert (
+        db.session.query(Book)
+        .filter(and_(Book.title == "A Book", Book.language_id == english.id))
+        .count()
+        == 1
+    )
+    assert (
+        db.session.query(Book)
+        .filter(and_(Book.title == "Another Book", Book.language_id == english.id))
+        .count()
+        == 1
+    )
+    assert (
+        db.session.query(Book)
+        .filter(and_(Book.title == "A Book", Book.language_id == german.id))
+        .count()
+        == 1
+    )

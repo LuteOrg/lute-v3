@@ -202,9 +202,11 @@ class Book(
     @staticmethod
     def find_by_title(book_title, language_id):
         "Get by title."
-        return db.session.query(Book).filter(and_(
-            Book.title == book_title,
-            Book.language_id == language_id)).first()
+        return (
+            db.session.query(Book)
+            .filter(and_(Book.title == book_title, Book.language_id == language_id))
+            .first()
+        )
 
 
 # TODO zzfuture fix: rename class and table to Page/pages
