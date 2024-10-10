@@ -1,0 +1,26 @@
+# TODO fix names
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.module]
+name = "lute_langname_parser"
+
+[project]
+name = "lute3-langname"
+dynamic = ['version']
+description = "Learning Using Texts - LangName Parser"
+requires-python = ">=3.8"
+authors = [
+  {name = "TODO your_name>"}
+]
+readme = "README_PyPi.md"
+
+dependencies = [
+  "lute3>=3.4.2"
+  # TODO others
+]
+
+
+[project.entry-points."lute.plugin.parse"]
+lute_mandarin = "lute_langname_parser.parser:LangNameParser"

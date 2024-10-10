@@ -1,0 +1,4 @@
+# Required dependency for base classes.
+lute3>=3.4.2
+
+# TODO -- extra requirements here.
