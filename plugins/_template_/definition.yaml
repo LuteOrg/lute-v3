@@ -1,0 +1,17 @@
+# TODO fix names
+name: LangName
+dictionaries:
+  - for: terms
+    type: embedded
+    url: TODO
+  - for: sentences
+    type: popup
+    url: TODO
+show_romanization: true
+# right_to_left:
+
+parser_type: lute_langname
+# character_substitutions:
+# split_sentences: .!?。！？
+# split_sentence_exceptions:
+word_chars: TODO character range
