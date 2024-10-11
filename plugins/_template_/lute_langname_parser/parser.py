@@ -1,8 +1,6 @@
 """
 Parsing using TODO
 
-The parser uses jieba to do parsing and pypinyin for character readings
-
 Includes classes:
 
 - LangNameParser
@@ -18,7 +16,6 @@ from lute.parse.base import ParsedToken, AbstractParser
 class LangNameParser(AbstractParser):
     """
     A parser for LANGNAME
-    using the jieba library for text segmentation.
     """
 
     @classmethod
