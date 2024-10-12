@@ -14,6 +14,12 @@ from lute.parse.base import ParsedToken
 from lute_langname_parser.parser import LangNameParser
 
 
+def test_dummy_test():
+    "A dummy test so that pytest doesn't complain in github ci."
+    s = "Hello"
+    assert s == "Hello", "TODO - fix these tests for your parser :-)"
+
+
 # TODO activate tests.
 def todo_test_token_count(langname):
     """
