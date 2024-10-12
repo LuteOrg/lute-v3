@@ -153,18 +153,26 @@
       }
 
       if (form_changed) {
-        const msg = 'You have unsaved changes, going to the parent will lose them.  Continue?';
+        const msg = 'You have unsaved changes.  Click OK to save these changes and go to the parent term, or Cancel to continue editing.';
         if (!confirm(msg))
           return;
       }
 
-      let url = '';
-      if ("{{ embedded_in_reading_frame }}" == "True") {
+      const in_reading_frame = ("{{ embedded_in_reading_frame }}" == "True");
+      let url = `/term/editbytext/${langid}/${clickedTagText}`;
+      if (in_reading_frame) {
         url = `/read/termform/${langid}/${clickedTagText}`;
-      } else {
-        url = `/term/editbytext/${langid}/${clickedTagText}`;
       }
-      window.location.href = url;
+
+      // Manually post, tell the reading screen to update, then go to the url.
+      const frm = $('#term-form');
+      const formData = frm.serialize();
+      $.post(frm.attr('action'), formData, function(response) {
+        if (in_reading_frame) {
+          window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
+        }
+        window.location.href = url;
+      });
     });
 
     tagify.on('add remove', function (e) {
