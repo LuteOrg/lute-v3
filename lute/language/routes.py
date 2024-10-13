@@ -59,9 +59,10 @@ def _handle_form(language, form) -> bool:
             flash(f"Language {language.name} updated", "success")
             result = True
         except IntegrityError as e:
+            current_app.db.session.rollback()
             msg = e.orig
             if "languages.LgName" in f"{e.orig}":
-                msg = f"{language.name} already exists."
+                msg = f"Language {form.name.data} already exists."
             flash(msg, "error")
 
     return result
