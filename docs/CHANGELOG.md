@@ -1,4 +1,22 @@
 
+# 3.5.6 (2024-10-13)
+
+Feature changes:
+
+* Add CLI tool to bulk import books from a CSV file.  See [the manual](https://luteorg.github.io/lute-manual/usage/command-line-jobs.html) for notes.  By @bwkimmel in #491
+
+Tweaks:
+
+* #103: click parent term auto-saves child
+* #467: allow change of book audio file
+
+Misc code:
+
+* #492: split prod and dev requirements
+* #490: build docker images using source code, not pypi
+* Add template for language parser plugins
+
+
 # 3.5.5 (2024-10-06)
 
 Feature changes:
