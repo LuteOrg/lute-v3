@@ -45,7 +45,7 @@ jobs:
         python-version: ${{ matrix.python_version }}
         cache: 'pip' # caching pip dependencies
 
-    - run: pip install -r requirements.txt
+    - run: pip install -r requirements-dev.txt
 
     - name: Setup config
       run: |
@@ -121,7 +121,7 @@ jobs:
         python-version: ${{ matrix.python_version }}
         cache: 'pip' # caching pip dependencies
 
-    - run: pip install -r requirements.txt
+    - run: pip install -r requirements-dev.txt
 
     - name: Setup config
       run: |
@@ -185,7 +185,7 @@ jobs:
       run: |
         for plugin in $(ls plugins); do
           # Lute reqs, such as pytest.
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
 
           # Lute itself, via toml, so that it can be found
           # by each plugin's own "pip install ."
@@ -228,7 +228,7 @@ jobs:
         python-version: ${{ matrix.python_version }}
         cache: 'pip' # caching pip dependencies
 
-    - run: pip install -r requirements.txt
+    - run: pip install -r requirements-dev.txt
 
     - name: Lint
       run: inv lint
@@ -252,7 +252,7 @@ jobs:
       with:
         python-version: 3.11
         cache: 'pip' # caching pip dependencies
-    - run: pip install -r requirements.txt
+    - run: pip install -r requirements-dev.txt
     - name: Test docker build
       run: |
         docker build -f docker/Dockerfile --build-arg INSTALL_EVERYTHING=false -t lute3 .
@@ -301,7 +301,7 @@ jobs:
         [System.IO.File]::WriteAllText("${{ github.workspace }}\lute\config\config.yml", $content)
         Get-Content -Path "${{ github.workspace }}\lute\config\config.yml"
 
-    - run: pip install -r requirements.txt
+    - run: pip install -r requirements-dev.txt
 
     # Can't get playwright to run reliably on Windows.
     # - name: Playwright install
