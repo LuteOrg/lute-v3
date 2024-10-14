@@ -539,6 +539,12 @@ let get_textitems_spans = function(e) {
   return $(`span.textitem[data-${attr_name}="${attr_value}"]`).toArray();
 };
 
+let handle_bookmark = function() {
+  // Function defined in read/index.html ... yuck, need to reorganize this js code.
+  // TODO javascript: reorganize, or make modules.
+  add_bookmark();
+}
+
 /** Copy the text of the textitemspans to the clipboard, and add a
  * color flash. */
 let handle_copy = function(e) {
@@ -787,6 +793,7 @@ function handle_keydown (e) {
   const kRIGHT = 39;
   const kUP = 38;
   const kDOWN = 40;
+  const kB = 66; // B)ookmark
   const kC = 67; // C)opy
   const kT = 84; // T)ranslate
   const kM = 77; // The(M)e
@@ -821,6 +828,7 @@ function handle_keydown (e) {
   map[kRIGHT] = () => move_cursor(right_increment);
   map[kUP] = () => increment_status_for_selected_elements(e, +1);
   map[kDOWN] = () => increment_status_for_selected_elements(e, -1);
+  map[kB] = () => handle_bookmark();
   map[kC] = () => handle_copy(e);
   map[kT] = () => show_sentence_translation(e);
   map[kM] = () => next_theme();

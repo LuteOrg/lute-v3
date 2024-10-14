@@ -530,15 +530,12 @@
   }
 
   function add_bookmark() {
-    const text_id = document.querySelector('#text_id')?.value;
     const book_id = document.querySelector('#book_id')?.value;
     const page_num = document.querySelector('#page_num')?.value;
-    let title = prompt(`Enter a bookmark title for page ${page_num}`);
+    let title = prompt(`Enter bookmark title, or Cancel to quit`);
 
-    if (!book_id || !page_num || !title) {
-      alert(`Missing bookmark data. No bookmark added.`);
-      return
-    }
+    if (!title)
+      return;
 
     fetch(`/bookmarks/add`, {
       method: "POST",
