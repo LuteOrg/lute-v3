@@ -163,3 +163,61 @@ def set_key_value(key, value):
         result = {"result": "failure", "message": message}
     db.session.commit()
     return jsonify(result)
+
+
+class ShortcutsForm(FlaskForm):
+    """
+    Shortcuts.
+
+    Note the field names here must match the keys in the settings table.
+    """
+
+    def __init__(self, settings, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Dynamically add fields based on settings
+        for setting_name, setting_value in settings.items():
+            print(f"adding {setting_name}", flush=True)
+            field = StringField(setting_name, default=setting_value)
+            setattr(self, setting_name, field)
+            self._fields[setting_name] = field
+
+
+@bp.route("/shortcuts", methods=["GET", "POST"])
+def edit_shortcuts():
+    "Edit shortcuts."
+    settings = {"AAA": "someval", "BBB": "another"}
+    setting_descs = {"AAA": "apple"}
+    # form = ShortcutsForm(settings)
+    ## form = UserSettingsForm()
+
+    ## with current_app.app_context():
+    ##     form.current_theme.choices = list_themes()
+
+    ## ac = current_app.env_config
+    ## if ac.is_docker:
+    ##     # User shouldn't change some things with docker.
+    ##     kw = {"readonly": True, "style": "background-color: LightGray"}
+    ##     # Backup dir gets mounted from host.
+    ##     form.backup_dir.render_kw = kw
+
+    ## if form.validate_on_submit():
+    ##     # Update the settings in the database
+    ##     for field in form:
+    ##         if field.id not in ("csrf_token", "submit"):
+    ##             UserSetting.set_value(field.id, field.data)
+    ##     db.session.commit()
+
+    ##     flash("Shortcuts updated", "success")
+    ##     return redirect("/")
+
+    ## # Load current settings from the database
+    ## for field in form:
+    ##     if field.id != "csrf_token":
+    ##         field.data = UserSetting.get_value(field.id)
+    ##     if isinstance(field, BooleanField):
+    ##         # Hack: set boolean settings to ints, otherwise they're always checked.
+    ##         field.data = int(field.data or 0)
+
+    return render_template(
+        "settings/shortcuts.html", settings=settings, setting_descs=setting_descs
+    )

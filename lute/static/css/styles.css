@@ -1209,6 +1209,10 @@ table input:not([type="checkbox"]) {
     width: 20rem;
 }
 
+.dupShortcut {
+    background-color: #FFCCCB;
+}
+
 #book td:first-child,
 #language td:first-child {
     width: 15rem;
