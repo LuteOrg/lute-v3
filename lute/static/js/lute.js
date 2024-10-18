@@ -775,33 +775,6 @@ function add_page_after() {
 }
 
 
-function getKeyString(event) {
-    const keys = [];
-
-    // Check for modifier keys
-    if (event.ctrlKey) keys.push('ctrl');
-    if (event.shiftKey) keys.push('shift');
-    if (event.altKey) keys.push('alt');
-    if (event.metaKey) keys.push('meta');
-
-    // Map special keys to names if needed
-    const keyMap = {
-        ' ': 'space'
-    };
-
-    const key = keyMap[event.key] || event.key.toLowerCase();
-
-    // If it's a normal key (not a modifier), add it to the keys array
-    if (!['shift', 'ctrl', 'alt', 'meta'].includes(key)) {
-        keys.push(key);
-    }
-
-    const ret = keys.join('+');
-    // console.log(`Got keydown = ${ret}`);
-    return ret;
-}
-
-
 function get_right_increment() {
   // read/index.js has some data rendered at the top of the page.
   const lang_is_rtl = $('#lang_is_rtl');
@@ -847,7 +820,7 @@ function handle_keydown (e) {
     [k.hotkey_StatusWellKnown]: () => update_status_for_marked_elements(99),
   }
 
-  const ks = getKeyString(e);
+  const ks = get_pressed_keys_as_string(e);
   if (ks in map) {
     // Override any existing event - e.g., if "up" arrow is in the map,
     // don't scroll screen.

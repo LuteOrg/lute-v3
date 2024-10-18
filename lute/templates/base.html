@@ -38,8 +38,9 @@
   <script type="text/javascript" src="{{ url_for('static', filename='vendor/datatables/datatables.button.download.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.hoverIntent.js') }}" charset="utf-8"></script>
 
-  <!-- this calls a route defined in app_factory to never cache this file -->
+  <!-- the "never_cache" calls a route defined in app_factory to never cache that particular .js file -->
   <script type="text/javascript" src="/static/js/never_cache/lute.js" charset="utf-8"></script>
+  <script type="text/javascript" src="/static/js/never_cache/lute-hotkey-utils.js" charset="utf-8"></script>
 
   <script type="text/javascript">
     const LUTE_USER_SETTINGS = {{ user_settings | safe }}
