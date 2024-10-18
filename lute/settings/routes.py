@@ -199,8 +199,30 @@ def edit_shortcuts():
         return redirect("/")
 
     ## # TODO Load current settings from the database
-    settings = {"AAA": "someval", "BBB": "another", "CCC": ""}
-    setting_descs = {"AAA": "apple"}
+    allsettings = db.session.query(UserSetting).all()
+    settings = {h.key: h.value for h in allsettings if h.key.startswith("hotkey_")}
+    setting_descs = {
+        "hotkey_StartHover": "Deselect all words",
+        "hotkey_PrevWord": "Move to previous word",
+        "hotkey_NextWord": "Move to next word",
+        "hotkey_StatusUp": "Bump the status up by 1",
+        "hotkey_StatusDown": "Bump that status down by 1",
+        "hotkey_Bookmark": "Bookmark the current page",
+        "hotkey_CopySentence": "Copy the sentence of the current word",
+        "hotkey_CopyPara": "Copy the paragraph of the current word",
+        "hotkey_TranslateSentence": "Translate the sentence of the current word",
+        "hotkey_TranslatePara": "Translate the paragraph of the current word",
+        "hotkey_NextTheme": "Change to the next theme",
+        "hotkey_ToggleHighlight": "Toggle highlights",
+        "hotkey_ToggleFocus": "Toggle focus mode",
+        "hotkey_Status1": "Set status to 1",
+        "hotkey_Status2": "Set status to 2",
+        "hotkey_Status3": "Set status to 3",
+        "hotkey_Status4": "Set status to 4",
+        "hotkey_Status5": "Set status to 5",
+        "hotkey_StatusIgnore": "Set status to Ignore",
+        "hotkey_StatusWellKnown": "Set status to Well Known",
+    }
 
     return render_template(
         "settings/shortcuts.html", settings=settings, setting_descs=setting_descs
