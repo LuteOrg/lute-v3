@@ -163,3 +163,101 @@ def set_key_value(key, value):
         result = {"result": "failure", "message": message}
     db.session.commit()
     return jsonify(result)
+
+
+class UserShortcutsForm(FlaskForm):
+    """
+    Shortcuts form.
+
+    The route manages getting and storing the settings
+    from the db, as there's a variable number of settings,
+    and it's easier to just work with the data directly
+    rather than trying to create a variable number of fields.
+
+    I'm only using this form to get the validate_on_submit()!
+    There's likely a better way to do this.
+    """
+
+
+def _get_categorized_hotkeys():
+    """
+    Return hotkey UserSetting keys and values,
+    grouped by category.
+    """
+
+    categorized_settings = {
+        "Navigation": ["hotkey_StartHover", "hotkey_PrevWord", "hotkey_NextWord"],
+        "Update status": [
+            "hotkey_Status1",
+            "hotkey_Status2",
+            "hotkey_Status3",
+            "hotkey_Status4",
+            "hotkey_Status5",
+            "hotkey_StatusIgnore",
+            "hotkey_StatusWellKnown",
+            "hotkey_StatusUp",
+            "hotkey_StatusDown",
+        ],
+        "Misc": [
+            "hotkey_Bookmark",
+            "hotkey_CopySentence",
+            "hotkey_CopyPara",
+            "hotkey_TranslateSentence",
+            "hotkey_TranslatePara",
+            "hotkey_NextTheme",
+            "hotkey_ToggleHighlight",
+            "hotkey_ToggleFocus",
+        ],
+    }
+
+    settings = {h.key: h.value for h in db.session.query(UserSetting).all()}
+    return {
+        category: {k: settings[k] for k in keylist}
+        for category, keylist in categorized_settings.items()
+    }
+
+
+@bp.route("/shortcuts", methods=["GET", "POST"])
+def edit_shortcuts():
+    "Edit shortcuts."
+    form = UserShortcutsForm()
+    if form.validate_on_submit():
+        # print(request.form, flush=True)
+        # Update the settings in the database
+        for k, v in request.form.items():
+            # print(f"{k} = {v}", flush=True)
+            UserSetting.set_value(k, v)
+        db.session.commit()
+        flash("Shortcuts updated", "success")
+        return redirect("/")
+
+    categorized_settings = _get_categorized_hotkeys()
+
+    setting_descs = {
+        "hotkey_StartHover": "Deselect all words",
+        "hotkey_PrevWord": "Move to previous word",
+        "hotkey_NextWord": "Move to next word",
+        "hotkey_StatusUp": "Bump the status up by 1",
+        "hotkey_StatusDown": "Bump that status down by 1",
+        "hotkey_Bookmark": "Bookmark the current page",
+        "hotkey_CopySentence": "Copy the sentence of the current word",
+        "hotkey_CopyPara": "Copy the paragraph of the current word",
+        "hotkey_TranslateSentence": "Translate the sentence of the current word",
+        "hotkey_TranslatePara": "Translate the paragraph of the current word",
+        "hotkey_NextTheme": "Change to the next theme",
+        "hotkey_ToggleHighlight": "Toggle highlights",
+        "hotkey_ToggleFocus": "Toggle focus mode",
+        "hotkey_Status1": "Set status to 1",
+        "hotkey_Status2": "Set status to 2",
+        "hotkey_Status3": "Set status to 3",
+        "hotkey_Status4": "Set status to 4",
+        "hotkey_Status5": "Set status to 5",
+        "hotkey_StatusIgnore": "Set status to Ignore",
+        "hotkey_StatusWellKnown": "Set status to Well Known",
+    }
+
+    return render_template(
+        "settings/shortcuts.html",
+        setting_descs=setting_descs,
+        categorized_settings=categorized_settings,
+    )

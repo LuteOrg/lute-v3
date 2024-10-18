@@ -233,7 +233,7 @@ Feature: User can actually read and stuff.
             Tengo
             un
             amigo
-        And I press hotkey "UP"
+        And I press hotkey "arrowup"
         Then the reading pane shows:
             Tengo (2)/ /un (3)/ /amigo (4)/.
 
@@ -241,7 +241,7 @@ Feature: User can actually read and stuff.
             Tengo
             un
             amigo
-        When I press hotkey "UP"
+        When I press hotkey "arrowup"
         Then the reading pane shows:
             Tengo (3)/ /un (4)/ /amigo (5)/.
 
@@ -249,7 +249,7 @@ Feature: User can actually read and stuff.
             Tengo
             un
             amigo
-        When I press hotkey "UP"
+        When I press hotkey "arrowup"
         Then the reading pane shows:
             Tengo (4)/ /un (5)/ /amigo (99)/.
 
@@ -257,7 +257,7 @@ Feature: User can actually read and stuff.
             Tengo
             un
             amigo
-        When I press hotkey "UP"
+        When I press hotkey "arrowup"
         Then the reading pane shows:
             Tengo (5)/ /un (99)/ /amigo (99)/.
 
@@ -265,18 +265,18 @@ Feature: User can actually read and stuff.
             Tengo
             un
             amigo
-        When I press hotkey "DOWN"
+        When I press hotkey "arrowdown"
         Then the reading pane shows:
             Tengo (4)/ /un (5)/ /amigo (5)/.
 
-        When I click "Tengo" and press hotkey "DOWN"
-        And I click "Tengo" and press hotkey "DOWN"
-        And I click "Tengo" and press hotkey "DOWN"
-        And I click "Tengo" and press hotkey "DOWN"
-        And I click "Tengo" and press hotkey "DOWN"
-        And I click "Tengo" and press hotkey "DOWN"
-        And I click "Tengo" and press hotkey "DOWN"
-        And I click "Tengo" and press hotkey "DOWN"
+        When I click "Tengo" and press hotkey "arrowdown"
+        And I click "Tengo" and press hotkey "arrowdown"
+        And I click "Tengo" and press hotkey "arrowdown"
+        And I click "Tengo" and press hotkey "arrowdown"
+        And I click "Tengo" and press hotkey "arrowdown"
+        And I click "Tengo" and press hotkey "arrowdown"
+        And I click "Tengo" and press hotkey "arrowdown"
+        And I click "Tengo" and press hotkey "arrowdown"
         Then the reading pane shows:
             Tengo (1)/ /un (5)/ /amigo (5)/.
 
