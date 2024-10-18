@@ -1209,16 +1209,8 @@ table input:not([type="checkbox"]) {
     width: 20rem;
 }
 
-#shortcutstable {
-   /* width: 70%; */
-}
-
 #shortcutstable th {
     text-align: left;
-}
-
-#shortcutstable td:first-child {
-    /* width: 30rem; */
 }
 
 #shortcutstable .settingcategory {

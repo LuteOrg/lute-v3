@@ -198,7 +198,6 @@ def edit_shortcuts():
         flash("Shortcuts updated", "success")
         return redirect("/")
 
-    ## # TODO Load current settings from the database
     allsettings = db.session.query(UserSetting).all()
     settings = {h.key: h.value for h in allsettings if h.key.startswith("hotkey_")}
 
