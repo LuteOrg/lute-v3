@@ -775,33 +775,6 @@ function add_page_after() {
 }
 
 
-function getKeyString(event) {
-    const keys = [];
-
-    // Check for modifier keys
-    if (event.ctrlKey) keys.push('ctrl');
-    if (event.shiftKey) keys.push('shift');
-    if (event.altKey) keys.push('alt');
-    if (event.metaKey) keys.push('meta');
-
-    // Map special keys to names if needed
-    const keyMap = {
-        ' ': 'space'
-    };
-
-    const key = keyMap[event.key] || event.key.toLowerCase();
-
-    // If it's a normal key (not a modifier), add it to the keys array
-    if (!['shift', 'ctrl', 'alt', 'meta'].includes(key)) {
-        keys.push(key);
-    }
-
-    const ret = keys.join('+');
-    console.log(`Got keydown = ${ret}`);
-    return ret;
-}
-
-
 function get_right_increment() {
   // read/index.js has some data rendered at the top of the page.
   const lang_is_rtl = $('#lang_is_rtl');
@@ -819,55 +792,35 @@ function handle_keydown (e) {
     return; // Nothing to do.
   }
 
-  // User hotkeys, to be read from UserSettings.
-  const user_keys = {
-    'HotkeyStartHover': 'escape',
-    'HotkeyPrevWord': 'arrowleft',
-    'HotkeyNextWord': 'arrowright',
-    'HotkeyStatusUp': 'arrowup',
-    'HotkeyStatusDown': 'arrowdown',
-    'HotkeyBookmark': 'b',
-    'HotkeyCopySentence': 'c',
-    'HotkeyCopyPara': 'shift+c',
-    'HotkeyTranslateSentence': 't',
-    'HotkeyTranslatePara': 'shift+t',
-    'HotkeyNextTheme': 'm',
-    'HotkeyToggleHighlight': 'h',
-    'HotkeyToggleFocus': 'f',
-    'HotkeyStatus1': '1',
-    'HotkeyStatus2': '2',
-    'HotkeyStatus3': '3',
-    'HotkeyStatus4': '4',
-    'HotkeyStatus5': '5',
-    'HotkeyStatusIgnore': 'i',
-    'HotkeyStatusWellKnown': 'w',
-  };
+  // User hotkeys are stored in LUTE_USER_SETTINGS
+  // hash in global space.
+  const k = LUTE_USER_SETTINGS;  // shorthand varname.
 
   // Map of shortcuts to lambdas:
   let map = {
-    [user_keys['HotkeyStartHover']]: () => start_hover_mode(),
-    [user_keys['HotkeyPrevWord']]: () => move_cursor(-1 * get_right_increment()),
-    [user_keys['HotkeyNextWord']]: () => move_cursor(get_right_increment()),
-    [user_keys['HotkeyStatusUp']]: () => increment_status_for_selected_elements(+1),
-    [user_keys['HotkeyStatusDown']]: () => increment_status_for_selected_elements(-1),
-    [user_keys['HotkeyBookmark']]: () => handle_bookmark(),
-    [user_keys['HotkeyCopySentence']]: () => handle_copy('sentence-id'),
-    [user_keys['HotkeyCopyPara']]: () => handle_copy('paragraph-id'),
-    [user_keys['HotkeyTranslateSentence']]: () => handle_translate('sentence-id'),
-    [user_keys['HotkeyTranslatePara']]: () => handle_translate('paragraph-id'),
-    [user_keys['HotkeyNextTheme']]: () => next_theme(),
-    [user_keys['HotkeyToggleHighlight']]: () => toggle_highlight(),
-    [user_keys['HotkeyToggleFocus']]: () => toggleFocus(),
-    [user_keys['HotkeyStatus1']]: () => update_status_for_marked_elements(1),
-    [user_keys['HotkeyStatus2']]: () => update_status_for_marked_elements(2),
-    [user_keys['HotkeyStatus3']]: () => update_status_for_marked_elements(3),
-    [user_keys['HotkeyStatus4']]: () => update_status_for_marked_elements(4),
-    [user_keys['HotkeyStatus5']]: () => update_status_for_marked_elements(5),
-    [user_keys['HotkeyStatusIgnore']]: () => update_status_for_marked_elements(98),
-    [user_keys['HotkeyStatusWellKnown']]: () => update_status_for_marked_elements(99),
+    [k.hotkey_StartHover]: () => start_hover_mode(),
+    [k.hotkey_PrevWord]: () => move_cursor(-1 * get_right_increment()),
+    [k.hotkey_NextWord]: () => move_cursor(get_right_increment()),
+    [k.hotkey_StatusUp]: () => increment_status_for_selected_elements(+1),
+    [k.hotkey_StatusDown]: () => increment_status_for_selected_elements(-1),
+    [k.hotkey_Bookmark]: () => handle_bookmark(),
+    [k.hotkey_CopySentence]: () => handle_copy('sentence-id'),
+    [k.hotkey_CopyPara]: () => handle_copy('paragraph-id'),
+    [k.hotkey_TranslateSentence]: () => handle_translate('sentence-id'),
+    [k.hotkey_TranslatePara]: () => handle_translate('paragraph-id'),
+    [k.hotkey_NextTheme]: () => next_theme(),
+    [k.hotkey_ToggleHighlight]: () => toggle_highlight(),
+    [k.hotkey_ToggleFocus]: () => toggleFocus(),
+    [k.hotkey_Status1]: () => update_status_for_marked_elements(1),
+    [k.hotkey_Status2]: () => update_status_for_marked_elements(2),
+    [k.hotkey_Status3]: () => update_status_for_marked_elements(3),
+    [k.hotkey_Status4]: () => update_status_for_marked_elements(4),
+    [k.hotkey_Status5]: () => update_status_for_marked_elements(5),
+    [k.hotkey_StatusIgnore]: () => update_status_for_marked_elements(98),
+    [k.hotkey_StatusWellKnown]: () => update_status_for_marked_elements(99),
   }
 
-  const ks = getKeyString(e);
+  const ks = get_pressed_keys_as_string(e);
   if (ks in map) {
     // Override any existing event - e.g., if "up" arrow is in the map,
     // don't scroll screen.
