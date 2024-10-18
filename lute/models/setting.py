@@ -163,6 +163,27 @@ class UserSetting(SettingBase):
             "open_popup_in_new_tab": False,
             "stop_audio_on_term_form_open": True,
             "stats_calc_sample_size": 5,
+            # Keyboard shortcuts:
+            "hotkey_StartHover": "escape",
+            "hotkey_PrevWord": "arrowleft",
+            "hotkey_NextWord": "arrowright",
+            "hotkey_StatusUp": "arrowup",
+            "hotkey_StatusDown": "arrowdown",
+            "hotkey_Bookmark": "b",
+            "hotkey_CopySentence": "c",
+            "hotkey_CopyPara": "shift+c",
+            "hotkey_TranslateSentence": "t",
+            "hotkey_TranslatePara": "shift+t",
+            "hotkey_NextTheme": "m",
+            "hotkey_ToggleHighlight": "h",
+            "hotkey_ToggleFocus": "f",
+            "hotkey_Status1": "1",
+            "hotkey_Status2": "2",
+            "hotkey_Status3": "3",
+            "hotkey_Status4": "4",
+            "hotkey_Status5": "5",
+            "hotkey_StatusIgnore": "i",
+            "hotkey_StatusWellKnown": "w",
         }
         for k, v in keys_and_defaults.items():
             if not UserSetting.key_exists(k):
