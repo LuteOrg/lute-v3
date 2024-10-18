@@ -258,7 +258,6 @@ def edit_shortcuts():
 
     return render_template(
         "settings/shortcuts.html",
-        settings=settings,
         setting_descs=setting_descs,
         categorized_settings=categorized_settings,
     )
