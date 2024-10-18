@@ -181,28 +181,11 @@ class UserShortcutsForm(FlaskForm):
     pass
 
 
-@bp.route("/shortcuts", methods=["GET", "POST"])
-def edit_shortcuts():
-    "Edit shortcuts."
-    form = UserShortcutsForm()
-    if form.validate_on_submit():
-        # print(request.form, flush=True)
-        # Update the settings in the database
-        for k, v in request.form.items():
-            # if k.startswith("usersetting")
-            print(f"{k} = {v}", flush=True)
-            # TODO: update settings
-            # UserSetting.set_value(k, v)
-        # db.session.commit()
-
-        flash("Shortcuts updated", "success")
-        return redirect("/")
-
-    allsettings = db.session.query(UserSetting).all()
-    settings = {h.key: h.value for h in allsettings if h.key.startswith("hotkey_")}
-
-    def _get_settings(key_array):
-        return {f"hotkey_{k}": settings[f"hotkey_{k}"] for k in key_array}
+def _get_categorized_hotkeys():
+    """
+    Return hotkey UserSetting keys and values,
+    grouped by category.
+    """
 
     categorized_settings = {
         "Navigation": ["StartHover", "PrevWord", "NextWord"],
@@ -228,9 +211,33 @@ def edit_shortcuts():
             "ToggleFocus",
         ],
     }
-    categorized_settings = {
-        k: _get_settings(v) for k, v in categorized_settings.items()
+
+    settings = {h.key: h.value for h in db.session.query(UserSetting).all()}
+
+    def _get_settings(key_array):
+        return {k: settings[k] for k in key_array}
+
+    return {
+        category: _get_settings([f"hotkey_{k}" for k in keylist])
+        for category, keylist in categorized_settings.items()
     }
+
+
+@bp.route("/shortcuts", methods=["GET", "POST"])
+def edit_shortcuts():
+    "Edit shortcuts."
+    form = UserShortcutsForm()
+    if form.validate_on_submit():
+        # print(request.form, flush=True)
+        # Update the settings in the database
+        for k, v in request.form.items():
+            # print(f"{k} = {v}", flush=True)
+            UserSetting.set_value(k, v)
+        db.session.commit()
+        flash("Shortcuts updated", "success")
+        return redirect("/")
+
+    categorized_settings = _get_categorized_hotkeys()
 
     setting_descs = {
         "hotkey_StartHover": "Deselect all words",
