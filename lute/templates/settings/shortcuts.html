@@ -14,13 +14,18 @@
       <th>Shortcut</th>
       <th>Enabled</th>
     </tr>
-    
-    {% for k, v in settings.items() %}
-    <tr>
-      <td>{{ setting_descs[k] or k}}</td>
-      <td><input class="shortcutdefinition" name="{{k}}" id="{{k}}" value="{{ v }}" readonly></td>
-      <td align="center"><input type="checkbox" {% if v %}checked{% endif %} onclick="toggle_shortcut(this, '{{k}}')"></td>
-    </tr>
+
+    {% for cat, catsets in categorized_settings.items() %}
+      <tr>
+        <td class="settingcategory" colspan="3">{{ cat }}</td>
+      </tr>
+      {% for k, v in catsets.items() %}
+      <tr>
+        <td>{{ setting_descs[k] or k}}</td>
+        <td><input type="text" class="shortcutdefinition" name="{{k}}" id="{{k}}" value="{{ v }}" readonly></td>
+        <td>&nbsp;<input type="checkbox" {% if v %}checked{% endif %} onclick="toggle_shortcut(this, '{{k}}')"></td>
+      </tr>
+      {% endfor %}
     {% endfor %}
 
   </table>

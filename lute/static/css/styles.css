@@ -1210,7 +1210,7 @@ table input:not([type="checkbox"]) {
 }
 
 #shortcutstable {
-    width: 80%;
+   /* width: 70%; */
 }
 
 #shortcutstable th {
@@ -1218,7 +1218,16 @@ table input:not([type="checkbox"]) {
 }
 
 #shortcutstable td:first-child {
-    width: 20rem;
+    /* width: 30rem; */
+}
+
+#shortcutstable .settingcategory {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+#shortcutstable input[type=text] {
+    max-width: 8rem;
 }
 
 .dupShortcut {

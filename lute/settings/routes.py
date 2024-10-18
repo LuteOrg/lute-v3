@@ -201,6 +201,38 @@ def edit_shortcuts():
     ## # TODO Load current settings from the database
     allsettings = db.session.query(UserSetting).all()
     settings = {h.key: h.value for h in allsettings if h.key.startswith("hotkey_")}
+
+    def _get_settings(key_array):
+        return {f"hotkey_{k}": settings[f"hotkey_{k}"] for k in key_array}
+
+    categorized_settings = {
+        "Navigation": ["StartHover", "PrevWord", "NextWord"],
+        "Update status": [
+            "Status1",
+            "Status2",
+            "Status3",
+            "Status4",
+            "Status5",
+            "StatusIgnore",
+            "StatusWellKnown",
+            "StatusUp",
+            "StatusDown",
+        ],
+        "Misc": [
+            "Bookmark",
+            "CopySentence",
+            "CopyPara",
+            "TranslateSentence",
+            "TranslatePara",
+            "NextTheme",
+            "ToggleHighlight",
+            "ToggleFocus",
+        ],
+    }
+    categorized_settings = {
+        k: _get_settings(v) for k, v in categorized_settings.items()
+    }
+
     setting_descs = {
         "hotkey_StartHover": "Deselect all words",
         "hotkey_PrevWord": "Move to previous word",
@@ -225,5 +257,8 @@ def edit_shortcuts():
     }
 
     return render_template(
-        "settings/shortcuts.html", settings=settings, setting_descs=setting_descs
+        "settings/shortcuts.html",
+        settings=settings,
+        setting_descs=setting_descs,
+        categorized_settings=categorized_settings,
     )
