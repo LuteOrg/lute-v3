@@ -7,18 +7,19 @@
 
 <form method="POST">
 
-  <table class="settingstable">
+  <table id="shortcutstable">
 
     <tr>
-      <td>
-        <h2>Shortcuts</h2>
-      </td>
+      <th>Setting</th>
+      <th>Shortcut</th>
+      <th>Enabled</th>
     </tr>
-
+    
     {% for k, v in settings.items() %}
     <tr>
       <td>{{ setting_descs[k] or k}}</td>
       <td><input class="shortcutdefinition" name="{{k}}" id="{{k}}" value="{{ v }}" readonly></td>
+      <td align="center"><input type="checkbox" {% if v %}checked{% endif %} onclick="toggle_shortcut(this, '{{k}}')"></td>
     </tr>
     {% endfor %}
 
@@ -48,7 +49,7 @@
     // Highlight any dups.
     $('.shortcutdefinition').each(function() {
       const val = $(this).val().trim();
-      if (values[val] > 1) {
+      if (val != "TBD" && values[val] > 1) {
         $(this).addClass('dupShortcut');
       } else {
         $(this).removeClass('dupShortcut');
@@ -61,6 +62,8 @@
       event.preventDefault();
       console.log('Key pressed: ' + event.key);
       $(this).val(event.key);
+      const chk = $(this).closest('tr').find('input[type="checkbox"]');
+      chk.prop('checked', true);
       _check_dups();
     });
   };
@@ -68,6 +71,11 @@
   $(document).ready(function () {
     _add_keyentry_handlers();
   });
+
+  function toggle_shortcut(el, text_input_id) {
+    let newval = el.checked ? "TBD" : "";
+    $(`#${text_input_id}`).val(newval);
+  }
 
 </script>
 

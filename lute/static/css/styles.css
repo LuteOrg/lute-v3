@@ -1209,6 +1209,18 @@ table input:not([type="checkbox"]) {
     width: 20rem;
 }
 
+#shortcutstable {
+    width: 80%;
+}
+
+#shortcutstable th {
+    text-align: left;
+}
+
+#shortcutstable td:first-child {
+    width: 20rem;
+}
+
 .dupShortcut {
     background-color: #FFCCCB;
 }
