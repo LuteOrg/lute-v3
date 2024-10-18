@@ -1209,6 +1209,23 @@ table input:not([type="checkbox"]) {
     width: 20rem;
 }
 
+#shortcutstable th {
+    text-align: left;
+}
+
+#shortcutstable .settingcategory {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+#shortcutstable input[type=text] {
+    max-width: 8rem;
+}
+
+.dupShortcut {
+    background-color: #FFCCCB;
+}
+
 #book td:first-child,
 #language td:first-child {
     width: 15rem;

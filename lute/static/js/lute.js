@@ -524,19 +524,15 @@ function _single_tap(el, e) {
 
 /** Get the rest of the textitems in the current active/hovered word's
  * sentence or paragraph, or null if no selection. */
-let get_textitems_spans = function(e) {
+let get_textitems_spans = function(span_attribute) {
   let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
   elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
   if (elements.length == 0)
     return elements;
 
   const w = elements[0];
-  let attr_name = 'sentence-id';
-  if (e && e.shiftKey) {
-    attr_name = 'paragraph-id';
-  }
-  const attr_value = $(w).data(attr_name);
-  return $(`span.textitem[data-${attr_name}="${attr_value}"]`).toArray();
+  const attr_value = $(w).data(span_attribute);
+  return $(`span.textitem[data-${span_attribute}="${attr_value}"]`).toArray();
 };
 
 let handle_bookmark = function() {
@@ -547,8 +543,8 @@ let handle_bookmark = function() {
 
 /** Copy the text of the textitemspans to the clipboard, and add a
  * color flash. */
-let handle_copy = function(e) {
-  tis = get_textitems_spans(e);
+let handle_copy = function(span_attribute) {
+  tis = get_textitems_spans(span_attribute);
   copy_text_to_clipboard(tis);
 }
 
@@ -680,8 +676,8 @@ let show_translation_for_text = function(text) {
 
 
 /** Show the translation using the next dictionary. */
-function show_sentence_translation(e) {
-  const tis = get_textitems_spans(e);
+function handle_translate(span_attribute) {
+  const tis = get_textitems_spans(span_attribute);
   const sentence = tis.map(s => $(s).text()).join('');
   show_translation_for_text(sentence);
 }
@@ -779,75 +775,60 @@ function add_page_after() {
 }
 
 
+function get_right_increment() {
+  // read/index.js has some data rendered at the top of the page.
+  const lang_is_rtl = $('#lang_is_rtl');
+  if (lang_is_rtl == null) {
+    console.log("ERROR: missing lang control.");
+    return 1;  // fallback.
+  }
+  const is_rtl = (lang_is_rtl.val().toLowerCase() == "true");
+  return is_rtl ? -1 : 1;
+}
+
+
 function handle_keydown (e) {
   if ($('span.word').length == 0) {
     return; // Nothing to do.
   }
 
-  // Map of key codes (e.which) to lambdas:
-  let map = {};
+  // User hotkeys are stored in LUTE_USER_SETTINGS
+  // hash in global space.
+  const k = LUTE_USER_SETTINGS;  // shorthand varname.
 
-  const kESC = 27;
-  const kRETURN = 13;
-  const kLEFT = 37;
-  const kRIGHT = 39;
-  const kUP = 38;
-  const kDOWN = 40;
-  const kB = 66; // B)ookmark
-  const kC = 67; // C)opy
-  const kT = 84; // T)ranslate
-  const kM = 77; // The(M)e
-  const kH = 72; // Toggle H)ighlight
-  const kF = 70; // Toggle F)ocus mode
-  const k1 = 49;
-  const k2 = 50;
-  const k3 = 51;
-  const k4 = 52;
-  const k5 = 53;
-  const kI = 73;
-  const kW = 87;
-
-  map[kESC] = () => start_hover_mode();
-  map[kRETURN] = () => start_hover_mode();
-
-  // read/index.js has some data rendered at the top of the page.
-  const lang_is_rtl = $('#lang_is_rtl');
-  let left_increment = -1;
-  let right_increment = 1;
-  if (lang_is_rtl == null)
-    console.log("ERROR: missing lang control.");
-  else {
-    const is_rtl = (lang_is_rtl.val().toLowerCase() == "true");
-    if (is_rtl) {
-      left_increment = 1;
-      right_increment = -1;
-    }
+  // Map of shortcuts to lambdas:
+  let map = {
+    [k.hotkey_StartHover]: () => start_hover_mode(),
+    [k.hotkey_PrevWord]: () => move_cursor(-1 * get_right_increment()),
+    [k.hotkey_NextWord]: () => move_cursor(get_right_increment()),
+    [k.hotkey_StatusUp]: () => increment_status_for_selected_elements(+1),
+    [k.hotkey_StatusDown]: () => increment_status_for_selected_elements(-1),
+    [k.hotkey_Bookmark]: () => handle_bookmark(),
+    [k.hotkey_CopySentence]: () => handle_copy('sentence-id'),
+    [k.hotkey_CopyPara]: () => handle_copy('paragraph-id'),
+    [k.hotkey_TranslateSentence]: () => handle_translate('sentence-id'),
+    [k.hotkey_TranslatePara]: () => handle_translate('paragraph-id'),
+    [k.hotkey_NextTheme]: () => next_theme(),
+    [k.hotkey_ToggleHighlight]: () => toggle_highlight(),
+    [k.hotkey_ToggleFocus]: () => toggleFocus(),
+    [k.hotkey_Status1]: () => update_status_for_marked_elements(1),
+    [k.hotkey_Status2]: () => update_status_for_marked_elements(2),
+    [k.hotkey_Status3]: () => update_status_for_marked_elements(3),
+    [k.hotkey_Status4]: () => update_status_for_marked_elements(4),
+    [k.hotkey_Status5]: () => update_status_for_marked_elements(5),
+    [k.hotkey_StatusIgnore]: () => update_status_for_marked_elements(98),
+    [k.hotkey_StatusWellKnown]: () => update_status_for_marked_elements(99),
   }
 
-  map[kLEFT] = () => move_cursor(left_increment);
-  map[kRIGHT] = () => move_cursor(right_increment);
-  map[kUP] = () => increment_status_for_selected_elements(e, +1);
-  map[kDOWN] = () => increment_status_for_selected_elements(e, -1);
-  map[kB] = () => handle_bookmark();
-  map[kC] = () => handle_copy(e);
-  map[kT] = () => show_sentence_translation(e);
-  map[kM] = () => next_theme();
-  map[kH] = () => toggle_highlight();
-  map[kF] = () => toggleFocus();
-  map[k1] = () => update_status_for_marked_elements(1);
-  map[k2] = () => update_status_for_marked_elements(2);
-  map[k3] = () => update_status_for_marked_elements(3);
-  map[k4] = () => update_status_for_marked_elements(4);
-  map[k5] = () => update_status_for_marked_elements(5);
-  map[kI] = () => update_status_for_marked_elements(98);
-  map[kW] = () => update_status_for_marked_elements(99);
-
-  if (e.which in map) {
-    let a = map[e.which];
-    a();
+  const ks = get_pressed_keys_as_string(e);
+  if (ks in map) {
+    // Override any existing event - e.g., if "up" arrow is in the map,
+    // don't scroll screen.
+    e.preventDefault();
+    map[ks]();
   }
   else {
-    // console.log('unhandled key ' + e.which);
+    // console.log('unhandled key ' + ks);
   }
 }
 
@@ -944,12 +925,7 @@ function post_bulk_update(updates) {
 /**
  * Change status using arrow keys for selected or hovered elements.
  */
-function increment_status_for_selected_elements(e, shiftBy) {
-  // Don't scroll screen.  If screen scrolling happens, then pressing
-  // "up" will both scroll up *and* change the status the selected term,
-  // which is odd.
-  e.preventDefault();
-
+function increment_status_for_selected_elements(shiftBy) {
   const elements = Array.from(document.querySelectorAll('span.kwordmarked, span.wordhover'));
   if (elements.length == 0)
     return;

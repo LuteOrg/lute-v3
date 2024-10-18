@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Keyboard shortcuts{% endblock %}
+{% block header %}Shortcuts{% endblock %}
+
+{% block body %}
+
+<form method="POST">
+
+  <p style="width: 60%; margin-bottom: 20px;">To set a hotkey for a function, click on its text box, and then hit the combination of keys you'd like to use.  To disable any function, uncheck its checkbox.  Click Save when done.</p>
+
+  <table id="shortcutstable">
+
+    <tr>
+      <th>Setting</th>
+      <th>Shortcut</th>
+      <th>Enabled</th>
+    </tr>
+
+    {% for cat, catsets in categorized_settings.items() %}
+      <tr>
+        <td class="settingcategory" colspan="3">{{ cat }}</td>
+      </tr>
+      {% for k, v in catsets.items() %}
+      <tr>
+        <td>{{ setting_descs[k] or k}}</td>
+        <td><input type="text" class="shortcutdefinition" name="{{k}}" id="{{k}}" value="{{ v }}" readonly></td>
+        <td>&nbsp;<input type="checkbox" {% if v %}checked{% endif %} onclick="toggle_shortcut(this, '{{k}}')"></td>
+      </tr>
+      {% endfor %}
+    {% endfor %}
+
+  </table>
+
+  <div style="margin-top:40px;">
+    <button id="btnSubmit" type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn" onclick="window.location = '/'; return false;">Cancel</button>
+  </div>
+</form>
+
+
+<script>
+
+  let _check_dups = function() {
+    let values = {};
+
+    $('.shortcutdefinition').each(function() {
+      const val = $(this).val().trim();
+      if (values[val]) {
+        values[val]++;
+      } else {
+        values[val] = 1;
+      }
+    });
+
+    let dups_found = false;
+    // Highlight any dups.
+    $('.shortcutdefinition').each(function() {
+      const val = $(this).val().trim();
+      if (val != "TBD" && values[val] > 1) {
+        $(this).addClass('dupShortcut');
+        dups_found = true;
+      } else {
+        $(this).removeClass('dupShortcut');
+      }
+    });
+
+    $("#btnSubmit").prop('disabled', dups_found);
+  };
+
+  let _add_keyentry_handlers = function() {
+    $(".shortcutdefinition").keydown(function(event) {
+      event.preventDefault();
+      const event_as_string = get_pressed_keys_as_string(event);
+      if (event_as_string == null)
+        return;
+      // console.log('Key pressed: ' + event_as_string);
+      $(this).val(event_as_string);
+      const chk = $(this).closest('tr').find('input[type="checkbox"]');
+      chk.prop('checked', true);
+      _check_dups();
+    });
+  };
+
+  $(document).ready(function () {
+    _add_keyentry_handlers();
+  });
+
+  function toggle_shortcut(el, text_input_id) {
+    let newval = el.checked ? "TBD" : "";
+    $(`#${text_input_id}`).val(newval);
+  }
+
+</script>
+
+{% endblock %}

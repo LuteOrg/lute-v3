@@ -294,32 +294,17 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
     def press_hotkey(self, hotkey):
         "Send a hotkey."
-        el = self.browser.find_by_tag("body")
-        map_to_js_keycode = {
-            "1": 49,
-            "2": 50,
-            "3": 51,
-            "4": 52,
-            "5": 53,
-            "i": 73,
-            "w": 87,
-            "c": 67,
-            "t": 84,
-            "m": 77,
-            "h": 72,
-            "up": 38,
-            "down": 40,
-        }
-        jscode = map_to_js_keycode[hotkey.lower()]
-        shift_pressed = "true" if hotkey in ["C", "T"] else "false"
-
-        # This was the only way I could get this to work:
+        event_parts = [
+            "type: 'keydown'",
+            f"key: '{hotkey.lower()}'",
+        ]
+        if hotkey in ["C", "T"]:
+            event_parts.append("shiftKey: true")
         script = f"""jQuery.event.trigger({{
-          type: 'keydown',
-          which: {jscode},
-          shiftKey: '{shift_pressed}'
+          {', '.join(event_parts)}
         }});"""
         # pylint: disable=protected-access
+        el = self.browser.find_by_tag("body")
         self.browser.execute_script(script, el._element)
         time.sleep(0.2)  # Or it's too fast.
         # print(script)
