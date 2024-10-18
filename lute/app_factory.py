@@ -207,10 +207,6 @@ def _add_base_routes(app, app_config):
             is_docker=ac.is_docker,
         )
 
-    @app.route("/hotkeys")
-    def show_hotkeys():
-        return render_template("hotkeys.html")
-
     @app.route("/info")
     def show_info():
         """
