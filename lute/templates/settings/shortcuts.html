@@ -31,7 +31,7 @@
   </table>
 
   <div style="margin-top:40px;">
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button id="btnSubmit" type="submit" class="btn btn-primary">Save</button>
     <button class="btn" onclick="window.location = '/'">Cancel</button>
   </div>
 </form>
@@ -51,22 +51,29 @@
       }
     });
 
+    let dups_found = false;
     // Highlight any dups.
     $('.shortcutdefinition').each(function() {
       const val = $(this).val().trim();
       if (val != "TBD" && values[val] > 1) {
         $(this).addClass('dupShortcut');
+        dups_found = true;
       } else {
         $(this).removeClass('dupShortcut');
       }
     });
+
+    $("#btnSubmit").prop('disabled', dups_found);
   };
 
   let _add_keyentry_handlers = function() {
     $(".shortcutdefinition").keydown(function(event) {
       event.preventDefault();
-      console.log('Key pressed: ' + event.key);
-      $(this).val(event.key);
+      const event_as_string = get_pressed_keys_as_string(event);
+      if (event_as_string == null)
+        return;
+      // console.log('Key pressed: ' + event_as_string);
+      $(this).val(event_as_string);
       const chk = $(this).closest('tr').find('input[type="checkbox"]');
       chk.prop('checked', true);
       _check_dups();
