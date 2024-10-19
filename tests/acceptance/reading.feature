@@ -285,7 +285,11 @@ Feature: User can actually read and stuff.
         Given a Spanish book "Hola" with content:
             Tengo un amigo y otro.
         When I click "Tengo" and press hotkey "1"
+        Then the reading pane shows:
+            Tengo (1)/ /un/ /amigo/ /y/ /otro/.
         When I click "un" and press hotkey "2"
+        Then the reading pane shows:
+            Tengo (1)/ /un (2)/ /amigo/ /y/ /otro/.
         When I click "amigo" and press hotkey "3"
         Then the reading pane shows:
             Tengo (1)/ /un (2)/ /amigo (3)/ /y/ /otro/.
