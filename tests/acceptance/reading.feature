@@ -294,9 +294,7 @@ Feature: User can actually read and stuff.
         Then the reading pane shows:
             Tengo (1)/ /un (2)/ /amigo (3)/ /y/ /otro/.
         When I press hotkey "h"
-        Then the reading pane shows:
-            Tengo/ /un/ /amigo/ /y/ /otro/.
-        When I hover over "Tengo"
+        And I hover over "Tengo"
         Then the reading pane shows:
             Tengo (1)/ /un/ /amigo/ /y/ /otro/.
         When I press hotkey "h"
