@@ -828,6 +828,7 @@ function handle_keydown (e) {
     [k.hotkey_Bookmark]: () => handle_bookmark(),
     [k.hotkey_CopySentence]: () => handle_copy('sentence-id'),
     [k.hotkey_CopyPara]: () => handle_copy('paragraph-id'),
+    [k.hotkey_CopyPage]: () => handle_copy(null),
     [k.hotkey_TranslateSentence]: () => handle_translate('sentence-id'),
     [k.hotkey_TranslatePara]: () => handle_translate('paragraph-id'),
     [k.hotkey_NextTheme]: () => next_theme(),
