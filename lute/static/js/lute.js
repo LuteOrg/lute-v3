@@ -522,23 +522,33 @@ function _single_tap(el, e) {
 /********************************************/
 // Keyboard navigation.
 
-/** Get the rest of the textitems in the current active/hovered word's
- * sentence or paragraph, or null if no selection. */
+/** Get the textitems whose span_attribute value matches that of the
+ * current active/hovered word.  If span_attribute is null, return
+ * all. */
 let get_textitems_spans = function(span_attribute) {
+  if (span_attribute == null)
+    return $('span.textitem').toArray();
+
   let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
   elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
   if (elements.length == 0)
     return elements;
 
-  const w = elements[0];
-  const attr_value = $(w).data(span_attribute);
-  return $(`span.textitem[data-${span_attribute}="${attr_value}"]`).toArray();
+  const attr_value = $(elements[0]).data(span_attribute);
+  const selector = `span.textitem[data-${span_attribute}="${attr_value}"]`;
+  return $(selector).toArray();
 };
 
 let handle_bookmark = function() {
   // Function defined in read/index.html ... yuck, need to reorganize this js code.
   // TODO javascript: reorganize, or make modules.
   add_bookmark();
+}
+
+let handle_edit_page = function() {
+  // Function defined in read/index.html ... yuck, need to reorganize this js code.
+  // TODO javascript: reorganize, or make modules.
+  edit_current_page();
 }
 
 /** Copy the text of the textitemspans to the clipboard, and add a
@@ -548,8 +558,31 @@ let handle_copy = function(span_attribute) {
   copy_text_to_clipboard(tis);
 }
 
+/** Get the text from the text items, adding "\n" between paragraphs. */
+let _get_textitems_text = function(textitemspans) {
+  if (textitemspans.length == 0)
+    return '';
+
+  let _partition_by_paragraph_id = function(textitemspans) {
+    const partitioned = {};
+    $(textitemspans).each(function() {
+      const pid = $(this).attr('data-paragraph-id');
+      if (!partitioned[pid])
+        partitioned[pid] = [];
+      partitioned[pid].push(this);
+    });
+    return partitioned;
+  };
+  const paras = _partition_by_paragraph_id(textitemspans);
+  const paratexts = Object.entries(paras).map(([pid, spans]) => {
+    let ptext = spans.map(s => $(s).text()).join('');
+    return ptext.replace(/\u200B/g, '');
+  });
+  return paratexts.join('\n').trim();
+}
+
 let copy_text_to_clipboard = function(textitemspans) {
-  const copytext = textitemspans.map(s => $(s).text()).join('');
+  const copytext = _get_textitems_text(textitemspans);
   if (copytext == '')
     return;
 
@@ -678,20 +711,8 @@ let show_translation_for_text = function(text) {
 /** Show the translation using the next dictionary. */
 function handle_translate(span_attribute) {
   const tis = get_textitems_spans(span_attribute);
-  const sentence = tis.map(s => $(s).text()).join('');
-  show_translation_for_text(sentence);
-}
-
-
-/** Translation for the full page. */
-function show_page_translation() {
-  let fulltext = $('#thetext p').map(function() {
-    return $(this).find('span.textitem').map(function() {
-      return $(this).text();
-    }).get().join('');
-  }).get().join('\n');
-  fulltext = fulltext.replace(/\u200B/g, '');
-  show_translation_for_text(fulltext);
+  const text = _get_textitems_text(tis);
+  show_translation_for_text(text);
 }
 
 
@@ -806,8 +827,11 @@ function handle_keydown (e) {
     [k.hotkey_Bookmark]: () => handle_bookmark(),
     [k.hotkey_CopySentence]: () => handle_copy('sentence-id'),
     [k.hotkey_CopyPara]: () => handle_copy('paragraph-id'),
+    [k.hotkey_CopyPage]: () => handle_copy(null),
+    [k.hotkey_EditPage]: () => handle_edit_page(),
     [k.hotkey_TranslateSentence]: () => handle_translate('sentence-id'),
     [k.hotkey_TranslatePara]: () => handle_translate('paragraph-id'),
+    [k.hotkey_TranslatePage]: () => handle_translate(null),
     [k.hotkey_NextTheme]: () => next_theme(),
     [k.hotkey_ToggleHighlight]: () => toggle_highlight(),
     [k.hotkey_ToggleFocus]: () => toggleFocus(),
@@ -818,6 +842,7 @@ function handle_keydown (e) {
     [k.hotkey_Status5]: () => update_status_for_marked_elements(5),
     [k.hotkey_StatusIgnore]: () => update_status_for_marked_elements(98),
     [k.hotkey_StatusWellKnown]: () => update_status_for_marked_elements(99),
+    [k.hotkey_DeleteTerm]: () => update_status_for_marked_elements(0),
   }
 
   const ks = get_pressed_keys_as_string(e);
