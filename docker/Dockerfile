@@ -23,7 +23,7 @@ RUN chmod +x /lute/install_all.sh
 
 RUN if [ "$INSTALL_EVERYTHING" = "true" ]; then /lute/install_all.sh; fi
 
-EXPOSE 5000
+EXPOSE 5001
 
 # Start script.
 COPY docker/Dockerfile_scripts/start.sh /lute/start.sh

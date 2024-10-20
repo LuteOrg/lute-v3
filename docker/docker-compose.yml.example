@@ -5,7 +5,7 @@ services:
   lute:
     image: lute3:latest
     ports:
-      - 5000:5000
+      - 5001:5001
     volumes:
       # Note: you should change these directories
       # to absolute paths (e.g. "/usr/yourname/etc/my_data")

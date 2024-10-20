@@ -36,7 +36,7 @@ Feature: Books and stats are available
 
     Scenario: I can import a url.
         Given I visit "/"
-        Given a Spanish book from url http://localhost:5000/dev_api/fake_story.html
+        Given a Spanish book from url http://localhost:5001/dev_api/fake_story.html
         Then the page title is Reading "Mi perro."
         And the reading pane shows:
             Hola/. /Tengo/ /un/ /perro/.
