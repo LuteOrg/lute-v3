@@ -4,9 +4,9 @@ Run pre-recorded smoke tests using playwright.
 Notes:
 
 - the db must be reset to the baseline with demo stories
-- site must be running (currently hardcoded to port 5000)
+- site must be running (currently hardcoded to port 5001)
 - start code gen in another window with `python codegen`,
-  then go to http://localhost:5000/ in the new window
+  then go to http://localhost:5001/ in the new window
 - click through etc etc, then stop the code gen, copy-paste
   code here, fix as needed, _then_ shut down
 
@@ -50,14 +50,14 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     page = context.new_page()
 
     _print("Reset db.")
-    page.goto("http://localhost:5000/dev_api/load_demo")
+    page.goto("http://localhost:5001/dev_api/load_demo")
 
     # Hardcoded port will cause problems ...
-    page.goto("http://localhost:5000/")
+    page.goto("http://localhost:5001/")
 
     # Open Tutorial
     _print("Tutorial check.")
-    page.goto("http://localhost:5000")
+    page.goto("http://localhost:5001")
     page.get_by_role("link", name="Tutorial", exact=True).click()
     page.locator("#ID-14-172").click()
     page.frame_locator('iframe[name="wordframe"]').get_by_placeholder(
@@ -77,7 +77,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
 
     # Bookmarks
     _print("Bookmarks.")
-    page.goto("http://localhost:5000")
+    page.goto("http://localhost:5001")
     page.get_by_role("link", name="Tutorial follow-up", exact=True).click()
     page.locator(".hamburger-btn").click()
     page.once("dialog", lambda dialog: dialog.accept(prompt_text="Page 1"))
@@ -106,7 +106,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
 
     # Open and archive book.
     _print("Archive.")
-    page.goto("http://localhost:5000")
+    page.goto("http://localhost:5001")
     page.get_by_role("link", name="Büyük ağaç").click()
     page.once("dialog", lambda dialog: dialog.accept())
     page.get_by_role("link", name="Archive book").click()
@@ -144,7 +144,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
 
     # Open term listing.
     _print("Term listing.")
-    page.goto("http://localhost:5000/")
+    page.goto("http://localhost:5001/")
     page.locator("#menu_terms").hover()
     page.get_by_role("link", name="Terms", exact=True).click()
     page.get_by_role("link", name="Hello").click()
@@ -162,7 +162,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
 
     # Edit language.
     _print("Edit language.")
-    page.goto("http://localhost:5000/")
+    page.goto("http://localhost:5001/")
     page.locator("#menu_settings").hover()
     page.get_by_role("link", name="Languages").click()
     page.get_by_role("link", name="English").click()
@@ -225,7 +225,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     page.locator("#menu_books").hover()
     page.get_by_role("link", name="Import web page").click()
     page.get_by_label("Import URL").fill(
-        "http://localhost:5000/dev_api/fake_story.html"
+        "http://localhost:5001/dev_api/fake_story.html"
     )
     page.get_by_role("button", name="Import").click()
     time.sleep(2)

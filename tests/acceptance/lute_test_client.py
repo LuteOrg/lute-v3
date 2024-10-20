@@ -352,7 +352,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
         To see this data, run the acc. tests with '-s', eg:
 
-        pytest tests/acceptance/test_smoke.py --port=5000 -s
+        pytest tests/acceptance/test_smoke.py --port=5001 -s
         """
         now = time.perf_counter()
         since_start = now - self.start

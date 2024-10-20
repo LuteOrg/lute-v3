@@ -11,7 +11,7 @@ For more information, see the [Lute manual](https://luteorg.github.io/lute-manua
 # How to use this image
 
 ```
-docker run -p 5000:5000 -v <MY_DATA_PATH>:/lute_data -v <MY_BACKUP_PATH>:/lute_backup jzohrab/lute3:latest
+docker run -p 5001:5001 -v <MY_DATA_PATH>:/lute_data -v <MY_BACKUP_PATH>:/lute_backup jzohrab/lute3:latest
 ```
 
 Docker containers using this image writes to container directories which must be mounted from the host:
@@ -26,13 +26,13 @@ Example:
 ```
 mkdir -p ~/lute/data
 mkdir -p ~/lute/backups
-docker run -p 5000:5000 -v ~/lute/data:/lute_data -v ~/lute/backups:/lute_backup --name my-lute jzohrab/lute3:latest
+docker run -p 5001:5001 -v ~/lute/data:/lute_data -v ~/lute/backups:/lute_backup --name my-lute jzohrab/lute3:latest
 ```
 
 The above:
 
 * runs the container from the `jzohrab/lute3:latest` image
-* exposes port 5000 on the host (so http://localhost:5000 works)
+* exposes port 5001 on the host (so http://localhost:5001 works)
 * mounts the necessary directories
 * names the running container "my-lute"
 
@@ -48,7 +48,7 @@ and it prints:
   
   Running at:
   
-  http://localhost:5000
+  http://localhost:5001
   
   
   When you're finished reading, stop this container
@@ -56,7 +56,7 @@ and it prints:
   as appropriate.
 ```
 
-(You can now open your browser to `http://localhost:5000` and start working through the Lute demo.)
+(You can now open your browser to `http://localhost:5001` and start working through the Lute demo.)
 
 With the above command, the `lutev3` process takes over that console window, so start a new console window and enter
 
@@ -81,7 +81,7 @@ services:
   lute:
     image: jzohrab/lute3:latest
     ports:
-      - 5000:5000
+      - 5001:5001
     volumes:
       - ~/lute/data:/lute_data
       - ./lute/backups:/lute_backup

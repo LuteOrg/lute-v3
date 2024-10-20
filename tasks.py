@@ -40,8 +40,8 @@ def todos(c):
     c.run("python utils/todos.py")
 
 
-@task(help={"port": "optional port to run on; default = 5000"})
-def start(c, port=5000):
+@task(help={"port": "optional port to run on; default = 5001"})
+def start(c, port=5001):
     """
     Start the dev server, using script dev.py.
     """
@@ -83,10 +83,10 @@ def test(c):
 
 def _site_is_running(useport=None):
     """
-    Return true if site is running on port, or default 5000.
+    Return true if site is running on port, or default 5001.
     """
     if useport is None:
-        useport = 5000
+        useport = 5001
 
     url = f"http://localhost:{useport}"
     try:
@@ -116,7 +116,7 @@ def _site_is_running(useport=None):
 )
 def accept(  # pylint: disable=too-many-arguments
     c,
-    port=5000,
+    port=5001,
     show=False,
     noheadless=False,
     kflag=None,
@@ -126,7 +126,7 @@ def accept(  # pylint: disable=too-many-arguments
     """
     Start lute, run tests/acceptance tests, screenshot fails.
 
-    If no port specified, use default 5000.
+    If no port specified, use default 5001.
 
     If Lute's not running on specified port, start a server.
     """
@@ -174,14 +174,14 @@ def playwright(c):
     """
     Start lute, run playwright tests.  export SHOW=true env var to run non-headless.
 
-    Only uses port 5000.
+    Only uses port 5001.
 
     If Lute's not running on specified port, start a server.
     """
     run_test = ["pytest", "tests/playwright/playwright.py", "-s"]
 
     tests_failed = False
-    port = 5000
+    port = 5001
     if _site_is_running(port):
         c.run(" ".join(run_test))
     else:

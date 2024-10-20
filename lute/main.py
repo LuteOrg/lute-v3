@@ -1,7 +1,7 @@
 """
 User entry point.
 
-Start lute running on given port, or 5000 if not set.
+Start lute running on given port, or 5001 if not set.
 
 e.g.
 
@@ -117,7 +117,7 @@ def start():
     "Main entry point.  Called via scripts and pyproject.toml."
     parser = argparse.ArgumentParser(description="Start lute.")
     parser.add_argument(
-        "--port", type=int, default=5000, help="Port number (default: 5000)"
+        "--port", type=int, default=5001, help="Port number (default: 5001)"
     )
     parser.add_argument(
         "--config",

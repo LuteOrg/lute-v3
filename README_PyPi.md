@@ -32,7 +32,7 @@ pip install lute3
 # Start lute
 python -m lute.main
 
-# Open your web browser to http://localhost:5000
+# Open your web browser to http://localhost:5001
 # When done, hit Ctl-C
 
 # Stop the virtual environment.
