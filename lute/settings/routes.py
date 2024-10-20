@@ -197,13 +197,21 @@ def _get_categorized_hotkeys():
             "hotkey_StatusWellKnown",
             "hotkey_StatusUp",
             "hotkey_StatusDown",
+            "hotkey_DeleteTerm",
+        ],
+        "Translate": [
+            "hotkey_TranslateSentence",
+            "hotkey_TranslatePara",
+            "hotkey_TranslatePage",
+        ],
+        "Copy": [
+            "hotkey_CopySentence",
+            "hotkey_CopyPara",
+            "hotkey_CopyPage",
         ],
         "Misc": [
             "hotkey_Bookmark",
-            "hotkey_CopySentence",
-            "hotkey_CopyPara",
-            "hotkey_TranslateSentence",
-            "hotkey_TranslatePara",
+            "hotkey_EditPage",
             "hotkey_NextTheme",
             "hotkey_ToggleHighlight",
             "hotkey_ToggleFocus",
@@ -242,8 +250,10 @@ def edit_shortcuts():
         "hotkey_Bookmark": "Bookmark the current page",
         "hotkey_CopySentence": "Copy the sentence of the current word",
         "hotkey_CopyPara": "Copy the paragraph of the current word",
+        "hotkey_CopyPage": "Copy the full page",
         "hotkey_TranslateSentence": "Translate the sentence of the current word",
         "hotkey_TranslatePara": "Translate the paragraph of the current word",
+        "hotkey_TranslatePage": "Translate the full page",
         "hotkey_NextTheme": "Change to the next theme",
         "hotkey_ToggleHighlight": "Toggle highlights",
         "hotkey_ToggleFocus": "Toggle focus mode",
@@ -254,6 +264,8 @@ def edit_shortcuts():
         "hotkey_Status5": "Set status to 5",
         "hotkey_StatusIgnore": "Set status to Ignore",
         "hotkey_StatusWellKnown": "Set status to Well Known",
+        "hotkey_DeleteTerm": "Delete term (set status to Unknown)",
+        "hotkey_EditPage": "Edit the current page",
     }
 
     return render_template(

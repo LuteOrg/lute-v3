@@ -24,7 +24,7 @@ function get_pressed_keys_as_string(event) {
   }
 
   const actual_key = keyMap[event.key] || event.key.toLowerCase();
-  if (['shift', 'ctrl', 'alt', 'meta'].includes(actual_key))
+  if (['shift', 'ctrl', 'alt', 'meta', 'control'].includes(actual_key))
     return null
 
   keys.push(actual_key);
