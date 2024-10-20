@@ -545,6 +545,12 @@ let handle_bookmark = function() {
   add_bookmark();
 }
 
+let handle_edit_page = function() {
+  // Function defined in read/index.html ... yuck, need to reorganize this js code.
+  // TODO javascript: reorganize, or make modules.
+  edit_current_page();
+}
+
 /** Copy the text of the textitemspans to the clipboard, and add a
  * color flash. */
 let handle_copy = function(span_attribute) {
@@ -829,6 +835,7 @@ function handle_keydown (e) {
     [k.hotkey_CopySentence]: () => handle_copy('sentence-id'),
     [k.hotkey_CopyPara]: () => handle_copy('paragraph-id'),
     [k.hotkey_CopyPage]: () => handle_copy(null),
+    [k.hotkey_EditPage]: () => handle_edit_page(),
     [k.hotkey_TranslateSentence]: () => handle_translate('sentence-id'),
     [k.hotkey_TranslatePara]: () => handle_translate('paragraph-id'),
     [k.hotkey_NextTheme]: () => next_theme(),

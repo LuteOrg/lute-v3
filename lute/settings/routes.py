@@ -206,6 +206,7 @@ def _get_categorized_hotkeys():
             "hotkey_CopyPage",
             "hotkey_TranslateSentence",
             "hotkey_TranslatePara",
+            "hotkey_EditPage",
             "hotkey_NextTheme",
             "hotkey_ToggleHighlight",
             "hotkey_ToggleFocus",
@@ -258,6 +259,7 @@ def edit_shortcuts():
         "hotkey_StatusIgnore": "Set status to Ignore",
         "hotkey_StatusWellKnown": "Set status to Well Known",
         "hotkey_DeleteTerm": "Delete term (set status to Unknown)",
+        "hotkey_EditPage": "Edit the current page",
     }
 
     return render_template(

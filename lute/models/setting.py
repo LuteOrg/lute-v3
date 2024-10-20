@@ -191,6 +191,7 @@ class UserSetting(SettingBase):
             # New hotkeys:
             "hotkey_CopyPage": "",
             "hotkey_DeleteTerm": "",
+            "hotkey_EditPage": "",
         }
         for k, v in keys_and_defaults.items():
             if not UserSetting.key_exists(k):
