@@ -711,15 +711,8 @@ let show_translation_for_text = function(text) {
 /** Show the translation using the next dictionary. */
 function handle_translate(span_attribute) {
   const tis = get_textitems_spans(span_attribute);
-  const sentence = tis.map(s => $(s).text()).join('');
-  show_translation_for_text(sentence);
-}
-
-
-/** Translation for the full page. */
-function show_page_translation() {
-  const fulltext = _get_textitems_text($('span.textitem').toArray());
-  show_translation_for_text(fulltext);
+  const text = _get_textitems_text(tis);
+  show_translation_for_text(text);
 }
 
 
