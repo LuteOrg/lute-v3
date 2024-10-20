@@ -522,17 +522,21 @@ function _single_tap(el, e) {
 /********************************************/
 // Keyboard navigation.
 
-/** Get the rest of the textitems in the current active/hovered word's
- * sentence or paragraph, or null if no selection. */
+/** Get the textitems whose span_attribute value matches that of the
+ * current active/hovered word.  If span_attribute is null, return
+ * all. */
 let get_textitems_spans = function(span_attribute) {
+  if (span_attribute == null)
+    return $('span.textitem').toArray();
+
   let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
   elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
   if (elements.length == 0)
     return elements;
 
-  const w = elements[0];
-  const attr_value = $(w).data(span_attribute);
-  return $(`span.textitem[data-${span_attribute}="${attr_value}"]`).toArray();
+  const attr_value = $(elements[0]).data(span_attribute);
+  const selector = `span.textitem[data-${span_attribute}="${attr_value}"]`;
+  return $(selector).toArray();
 };
 
 let handle_bookmark = function() {
@@ -548,8 +552,31 @@ let handle_copy = function(span_attribute) {
   copy_text_to_clipboard(tis);
 }
 
+/** Get the text from the text items, adding "\n" between paragraphs. */
+let _get_textitems_text = function(textitemspans) {
+  if (textitemspans.length == 0)
+    return '';
+
+  let _partition_by_paragraph_id = function(textitemspans) {
+    const partitioned = {};
+    $(textitemspans).each(function() {
+      const pid = $(this).attr('data-paragraph-id');
+      if (!partitioned[pid])
+        partitioned[pid] = [];
+      partitioned[pid].push(this);
+    });
+    return partitioned;
+  };
+  const paras = _partition_by_paragraph_id(textitemspans);
+  const paratexts = Object.entries(paras).map(([pid, spans]) => {
+    let ptext = spans.map(s => $(s).text()).join('');
+    return ptext.replace(/\u200B/g, '');
+  });
+  return paratexts.join('\n').trim();
+}
+
 let copy_text_to_clipboard = function(textitemspans) {
-  const copytext = textitemspans.map(s => $(s).text()).join('');
+  const copytext = _get_textitems_text(textitemspans);
   if (copytext == '')
     return;
 
@@ -685,12 +712,7 @@ function handle_translate(span_attribute) {
 
 /** Translation for the full page. */
 function show_page_translation() {
-  let fulltext = $('#thetext p').map(function() {
-    return $(this).find('span.textitem').map(function() {
-      return $(this).text();
-    }).get().join('');
-  }).get().join('\n');
-  fulltext = fulltext.replace(/\u200B/g, '');
+  const fulltext = _get_textitems_text($('span.textitem').toArray());
   show_translation_for_text(fulltext);
 }
 
