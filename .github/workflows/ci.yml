@@ -72,7 +72,7 @@ jobs:
           # handle errors manually, so that the retry works.
           # Have to explicitly set MECAB_PATH for natto-py.
           export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
-          inv accept --show --verbose -k pretend_failure || exit_code=$?
+          inv accept --show --verbose || exit_code=$?
           if [ $exit_code -ne 0 ]; then
               echo "Command failed with exit code $exit_code, retrying..."
           fi
