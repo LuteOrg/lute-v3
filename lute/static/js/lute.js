@@ -841,6 +841,7 @@ function handle_keydown (e) {
     [k.hotkey_Status5]: () => update_status_for_marked_elements(5),
     [k.hotkey_StatusIgnore]: () => update_status_for_marked_elements(98),
     [k.hotkey_StatusWellKnown]: () => update_status_for_marked_elements(99),
+    [k.hotkey_DeleteTerm]: () => update_status_for_marked_elements(0),
   }
 
   const ks = get_pressed_keys_as_string(e);

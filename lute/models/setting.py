@@ -190,6 +190,7 @@ class UserSetting(SettingBase):
             "hotkey_StatusWellKnown": "w",
             # New hotkeys:
             "hotkey_CopyPage": "",
+            "hotkey_DeleteTerm": "",
         }
         for k, v in keys_and_defaults.items():
             if not UserSetting.key_exists(k):

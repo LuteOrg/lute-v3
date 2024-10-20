@@ -197,6 +197,7 @@ def _get_categorized_hotkeys():
             "hotkey_StatusWellKnown",
             "hotkey_StatusUp",
             "hotkey_StatusDown",
+            "hotkey_DeleteTerm",
         ],
         "Misc": [
             "hotkey_Bookmark",
@@ -256,6 +257,7 @@ def edit_shortcuts():
         "hotkey_Status5": "Set status to 5",
         "hotkey_StatusIgnore": "Set status to Ignore",
         "hotkey_StatusWellKnown": "Set status to Well Known",
+        "hotkey_DeleteTerm": "Delete term (set status to Unknown)",
     }
 
     return render_template(
