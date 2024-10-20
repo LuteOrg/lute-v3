@@ -37,7 +37,7 @@ def test_popup_shown_if_parent_exists_even_if_no_other_data(spanish, app_context
     assert d is not None, "Has parent, popup, even if no other data."
 
 
-def test_popup_data_is_none_for_unknown_and_ignored(spanish, app_context):
+def test_popup_data_is_none_for_unknown(spanish, app_context):
     "Return None if no-popup statuses."
     t = Term(spanish, "gato")
     db.session.add(t)
@@ -46,14 +46,14 @@ def test_popup_data_is_none_for_unknown_and_ignored(spanish, app_context):
     d = get_popup_data(t.id)
     assert d is not None, "Have data, popup"
 
-    for s in [Status.UNKNOWN, Status.IGNORED]:
+    t.status = Status.UNKNOWN
+    d = get_popup_data(t.id)
+    assert d is None, "No popup for UNKNOWN words"
+
+    for s in [1, Status.IGNORED]:
         t.status = s
         d = get_popup_data(t.id)
-        assert d is None, "No popup for these statuses"
-
-    t.status = 1
-    d = get_popup_data(t.id)
-    assert d is not None, "Have data for these statuses"
+        assert d is not None, f"Have data for status {s}"
 
 
 def test_term_with_no_parents(spanish, app_context):

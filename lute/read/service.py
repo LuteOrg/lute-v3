@@ -96,7 +96,7 @@ def get_popup_data(termid):
     "Get popup data, or None if popup shouldn't be shown."
     term = Term.find(termid)
 
-    if term.status in [Status.UNKNOWN, Status.IGNORED]:
+    if term.status == Status.UNKNOWN:
         return None
 
     def has_popup_data(cterm):
