@@ -831,6 +831,7 @@ function handle_keydown (e) {
     [k.hotkey_EditPage]: () => handle_edit_page(),
     [k.hotkey_TranslateSentence]: () => handle_translate('sentence-id'),
     [k.hotkey_TranslatePara]: () => handle_translate('paragraph-id'),
+    [k.hotkey_TranslatePage]: () => handle_translate(null),
     [k.hotkey_NextTheme]: () => next_theme(),
     [k.hotkey_ToggleHighlight]: () => toggle_highlight(),
     [k.hotkey_ToggleFocus]: () => toggleFocus(),

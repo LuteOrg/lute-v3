@@ -199,13 +199,18 @@ def _get_categorized_hotkeys():
             "hotkey_StatusDown",
             "hotkey_DeleteTerm",
         ],
-        "Misc": [
-            "hotkey_Bookmark",
+        "Translate": [
+            "hotkey_TranslateSentence",
+            "hotkey_TranslatePara",
+            "hotkey_TranslatePage",
+        ],
+        "Copy": [
             "hotkey_CopySentence",
             "hotkey_CopyPara",
             "hotkey_CopyPage",
-            "hotkey_TranslateSentence",
-            "hotkey_TranslatePara",
+        ],
+        "Misc": [
+            "hotkey_Bookmark",
             "hotkey_EditPage",
             "hotkey_NextTheme",
             "hotkey_ToggleHighlight",
@@ -248,6 +253,7 @@ def edit_shortcuts():
         "hotkey_CopyPage": "Copy the full page",
         "hotkey_TranslateSentence": "Translate the sentence of the current word",
         "hotkey_TranslatePara": "Translate the paragraph of the current word",
+        "hotkey_TranslatePage": "Translate the full page",
         "hotkey_NextTheme": "Change to the next theme",
         "hotkey_ToggleHighlight": "Toggle highlights",
         "hotkey_ToggleFocus": "Toggle focus mode",
