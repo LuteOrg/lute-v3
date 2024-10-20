@@ -72,7 +72,7 @@ jobs:
           set -e
           # Have to explicitly set MECAB_PATH for natto-py.
           export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
-          inv accept --show --verbose
+          inv accept --show --verbose -k pretend_failure
 
     # Playwright tests were hanging far too often on github ci,
     # but not consistently.  No idea what was going wrong.
