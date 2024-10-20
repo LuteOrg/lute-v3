@@ -21,6 +21,7 @@ python `pwd`/devstart.py
 import os
 import argparse
 import logging
+from lute import __version__
 from lute.app_factory import create_app
 from lute.config.app_config import AppConfig
 
@@ -47,7 +48,8 @@ def start(port):
     app = create_app(config_file, output_func=dev_print)
 
     ac = AppConfig(config_file)
-    dev_print(f"\ndb name: {ac.dbname}")
+    dev_print(f"\nversion {__version__}")
+    dev_print(f"db name: {ac.dbname}")
     dev_print(f"data: {ac.datapath}")
     dev_print(f"Running at: http://localhost:{port}\n")
 

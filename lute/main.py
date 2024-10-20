@@ -14,6 +14,7 @@ import shutil
 import logging
 import textwrap
 from waitress import serve
+from lute import __version__
 from lute.app_factory import create_app
 from lute.config.app_config import AppConfig
 
@@ -73,7 +74,7 @@ def _get_config_file_path(config_file_path=None):
 
 def _start(args):
     "Configure and start the app."
-    _print("\nStarting Lute.\n")
+    _print(f"\nStarting Lute version {__version__}.\n")
 
     config_file_path = _get_config_file_path(args.config)
     app = create_app(config_file_path, output_func=_print)
@@ -90,7 +91,7 @@ def _start(args):
         """
     _print(textwrap.dedent(close_msg))
 
-    msg = f"""Lute is running.  Open a web browser, and go to:
+    msg = f"""Lute v{__version__} is running.  Open a web browser, and go to:
 
     http://localhost:{args.port}
     """
