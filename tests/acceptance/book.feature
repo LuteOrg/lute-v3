@@ -4,6 +4,14 @@ Feature: Books and stats are available
         Given a running site
         And demo languages
 
+    ## Scenario: pretend failure
+    ##     Given I visit "/"
+    ##     Given a Spanish book "Hola" with content:
+    ##         Hola. Tengo un gato.
+    ##     Then the page title is Reading "Hola"
+    ##     And the reading pane shows:
+    ##         Hola/. /Tengo/ /un/ /perro/.
+
     Scenario: I can import text.
         Given I visit "/"
         Given a Spanish book "Hola" with content:
