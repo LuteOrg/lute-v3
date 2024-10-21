@@ -259,8 +259,9 @@ class Repository:
 
     def commit(self):
         """
-        Commit everything.
+        Commit everything, flush the map to force refetches.
         """
+        self.identity_map = {}
         self.db.session.commit()
 
     def _search_spec_term(self, langid, text):
@@ -336,21 +337,27 @@ class Repository:
         spec = self._search_spec_term(language.id, pt)
         p = DBTerm.find_by_spec(spec)
 
-        if p is not None:
-            if p.status == 0:  # previously unknown, inherits from term.
-                p.status = term.status
+        new_or_unknown_parent = p is None or p.status == 0
+        new_term = term.id is None
+
+        if p is None:
+            p = DBTerm(language, pt)
+
+        if new_or_unknown_parent:
+            p.status = term.status
+
+        # Copy translation, image if missing, but _not_ if we're just
+        # re-saving an existing term.
+        if new_or_unknown_parent or new_term:
             if (p.translation or "") == "":
                 p.translation = term.translation
             if (p.get_current_image() or "") == "":
                 p.set_current_image(term.current_image)
-            return p
 
-        p = DBTerm(language, pt)
-        p.status = term.status
-        p.translation = term.translation
-        p.set_current_image(term.current_image)
-        for tt in termtags:
-            p.add_term_tag(tt)
+        # Only copy tags if both are new.
+        if new_or_unknown_parent and new_term:
+            for tt in termtags:
+                p.add_term_tag(tt)
 
         return p
 

@@ -237,40 +237,182 @@ def test_save_term_image_set_to_blank_removes_record(app_context, repo, hello_te
 ## Saving and parents.
 
 
-def test_save_with_new_parent(app_context, repo, hello_term):
+def create_parent(lang, status=0, translation=None, image=None, tags=[]):
+    "Create test parent."
+    p = DBTerm(lang, "parent")
+    p.status = status
+    p.translation = translation
+    p.set_current_image(image)
+    for t in tags:
+        p.add_term_tag(TermTag(t))  # Ensure no double-tag added.
+    db.session.add(p)
+    db.session.commit()
+    return p
+
+
+def assert_parent_has(status, translation, img, term_tags):
+    "Assert parent data matches expected."
+    # For some weird reason, query with filter was not returning
+    # a match, so doing a loop to get the parent. Possibly due to aliasing
+    # of lute.models.term.Term to DBTerm.
+    # p = db.session.query(DBTerm).filter(DBTerm.text == "parent").first()
+    parents = [t for t in db.session.query(DBTerm).all() if t.text == "parent"]
+    assert len(parents) == 1, "Sanity check"
+    p = parents[0]
+    assert (p.translation or "-") == (translation or "-"), "txn"
+    assert (p.get_current_image() or "-") == (img or "-"), "img"
+    actual_tags = sorted([t.text for t in p.term_tags])
+    assert actual_tags == term_tags, "tags"
+
+
+def test_save_new_child_creates_new_populated_parent(app_context, repo, hello_term):
     """
     Given a Term with parents = [ 'newparent' ],
     new parent DBTerm is created, and is assigned translation and image and tag.
+
+    The child's data is propagated up if needed, to 'fill in' missing parent data.
     """
+    t = hello_term
+    t.parents = ["parent"]
+    t.term_tags = ["a", "b"]
+    repo.add(t)
+    repo.commit()
+
+    assert_parent_has(t.status, t.translation, t.current_image, ["a", "b"])
+
+
+def test_save_new_child_populates_existing_unknown_parent(
+    app_context, repo, english, hello_term
+):
+    "Existing parent with status 0 is bumped to status 1."
+    create_parent(english, status=0)
+
     hello_term.parents = ["parent"]
     hello_term.term_tags = ["a", "b"]
     repo.add(hello_term)
     repo.commit()
-    assert_sql_result("select WoText from words", ["HELLO", "parent"], "parent created")
+
+    t = hello_term
+    assert_parent_has(t.status, t.translation, t.current_image, ["a", "b"])
+
+
+def test_save_new_child_sets_existing_parent_translation_and_image_if_missing(
+    app_context, repo, english, hello_term
+):
+    "Existing new child data is propagated up if needed, to 'fill in' missing parent data."
+    create_parent(english, status=3, translation="something")
+
+    hello_term.parents = ["parent"]
+    hello_term.term_tags = ["a", "b"]
+    repo.add(hello_term)
+    repo.commit()
+
+    assert_parent_has(3, "something", hello_term.current_image, [])
+
+
+def test_save_existing_child_creates_new_populated_parent(
+    app_context, repo, hello_term
+):
+    """
+    Given a Term with parents = [ 'newparent' ],
+    new parent DBTerm is created, and is assigned translation and image and tag.
+
+    The child's data is propagated up if needed, to 'fill in' missing parent data.
+    """
+    repo.add(hello_term)
+    repo.commit()
+    assert_sql_result("select WoText from words", ["HELLO"], "no parent yet")
+
+    hello_term.parents = ["parent"]
+    hello_term.term_tags = ["a", "b"]
+    repo.add(hello_term)
+    repo.commit()
+
+    t = hello_term
+    assert_parent_has(t.status, t.translation, t.current_image, ["a", "b"])
+
+
+def test_save_existing_child_populates_existing_unknown_parent_translation_and_image(
+    app_context, repo, english, hello_term
+):
+    "Existing parent with status 0 is bumped to status 1."
+    create_parent(english, status=0, tags=["a"])
+
+    repo.add(hello_term)
+    repo.commit()
 
     parent = repo.find(hello_term.language_id, "parent")
-    assert isinstance(parent, Term), "is a Term bus. object"
-    assert parent.text == "parent"
-    assert sorted(parent.term_tags) == ["a", "b"]  # just spelling it out.
-    assert parent.translation == hello_term.translation
-    assert parent.current_image == hello_term.current_image
-    assert parent.parents == []
+    assert parent.status == 0, "parent still unknown"
+
+    h2 = repo.find(hello_term.language_id, hello_term.text)
+    h2.parents = ["parent"]
+    h2.term_tags = ["a", "b"]
+    repo.add(h2)
+    repo.commit()
+
+    t = hello_term
+    assert_parent_has(t.status, t.translation, t.current_image, ["a"])
 
 
-def test_save_with_existing_but_unknown_parent(app_context, repo, english, hello_term):
-    "Existing parent with status 0 is bumped to status 1."
-    p = DBTerm(english, "parent")
-    p.status = 0
-    db.session.add(p)
-    db.session.commit()
+def test_save_existing_child_add_existing_parent_does_not_set_parent_translation_and_image_even_if_missing(
+    app_context, repo, english, hello_term
+):
+    """
+    If a parent existed before, and the child existed before, then
+    editing the child shouldn't affect the parent, even if the
+    parent's translation and image are empty -- reason: they have been
+    created and are specifically empty.
+    """
+    create_parent(english, translation=None, image=None, status=3)
 
+    repo.add(hello_term)
+    repo.commit()
+
+    hello_term = repo.find(hello_term.language_id, hello_term.text)
+    assert hello_term is not None, "Have hello_term"
     hello_term.parents = ["parent"]
     hello_term.term_tags = ["a", "b"]
     repo.add(hello_term)
     repo.commit()
 
-    sql = "select WoText, WoStatus from words order by WoText"
-    assert_sql_result(sql, ["HELLO; 1", "parent; 1"], "parent status set to 1")
+    assert_parent_has(3, None, None, [])
+
+
+def test_save_existing_child_with_existing_parent_does_not_set_translation_and_image_even_if_missing(
+    app_context, repo, english, hello_term
+):
+    """
+    If a parent existed before, and the child existed before, then
+    editing the child shouldn't affect the parent, even if the
+    parent's translation and image are empty -- reason: they have been
+    created and are specifically empty.
+    """
+    p = create_parent(english, translation=None, image=None, status=3)
+
+    hello_term.parents = ["parent"]
+    repo.add(hello_term)
+    repo.commit()
+
+    # Parent updated on initial save.
+    assert_parent_has(3, hello_term.translation, hello_term.current_image, [])
+
+    # Re-set parent.
+    p.translation = None
+    p.set_current_image(None)
+    db.session.add(p)
+    db.session.commit()
+    assert_parent_has(3, None, None, [])
+
+    # Re-update existing child term.
+    hello_term = repo.find(hello_term.language_id, hello_term.text)
+    assert hello_term.parents == ["parent"], "parent still set"
+    hello_term.translation = "UPDATED"
+    hello_term.current_image = "UPDATED.PNG"
+    repo.add(hello_term)
+    repo.commit()
+
+    # Parent not changed.
+    assert_parent_has(3, None, None, [])
 
 
 def test_save_remove_parent_breaks_link(app_context, repo, hello_term):
