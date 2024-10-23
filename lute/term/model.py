@@ -354,8 +354,9 @@ class Repository:
             if (p.get_current_image() or "") == "":
                 p.set_current_image(term.current_image)
 
-        # Only copy tags if both are new.
-        if new_or_unknown_parent and new_term:
+        # Only copy tags if this is a new parent.  New parents should
+        # _likely_ inherity the tags of the term.
+        if new_or_unknown_parent:
             for tt in termtags:
                 p.add_term_tag(tt)
 
