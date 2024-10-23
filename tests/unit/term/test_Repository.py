@@ -237,13 +237,13 @@ def test_save_term_image_set_to_blank_removes_record(app_context, repo, hello_te
 ## Saving and parents.
 
 
-def create_parent(lang, status=0, translation=None, image=None, tags=[]):
+def create_parent(lang, status=0, translation=None, image=None, tags=None):
     "Create test parent."
     p = DBTerm(lang, "parent")
     p.status = status
     p.translation = translation
     p.set_current_image(image)
-    for t in tags:
+    for t in tags or []:
         p.add_term_tag(TermTag(t))  # Ensure no double-tag added.
     db.session.add(p)
     db.session.commit()
@@ -259,6 +259,7 @@ def assert_parent_has(status, translation, img, term_tags):
     parents = [t for t in db.session.query(DBTerm).all() if t.text == "parent"]
     assert len(parents) == 1, "Sanity check"
     p = parents[0]
+    assert p.status == status, "status"
     assert (p.translation or "-") == (translation or "-"), "txn"
     assert (p.get_current_image() or "-") == (img or "-"), "img"
     actual_tags = sorted([t.text for t in p.term_tags])
@@ -354,7 +355,7 @@ def test_save_existing_child_populates_existing_unknown_parent_translation_and_i
     assert_parent_has(t.status, t.translation, t.current_image, ["a"])
 
 
-def test_save_existing_child_add_existing_parent_does_not_set_parent_translation_and_image_even_if_missing(
+def test_update_child_add_existing_parent_does_not_change_parent_data_even_if_missing(
     app_context, repo, english, hello_term
 ):
     """
@@ -378,7 +379,7 @@ def test_save_existing_child_add_existing_parent_does_not_set_parent_translation
     assert_parent_has(3, None, None, [])
 
 
-def test_save_existing_child_with_existing_parent_does_not_set_translation_and_image_even_if_missing(
+def test_update_child_with_parent_does_not_change_parent_data_even_if_missing(
     app_context, repo, english, hello_term
 ):
     """
