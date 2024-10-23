@@ -333,7 +333,7 @@ def test_save_existing_child_creates_new_populated_parent(
     assert_parent_has(t.status, t.translation, t.current_image, ["a", "b"])
 
 
-def test_save_existing_child_populates_existing_unknown_parent_translation_and_image(
+def test_save_existing_child_populates_existing_unknown_parent(
     app_context, repo, english, hello_term
 ):
     "Existing parent with status 0 is bumped to status 1."
@@ -352,7 +352,7 @@ def test_save_existing_child_populates_existing_unknown_parent_translation_and_i
     repo.commit()
 
     t = hello_term
-    assert_parent_has(t.status, t.translation, t.current_image, ["a"])
+    assert_parent_has(t.status, t.translation, t.current_image, ["a", "b"])
 
 
 def test_update_child_add_existing_parent_does_not_change_parent_data_even_if_missing(
