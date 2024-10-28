@@ -611,37 +611,54 @@ let copy_text_to_clipboard = function(textitemspans) {
 }
 
 
-let move_cursor = function(shiftby) {
-  // Cursor is set to the first clicked or hovered element.
+/** First selected/hovered element, or null if nothing. */
+let _first_selected_element = function() {
   let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
+  if (elements.length == 0)
+    return null;
   elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
-  const curr = (elements.length == 0) ? null : elements[0];
+  return elements[0];
+};
 
-  let words = $('span.word');
-  words.sort((a, b) => _get_order($(a)) - _get_order($(b)));
 
-  let _get_new_index = function(curr) {
-    if (curr == null)
-      return 0;
-    const pid = $(curr).attr('id');
-    let i = words.toArray().findIndex(e => $(e).attr('id') == pid) + shiftby;
-    i = Math.max(i, 0); // ensure >= 0
-    i = Math.min(i, words.length - 1);  // within array.
-    return i;
-  }
-  const target = $(words[_get_new_index(curr)]);
-
-  // Adjust all screen state.
-  $('span.newmultiterm').removeClass('newmultiterm');
-  $('span.kwordmarked').removeClass('kwordmarked');
-  $('span.wordhover').removeClass('wordhover');
+/** Update cursor, clear prior cursors. */
+let _update_screen_cursor = function(target) {
+  $('span.newmultiterm, span.kwordmarked, span.wordhover').removeClass('newmultiterm kwordmarked wordhover');
   remove_status_highlights();
   target.addClass('kwordmarked');
   save_curr_data_order(target);
   apply_status_class(target);
   $(window).scrollTo(target, { axis: 'y', offset: -150 });
   show_term_edit_form(target);
-}
+};
+
+
+/** Move to the next/prev candidate determined by the selector.
+ * direction is 1 if moving "right", -1 if moving "left" -
+ * note that these switch depending on if the language is right-to-left! */
+let _move_cursor = function(selector, direction = 1) {
+  const fe = _first_selected_element();
+  const fe_order = (fe != null) ? _get_order($(fe)) : 0;
+  let candidates = $(selector).toArray();
+  let comparator = function(a, b) { return a > b };
+  if (direction < 0) {
+    candidates = candidates.reverse();
+    comparator = function(a, b) { return a < b };
+  }
+
+  const match = candidates.find(el => comparator(_get_order($(el)), fe_order));
+  if (match) {
+    _update_screen_cursor($(match));
+
+    // Highlight the word if we're jumping around a lot.
+    if (selector != 'span.word') {
+      const match_order = _get_order($(match));
+      const match_class = `flash_${match_order}`;
+      $(match).addClass(`flashtextcopy ${match_class}`);
+      setTimeout(() => $(`.${match_class}`).removeClass(`flashtextcopy ${match_class}`), 1000);
+    }
+  }
+};
 
 
 /** SENTENCE TRANSLATIONS *************************/
@@ -796,15 +813,14 @@ function add_page_after() {
 }
 
 
-function get_right_increment() {
+function _lang_is_left_to_right() {
   // read/index.js has some data rendered at the top of the page.
   const lang_is_rtl = $('#lang_is_rtl');
-  if (lang_is_rtl == null) {
-    console.log("ERROR: missing lang control.");
-    return 1;  // fallback.
+  if (!lang_is_rtl.length) {
+    console.error("ERROR: missing lang control.");
+    return true;  // fallback.
   }
-  const is_rtl = (lang_is_rtl.val().toLowerCase() == "true");
-  return is_rtl ? -1 : 1;
+  return (lang_is_rtl.val().toLowerCase() !== "true");
 }
 
 
@@ -817,11 +833,16 @@ function handle_keydown (e) {
   // hash in global space.
   const k = LUTE_USER_SETTINGS;  // shorthand varname.
 
+  const next_incr = _lang_is_left_to_right() ? 1 : -1;
+  const prev_incr = -1 * next_incr;
+
   // Map of shortcuts to lambdas:
   let map = {
     [k.hotkey_StartHover]: () => start_hover_mode(),
-    [k.hotkey_PrevWord]: () => move_cursor(-1 * get_right_increment()),
-    [k.hotkey_NextWord]: () => move_cursor(get_right_increment()),
+    [k.hotkey_PrevWord]: () => _move_cursor('span.word', prev_incr),
+    [k.hotkey_NextWord]: () => _move_cursor('span.word', next_incr),
+    [k.hotkey_PrevUnknownWord]: () => _move_cursor('span.word.status0', prev_incr),
+    [k.hotkey_NextUnknownWord]: () => _move_cursor('span.word.status0', next_incr),
     [k.hotkey_StatusUp]: () => increment_status_for_selected_elements(+1),
     [k.hotkey_StatusDown]: () => increment_status_for_selected_elements(-1),
     [k.hotkey_Bookmark]: () => handle_bookmark(),
