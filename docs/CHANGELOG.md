@@ -1,4 +1,12 @@
 
+# 3.5.8 (2024-10-28)
+
+Tweaks:
+
+* #434: New hotkeys to move to prev/next unknown word.
+* #496: only propagate new child data to parent (saving an existing child doesn't re-update the parent)
+
+
 # 3.5.7 (2024-10-21)
 
 Feature changes:
