@@ -199,7 +199,9 @@ function show_multiword_term_edit_form(selected) {
   if (text == "")
     return;
   const lid = parseInt(selected.eq(0).data('lang-id'));
-  _show_wordframe_url(`/read/termform/${lid}/${text}`);
+  // "/" in the term cause problems with routing, so hack a fix.
+  const sendtext = text.replace(/\//g, "LUTESLASH");
+  _show_wordframe_url(`/read/termform/${lid}/${sendtext}`);
 }
 
 
