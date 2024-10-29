@@ -14,7 +14,7 @@ from flask import (
     send_file,
 )
 from lute.models.language import Language
-from lute.models.term import Term as DBTerm
+from lute.models.term import Term as DBTerm, Status
 from lute.models.setting import UserSetting
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list
@@ -34,8 +34,12 @@ def index(search):
     languages = db.session.query(Language).order_by(Language.name).all()
     langopts = [(lang.id, lang.name) for lang in languages]
     langopts = [(0, "(all)")] + langopts
+    statuses = [s for s in Status.all() if s.id != Status.UNKNOWN]
     return render_template(
-        "term/index.html", initial_search=search, language_options=langopts
+        "term/index.html",
+        initial_search=search,
+        language_options=langopts,
+        statuses=statuses,
     )
 
 
