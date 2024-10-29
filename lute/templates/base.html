@@ -28,6 +28,8 @@
   <link rel="stylesheet" type="text/css" href="/theme/current">
   <link rel="stylesheet" type="text/css" href="/theme/custom_styles">
 
+  {% block preloadassets %}{% endblock %}
+
   <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.scrollTo.min.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery-ui.min.js') }}"  charset="utf-8"></script>

@@ -35,7 +35,7 @@ from lute.parse.registry import init_parser_plugins, supported_parsers
 from lute.models.book import Book
 from lute.models.language import Language
 from lute.models.setting import BackupSettings, UserSetting
-from lute.book.stats import refresh_stats, mark_stale
+from lute.book.stats import mark_stale
 
 from lute.book.routes import bp as book_bp
 from lute.bookmarks.routes import bp as bookmarks_bp
@@ -169,7 +169,6 @@ def _add_base_routes(app, app_config):
         books_to_update = db.session.query(Book).filter(Book.archived == 0).all()
         for book in books_to_update:
             mark_stale(book)
-        refresh_stats()
         return redirect("/", 302)
 
     @app.route("/wipe_database")
