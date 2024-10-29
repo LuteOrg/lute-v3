@@ -202,10 +202,13 @@ def get_paragraphs(s, language):
         return ret
 
     def _split_by_sentence_number(p):
-        return [
+        sentences = [
             list(sentence)
             for _, sentence in itertools.groupby(p, key=lambda t: t.sentence_number)
         ]
+        for s in sentences:
+            s[0].add_html_class("sentencestart")
+        return sentences
 
     paras = [
         _split_by_sentence_number(list(sentences))
