@@ -177,10 +177,11 @@ def empty():
 @bp.route("/termform/<int:langid>/<text>", methods=["GET", "POST"])
 def term_form(langid, text):
     """
-    Create a multiword term.
+    Create a multiword term for the given text, replacing the LUTESLASH hack.
     """
+    usetext = text.replace("LUTESLASH", "/")
     repo = Repository(db)
-    term = repo.find_or_new(langid, text)
+    term = repo.find_or_new(langid, usetext)
     if term.status == 0:
         term.status = 1
     return handle_term_form(
