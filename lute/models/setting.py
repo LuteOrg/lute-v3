@@ -195,6 +195,8 @@ class UserSetting(SettingBase):
             "hotkey_TranslatePage": "",
             "hotkey_PrevUnknownWord": "",
             "hotkey_NextUnknownWord": "",
+            "hotkey_PrevSentence": "",
+            "hotkey_NextSentence": "",
         }
         for k, v in keys_and_defaults.items():
             if not UserSetting.key_exists(k):

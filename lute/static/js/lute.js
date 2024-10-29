@@ -843,6 +843,8 @@ function handle_keydown (e) {
     [k.hotkey_NextWord]: () => _move_cursor('span.word', next_incr),
     [k.hotkey_PrevUnknownWord]: () => _move_cursor('span.word.status0', prev_incr),
     [k.hotkey_NextUnknownWord]: () => _move_cursor('span.word.status0', next_incr),
+    [k.hotkey_PrevSentence]: () => _move_cursor('span.word.sentencestart', prev_incr),
+    [k.hotkey_NextSentence]: () => _move_cursor('span.word.sentencestart', next_incr),
     [k.hotkey_StatusUp]: () => increment_status_for_selected_elements(+1),
     [k.hotkey_StatusDown]: () => increment_status_for_selected_elements(-1),
     [k.hotkey_Bookmark]: () => handle_bookmark(),
