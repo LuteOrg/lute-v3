@@ -4,7 +4,7 @@
 
 from flask import Blueprint, request, render_template, jsonify
 from lute.bookmarks.datatables import get_data_tables_list
-from lute.models.book import Book, Text, TextBookmark
+from lute.models.book import Text, TextBookmark, BookRepository
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.db import db
 
@@ -22,7 +22,8 @@ def datatables_bookmarks(bookid):
 @bp.route("/<int:bookid>", methods=["GET"])
 def bookmarks(bookid):
     "Get all bookarks for given bookid."
-    book = Book.find(bookid)
+    br = BookRepository(db.session)
+    book = br.find(bookid)
 
     text_dir = "rtl" if book.language.right_to_left else "ltr"
     return render_template("bookmarks/list.html", book=book, text_dir=text_dir)

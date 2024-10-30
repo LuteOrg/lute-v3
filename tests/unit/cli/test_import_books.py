@@ -4,7 +4,7 @@ Smoke test for bulk import of books.
 
 from sqlalchemy import and_
 from lute.cli.import_books import import_books_from_csv
-from lute.models.book import Book
+from lute.models.book import Book, BookRepository
 from lute.db import db
 
 
@@ -24,16 +24,18 @@ A Book,German,,,,,,Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter
 
     common_tags = ["bar", "qux"]
 
+    repo = BookRepository(db.session)
+
     # Check that no changes are made if not committing.
     import_books_from_csv(csv_file, "English", common_tags, False)
-    assert Book.find_by_title("A Book", english.id) is None
-    assert Book.find_by_title("Another Book", english.id) is None
-    assert Book.find_by_title("A Book", german.id) is None
+    assert repo.find_by_title("A Book", english.id) is None
+    assert repo.find_by_title("Another Book", english.id) is None
+    assert repo.find_by_title("A Book", german.id) is None
 
     # Check that new books are added.
     import_books_from_csv(csv_file, "English", common_tags, True)
 
-    book = Book.find_by_title("A Book", english.id)
+    book = repo.find_by_title("A Book", english.id)
     assert book is not None
     assert book.title == "A Book"
     assert book.language_id == english.id
@@ -44,7 +46,7 @@ A Book,German,,,,,,Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter
     assert book.texts[0].text == "Lorem ipsum, dolor sit amet."
     assert sorted([tag.text for tag in book.book_tags]) == ["bar", "baz", "foo", "qux"]
 
-    book = Book.find_by_title("Another Book", english.id)
+    book = repo.find_by_title("Another Book", english.id)
     assert book is not None
     assert book.title == "Another Book"
     assert book.language_id == english.id
@@ -55,7 +57,7 @@ A Book,German,,,,,,Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter
     assert book.texts[0].text == "The quick brown fox jumps over the lazy dog."
     assert sorted([tag.text for tag in book.book_tags]) == ["bar", "qux"]
 
-    book = Book.find_by_title("A Book", german.id)
+    book = repo.find_by_title("A Book", german.id)
     assert book is not None
     assert book.title == "A Book"
     assert book.language_id == german.id

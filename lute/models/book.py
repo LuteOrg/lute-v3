@@ -195,16 +195,21 @@ class Book(
 
         return b
 
-    @staticmethod
-    def find(book_id):
-        "Get by ID."
-        return db.session.query(Book).filter(Book.id == book_id).first()
 
-    @staticmethod
-    def find_by_title(book_title, language_id):
+class BookRepository:
+    "Repository."
+
+    def __init__(self, session):
+        self.session = session
+
+    def find(self, book_id):
+        "Get by ID."
+        return self.session.query(Book).filter(Book.id == book_id).first()
+
+    def find_by_title(self, book_title, language_id):
         "Get by title."
         return (
-            db.session.query(Book)
+            self.session.query(Book)
             .filter(and_(Book.title == book_title, Book.language_id == language_id))
             .first()
         )

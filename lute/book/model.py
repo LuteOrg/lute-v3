@@ -2,7 +2,7 @@
 Book domain objects.
 """
 
-from lute.models.book import Book as DBBook, BookTag, BookTagRepository
+from lute.models.book import Book as DBBook, BookTag, BookTagRepository, BookRepository
 from lute.models.language import Language
 
 
@@ -42,17 +42,18 @@ class Repository:
 
     def __init__(self, _session):
         self.session = _session
+        self.book_repo = BookRepository(self.session)
 
     def load(self, book_id):
         "Loads a Book business object for the DBBook."
-        dbb = DBBook.find(book_id)
+        dbb = self.book_repo.find(book_id)
         if dbb is None:
             raise ValueError(f"No book with id {book_id} found")
         return self._build_business_book(dbb)
 
     def find_by_title(self, book_title, language_id):
         "Loads a Book business object for the book with a given title."
-        dbb = DBBook.find_by_title(book_title, language_id)
+        dbb = self.book_repo.find_by_title(book_title, language_id)
         if dbb is None:
             return None
         return self._build_business_book(dbb)
@@ -78,7 +79,7 @@ class Repository:
         """
         if book.id is None:
             raise ValueError(f"book {book.title} not saved")
-        b = DBBook.find(book.id)
+        b = self.book_repo.find(book.id)
         self.session.delete(b)
 
     def commit(self):
@@ -100,7 +101,7 @@ class Repository:
         if book.id is None:
             b = DBBook.create_book(book.title, lang, book.text, book.max_page_tokens)
         else:
-            b = DBBook.find(book.id)
+            b = self.book_repo.find(book.id)
         b.title = book.title
         b.source_uri = book.source_uri
         b.audio_filename = book.audio_filename
