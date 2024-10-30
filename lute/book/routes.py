@@ -19,7 +19,7 @@ from lute.book.stats import get_stats
 import lute.utils.formutils
 from lute.db import db
 
-from lute.models.language import Language
+from lute.models.language import Language, LanguageRepository
 from lute.models.book import BookRepository
 from lute.models.setting import UserSetting
 from lute.book.model import Book, Repository
@@ -147,7 +147,8 @@ def edit(bookid):
         flash(f"{b.title} updated.")
         return redirect("/", 302)
 
-    lang = Language.find(b.language_id)
+    lang_repo = LanguageRepository(db.session)
+    lang = lang_repo.find(b.language_id)
     return render_template(
         "book/edit.html",
         book=b,

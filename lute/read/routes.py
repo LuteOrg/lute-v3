@@ -8,7 +8,7 @@ from lute.read.service import set_unknowns_to_known, start_reading, get_popup_da
 from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
-from lute.models.book import Book, Text, BookRepository
+from lute.models.book import Text, BookRepository
 from lute.models.setting import UserSetting
 from lute.db import db
 

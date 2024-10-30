@@ -6,7 +6,7 @@ import csv
 
 from lute.db import db
 from lute.models.term import Status
-from lute.models.language import Language
+from lute.models.language import LanguageRepository
 from lute.term.model import Term, Repository
 
 
@@ -92,10 +92,11 @@ def _validate_data(import_data):
 
 def _create_langs_dict(import_data):
     "Create dictionary of language name to Language."
+    repo = LanguageRepository(db.session)
     lang_dict = {}
     langs = [hsh["language"].strip() for hsh in import_data]
     for lang_name in list(set(langs)):
-        lang_dict[lang_name] = Language.find_by_name(lang_name)
+        lang_dict[lang_name] = repo.find_by_name(lang_name)
     return lang_dict
 
 
