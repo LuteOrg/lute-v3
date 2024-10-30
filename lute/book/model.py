@@ -40,8 +40,8 @@ class Repository:
     Maps Book BO to and from lute.model.Book.
     """
 
-    def __init__(self, _db):
-        self.db = _db
+    def __init__(self, _session):
+        self.session = _session
 
     def load(self, book_id):
         "Loads a Book business object for the DBBook."
@@ -59,7 +59,7 @@ class Repository:
 
     def get_book_tags(self):
         "Get all available book tags, helper method."
-        bts = self.db.session.query(BookTag).all()
+        bts = self.session.query(BookTag).all()
         return [t.text for t in bts]
 
     def add(self, book):
@@ -69,7 +69,7 @@ class Repository:
         clients should not change it.
         """
         dbbook = self._build_db_book(book)
-        self.db.session.add(dbbook)
+        self.session.add(dbbook)
         return dbbook
 
     def delete(self, book):
@@ -79,13 +79,13 @@ class Repository:
         if book.id is None:
             raise ValueError(f"book {book.title} not saved")
         b = DBBook.find(book.id)
-        self.db.session.delete(b)
+        self.session.delete(b)
 
     def commit(self):
         """
         Commit everything.
         """
-        self.db.session.commit()
+        self.session.commit()
 
     def _build_db_book(self, book):
         "Convert a book business object to a DBBook."

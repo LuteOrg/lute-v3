@@ -14,7 +14,7 @@ from tests.dbasserts import assert_sql_result
 
 @pytest.fixture(name="repo")
 def fixture_repo():
-    return Repository(db)
+    return Repository(db.session)
 
 
 @pytest.fixture(name="new_book")
