@@ -180,7 +180,7 @@ def term_form(langid, text):
     Create a multiword term for the given text, replacing the LUTESLASH hack.
     """
     usetext = text.replace("LUTESLASH", "/")
-    repo = Repository(db)
+    repo = Repository(db.session)
     term = repo.find_or_new(langid, usetext)
     if term.status == 0:
         term.status = 1
@@ -198,7 +198,7 @@ def edit_term_form(term_id):
     """
     Edit a term.
     """
-    repo = Repository(db)
+    repo = Repository(db.session)
     term = repo.load(term_id)
     # print(f"editing term {term_id}", flush=True)
     if term.status == 0:
