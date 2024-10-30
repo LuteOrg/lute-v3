@@ -26,7 +26,7 @@ def import_books_from_csv(file, language, tags, commit):
                 database. If false, a list of books to be imported will be
                 printed out, but no changes will be made.
     """
-    repo = Repository(db)
+    repo = Repository(db.session)
     count = 0
     with open(file, newline="", encoding="utf-8") as f:
         r = csv.DictReader(f)
