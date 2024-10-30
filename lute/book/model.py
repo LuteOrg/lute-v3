@@ -3,7 +3,7 @@ Book domain objects.
 """
 
 from lute.models.book import Book as DBBook, BookTag, BookTagRepository, BookRepository
-from lute.models.language import Language
+from lute.models.language import LanguageRepository
 
 
 class Book:  # pylint: disable=too-many-instance-attributes
@@ -91,11 +91,12 @@ class Repository:
     def _build_db_book(self, book):
         "Convert a book business object to a DBBook."
 
+        lang_repo = LanguageRepository(self.session)
         lang = None
         if book.language_id:
-            lang = Language.find(book.language_id)
+            lang = lang_repo.find(book.language_id)
         elif book.language_name:
-            lang = Language.find_by_name(book.language_name)
+            lang = lang_repo.find_by_name(book.language_name)
 
         b = None
         if book.id is None:
