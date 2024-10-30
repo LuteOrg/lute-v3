@@ -30,15 +30,16 @@ class BookTag(db.Model):
         tt.comment = comment
         return tt
 
-    @staticmethod
-    def find_by_text(text):
-        "Find a tag by text, or None if not found."
-        return db.session.query(BookTag).filter(BookTag.text == text).first()
 
-    @staticmethod
-    def find_or_create_by_text(text):
+class BookTagRepository:
+    "Repository."
+
+    def __init__(self, session):
+        self.session = session
+
+    def find_or_create_by_text(self, text):
         "Return tag or create one."
-        ret = BookTag.find_by_text(text)
+        ret = db.session.query(BookTag).filter(BookTag.text == text).first()
         if ret is not None:
             return ret
         return BookTag.make_book_tag(text)
