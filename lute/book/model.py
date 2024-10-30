@@ -2,7 +2,7 @@
 Book domain objects.
 """
 
-from lute.models.book import Book as DBBook, BookTag
+from lute.models.book import Book as DBBook, BookTag, BookTagRepository
 from lute.models.language import Language
 
 
@@ -107,9 +107,10 @@ class Repository:
         b.audio_current_pos = book.audio_current_pos
         b.audio_bookmarks = book.audio_bookmarks
 
+        btr = BookTagRepository(self.session)
         booktags = []
         for s in book.book_tags:
-            booktags.append(BookTag.find_or_create_by_text(s))
+            booktags.append(btr.find_or_create_by_text(s))
         b.remove_all_book_tags()
         for tt in booktags:
             b.add_book_tag(tt)
