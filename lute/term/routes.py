@@ -178,7 +178,7 @@ def edit(termid):
     """
     Edit a term.
     """
-    repo = Repository(db)
+    repo = Repository(db.session)
     term = repo.load(termid)
     if term.status == 0:
         term.status = 1
@@ -190,7 +190,7 @@ def edit_by_text(langid, text):
     """
     Edit a term.
     """
-    repo = Repository(db)
+    repo = Repository(db.session)
     term = repo.find_or_new(langid, text)
     if term.status == 0:
         term.status = 1
@@ -202,7 +202,7 @@ def new():
     """
     Create a term.
     """
-    repo = Repository(db)
+    repo = Repository(db.session)
     term = Term()
     return _handle_form(term, repo, "/term/new")
 
@@ -212,7 +212,7 @@ def search_by_text_in_language(text, langid):
     "JSON data for parent data."
     if text.strip() == "" or langid == 0:
         return []
-    repo = Repository(db)
+    repo = Repository(db.session)
     matches = repo.find_matches(langid, text)
 
     def _make_entry(t):
@@ -230,7 +230,7 @@ def search_by_text_in_language(text, langid):
 @bp.route("/sentences/<int:langid>/<text>", methods=["GET"])
 def sentences(langid, text):
     "Get sentences for terms."
-    repo = Repository(db)
+    repo = Repository(db.session)
     # Use find_or_new(): if the user clicks on a parent tag
     # in the term form, and the parent does not exist yet, then
     # we're creating a new term.
@@ -262,7 +262,7 @@ def bulk_update_status():
       updates: [ { new_status: 1, termids: [ 42, ] }, ... }, ]
     }
     """
-    repo = Repository(db)
+    repo = Repository(db.session)
 
     data = request.get_json()
     updates = data.get("updates")
@@ -285,7 +285,7 @@ def bulk_set_parent():
     termids = data.get("wordids")
     parenttext = data.get("parenttext")
     parent = None
-    repo = Repository(db)
+    repo = Repository(db.session)
     for tid in termids:
         term = repo.load(int(tid))
         if parent is None:
@@ -304,7 +304,7 @@ def bulk_delete():
     "Delete terms."
     data = request.get_json()
     termids = data.get("wordids")
-    repo = Repository(db)
+    repo = Repository(db.session)
     for tid in termids:
         term = repo.load(int(tid))
         repo.delete(term)
@@ -317,7 +317,7 @@ def delete(termid):
     """
     Delete a term.
     """
-    repo = Repository(db)
+    repo = Repository(db.session)
     term = repo.load(termid)
     repo.delete(term)
     repo.commit()

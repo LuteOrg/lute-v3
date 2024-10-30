@@ -50,7 +50,7 @@ def bulk_status_update(text: Text, terms_text_array, new_status):
     and set the status.
     """
     language = text.book.language
-    repo = Repository(db)
+    repo = Repository(db.session)
     for term_text in terms_text_array:
         t = repo.find_or_new(language.id, term_text)
         t.status = new_status

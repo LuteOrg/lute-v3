@@ -13,7 +13,7 @@ from lute.term.forms import TermForm
 
 def test_validate(app, app_context, english):
     "A new term is valid."
-    repo = Repository(db)
+    repo = Repository(db.session)
     t = repo.find_or_new(english.id, "CAT")
     with app.test_request_context():
         f = TermForm(obj=t)
@@ -28,7 +28,7 @@ def test_text_change_not_valid(app, app_context, english):
     db.session.add(dbt)
     db.session.commit()
 
-    repo = Repository(db)
+    repo = Repository(db.session)
     t = repo.find_or_new(english.id, "CAT")
     t.text = "dog"
     with app.test_request_context():
@@ -64,7 +64,7 @@ def test_update_existing_term_is_valid(app, app_context, english):
     db.session.add(dbt)
     db.session.commit()
 
-    repo = Repository(db)
+    repo = Repository(db.session)
     t = repo.find_or_new(english.id, "cat")
     t.text = "cat"
     with app.test_request_context():

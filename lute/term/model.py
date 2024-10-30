@@ -78,8 +78,8 @@ class Repository:
     Maps Term BO to and from lute.model.Term.
     """
 
-    def __init__(self, _db):
-        self.db = _db
+    def __init__(self, _session):
+        self.session = _session
 
         # Identity map for business lookup.
         # Note that the same term is stored
@@ -227,11 +227,11 @@ class Repository:
         # print(params)
 
         alchsql = sqlalchemy.text(sql_query)
-        return self.db.session.execute(alchsql, params).fetchall()
+        return self.session.execute(alchsql, params).fetchall()
 
     def get_term_tags(self):
         "Get all available term tags, helper method."
-        tags = self.db.session.query(TermTag).all()
+        tags = self.session.query(TermTag).all()
         return [t.text for t in tags]
 
     def add(self, term):
@@ -241,7 +241,7 @@ class Repository:
         clients should not change it.
         """
         dbterm = self._build_db_term(term)
-        self.db.session.add(dbterm)
+        self.session.add(dbterm)
         return dbterm
 
     def delete(self, term):
@@ -255,14 +255,14 @@ class Repository:
             spec = self._search_spec_term(term.language_id, term.text)
             dbt = DBTerm.find_by_spec(spec)
         if dbt is not None:
-            self.db.session.delete(dbt)
+            self.session.delete(dbt)
 
     def commit(self):
         """
         Commit everything, flush the map to force refetches.
         """
         self.identity_map = {}
-        self.db.session.commit()
+        self.session.commit()
 
     def _search_spec_term(self, langid, text):
         """
@@ -460,7 +460,7 @@ class Repository:
 
         pattern = f"%{chr(0x200B)}{term_lc}{chr(0x200B)}%"
         params = {"pattern": pattern}
-        result = self.db.session.execute(query, params)
+        result = self.session.execute(query, params)
         return self._build_term_references(term_lc, result)
 
     def _get_all_refs(self, terms):

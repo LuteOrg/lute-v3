@@ -245,7 +245,7 @@ def _do_import(
     """
     # pylint: disable=too-many-locals
 
-    repo = Repository(db)
+    repo = Repository(db.session)
 
     skipped = 0
 
