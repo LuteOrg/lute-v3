@@ -24,7 +24,7 @@ def add_term(lang, s, status):
     term.language_id = lang.id
     term.text = s
     term.status = status
-    repo = Repository(db)
+    repo = Repository(db.session)
     repo.add(term)
     repo.commit()
 
@@ -113,7 +113,7 @@ def fixture_make_book(empty_db, spanish):
 
 def add_terms(lang, terms):
     "Create and add term."
-    repo = Repository(db)
+    repo = Repository(db.session)
     for s in terms:
         term = Term()
         term.language = lang

@@ -45,7 +45,7 @@ def given_terms(content):
 
 @given(parsers.parse('term "{content}" with status {status} and parent "{parenttext}"'))
 def given_term_with_status_and_parent(content, status, parenttext):
-    r = Repository(db)
+    r = Repository(db.session)
     t = r.find_or_new(language.id, content)
     t.status = int(status)
     t.parents.append(parenttext)
@@ -55,7 +55,7 @@ def given_term_with_status_and_parent(content, status, parenttext):
 
 @given(parsers.parse('term "{content}" with status {status}'))
 def given_term_with_status(content, status):
-    r = Repository(db)
+    r = Repository(db.session)
     t = r.find_or_new(language.id, content)
     t.status = int(status)
     r.add(t)

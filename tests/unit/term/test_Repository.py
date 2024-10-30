@@ -17,7 +17,7 @@ from tests.utils import add_terms, make_text
 
 @pytest.fixture(name="repo")
 def fixture_repo():
-    return Repository(db)
+    return Repository(db.session)
 
 
 @pytest.fixture(name="hello_term")
