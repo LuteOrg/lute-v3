@@ -20,7 +20,7 @@ def test_set_unknowns_to_known(english, app_context):
     b.title = "blah"
     b.language_id = english.id
     b.text = "Dog CAT dog cat."
-    r = Repository(db)
+    r = Repository(db.session)
     dbbook = r.add(b)
     r.commit()
 
@@ -45,7 +45,7 @@ def test_smoke_start_reading(english, app_context):
     b.title = "blah"
     b.language_id = english.id
     b.text = "Here is some content.  Here is more."
-    r = Repository(db)
+    r = Repository(db.session)
     dbbook = r.add(b)
     r.commit()
 
@@ -64,7 +64,7 @@ def test_start_reading_creates_Terms_for_unknown_words(english, app_context):
     b.title = "blah"
     b.language_id = english.id
     b.text = "Dog CAT dog cat."
-    r = Repository(db)
+    r = Repository(db.session)
     dbbook = r.add(b)
     r.commit()
 

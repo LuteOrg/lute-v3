@@ -114,7 +114,7 @@ def load_demo_stories():
     ]
     langdefs = [d for d in langdefs if d["language"].is_supported]
 
-    r = Repository(db)
+    r = Repository(db.session)
     for d in langdefs:
         for b in d["books"]:
             r.add(b)

@@ -65,7 +65,7 @@ def load_language_def(lang_name):
     db.session.add(lang)
     db.session.commit()
 
-    r = Repository(db)
+    r = Repository(db.session)
     for b in load_def["books"]:
         r.add(b)
     r.commit()

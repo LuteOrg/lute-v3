@@ -108,7 +108,7 @@ def new():
 
     form = NewBookForm(obj=b)
     form.language_id.choices = lute.utils.formutils.language_choices()
-    repo = Repository(db)
+    repo = Repository(db.session)
 
     if form.validate_on_submit():
         try:
@@ -136,7 +136,7 @@ def new():
 @bp.route("/edit/<int:bookid>", methods=["GET", "POST"])
 def edit(bookid):
     "Edit a book - can only change a few fields."
-    repo = Repository(db)
+    repo = Repository(db.session)
     b = repo.load(bookid)
     form = EditBookForm(obj=b)
 
