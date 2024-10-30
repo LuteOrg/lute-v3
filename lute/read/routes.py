@@ -8,7 +8,7 @@ from lute.read.service import set_unknowns_to_known, start_reading, get_popup_da
 from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
-from lute.models.book import Book, Text
+from lute.models.book import Book, Text, BookRepository
 from lute.models.setting import UserSetting
 from lute.db import db
 
@@ -39,6 +39,12 @@ def _render_book_page(book, pagenum):
     )
 
 
+def _find_book(bookid):
+    "Find book from db."
+    br = BookRepository(db.session)
+    return br.find(bookid)
+
+
 @bp.route("/<int:bookid>", methods=["GET"])
 def read(bookid):
     """
@@ -46,7 +52,7 @@ def read(bookid):
 
     This is called from the book listing, on Lute index.
     """
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     if book is None:
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
@@ -67,7 +73,7 @@ def read_page(bookid, pagenum):
 
     Called from term Sentences link.
     """
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     if book is None:
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
@@ -84,7 +90,7 @@ def page_done():
     pagenum = int(data.get("pagenum"))
     restknown = data.get("restknown")
 
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     text = book.text_at_page(pagenum)
     text.read_date = datetime.now()
     db.session.add(text)
@@ -99,7 +105,7 @@ def delete_page(bookid, pagenum):
     """
     Delete page.
     """
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     if book is None:
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
@@ -119,7 +125,7 @@ def delete_page(bookid, pagenum):
 def new_page(bookid, position, pagenum):
     "Create a new page."
     form = TextForm()
-    book = Book.find(bookid)
+    book = _find_book(bookid)
 
     if form.validate_on_submit():
         t = None
@@ -149,7 +155,7 @@ def save_player_data():
     "Save current player position, bookmarks.  Called on a loop by the player."
     data = request.json
     bookid = int(data.get("bookid"))
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     book.audio_current_pos = float(data.get("position"))
     book.audio_bookmarks = data.get("bookmarks")
     db.session.add(book)
@@ -160,7 +166,7 @@ def save_player_data():
 @bp.route("/renderpage/<int:bookid>/<int:pagenum>", methods=["GET"])
 def render_page(bookid, pagenum):
     "Method called by ajax, render the given page."
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     if book is None:
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
@@ -240,7 +246,7 @@ def flashcopied():
 @bp.route("/editpage/<int:bookid>/<int:pagenum>", methods=["GET", "POST"])
 def edit_page(bookid, pagenum):
     "Edit the text on a page."
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     text = book.text_at_page(pagenum)
     if text is None:
         return redirect("/", 302)

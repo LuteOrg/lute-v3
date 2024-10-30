@@ -20,7 +20,7 @@ import lute.utils.formutils
 from lute.db import db
 
 from lute.models.language import Language
-from lute.models.book import Book as DBBook
+from lute.models.book import BookRepository
 from lute.models.setting import UserSetting
 from lute.book.model import Book, Repository
 
@@ -162,10 +162,16 @@ def import_webpage():
     return render_template("book/import_webpage.html")
 
 
+def _find_book(bookid):
+    "Find book from db."
+    br = BookRepository(db.session)
+    return br.find(bookid)
+
+
 @bp.route("/archive/<int:bookid>", methods=["POST"])
 def archive(bookid):
     "Archive a book."
-    b = DBBook.find(bookid)
+    b = _find_book(bookid)
     b.archived = True
     db.session.add(b)
     db.session.commit()
@@ -175,7 +181,7 @@ def archive(bookid):
 @bp.route("/unarchive/<int:bookid>", methods=["POST"])
 def unarchive(bookid):
     "Archive a book."
-    b = DBBook.find(bookid)
+    b = _find_book(bookid)
     b.archived = False
     db.session.add(b)
     db.session.commit()
@@ -185,7 +191,7 @@ def unarchive(bookid):
 @bp.route("/delete/<int:bookid>", methods=["POST"])
 def delete(bookid):
     "Archive a book."
-    b = DBBook.find(bookid)
+    b = _find_book(bookid)
     db.session.delete(b)
     db.session.commit()
     return redirect("/", 302)
@@ -194,7 +200,7 @@ def delete(bookid):
 @bp.route("/table_stats/<int:bookid>", methods=["GET"])
 def table_stats(bookid):
     "Get the stats, return ajax."
-    b = DBBook.find(bookid)
+    b = _find_book(bookid)
     stats = get_stats(b)
     ret = {
         "distinctterms": stats.distinctterms,
