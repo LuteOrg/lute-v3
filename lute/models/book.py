@@ -327,11 +327,6 @@ class Text(db.Model):
             sentence.text = None
         self.sentences = []
 
-    @staticmethod
-    def find(text_id):
-        "Get by ID."
-        return db.session.query(Text).filter(Text.id == text_id).first()
-
 
 class Sentence(db.Model):
     """

@@ -60,7 +60,7 @@ def read(bookid):
     page_num = 1
     text = book.texts[0]
     if book.current_tx_id:
-        text = Text.find(book.current_tx_id)
+        text = db.session.get(Text, book.current_tx_id)
         page_num = text.order
 
     return _render_book_page(book, page_num)
