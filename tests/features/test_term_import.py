@@ -9,9 +9,9 @@ import pytest
 
 from pytest_bdd import given, when, then, scenarios, parsers
 
-from lute.models.language import Language
+from lute.db import db
+from lute.models.language import Language, LanguageRepository
 from lute.models.term import Term
-
 from lute.termimport.service import import_file, BadImportFileError
 
 from tests.dbasserts import assert_sql_result
@@ -110,7 +110,8 @@ def then_words_table_contains_WoTextLC(text_lc_content):
 
 @then(parsers.parse('{language} term "{term}" should be:\n{expected}'))
 def then_term_tags(language, term, expected):
-    lang = Language.find_by_name(language)
+    repo = LanguageRepository(db.session)
+    lang = repo.find_by_name(language)
     spec = Term(lang, term)
     t = Term.find_by_spec(spec)
     pstring = ", ".join([p.text for p in t.parents])

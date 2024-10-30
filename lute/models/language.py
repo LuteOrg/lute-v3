@@ -167,19 +167,11 @@ class Language(
     def get_lowercase(self, s) -> str:
         return self.parser.get_lowercase(s)
 
+    # TODO remove this!!!
     @staticmethod
     def find(language_id):
         "Get by ID."
         return db.session.query(Language).filter(Language.id == language_id).first()
-
-    @staticmethod
-    def find_by_name(name):
-        "Get by name."
-        return (
-            db.session.query(Language)
-            .filter(func.lower(Language.name) == func.lower(name))
-            .first()
-        )
 
     def to_dict(self):
         "Return dictionary of data, for serialization."
@@ -259,3 +251,22 @@ class Language(
             lang.dictionaries.append(ld)
 
         return lang
+
+
+class LanguageRepository:
+    "Repository."
+
+    def __init__(self, session):
+        self.session = session
+
+    def find(self, language_id):
+        "Get by ID."
+        return self.session.query(Language).filter(Language.id == language_id).first()
+
+    def find_by_name(self, name):
+        "Get by name."
+        return (
+            self.session.query(Language)
+            .filter(func.lower(Language.name) == func.lower(name))
+            .first()
+        )
