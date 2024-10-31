@@ -94,7 +94,7 @@ def start_reading(dbbook, pagenum, db_session):
 
 def get_popup_data(termid):
     "Get popup data, or None if popup shouldn't be shown."
-    term = Term.find(termid)
+    term = db.session.get(Term, termid)
 
     if term.status == Status.UNKNOWN:
         return None

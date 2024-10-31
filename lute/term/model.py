@@ -86,7 +86,7 @@ class Repository:
 
     def load(self, term_id):
         "Loads a Term business object for the DBTerm with the id."
-        dbt = DBTerm.find(term_id)
+        dbt = self.session.get(DBTerm, term_id)
         if dbt is None:
             raise ValueError(f"No term with id {term_id} found")
         term = self._build_business_term(dbt)
@@ -230,7 +230,7 @@ class Repository:
         """
         dbt = None
         if term.id is not None:
-            dbt = DBTerm.find(term.id)
+            dbt = self.session.get(DBTerm, term.id)
         else:
             spec = self._search_spec_term(term.language_id, term.text)
             dbt = DBTerm.find_by_spec(spec)
@@ -263,7 +263,7 @@ class Repository:
         t = None
         if term.id is not None:
             # This is an existing term, so use it directly.
-            t = DBTerm.find(term.id)
+            t = self.session.get(DBTerm, term.id)
         else:
             # New term, or finding by text.
             spec = self._search_spec_term(term.language_id, term.text)
