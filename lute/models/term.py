@@ -72,20 +72,24 @@ class TermTag(db.Model):
         "Set cleaned comment."
         self._comment = c if c is not None else ""
 
-    @staticmethod
-    def find(termtag_id):
+
+class TermTagRepository:
+    "Repository."
+
+    def __init__(self, session):
+        self.session = session
+
+    def find(self, termtag_id):
         "Get by ID."
-        return db.session.query(TermTag).filter(TermTag.id == termtag_id).first()
+        return self.session.query(TermTag).filter(TermTag.id == termtag_id).first()
 
-    @staticmethod
-    def find_by_text(text):
+    def find_by_text(self, text):
         "Find a tag by text, or None if not found."
-        return db.session.query(TermTag).filter(TermTag.text == text).first()
+        return self.session.query(TermTag).filter(TermTag.text == text).first()
 
-    @staticmethod
-    def find_or_create_by_text(text):
+    def find_or_create_by_text(self, text):
         "Return tag or create one."
-        ret = TermTag.find_by_text(text)
+        ret = self.find_by_text(text)
         if ret is not None:
             return ret
         return TermTag(text)
