@@ -3,15 +3,19 @@
 """
 
 from datetime import datetime
-from flask import Blueprint, flash, request, render_template, redirect, jsonify
+from flask import Blueprint, flash, request, render_template, redirect, jsonify, send_file, current_app
 from lute.read.service import set_unknowns_to_known, start_reading, get_popup_data
 from lute.read.forms import TextForm
+from lute.tts.registry import tts_enabled, get_tts_engine_for_language
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
 from lute.models.language import LanguageRepository
 from lute.models.book import Text, BookRepository
 from lute.models.setting import UserSetting
 from lute.db import db
+
+from lute.tts.openai import TTSEngineOpenAiApi
+import os
 
 
 bp = Blueprint("read", __name__, url_prefix="/read")
@@ -172,7 +176,8 @@ def render_page(bookid, pagenum):
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
     paragraphs = start_reading(book, pagenum, db.session)
-    return render_template("read/page_content.html", paragraphs=paragraphs)
+    return render_template("read/page_content.html", paragraphs=paragraphs,\
+                           use_tts=tts_enabled(book.language_id), bookid=bookid, pagenum=pagenum)
 
 
 @bp.route("/empty", methods=["GET"])
@@ -267,3 +272,20 @@ def edit_page(bookid, pagenum):
     return render_template(
         "read/page_edit_form.html", hide_top_menu=True, form=form, text_dir=text_dir
     )
+
+@bp.route("/tts/<int:bookid>/<int:pagenum>", methods=["GET"])
+def tts(bookid, pagenum):
+    """Per-page TTS Endpoint"""
+    book = Book.find(bookid)
+    if book is None:
+        flash(f"No book matching id {bookid}")
+        return redirect("/", 302)
+    raw_text = book.text_at_page(pagenum).text
+    dirname = current_app.env_config.ttsoutputpath
+    speech_file_path=os.path.join(dirname, f"book{bookid}-page{pagenum}.mp3")
+    if os.path.exists(speech_file_path) and os.path.isfile(speech_file_path):
+        return send_file(speech_file_path)
+    else:
+        engine = get_tts_engine_for_language(book.language_id)
+        engine.tts(raw_text, speech_file_path)
+        return send_file(speech_file_path)
