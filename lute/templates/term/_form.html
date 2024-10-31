@@ -23,7 +23,7 @@
     {{ form.hidden_tag() }}
     <div id="term">
       <div id="languageSel"
-        {% if term.language_id is none and term.language is none %}
+        {% if term.language_id is none %}
         {# show the language select box. #}
         {% else %}
         style="display:none;"
