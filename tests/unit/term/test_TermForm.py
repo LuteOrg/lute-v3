@@ -6,7 +6,6 @@ and retrieved from DB.
 """
 
 from lute.models.term import Term as DBTerm
-from lute.models.language import LanguageRepository
 from lute.db import db
 from lute.term.model import Term, Repository
 from lute.term.forms import TermForm
@@ -14,9 +13,8 @@ from lute.term.forms import TermForm
 
 def _make_form(t, app, english):
     "Make form with args."
-    repo = LanguageRepository(db.session)
     with app.test_request_context():
-        f = TermForm(obj=t, language_repo=repo)
+        f = TermForm(obj=t, session=db.session)
         f.language_id.choices = [(english.id, "english")]
         return f
 
