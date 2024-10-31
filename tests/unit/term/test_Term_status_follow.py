@@ -341,7 +341,7 @@ def test_deleting_parent_deactivates_sync_status(term_family, app_context):
 
 def test_adding_extra_parents_unsets_sync_status(term_family, app_context):
     "Can't follow multiple people."
-    c1 = DBTerm.find(term_family.c1.id)
+    c1 = db.session.get(DBTerm, term_family.c1.id)
     assert c1.sync_status is True, "following C"
 
     c1.add_parent(term_family.B)
@@ -350,7 +350,7 @@ def test_adding_extra_parents_unsets_sync_status(term_family, app_context):
 
 def test_changing_parent_keeps_sync_status(term_family, app_context):
     "Can't follow multiple people."
-    c1 = DBTerm.find(term_family.c1.id)
+    c1 = db.session.get(DBTerm, term_family.c1.id)
     assert c1.sync_status is True, "following C"
 
     c1.remove_all_parents()
