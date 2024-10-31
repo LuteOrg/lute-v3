@@ -16,7 +16,7 @@ from wtforms import (
 from wtforms import ValidationError
 from wtforms.validators import DataRequired
 
-from lute.models.term import Term
+from lute.models.term import Term, TermRepository
 from lute.models.language import LanguageRepository
 
 
@@ -112,7 +112,8 @@ class TermForm(FlaskForm):
         if orig_text in ("", None):
             # New term - throw if already exists.
             spec = Term(lang, self.text.data)
-            self.duplicated_term = Term.find_by_spec(spec)
+            term_repo = TermRepository(self.session)
+            self.duplicated_term = term_repo.find_by_spec(spec)
             if self.duplicated_term is not None:
                 raise ValidationError("Term already exists")
 

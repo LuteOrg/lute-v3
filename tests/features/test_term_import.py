@@ -11,7 +11,7 @@ from pytest_bdd import given, when, then, scenarios, parsers
 
 from lute.db import db
 from lute.models.language import Language, LanguageRepository
-from lute.models.term import Term
+from lute.models.term import Term, TermRepository
 from lute.termimport.service import import_file, BadImportFileError
 
 from tests.dbasserts import assert_sql_result
@@ -113,7 +113,8 @@ def then_term_tags(language, term, expected):
     repo = LanguageRepository(db.session)
     lang = repo.find_by_name(language)
     spec = Term(lang, term)
-    t = Term.find_by_spec(spec)
+    term_repo = TermRepository(db.session)
+    t = term_repo.find_by_spec(spec)
     pstring = ", ".join([p.text for p in t.parents])
     if pstring == "":
         pstring = "-"

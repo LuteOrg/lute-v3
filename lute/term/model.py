@@ -8,7 +8,7 @@ them in the database.
 import re
 import sqlalchemy
 
-from lute.models.term import Term as DBTerm, TermTag, TermTagRepository
+from lute.models.term import Term as DBTerm, TermRepository, TermTag, TermTagRepository
 from lute.models.language import LanguageRepository
 
 
@@ -93,6 +93,22 @@ class Repository:
         self._add_to_identity_map(term)
         return term
 
+    def _search_spec_term(self, langid, text):
+        """
+        Make a term to get the correct text_lc to search for.
+        This ensures that the spec term is properly parsed
+        and downcased.
+        """
+        lang_repo = LanguageRepository(self.session)
+        lang = lang_repo.find(langid)
+        return DBTerm(lang, text)
+
+    def _find_by_spec(self, langid, text):
+        "Do a search using a spec term."
+        spec = self._search_spec_term(langid, text)
+        repo = TermRepository(self.session)
+        return repo.find_by_spec(spec)
+
     def find(self, langid, text):
         """
         Return a Term business object for the DBTerm with the langid and text.
@@ -102,8 +118,7 @@ class Repository:
         if term is not None:
             return term
 
-        spec = self._search_spec_term(langid, text)
-        dbt = DBTerm.find_by_spec(spec)
+        dbt = self._find_by_spec(langid, text)
         if dbt is None:
             return None
         term = self._build_business_term(dbt)
@@ -232,8 +247,7 @@ class Repository:
         if term.id is not None:
             dbt = self.session.get(DBTerm, term.id)
         else:
-            spec = self._search_spec_term(term.language_id, term.text)
-            dbt = DBTerm.find_by_spec(spec)
+            dbt = self._find_by_spec(term.language_id, term.text)
         if dbt is not None:
             self.session.delete(dbt)
 
@@ -243,16 +257,6 @@ class Repository:
         """
         self.identity_map = {}
         self.session.commit()
-
-    def _search_spec_term(self, langid, text):
-        """
-        Make a term to get the correct text_lc to search for.
-        This ensures that the spec term is properly parsed
-        and downcased.
-        """
-        lang_repo = LanguageRepository(self.session)
-        lang = lang_repo.find(langid)
-        return DBTerm(lang, text)
 
     def _build_db_term(self, term):
         "Convert a term business object to a DBTerm."
@@ -267,7 +271,8 @@ class Repository:
         else:
             # New term, or finding by text.
             spec = self._search_spec_term(term.language_id, term.text)
-            t = DBTerm.find_by_spec(spec) or DBTerm()
+            term_repo = TermRepository(self.session)
+            t = term_repo.find_by_spec(spec) or DBTerm()
             t.language = spec.language
 
         t.text = term.text
@@ -314,9 +319,7 @@ class Repository:
         return t
 
     def _find_or_create_parent(self, pt, language, term, termtags) -> DBTerm:
-        spec = self._search_spec_term(language.id, pt)
-        p = DBTerm.find_by_spec(spec)
-
+        p = self._find_by_spec(language.id, pt)
         new_or_unknown_parent = p is None or p.status == 0
         new_term = term.id is None
 
@@ -383,7 +386,8 @@ class Repository:
         Return references of term, children, and parents.
         """
         spec = self._search_spec_term(term.language_id, term.text)
-        searchterm = DBTerm.find_by_spec(spec)
+        term_repo = TermRepository(self.session)
+        searchterm = term_repo.find_by_spec(spec)
         if searchterm is None:
             searchterm = spec
 

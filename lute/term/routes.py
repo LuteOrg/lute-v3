@@ -14,7 +14,7 @@ from flask import (
     send_file,
 )
 from lute.models.language import Language, LanguageRepository
-from lute.models.term import Term as DBTerm, Status
+from lute.models.term import TermRepository, Status
 from lute.models.setting import UserSetting
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list
@@ -30,7 +30,8 @@ bp = Blueprint("term", __name__, url_prefix="/term")
 @bp.route("/index/<search>", methods=["GET"])
 def index(search):
     "Index page."
-    DBTerm.delete_empty_images()
+    repo = TermRepository(db.session)
+    repo.delete_empty_images()
     languages = db.session.query(Language).order_by(Language.name).all()
     langopts = [(lang.id, lang.name) for lang in languages]
     langopts = [(0, "(all)")] + langopts

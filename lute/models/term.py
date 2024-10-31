@@ -313,18 +313,6 @@ class Term(
             ti.source = s.strip()
             self.images.append(ti)
 
-    @staticmethod
-    def delete_empty_images():
-        """
-        Data clean-up: delete empty images.
-
-        The code was leaving empty images in the db, which are obviously no good.
-        This is a hack to clean up the data.
-        """
-        sql = "delete from wordimages where trim(WiSource) = ''"
-        db.session.execute(sqltext(sql))
-        db.session.commit()
-
     def get_flash_message(self):
         "Get the flash message."
         if not self.term_flash_message:
@@ -347,21 +335,38 @@ class Term(
         self.term_flash_message = None
         return m
 
-    @staticmethod
-    def find_by_spec(spec):
+
+class TermRepository:
+    "Repository."
+
+    def __init__(self, session):
+        self.session = session
+
+    def find_by_spec(self, spec):
         """
         Find by the given spec term's language ID and text.
         Returns None if not found.
         """
         langid = spec.language.id
         text_lc = spec.text_lc
-        query = db.session.query(Term).filter(
+        query = self.session.query(Term).filter(
             and_(Term.language_id == langid, Term.text_lc == text_lc)
         )
         terms = query.all()
         if not terms:
             return None
         return terms[0]
+
+    def delete_empty_images(self):
+        """
+        Data clean-up: delete empty images.
+
+        The code was leaving empty images in the db, which are obviously no good.
+        This is a hack to clean up the data.
+        """
+        sql = "delete from wordimages where trim(WiSource) = ''"
+        self.session.execute(sqltext(sql))
+        self.session.commit()
 
 
 class Status(db.Model):  # pylint: disable=too-few-public-methods

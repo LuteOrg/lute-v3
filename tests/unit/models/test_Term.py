@@ -5,7 +5,7 @@ Term tests.
 import datetime
 import pytest
 from sqlalchemy import text
-from lute.models.term import Term, TermImage
+from lute.models.term import Term, TermRepository, TermImage
 from lute.db import db
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
 
@@ -79,15 +79,16 @@ def test_find_by_spec(app_context, spanish, english):
     db.session.commit()
 
     spec = Term(spanish, "GATO")
-    found = Term.find_by_spec(spec)
+    repo = TermRepository(db.session)
+    found = repo.find_by_spec(spec)
     assert found.id == t.id, "term found by matching spec"
 
     spec = Term(english, "GATO")
-    found = Term.find_by_spec(spec)
+    found = repo.find_by_spec(spec)
     assert found is None, "not found in different language"
 
     spec = Term(spanish, "gatito")
-    found = Term.find_by_spec(spec)
+    found = repo.find_by_spec(spec)
     assert found is None, "not found with different text"
 
 
@@ -222,7 +223,8 @@ def test_delete_empty_image_records(app_context, spanish):
 
     assert_sql_result("select wisource from wordimages", ["", "   ", "3.png"], "images")
 
-    Term.delete_empty_images()
+    repo = TermRepository(db.session)
+    repo.delete_empty_images()
     assert_sql_result("select wisource from wordimages", ["3.png"], "cleaned images")
 
 
