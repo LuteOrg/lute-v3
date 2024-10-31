@@ -8,6 +8,7 @@ from lute.read.service import set_unknowns_to_known, start_reading, get_popup_da
 from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
+from lute.models.language import LanguageRepository
 from lute.models.book import Text, BookRepository
 from lute.models.setting import UserSetting
 from lute.db import db
@@ -187,12 +188,14 @@ def term_form(langid, text):
     """
     usetext = text.replace("LUTESLASH", "/")
     repo = Repository(db.session)
+    lang_repo = LanguageRepository(db.session)
     term = repo.find_or_new(langid, usetext)
     if term.status == 0:
         term.status = 1
     return handle_term_form(
         term,
         repo,
+        lang_repo,
         "/read/frameform.html",
         render_template("/read/updated.html", term_text=term.text),
         embedded_in_reading_frame=True,
@@ -205,6 +208,7 @@ def edit_term_form(term_id):
     Edit a term.
     """
     repo = Repository(db.session)
+    lang_repo = LanguageRepository(db.session)
     term = repo.load(term_id)
     # print(f"editing term {term_id}", flush=True)
     if term.status == 0:
@@ -212,6 +216,7 @@ def edit_term_form(term_id):
     return handle_term_form(
         term,
         repo,
+        lang_repo,
         "/read/frameform.html",
         render_template("/read/updated.html", term_text=term.text),
         embedded_in_reading_frame=True,
