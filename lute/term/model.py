@@ -20,12 +20,6 @@ class Term:  # pylint: disable=too-many-instance-attributes
     def __init__(self):
         # The ID of the DBTerm.
         self.id = None
-        # A language object is required as the Term bus. object
-        # must downcase the text and the original_text to see
-        # if anything has changed.
-        self._language = None
-        # Ideally this wouldn't be needed, but the term form
-        # populates this field with the (primitive) language id.
         self.language_id = None
         # The text.
         self.text = None
@@ -45,19 +39,6 @@ class Term:  # pylint: disable=too-many-instance-attributes
         return (
             f'<Term BO "{self.text}" lang_id={self.language_id} lang={self.language}>'
         )
-
-    @property
-    def language(self):
-        "Use or get the language."
-        if self._language is not None:
-            return self._language
-        return Language.find(self.language_id)
-
-    @language.setter
-    def language(self, lang):
-        if not isinstance(lang, Language):
-            raise ValueError("not a language")
-        self._language = lang
 
 
 class TermReference:
@@ -168,7 +149,6 @@ class Repository:
 
         spec = self._search_spec_term(langid, text)
         t = Term()
-        t.language = spec.language
         t.language_id = langid
         t.text = spec.text
         t.text_lc = spec.text_lc
@@ -267,10 +247,8 @@ class Repository:
     def _search_spec_term(self, langid, text):
         """
         Make a term to get the correct text_lc to search for.
-
-        Creating a term does parsing and correct downcasing,
-        so term.language.id and term.text_lc match what the
-        db would contain.
+        This ensures that the spec term is properly parsed
+        and downcased.
         """
         lang = Language.find(langid)
         return DBTerm(lang, text)
@@ -366,7 +344,6 @@ class Repository:
         "Create a Term bus. object from a lute.model.term.Term."
         term = Term()
         term.id = dbterm.id
-        term.language = dbterm.language
         term.language_id = dbterm.language.id
 
         text = dbterm.text
