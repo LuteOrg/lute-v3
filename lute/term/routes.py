@@ -120,7 +120,7 @@ def handle_term_form(
     lives in an iframe in the reading frames and returns a different
     template on success.
     """
-    form = TermForm(obj=term)
+    form = TermForm(obj=term, language_repo=language_repo)
 
     # Flash messages get added on things like term imports.
     # The user opening the form is treated as an acknowledgement.
