@@ -4,7 +4,7 @@ TermTag tests.
 
 import pytest
 
-from lute.models.term import TermTag
+from lute.models.term import TermTag, TermTagRepository
 from lute.db import db
 from tests.dbasserts import assert_sql_result
 
@@ -34,19 +34,22 @@ def test_new_dup_tag_text_fails(_hola_tag, app_context):
 
 def test_find_by_text(_hola_tag, app_context):
     "Find by text returns match."
-    retrieved = TermTag.find_by_text("Hola")
+    repo = TermTagRepository(db.session)
+    retrieved = repo.find_by_text("Hola")
     assert retrieved is not None
     assert retrieved.text == "Hola"
 
 
 def test_find_by_text_returns_null_if_not_exact_match(_hola_tag, app_context):
     "Find returns null if no match."
-    assert TermTag.find_by_text("unknown") is None
-    assert TermTag.find_by_text("hola") is None
+    repo = TermTagRepository(db.session)
+    assert repo.find_by_text("unknown") is None
+    assert repo.find_by_text("hola") is None
 
 
 def test_find_or_create_by_text_returns_new_if_no_match(_hola_tag, app_context):
     "Return new."
-    assert TermTag.find_by_text("unknown") is None
-    t = TermTag.find_or_create_by_text("unknown")
+    repo = TermTagRepository(db.session)
+    assert repo.find_by_text("unknown") is None
+    t = repo.find_or_create_by_text("unknown")
     assert t.text == "unknown", "new tag created"

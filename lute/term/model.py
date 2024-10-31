@@ -8,7 +8,7 @@ them in the database.
 import re
 import sqlalchemy
 
-from lute.models.term import Term as DBTerm, TermTag
+from lute.models.term import Term as DBTerm, TermTag, TermTagRepository
 from lute.models.language import LanguageRepository
 
 
@@ -283,9 +283,10 @@ class Repository:
         else:
             t.pop_flash_message()
 
+        tt_repo = TermTagRepository(self.session)
         termtags = []
         for s in list(set(term.term_tags)):
-            termtags.append(TermTag.find_or_create_by_text(s))
+            termtags.append(tt_repo.find_or_create_by_text(s))
         t.remove_all_term_tags()
         for tt in termtags:
             t.add_term_tag(tt)
