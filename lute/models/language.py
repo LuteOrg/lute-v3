@@ -167,12 +167,6 @@ class Language(
     def get_lowercase(self, s) -> str:
         return self.parser.get_lowercase(s)
 
-    # TODO remove this!!!
-    @staticmethod
-    def find(language_id):
-        "Get by ID."
-        return db.session.query(Language).filter(Language.id == language_id).first()
-
     def to_dict(self):
         "Return dictionary of data, for serialization."
         ret = {}

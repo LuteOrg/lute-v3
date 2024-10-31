@@ -9,7 +9,7 @@ import re
 import sqlalchemy
 
 from lute.models.term import Term as DBTerm, TermTag
-from lute.models.language import Language
+from lute.models.language import LanguageRepository
 
 
 class Term:  # pylint: disable=too-many-instance-attributes
@@ -250,7 +250,8 @@ class Repository:
         This ensures that the spec term is properly parsed
         and downcased.
         """
-        lang = Language.find(langid)
+        lang_repo = LanguageRepository(self.session)
+        lang = lang_repo.find(langid)
         return DBTerm(lang, text)
 
     def _build_db_term(self, term):
