@@ -348,11 +348,6 @@ class Term(
         return m
 
     @staticmethod
-    def find(term_id):
-        "Get by ID."
-        return db.session.query(Term).filter(Term.id == term_id).first()
-
-    @staticmethod
     def find_by_spec(spec):
         """
         Find by the given spec term's language ID and text.
