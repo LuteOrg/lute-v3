@@ -34,7 +34,7 @@ def index(search):
     languages = db.session.query(Language).order_by(Language.name).all()
     langopts = [(lang.id, lang.name) for lang in languages]
     langopts = [(0, "(all)")] + langopts
-    statuses = [s for s in Status.all() if s.id != Status.UNKNOWN]
+    statuses = [s for s in db.session.query(Status).all() if s.id != Status.UNKNOWN]
     return render_template(
         "term/index.html",
         initial_search=search,
