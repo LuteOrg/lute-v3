@@ -17,6 +17,7 @@ from wtforms import ValidationError
 from wtforms.validators import DataRequired
 
 from lute.models.term import Term
+from lute.models.language import LanguageRepository
 
 
 class TermForm(FlaskForm):
@@ -63,7 +64,7 @@ class TermForm(FlaskForm):
         "Call the constructor of the superclass (FlaskForm)"
         super().__init__(*args, **kwargs)
         term = kwargs["obj"]
-        self.language_repo = kwargs["language_repo"]
+        self.session = kwargs["session"]
 
         def _data(arr):
             "Get data in proper format for tagify."
@@ -102,7 +103,8 @@ class TermForm(FlaskForm):
         if self.language_id.data in (None, 0):
             return
         langid = int(self.language_id.data)
-        lang = self.language_repo.find(langid)
+        language_repo = LanguageRepository(self.session)
+        lang = language_repo.find(langid)
         if lang is None:
             return
 

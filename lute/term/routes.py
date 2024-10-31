@@ -108,7 +108,7 @@ def export_terms():
 def handle_term_form(
     term,
     repo,
-    language_repo,
+    session,
     form_template_name,
     return_on_success,
     embedded_in_reading_frame=False,
@@ -120,7 +120,7 @@ def handle_term_form(
     lives in an iframe in the reading frames and returns a different
     template on success.
     """
-    form = TermForm(obj=term, language_repo=language_repo)
+    form = TermForm(obj=term, session=session)
 
     # Flash messages get added on things like term imports.
     # The user opening the form is treated as an acknowledgement.
@@ -138,6 +138,7 @@ def handle_term_form(
     # See DUPLICATE_TERM_CHECK comments in other files.
 
     hide_pronunciation = False
+    language_repo = LanguageRepository(session)
     term_language = language_repo.find(
         term.language_id or -1
     )  # -1 hack for no lang set.
@@ -171,9 +172,8 @@ def _handle_form(term, repo, redirect_to="/term/index"):
     """
     Handle the form post, redirecting to specified url.
     """
-    language_repo = LanguageRepository(db.session)
     return handle_term_form(
-        term, repo, language_repo, "/term/formframes.html", redirect(redirect_to, 302)
+        term, repo, db.session, "/term/formframes.html", redirect(redirect_to, 302)
     )
 
 
