@@ -17,7 +17,7 @@ from wtforms import BooleanField, StringField, IntegerField, TextAreaField, Sele
 from wtforms.validators import InputRequired, NumberRange
 from wtforms import ValidationError
 from lute.models.language import Language
-from lute.models.setting import UserSetting
+from lute.models.setting import UserSetting, UserSettingRepository
 from lute.themes.service import list_themes
 from lute.db import db
 from lute.parse.mecab_parser import JapaneseParser
@@ -98,11 +98,12 @@ def edit_settings():
         # Backup dir gets mounted from host.
         form.backup_dir.render_kw = kw
 
+    repo = UserSettingRepository(db.session)
     if form.validate_on_submit():
         # Update the settings in the database
         for field in form:
             if field.id not in ("csrf_token", "submit"):
-                UserSetting.set_value(field.id, field.data)
+                repo.set_value(field.id, field.data)
         db.session.commit()
 
         flash("Settings updated", "success")
@@ -111,7 +112,7 @@ def edit_settings():
     # Load current settings from the database
     for field in form:
         if field.id != "csrf_token":
-            field.data = UserSetting.get_value(field.id)
+            field.data = repo.get_value(field.id)
         if isinstance(field, BooleanField):
             # Hack: set boolean settings to ints, otherwise they're always checked.
             field.data = int(field.data or 0)
@@ -129,10 +130,11 @@ def test_parse():
 
     """
     mecab_path = request.args.get("mecab_path", None)
-    old_setting = UserSetting.get_value("mecab_path")
+    repo = UserSettingRepository(db.session)
+    old_setting = repo.get_value("mecab_path")
     result = {"failure": "tbd"}
     try:
-        UserSetting.set_value("mecab_path", mecab_path)
+        repo.set_value("mecab_path", mecab_path)
         # Parsing requires a language, even if it's a dummy.
         lang = Language()
         p = JapaneseParser()
@@ -145,7 +147,7 @@ def test_parse():
         message = f"{type(e).__name__}: { str(e) }"
         result = {"result": "failure", "message": message}
     finally:
-        UserSetting.set_value("mecab_path", old_setting)
+        repo.set_value("mecab_path", old_setting)
 
     return jsonify(result)
 
@@ -153,13 +155,14 @@ def test_parse():
 @bp.route("/set/<key>/<value>", methods=["POST"])
 def set_key_value(key, value):
     "Set a UserSetting key to value."
-    old_value = UserSetting.get_value(key)
+    repo = UserSettingRepository(db.session)
+    old_value = repo.get_value(key)
     try:
-        UserSetting.set_value(key, value)
+        repo.set_value(key, value)
         result = {"result": "success", "message": "OK"}
     except Exception as e:  # pylint: disable=broad-exception-caught
         message = f"{type(e).__name__}: { str(e) }"
-        UserSetting.set_value(key, old_value)
+        repo.set_value(key, old_value)
         result = {"result": "failure", "message": message}
     db.session.commit()
     return jsonify(result)
@@ -236,13 +239,14 @@ def _get_categorized_hotkeys():
 @bp.route("/shortcuts", methods=["GET", "POST"])
 def edit_shortcuts():
     "Edit shortcuts."
+    repo = UserSettingRepository(db.session)
     form = UserShortcutsForm()
     if form.validate_on_submit():
         # print(request.form, flush=True)
         # Update the settings in the database
         for k, v in request.form.items():
             # print(f"{k} = {v}", flush=True)
-            UserSetting.set_value(k, v)
+            repo.set_value(k, v)
         db.session.commit()
         flash("Shortcuts updated", "success")
         return redirect("/")

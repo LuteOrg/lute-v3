@@ -3,7 +3,7 @@
 from flask import Blueprint, Response, jsonify
 
 from lute.themes.service import get_current_css, next_theme
-from lute.models.setting import UserSetting
+from lute.models.setting import UserSettingRepository
 from lute.db import db
 
 bp = Blueprint("themes", __name__, url_prefix="/theme")
@@ -22,7 +22,8 @@ def custom_styles():
     """
     Return the custom settings for inclusion in the base.html.
     """
-    css = UserSetting.get_value("custom_styles")
+    repo = UserSettingRepository(db.session)
+    css = repo.get_value("custom_styles")
     response = Response(css, 200)
     response.content_type = "text/css; charset=utf-8"
     return response
@@ -38,7 +39,8 @@ def set_next_theme():
 @bp.route("/toggle_highlight", methods=["POST"])
 def toggle_highlight():
     "Fix the highlight."
-    b = bool(int(UserSetting.get_value("show_highlights")))
-    UserSetting.set_value("show_highlights", not b)
+    repo = UserSettingRepository(db.session)
+    b = bool(int(repo.get_value("show_highlights")))
+    repo.set_value("show_highlights", not b)
     db.session.commit()
     return jsonify("ok")

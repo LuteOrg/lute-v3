@@ -7,7 +7,7 @@ from sqlalchemy import select, text
 from lute.read.render.service import get_multiword_indexer, get_textitems
 from lute.db import db
 from lute.models.book import Book
-from lute.models.setting import UserSetting
+from lute.models.setting import UserSettingRepository
 
 # from lute.utils.debug_helpers import DebugTimer
 
@@ -38,7 +38,8 @@ def calc_status_distribution(book):
                 break
             txindex += 1
 
-    sample_size = int(UserSetting.get_value("stats_calc_sample_size") or 5)
+    repo = UserSettingRepository(db.session)
+    sample_size = int(repo.get_value("stats_calc_sample_size") or 5)
     texts = _last_n_pages(book, txindex, sample_size)
 
     # Getting the individual paragraphs per page, and then combining,

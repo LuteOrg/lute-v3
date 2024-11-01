@@ -17,8 +17,9 @@ import re
 from typing import List
 from natto import MeCab
 import jaconv
+from lute.db import db
 from lute.parse.base import ParsedToken, AbstractParser
-from lute.models.setting import UserSetting, MissingUserSettingKeyException
+from lute.models.setting import UserSettingRepository, MissingUserSettingKeyException
 
 
 class JapaneseParser(AbstractParser):
@@ -30,7 +31,7 @@ class JapaneseParser(AbstractParser):
     The parser uses natto-py library, and so should
     be able to find mecab automatically; if it can't,
     you may need to set the MECAB_PATH env variable,
-    managed by UserSetting.set_value("mecab_path", p)
+    managed by UserSettingRepository.set_value("mecab_path", p)
     """
 
     _is_supported = None
@@ -136,8 +137,13 @@ class JapaneseParser(AbstractParser):
             return None
 
         jp_reading_setting = ""
+        # TODO fix_implicit_dependency: this is pretty trashy.  The
+        # settings are necessary, but the dependencies here need to
+        # change, as getting the reading shouldn't require the
+        # db.session.
+        repo = UserSettingRepository(db.session)
         try:
-            jp_reading_setting = UserSetting.get_value("japanese_reading")
+            jp_reading_setting = repo.get_value("japanese_reading")
         except MissingUserSettingKeyException:
             # During loading of demo data, the key isn't set, but the
             # reading isn't needed either, as this is only called when

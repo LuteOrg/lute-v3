@@ -1,14 +1,13 @@
 """
 Theming service.
 
-Themes are stored in the css folder.  Current theme is saved in
-UserSetting.
+Themes are stored in the css folder, current theme in UserSetting.
 """
 
 import os
 from glob import glob
 from flask import current_app
-from lute.models.setting import UserSetting
+from lute.models.setting import UserSettingRepository
 from lute.db import db
 
 default_entry = ("-", "(default)")
@@ -53,7 +52,8 @@ def get_current_css():
     """
     Return the current css pointed at by the current_theme user setting.
     """
-    current_theme = UserSetting.get_value("current_theme")
+    repo = UserSettingRepository(db.session)
+    current_theme = repo.get_value("current_theme")
     if current_theme == default_entry[0]:
         return ""
 
@@ -76,12 +76,13 @@ def next_theme():
     """
     Move to the next theme in the list of themes.
     """
-    current_theme = UserSetting.get_value("current_theme")
+    repo = UserSettingRepository(db.session)
+    current_theme = repo.get_value("current_theme")
     themes = [t[0] for t in list_themes()]
     themes.append(default_entry[0])
     for i in range(0, len(themes)):  # pylint: disable=consider-using-enumerate
         if themes[i] == current_theme:
             new_index = i + 1
             break
-    UserSetting.set_value("current_theme", themes[new_index])
+    repo.set_value("current_theme", themes[new_index])
     db.session.commit()

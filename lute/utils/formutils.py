@@ -3,7 +3,7 @@ Common form methods.
 """
 
 from lute.models.language import Language
-from lute.models.setting import UserSetting
+from lute.models.setting import UserSettingRepository
 from lute.db import db
 
 
@@ -28,7 +28,8 @@ def valid_current_language_id():
     Get the current language id from UserSetting, ensuring
     it's still valid.  If not, change it.
     """
-    current_language_id = UserSetting.get_value("current_language_id")
+    repo = UserSettingRepository(db.session)
+    current_language_id = repo.get_value("current_language_id")
     current_language_id = int(current_language_id)
 
     valid_language_ids = [int(p[0]) for p in language_choices()]
@@ -36,6 +37,6 @@ def valid_current_language_id():
         return current_language_id
 
     current_language_id = valid_language_ids[0]
-    UserSetting.set_value("current_language_id", current_language_id)
+    repo.set_value("current_language_id", current_language_id)
     db.session.commit()
     return current_language_id
