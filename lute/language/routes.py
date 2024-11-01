@@ -5,7 +5,7 @@
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
-from lute.models.language import Language
+from lute.models.language import Language, LanguageRepository
 from lute.models.setting import UserSettingRepository
 import lute.language.service
 from lute.language.forms import LanguageForm
@@ -155,7 +155,8 @@ def delete(langid):
     language = db.session.get(Language, langid)
     if not language:
         flash(f"Language {langid} not found")
-    Language.delete(language)
+    r = LanguageRepository(db.session)
+    r.delete(language)
     return redirect(url_for("language.index"))
 
 

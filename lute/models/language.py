@@ -127,30 +127,6 @@ class Language(
             }
         return lang_dicts
 
-    @staticmethod
-    def delete(language):
-        """
-        Hacky method to delete language and all terms, books, and dicts
-        associated with it.
-
-        There is _certainly_ a better way to do this using
-        Sqlalchemy relationships and cascade deletes, but I
-        was running into problems with it (things not cascading,
-        or warnings ("SAWarning: Object of type <Term> not in
-        session, add operation along 'Language.terms' will not
-        proceed") during test runs.  It would be nice to have
-        a "correct" mapping, but this is good enough for now.
-
-        TODO zzfuture fix: fix Language-Book and -Term mappings.
-        """
-        sqls = [
-            "pragma foreign_keys = ON",
-            f"delete from languages where LgID = {language.id}",
-        ]
-        for s in sqls:
-            db.session.execute(text(s))
-        db.session.commit()
-
     @property
     def parser(self):
         "Note: this throws if the parser is not supported!!!"
@@ -264,3 +240,26 @@ class LanguageRepository:
             .filter(func.lower(Language.name) == func.lower(name))
             .first()
         )
+
+    def delete(self, language):
+        """
+        Hacky method to delete language and all terms, books, and dicts
+        associated with it.
+
+        There is _certainly_ a better way to do this using
+        Sqlalchemy relationships and cascade deletes, but I
+        was running into problems with it (things not cascading,
+        or warnings ("SAWarning: Object of type <Term> not in
+        session, add operation along 'Language.terms' will not
+        proceed") during test runs.  It would be nice to have
+        a "correct" mapping, but this is good enough for now.
+
+        TODO zzfuture fix: fix Language-Book and -Term mappings.
+        """
+        sqls = [
+            "pragma foreign_keys = ON",
+            f"delete from languages where LgID = {language.id}",
+        ]
+        for s in sqls:
+            self.session.execute(text(s))
+        self.session.commit()
