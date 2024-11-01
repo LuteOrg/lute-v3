@@ -3,6 +3,7 @@ Book statistics.
 """
 
 import json
+from sqlalchemy import select, text
 from lute.read.render.service import get_multiword_indexer, get_textitems
 from lute.db import db
 from lute.models.book import Book
@@ -85,10 +86,12 @@ class BookStats(db.Model):
 
 def refresh_stats():
     "Refresh stats for all books requiring update."
+    sql = "delete from bookstats where status_distribution is null"
+    db.session.execute(text(sql))
+    db.session.commit()
+    book_ids_with_stats = select(BookStats.BkID).scalar_subquery()
     books_to_update = (
-        db.session.query(Book)
-        .filter(~Book.id.in_(db.session.query(BookStats.BkID)))
-        .all()
+        db.session.query(Book).filter(~Book.id.in_(book_ids_with_stats)).all()
     )
     books = [b for b in books_to_update if b.is_supported]
     for book in books:
@@ -107,7 +110,7 @@ def get_stats(book):
     "Gets stats from the cache if available, or calculates."
     bk_id = book.id
     stats = db.session.query(BookStats).filter_by(BkID=bk_id).first()
-    if stats is None:
+    if stats is None or stats.status_distribution is None:
         newstats = _calculate_stats(book)
         _update_stats(book, newstats)
         stats = db.session.query(BookStats).filter_by(BkID=bk_id).first()

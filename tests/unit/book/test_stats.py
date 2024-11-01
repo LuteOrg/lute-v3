@@ -3,6 +3,7 @@ Book stats tests.
 """
 
 import pytest
+from sqlalchemy.sql import text
 
 from lute.db import db
 from lute.term.model import Term, Repository
@@ -207,4 +208,22 @@ def test_stats_only_update_books_marked_stale(_test_book, spanish):
             "4; 1; 25; {'0': 1, '1': 3, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"
         ],
         "updated",
+    )
+
+
+def test_stats_updated_if_field_empty(_test_book, spanish):
+    "Have to mark book as stale, too expensive otherwise."
+    add_terms(spanish, ["gato", "TENGO"])
+    refresh_stats()
+    assert_stats(
+        ["4; 2; 50; {'0': 2, '1': 2, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"]
+    )
+
+    db.session.execute(text("update bookstats set status_distribution = null"))
+    db.session.commit()
+
+    assert_stats(["4; 2; 50; None"], "Set to none")
+    refresh_stats()
+    assert_stats(
+        ["4; 2; 50; {'0': 2, '1': 2, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"]
     )
