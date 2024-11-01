@@ -34,7 +34,8 @@ from lute.parse.registry import init_parser_plugins, supported_parsers
 
 from lute.models.book import Book
 from lute.models.language import Language
-from lute.models.setting import BackupSettings, UserSettingRepository
+from lute.settings.current import load as load_settings, current_settings
+from lute.models.setting import BackupSettings
 from lute.book.stats import mark_stale
 
 from lute.book.routes import bp as book_bp
@@ -113,14 +114,13 @@ def _add_base_routes(app, app_config):
         """
         bs = BackupSettings(db.session)
         have_languages = len(db.session.query(Language).all()) > 0
-        usersetting_repo = UserSettingRepository(db.session)
         ret = {
             "have_languages": have_languages,
             "backup_enabled": bs.backup_enabled,
             "backup_directory": bs.backup_dir,
             "backup_last_display_date": bs.last_backup_display_date,
             "backup_time_since": bs.time_since_last_backup,
-            "user_settings": json.dumps(usersetting_repo.all_settings()),
+            "user_settings": json.dumps(current_settings),
         }
         return ret
 
@@ -306,8 +306,7 @@ def _create_app(app_config, extra_config):
 
     with app.app_context():
         db.create_all()
-        usersetting_repo = UserSettingRepository(db.session)
-        usersetting_repo.load()
+        load_settings(db.session, app_config.default_user_backup_path)
         # TODO valid parsers: do parser check, mark valid as active, invalid as inactive.
         clean_data()
     app.db = db

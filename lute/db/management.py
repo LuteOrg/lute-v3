@@ -3,8 +3,9 @@ Db management.
 """
 
 from sqlalchemy import text
+from flask import current_app
 from lute.db import db
-from lute.models.setting import UserSettingRepository
+from lute.settings.current import load
 
 
 def delete_all_data():
@@ -25,5 +26,4 @@ def delete_all_data():
     for s in statements:
         db.session.execute(text(s))
     db.session.commit()
-    repo = UserSettingRepository(db.session)
-    repo.load()
+    load(db.session, current_app.env_config.default_user_backup_path)
