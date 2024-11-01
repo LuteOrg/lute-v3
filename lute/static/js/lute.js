@@ -318,6 +318,7 @@ let word_clicked = function(el, e) {
 /** Multiword selection */
 
 let selection_start_el = null;
+let selection_start_shift_held = false;
 
 let clear_newmultiterm_elements = function() {
   $('.newmultiterm').removeClass('newmultiterm');
@@ -332,6 +333,7 @@ function select_started(el, e) {
   clear_newmultiterm_elements();
   el.addClass('newmultiterm');
   selection_start_el = el;
+  selection_start_shift_held = e.shiftKey;
   save_curr_data_order(el);
 }
 
@@ -374,7 +376,7 @@ function select_ended(el, e) {
   $('span.kwordmarked').removeClass('kwordmarked');
 
   const selected = get_selected_in_range(selection_start_el, el);
-  if (e.shiftKey) {
+  if (selection_start_shift_held) {
     copy_text_to_clipboard(selected.toArray());
     start_hover_mode(false);
     return;
@@ -382,6 +384,7 @@ function select_ended(el, e) {
 
   show_multiword_term_edit_form(selected);
   selection_start_el = null;
+  selection_start_shift_held = false;
 }
 
 
