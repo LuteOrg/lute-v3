@@ -92,7 +92,8 @@ def _start(args):
     _print(textwrap.dedent(close_msg))
 
     host_ip = "127.0.0.1" if args.local else "0.0.0.0"
-    msg = f"""Lute v{__version__} is running on {host_ip}:{args.port}.  Open a web browser, and go to:
+    ip_port = f"{host_ip}:{args.port}"
+    msg = f"""Lute v{__version__} is running on {ip_port}.  Open a web browser and go to:
 
     http://localhost:{args.port}
     """
