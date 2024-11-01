@@ -16,6 +16,7 @@ from lute.models.language import Language
 from lute.models.setting import UserSetting, UserSettingRepository
 from lute.themes.service import list_themes
 from lute.settings.forms import UserSettingsForm, UserShortcutsForm
+from lute.settings.current import refresh_global_settings
 from lute.db import db
 from lute.parse.mecab_parser import JapaneseParser
 
@@ -45,6 +46,7 @@ def edit_settings():
             if field.id not in ("csrf_token", "submit"):
                 repo.set_value(field.id, field.data)
         db.session.commit()
+        refresh_global_settings(db.session)
 
         flash("Settings updated", "success")
         return redirect("/")
@@ -105,6 +107,7 @@ def set_key_value(key, value):
         repo.set_value(key, old_value)
         result = {"result": "failure", "message": message}
     db.session.commit()
+    refresh_global_settings(db.session)
     return jsonify(result)
 
 
@@ -174,6 +177,7 @@ def edit_shortcuts():
             # print(f"{k} = {v}", flush=True)
             repo.set_value(k, v)
         db.session.commit()
+        refresh_global_settings(db.session)
         flash("Shortcuts updated", "success")
         return redirect("/")
 

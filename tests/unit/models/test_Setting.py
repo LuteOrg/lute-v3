@@ -5,7 +5,6 @@ Settings test.
 import os
 from unittest.mock import patch
 import pytest
-from sqlalchemy import text
 from lute.db import db
 from lute.models.setting import (
     UserSettingRepository,
@@ -148,33 +147,6 @@ def test_time_since_last_backup_in_past(app_context):
         assert b.time_since_last_backup == "26 weeks ago"
         b.last_backup_datetime = now - 45360001
         assert b.time_since_last_backup == "75 weeks ago"
-
-
-def test_user_settings_loaded_with_defaults(us_repo):
-    "Called on load."
-    db.session.execute(text("delete from settings"))
-    db.session.commit()
-    assert us_repo.key_exists("backup_dir") is False, "key removed"
-    us_repo.load()
-    assert us_repo.key_exists("backup_dir") is True, "key created"
-
-    # Check defaults
-    b = BackupSettings(db.session)
-    assert b.backup_enabled is True
-    assert b.backup_dir is not None
-    assert b.backup_auto is True
-    assert b.backup_warn is True
-    assert b.backup_count == 5
-
-
-def test_user_settings_load_leaves_existing_values(us_repo):
-    "Called on load."
-    us_repo.set_value("backup_count", 17)
-    db.session.commit()
-    assert us_repo.get_value("backup_count") == "17"
-    us_repo.load()
-    b = BackupSettings(db.session)
-    assert b.backup_count == 17, "still 17"
 
 
 def test_get_or_set_user_setting_unknown_key_throws(us_repo):
