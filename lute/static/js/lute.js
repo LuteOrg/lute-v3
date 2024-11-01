@@ -586,12 +586,27 @@ let _get_textitems_text = function(textitemspans) {
   return paratexts.join('\n').trim();
 }
 
+
+let _show_element_message_tooltip = function(element, message) {
+  const el = $(element);
+  el.attr('title', message);
+  el.tooltip({
+    show: { effect: "fadeIn", duration: 200 },
+    hide: { effect: "fadeOut", duration: 200 }
+  });
+  el.tooltip("open");
+  setTimeout(function() {
+    el.tooltip("close");
+    el.removeAttr('title');
+  }, 1000);
+};
+
+
 let copy_text_to_clipboard = function(textitemspans) {
   const copytext = _get_textitems_text(textitemspans);
   if (copytext == '')
     return;
 
-  // console.log('copying ' + copytext);
   var textArea = document.createElement("textarea");
   textArea.value = copytext;
   document.body.appendChild(textArea);
@@ -600,19 +615,17 @@ let copy_text_to_clipboard = function(textitemspans) {
   textArea.remove();
 
   const removeFlash = function() {
-    // console.log('removing flash');
     $('span.flashtextcopy').addClass('wascopied'); // for acceptance testing.
     $('span.flashtextcopy').removeClass('flashtextcopy');
   };
 
-  // Add flash, set timer to remove.
   removeFlash();
   textitemspans.forEach(function (t) {
     $(t).addClass('flashtextcopy');
   });
   setTimeout(() => removeFlash(), 1000);
 
-  $('#wordframeid').attr('src', '/read/flashcopied');
+  _show_element_message_tooltip(textitemspans[textitemspans.length - 1], "Copied to clipboard.");
 }
 
 
