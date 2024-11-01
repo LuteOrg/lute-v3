@@ -6,7 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
 from lute.models.language import Language
-from lute.models.setting import UserSetting
+from lute.models.setting import UserSettingRepository
 import lute.language.service
 from lute.language.forms import LanguageForm
 from lute.db import db
@@ -135,7 +135,8 @@ def new(langname):
         # adds language Y, the filter stays on X, which may be
         # disconcerting/confusing.  Forcing a reselect is painless and
         # unambiguous.
-        UserSetting.set_value("current_language_id", 0)
+        repo = UserSettingRepository(db.session)
+        repo.set_value("current_language_id", 0)
         db.session.commit()
         return redirect("/")
 
@@ -172,7 +173,8 @@ def list_predefined():
 def load_predefined(langname):
     "Load a predefined language and its stories."
     lang_id = lute.language.service.load_language_def(langname)
-    UserSetting.set_value("current_language_id", lang_id)
+    repo = UserSettingRepository(db.session)
+    repo.set_value("current_language_id", lang_id)
     db.session.commit()
     flash(f"Loaded {langname} and sample book(s)")
     return redirect("/")

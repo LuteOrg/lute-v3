@@ -16,6 +16,7 @@ from flask import (
     send_file,
     flash,
 )
+from lute.db import db
 from lute.models.setting import BackupSettings
 from lute.backup.service import create_backup, skip_this_backup, list_backups
 
@@ -28,7 +29,7 @@ def index():
     """
     List all backups.
     """
-    settings = BackupSettings.get_backup_settings()
+    settings = BackupSettings(db.session)
     backups = list_backups(settings.backup_dir)
     backups.sort(reverse=True)
 
@@ -40,7 +41,7 @@ def index():
 @bp.route("/download/<filename>")
 def download_backup(filename):
     "Download the given backup file."
-    settings = BackupSettings.get_backup_settings()
+    settings = BackupSettings(db.session)
     fullpath = os.path.join(settings.backup_dir, filename)
     return send_file(fullpath, as_attachment=True)
 
@@ -56,7 +57,7 @@ def backup():
     if "type" in request.args:
         backuptype = "manual"
 
-    settings = BackupSettings.get_backup_settings()
+    settings = BackupSettings(db.session)
     return render_template(
         "backup/backup.html", backup_folder=settings.backup_dir, backuptype=backuptype
     )
@@ -73,7 +74,7 @@ def do_backup():
         backuptype = prms["type"]
 
     c = current_app.env_config
-    settings = BackupSettings.get_backup_settings()
+    settings = BackupSettings(db.session)
     is_manual = backuptype.lower() == "manual"
     try:
         f = create_backup(c, settings, is_manual=is_manual)

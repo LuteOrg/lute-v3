@@ -16,6 +16,7 @@ from lute.backup.service import (
     list_backups,
 )
 from lute.models.setting import BackupSettings
+from lute.db import db
 
 # pylint: disable=missing-function-docstring
 # Test method names are pretty descriptive already.
@@ -53,7 +54,7 @@ def cleanup_directory(directory):
 @pytest.fixture(name="backup_settings")
 def fixture_backup_settings(app_context, bkp_dir):
     # app_context is passed so that the db session is available.
-    ret = BackupSettings.get_backup_settings()
+    ret = BackupSettings(db.session)
     ret.backup_dir = bkp_dir
     ret.backup_enabled = True
     yield ret
@@ -141,7 +142,7 @@ def test_last_import_setting_is_updated_on_successful_backup(
 ):
     assert backup_settings.last_backup_datetime is None, "no backup"
     create_backup(testconfig, backup_settings)
-    updated = BackupSettings.get_backup_settings()
+    updated = BackupSettings(db.session)
     assert updated.last_backup_datetime is not None, "set"
 
 

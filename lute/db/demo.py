@@ -12,7 +12,7 @@ from sqlalchemy import text
 import lute.language.service
 from lute.book.model import Repository
 from lute.book.stats import refresh_stats
-from lute.models.setting import SystemSetting
+from lute.models.setting import SystemSettingRepository
 from lute.db import db
 import lute.db.management
 
@@ -43,7 +43,8 @@ def contains_demo_data():
     """
     True if IsDemoData setting is present.
     """
-    ss = SystemSetting.get_value("IsDemoData")
+    repo = SystemSettingRepository(db.session)
+    ss = repo.get_value("IsDemoData")
     if ss is None:
         return False
     return True
@@ -56,7 +57,8 @@ def remove_flag():
     if not contains_demo_data():
         raise RuntimeError("Can't delete non-demo data.")
 
-    SystemSetting.delete_key("IsDemoData")
+    repo = SystemSettingRepository(db.session)
+    repo.delete_key("IsDemoData")
     db.session.commit()
 
 
@@ -120,7 +122,8 @@ def load_demo_stories():
             r.add(b)
     r.commit()
 
-    SystemSetting.set_value("IsDemoData", True)
+    repo = SystemSettingRepository(db.session)
+    repo.set_value("IsDemoData", True)
     db.session.commit()
     refresh_stats()
 
@@ -131,5 +134,6 @@ def load_demo_data():
     """
     load_demo_languages()
     load_demo_stories()
-    SystemSetting.set_value("IsDemoData", True)
+    repo = SystemSettingRepository(db.session)
+    repo.set_value("IsDemoData", True)
     db.session.commit()

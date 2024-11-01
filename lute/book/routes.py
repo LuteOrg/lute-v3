@@ -21,7 +21,7 @@ from lute.db import db
 
 from lute.models.language import Language, LanguageRepository
 from lute.models.book import BookRepository
-from lute.models.setting import UserSetting
+from lute.models.setting import UserSettingRepository
 from lute.book.model import Book, Repository
 
 
@@ -120,7 +120,8 @@ def new():
             flash(e.message, "notice")
 
     # Don't set the current language before submit.
-    current_language_id = int(UserSetting.get_value("current_language_id"))
+    usrepo = UserSettingRepository(db.session)
+    current_language_id = int(usrepo.get_value("current_language_id"))
     form.language_id.data = current_language_id
 
     return render_template(

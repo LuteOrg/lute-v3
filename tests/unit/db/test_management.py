@@ -48,6 +48,6 @@ def test_wiping_db_clears_out_all_tables(app_context):
 def test_can_get_backup_settings_when_db_is_wiped(app_context):
     "The backupsettings struct assumes certain things about the data."
     delete_all_data()
-    bs = BackupSettings.get_backup_settings()
+    bs = BackupSettings(db.session)
     assert bs.backup_enabled, "backup is back to being enabled"
     assert bs.backup_dir is not None, "default restored"

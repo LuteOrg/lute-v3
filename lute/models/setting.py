@@ -23,52 +23,70 @@ class SettingBase(db.Model):
     value = db.Column("StValue", db.String, nullable=False)
     __mapper_args__ = {"polymorphic_on": keytype}
 
-    @classmethod
-    def key_exists_precheck(cls, keyname):
+
+class SettingRepositoryBase:
+    "Repository."
+
+    def __init__(self, session, classtype):
+        self.session = session
+        self.classtype = classtype
+
+    def key_exists_precheck(self, keyname):
         """
         Check key validity for certain actions.
         """
 
-    @classmethod
-    def set_value_post(cls, keyname, keyvalue):
+    def set_value_post(self, keyname, keyvalue):
         """
         Post-setting value for certain keys."
         """
 
-    @classmethod
-    def set_value(cls, keyname, keyvalue):
+    def set_value(self, keyname, keyvalue):
         "Set, but don't save, a setting."
-        cls.key_exists_precheck(keyname)
-        s = db.session.query(cls).filter(cls.key == keyname).first()
+        self.key_exists_precheck(keyname)
+        s = (
+            self.session.query(self.classtype)
+            .filter(self.classtype.key == keyname)
+            .first()
+        )
         if s is None:
-            s = cls()
+            s = self.classtype()
             s.key = keyname
         s.value = keyvalue
-        db.session.add(s)
-        cls.set_value_post(keyname, keyvalue)
+        self.session.add(s)
+        self.set_value_post(keyname, keyvalue)
 
-    @classmethod
-    def key_exists(cls, keyname):
+    def key_exists(self, keyname):
         "True if exists."
-        s = db.session.query(cls).filter(cls.key == keyname).first()
+        s = (
+            self.session.query(self.classtype)
+            .filter(self.classtype.key == keyname)
+            .first()
+        )
         no_key = s is None
         return not no_key
 
-    @classmethod
-    def get_value(cls, keyname):
+    def get_value(self, keyname):
         "Get the saved key, or None if it doesn't exist."
-        cls.key_exists_precheck(keyname)
-        s = db.session.query(cls).filter(cls.key == keyname).first()
+        self.key_exists_precheck(keyname)
+        s = (
+            self.session.query(self.classtype)
+            .filter(self.classtype.key == keyname)
+            .first()
+        )
         if s is None:
             return None
         return s.value
 
-    @classmethod
-    def delete_key(cls, keyname):
+    def delete_key(self, keyname):
         "Delete a key."
-        s = db.session.query(cls).filter(cls.key == keyname).first()
+        s = (
+            self.session.query(self.classtype)
+            .filter(self.classtype.key == keyname)
+            .first()
+        )
         if s is not None:
-            db.session.delete(s)
+            self.session.delete(s)
 
 
 class MissingUserSettingKeyException(Exception):
@@ -82,16 +100,21 @@ class UserSetting(SettingBase):
     __tablename__ = None
     __mapper_args__ = {"polymorphic_identity": "user"}
 
-    @classmethod
-    def key_exists_precheck(cls, keyname):
+
+class UserSettingRepository(SettingRepositoryBase):
+    "Repository."
+
+    def __init__(self, session):
+        super().__init__(session, UserSetting)
+
+    def key_exists_precheck(self, keyname):
         """
         User keys must exist.
         """
-        if not UserSetting.key_exists(keyname):
+        if not self.key_exists(keyname):
             raise MissingUserSettingKeyException(keyname)
 
-    @classmethod
-    def set_value_post(cls, keyname, keyvalue):
+    def set_value_post(self, keyname, keyvalue):
         """
         Setting some keys runs other code.
         """
@@ -103,8 +126,7 @@ class UserSetting(SettingBase):
             else:
                 os.environ[mp] = keyvalue.strip()
 
-    @staticmethod
-    def _revised_mecab_path():
+    def _revised_mecab_path(self):
         """
         Change the mecab_path if it's not found, and a
         replacement is found.
@@ -118,7 +140,7 @@ class UserSetting(SettingBase):
         new one found, otherwise just return the old one.
         """
 
-        mp = UserSetting.get_value("mecab_path")
+        mp = self.get_value("mecab_path")
         if mp is not None and os.path.exists(mp):
             return mp
 
@@ -137,8 +159,7 @@ class UserSetting(SettingBase):
         # Replacement not found, leave current value as-is.
         return mp
 
-    @staticmethod
-    def load():
+    def load(self):
         """
         Load missing user settings with default values.
         """
@@ -199,28 +220,27 @@ class UserSetting(SettingBase):
             "hotkey_NextSentence": "",
         }
         for k, v in keys_and_defaults.items():
-            if not UserSetting.key_exists(k):
+            if not self.key_exists(k):
                 s = UserSetting()
                 s.key = k
                 s.value = v
-                db.session.add(s)
-        db.session.commit()
+                self.session.add(s)
+        self.session.commit()
 
         # Revise the mecab path if necessary.
         # Note this is done _after_ the defaults are loaded,
         # because the user may have already loaded the defaults
         # (e.g. on machine upgrade) and stored them in the db,
         # so we may have to _update_ the existing setting.
-        revised_mecab_path = UserSetting._revised_mecab_path()
-        UserSetting.set_value("mecab_path", revised_mecab_path)
-        db.session.commit()
+        revised_mecab_path = self._revised_mecab_path()
+        self.set_value("mecab_path", revised_mecab_path)
+        self.session.commit()
 
-    @staticmethod
-    def all_settings():
+    def all_settings(self):
         """
         Get dict of all settings, for rendering into Javascript global space.
         """
-        settings = db.session.query(UserSetting).all()
+        settings = self.session.query(UserSetting).all()
         ret = {}
         for s in settings:
             ret[s.key] = s.value
@@ -240,19 +260,24 @@ class SystemSetting(SettingBase):
 
     # Helpers for certain sys settings.
 
-    @classmethod
-    def get_last_backup_datetime(cls):
+
+class SystemSettingRepository(SettingRepositoryBase):
+    "Repository."
+
+    def __init__(self, session):
+        super().__init__(session, SystemSetting)
+
+    def get_last_backup_datetime(self):
         "Get the last_backup_datetime as int, or None."
-        v = cls.get_value("lastbackup")
+        v = self.get_value("lastbackup")
         if v is None:
             return None
         return int(v)
 
-    @classmethod
-    def set_last_backup_datetime(cls, v):
+    def set_last_backup_datetime(self, v):
         "Set and save the last backup time."
-        cls.set_value("lastbackup", v)
-        db.session.commit()
+        self.set_value("lastbackup", v)
+        self.session.commit()
 
 
 class BackupSettings:
@@ -261,17 +286,20 @@ class BackupSettings:
     Getter only.
     """
 
-    def __init__(self):
+    def __init__(self, session):
+        us_repo = UserSettingRepository(session)
+        ss_repo = SystemSettingRepository(session)
+
         def _bool(k):
-            v = UserSetting.get_value(k)
+            v = us_repo.get_value(k)
             return v in (1, "1", "y", True)
 
         self.backup_enabled = _bool("backup_enabled")
         self.backup_auto = _bool("backup_auto")
         self.backup_warn = _bool("backup_warn")
-        self.backup_dir = UserSetting.get_value("backup_dir")
-        self.backup_count = int(UserSetting.get_value("backup_count") or 5)
-        self.last_backup_datetime = SystemSetting.get_last_backup_datetime()
+        self.backup_dir = us_repo.get_value("backup_dir")
+        self.backup_count = int(us_repo.get_value("backup_count") or 5)
+        self.last_backup_datetime = ss_repo.get_last_backup_datetime()
 
     @property
     def last_backup_display_date(self):
@@ -280,11 +308,6 @@ class BackupSettings:
         if t is None:
             return None
         return datetime.datetime.fromtimestamp(t).strftime("%Y-%m-%d %H:%M:%S")
-
-    @staticmethod
-    def get_backup_settings():
-        "Get BackupSettings."
-        return BackupSettings()
 
     @property
     def time_since_last_backup(self):

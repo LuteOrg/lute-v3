@@ -15,7 +15,7 @@ from flask import (
 )
 from lute.models.language import Language, LanguageRepository
 from lute.models.term import TermRepository, Status
-from lute.models.setting import UserSetting
+from lute.models.setting import UserSettingRepository
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list
 from lute.term.model import Repository, Term
@@ -154,7 +154,8 @@ def handle_term_form(
     else:
         # The language select control is shown and this is a new term,
         # so use the default value.
-        current_language_id = int(UserSetting.get_value("current_language_id"))
+        us_repo = UserSettingRepository(db.session)
+        current_language_id = int(us_repo.get_value("current_language_id"))
         form.language_id.data = current_language_id
 
     return render_template(

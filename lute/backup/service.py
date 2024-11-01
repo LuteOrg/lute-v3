@@ -11,7 +11,7 @@ import time
 from typing import List, Union
 
 from lute.db import db
-from lute.models.setting import SystemSetting
+from lute.models.setting import SystemSettingRepository
 from lute.models.book import Book
 from lute.models.term import Term
 
@@ -79,7 +79,7 @@ def create_backup(app_config, settings, is_manual=False, suffix=None):
 
     suffix can be specified for test.
 
-    settings are from Setting.get_backup_settings().
+    settings are from BackupSettings.
       - backup_enabled
       - backup_dir
       - backup_auto
@@ -157,13 +157,15 @@ def _create_db_backup(dbfilename, backupfile):
     ) as out_file:
         shutil.copyfileobj(in_file, out_file)
     os.remove(backupfile)
-    SystemSetting.set_last_backup_datetime(int(time.time()))
+    r = SystemSettingRepository(db.session)
+    r.set_last_backup_datetime(int(time.time()))
     return f
 
 
 def skip_this_backup():
     "Set the last backup time to today."
-    SystemSetting.set_last_backup_datetime(int(time.time()))
+    r = SystemSettingRepository(db.session)
+    r.set_last_backup_datetime(int(time.time()))
 
 
 def _remove_excess_backups(count, outdir):
