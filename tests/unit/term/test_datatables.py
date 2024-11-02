@@ -4,6 +4,7 @@ Book tests.
 
 import pytest
 from lute.term.datatables import get_data_tables_list
+from lute.db import db
 
 
 @pytest.fixture(name="_dt_params")
@@ -38,7 +39,7 @@ def test_smoke_term_datatables_query_runs(app_context, _dt_params):
     """
     Smoke test only, ensure query runs.
     """
-    get_data_tables_list(_dt_params)
+    get_data_tables_list(_dt_params, db.session)
     # print(d['data'])
     a = 1
     assert a == 1, "dummy check"
@@ -53,4 +54,4 @@ def test_smoke_query_with_filter_params_runs(app_context, _dt_params):
     _dt_params["filtStatusMin"] = "2"
     _dt_params["filtStatusMax"] = "4"
     _dt_params["filtIncludeIgnored"] = "true"
-    get_data_tables_list(_dt_params)
+    get_data_tables_list(_dt_params, db.session)

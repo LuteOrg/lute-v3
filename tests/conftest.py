@@ -88,7 +88,7 @@ def fixture_empty_db(app_context):
     """
     Wipe the db.
     """
-    lute.db.management.delete_all_data()
+    lute.db.management.delete_all_data(db.session)
 
 
 @pytest.fixture(name="client")

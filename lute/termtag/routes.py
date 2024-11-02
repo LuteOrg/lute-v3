@@ -24,7 +24,7 @@ def index(search):
 def datatables_active_source():
     "Datatables data for terms."
     parameters = DataTablesFlaskParamParser.parse_params(request.form)
-    data = get_data_tables_list(parameters)
+    data = get_data_tables_list(parameters, db.session)
     return jsonify(data)
 
 

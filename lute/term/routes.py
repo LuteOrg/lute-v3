@@ -65,7 +65,7 @@ def datatables_active_source():
     "Datatables data for terms."
     parameters = DataTablesFlaskParamParser.parse_params(request.form)
     _load_term_custom_filters(request.form, parameters)
-    data = get_data_tables_list(parameters)
+    data = get_data_tables_list(parameters, db.session)
     return jsonify(data)
 
 
@@ -76,7 +76,7 @@ def export_terms():
     _load_term_custom_filters(request.form, parameters)
     parameters["length"] = 1000000
     outfile = os.path.join(current_app.env_config.temppath, "export_terms.csv")
-    data = get_data_tables_list(parameters)
+    data = get_data_tables_list(parameters, db.session)
     term_data = data["data"]
 
     # Term data is an array of dicts, with the sql field name as dict
@@ -127,7 +127,7 @@ def handle_term_form(
     # The user opening the form is treated as an acknowledgement.
     term.flash_message = None
 
-    form.language_id.choices = lute.utils.formutils.language_choices()
+    form.language_id.choices = lute.utils.formutils.language_choices(session)
 
     if form.validate_on_submit():
         form.populate_obj(term)

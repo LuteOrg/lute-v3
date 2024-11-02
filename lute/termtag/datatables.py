@@ -2,11 +2,10 @@
 Show terms in datatables.
 """
 
-from lute.db import db
 from lute.utils.data_tables import DataTablesSqliteQuery
 
 
-def get_data_tables_list(parameters):
+def get_data_tables_list(parameters, session):
     "json data for datatables."
     base_sql = """SELECT
           TgID,
@@ -21,6 +20,5 @@ def get_data_tables_list(parameters):
             group by WtTgID
           ) src on src.WtTgID = TgID
     """
-    session = db.session
     connection = session.connection()
     return DataTablesSqliteQuery.get_data(base_sql, parameters, connection)

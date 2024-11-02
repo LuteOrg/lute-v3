@@ -4,11 +4,10 @@ Db management.
 
 from sqlalchemy import text
 from flask import current_app
-from lute.db import db
 from lute.settings.current import load
 
 
-def delete_all_data():
+def delete_all_data(session):
     """
     DANGEROUS!  Delete everything, restore user settings, clear sys settings.
 
@@ -24,6 +23,6 @@ def delete_all_data():
         "delete from settings",
     ]
     for s in statements:
-        db.session.execute(text(s))
-    db.session.commit()
-    load(db.session, current_app.env_config.default_user_backup_path)
+        session.execute(text(s))
+    session.commit()
+    load(session, current_app.env_config.default_user_backup_path)
