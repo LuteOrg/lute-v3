@@ -76,17 +76,18 @@ class Service:
             self.session.add(ti.term)
         self.session.commit()
 
-    def start_reading(self, dbbook, pagenum, db_session):
+    def start_reading(self, dbbook, pagenum):
         "Start reading a page in the book, getting paragraphs."
 
         text = dbbook.text_at_page(pagenum)
         text.load_sentences()
 
-        mark_stale(dbbook)
+        svc = StatsService(self.session)
+        svc.mark_stale(dbbook)
         dbbook.current_tx_id = text.id
-        db_session.add(dbbook)
-        db_session.add(text)
-        db_session.commit()
+        self.session.add(dbbook)
+        self.session.add(text)
+        self.session.commit()
 
         lang = text.book.language
         rs = RenderService(self.session)
