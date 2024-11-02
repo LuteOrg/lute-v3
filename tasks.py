@@ -217,7 +217,7 @@ def coverage(c, html=False):
         c.run(cmd)
 
 
-@task(post=[lint])
+@task
 def black(c):
     "black-format things."
     c.run("python -m black .")
