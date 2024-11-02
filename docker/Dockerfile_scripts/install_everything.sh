@@ -8,5 +8,6 @@ apt-get update -y
 apt-get install -y mecab mecab-ipadic-utf8
 apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Mandarin.
+# Plugins
 pip install lute3-mandarin
+pip install lute3-thai
