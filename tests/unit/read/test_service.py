@@ -28,7 +28,7 @@ def test_set_unknowns_to_known(english, app_context):
     assert_sql_result(sql, ["dog; 1"], "before start")
 
     service = Service(db.session)
-    service.start_reading(dbbook, 1, db.session)
+    service.start_reading(dbbook, 1)
     assert_sql_result(sql, ["cat; 0", "dog; 1"], "after start")
 
     tx = dbbook.texts[0]
@@ -53,7 +53,7 @@ def test_smoke_start_reading(english, app_context):
 
     assert_record_count_equals("select * from sentences", 0, "before start")
     service = Service(db.session)
-    service.start_reading(dbbook, 1, db.session)
+    service.start_reading(dbbook, 1)
     assert_record_count_equals("select * from sentences", 2, "after start")
 
 
@@ -75,7 +75,7 @@ def test_start_reading_creates_Terms_for_unknown_words(english, app_context):
     assert_sql_result(sql, ["dog"], "before start")
 
     service = Service(db.session)
-    paragraphs = service.start_reading(dbbook, 1, db.session)
+    paragraphs = service.start_reading(dbbook, 1)
     textitems = [
         ti
         for para in paragraphs

@@ -172,7 +172,7 @@ def render_page(bookid, pagenum):
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
     service = Service(db.session)
-    paragraphs = service.start_reading(book, pagenum, db.session)
+    paragraphs = service.start_reading(book, pagenum)
     return render_template("read/page_content.html", paragraphs=paragraphs)
 
 
