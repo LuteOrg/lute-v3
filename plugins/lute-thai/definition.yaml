@@ -14,6 +14,6 @@ show_romanization: true
 
 parser_type: lute_thai
 # character_substitutions:
-split_sentences: ฯ!
+split_sentences: ฯ!?
 # split_sentence_exceptions:
 word_chars: ก-๛
