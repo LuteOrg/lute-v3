@@ -4,7 +4,7 @@ Book statistics.
 
 import json
 from sqlalchemy import select, text
-from lute.read.render.service import get_multiword_indexer, get_textitems
+from lute.read.render.service import Service
 from lute.db import db
 from lute.models.book import Book
 from lute.models.setting import UserSettingRepository
@@ -20,17 +20,8 @@ def _last_n_pages(book, txindex, n):
     return texts[-n:]
 
 
-def calc_status_distribution(book):
-    """
-    Calculate statuses and count of unique words per status.
-
-    Does a full render of a small number of pages
-    to calculate the distribution.
-    """
-
-    # DebugTimer.clear_total_summary()
-    # dt = DebugTimer("get_status_distribution", display=False)
-
+def _get_sample_texts(book):
+    "Get texts to use as sample."
     txindex = 0
     if (book.current_tx_id or 0) != 0:
         for t in book.texts:
@@ -41,13 +32,28 @@ def calc_status_distribution(book):
     repo = UserSettingRepository(db.session)
     sample_size = int(repo.get_value("stats_calc_sample_size") or 5)
     texts = _last_n_pages(book, txindex, sample_size)
+    return texts
+
+
+def calc_status_distribution(book):
+    """
+    Calculate statuses and count of unique words per status.
+
+    Does a full render of a small number of pages
+    to calculate the distribution.
+    """
+
+    # DebugTimer.clear_total_summary()
+    # dt = DebugTimer("get_status_distribution", display=False)
+    texts = _get_sample_texts(book)
 
     # Getting the individual paragraphs per page, and then combining,
     # is much faster than combining all pages into one giant page.
-    mw = get_multiword_indexer(book.language)
+    service = Service(db.session)
+    mw = service.get_multiword_indexer(book.language)
     textitems = []
     for tx in texts:
-        textitems.extend(get_textitems(tx.text, book.language, mw))
+        textitems.extend(service.get_textitems(tx.text, book.language, mw))
     # # Old slower code:
     # text_sample = "\n".join([t.text for t in texts])
     # paras = get_paragraphs(text_sample, book.language) ... etc.

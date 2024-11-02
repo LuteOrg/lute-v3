@@ -8,7 +8,7 @@ from pytest_bdd import given, then, scenarios, parsers
 from lute.db import db
 from lute.models.language import Language
 from lute.term.model import Repository
-from lute.read.render.service import get_paragraphs
+from lute.read.render.service import Service as RenderService
 from lute.read.service import Service
 
 from tests.utils import add_terms, make_text
@@ -87,7 +87,8 @@ def _assert_stringized_equals(stringizer, joiner, expected):
     Get paragraphs and stringize all textitems,
     join and assert equals expected.
     """
-    paras = get_paragraphs(text.text, text.book.language)
+    rs = RenderService(db.session)
+    paras = rs.get_paragraphs(text.text, text.book.language)
     # print("TOKENS", flush=True)
     # print(paras, flush=True)
     ret = []
