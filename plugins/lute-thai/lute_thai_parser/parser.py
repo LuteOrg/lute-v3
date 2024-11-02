@@ -13,8 +13,6 @@ import pythainlp
 
 from typing import List
 
-from pythainlp.transliterate import romanize
-
 from lute.parse.base import ParsedToken, AbstractParser
 
 

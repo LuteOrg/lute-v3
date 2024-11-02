@@ -2,7 +2,6 @@
 ThaiParser tests.
 """
 
-# TODO fix names, activate tests.
 
 import pytest
 
@@ -10,14 +9,7 @@ import pytest
 from lute.models.term import Term
 from lute.parse.base import ParsedToken
 
-# TODO fix name
 from lute_thai_parser.parser import ThaiParser
-
-
-def test_dummy_test():
-    "A dummy test so that pytest doesn't complain in github ci."
-    s = "Hello"
-    assert s == "Hello", "TODO - fix these tests for your parser :-)"
 
 
 def test_token_count(thai):
