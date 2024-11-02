@@ -1,0 +1,24 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.module]
+name = "lute_thai_parser"
+
+[project]
+name = "lute3-thai"
+dynamic = ['version']
+description = "Learning Using Texts - Thai Parser"
+requires-python = ">=3.8"
+authors = [
+  {name = "Justin Dom"}
+]
+readme = "README_PyPi.md"
+
+dependencies = [
+  "lute3>=3.4.2",
+  "pythainlp==5.0.4"
+]
+
+[project.entry-points."lute.plugin.parse"]
+lute_thai = "lute_thai_parser.parser:ThaiParser"
