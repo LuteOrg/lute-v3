@@ -391,3 +391,14 @@ class TextBookmark(db.Model):
     title = db.Column("TbTitle", db.Text, nullable=False)
 
     text = db.relationship("Text", back_populates="bookmarks")
+
+
+class BookStats(db.Model):
+    "The stats table."
+    __tablename__ = "bookstats"
+
+    BkID = db.Column(db.Integer, primary_key=True)
+    distinctterms = db.Column(db.Integer)
+    distinctunknowns = db.Column(db.Integer)
+    unknownpercent = db.Column(db.Integer)
+    status_distribution = db.Column(db.String, nullable=True)

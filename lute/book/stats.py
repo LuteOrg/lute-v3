@@ -6,7 +6,7 @@ import json
 from sqlalchemy import select, text
 from lute.read.render.service import Service
 from lute.db import db
-from lute.models.book import Book
+from lute.models.book import Book, BookStats
 from lute.models.setting import UserSettingRepository
 
 # from lute.utils.debug_helpers import DebugTimer
@@ -78,17 +78,6 @@ def calc_status_distribution(book):
 
 ##################################################
 # Stats table refresh.
-
-
-class BookStats(db.Model):
-    "The stats table."
-    __tablename__ = "bookstats"
-
-    BkID = db.Column(db.Integer, primary_key=True)
-    distinctterms = db.Column(db.Integer)
-    distinctunknowns = db.Column(db.Integer)
-    unknownpercent = db.Column(db.Integer)
-    status_distribution = db.Column(db.String, nullable=True)
 
 
 def refresh_stats():
