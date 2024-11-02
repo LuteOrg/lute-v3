@@ -91,14 +91,16 @@ def _start(args):
         """
     _print(textwrap.dedent(close_msg))
 
-    msg = f"""Lute v{__version__} is running.  Open a web browser, and go to:
+    host_ip = "127.0.0.1" if args.local else "0.0.0.0"
+    ip_port = f"{host_ip}:{args.port}"
+    msg = f"""Lute v{__version__} is running on {ip_port}.  Open a web browser and go to:
 
     http://localhost:{args.port}
     """
     _print(textwrap.dedent(msg))
 
     try:
-        serve(app, host="0.0.0.0", port=args.port)
+        serve(app, host=host_ip, port=args.port)
     except OSError as err:
         if err.errno == errno.EADDRINUSE:
             msg = [
@@ -117,6 +119,11 @@ def _start(args):
 def start():
     "Main entry point.  Called via scripts and pyproject.toml."
     parser = argparse.ArgumentParser(description="Start lute.")
+    parser.add_argument(
+        "--local",
+        action="store_true",
+        help="Run local only (not accessible on other devices on the same network)",
+    )
     parser.add_argument(
         "--port", type=int, default=5001, help="Port number (default: 5001)"
     )

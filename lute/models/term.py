@@ -365,7 +365,7 @@ class Term(
         return terms[0]
 
 
-class Status:
+class Status(db.Model):  # pylint: disable=too-few-public-methods
     """
     Term statuses.
     """
@@ -373,3 +373,14 @@ class Status:
     UNKNOWN = 0
     WELLKNOWN = 99
     IGNORED = 98
+
+    __tablename__ = "statuses"
+
+    id = db.Column("StID", db.SmallInteger, primary_key=True)
+    text = db.Column("StText", db.String(250))
+    abbreviation = db.Column("StAbbreviation", db.String(250))
+
+    @staticmethod
+    def all():
+        "Get all statuses."
+        return db.session.query(Status).all()

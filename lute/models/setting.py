@@ -163,11 +163,9 @@ class UserSetting(SettingBase):
             "open_popup_in_new_tab": False,
             "stop_audio_on_term_form_open": True,
             "stats_calc_sample_size": 5,
-            # Keyboard shortcuts.  Those defined in the initial
-            # release have default values.  New hotkeys added after
-            # the initial release have empty values, because users may
-            # have already set up their hotkeys, and we can't assume
-            # that a key combination hasn't already been assigned.
+            # Keyboard shortcuts.  These have default values assigned
+            # as they were the hotkeys defined in the initial Lute
+            # release.
             "hotkey_StartHover": "escape",
             "hotkey_PrevWord": "arrowleft",
             "hotkey_NextWord": "arrowright",
@@ -188,11 +186,17 @@ class UserSetting(SettingBase):
             "hotkey_Status5": "5",
             "hotkey_StatusIgnore": "i",
             "hotkey_StatusWellKnown": "w",
-            # New hotkeys:
+            # New hotkeys.  These must have empty values, because
+            # users may have already setup their hotkeys, and we can't
+            # assume that a given key combination is free:
             "hotkey_CopyPage": "",
             "hotkey_DeleteTerm": "",
             "hotkey_EditPage": "",
             "hotkey_TranslatePage": "",
+            "hotkey_PrevUnknownWord": "",
+            "hotkey_NextUnknownWord": "",
+            "hotkey_PrevSentence": "",
+            "hotkey_NextSentence": "",
         }
         for k, v in keys_and_defaults.items():
             if not UserSetting.key_exists(k):

@@ -225,6 +225,7 @@
   /* Ajax called from createdRow datatables hook. */
   let ajax_in_book_stats = function(row, data, dataIndex) {
     var cell = $(row).find('.book-stats-ajax-cell');
+    cell.html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
     $.ajax({
       url: '/book/table_stats/' + data['BkID'],
       method: 'GET',
