@@ -12,7 +12,7 @@ from flask import (
     flash,
 )
 from lute.utils.data_tables import DataTablesFlaskParamParser
-from lute.book import service
+from lute.book.service import Service, BookImportException
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm
 from lute.book.stats import get_stats
@@ -80,9 +80,10 @@ def datatables_archived_source():
 def _book_from_url(url):
     "Create a new book, or flash an error if can't parse."
     b = Book()
+    service = Service()
     try:
         b = service.book_from_url(url)
-    except service.BookImportException as e:
+    except BookImportException as e:
         flash(e.message, "notice")
         b = Book()
     return b
@@ -116,7 +117,7 @@ def new():
             book = repo.add(b)
             repo.commit()
             return redirect(f"/read/{book.id}/page/1", 302)
-        except service.BookImportException as e:
+        except BookImportException as e:
             flash(e.message, "notice")
 
     # Don't set the current language before submit.
