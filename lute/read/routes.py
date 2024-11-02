@@ -8,8 +8,8 @@ from lute.read.service import set_unknowns_to_known, start_reading, get_popup_da
 from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
+from lute.settings.current import current_settings
 from lute.models.book import Text, BookRepository
-from lute.models.setting import UserSettingRepository
 from lute.db import db
 
 
@@ -21,8 +21,7 @@ def _render_book_page(book, pagenum):
     Render a particular book page.
     """
     lang = book.language
-    usrepo = UserSettingRepository(db.session)
-    show_highlights = bool(int(usrepo.get_value("show_highlights")))
+    show_highlights = current_settings["show_highlights"]
     term_dicts = lang.all_dictionaries()[lang.id]["term"]
 
     return render_template(

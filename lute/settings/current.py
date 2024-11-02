@@ -139,6 +139,10 @@ def refresh_global_settings(session):
         current_settings[s.key] = s.value
 
     # Convert some ints into bools.
-    boolkeys = ["open_popup_in_new_tab", "stop_audio_on_term_form_open"]
+    boolkeys = [
+        "open_popup_in_new_tab",
+        "stop_audio_on_term_form_open",
+        "show_highlights",
+    ]
     for k in boolkeys:
         current_settings[k] = current_settings[k] == "1"
