@@ -2,7 +2,6 @@
 Settings test.
 """
 
-import os
 from unittest.mock import patch
 import pytest
 from lute.db import db
@@ -155,13 +154,3 @@ def test_get_or_set_user_setting_unknown_key_throws(us_repo):
         us_repo.get_value("bad_key")
     with pytest.raises(MissingUserSettingKeyException):
         us_repo.set_value("bad_key", 17)
-
-
-def test_setting_mecab_path_sets_env_var(us_repo):
-    "Natto-py needs an env var."
-    us_repo.set_value("mecab_path", "blah")
-    assert os.environ["MECAB_PATH"] == "blah", "was set"
-    us_repo.set_value("mecab_path", None)
-    assert os.environ.get("MECAB_PATH", "X") == "X", "not set"
-    us_repo.set_value("mecab_path", "")
-    assert os.environ.get("MECAB_PATH", "Y") == "Y", "not set"

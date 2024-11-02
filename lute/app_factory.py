@@ -393,6 +393,7 @@ def create_app(
     outfunc("Initializing app.")
     app = _create_app(app_config, extra_config)
 
+    # Plugins are loaded after the app, as they may use settings etc.
     _init_parser_plugins(app_config.plugin_datapath, outfunc)
 
     return app
