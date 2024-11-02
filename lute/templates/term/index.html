@@ -76,6 +76,7 @@
     <div class="term-action-content">
       <a href="/term/new">Create new</a>
       <a id="term_action_set_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
+      <a id="term_action_set_status" href="#" onclick="show_hide_set_status(event);">Set status</a>
       <a id="term_action_bulk_delete" href="#" onclick="bulk_delete(event);">Delete selected</a>
       <a id="term_action_export_csv" href="#" onclick="export_csv(event);">Export CSV</a>
     </div>
@@ -84,6 +85,16 @@
   <div id="set_parent_div" style="display: none;">
     <p>Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" disabled >go</button></p>
   </div>
+  <div id="set_status_div" style="display: none;">
+    <p>Set status:
+      <select id="selSetStatus">
+        {% for s in statuses %}
+        <option value="{{ s.id }}">{{ s.text }}</option>
+        {% endfor %}
+      </select>
+      <button id="btnSetStatus">go</button></p>
+  </div>
+
 </div>
 
 
@@ -245,6 +256,11 @@
     c.addClass(disabled);
     if (checked_count > 0 && lang_id != null)
       c.removeClass(disabled);
+
+    c = $("#term_action_set_status");
+    c.addClass(disabled);
+    if (checked_count > 0)
+      c.removeClass(disabled);
   }
 
 
@@ -254,6 +270,14 @@
       return;
     $("#set_parent_div").css("display", "flex");
     $("#txtSetParent").focus();
+  }
+
+  function show_hide_set_status(event) {
+    event.preventDefault();
+    if ($("#term_action_set_status").hasClass("actionDisabled"))
+      return;
+    $("#set_status_div").css("display", "flex");
+    $("#selSetStatus").focus();
   }
 
   // Return the clicked checkboxes' language ID,
@@ -339,6 +363,30 @@
       }
     });
   };
+
+
+  let handle_set_status_click = function() {
+    let wordids = [];
+    $('.chkWord:checked').each(function(i) {
+      wordids.push($(this).attr('wordid'));
+    });
+
+    const resp = confirm(`Change status for ${wordids.length} term(s)?`);
+    if (! resp)
+      return;
+
+    const sval=$('#selSetStatus').val();
+    data = {updates: [{ new_status: sval, termids: wordids }]};
+    $.ajax({
+      url: '/term/bulk_update_status',
+      method: 'POST',
+      data: JSON.stringify(data),
+      contentType: "application/json; charset=utf-8",
+      success: function(data) {
+        location.reload();
+      }
+    });
+  }
 
 
   function bulk_delete(event) {
@@ -456,6 +504,7 @@
     setup_term_datatable("{{ initial_search or '' }}");
     set_up_parent_autocomplete();
     $('#btnSetParent').click(handle_set_parent_click);
+    $('#btnSetStatus').click(handle_set_status_click);
     $('#showHideFilters').click(handle_show_hide_filter_click);
 
     $('#filtLanguage').change(handle_filter_update);

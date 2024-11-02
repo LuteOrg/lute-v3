@@ -33,6 +33,8 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         # Calls setter
         self.term = term
 
+        self.extra_html_classes = []
+
         # TODO code
         # # The flash message can be None, so we need an extra flag
         # # to determine if it has been loaded or not.
@@ -106,6 +108,10 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
             return "status0"
         return f"status{self.wo_status}"
 
+    def add_html_class(self, c):
+        "Add extra class to term."
+        self.extra_html_classes.append(c)
+
     @property
     def html_class_string(self):
         """
@@ -123,5 +129,6 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
 
         if self.display_text != self.text:
             classes.append("overlapped")
+        classes.extend(self.extra_html_classes)
 
         return " ".join(classes)

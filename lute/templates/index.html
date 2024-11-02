@@ -2,6 +2,11 @@
 
 {% block title %}Lute index{% endblock %}
 
+{% block preloadassets %}
+  {# The book status load blocks the waiting2.gif from being served, so preload it. #}
+  <link rel="preload" as="image" href="{{ url_for('static', filename='icn/waiting2.gif') }}">
+{% endblock %}
+
 {# Must pass empty block to base, or an empty h1 is written. #}
 {% block header %}{% endblock %}
 

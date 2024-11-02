@@ -57,7 +57,7 @@
     // Highlight any dups.
     $('.shortcutdefinition').each(function() {
       const val = $(this).val().trim();
-      if (val != "TBD" && values[val] > 1) {
+      if (val != "TBD" && val != "" && values[val] > 1) {
         $(this).addClass('dupShortcut');
         dups_found = true;
       } else {

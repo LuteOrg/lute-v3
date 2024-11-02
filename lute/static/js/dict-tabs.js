@@ -15,7 +15,7 @@ class LookupButton {
   /** All LookupButtons created. */
   static all = [];
 
-  constructor(dictURL, frameName) {
+  constructor(frameName) {
     let createIFrame = function(name) {
       const f = document.createElement("iframe");
       f.name = name;

@@ -1,4 +1,26 @@
 
+# 3.5.8 (2024-10-28)
+
+Tweaks:
+
+* #434: New hotkeys to move to prev/next unknown word.
+* #496: only propagate new child data to parent (saving an existing child doesn't re-update the parent)
+
+
+# 3.5.7 (2024-10-21)
+
+Feature changes:
+
+* #141: allow customized shortcuts
+* #495: add new shortcuts: translate page, edit page, copy page text, add bookmark, delete term
+
+Tweaks:
+
+* #497: Change default port to 5001.
+* #500: show  popup for ignored terms with data
+* Add version to startup console.
+
+
 # 3.5.6 (2024-10-13)
 
 Feature changes:
