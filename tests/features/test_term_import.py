@@ -12,7 +12,7 @@ from pytest_bdd import given, when, then, scenarios, parsers
 from lute.db import db
 from lute.models.language import Language, LanguageRepository
 from lute.models.term import Term, TermRepository
-from lute.termimport.service import import_file, BadImportFileError
+from lute.termimport.service import Service, BadImportFileError
 
 from tests.dbasserts import assert_sql_result
 
@@ -52,7 +52,10 @@ def import_with_settings(create, update):
         tmp.write(content)
 
     global stats  # pylint: disable=global-statement
-    stats = import_file(path, create.lower() == "true", update.lower() == "true")
+    service = Service(db.session)
+    stats = service.import_file(
+        path, create.lower() == "true", update.lower() == "true"
+    )
     os.remove(path)
 
 
@@ -68,7 +71,8 @@ def import_with_settings_and_newunks(create, update, newunknowns):
         tmp.write(content)
 
     global stats  # pylint: disable=global-statement
-    stats = import_file(
+    service = Service(db.session)
+    stats = service.import_file(
         path,
         create.lower() == "true",
         update.lower() == "true",
@@ -95,7 +99,8 @@ def fail_with_message(message):
         # do stuff with temp file
         tmp.write(content)
     with pytest.raises(BadImportFileError, match=message):
-        import_file(path)
+        service = Service(db.session)
+        service.import_file(path)
     os.remove(path)
 
 

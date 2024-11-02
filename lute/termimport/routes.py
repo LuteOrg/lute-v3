@@ -8,7 +8,8 @@ from wtforms import BooleanField
 from wtforms.validators import DataRequired
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
-from lute.termimport.service import import_file, BadImportFileError
+from lute.termimport.service import Service, BadImportFileError
+from lute.db import db
 
 
 bp = Blueprint("termimport", __name__, url_prefix="/termimport")
@@ -26,7 +27,7 @@ class TermImportForm(FlaskForm):
 def term_import_index():
     "Import posted file."
     form = TermImportForm()
-
+    service = Service(db.session)
     if form.validate_on_submit():
         text_file = form.text_file.data
         if text_file:
@@ -35,7 +36,7 @@ def term_import_index():
             )
             text_file.save(temp_file_name)
             try:
-                stats = import_file(
+                stats = service.import_file(
                     temp_file_name,
                     form.create_terms.data,
                     form.update_terms.data,
