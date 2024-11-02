@@ -5,7 +5,7 @@ Reading helpers.
 import functools
 from lute.models.term import Term, Status
 from lute.models.book import Text
-from lute.book.stats import mark_stale
+from lute.book.stats import Service as StatsService
 from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
 from lute.term.model import Repository

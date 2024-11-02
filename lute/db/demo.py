@@ -11,7 +11,7 @@ data is demo.
 from sqlalchemy import text
 from lute.language.service import Service
 from lute.book.model import Repository
-from lute.book.stats import refresh_stats
+from lute.book.stats import Service as StatsService
 from lute.models.setting import SystemSettingRepository
 from lute.db import db
 import lute.db.management
@@ -122,7 +122,9 @@ def load_demo_stories():
     repo = SystemSettingRepository(db.session)
     repo.set_value("IsDemoData", True)
     db.session.commit()
-    refresh_stats()
+
+    svc = StatsService(db.session)
+    svc.refresh_stats()
 
 
 def load_demo_data():
