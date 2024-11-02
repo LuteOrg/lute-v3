@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
 from lute.models.language import Language, LanguageRepository
 from lute.models.setting import UserSettingRepository
-import lute.language.service
+from lute.language.service import Service
 from lute.language.forms import LanguageForm
 from lute.db import db
 from lute.parse.registry import supported_parsers
@@ -116,7 +116,8 @@ def new(langname):
     """
     Create a new language.
     """
-    predefined = lute.language.service.predefined_languages()
+    service = Service(db.session)
+    predefined = service.predefined_languages()
     language = Language()
     if langname is not None:
         candidates = [lang for lang in predefined if lang.name == langname]
@@ -163,7 +164,8 @@ def delete(langid):
 @bp.route("/list_predefined", methods=["GET"])
 def list_predefined():
     "Show predefined languages that are not already in the db."
-    predefined = lute.language.service.predefined_languages()
+    service = Service(db.session)
+    predefined = service.predefined_languages()
     existing_langs = db.session.query(Language).all()
     existing_names = [l.name for l in existing_langs]
     new_langs = [p for p in predefined if p.name not in existing_names]
@@ -173,7 +175,8 @@ def list_predefined():
 @bp.route("/load_predefined/<langname>", methods=["GET"])
 def load_predefined(langname):
     "Load a predefined language and its stories."
-    lang_id = lute.language.service.load_language_def(langname)
+    service = Service(db.session)
+    lang_id = service.load_language_def(langname)
     repo = UserSettingRepository(db.session)
     repo.set_value("current_language_id", lang_id)
     db.session.commit()

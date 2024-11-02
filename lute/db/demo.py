@@ -9,7 +9,7 @@ data is demo.
 """
 
 from sqlalchemy import text
-import lute.language.service
+from lute.language.service import Service
 from lute.book.model import Repository
 from lute.book.stats import refresh_stats
 from lute.models.setting import SystemSettingRepository
@@ -98,10 +98,8 @@ def load_demo_languages():
     This method will also be called during acceptance tests, so it's public.
     """
     demo_langs = _demo_languages()
-    langs = [
-        lute.language.service.get_language_def(langname)["language"]
-        for langname in demo_langs
-    ]
+    service = Service(db.session)
+    langs = [service.get_language_def(langname)["language"] for langname in demo_langs]
     supported = [lang for lang in langs if lang.is_supported]
     for lang in supported:
         db.session.add(lang)
@@ -111,9 +109,8 @@ def load_demo_languages():
 def load_demo_stories():
     "Load the stories."
     demo_langs = _demo_languages()
-    langdefs = [
-        lute.language.service.get_language_def(langname) for langname in demo_langs
-    ]
+    service = Service(db.session)
+    langdefs = [service.get_language_def(langname) for langname in demo_langs]
     langdefs = [d for d in langdefs if d["language"].is_supported]
 
     r = Repository(db.session)
