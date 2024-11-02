@@ -18,7 +18,7 @@ from flask import (
 )
 from lute.db import db
 from lute.models.setting import BackupSettings
-from lute.backup.service import create_backup, skip_this_backup, list_backups
+from lute.backup.service import Service
 
 
 bp = Blueprint("backup", __name__, url_prefix="/backup")
@@ -30,7 +30,8 @@ def index():
     List all backups.
     """
     settings = BackupSettings(db.session)
-    backups = list_backups(settings.backup_dir)
+    service = Service(db.session)
+    backups = service.list_backups(settings.backup_dir)
     backups.sort(reverse=True)
 
     return render_template(
@@ -75,9 +76,10 @@ def do_backup():
 
     c = current_app.env_config
     settings = BackupSettings(db.session)
+    service = Service(db.session)
     is_manual = backuptype.lower() == "manual"
     try:
-        f = create_backup(c, settings, is_manual=is_manual)
+        f = service.create_backup(c, settings, is_manual=is_manual)
         flash(f"Backup created: {f}", "notice")
         return jsonify(f)
     except Exception as e:  # pylint: disable=broad-exception-caught
@@ -88,5 +90,6 @@ def do_backup():
 @bp.route("/skip_this_backup", methods=["GET"])
 def handle_skip_this_backup():
     "Update last backup date so backup not attempted again."
-    skip_this_backup()
+    service = Service(db.session)
+    service.skip_this_backup()
     return redirect("/", 302)
