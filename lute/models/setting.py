@@ -2,7 +2,6 @@
 Lute settings, in settings key-value table.
 """
 
-import os
 import datetime
 import time
 from lute.db import db
@@ -35,11 +34,6 @@ class SettingRepositoryBase:
         Check key validity for certain actions.
         """
 
-    def set_value_post(self, keyname, keyvalue):
-        """
-        Post-setting value for certain keys."
-        """
-
     def set_value(self, keyname, keyvalue):
         "Set, but don't save, a setting."
         self.key_exists_precheck(keyname)
@@ -53,7 +47,6 @@ class SettingRepositoryBase:
             s.key = keyname
         s.value = keyvalue
         self.session.add(s)
-        self.set_value_post(keyname, keyvalue)
 
     def key_exists(self, keyname):
         "True if exists."
@@ -112,18 +105,6 @@ class UserSettingRepository(SettingRepositoryBase):
         """
         if not self.key_exists(keyname):
             raise MissingUserSettingKeyException(keyname)
-
-    def set_value_post(self, keyname, keyvalue):
-        """
-        Setting some keys runs other code.
-        """
-        if keyname == "mecab_path":
-            mp = "MECAB_PATH"
-            if keyvalue is None or keyvalue == "":
-                if mp in os.environ:
-                    del os.environ[mp]
-            else:
-                os.environ[mp] = keyvalue.strip()
 
 
 class SystemSetting(SettingBase):
