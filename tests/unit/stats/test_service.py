@@ -48,7 +48,7 @@ def test_get_chart_data(spanish, english, app_context):
             {"readdate": today.strftime("%Y-%m-%d"), "wordcount": 2, "runningTotal": 2},
         ],
     }
-    assert get_chart_data() == expected
+    assert get_chart_data(db.session) == expected
 
 
 def test_get_table_data(spanish, english, app_context):
@@ -71,11 +71,11 @@ def test_get_table_data(spanish, english, app_context):
             "counts": {"day": 4, "week": 7, "month": 7, "year": 7, "total": 7},
         },
     ]
-    actual = get_table_data()
+    actual = get_table_data(db.session)
     assert actual == expected
 
 
 def test_get_data_works_when_nothing_read(app_context):
     "Nothing read should still be ok, empty chart."
-    assert not get_chart_data(), "nothing present"
-    assert not get_table_data(), "nothing"
+    assert not get_chart_data(db.session), "nothing present"
+    assert not get_table_data(db.session), "nothing"

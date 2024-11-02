@@ -2,11 +2,10 @@
 Show terms in datatables.
 """
 
-from lute.db import db
 from lute.utils.data_tables import DataTablesSqliteQuery, supported_parser_type_criteria
 
 
-def get_data_tables_list(parameters):
+def get_data_tables_list(parameters, session):
     "Term json data for datatables."
 
     base_sql = """SELECT
@@ -93,5 +92,5 @@ def get_data_tables_list(parameters):
 
     # Phew.
     return DataTablesSqliteQuery.get_data(
-        base_sql + " WHERE " + " AND ".join(wheres), parameters, db.session.connection()
+        base_sql + " WHERE " + " AND ".join(wheres), parameters, session.connection()
     )

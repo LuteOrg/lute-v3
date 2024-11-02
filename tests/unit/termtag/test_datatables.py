@@ -3,6 +3,7 @@ Book tests.
 """
 
 from lute.termtag.datatables import get_data_tables_list
+from lute.db import db
 
 
 def test_smoke_datatables_query_runs(app_context):
@@ -22,7 +23,7 @@ def test_smoke_datatables_query_runs(app_context):
         "search": {"value": "", "regex": False},
     }
 
-    d = get_data_tables_list(params)
+    d = get_data_tables_list(params, db.session)
     print(d)
     a = 1
     assert a == 1, "dummy check"

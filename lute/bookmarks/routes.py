@@ -15,7 +15,7 @@ bp = Blueprint("bookmarks", __name__, url_prefix="/bookmarks")
 def datatables_bookmarks(bookid):
     "Get datatables json for bookmarks."
     parameters = DataTablesFlaskParamParser.parse_params(request.form)
-    data = get_data_tables_list(parameters, bookid)
+    data = get_data_tables_list(parameters, bookid, db.session)
     return jsonify(data)
 
 

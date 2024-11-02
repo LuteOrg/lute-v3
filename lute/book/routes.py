@@ -46,7 +46,7 @@ def datatables_source(is_archived):
     # (currently unused)
     parameters = DataTablesFlaskParamParser.parse_params(request.form)
     _load_term_custom_filters(request.form, parameters)
-    data = get_data_tables_list(parameters, is_archived)
+    data = get_data_tables_list(parameters, is_archived, db.session)
     return jsonify(data)
 
 
@@ -59,8 +59,10 @@ def datatables_active_source():
 @bp.route("/archived", methods=["GET"])
 def archived():
     "List archived books."
-    language_choices = lute.utils.formutils.language_choices("(all languages)")
-    current_language_id = lute.utils.formutils.valid_current_language_id()
+    language_choices = lute.utils.formutils.language_choices(
+        db.session, "(all languages)"
+    )
+    current_language_id = lute.utils.formutils.valid_current_language_id(db.session)
 
     return render_template(
         "book/index.html",
@@ -108,7 +110,7 @@ def new():
         b = _book_from_url(import_url)
 
     form = NewBookForm(obj=b)
-    form.language_id.choices = lute.utils.formutils.language_choices()
+    form.language_id.choices = lute.utils.formutils.language_choices(db.session)
     repo = Repository(db.session)
 
     if form.validate_on_submit():

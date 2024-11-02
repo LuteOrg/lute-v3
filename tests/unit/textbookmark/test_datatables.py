@@ -4,6 +4,7 @@ TextBookmark DataTable tests.
 
 import pytest
 from lute.bookmarks.datatables import get_data_tables_list
+from lute.db import db
 
 
 @pytest.fixture(name="_dt_params")
@@ -28,5 +29,5 @@ def test_smoke_term_datatables_query_runs(app_context, _dt_params):
     """
     Smoke test only, ensure query runs.
     """
-    data = get_data_tables_list(_dt_params, 1)
+    data = get_data_tables_list(_dt_params, 1, db.session)
     assert data is not None

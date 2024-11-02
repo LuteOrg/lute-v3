@@ -126,13 +126,15 @@ def _add_base_routes(app, app_config):
 
     @app.route("/")
     def index():
-        is_production = not lute.db.demo.contains_demo_data()
+        is_production = not lute.db.demo.contains_demo_data(db.session)
         bkp_settings = BackupSettings(db.session)
 
         have_books = len(db.session.query(Book).all()) > 0
         have_languages = len(db.session.query(Language).all()) > 0
-        language_choices = lute.utils.formutils.language_choices("(all languages)")
-        current_language_id = lute.utils.formutils.valid_current_language_id()
+        language_choices = lute.utils.formutils.language_choices(
+            db.session, "(all languages)"
+        )
+        current_language_id = lute.utils.formutils.valid_current_language_id(db.session)
 
         bs = BackupService(db.session)
         should_run_auto_backup = bs.should_run_auto_backup(bkp_settings)
@@ -154,7 +156,7 @@ def _add_base_routes(app, app_config):
                 hide_homelink=True,
                 dbname=app_config.dbname,
                 datapath=app_config.datapath,
-                tutorial_book_id=lute.db.demo.tutorial_book_id(),
+                tutorial_book_id=lute.db.demo.tutorial_book_id(db.session),
                 have_books=have_books,
                 have_languages=have_languages,
                 language_choices=language_choices,
@@ -176,8 +178,8 @@ def _add_base_routes(app, app_config):
 
     @app.route("/wipe_database")
     def wipe_db():
-        if lute.db.demo.contains_demo_data():
-            lute.db.demo.delete_demo_data()
+        if lute.db.demo.contains_demo_data(db.session):
+            lute.db.demo.delete_demo_data(db.session)
             msg = """
             The database has been wiped clean.  Have fun! <br /><br />
             <i>(Lute has automatically enabled backups --
@@ -188,8 +190,8 @@ def _add_base_routes(app, app_config):
 
     @app.route("/remove_demo_flag")
     def remove_demo():
-        if lute.db.demo.contains_demo_data():
-            lute.db.demo.remove_flag()
+        if lute.db.demo.contains_demo_data(db.session):
+            lute.db.demo.remove_flag(db.session)
             msg = """
             Demo mode deactivated. Have fun! <br /><br />
             <i>(Lute has automatically enabled backups --
@@ -310,7 +312,7 @@ def _create_app(app_config, extra_config):
         db.create_all()
         load_settings(db.session, app_config.default_user_backup_path)
         # TODO valid parsers: do parser check, mark valid as active, invalid as inactive.
-        clean_data()
+        clean_data(db.session)
     app.db = db
 
     _add_base_routes(app, app_config)
