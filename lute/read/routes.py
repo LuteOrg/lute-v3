@@ -4,7 +4,7 @@
 
 from datetime import datetime
 from flask import Blueprint, flash, request, render_template, redirect, jsonify
-from lute.read.service import set_unknowns_to_known, start_reading, get_popup_data
+from lute.read.service import Service
 from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
@@ -95,8 +95,9 @@ def page_done():
     text.read_date = datetime.now()
     db.session.add(text)
     db.session.commit()
+    service = Service(db.session)
     if restknown:
-        set_unknowns_to_known(text)
+        service.set_unknowns_to_known(text)
     return jsonify("ok")
 
 
@@ -170,7 +171,8 @@ def render_page(bookid, pagenum):
     if book is None:
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
-    paragraphs = start_reading(book, pagenum, db.session)
+    service = Service(db.session)
+    paragraphs = service.start_reading(book, pagenum, db.session)
     return render_template("read/page_content.html", paragraphs=paragraphs)
 
 
@@ -225,7 +227,8 @@ def term_popup(termid):
     """
     Get popup html for DBTerm, or None if nothing should be shown.
     """
-    d = get_popup_data(termid)
+    service = Service(db.session)
+    d = service.get_popup_data(termid)
     if d is None:
         return ""
     return render_template(

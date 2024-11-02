@@ -9,7 +9,7 @@ from lute.db import db
 from lute.models.language import Language
 from lute.term.model import Repository
 from lute.read.render.service import get_paragraphs
-from lute.read.service import set_unknowns_to_known, bulk_status_update
+from lute.read.service import Service
 
 from tests.utils import add_terms, make_text
 from tests.dbasserts import assert_sql_result
@@ -72,12 +72,14 @@ def given_text(content):
 
 @given("all unknowns are set to known")
 def set_to_known():
-    set_unknowns_to_known(text)
+    service = Service(db.session)
+    service.set_unknowns_to_known(text)
 
 
 @given(parsers.parse("bulk status {newstatus} update for terms:\n{terms}"))
 def update_status(newstatus, terms):
-    bulk_status_update(text, terms.split("\n"), int(newstatus))
+    service = Service(db.session)
+    service.bulk_status_update(text, terms.split("\n"), int(newstatus))
 
 
 def _assert_stringized_equals(stringizer, joiner, expected):
