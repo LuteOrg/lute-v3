@@ -6,7 +6,7 @@ import functools
 from lute.models.term import Term, Status
 from lute.models.book import Text
 from lute.book.stats import mark_stale
-from lute.read.render.service import get_paragraphs, find_all_Terms_in_string
+from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
 from lute.term.model import Repository
 
@@ -24,7 +24,8 @@ class Service:
         Given a text, create new Terms with status Well-Known
         for any new Terms.
         """
-        paragraphs = get_paragraphs(text.text, text.book.language)
+        rs = RenderService(self.session)
+        paragraphs = rs.get_paragraphs(text.text, text.book.language)
         self._save_new_status_0_terms(paragraphs)
 
         unknowns = [
@@ -88,7 +89,8 @@ class Service:
         db_session.commit()
 
         lang = text.book.language
-        paragraphs = get_paragraphs(text.text, lang)
+        rs = RenderService(self.session)
+        paragraphs = rs.get_paragraphs(text.text, lang)
         self._save_new_status_0_terms(paragraphs)
 
         return paragraphs
@@ -155,9 +157,10 @@ class Service:
             component_and_pos.sort(key=functools.cmp_to_key(compare))
             return [c[0] for c in component_and_pos]
 
+        rs = RenderService(self.session)
         components = [
             c
-            for c in find_all_Terms_in_string(term.text, term.language)
+            for c in rs.find_all_Terms_in_string(term.text, term.language)
             if c.id != term.id
         ]
         components = sort_components(components)

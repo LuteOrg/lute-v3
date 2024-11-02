@@ -4,7 +4,7 @@ Utility methods for tests.
 
 from lute.models.term import Term
 from lute.models.book import Book
-from lute.read.render.service import get_paragraphs
+from lute.read.render.service import Service
 from lute.db import db
 
 
@@ -46,7 +46,8 @@ def get_rendered_string(text, imploder="/", overridestringize=None):
 
     usestringize = overridestringize or stringize
     ret = []
-    paras = get_paragraphs(text.text, text.book.language)
+    service = Service(db.session)
+    paras = service.get_paragraphs(text.text, text.book.language)
     for p in paras:
         tis = [t for s in p for t in s]
         ss = [usestringize(ti) for ti in tis]

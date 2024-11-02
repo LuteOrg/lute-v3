@@ -15,7 +15,7 @@ haber; 100; 1500; book1,book2; to exist; 99; hay (500), he (200), has (150) ...
 import csv
 from lute.db import db
 from lute.models.book import Book
-from lute.read.render.service import get_textitems, get_multiword_indexer
+from lute.read.render.service import Service
 
 
 def _add_term_to_dict(t, terms):
@@ -54,11 +54,12 @@ def _process_book(b, terms, multiword_indexer):
     "Process pages in book, add to output."
     print(f"Processing {b.title} ...")
     i = 0
+    service = Service(db.session)
     for text in b.texts:
         i += 1
         if i % 10 == 0:
             print(f"  page {i} of {b.page_count}", end="\r")
-        textitems = get_textitems(text.text, b.language, multiword_indexer)
+        textitems = service.get_textitems(text.text, b.language, multiword_indexer)
         displayed_terms = [
             ti.term for ti in textitems if ti.is_word and ti.term is not None
         ]
@@ -111,10 +112,11 @@ def _finalize_output(terms):
 
 def _load_indexers(books):
     "Load multiword indexers for book languages."
+    service = Service(db.session)
     ret = {}
     lang_map = {book.language.id: book.language for book in books}
     for langid, lang in lang_map.items():
-        ret[langid] = get_multiword_indexer(lang)
+        ret[langid] = service.get_multiword_indexer(lang)
     return ret
 
 
