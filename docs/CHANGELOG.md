@@ -1,4 +1,25 @@
 
+# 3.5.9 (2024-11-02)
+
+Feature changes:
+
+* Add Thai plugin!  By @jaydom28 in #510.  Will be released to PyPi separately.
+* Add Thai definition and story, using the new Thai plugin.
+* #12: Allow bulk set status in Term listing.
+
+Tweaks:
+
+* #140: keyboard shortcuts to move to prev, next sentences.
+* #507: add `--local` startup flag to lute.main (disallows accessing from mobile devices)
+* Show 'text copied' message in tooltip only.
+* Only hold Shift down at start of text copy.
+
+Fixes:
+
+* #506: update stats if distribution is missing.
+* #114: allow / in multiword terms from reading screen.
+
+
 # 3.5.8 (2024-10-28)
 
 Tweaks:
