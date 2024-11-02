@@ -26,7 +26,7 @@ from lute.config.app_config import AppConfig
 from lute.db import db
 from lute.db.setup.main import setup_db
 from lute.db.data_cleanup import clean_data
-import lute.backup.service as backupservice
+from lute.backup.service import Service as BackupService
 import lute.db.demo
 import lute.utils.formutils
 
@@ -134,13 +134,14 @@ def _add_base_routes(app, app_config):
         language_choices = lute.utils.formutils.language_choices("(all languages)")
         current_language_id = lute.utils.formutils.valid_current_language_id()
 
-        should_run_auto_backup = backupservice.should_run_auto_backup(bkp_settings)
+        bs = BackupService(db.session)
+        should_run_auto_backup = bs.should_run_auto_backup(bkp_settings)
         # Only back up if we have books, otherwise the backup is
         # kicked off when the user empties the demo database.
         if is_production and have_books and should_run_auto_backup:
             return redirect("/backup/backup", 302)
 
-        warning_msg = backupservice.backup_warning(bkp_settings)
+        warning_msg = bs.backup_warning(bkp_settings)
         backup_show_warning = (
             bkp_settings.backup_warn
             and bkp_settings.backup_enabled
