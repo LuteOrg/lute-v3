@@ -15,7 +15,7 @@ from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.book.service import Service, BookImportException
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm
-from lute.book.stats import get_stats
+from lute.book.stats import Service as StatsService
 import lute.utils.formutils
 from lute.db import db
 
@@ -204,7 +204,8 @@ def delete(bookid):
 def table_stats(bookid):
     "Get the stats, return ajax."
     b = _find_book(bookid)
-    stats = get_stats(b)
+    svc = StatsService(db.session)
+    stats = svc.get_stats(b)
     ret = {
         "distinctterms": stats.distinctterms,
         "distinctunknowns": stats.distinctunknowns,
