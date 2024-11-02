@@ -31,7 +31,6 @@ def _get_test_language():
     return lang
 
 
-# TODO fix name
 @pytest.fixture(name="thai")
 def fixture_thai():
     return _get_test_language()
