@@ -47,9 +47,12 @@ class ThaiParser(AbstractParser):
         words = pythainlp.word_tokenize(text)
         tokens = []
         pattern = f"[{language.word_characters}]"
+        whitespace_regex = r"[ \t]+"
         for word in words:
             is_word_char = re.match(pattern, word) is not None
-            is_end_of_sentence = word in language.regexp_split_sentences
+            is_whitespace = re.match(whitespace_regex, word) is not None
+            is_split_sentence = word in language.regexp_split_sentences
+            is_end_of_sentence = is_split_sentence or is_whitespace
             if is_end_of_sentence:
                 is_word_char = False
             if word == "\n":
