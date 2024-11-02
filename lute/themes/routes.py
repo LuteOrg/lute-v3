@@ -4,6 +4,7 @@ from flask import Blueprint, Response, jsonify
 
 from lute.themes.service import get_current_css, next_theme
 from lute.models.setting import UserSettingRepository
+from lute.settings.current import current_settings
 from lute.db import db
 
 bp = Blueprint("themes", __name__, url_prefix="/theme")
@@ -39,8 +40,9 @@ def set_next_theme():
 @bp.route("/toggle_highlight", methods=["POST"])
 def toggle_highlight():
     "Fix the highlight."
+    new_setting = not current_settings["show_highlights"]
     repo = UserSettingRepository(db.session)
-    b = bool(int(repo.get_value("show_highlights")))
-    repo.set_value("show_highlights", not b)
+    repo.set_value("show_highlights", new_setting)
     db.session.commit()
+    current_settings["show_highlights"] = new_setting
     return jsonify("ok")
