@@ -14,7 +14,7 @@ from flask import (
 from wtforms import BooleanField
 from lute.models.language import Language
 from lute.models.setting import UserSetting, UserSettingRepository
-from lute.themes.service import list_themes
+from lute.themes.service import Service as ThemeService
 from lute.settings.forms import UserSettingsForm, UserShortcutsForm
 from lute.settings.current import refresh_global_settings
 from lute.db import db
@@ -30,7 +30,8 @@ def edit_settings():
     form = UserSettingsForm()
 
     with current_app.app_context():
-        form.current_theme.choices = list_themes()
+        svc = ThemeService(db.session)
+        form.current_theme.choices = svc.list_themes()
 
     ac = current_app.env_config
     if ac.is_docker:

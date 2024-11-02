@@ -2,7 +2,7 @@
 
 from flask import Blueprint, Response, jsonify
 
-from lute.themes.service import get_current_css, next_theme
+from lute.themes.service import Service
 from lute.models.setting import UserSettingRepository
 from lute.settings.current import current_settings
 from lute.db import db
@@ -13,7 +13,8 @@ bp = Blueprint("themes", __name__, url_prefix="/theme")
 @bp.route("/current", methods=["GET"])
 def current_theme():
     "Return current css."
-    response = Response(get_current_css(), 200)
+    service = Service(db.session)
+    response = Response(service.get_current_css(), 200)
     response.content_type = "text/css; charset=utf-8"
     return response
 
@@ -33,7 +34,8 @@ def custom_styles():
 @bp.route("/next", methods=["POST"])
 def set_next_theme():
     "Go to next theme."
-    next_theme()
+    service = Service(db.session)
+    service.next_theme()
     return jsonify("ok")
 
 
