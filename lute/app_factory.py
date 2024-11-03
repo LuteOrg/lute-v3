@@ -25,6 +25,7 @@ from sqlalchemy.pool import Pool
 from lute.config.app_config import AppConfig
 from lute.db import db
 from lute.db.setup.main import setup_db
+from lute.db.management import add_default_user_settings
 from lute.db.data_cleanup import clean_data
 from lute.backup.service import Service as BackupService
 import lute.db.demo
@@ -34,7 +35,7 @@ from lute.parse.registry import init_parser_plugins, supported_parsers
 
 from lute.models.book import Book
 from lute.models.language import Language
-from lute.settings.current import load as load_settings, current_settings
+from lute.settings.current import refresh_global_settings, current_settings
 from lute.models.repositories import UserSettingRepository
 from lute.book.stats import Service as StatsService
 
@@ -312,7 +313,8 @@ def _create_app(app_config, extra_config):
 
     with app.app_context():
         db.create_all()
-        load_settings(db.session, app_config.default_user_backup_path)
+        add_default_user_settings(db.session, app_config.default_user_backup_path)
+        refresh_global_settings(db.session)
         # TODO valid parsers: do parser check, mark valid as active, invalid as inactive.
         clean_data(db.session)
     app.db = db
