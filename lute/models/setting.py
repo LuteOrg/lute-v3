@@ -93,67 +93,19 @@ class UserSetting(SettingBase):
     __mapper_args__ = {"polymorphic_identity": "user"}
 
 
-class UserSettingRepository(SettingRepositoryBase):
-    "Repository."
-
-    def __init__(self, session):
-        super().__init__(session, UserSetting)
-
-    def key_exists_precheck(self, keyname):
-        """
-        User keys must exist.
-        """
-        if not self.key_exists(keyname):
-            raise MissingUserSettingKeyException(keyname)
-
-
-class SystemSetting(SettingBase):
-    "System setting."
-    __tablename__ = None
-    __mapper_args__ = {"polymorphic_identity": "system"}
-
-    # Helpers for certain sys settings.
-
-
-class SystemSettingRepository(SettingRepositoryBase):
-    "Repository."
-
-    def __init__(self, session):
-        super().__init__(session, SystemSetting)
-
-    def get_last_backup_datetime(self):
-        "Get the last_backup_datetime as int, or None."
-        v = self.get_value("lastbackup")
-        if v is None:
-            return None
-        return int(v)
-
-    def set_last_backup_datetime(self, v):
-        "Set and save the last backup time."
-        self.set_value("lastbackup", v)
-        self.session.commit()
-
-
 class BackupSettings:
     """
     Convenience wrapper for current backup settings.
     Getter only.
     """
 
-    def __init__(self, session):
-        us_repo = UserSettingRepository(session)
-        ss_repo = SystemSettingRepository(session)
-
-        def _bool(k):
-            v = us_repo.get_value(k)
-            return v in (1, "1", "y", True)
-
-        self.backup_enabled = _bool("backup_enabled")
-        self.backup_auto = _bool("backup_auto")
-        self.backup_warn = _bool("backup_warn")
-        self.backup_dir = us_repo.get_value("backup_dir")
-        self.backup_count = int(us_repo.get_value("backup_count") or 5)
-        self.last_backup_datetime = ss_repo.get_last_backup_datetime()
+    def __init__(self):
+        self.backup_enabled = None
+        self.backup_auto = None
+        self.backup_warn = None
+        self.backup_dir = None
+        self.backup_count = None
+        self.last_backup_datetime = None
 
     @property
     def last_backup_display_date(self):
@@ -197,3 +149,59 @@ class BackupSettings:
             message = f"{abs(delta)} seconds"
 
         return message + " ago"
+
+
+class UserSettingRepository(SettingRepositoryBase):
+    "Repository."
+
+    def __init__(self, session):
+        super().__init__(session, UserSetting)
+
+    def key_exists_precheck(self, keyname):
+        """
+        User keys must exist.
+        """
+        if not self.key_exists(keyname):
+            raise MissingUserSettingKeyException(keyname)
+
+    def get_backup_settings(self):
+        "Convenience method."
+        bs = BackupSettings()
+
+        def _bool(k):
+            return self.get_value(k) in (1, "1", "y", True)
+
+        bs.backup_enabled = _bool("backup_enabled")
+        bs.backup_auto = _bool("backup_auto")
+        bs.backup_warn = _bool("backup_warn")
+        bs.backup_dir = self.get_value("backup_dir")
+        bs.backup_count = int(self.get_value("backup_count") or 5)
+        bs.last_backup_datetime = self.get_last_backup_datetime()
+        return bs
+
+    def get_last_backup_datetime(self):
+        "Get the last_backup_datetime as int, or None."
+        v = self.get_value("lastbackup")
+        if v is None:
+            return None
+        return int(v)
+
+    def set_last_backup_datetime(self, v):
+        "Set and save the last backup time."
+        self.set_value("lastbackup", v)
+        self.session.commit()
+
+
+class SystemSetting(SettingBase):
+    "System setting."
+    __tablename__ = None
+    __mapper_args__ = {"polymorphic_identity": "system"}
+
+    # Helpers for certain sys settings.
+
+
+class SystemSettingRepository(SettingRepositoryBase):
+    "Repository."
+
+    def __init__(self, session):
+        super().__init__(session, SystemSetting)

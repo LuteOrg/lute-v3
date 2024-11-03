@@ -10,7 +10,7 @@ from datetime import datetime
 import time
 from typing import List, Union
 
-from lute.models.setting import SystemSettingRepository
+from lute.models.setting import UserSettingRepository
 from lute.models.book import Book
 from lute.models.term import Term
 
@@ -159,13 +159,13 @@ class Service:
         ) as out_file:
             shutil.copyfileobj(in_file, out_file)
         os.remove(backupfile)
-        r = SystemSettingRepository(self.session)
+        r = UserSettingRepository(self.session)
         r.set_last_backup_datetime(int(time.time()))
         return f
 
     def skip_this_backup(self):
         "Set the last backup time to today."
-        r = SystemSettingRepository(self.session)
+        r = UserSettingRepository(self.session)
         r.set_last_backup_datetime(int(time.time()))
 
     def _remove_excess_backups(self, count, outdir):

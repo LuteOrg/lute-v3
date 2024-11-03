@@ -35,7 +35,7 @@ from lute.parse.registry import init_parser_plugins, supported_parsers
 from lute.models.book import Book
 from lute.models.language import Language
 from lute.settings.current import load as load_settings, current_settings
-from lute.models.setting import BackupSettings
+from lute.models.setting import UserSettingRepository
 from lute.book.stats import Service as StatsService
 
 from lute.book.routes import bp as book_bp
@@ -112,7 +112,8 @@ def _add_base_routes(app, app_config):
         """
         Inject backup settings into the all templates for the menu bar.
         """
-        bs = BackupSettings(db.session)
+        us_repo = UserSettingRepository(db.session)
+        bs = us_repo.get_backup_settings()
         have_languages = len(db.session.query(Language).all()) > 0
         ret = {
             "have_languages": have_languages,
@@ -127,7 +128,8 @@ def _add_base_routes(app, app_config):
     @app.route("/")
     def index():
         is_production = not lute.db.demo.contains_demo_data(db.session)
-        bkp_settings = BackupSettings(db.session)
+        us_repo = UserSettingRepository(db.session)
+        bkp_settings = us_repo.get_backup_settings()
 
         have_books = len(db.session.query(Book).all()) > 0
         have_languages = len(db.session.query(Language).all()) > 0
