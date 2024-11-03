@@ -9,7 +9,6 @@ from lute.models.setting import (
     UserSettingRepository,
     SystemSettingRepository,
     MissingUserSettingKeyException,
-    BackupSettings,
 )
 from tests.dbasserts import assert_sql_result
 
@@ -57,13 +56,13 @@ def test_missing_value_value_is_null(ss_repo):
     assert ss_repo.get_value("missing") is None, "missing key"
 
 
-def test_smoke_last_backup(ss_repo):
+def test_smoke_last_backup(us_repo):
     "Check syntax only."
-    v = ss_repo.get_last_backup_datetime()
+    v = us_repo.get_last_backup_datetime()
     assert v is None, "not set"
 
-    ss_repo.set_last_backup_datetime(42)
-    v = ss_repo.get_last_backup_datetime()
+    us_repo.set_last_backup_datetime(42)
+    v = us_repo.get_last_backup_datetime()
     assert v == 42, "set _and_ saved"
 
 
@@ -73,7 +72,7 @@ def test_get_backup_settings(us_repo):
     us_repo.set_value("backup_count", 12)
     us_repo.set_value("backup_warn", 0)
     db.session.commit()
-    b = BackupSettings(db.session)
+    b = us_repo.get_backup_settings()
     assert b.backup_dir == "blah"
     assert b.backup_auto is True  # initial defaults
     assert b.backup_warn is False  # set to 0 above
@@ -81,49 +80,49 @@ def test_get_backup_settings(us_repo):
     assert b.last_backup_datetime is None
 
 
-def test_time_since_last_backup_future(app_context):
+def test_time_since_last_backup_future(us_repo):
     """
     Check formatting when last backup is reported to be in the future.
 
     current time = 600, backup time = 900
     """
-    b = BackupSettings(db.session)
+    b = us_repo.get_backup_settings()
     with patch("time.time", return_value=600):
         b.last_backup_datetime = 900
         assert b.time_since_last_backup is None
 
 
-def test_time_since_last_backup_none(app_context):
+def test_time_since_last_backup_none(us_repo):
     """
     Check formatting when last backup is reported to be None.
 
     current time = 600, backup time = None
     """
-    b = BackupSettings(db.session)
+    b = us_repo.get_backup_settings()
     with patch("time.time", return_value=600):
         b.last_backup_datetime = None
         assert b.time_since_last_backup is None
 
 
-def test_time_since_last_backup_right_now(app_context):
+def test_time_since_last_backup_right_now(us_repo):
     """
     Check formatting when last backup is reported to be the same as current time.
 
     current time = 600, backup time = 600
     """
-    b = BackupSettings(db.session)
+    b = us_repo.get_backup_settings()
     with patch("time.time", return_value=600):
         b.last_backup_datetime = 600
         assert b.time_since_last_backup == "0 seconds ago"
 
 
-def test_time_since_last_backup_in_past(app_context):
+def test_time_since_last_backup_in_past(us_repo):
     """
     Check formatting when last backup is reported to be in the past.
 
     current time = 62899200, backup time = various
     """
-    b = BackupSettings(db.session)
+    b = us_repo.get_backup_settings()
     now = 62899200
     with patch("time.time", return_value=now):
         b.last_backup_datetime = now - 45

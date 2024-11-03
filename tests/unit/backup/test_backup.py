@@ -8,7 +8,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from lute.backup.service import Service, BackupException, DatabaseBackupFile
-from lute.models.setting import BackupSettings
+from lute.models.setting import UserSettingRepository
 from lute.db import db
 
 # pylint: disable=missing-function-docstring
@@ -47,7 +47,8 @@ def cleanup_directory(directory):
 @pytest.fixture(name="backup_settings")
 def fixture_backup_settings(app_context, bkp_dir):
     # app_context is passed so that the db session is available.
-    ret = BackupSettings(db.session)
+    repo = UserSettingRepository(db.session)
+    ret = repo.get_backup_settings()
     ret.backup_dir = bkp_dir
     ret.backup_enabled = True
     yield ret
@@ -143,7 +144,9 @@ def test_last_import_setting_is_updated_on_successful_backup(
     assert backup_settings.last_backup_datetime is None, "no backup"
     service = Service(db.session)
     service.create_backup(testconfig, backup_settings)
-    updated = BackupSettings(db.session)
+
+    repo = UserSettingRepository(db.session)
+    updated = repo.get_backup_settings()
     assert updated.last_backup_datetime is not None, "set"
 
 

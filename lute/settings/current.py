@@ -63,6 +63,7 @@ def load(session, default_user_backup_path):
         "backup_warn": True,
         "backup_dir": default_user_backup_path,
         "backup_count": 5,
+        "lastbackup": None,
         "mecab_path": None,
         "japanese_reading": "hiragana",
         "current_theme": "-",

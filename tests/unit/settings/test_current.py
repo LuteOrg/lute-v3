@@ -5,10 +5,7 @@ Current settings tests.
 import pytest
 from sqlalchemy import text
 from lute.db import db
-from lute.models.setting import (
-    UserSettingRepository,
-    BackupSettings,
-)
+from lute.models.setting import UserSettingRepository
 from lute.settings.current import load, refresh_global_settings, current_settings
 
 
@@ -44,7 +41,7 @@ def test_user_settings_loaded_with_defaults(us_repo):
     assert us_repo.key_exists("backup_dir") is True, "key created"
 
     # Check defaults
-    b = BackupSettings(db.session)
+    b = us_repo.get_backup_settings()
     assert b.backup_enabled is True
     assert b.backup_dir is not None
     assert b.backup_auto is True
@@ -58,5 +55,5 @@ def test_user_settings_load_leaves_existing_values(us_repo):
     db.session.commit()
     assert us_repo.get_value("backup_count") == "17"
     load(db.session, "blah")
-    b = BackupSettings(db.session)
+    b = us_repo.get_backup_settings()
     assert b.backup_count == 17, "still 17"

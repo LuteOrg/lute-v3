@@ -17,11 +17,17 @@ from flask import (
     flash,
 )
 from lute.db import db
-from lute.models.setting import BackupSettings
+from lute.models.setting import UserSettingRepository
 from lute.backup.service import Service
 
 
 bp = Blueprint("backup", __name__, url_prefix="/backup")
+
+
+def _get_settings():
+    "Get backup settings."
+    repo = UserSettingRepository(db.session)
+    return repo.get_backup_settings()
 
 
 @bp.route("/index")
@@ -29,7 +35,7 @@ def index():
     """
     List all backups.
     """
-    settings = BackupSettings(db.session)
+    settings = _get_settings()
     service = Service(db.session)
     backups = service.list_backups(settings.backup_dir)
     backups.sort(reverse=True)
@@ -42,7 +48,7 @@ def index():
 @bp.route("/download/<filename>")
 def download_backup(filename):
     "Download the given backup file."
-    settings = BackupSettings(db.session)
+    settings = _get_settings()
     fullpath = os.path.join(settings.backup_dir, filename)
     return send_file(fullpath, as_attachment=True)
 
@@ -58,7 +64,7 @@ def backup():
     if "type" in request.args:
         backuptype = "manual"
 
-    settings = BackupSettings(db.session)
+    settings = _get_settings()
     return render_template(
         "backup/backup.html", backup_folder=settings.backup_dir, backuptype=backuptype
     )
@@ -75,7 +81,7 @@ def do_backup():
         backuptype = prms["type"]
 
     c = current_app.env_config
-    settings = BackupSettings(db.session)
+    settings = _get_settings()
     service = Service(db.session)
     is_manual = backuptype.lower() == "manual"
     try:
