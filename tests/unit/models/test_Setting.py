@@ -5,7 +5,7 @@ Settings test.
 from unittest.mock import patch
 import pytest
 from lute.db import db
-from lute.models.setting import (
+from lute.models.repositories import (
     UserSettingRepository,
     SystemSettingRepository,
     MissingUserSettingKeyException,

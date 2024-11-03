@@ -5,7 +5,7 @@ Term import.
 import csv
 
 from lute.models.term import Status
-from lute.models.language import LanguageRepository
+from lute.models.repositories import LanguageRepository
 from lute.term.model import Term, Repository
 
 

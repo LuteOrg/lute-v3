@@ -10,7 +10,7 @@ from datetime import datetime
 import time
 from typing import List, Union
 
-from lute.models.setting import UserSettingRepository
+from lute.models.repositories import UserSettingRepository
 from lute.models.book import Book
 from lute.models.term import Term
 

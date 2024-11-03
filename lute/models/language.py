@@ -3,7 +3,6 @@ Language entity.
 """
 
 import re
-from sqlalchemy import text, func
 from lute.db import db
 from lute.parse.registry import get_parser, is_supported
 
@@ -221,45 +220,3 @@ class Language(
             lang.dictionaries.append(ld)
 
         return lang
-
-
-class LanguageRepository:
-    "Repository."
-
-    def __init__(self, session):
-        self.session = session
-
-    def find(self, language_id):
-        "Get by ID."
-        return self.session.query(Language).filter(Language.id == language_id).first()
-
-    def find_by_name(self, name):
-        "Get by name."
-        return (
-            self.session.query(Language)
-            .filter(func.lower(Language.name) == func.lower(name))
-            .first()
-        )
-
-    def delete(self, language):
-        """
-        Hacky method to delete language and all terms, books, and dicts
-        associated with it.
-
-        There is _certainly_ a better way to do this using
-        Sqlalchemy relationships and cascade deletes, but I
-        was running into problems with it (things not cascading,
-        or warnings ("SAWarning: Object of type <Term> not in
-        session, add operation along 'Language.terms' will not
-        proceed") during test runs.  It would be nice to have
-        a "correct" mapping, but this is good enough for now.
-
-        TODO zzfuture fix: fix Language-Book and -Term mappings.
-        """
-        sqls = [
-            "pragma foreign_keys = ON",
-            f"delete from languages where LgID = {language.id}",
-        ]
-        for s in sqls:
-            self.session.execute(text(s))
-        self.session.commit()

@@ -2,7 +2,6 @@
 Term entity.
 """
 
-from sqlalchemy import text as sqltext, and_
 from lute.db import db
 
 wordparents = db.Table(
@@ -71,28 +70,6 @@ class TermTag(db.Model):
     def comment(self, c):
         "Set cleaned comment."
         self._comment = c if c is not None else ""
-
-
-class TermTagRepository:
-    "Repository."
-
-    def __init__(self, session):
-        self.session = session
-
-    def find(self, termtag_id):
-        "Get by ID."
-        return self.session.query(TermTag).filter(TermTag.id == termtag_id).first()
-
-    def find_by_text(self, text):
-        "Find a tag by text, or None if not found."
-        return self.session.query(TermTag).filter(TermTag.text == text).first()
-
-    def find_or_create_by_text(self, text):
-        "Return tag or create one."
-        ret = self.find_by_text(text)
-        if ret is not None:
-            return ret
-        return TermTag(text)
 
 
 class TermTextChangedException(Exception):
@@ -334,39 +311,6 @@ class Term(
         m = self.term_flash_message.message
         self.term_flash_message = None
         return m
-
-
-class TermRepository:
-    "Repository."
-
-    def __init__(self, session):
-        self.session = session
-
-    def find_by_spec(self, spec):
-        """
-        Find by the given spec term's language ID and text.
-        Returns None if not found.
-        """
-        langid = spec.language.id
-        text_lc = spec.text_lc
-        query = self.session.query(Term).filter(
-            and_(Term.language_id == langid, Term.text_lc == text_lc)
-        )
-        terms = query.all()
-        if not terms:
-            return None
-        return terms[0]
-
-    def delete_empty_images(self):
-        """
-        Data clean-up: delete empty images.
-
-        The code was leaving empty images in the db, which are obviously no good.
-        This is a hack to clean up the data.
-        """
-        sql = "delete from wordimages where trim(WiSource) = ''"
-        self.session.execute(sqltext(sql))
-        self.session.commit()
 
 
 class Status(db.Model):  # pylint: disable=too-few-public-methods

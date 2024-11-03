@@ -4,7 +4,8 @@ Smoke test for bulk import of books.
 
 from sqlalchemy import and_
 from lute.cli.import_books import import_books_from_csv
-from lute.models.book import Book, BookRepository
+from lute.models.book import Book
+from lute.models.repositories import BookRepository
 from lute.db import db
 
 

@@ -5,7 +5,7 @@ Current settings tests.
 import pytest
 from sqlalchemy import text
 from lute.db import db
-from lute.models.setting import UserSettingRepository
+from lute.models.repositories import UserSettingRepository
 from lute.settings.current import load, refresh_global_settings, current_settings
 
 

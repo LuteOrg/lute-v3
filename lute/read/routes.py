@@ -9,7 +9,8 @@ from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
 from lute.settings.current import current_settings
-from lute.models.book import Text, BookRepository
+from lute.models.book import Text
+from lute.models.repositories import BookRepository
 from lute.db import db
 
 

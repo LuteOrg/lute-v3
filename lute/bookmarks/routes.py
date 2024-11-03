@@ -4,7 +4,8 @@
 
 from flask import Blueprint, request, render_template, jsonify
 from lute.bookmarks.datatables import get_data_tables_list
-from lute.models.book import Text, TextBookmark, BookRepository
+from lute.models.book import Text, TextBookmark
+from lute.models.repositories import BookRepository
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.db import db
 

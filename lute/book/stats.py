@@ -6,7 +6,7 @@ import json
 from sqlalchemy import select, text
 from lute.read.render.service import Service as RenderService
 from lute.models.book import Book, BookStats
-from lute.models.setting import UserSettingRepository
+from lute.models.repositories import UserSettingRepository
 
 # from lute.utils.debug_helpers import DebugTimer
 

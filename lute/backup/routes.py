@@ -17,7 +17,7 @@ from flask import (
     flash,
 )
 from lute.db import db
-from lute.models.setting import UserSettingRepository
+from lute.models.repositories import UserSettingRepository
 from lute.backup.service import Service
 
 

@@ -8,7 +8,8 @@ They're written to at load (or when the settings change).
 """
 
 import os
-from lute.models.setting import UserSetting, UserSettingRepository
+from lute.models.setting import UserSetting
+from lute.models.repositories import UserSettingRepository
 
 # The current user settings, key/value dict.
 current_settings = {}

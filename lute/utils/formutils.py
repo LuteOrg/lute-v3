@@ -3,7 +3,7 @@ Common form methods.
 """
 
 from lute.models.language import Language
-from lute.models.setting import UserSettingRepository
+from lute.models.repositories import UserSettingRepository
 
 
 def language_choices(session, dummy_entry_placeholder="-"):

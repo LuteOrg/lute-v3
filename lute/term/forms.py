@@ -16,8 +16,8 @@ from wtforms import (
 from wtforms import ValidationError
 from wtforms.validators import DataRequired
 
-from lute.models.term import Term, TermRepository
-from lute.models.language import LanguageRepository
+from lute.models.term import Term
+from lute.models.repositories import LanguageRepository, TermRepository
 
 
 class TermForm(FlaskForm):

@@ -4,7 +4,8 @@ TermTag tests.
 
 import pytest
 
-from lute.models.term import TermTag, TermTagRepository
+from lute.models.term import TermTag
+from lute.models.repositories import TermTagRepository
 from lute.db import db
 from tests.dbasserts import assert_sql_result
 

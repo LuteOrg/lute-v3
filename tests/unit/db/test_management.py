@@ -6,7 +6,8 @@ Testing management functions.
 
 import pytest
 from lute.db import db
-from lute.models.setting import UserSetting, UserSettingRepository
+from lute.models.setting import UserSetting
+from lute.models.repositories import UserSettingRepository
 from lute.db.management import delete_all_data
 from tests.dbasserts import assert_record_count_equals
 
