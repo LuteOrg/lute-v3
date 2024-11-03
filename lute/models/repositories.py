@@ -92,12 +92,12 @@ class UserSettingRepository(SettingRepositoryBase):
         "Convenience method."
         bs = BackupSettings()
 
-        def _bool(k):
-            return self.get_value(k) in (1, "1", "y", True)
+        def _bool(v):
+            return v in (1, "1", "y", True)
 
-        bs.backup_enabled = _bool("backup_enabled")
-        bs.backup_auto = _bool("backup_auto")
-        bs.backup_warn = _bool("backup_warn")
+        bs.backup_enabled = _bool(self.get_value("backup_enabled"))
+        bs.backup_auto = _bool(self.get_value("backup_auto"))
+        bs.backup_warn = _bool(self.get_value("backup_warn"))
         bs.backup_dir = self.get_value("backup_dir")
         bs.backup_count = int(self.get_value("backup_count") or 5)
         bs.last_backup_datetime = self.get_last_backup_datetime()
