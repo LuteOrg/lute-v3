@@ -15,6 +15,8 @@ invoke --help <cmd>    # See docstrings and help notes
 import os
 import sys
 import subprocess
+import threading
+import time
 from datetime import datetime
 import requests
 from invoke import task, Collection
@@ -103,6 +105,65 @@ def _site_is_running(useport=None):
         return False
 
 
+def _wait_for_running_site(port):
+    "Wait until the site is running."
+    url = f"http://localhost:{port}"
+    is_running = False
+    attempt_count = 0
+    print(f"Wait until site is running at {url}.", flush=True)
+    while attempt_count < 10 and not is_running:
+        attempt_count += 1
+        try:
+            print(f"  Attempt {attempt_count}", flush=True)
+            resp = requests.get(url)
+            is_running = True
+        except requests.exceptions.ConnectionError:
+            time.sleep(1)
+    if not is_running:
+        raise Exception("Site didn't start?")
+
+
+def _run_browser_tests(port, run_test):
+    "Start server on port if necessary, and run tests."
+    tests_failed = False
+    if _site_is_running(port):
+        c.run(" ".join(run_test))
+    else:
+
+        def print_subproc_output(pipe, label):
+            """Prints output from a given pipe with a label."""
+            for line in iter(pipe.readline, b""):
+                print(f"[{label}] {line.decode().strip()}", flush=True)
+            pipe.close()
+
+        cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{port}"]
+        with subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ) as app_process:
+            _wait_for_running_site(port)
+            stdout_thread = threading.Thread(
+                target=print_subproc_output, args=(app_process.stdout, "STDOUT")
+            )
+            stderr_thread = threading.Thread(
+                target=print_subproc_output, args=(app_process.stderr, "STDERR")
+            )
+            stdout_thread.start()
+            stderr_thread.start()
+            try:
+                subprocess.run(run_test, check=True)
+            except subprocess.CalledProcessError:
+                # This just means a test failed.  We don't need to see
+                # a stack trace, the assert failures are already displayed.
+                tests_failed = True
+            finally:
+                app_process.terminate()
+                stdout_thread.join()
+                stderr_thread.join()
+
+    if tests_failed:
+        raise RuntimeError("tests failed")
+
+
 @task(
     pre=[_ensure_test_db],
     help={
@@ -150,23 +211,7 @@ def accept(  # pylint: disable=too-many-arguments
     if verbose:
         run_test.append("-vv")
 
-    tests_failed = False
-    if _site_is_running(port):
-        c.run(" ".join(run_test))
-    else:
-        cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{port}"]
-        with subprocess.Popen(cmd) as app_process:
-            try:
-                subprocess.run(run_test, check=True)
-            except subprocess.CalledProcessError:
-                # This just means a test failed.  We don't need to see
-                # a stack trace, the assert failures are already displayed.
-                tests_failed = True
-            finally:
-                app_process.terminate()
-
-    if tests_failed:
-        raise RuntimeError("tests failed")
+    _run_browser_tests(5001, run_test)
 
 
 @task(pre=[_ensure_test_db])
@@ -181,23 +226,7 @@ def playwright(c):
     run_test = ["pytest", "tests/playwright/playwright.py", "-s"]
 
     tests_failed = False
-    port = 5001
-    if _site_is_running(port):
-        c.run(" ".join(run_test))
-    else:
-        cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{port}"]
-        with subprocess.Popen(cmd) as app_process:
-            try:
-                subprocess.run(run_test, check=True)
-            except subprocess.CalledProcessError:
-                # This just means a test failed.  We don't need to see
-                # a stack trace, the assert failures are already displayed.
-                tests_failed = True
-            finally:
-                app_process.terminate()
-
-    if tests_failed:
-        raise RuntimeError("tests failed")
+    _run_browser_tests(5001, run_test)
 
 
 @task(pre=[_ensure_test_db], help={"html": "open html report"})
