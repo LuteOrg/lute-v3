@@ -6,8 +6,8 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
 from lute.models.language import Language
-from lute.models.setting import UserSetting
-import lute.language.service
+from lute.models.repositories import LanguageRepository, UserSettingRepository
+from lute.language.service import Service
 from lute.language.forms import LanguageForm
 from lute.db import db
 from lute.parse.registry import supported_parsers
@@ -116,7 +116,8 @@ def new(langname):
     """
     Create a new language.
     """
-    predefined = lute.language.service.predefined_languages()
+    service = Service(db.session)
+    predefined = service.predefined_languages()
     language = Language()
     if langname is not None:
         candidates = [lang for lang in predefined if lang.name == langname]
@@ -135,7 +136,8 @@ def new(langname):
         # adds language Y, the filter stays on X, which may be
         # disconcerting/confusing.  Forcing a reselect is painless and
         # unambiguous.
-        UserSetting.set_value("current_language_id", 0)
+        repo = UserSettingRepository(db.session)
+        repo.set_value("current_language_id", 0)
         db.session.commit()
         return redirect("/")
 
@@ -154,14 +156,16 @@ def delete(langid):
     language = db.session.get(Language, langid)
     if not language:
         flash(f"Language {langid} not found")
-    Language.delete(language)
+    r = LanguageRepository(db.session)
+    r.delete(language)
     return redirect(url_for("language.index"))
 
 
 @bp.route("/list_predefined", methods=["GET"])
 def list_predefined():
     "Show predefined languages that are not already in the db."
-    predefined = lute.language.service.predefined_languages()
+    service = Service(db.session)
+    predefined = service.predefined_languages()
     existing_langs = db.session.query(Language).all()
     existing_names = [l.name for l in existing_langs]
     new_langs = [p for p in predefined if p.name not in existing_names]
@@ -171,8 +175,10 @@ def list_predefined():
 @bp.route("/load_predefined/<langname>", methods=["GET"])
 def load_predefined(langname):
     "Load a predefined language and its stories."
-    lang_id = lute.language.service.load_language_def(langname)
-    UserSetting.set_value("current_language_id", lang_id)
+    service = Service(db.session)
+    lang_id = service.load_language_def(langname)
+    repo = UserSettingRepository(db.session)
+    repo.set_value("current_language_id", lang_id)
     db.session.commit()
     flash(f"Loaded {langname} and sample book(s)")
     return redirect("/")

@@ -18,7 +18,7 @@ from typing import List
 from natto import MeCab
 import jaconv
 from lute.parse.base import ParsedToken, AbstractParser
-from lute.models.setting import UserSetting, MissingUserSettingKeyException
+from lute.settings.current import current_settings
 
 
 class JapaneseParser(AbstractParser):
@@ -30,7 +30,7 @@ class JapaneseParser(AbstractParser):
     The parser uses natto-py library, and so should
     be able to find mecab automatically; if it can't,
     you may need to set the MECAB_PATH env variable,
-    managed by UserSetting.set_value("mecab_path", p)
+    managed by UserSettingRepository.set_value("mecab_path", p)
     """
 
     _is_supported = None
@@ -42,13 +42,21 @@ class JapaneseParser(AbstractParser):
         True if a natto MeCab can be instantiated,
         otherwise false.
         """
-        mecab_path = os.environ.get("MECAB_PATH", "<NOTSET>")
-        if (
-            mecab_path == JapaneseParser._old_mecab_path
-        ) and JapaneseParser._is_supported is not None:
+
+        mecab_path = current_settings.get("mecab_path", "") or ""
+        mecab_path = mecab_path.strip()
+        path_unchanged = mecab_path == JapaneseParser._old_mecab_path
+        if path_unchanged and JapaneseParser._is_supported is not None:
             return JapaneseParser._is_supported
 
-        b = False
+        # Natto uses the MECAB_PATH env key if it's set.
+        env_key = "MECAB_PATH"
+        if mecab_path != "":
+            os.environ[env_key] = mecab_path
+        else:
+            os.environ.pop(env_key, None)
+
+        mecab_works = False
 
         # Calling MeCab() prints to stderr even if the
         # exception is caught.  Suppress that output noise.
@@ -56,15 +64,15 @@ class JapaneseParser(AbstractParser):
         try:
             sys.stderr = temp_err
             MeCab()
-            b = True
+            mecab_works = True
         except:  # pylint: disable=bare-except
-            b = False
+            mecab_works = False
         finally:
             sys.stderr = sys.__stderr__
 
         JapaneseParser._old_mecab_path = mecab_path
-        JapaneseParser._is_supported = b
-        return b
+        JapaneseParser._is_supported = mecab_works
+        return mecab_works
 
     @classmethod
     def name(cls):
@@ -135,13 +143,9 @@ class JapaneseParser(AbstractParser):
         if self._string_is_hiragana(text):
             return None
 
-        jp_reading_setting = ""
-        try:
-            jp_reading_setting = UserSetting.get_value("japanese_reading")
-        except MissingUserSettingKeyException:
-            # During loading of demo data, the key isn't set, but the
-            # reading isn't needed either, as this is only called when
-            # calculating stats.
+        jp_reading_setting = current_settings.get("japanese_reading", "").strip()
+        if jp_reading_setting == "":
+            # Don't set reading if nothing specified.
             return None
 
         flags = r"-O yomi"

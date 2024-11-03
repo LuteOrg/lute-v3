@@ -2,7 +2,6 @@
 Term entity.
 """
 
-from sqlalchemy import text as sqltext, and_
 from lute.db import db
 
 wordparents = db.Table(
@@ -71,24 +70,6 @@ class TermTag(db.Model):
     def comment(self, c):
         "Set cleaned comment."
         self._comment = c if c is not None else ""
-
-    @staticmethod
-    def find(termtag_id):
-        "Get by ID."
-        return db.session.query(TermTag).filter(TermTag.id == termtag_id).first()
-
-    @staticmethod
-    def find_by_text(text):
-        "Find a tag by text, or None if not found."
-        return db.session.query(TermTag).filter(TermTag.text == text).first()
-
-    @staticmethod
-    def find_or_create_by_text(text):
-        "Return tag or create one."
-        ret = TermTag.find_by_text(text)
-        if ret is not None:
-            return ret
-        return TermTag(text)
 
 
 class TermTextChangedException(Exception):
@@ -309,18 +290,6 @@ class Term(
             ti.source = s.strip()
             self.images.append(ti)
 
-    @staticmethod
-    def delete_empty_images():
-        """
-        Data clean-up: delete empty images.
-
-        The code was leaving empty images in the db, which are obviously no good.
-        This is a hack to clean up the data.
-        """
-        sql = "delete from wordimages where trim(WiSource) = ''"
-        db.session.execute(sqltext(sql))
-        db.session.commit()
-
     def get_flash_message(self):
         "Get the flash message."
         if not self.term_flash_message:
@@ -343,27 +312,6 @@ class Term(
         self.term_flash_message = None
         return m
 
-    @staticmethod
-    def find(term_id):
-        "Get by ID."
-        return db.session.query(Term).filter(Term.id == term_id).first()
-
-    @staticmethod
-    def find_by_spec(spec):
-        """
-        Find by the given spec term's language ID and text.
-        Returns None if not found.
-        """
-        langid = spec.language.id
-        text_lc = spec.text_lc
-        query = db.session.query(Term).filter(
-            and_(Term.language_id == langid, Term.text_lc == text_lc)
-        )
-        terms = query.all()
-        if not terms:
-            return None
-        return terms[0]
-
 
 class Status(db.Model):  # pylint: disable=too-few-public-methods
     """
@@ -379,8 +327,3 @@ class Status(db.Model):  # pylint: disable=too-few-public-methods
     id = db.Column("StID", db.SmallInteger, primary_key=True)
     text = db.Column("StText", db.String(250))
     abbreviation = db.Column("StAbbreviation", db.String(250))
-
-    @staticmethod
-    def all():
-        "Get all statuses."
-        return db.session.query(Status).all()

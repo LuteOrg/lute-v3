@@ -64,8 +64,7 @@ def test_deleting_termtag_removes_wordtags_table_record(empty_db, spanish):
     sqlassoc = "select * from wordtags"
     assert_record_count_equals(sqlassoc, 3, "word tag associations exist")
 
-    termtag = TermTag.find(tg.id)
-    # route_delete(tg.id)
+    termtag = db.session.get(TermTag, tg.id)
     db.session.delete(termtag)
     db.session.commit()
 

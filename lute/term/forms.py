@@ -16,8 +16,8 @@ from wtforms import (
 from wtforms import ValidationError
 from wtforms.validators import DataRequired
 
-from lute.models.language import Language
 from lute.models.term import Term
+from lute.models.repositories import LanguageRepository, TermRepository
 
 
 class TermForm(FlaskForm):
@@ -63,7 +63,8 @@ class TermForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         "Call the constructor of the superclass (FlaskForm)"
         super().__init__(*args, **kwargs)
-        term = kwargs.get("obj")
+        term = kwargs["obj"]
+        self.session = kwargs["session"]
 
         def _data(arr):
             "Get data in proper format for tagify."
@@ -102,7 +103,8 @@ class TermForm(FlaskForm):
         if self.language_id.data in (None, 0):
             return
         langid = int(self.language_id.data)
-        lang = Language.find(langid)
+        language_repo = LanguageRepository(self.session)
+        lang = language_repo.find(langid)
         if lang is None:
             return
 
@@ -110,7 +112,8 @@ class TermForm(FlaskForm):
         if orig_text in ("", None):
             # New term - throw if already exists.
             spec = Term(lang, self.text.data)
-            self.duplicated_term = Term.find_by_spec(spec)
+            term_repo = TermRepository(self.session)
+            self.duplicated_term = term_repo.find_by_spec(spec)
             if self.duplicated_term is not None:
                 raise ValidationError("Term already exists")
 

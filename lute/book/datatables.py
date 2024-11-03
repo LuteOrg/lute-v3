@@ -2,11 +2,10 @@
 Show books in datatables.
 """
 
-from lute.db import db
 from lute.utils.data_tables import DataTablesSqliteQuery, supported_parser_type_criteria
 
 
-def get_data_tables_list(parameters, is_archived):
+def get_data_tables_list(parameters, is_archived, session):
     "Book json data for datatables."
     archived = "true" if is_archived else "false"
 
@@ -70,7 +69,5 @@ def get_data_tables_list(parameters, is_archived):
     if language_id != 0:
         base_sql += f" and LgID = {language_id}"
 
-    session = db.session
     connection = session.connection()
-
     return DataTablesSqliteQuery.get_data(base_sql, parameters, connection)

@@ -25,8 +25,9 @@ from sqlalchemy.pool import Pool
 from lute.config.app_config import AppConfig
 from lute.db import db
 from lute.db.setup.main import setup_db
+from lute.db.management import add_default_user_settings
 from lute.db.data_cleanup import clean_data
-import lute.backup.service as backupservice
+from lute.backup.service import Service as BackupService
 import lute.db.demo
 import lute.utils.formutils
 
@@ -34,8 +35,9 @@ from lute.parse.registry import init_parser_plugins, supported_parsers
 
 from lute.models.book import Book
 from lute.models.language import Language
-from lute.models.setting import BackupSettings, UserSetting
-from lute.book.stats import mark_stale
+from lute.settings.current import refresh_global_settings, current_settings
+from lute.models.repositories import UserSettingRepository
+from lute.book.stats import Service as StatsService
 
 from lute.book.routes import bp as book_bp
 from lute.bookmarks.routes import bp as bookmarks_bp
@@ -111,7 +113,8 @@ def _add_base_routes(app, app_config):
         """
         Inject backup settings into the all templates for the menu bar.
         """
-        bs = BackupSettings.get_backup_settings()
+        us_repo = UserSettingRepository(db.session)
+        bs = us_repo.get_backup_settings()
         have_languages = len(db.session.query(Language).all()) > 0
         ret = {
             "have_languages": have_languages,
@@ -119,27 +122,31 @@ def _add_base_routes(app, app_config):
             "backup_directory": bs.backup_dir,
             "backup_last_display_date": bs.last_backup_display_date,
             "backup_time_since": bs.time_since_last_backup,
-            "user_settings": json.dumps(UserSetting.all_settings()),
+            "user_settings": json.dumps(current_settings),
         }
         return ret
 
     @app.route("/")
     def index():
-        is_production = not lute.db.demo.contains_demo_data()
-        bkp_settings = BackupSettings.get_backup_settings()
+        is_production = not lute.db.demo.contains_demo_data(db.session)
+        us_repo = UserSettingRepository(db.session)
+        bkp_settings = us_repo.get_backup_settings()
 
         have_books = len(db.session.query(Book).all()) > 0
         have_languages = len(db.session.query(Language).all()) > 0
-        language_choices = lute.utils.formutils.language_choices("(all languages)")
-        current_language_id = lute.utils.formutils.valid_current_language_id()
+        language_choices = lute.utils.formutils.language_choices(
+            db.session, "(all languages)"
+        )
+        current_language_id = lute.utils.formutils.valid_current_language_id(db.session)
 
-        should_run_auto_backup = backupservice.should_run_auto_backup(bkp_settings)
+        bs = BackupService(db.session)
+        should_run_auto_backup = bs.should_run_auto_backup(bkp_settings)
         # Only back up if we have books, otherwise the backup is
         # kicked off when the user empties the demo database.
         if is_production and have_books and should_run_auto_backup:
             return redirect("/backup/backup", 302)
 
-        warning_msg = backupservice.backup_warning(bkp_settings)
+        warning_msg = bs.backup_warning(bkp_settings)
         backup_show_warning = (
             bkp_settings.backup_warn
             and bkp_settings.backup_enabled
@@ -152,7 +159,7 @@ def _add_base_routes(app, app_config):
                 hide_homelink=True,
                 dbname=app_config.dbname,
                 datapath=app_config.datapath,
-                tutorial_book_id=lute.db.demo.tutorial_book_id(),
+                tutorial_book_id=lute.db.demo.tutorial_book_id(db.session),
                 have_books=have_books,
                 have_languages=have_languages,
                 language_choices=language_choices,
@@ -167,14 +174,15 @@ def _add_base_routes(app, app_config):
     @app.route("/refresh_all_stats")
     def refresh_all_stats():
         books_to_update = db.session.query(Book).filter(Book.archived == 0).all()
+        svc = StatsService(db.session)
         for book in books_to_update:
-            mark_stale(book)
+            svc.mark_stale(book)
         return redirect("/", 302)
 
     @app.route("/wipe_database")
     def wipe_db():
-        if lute.db.demo.contains_demo_data():
-            lute.db.demo.delete_demo_data()
+        if lute.db.demo.contains_demo_data(db.session):
+            lute.db.demo.delete_demo_data(db.session)
             msg = """
             The database has been wiped clean.  Have fun! <br /><br />
             <i>(Lute has automatically enabled backups --
@@ -185,8 +193,8 @@ def _add_base_routes(app, app_config):
 
     @app.route("/remove_demo_flag")
     def remove_demo():
-        if lute.db.demo.contains_demo_data():
-            lute.db.demo.remove_flag()
+        if lute.db.demo.contains_demo_data(db.session):
+            lute.db.demo.remove_flag(db.session)
             msg = """
             Demo mode deactivated. Have fun! <br /><br />
             <i>(Lute has automatically enabled backups --
@@ -305,9 +313,10 @@ def _create_app(app_config, extra_config):
 
     with app.app_context():
         db.create_all()
-        UserSetting.load()
+        add_default_user_settings(db.session, app_config.default_user_backup_path)
+        refresh_global_settings(db.session)
         # TODO valid parsers: do parser check, mark valid as active, invalid as inactive.
-        clean_data()
+        clean_data(db.session)
     app.db = db
 
     _add_base_routes(app, app_config)
@@ -392,6 +401,7 @@ def create_app(
     outfunc("Initializing app.")
     app = _create_app(app_config, extra_config)
 
+    # Plugins are loaded after the app, as they may use settings etc.
     _init_parser_plugins(app_config.plugin_datapath, outfunc)
 
     return app

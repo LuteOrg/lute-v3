@@ -4,12 +4,13 @@
 
 from datetime import datetime
 from flask import Blueprint, flash, request, render_template, redirect, jsonify
-from lute.read.service import set_unknowns_to_known, start_reading, get_popup_data
+from lute.read.service import Service
 from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
-from lute.models.book import Book, Text
-from lute.models.setting import UserSetting
+from lute.settings.current import current_settings
+from lute.models.book import Text
+from lute.models.repositories import BookRepository
 from lute.db import db
 
 
@@ -21,7 +22,7 @@ def _render_book_page(book, pagenum):
     Render a particular book page.
     """
     lang = book.language
-    show_highlights = bool(int(UserSetting.get_value("show_highlights")))
+    show_highlights = current_settings["show_highlights"]
     term_dicts = lang.all_dictionaries()[lang.id]["term"]
 
     return render_template(
@@ -39,6 +40,12 @@ def _render_book_page(book, pagenum):
     )
 
 
+def _find_book(bookid):
+    "Find book from db."
+    br = BookRepository(db.session)
+    return br.find(bookid)
+
+
 @bp.route("/<int:bookid>", methods=["GET"])
 def read(bookid):
     """
@@ -46,7 +53,7 @@ def read(bookid):
 
     This is called from the book listing, on Lute index.
     """
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     if book is None:
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
@@ -54,7 +61,7 @@ def read(bookid):
     page_num = 1
     text = book.texts[0]
     if book.current_tx_id:
-        text = Text.find(book.current_tx_id)
+        text = db.session.get(Text, book.current_tx_id)
         page_num = text.order
 
     return _render_book_page(book, page_num)
@@ -67,7 +74,7 @@ def read_page(bookid, pagenum):
 
     Called from term Sentences link.
     """
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     if book is None:
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
@@ -84,13 +91,14 @@ def page_done():
     pagenum = int(data.get("pagenum"))
     restknown = data.get("restknown")
 
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     text = book.text_at_page(pagenum)
     text.read_date = datetime.now()
     db.session.add(text)
     db.session.commit()
+    service = Service(db.session)
     if restknown:
-        set_unknowns_to_known(text)
+        service.set_unknowns_to_known(text)
     return jsonify("ok")
 
 
@@ -99,7 +107,7 @@ def delete_page(bookid, pagenum):
     """
     Delete page.
     """
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     if book is None:
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
@@ -119,7 +127,7 @@ def delete_page(bookid, pagenum):
 def new_page(bookid, position, pagenum):
     "Create a new page."
     form = TextForm()
-    book = Book.find(bookid)
+    book = _find_book(bookid)
 
     if form.validate_on_submit():
         t = None
@@ -149,7 +157,7 @@ def save_player_data():
     "Save current player position, bookmarks.  Called on a loop by the player."
     data = request.json
     bookid = int(data.get("bookid"))
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     book.audio_current_pos = float(data.get("position"))
     book.audio_bookmarks = data.get("bookmarks")
     db.session.add(book)
@@ -160,11 +168,12 @@ def save_player_data():
 @bp.route("/renderpage/<int:bookid>/<int:pagenum>", methods=["GET"])
 def render_page(bookid, pagenum):
     "Method called by ajax, render the given page."
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     if book is None:
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
-    paragraphs = start_reading(book, pagenum, db.session)
+    service = Service(db.session)
+    paragraphs = service.start_reading(book, pagenum)
     return render_template("read/page_content.html", paragraphs=paragraphs)
 
 
@@ -180,13 +189,14 @@ def term_form(langid, text):
     Create a multiword term for the given text, replacing the LUTESLASH hack.
     """
     usetext = text.replace("LUTESLASH", "/")
-    repo = Repository(db)
+    repo = Repository(db.session)
     term = repo.find_or_new(langid, usetext)
     if term.status == 0:
         term.status = 1
     return handle_term_form(
         term,
         repo,
+        db.session,
         "/read/frameform.html",
         render_template("/read/updated.html", term_text=term.text),
         embedded_in_reading_frame=True,
@@ -198,7 +208,7 @@ def edit_term_form(term_id):
     """
     Edit a term.
     """
-    repo = Repository(db)
+    repo = Repository(db.session)
     term = repo.load(term_id)
     # print(f"editing term {term_id}", flush=True)
     if term.status == 0:
@@ -206,6 +216,7 @@ def edit_term_form(term_id):
     return handle_term_form(
         term,
         repo,
+        db.session,
         "/read/frameform.html",
         render_template("/read/updated.html", term_text=term.text),
         embedded_in_reading_frame=True,
@@ -217,7 +228,8 @@ def term_popup(termid):
     """
     Get popup html for DBTerm, or None if nothing should be shown.
     """
-    d = get_popup_data(termid)
+    service = Service(db.session)
+    d = service.get_popup_data(termid)
     if d is None:
         return ""
     return render_template(
@@ -240,7 +252,7 @@ def flashcopied():
 @bp.route("/editpage/<int:bookid>/<int:pagenum>", methods=["GET", "POST"])
 def edit_page(bookid, pagenum):
     "Edit the text on a page."
-    book = Book.find(bookid)
+    book = _find_book(bookid)
     text = book.text_at_page(pagenum)
     if text is None:
         return redirect("/", 302)

@@ -8,7 +8,7 @@ import sys
 
 from lute.book.model import Book, Repository
 from lute.db import db
-from lute.models.language import Language
+from lute.models.repositories import LanguageRepository
 
 
 def import_books_from_csv(file, language, tags, commit):
@@ -26,7 +26,9 @@ def import_books_from_csv(file, language, tags, commit):
                 database. If false, a list of books to be imported will be
                 printed out, but no changes will be made.
     """
-    repo = Repository(db)
+    repo = Repository(db.session)
+    lang_repo = LanguageRepository(db.session)
+
     count = 0
     with open(file, newline="", encoding="utf-8") as f:
         r = csv.DictReader(f)
@@ -37,7 +39,7 @@ def import_books_from_csv(file, language, tags, commit):
             if not book.language_name:
                 print(f"Skipping book with unspecified language: {book.title}")
                 continue
-            lang = Language.find_by_name(book.language_name)
+            lang = lang_repo.find_by_name(book.language_name)
             if not lang:
                 print(
                     f"Skipping book with unknown language ({book.language_name}): {book.title}"

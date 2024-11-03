@@ -35,8 +35,8 @@ def test_smoke_book_datatables_query_runs(app_context, _dt_params):
     """
     Smoke test only, ensure query runs.
     """
-    load_demo_stories()
-    get_data_tables_list(_dt_params, False)
+    load_demo_stories(db.session)
+    get_data_tables_list(_dt_params, False, db.session)
     # print(d['data'])
     a = 1
     assert a == 1, "dummy check"
@@ -46,12 +46,12 @@ def test_book_query_only_returns_supported_language_books(app_context, _dt_param
     """
     Smoke test only, ensure query runs.
     """
-    load_demo_stories()
+    load_demo_stories(db.session)
     for lang in db.session.query(Language).all():
         lang.parser_type = "unknown"
         db.session.add(lang)
     db.session.commit()
-    d = get_data_tables_list(_dt_params, False)
+    d = get_data_tables_list(_dt_params, False, db.session)
     assert len(d["data"]) == 0, "no books should be active"
 
 
@@ -63,7 +63,7 @@ def test_book_data_says_completed_if_last_page_has_been_read(
     db.session.add(b)
     db.session.commit()
     _dt_params["search"] = {"value": "title", "regex": False}
-    d = get_data_tables_list(_dt_params, False)
+    d = get_data_tables_list(_dt_params, False, db.session)
     actual = d["data"][0]
     assert actual["BkID"] == b.id, "correct book"
     assert actual["IsCompleted"] == 0, "not completed"
@@ -71,7 +71,7 @@ def test_book_data_says_completed_if_last_page_has_been_read(
     t.read_date = datetime.now()
     db.session.add(t)
     db.session.commit()
-    d = get_data_tables_list(_dt_params, False)
+    d = get_data_tables_list(_dt_params, False, db.session)
     actual = d["data"][0]
     assert actual["BkID"] == b.id, "correct book"
     assert actual["IsCompleted"] == 1, "completed"

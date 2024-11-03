@@ -3,7 +3,7 @@ Render service tests.
 """
 
 from lute.parse.base import ParsedToken
-from lute.read.render.service import find_all_Terms_in_string, get_paragraphs
+from lute.read.render.service import Service
 from lute.db import db
 from lute.models.term import Term
 
@@ -17,7 +17,8 @@ def _run_scenario(language, content, expected_found, msg=""):
     find_all method returns the expected_found terms that
     exist in the content string.
     """
-    found_terms = find_all_Terms_in_string(content, language)
+    service = Service(db.session)
+    found_terms = service.find_all_Terms_in_string(content, language)
     assert len(found_terms) == len(expected_found), "found count, " + msg
     zws = "\u200B"  # zero-width space
     found_terms = [t.text.replace(zws, "") for t in found_terms]
@@ -101,7 +102,8 @@ def test_smoke_get_paragraphs(spanish, app_context):
     assert_sql_result(sql, ["perro", "tengo/ /un", "un/ /gato"], "initial")
 
     ParsedToken.reset_counters()
-    paras = get_paragraphs(t.text, t.book.language)
+    service = Service(db.session)
+    paras = service.get_paragraphs(t.text, t.book.language)
     assert len(paras) == 2
 
     def stringize(t):

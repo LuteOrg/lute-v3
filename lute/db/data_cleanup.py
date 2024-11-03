@@ -5,11 +5,10 @@ Sometimes required as data management changes.
 These cleanup routines will be called by the app_factory.
 """
 
-from lute.db import db
 from lute.models.book import Text
 
 
-def _set_texts_word_count():
+def _set_texts_word_count(session):
     """
     texts.TxWordCount should be set for all texts.
 
@@ -18,7 +17,7 @@ def _set_texts_word_count():
 
     Ref https://github.com/jzohrab/lute-v3/issues/95
     """
-    calc_counts = db.session.query(Text).filter(Text.word_count.is_(None)).all()
+    calc_counts = session.query(Text).filter(Text.word_count.is_(None)).all()
 
     # Don't recalc with invalid parsers!!!!
     recalc = [t for t in calc_counts if t.book.language.is_supported]
@@ -31,10 +30,10 @@ def _set_texts_word_count():
         pt = t.book.language.get_parsed_tokens(t.text)
         words = [w for w in pt if w.is_word]
         t.word_count = len(words)
-        db.session.add(t)
-    db.session.commit()
+        session.add(t)
+    session.commit()
 
 
-def clean_data():
+def clean_data(session):
     "Clean all data as required."
-    _set_texts_word_count()
+    _set_texts_word_count(session)

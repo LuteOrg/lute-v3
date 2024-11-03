@@ -2,11 +2,10 @@
 Show bookmarks in datatables.
 """
 
-from lute.db import db
 from lute.utils.data_tables import DataTablesSqliteQuery
 
 
-def get_data_tables_list(parameters, book_id):
+def get_data_tables_list(parameters, book_id, session):
     "Bookmark json data for datatables."
 
     base_sql = f"""
@@ -16,7 +15,5 @@ def get_data_tables_list(parameters, book_id):
       WHERE tx.TxBkID = { book_id }
     """
 
-    session = db.session
     connection = session.connection()
-
     return DataTablesSqliteQuery.get_data(base_sql, parameters, connection)
