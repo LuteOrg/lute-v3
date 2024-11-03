@@ -23,5 +23,5 @@ logging.getLogger("waitress.queue").setLevel(logging.ERROR)
 app = create_app()
 
 port = int(sys.argv[1])
-print(f"running at localhost:{port}")
+print(f"running at localhost:{port}", flush=True)
 serve(app, host="0.0.0.0", port=port)
