@@ -51,7 +51,7 @@ def test_end_of_sentence_stored_in_parsed_tokens(thai):
         ("สวัสดี", True),
         ("ทุกคน", True),
         ("!", False, True),
-        (" ", False),
+        (" ", False, True),
         ("ฉัน", True),
         ("เรียน", True),
         ("ภาษาไทย", True),
