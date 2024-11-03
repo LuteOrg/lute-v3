@@ -115,15 +115,15 @@ def _wait_for_running_site(port):
         attempt_count += 1
         try:
             print(f"  Attempt {attempt_count}", flush=True)
-            resp = requests.get(url)
+            requests.get(url, timeout=5)
             is_running = True
         except requests.exceptions.ConnectionError:
             time.sleep(1)
     if not is_running:
-        raise Exception("Site didn't start?")
+        raise Exception("Site didn't start?")  # pylint: disable=broad-exception-raised
 
 
-def _run_browser_tests(port, run_test):
+def _run_browser_tests(c, port, run_test):
     "Start server on port if necessary, and run tests."
     tests_failed = False
     if _site_is_running(port):
@@ -211,7 +211,7 @@ def accept(  # pylint: disable=too-many-arguments
     if verbose:
         run_test.append("-vv")
 
-    _run_browser_tests(5001, run_test)
+    _run_browser_tests(c, 5001, run_test)
 
 
 @task(pre=[_ensure_test_db])
@@ -224,9 +224,7 @@ def playwright(c):
     If Lute's not running on specified port, start a server.
     """
     run_test = ["pytest", "tests/playwright/playwright.py", "-s"]
-
-    tests_failed = False
-    _run_browser_tests(5001, run_test)
+    _run_browser_tests(c, 5001, run_test)
 
 
 @task(pre=[_ensure_test_db], help={"html": "open html report"})

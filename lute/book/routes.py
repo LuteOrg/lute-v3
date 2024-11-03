@@ -209,7 +209,7 @@ def delete(bookid):
 def table_stats(bookid):
     "Get the stats, return ajax."
     b = _find_book(bookid)
-    if b == None or b.language == None:
+    if b is None or b.language is None:
         # Playwright tests were sometimes passing an id that didn't exist ...
         # I believe this is due to page caching, i.e. the book listing
         # is showing books and IDs that no longer exist after cache reset.
