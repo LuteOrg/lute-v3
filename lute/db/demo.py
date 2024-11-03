@@ -12,7 +12,7 @@ from sqlalchemy import text
 from lute.language.service import Service
 from lute.book.model import Repository
 from lute.book.stats import Service as StatsService
-from lute.models.setting import SystemSettingRepository
+from lute.models.repositories import SystemSettingRepository
 import lute.db.management
 
 

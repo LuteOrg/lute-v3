@@ -7,7 +7,7 @@ Themes are stored in the css folder, current theme in UserSetting.
 import os
 from glob import glob
 from flask import current_app
-from lute.models.setting import UserSettingRepository
+from lute.models.repositories import UserSettingRepository
 
 default_entry = ("-", "(default)")
 

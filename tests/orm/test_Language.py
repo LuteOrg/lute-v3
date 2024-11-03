@@ -3,7 +3,8 @@ Language mapping tests.
 """
 
 import json
-from lute.models.language import Language, LanguageDictionary, LanguageRepository
+from lute.models.language import Language, LanguageDictionary
+from lute.models.repositories import LanguageRepository
 from lute.db import db
 from tests.dbasserts import assert_sql_result
 from tests.utils import make_text, add_terms

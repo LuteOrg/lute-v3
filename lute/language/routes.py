@@ -5,8 +5,8 @@
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
-from lute.models.language import Language, LanguageRepository
-from lute.models.setting import UserSettingRepository
+from lute.models.language import Language
+from lute.models.repositories import LanguageRepository, UserSettingRepository
 from lute.language.service import Service
 from lute.language.forms import LanguageForm
 from lute.db import db

@@ -5,7 +5,8 @@ Low value but ensure that the db mapping is correct.
 """
 
 from lute.db import db
-from lute.models.language import Language, LanguageRepository
+from lute.models.language import Language
+from lute.models.repositories import LanguageRepository
 from tests.dbasserts import assert_sql_result
 
 

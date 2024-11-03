@@ -5,7 +5,7 @@ Theme service tests.
 import os
 from lute.themes.service import Service
 from lute.db import db
-from lute.models.setting import UserSettingRepository
+from lute.models.repositories import UserSettingRepository
 
 
 def test_list_themes(app_context):

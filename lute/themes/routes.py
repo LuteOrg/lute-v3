@@ -3,7 +3,7 @@
 from flask import Blueprint, Response, jsonify
 
 from lute.themes.service import Service
-from lute.models.setting import UserSettingRepository
+from lute.models.repositories import UserSettingRepository
 from lute.settings.current import current_settings
 from lute.db import db
 

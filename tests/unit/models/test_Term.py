@@ -5,7 +5,8 @@ Term tests.
 import datetime
 import pytest
 from sqlalchemy import text
-from lute.models.term import Term, TermRepository, TermImage
+from lute.models.term import Term, TermImage
+from lute.models.repositories import TermRepository
 from lute.db import db
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
 

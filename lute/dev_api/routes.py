@@ -18,7 +18,7 @@ import os
 from sqlalchemy import text
 from flask import Blueprint, current_app, Response, jsonify, redirect, flash
 from lute.models.language import Language
-from lute.models.setting import UserSettingRepository
+from lute.models.repositories import UserSettingRepository
 import lute.parse.registry
 from lute.db import db
 import lute.db.management

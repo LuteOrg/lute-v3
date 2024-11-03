@@ -2,7 +2,8 @@
 
 from lute.cli.language_term_export import generate_language_file, generate_book_file
 
-from lute.models.term import Term, TermRepository, TermTag
+from lute.models.term import Term, TermTag
+from lute.models.repositories import TermRepository
 from lute.models.book import Book
 from lute.db import db
 from tests.dbasserts import assert_sql_result

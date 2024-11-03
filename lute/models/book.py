@@ -2,7 +2,6 @@
 Book entity.
 """
 
-from sqlalchemy import and_
 from lute.db import db
 from lute.parse.base import SentenceGroupIterator
 
@@ -29,20 +28,6 @@ class BookTag(db.Model):
         tt.text = text
         tt.comment = comment
         return tt
-
-
-class BookTagRepository:
-    "Repository."
-
-    def __init__(self, session):
-        self.session = session
-
-    def find_or_create_by_text(self, text):
-        "Return tag or create one."
-        ret = db.session.query(BookTag).filter(BookTag.text == text).first()
-        if ret is not None:
-            return ret
-        return BookTag.make_book_tag(text)
 
 
 class Book(
@@ -194,25 +179,6 @@ class Book(
             t = Text(b, page, index + 1)
 
         return b
-
-
-class BookRepository:
-    "Repository."
-
-    def __init__(self, session):
-        self.session = session
-
-    def find(self, book_id):
-        "Get by ID."
-        return self.session.query(Book).filter(Book.id == book_id).first()
-
-    def find_by_title(self, book_title, language_id):
-        "Get by title."
-        return (
-            self.session.query(Book)
-            .filter(and_(Book.title == book_title, Book.language_id == language_id))
-            .first()
-        )
 
 
 # TODO zzfuture fix: rename class and table to Page/pages

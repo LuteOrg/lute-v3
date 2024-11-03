@@ -4,7 +4,7 @@ DataTables sqlite tests.
 
 from lute.db import db
 from lute.utils.formutils import language_choices, valid_current_language_id
-from lute.models.setting import UserSettingRepository
+from lute.models.repositories import UserSettingRepository
 
 
 def test_language_choices(app_context):

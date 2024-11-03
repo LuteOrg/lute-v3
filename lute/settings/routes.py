@@ -13,7 +13,8 @@ from flask import (
 )
 from wtforms import BooleanField
 from lute.models.language import Language
-from lute.models.setting import UserSetting, UserSettingRepository
+from lute.models.setting import UserSetting
+from lute.models.repositories import UserSettingRepository
 from lute.themes.service import Service as ThemeService
 from lute.settings.forms import UserSettingsForm, UserShortcutsForm
 from lute.settings.current import refresh_global_settings

@@ -2,8 +2,12 @@
 Book domain objects.
 """
 
-from lute.models.book import Book as DBBook, BookTag, BookTagRepository, BookRepository
-from lute.models.language import LanguageRepository
+from lute.models.book import Book as DBBook, BookTag
+from lute.models.repositories import (
+    BookRepository,
+    BookTagRepository,
+    LanguageRepository,
+)
 
 
 class Book:  # pylint: disable=too-many-instance-attributes

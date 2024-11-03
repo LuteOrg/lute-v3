@@ -8,7 +8,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from lute.backup.service import Service, BackupException, DatabaseBackupFile
-from lute.models.setting import UserSettingRepository
+from lute.models.repositories import UserSettingRepository
 from lute.db import db
 
 # pylint: disable=missing-function-docstring

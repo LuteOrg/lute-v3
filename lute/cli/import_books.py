@@ -8,7 +8,7 @@ import sys
 
 from lute.book.model import Book, Repository
 from lute.db import db
-from lute.models.language import LanguageRepository
+from lute.models.repositories import LanguageRepository
 
 
 def import_books_from_csv(file, language, tags, commit):

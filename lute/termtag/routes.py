@@ -4,7 +4,8 @@
 
 from sqlalchemy import text
 from flask import Blueprint, request, jsonify, render_template, redirect
-from lute.models.term import TermTag, TermTagRepository
+from lute.models.term import TermTag
+from lute.models.repositories import TermTagRepository
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.termtag.datatables import get_data_tables_list
 from lute.db import db

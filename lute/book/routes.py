@@ -19,9 +19,12 @@ from lute.book.stats import Service as StatsService
 import lute.utils.formutils
 from lute.db import db
 
-from lute.models.language import Language, LanguageRepository
-from lute.models.book import BookRepository
-from lute.models.setting import UserSettingRepository
+from lute.models.language import Language
+from lute.models.repositories import (
+    BookRepository,
+    UserSettingRepository,
+    LanguageRepository,
+)
 from lute.book.model import Book, Repository
 
 

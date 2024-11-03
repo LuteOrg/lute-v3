@@ -8,8 +8,12 @@ them in the database.
 import re
 import sqlalchemy
 
-from lute.models.term import Term as DBTerm, TermRepository, TermTag, TermTagRepository
-from lute.models.language import LanguageRepository
+from lute.models.term import Term as DBTerm, TermTag
+from lute.models.repositories import (
+    LanguageRepository,
+    TermRepository,
+    TermTagRepository,
+)
 
 
 class Term:  # pylint: disable=too-many-instance-attributes

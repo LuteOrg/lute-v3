@@ -10,8 +10,9 @@ import pytest
 from pytest_bdd import given, when, then, scenarios, parsers
 
 from lute.db import db
-from lute.models.language import Language, LanguageRepository
-from lute.models.term import Term, TermRepository
+from lute.models.language import Language
+from lute.models.term import Term
+from lute.models.repositories import LanguageRepository, TermRepository
 from lute.termimport.service import Service, BadImportFileError
 
 from tests.dbasserts import assert_sql_result

@@ -35,7 +35,7 @@ from lute.parse.registry import init_parser_plugins, supported_parsers
 from lute.models.book import Book
 from lute.models.language import Language
 from lute.settings.current import load as load_settings, current_settings
-from lute.models.setting import UserSettingRepository
+from lute.models.repositories import UserSettingRepository
 from lute.book.stats import Service as StatsService
 
 from lute.book.routes import bp as book_bp

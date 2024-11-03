@@ -13,9 +13,13 @@ from flask import (
     current_app,
     send_file,
 )
-from lute.models.language import Language, LanguageRepository
-from lute.models.term import TermRepository, Status
-from lute.models.setting import UserSettingRepository
+from lute.models.language import Language
+from lute.models.term import Status
+from lute.models.repositories import (
+    LanguageRepository,
+    TermRepository,
+    UserSettingRepository,
+)
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list
 from lute.term.model import Repository, Term
