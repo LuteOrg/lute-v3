@@ -3,6 +3,7 @@
 from lute.cli.language_term_export import generate_language_file, generate_book_file
 
 from lute.models.term import Term, TermTag
+from lute.models.repositories import TermRepository
 from lute.models.book import Book
 from lute.db import db
 from tests.dbasserts import assert_sql_result
@@ -56,7 +57,8 @@ def test_single_book_export(app_context, empty_db, tmp_path, english):
     def _find(term_string):
         "Find term with the text."
         spec = Term(english, term_string)
-        ret = Term.find_by_spec(spec)
+        repo = TermRepository(db.session)
+        ret = repo.find_by_spec(spec)
         assert ret is not None, f"Have {term_string}"
         return ret
 

@@ -12,16 +12,19 @@ from flask import (
     flash,
 )
 from lute.utils.data_tables import DataTablesFlaskParamParser
-from lute.book import service
+from lute.book.service import Service, BookImportException
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm
-from lute.book.stats import get_stats
+from lute.book.stats import Service as StatsService
 import lute.utils.formutils
 from lute.db import db
 
 from lute.models.language import Language
-from lute.models.book import Book as DBBook
-from lute.models.setting import UserSetting
+from lute.models.repositories import (
+    BookRepository,
+    UserSettingRepository,
+    LanguageRepository,
+)
 from lute.book.model import Book, Repository
 
 
@@ -46,7 +49,7 @@ def datatables_source(is_archived):
     # (currently unused)
     parameters = DataTablesFlaskParamParser.parse_params(request.form)
     _load_term_custom_filters(request.form, parameters)
-    data = get_data_tables_list(parameters, is_archived)
+    data = get_data_tables_list(parameters, is_archived, db.session)
     return jsonify(data)
 
 
@@ -59,8 +62,10 @@ def datatables_active_source():
 @bp.route("/archived", methods=["GET"])
 def archived():
     "List archived books."
-    language_choices = lute.utils.formutils.language_choices("(all languages)")
-    current_language_id = lute.utils.formutils.valid_current_language_id()
+    language_choices = lute.utils.formutils.language_choices(
+        db.session, "(all languages)"
+    )
+    current_language_id = lute.utils.formutils.valid_current_language_id(db.session)
 
     return render_template(
         "book/index.html",
@@ -80,9 +85,10 @@ def datatables_archived_source():
 def _book_from_url(url):
     "Create a new book, or flash an error if can't parse."
     b = Book()
+    service = Service()
     try:
         b = service.book_from_url(url)
-    except service.BookImportException as e:
+    except BookImportException as e:
         flash(e.message, "notice")
         b = Book()
     return b
@@ -107,8 +113,8 @@ def new():
         b = _book_from_url(import_url)
 
     form = NewBookForm(obj=b)
-    form.language_id.choices = lute.utils.formutils.language_choices()
-    repo = Repository(db)
+    form.language_id.choices = lute.utils.formutils.language_choices(db.session)
+    repo = Repository(db.session)
 
     if form.validate_on_submit():
         try:
@@ -116,11 +122,12 @@ def new():
             book = repo.add(b)
             repo.commit()
             return redirect(f"/read/{book.id}/page/1", 302)
-        except service.BookImportException as e:
+        except BookImportException as e:
             flash(e.message, "notice")
 
     # Don't set the current language before submit.
-    current_language_id = int(UserSetting.get_value("current_language_id"))
+    usrepo = UserSettingRepository(db.session)
+    current_language_id = int(usrepo.get_value("current_language_id"))
     form.language_id.data = current_language_id
 
     return render_template(
@@ -136,7 +143,7 @@ def new():
 @bp.route("/edit/<int:bookid>", methods=["GET", "POST"])
 def edit(bookid):
     "Edit a book - can only change a few fields."
-    repo = Repository(db)
+    repo = Repository(db.session)
     b = repo.load(bookid)
     form = EditBookForm(obj=b)
 
@@ -147,7 +154,8 @@ def edit(bookid):
         flash(f"{b.title} updated.")
         return redirect("/", 302)
 
-    lang = Language.find(b.language_id)
+    lang_repo = LanguageRepository(db.session)
+    lang = lang_repo.find(b.language_id)
     return render_template(
         "book/edit.html",
         book=b,
@@ -162,10 +170,16 @@ def import_webpage():
     return render_template("book/import_webpage.html")
 
 
+def _find_book(bookid):
+    "Find book from db."
+    br = BookRepository(db.session)
+    return br.find(bookid)
+
+
 @bp.route("/archive/<int:bookid>", methods=["POST"])
 def archive(bookid):
     "Archive a book."
-    b = DBBook.find(bookid)
+    b = _find_book(bookid)
     b.archived = True
     db.session.add(b)
     db.session.commit()
@@ -175,7 +189,7 @@ def archive(bookid):
 @bp.route("/unarchive/<int:bookid>", methods=["POST"])
 def unarchive(bookid):
     "Archive a book."
-    b = DBBook.find(bookid)
+    b = _find_book(bookid)
     b.archived = False
     db.session.add(b)
     db.session.commit()
@@ -185,7 +199,7 @@ def unarchive(bookid):
 @bp.route("/delete/<int:bookid>", methods=["POST"])
 def delete(bookid):
     "Archive a book."
-    b = DBBook.find(bookid)
+    b = _find_book(bookid)
     db.session.delete(b)
     db.session.commit()
     return redirect("/", 302)
@@ -194,8 +208,15 @@ def delete(bookid):
 @bp.route("/table_stats/<int:bookid>", methods=["GET"])
 def table_stats(bookid):
     "Get the stats, return ajax."
-    b = DBBook.find(bookid)
-    stats = get_stats(b)
+    b = _find_book(bookid)
+    if b is None or b.language is None:
+        # Playwright tests were sometimes passing an id that didn't exist ...
+        # I believe this is due to page caching, i.e. the book listing
+        # is showing books and IDs that no longer exist after cache reset.
+        # TODO fix_hack: get rid of this hack.
+        return jsonify({})
+    svc = StatsService(db.session)
+    stats = svc.get_stats(b)
     ret = {
         "distinctterms": stats.distinctterms,
         "distinctunknowns": stats.distinctunknowns,

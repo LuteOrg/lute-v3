@@ -18,44 +18,44 @@ from tests.dbasserts import assert_record_count_equals, assert_sql_result
 
 def test_new_db_is_demo(app_context):
     "New db created from the baseline has the demo flag set."
-    assert contains_demo_data() is True, "new db contains demo."
+    assert contains_demo_data(db.session) is True, "new db contains demo."
 
 
 def test_removing_flag_means_not_demo(app_context):
     "Unsetting the flag means the db is not a demo."
-    remove_flag()
-    assert contains_demo_data() is False, "not a demo."
+    remove_flag(db.session)
+    assert contains_demo_data(db.session) is False, "not a demo."
 
 
 def test_wiping_db_clears_flag(app_context):
     "No longer a demo if the demo is wiped out!"
-    delete_demo_data()
-    assert contains_demo_data() is False, "not a demo."
+    delete_demo_data(db.session)
+    assert contains_demo_data(db.session) is False, "not a demo."
 
 
 def test_wipe_db_only_works_if_flag_is_set(app_context):
     "Can only wipe a demo db!"
-    remove_flag()
+    remove_flag(db.session)
     with pytest.raises(Exception):
-        delete_demo_data()
+        delete_demo_data(db.session)
 
 
 def test_tutorial_id_returned_if_present(app_context):
     "Sanity check."
-    assert tutorial_book_id() > 0, "have tutorial"
+    assert tutorial_book_id(db.session) > 0, "have tutorial"
 
     sql = 'update books set bktitle = "xxTutorial" where bktitle = "Tutorial"'
     db.session.execute(text(sql))
     db.session.commit()
-    assert tutorial_book_id() is None, "no tutorial"
+    assert tutorial_book_id(db.session) is None, "no tutorial"
 
     sql = 'update books set bktitle = "Tutorial" where bktitle = "xxTutorial"'
     db.session.execute(text(sql))
     db.session.commit()
-    assert tutorial_book_id() > 0, "have tutorial again"
+    assert tutorial_book_id(db.session) > 0, "have tutorial again"
 
-    delete_demo_data()
-    assert tutorial_book_id() is None, "no tutorial"
+    delete_demo_data(db.session)
+    assert tutorial_book_id(db.session) is None, "no tutorial"
 
 
 # Loading.
@@ -69,12 +69,12 @@ def test_load_demo_loads_language_yaml_files(app_context):
     This test is also used from "inv db.reset" in tasks.py
     (see .pytest.ini).
     """
-    delete_demo_data()
-    assert contains_demo_data() is False, "not a demo."
+    delete_demo_data(db.session)
+    assert contains_demo_data(db.session) is False, "not a demo."
     assert_record_count_equals("languages", 0, "wiped out")
 
-    load_demo_data()
-    assert contains_demo_data() is True, "demo loaded"
+    load_demo_data(db.session)
+    assert contains_demo_data(db.session) is True, "demo loaded"
     checks = [
         "select * from languages where LgName = 'English'",
         "select * from books where BkTitle = 'Tutorial'",

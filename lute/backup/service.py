@@ -10,8 +10,7 @@ from datetime import datetime
 import time
 from typing import List, Union
 
-from lute.db import db
-from lute.models.setting import SystemSetting
+from lute.models.repositories import UserSettingRepository
 from lute.models.book import Book
 from lute.models.term import Term
 
@@ -70,124 +69,125 @@ class DatabaseBackupFile:
         return f"{s} bytes"
 
 
-def create_backup(app_config, settings, is_manual=False, suffix=None):
-    """
-    Create backup using current app config, settings.
+class Service:
+    "Service."
 
-    is_manual is True if this is a user-triggered manual
-    backup, otherwise is False.
+    def __init__(self, session):
+        self.session = session
 
-    suffix can be specified for test.
+    def create_backup(self, app_config, settings, is_manual=False, suffix=None):
+        """
+        Create backup using current app config, settings.
 
-    settings are from Setting.get_backup_settings().
-      - backup_enabled
-      - backup_dir
-      - backup_auto
-      - backup_warn
-      - backup_count
-      - last_backup_datetime
-    """
-    if not os.path.exists(settings.backup_dir):
-        raise BackupException("Missing directory " + settings.backup_dir)
+        is_manual is True if this is a user-triggered manual
+        backup, otherwise is False.
 
-    ### Timing helper for when implement audio backup.
-    # def _print_now(msg):
-    #     now = datetime.now().strftime("%H-%M-%S")
-    #     print(f"{now} - {msg}", flush=True)
+        suffix can be specified for test.
 
-    _mirror_images_dir(app_config.userimagespath, settings.backup_dir)
+        settings are from BackupSettings.
+          - backup_enabled
+          - backup_dir
+          - backup_auto
+          - backup_warn
+          - backup_count
+          - last_backup_datetime
+        """
+        if not os.path.exists(settings.backup_dir):
+            raise BackupException("Missing directory " + settings.backup_dir)
 
-    prefix = "manual_" if is_manual else ""
-    if suffix is None:
-        suffix = datetime.now().strftime("%Y-%m-%d_%H%M%S")
-    fname = f"{prefix}lute_backup_{suffix}.db"
-    backupfile = os.path.join(settings.backup_dir, fname)
+        ### Timing helper for when implement audio backup.
+        # def _print_now(msg):
+        #     now = datetime.now().strftime("%H-%M-%S")
+        #     print(f"{now} - {msg}", flush=True)
 
-    f = _create_db_backup(app_config.dbfilename, backupfile)
-    _remove_excess_backups(settings.backup_count, settings.backup_dir)
-    return f
+        self._mirror_images_dir(app_config.userimagespath, settings.backup_dir)
 
+        prefix = "manual_" if is_manual else ""
+        if suffix is None:
+            suffix = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        fname = f"{prefix}lute_backup_{suffix}.db"
+        backupfile = os.path.join(settings.backup_dir, fname)
 
-def should_run_auto_backup(backup_settings):
-    """
-    True (if applicable) if last backup was old.
-    """
-    bs = backup_settings
-    if bs.backup_enabled is False or bs.backup_auto is False:
-        return False
+        f = self._create_db_backup(app_config.dbfilename, backupfile)
+        self._remove_excess_backups(settings.backup_count, settings.backup_dir)
+        return f
 
-    last = bs.last_backup_datetime
-    if last is None:
-        return True
+    def should_run_auto_backup(self, backup_settings):
+        """
+        True (if applicable) if last backup was old.
+        """
+        bs = backup_settings
+        if bs.backup_enabled is False or bs.backup_auto is False:
+            return False
 
-    curr = int(time.time())
-    diff = curr - last
-    return diff > 24 * 60 * 60
+        last = bs.last_backup_datetime
+        if last is None:
+            return True
 
+        curr = int(time.time())
+        diff = curr - last
+        return diff > 24 * 60 * 60
 
-def backup_warning(backup_settings):
-    "Get warning if needed."
-    if not backup_settings.backup_warn:
+    def backup_warning(self, backup_settings):
+        "Get warning if needed."
+        if not backup_settings.backup_warn:
+            return ""
+
+        have_books = self.session.query(self.session.query(Book).exists()).scalar()
+        have_terms = self.session.query(self.session.query(Term).exists()).scalar()
+        if have_books is False and have_terms is False:
+            return ""
+
+        last = backup_settings.last_backup_datetime
+        if last is None:
+            return "Never backed up."
+
+        curr = int(time.time())
+        diff = curr - last
+        old_backup_msg = "Last backup was more than 1 week ago."
+        if diff > 7 * 24 * 60 * 60:
+            return old_backup_msg
+
         return ""
 
-    have_books = db.session.query(db.session.query(Book).exists()).scalar()
-    have_terms = db.session.query(db.session.query(Term).exists()).scalar()
-    if have_books is False and have_terms is False:
-        return ""
+    def _create_db_backup(self, dbfilename, backupfile):
+        "Make a backup."
+        shutil.copy(dbfilename, backupfile)
+        f = f"{backupfile}.gz"
+        with open(backupfile, "rb") as in_file, gzip.open(
+            f, "wb", compresslevel=4
+        ) as out_file:
+            shutil.copyfileobj(in_file, out_file)
+        os.remove(backupfile)
+        r = UserSettingRepository(self.session)
+        r.set_last_backup_datetime(int(time.time()))
+        return f
 
-    last = backup_settings.last_backup_datetime
-    if last is None:
-        return "Never backed up."
+    def skip_this_backup(self):
+        "Set the last backup time to today."
+        r = UserSettingRepository(self.session)
+        r.set_last_backup_datetime(int(time.time()))
 
-    curr = int(time.time())
-    diff = curr - last
-    old_backup_msg = "Last backup was more than 1 week ago."
-    if diff > 7 * 24 * 60 * 60:
-        return old_backup_msg
+    def _remove_excess_backups(self, count, outdir):
+        "Remove old backups."
+        files = [f for f in self.list_backups(outdir) if not f.is_manual]
+        files.sort(reverse=True)
+        to_remove = files[count:]
+        for f in to_remove:
+            os.remove(f.filepath)
 
-    return ""
+    def _mirror_images_dir(self, userimagespath, outdir):
+        "Copy the images to backup."
+        target_dir = os.path.join(outdir, "userimages_backup")
+        target_dir = os.path.abspath(target_dir)
+        if not os.path.exists(target_dir):
+            os.mkdir(target_dir)
+        shutil.copytree(userimagespath, target_dir, dirs_exist_ok=True)
 
-
-def _create_db_backup(dbfilename, backupfile):
-    "Make a backup."
-    shutil.copy(dbfilename, backupfile)
-    f = f"{backupfile}.gz"
-    with open(backupfile, "rb") as in_file, gzip.open(
-        f, "wb", compresslevel=4
-    ) as out_file:
-        shutil.copyfileobj(in_file, out_file)
-    os.remove(backupfile)
-    SystemSetting.set_last_backup_datetime(int(time.time()))
-    return f
-
-
-def skip_this_backup():
-    "Set the last backup time to today."
-    SystemSetting.set_last_backup_datetime(int(time.time()))
-
-
-def _remove_excess_backups(count, outdir):
-    "Remove old backups."
-    files = [f for f in list_backups(outdir) if not f.is_manual]
-    files.sort(reverse=True)
-    to_remove = files[count:]
-    for f in to_remove:
-        os.remove(f.filepath)
-
-
-def _mirror_images_dir(userimagespath, outdir):
-    "Copy the images to backup."
-    target_dir = os.path.join(outdir, "userimages_backup")
-    target_dir = os.path.abspath(target_dir)
-    if not os.path.exists(target_dir):
-        os.mkdir(target_dir)
-    shutil.copytree(userimagespath, target_dir, dirs_exist_ok=True)
-
-
-def list_backups(outdir) -> List[DatabaseBackupFile]:
-    "List all backup files."
-    return [
-        DatabaseBackupFile(os.path.join(outdir, f))
-        for f in os.listdir(outdir)
-        if re.match(r"(manual_)?lute_backup_", f)
-    ]
+    def list_backups(self, outdir) -> List[DatabaseBackupFile]:
+        "List all backup files."
+        return [
+            DatabaseBackupFile(os.path.join(outdir, f))
+            for f in os.listdir(outdir)
+            if re.match(r"(manual_)?lute_backup_", f)
+        ]

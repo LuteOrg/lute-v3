@@ -8,8 +8,8 @@ from pytest_bdd import given, then, scenarios, parsers
 from lute.db import db
 from lute.models.language import Language
 from lute.term.model import Repository
-from lute.read.render.service import get_paragraphs
-from lute.read.service import set_unknowns_to_known, bulk_status_update
+from lute.read.render.service import Service as RenderService
+from lute.read.service import Service
 
 from tests.utils import add_terms, make_text
 from tests.dbasserts import assert_sql_result
@@ -45,7 +45,7 @@ def given_terms(content):
 
 @given(parsers.parse('term "{content}" with status {status} and parent "{parenttext}"'))
 def given_term_with_status_and_parent(content, status, parenttext):
-    r = Repository(db)
+    r = Repository(db.session)
     t = r.find_or_new(language.id, content)
     t.status = int(status)
     t.parents.append(parenttext)
@@ -55,7 +55,7 @@ def given_term_with_status_and_parent(content, status, parenttext):
 
 @given(parsers.parse('term "{content}" with status {status}'))
 def given_term_with_status(content, status):
-    r = Repository(db)
+    r = Repository(db.session)
     t = r.find_or_new(language.id, content)
     t.status = int(status)
     r.add(t)
@@ -72,12 +72,14 @@ def given_text(content):
 
 @given("all unknowns are set to known")
 def set_to_known():
-    set_unknowns_to_known(text)
+    service = Service(db.session)
+    service.set_unknowns_to_known(text)
 
 
 @given(parsers.parse("bulk status {newstatus} update for terms:\n{terms}"))
 def update_status(newstatus, terms):
-    bulk_status_update(text, terms.split("\n"), int(newstatus))
+    service = Service(db.session)
+    service.bulk_status_update(text, terms.split("\n"), int(newstatus))
 
 
 def _assert_stringized_equals(stringizer, joiner, expected):
@@ -85,7 +87,8 @@ def _assert_stringized_equals(stringizer, joiner, expected):
     Get paragraphs and stringize all textitems,
     join and assert equals expected.
     """
-    paras = get_paragraphs(text.text, text.book.language)
+    rs = RenderService(db.session)
+    paras = rs.get_paragraphs(text.text, text.book.language)
     # print("TOKENS", flush=True)
     # print(paras, flush=True)
     ret = []

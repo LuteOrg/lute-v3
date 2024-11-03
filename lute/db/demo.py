@@ -9,11 +9,10 @@ data is demo.
 """
 
 from sqlalchemy import text
-import lute.language.service
+from lute.language.service import Service
 from lute.book.model import Repository
-from lute.book.stats import refresh_stats
-from lute.models.setting import SystemSetting
-from lute.db import db
+from lute.book.stats import Service as StatsService
+from lute.models.repositories import SystemSettingRepository
 import lute.db.management
 
 
@@ -39,97 +38,100 @@ def _demo_languages():
     ]
 
 
-def contains_demo_data():
+def contains_demo_data(session):
     """
     True if IsDemoData setting is present.
     """
-    ss = SystemSetting.get_value("IsDemoData")
+    repo = SystemSettingRepository(session)
+    ss = repo.get_value("IsDemoData")
     if ss is None:
         return False
     return True
 
 
-def remove_flag():
+def remove_flag(session):
     """
     Remove IsDemoData setting.
     """
-    if not contains_demo_data():
+    if not contains_demo_data(session):
         raise RuntimeError("Can't delete non-demo data.")
 
-    SystemSetting.delete_key("IsDemoData")
-    db.session.commit()
+    repo = SystemSettingRepository(session)
+    repo.delete_key("IsDemoData")
+    session.commit()
 
 
-def tutorial_book_id():
+def tutorial_book_id(session):
     """
     Return the book id of the tutorial.
     """
-    if not contains_demo_data():
+    if not contains_demo_data(session):
         return None
     sql = """select BkID from books
     inner join languages on LgID = BkLgID
     where LgName = 'English' and BkTitle = 'Tutorial'
     """
-    r = db.session.execute(text(sql)).first()
+    r = session.execute(text(sql)).first()
     if r is None:
         return None
     return int(r[0])
 
 
-def delete_demo_data():
+def delete_demo_data(session):
     """
     If this is a demo, wipe everything.
     """
-    if not contains_demo_data():
+    if not contains_demo_data(session):
         raise RuntimeError("Can't delete non-demo data.")
-    remove_flag()
-    lute.db.management.delete_all_data()
+    remove_flag(session)
+    lute.db.management.delete_all_data(session)
 
 
 # Loading demo data.
 
 
-def load_demo_languages():
+def load_demo_languages(session):
     """
     Load selected predefined languages.  Assume everything is supported.
 
     This method will also be called during acceptance tests, so it's public.
     """
     demo_langs = _demo_languages()
-    langs = [
-        lute.language.service.get_language_def(langname)["language"]
-        for langname in demo_langs
-    ]
+    service = Service(session)
+    langs = [service.get_language_def(langname)["language"] for langname in demo_langs]
     supported = [lang for lang in langs if lang.is_supported]
     for lang in supported:
-        db.session.add(lang)
-    db.session.commit()
+        session.add(lang)
+    session.commit()
 
 
-def load_demo_stories():
+def load_demo_stories(session):
     "Load the stories."
     demo_langs = _demo_languages()
-    langdefs = [
-        lute.language.service.get_language_def(langname) for langname in demo_langs
-    ]
+    service = Service(session)
+    langdefs = [service.get_language_def(langname) for langname in demo_langs]
     langdefs = [d for d in langdefs if d["language"].is_supported]
 
-    r = Repository(db)
+    r = Repository(session)
     for d in langdefs:
         for b in d["books"]:
             r.add(b)
     r.commit()
 
-    SystemSetting.set_value("IsDemoData", True)
-    db.session.commit()
-    refresh_stats()
+    repo = SystemSettingRepository(session)
+    repo.set_value("IsDemoData", True)
+    session.commit()
+
+    svc = StatsService(session)
+    svc.refresh_stats()
 
 
-def load_demo_data():
+def load_demo_data(session):
     """
     Load the data.
     """
-    load_demo_languages()
-    load_demo_stories()
-    SystemSetting.set_value("IsDemoData", True)
-    db.session.commit()
+    load_demo_languages(session)
+    load_demo_stories(session)
+    repo = SystemSettingRepository(session)
+    repo.set_value("IsDemoData", True)
+    session.commit()

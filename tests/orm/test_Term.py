@@ -65,7 +65,7 @@ def test_term_parent_with_two_children(spanish):
     db.session.add(gato)
     db.session.commit()
 
-    parent_get = Term.find(parent.id)
+    parent_get = db.session.get(Term, parent.id)
     assert parent_get.text == "PARENT"
     assert len(parent_get.children) == 2
 
@@ -264,7 +264,7 @@ def test_changing_text_to_same_thing_does_not_throw(japanese):
     sql = f"select wotext, wotextlc from words where woid = {term.id}"
     assert_sql_result(sql, ["集めれ; 集めれ"], "have term")
 
-    t = Term.find(term.id)
+    t = db.session.get(Term, term.id)
     t.text = "集めれ"
     db.session.add(t)
     db.session.commit()
@@ -283,7 +283,7 @@ def test_changing_multiword_text_case_does_not_throw(english):
     sql = f"select wotext, wotextlc from words where woid = {term.id}"
     assert_sql_result(sql, ["a/ /CAT; a/ /cat"], "have term")
 
-    t = Term.find(term.id)
+    t = db.session.get(Term, term.id)
     t.text = term.text.lower()
     db.session.add(t)
     db.session.commit()

@@ -16,11 +16,18 @@ from flask import (
     send_file,
     flash,
 )
-from lute.models.setting import BackupSettings
-from lute.backup.service import create_backup, skip_this_backup, list_backups
+from lute.db import db
+from lute.models.repositories import UserSettingRepository
+from lute.backup.service import Service
 
 
 bp = Blueprint("backup", __name__, url_prefix="/backup")
+
+
+def _get_settings():
+    "Get backup settings."
+    repo = UserSettingRepository(db.session)
+    return repo.get_backup_settings()
 
 
 @bp.route("/index")
@@ -28,8 +35,9 @@ def index():
     """
     List all backups.
     """
-    settings = BackupSettings.get_backup_settings()
-    backups = list_backups(settings.backup_dir)
+    settings = _get_settings()
+    service = Service(db.session)
+    backups = service.list_backups(settings.backup_dir)
     backups.sort(reverse=True)
 
     return render_template(
@@ -40,7 +48,7 @@ def index():
 @bp.route("/download/<filename>")
 def download_backup(filename):
     "Download the given backup file."
-    settings = BackupSettings.get_backup_settings()
+    settings = _get_settings()
     fullpath = os.path.join(settings.backup_dir, filename)
     return send_file(fullpath, as_attachment=True)
 
@@ -56,7 +64,7 @@ def backup():
     if "type" in request.args:
         backuptype = "manual"
 
-    settings = BackupSettings.get_backup_settings()
+    settings = _get_settings()
     return render_template(
         "backup/backup.html", backup_folder=settings.backup_dir, backuptype=backuptype
     )
@@ -73,10 +81,11 @@ def do_backup():
         backuptype = prms["type"]
 
     c = current_app.env_config
-    settings = BackupSettings.get_backup_settings()
+    settings = _get_settings()
+    service = Service(db.session)
     is_manual = backuptype.lower() == "manual"
     try:
-        f = create_backup(c, settings, is_manual=is_manual)
+        f = service.create_backup(c, settings, is_manual=is_manual)
         flash(f"Backup created: {f}", "notice")
         return jsonify(f)
     except Exception as e:  # pylint: disable=broad-exception-caught
@@ -87,5 +96,6 @@ def do_backup():
 @bp.route("/skip_this_backup", methods=["GET"])
 def handle_skip_this_backup():
     "Update last backup date so backup not attempted again."
-    skip_this_backup()
+    service = Service(db.session)
+    service.skip_this_backup()
     return redirect("/", 302)

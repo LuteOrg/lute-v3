@@ -4,8 +4,7 @@ Book mapping checks.
 
 from datetime import datetime
 import pytest
-from lute.models.book import Book, BookTag, TextBookmark
-from lute.book.stats import BookStats
+from lute.models.book import Book, BookTag, TextBookmark, BookStats
 from lute.db import db
 from tests.dbasserts import assert_sql_result, assert_record_count_equals
 

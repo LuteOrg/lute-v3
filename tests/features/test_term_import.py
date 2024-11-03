@@ -9,10 +9,11 @@ import pytest
 
 from pytest_bdd import given, when, then, scenarios, parsers
 
+from lute.db import db
 from lute.models.language import Language
 from lute.models.term import Term
-
-from lute.termimport.service import import_file, BadImportFileError
+from lute.models.repositories import LanguageRepository, TermRepository
+from lute.termimport.service import Service, BadImportFileError
 
 from tests.dbasserts import assert_sql_result
 
@@ -52,7 +53,10 @@ def import_with_settings(create, update):
         tmp.write(content)
 
     global stats  # pylint: disable=global-statement
-    stats = import_file(path, create.lower() == "true", update.lower() == "true")
+    service = Service(db.session)
+    stats = service.import_file(
+        path, create.lower() == "true", update.lower() == "true"
+    )
     os.remove(path)
 
 
@@ -68,7 +72,8 @@ def import_with_settings_and_newunks(create, update, newunknowns):
         tmp.write(content)
 
     global stats  # pylint: disable=global-statement
-    stats = import_file(
+    service = Service(db.session)
+    stats = service.import_file(
         path,
         create.lower() == "true",
         update.lower() == "true",
@@ -95,7 +100,8 @@ def fail_with_message(message):
         # do stuff with temp file
         tmp.write(content)
     with pytest.raises(BadImportFileError, match=message):
-        import_file(path)
+        service = Service(db.session)
+        service.import_file(path)
     os.remove(path)
 
 
@@ -110,9 +116,11 @@ def then_words_table_contains_WoTextLC(text_lc_content):
 
 @then(parsers.parse('{language} term "{term}" should be:\n{expected}'))
 def then_term_tags(language, term, expected):
-    lang = Language.find_by_name(language)
+    repo = LanguageRepository(db.session)
+    lang = repo.find_by_name(language)
     spec = Term(lang, term)
-    t = Term.find_by_spec(spec)
+    term_repo = TermRepository(db.session)
+    t = term_repo.find_by_spec(spec)
     pstring = ", ".join([p.text for p in t.parents])
     if pstring == "":
         pstring = "-"

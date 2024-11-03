@@ -10,7 +10,7 @@ from sqlalchemy import asc
 from lute.db import db
 from lute.models.book import Book
 from lute.models.language import Language
-from lute.term_parent_map.service import export_unknown_terms
+from lute.term_parent_map.service import Service
 
 
 bp = Blueprint("term_parent_map", __name__, url_prefix="/term_parent_map")
@@ -42,5 +42,6 @@ def export_book(bookid):
     "Generate a file and return it."
     outfile = os.path.join(current_app.env_config.temppath, "export_book.txt")
     book = db.session.get(Book, bookid)
-    export_unknown_terms(book, outfile)
+    service = Service(db.session)
+    service.export_unknown_terms(book, outfile)
     return send_file(outfile, as_attachment=True, download_name="unknown_terms.txt")

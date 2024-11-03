@@ -18,7 +18,7 @@ import os
 from sqlalchemy import text
 from flask import Blueprint, current_app, Response, jsonify, redirect, flash
 from lute.models.language import Language
-from lute.models.setting import UserSetting
+from lute.models.repositories import UserSettingRepository
 import lute.parse.registry
 from lute.db import db
 import lute.db.management
@@ -38,7 +38,7 @@ def _ensure_is_test_db():
 @bp.route("/wipe_db", methods=["GET"])
 def wipe_db():
     "Clean it all."
-    lute.db.management.delete_all_data()
+    lute.db.management.delete_all_data(db.session)
     flash("db wiped")
     return redirect("/", 302)
 
@@ -46,8 +46,8 @@ def wipe_db():
 @bp.route("/load_demo", methods=["GET"])
 def load_demo():
     "Clean out everything, and load the demo."
-    lute.db.management.delete_all_data()
-    lute.db.demo.load_demo_data()
+    lute.db.management.delete_all_data(db.session)
+    lute.db.demo.load_demo_data(db.session)
     flash("demo loaded")
     return redirect("/", 302)
 
@@ -55,8 +55,8 @@ def load_demo():
 @bp.route("/load_demo_languages", methods=["GET"])
 def load_demo_languages():
     "Clean out everything, and load the demo langs with dummy dictionaries."
-    lute.db.management.delete_all_data()
-    lute.db.demo.load_demo_languages()
+    lute.db.management.delete_all_data(db.session)
+    lute.db.demo.load_demo_languages(db.session)
     langs = db.session.query(Language).all()
     for lang in langs:
         d = lang.dictionaries[0]
@@ -70,7 +70,7 @@ def load_demo_languages():
 @bp.route("/load_demo_stories", methods=["GET"])
 def load_demo_stories():
     "Stories only.  No db wipe."
-    lute.db.demo.load_demo_stories()
+    lute.db.demo.load_demo_stories(db.session)
     flash("stories loaded")
     return redirect("/", 302)
 
@@ -148,7 +148,8 @@ def disable_parser(parsername, renameto):
 @bp.route("/disable_backup", methods=["GET"])
 def disable_backup():
     "Disables backup -- tests don't need to back up."
-    UserSetting.set_value("backup_enabled", False)
+    repo = UserSettingRepository(db.session)
+    repo.set_value("backup_enabled", False)
     db.session.commit()
     flash("backup disabled")
     return redirect("/", 302)

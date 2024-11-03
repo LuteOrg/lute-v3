@@ -3,12 +3,14 @@ Read service tests.
 """
 
 # from lute.db import db
-from lute.language import service
+from lute.language.service import Service
+from lute.db import db
 from tests.dbasserts import assert_sql_result
 
 
 def test_get_all_lang_defs(app_context):
     "Can get all predefined languages."
+    service = Service(db.session)
     defs = service.get_supported_defs()
     engs = [d for d in defs if d["language"].name == "English"]
     assert len(engs) == 1, "have english"
@@ -23,6 +25,7 @@ def test_get_language_def():
     """
     Smoke test, can load a new language from yaml definition.
     """
+    service = Service(db.session)
     lang = service.get_language_def("English")["language"]
 
     assert lang.name == "English"
@@ -50,6 +53,7 @@ def test_load_def_loads_lang_and_stories(empty_db):
     assert_sql_result(lang_sql, [], "no langs")
     assert_sql_result(story_sql, [], "nothing loaded")
 
+    service = Service(db.session)
     lang_id = service.load_language_def("English")
     assert lang_id > 0, "ID returned, used for filtering"
     assert_sql_result(lang_sql, ["English"], "eng loaded")
@@ -63,6 +67,7 @@ def test_load_all_defs_loads_lang_and_stories(empty_db):
     assert_sql_result(lang_sql, [], "no langs")
     assert_sql_result(story_sql, [], "nothing loaded")
 
+    service = Service(db.session)
     defs = service.get_supported_defs()
     langnames = [d["language"].name for d in defs]
     for n in langnames:

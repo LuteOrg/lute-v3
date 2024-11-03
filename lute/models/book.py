@@ -2,7 +2,6 @@
 Book entity.
 """
 
-from sqlalchemy import and_
 from lute.db import db
 from lute.parse.base import SentenceGroupIterator
 
@@ -29,19 +28,6 @@ class BookTag(db.Model):
         tt.text = text
         tt.comment = comment
         return tt
-
-    @staticmethod
-    def find_by_text(text):
-        "Find a tag by text, or None if not found."
-        return db.session.query(BookTag).filter(BookTag.text == text).first()
-
-    @staticmethod
-    def find_or_create_by_text(text):
-        "Return tag or create one."
-        ret = BookTag.find_by_text(text)
-        if ret is not None:
-            return ret
-        return BookTag.make_book_tag(text)
 
 
 class Book(
@@ -194,20 +180,6 @@ class Book(
 
         return b
 
-    @staticmethod
-    def find(book_id):
-        "Get by ID."
-        return db.session.query(Book).filter(Book.id == book_id).first()
-
-    @staticmethod
-    def find_by_title(book_title, language_id):
-        "Get by title."
-        return (
-            db.session.query(Book)
-            .filter(and_(Book.title == book_title, Book.language_id == language_id))
-            .first()
-        )
-
 
 # TODO zzfuture fix: rename class and table to Page/pages
 class Text(db.Model):
@@ -321,11 +293,6 @@ class Text(db.Model):
             sentence.text = None
         self.sentences = []
 
-    @staticmethod
-    def find(text_id):
-        "Get by ID."
-        return db.session.query(Text).filter(Text.id == text_id).first()
-
 
 class Sentence(db.Model):
     """
@@ -390,3 +357,14 @@ class TextBookmark(db.Model):
     title = db.Column("TbTitle", db.Text, nullable=False)
 
     text = db.relationship("Text", back_populates="bookmarks")
+
+
+class BookStats(db.Model):
+    "The stats table."
+    __tablename__ = "bookstats"
+
+    BkID = db.Column(db.Integer, primary_key=True)
+    distinctterms = db.Column(db.Integer)
+    distinctunknowns = db.Column(db.Integer)
+    unknownpercent = db.Column(db.Integer)
+    status_distribution = db.Column(db.String, nullable=True)

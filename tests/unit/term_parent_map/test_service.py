@@ -5,7 +5,8 @@ Term parent map file generation tests.
 import os
 import tempfile
 import pytest
-from lute.term_parent_map.service import export_unknown_terms
+from lute.db import db
+from lute.term_parent_map.service import Service
 from tests.utils import add_terms, make_book
 
 
@@ -37,7 +38,8 @@ def assert_file_content(fname, expected):
 
 def test_smoke_book_file_created(app_context, _book, output_tempfile):
     "Smoke test only."
-    export_unknown_terms(_book, output_tempfile)
+    service = Service(db.session)
+    service.export_unknown_terms(_book, output_tempfile)
     expected = [
         "hola",
         "gato",
@@ -59,7 +61,8 @@ def test_known_multiword_terms_can_hide_unknown_terms(
     "See what terms would show up as blue 'unknown' for a book."
     spanish_terms = ["gato", "lista", "tiene una", "listo"]
     add_terms(spanish, spanish_terms)
-    export_unknown_terms(_book, output_tempfile)
+    service = Service(db.session)
+    service.export_unknown_terms(_book, output_tempfile)
     expected = ["hola", "tengo", "un", "no", "ella", "tiene", "una", "bebida"]
     assert_file_content(output_tempfile, expected)
 

@@ -4,6 +4,7 @@ Language mapping tests.
 
 import json
 from lute.models.language import Language, LanguageDictionary
+from lute.models.repositories import LanguageRepository
 from lute.db import db
 from tests.dbasserts import assert_sql_result
 from tests.utils import make_text, add_terms
@@ -91,7 +92,7 @@ def test_language_dictionaries_smoke_test(empty_db):
 
 def test_delete_language_removes_book_and_terms(app_context, spanish):
     """
-    Test HACKY Language.delete() method to ensure deletes cascade.
+    Test HACKY LanguageRepository.delete() method to ensure deletes cascade.
     """
     add_terms(spanish, ["gato", "perro"])
     t = make_text("hola", "Hola amigo", spanish)
@@ -114,7 +115,8 @@ def test_delete_language_removes_book_and_terms(app_context, spanish):
     assert_sql_result(sqlbook, ["hola"], "initial book")
     assert_sql_result(sqldict, ["something?###"], "dict")
 
-    Language.delete(spanish)
+    repo = LanguageRepository(db.session)
+    repo.delete(spanish)
 
     assert_sql_result(sqlbook, [], "book deleted")
     assert_sql_result(sqlterms, [], "terms deleted")

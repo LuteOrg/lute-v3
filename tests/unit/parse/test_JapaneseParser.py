@@ -4,8 +4,7 @@ JapaneseParser tests.
 
 from lute.parse.mecab_parser import JapaneseParser
 from lute.models.term import Term
-from lute.models.setting import UserSetting
-from lute.db import db
+from lute.settings.current import current_settings
 from lute.parse.base import ParsedToken
 
 
@@ -105,6 +104,5 @@ def test_reading_setting(app_context):
     }
     p = JapaneseParser()
     for k, v in cases.items():
-        UserSetting.set_value("japanese_reading", k)
-        db.session.commit()
+        current_settings["japanese_reading"] = k
         assert p.get_reading("強い") == v, k

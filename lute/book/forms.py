@@ -9,7 +9,7 @@ from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from lute.book import service
+from lute.book.service import Service
 
 
 class NewBookForm(FlaskForm):
@@ -78,6 +78,7 @@ class NewBookForm(FlaskForm):
 
         obj.book_tags = _values(self.book_tags.data)
 
+        service = Service()
         if self.textfile.data:
             obj.text = service.get_file_content(self.textfile.data)
         f = self.audiofile.data
@@ -149,6 +150,7 @@ class EditBookForm(FlaskForm):
         obj.book_tags = _values(self.book_tags.data)
 
         f = self.audiofile.data
+        service = Service()
         if f:
             obj.audio_filename = service.save_audio_file(f)
             obj.audio_bookmarks = None

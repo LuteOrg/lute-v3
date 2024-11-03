@@ -5,6 +5,7 @@
 from sqlalchemy import text
 from flask import Blueprint, request, jsonify, render_template, redirect
 from lute.models.term import TermTag
+from lute.models.repositories import TermTagRepository
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.termtag.datatables import get_data_tables_list
 from lute.db import db
@@ -24,7 +25,7 @@ def index(search):
 def datatables_active_source():
     "Datatables data for terms."
     parameters = DataTablesFlaskParamParser.parse_params(request.form)
-    data = get_data_tables_list(parameters)
+    data = get_data_tables_list(parameters, db.session)
     return jsonify(data)
 
 
@@ -48,7 +49,8 @@ def edit(termtagid):
     """
     Edit a termtag
     """
-    termtag = TermTag.find(termtagid)
+    repo = TermTagRepository(db.session)
+    termtag = repo.find(termtagid)
     return _handle_form(termtag, "termtag/edit.html")
 
 
@@ -66,7 +68,8 @@ def delete(termtagid):
     """
     Delete a termtag.
     """
-    termtag = TermTag.find(termtagid)
+    repo = TermTagRepository(db.session)
+    termtag = repo.find(termtagid)
     db.session.delete(termtag)
 
     # ANNOYING HACK.  Per GitHub issue 455, the records
