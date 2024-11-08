@@ -78,9 +78,6 @@ class Service:
 
         return stats
 
-    ##################################################
-    # Stats table refresh.
-
     def refresh_stats(self):
         "Refresh stats for all books requiring update."
         sql = "delete from bookstats where status_distribution is null"
