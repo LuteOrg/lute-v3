@@ -34,10 +34,10 @@ def test_get_language_def():
 
     # pylint: disable=line-too-long
     expected = [
-        "terms; embeddedhtml; https://simple.wiktionary.org/wiki/###; True; 1",
-        "terms; popuphtml; https://www.collinsdictionary.com/dictionary/english/###; True; 2",
-        "sentences; popuphtml; https://www.deepl.com/translator#en/en/###; True; 3",
-        "terms; popuphtml; https://conjugator.reverso.net/conjugation-english-verb-###.html; True; 4",
+        "terms; embeddedhtml; https://simple.wiktionary.org/wiki/[LUTE]; True; 1",
+        "terms; popuphtml; https://www.collinsdictionary.com/dictionary/english/[LUTE]; True; 2",
+        "sentences; popuphtml; https://www.deepl.com/translator#en/en/[LUTE]; True; 3",
+        "terms; popuphtml; https://conjugator.reverso.net/conjugation-english-verb-[LUTE].html; True; 4",
     ]
     actual = [
         f"{ld.usefor}; {ld.dicttype}; {ld.dicturi}; {ld.is_active}; {ld.sort_order}"
