@@ -1,0 +1,22 @@
+name: Khmer
+dictionaries:
+  - for: terms
+    type: embedded
+    url: https://en.wiktionary.org/wiki/###
+  - for: terms
+    type: popup
+    url: https://glosbe.com/km/en/###
+  - for: terms
+    type: popup
+    url: https://www.kheng.info/search/?query=###
+  - for: sentences
+    type: embedded
+    url: https://www.bing.com/translator/?from=kh&to=en&text=###
+show_romanization: true
+# right_to_left:
+
+parser_type: lute_khmer
+# character_substitutions:
+split_sentences: ។?៕
+# split_sentence_exceptions:
+word_chars: ក-៹
