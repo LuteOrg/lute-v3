@@ -727,7 +727,8 @@ let show_translation_for_text = function(text) {
   const userdict = LUTE_SENTENCE_LOOKUP_URIS[dict_index];
 
   const lookup = encodeURIComponent(text);
-  const url = userdict.replace('###', lookup);
+  let url = userdict.replace('[LUTE]', lookup);
+  url = url.replace('###', lookup);  // TODO remove_old_###_placeholder: remove
   if (url[0] == '*') {
     const finalurl = url.substring(1);  // drop first char.
     let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no';
