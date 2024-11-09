@@ -44,7 +44,7 @@ class KhmerParser(AbstractParser):
         # markers are used correctly.  Lute uses paragraph markers
         # for rendering.
         text = text.replace("\r\n", "\n")
-        text = text.replace("\n", "NEWLINE_CHARACTER_FOR_LUTE")
+        text = text.replace("\n", "\\")
 
         words = khmernltk.word_tokenize(text)  # ... get words using parser.
         tokens = []
@@ -60,11 +60,21 @@ class KhmerParser(AbstractParser):
                 re.match(pattern, word) is not None
             )
 
-            if word == "NEWLINE_CHARACTER_FOR_LUTE":
+            if word == "\\":
                 word = "¶"
             if word == "¶":
                 is_word_char = False
                 is_end_of_sentence = True
+
+            if word.startswith("\\"):
+                num_leading_slashes = len(word) - len(word.lstrip("\\"))
+                for _ in range(num_leading_slashes):
+                    tokens.append(ParsedToken("¶", False, True))
+
+                word = word.lstrip("\\")
+                is_word_char = True
+                is_end_of_sentence = False
+
             t = ParsedToken(word, is_word_char, is_end_of_sentence)
             tokens.append(t)
         return tokens
