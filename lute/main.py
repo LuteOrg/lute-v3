@@ -150,8 +150,5 @@ def start():
         print(textwrap.dedent(failmsg))
 
 
-###############################
-
-
 if __name__ == "__main__":
     start()

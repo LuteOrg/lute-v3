@@ -60,7 +60,7 @@ def load_demo_languages():
     langs = db.session.query(Language).all()
     for lang in langs:
         d = lang.dictionaries[0]
-        d.dicturi = f"/dev_api/dummy_dict/{lang.name}/###"
+        d.dicturi = f"/dev_api/dummy_dict/{lang.name}/[LUTE]"
         d.dicttype = "embeddedhtml"  # Ensure not pop-up
         db.session.add(lang)
     db.session.commit()

@@ -215,10 +215,8 @@ if not, change the type to "Pop-up window".</p>
 
       const dicturi = div.find(".dict-uri").val();
       const dict_type = div.find(".dict-type").val();
-      const testurl = dicturi.replace('###', 'test').replace('<TERM>', 'test');
-      // console.log(dicturi);
-      // console.log(dict_type);
-      // console.log(testurl);
+      let testurl = dicturi.replace('[LUTE]', 'test');
+      testurl = testurl.replace('###', 'test');  // TODO remove_old_###_placeholder: remove
 
       switch (dict_type) {
       case 'popuphtml':

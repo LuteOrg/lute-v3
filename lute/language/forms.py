@@ -37,13 +37,6 @@ class LanguageDictionaryForm(Form):
     is_active = BooleanField("Is active", render_kw={"title": "Is active?"})
     sort_order = IntegerField("Sort", render_kw={"style": "display: none"})
 
-    def validate_dicturi(self, field):  # pylint: disable=unused-argument
-        "Language must be set."
-        # TODO TERM_for_dict_lookup_key: re-add <TERM> criteria.
-        #  and "<TERM>" not in field.data:
-        if "###" not in field.data:
-            raise ValidationError("Dictionary URI must contain ###")  # or <TERM>
-
 
 class LanguageForm(FlaskForm):
     """

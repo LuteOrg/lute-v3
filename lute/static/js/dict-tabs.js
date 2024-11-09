@@ -130,7 +130,7 @@ class ImageLookupButton extends GeneralLookupButton {
       if (parents.length == 1)
         use_text = parents[0];
 
-      const raw_bing_url = 'https://www.bing.com/images/search?q=###&form=HDRSC2&first=1&tsc=ImageHoverTitle';
+      const raw_bing_url = 'https://www.bing.com/images/search?q=[LUTE]&form=HDRSC2&first=1&tsc=ImageHoverTitle';
       const binghash = raw_bing_url.replace('https://www.bing.com/images/search?', '');
       const url = `/bing/search/${LookupButton.LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
 
@@ -222,7 +222,8 @@ class DictButton extends LookupButton {
           replace(/\s+/g, ' ');
     const searchterm = encodeURIComponent(cleantext).
           replaceAll(sqlZWS, '');
-    ret = ret.replace('###', searchterm);
+    ret = ret.replace('[LUTE]', searchterm);
+    ret = ret.replace('###', searchterm);  // TODO remove_old_###_placeholder
     return ret;
   }
 
