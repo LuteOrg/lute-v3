@@ -66,14 +66,22 @@ class KhmerParser(AbstractParser):
                 is_word_char = False
                 is_end_of_sentence = True
 
-            if word.startswith("\\"):
+            if word.startswith("\\") or word.endswith("\\"):
                 num_leading_slashes = len(word) - len(word.lstrip("\\"))
+                num_trailing_slashes = len(word) - len(word.rstrip("\\"))
+
                 for _ in range(num_leading_slashes):
                     tokens.append(ParsedToken("¶", False, True))
 
-                word = word.lstrip("\\")
+                word = word.strip("\\")
                 is_word_char = True
                 is_end_of_sentence = False
+                tokens.append(ParsedToken(word, is_word_char, is_end_of_sentence))
+
+                for _ in range(num_trailing_slashes):
+                    tokens.append(ParsedToken("¶", False, True))
+
+                continue
 
             t = ParsedToken(word, is_word_char, is_end_of_sentence)
             tokens.append(t)
