@@ -2,16 +2,16 @@ name: Thai
 dictionaries:
   - for: terms
     type: embedded
-    url: https://dict.com/thai-english/###
+    url: https://dict.com/thai-english/[LUTE]
   - for: terms
     type: embedded
-    url: https://en.wiktionary.org/wiki/###
+    url: https://en.wiktionary.org/wiki/[LUTE]
   - for: terms
     type: popup
-    url: https://glosbe.com/th/en/###
+    url: https://glosbe.com/th/en/[LUTE]
   - for: sentences
     type: popup
-    url: https://www.bing.com/translator/?from=th&to=en&text=###
+    url: https://www.bing.com/translator/?from=th&to=en&text=[LUTE]
 show_romanization: true
 # right_to_left:
 

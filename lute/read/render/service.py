@@ -152,8 +152,6 @@ class Service:
 
         return all_terms
 
-    ## Getting paragraphs ##############################
-
     def get_textitems(self, s, language, multiword_term_indexer=None):
         """
         Get array of TextItems for the string s.

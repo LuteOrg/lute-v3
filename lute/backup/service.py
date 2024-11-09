@@ -95,8 +95,8 @@ class Service:
         if not os.path.exists(settings.backup_dir):
             raise BackupException("Missing directory " + settings.backup_dir)
 
-        ### Timing helper for when implement audio backup.
         # def _print_now(msg):
+        #     "Timing helper for when implement audio backup."
         #     now = datetime.now().strftime("%H-%M-%S")
         #     print(f"{now} - {msg}", flush=True)
 
