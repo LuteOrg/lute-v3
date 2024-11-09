@@ -2,10 +2,10 @@ name: Mandarin Chinese
 dictionaries:
   - for: terms
     type: embedded
-    url: https://chinese.yabla.com/chinese-english-pinyin-dictionary.php?define=###
+    url: https://chinese.yabla.com/chinese-english-pinyin-dictionary.php?define=[LUTE]
   - for: sentences
     type: popup
-    url: https://www.deepl.com/translator#ch/en/###
+    url: https://www.deepl.com/translator#ch/en/[LUTE]
 show_romanization: true
 # right_to_left:
 
