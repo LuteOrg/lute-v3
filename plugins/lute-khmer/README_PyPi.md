@@ -1,6 +1,6 @@
 # `lute3-khmer`
 
-A Khmer parser for Lute (`lute3`) ... TODO notes here.
+A Khmer parser for Lute (`lute3`).
 
 ## Installation
 

@@ -18,7 +18,6 @@ def test_dummy_test():
     assert s == "Hello", "TODO - fix these tests for your parser :-)"
 
 
-# TODO activate tests.
 def test_token_count(khmer):
     """
     token_count checks.
