@@ -24,8 +24,9 @@ def bing_search(langid, text, searchstring):
 
     # dump("searching for " + text + " in " + language.getLgName())
     search = urllib.parse.quote(text)
-    searchparams = searchstring.replace("###", search)
-    url = "https://www.bing.com/images/search?" + searchparams
+    params = searchstring.replace("[LUTE]", search)
+    params = params.replace("###", search)  # TODO remove_old_###_placeholder: remove
+    url = "https://www.bing.com/images/search?" + params
     content = ""
     error_msg = ""
     try:
