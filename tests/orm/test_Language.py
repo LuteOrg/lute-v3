@@ -87,7 +87,9 @@ def test_language_dictionaries_smoke_test(empty_db):
     assert ld.dicturi == "1?[LUTE]", "uri"
 
     exp = """{"1": {"term": ["1?[LUTE]", "*2?[LUTE]"], "sentence": ["*3?[LUTE]"]}}"""
-    assert json.dumps(Language.all_dictionaries()) == exp
+    repo = LanguageRepository(db.session)
+    dicts = repo.all_dictionaries()
+    assert json.dumps(dicts) == exp
 
 
 def test_delete_language_removes_book_and_terms(app_context, spanish):

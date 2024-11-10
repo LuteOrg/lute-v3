@@ -167,7 +167,7 @@ def handle_term_form(
         form=form,
         term=term,
         duplicated_term=form.duplicated_term,
-        language_dicts=Language.all_dictionaries(),
+        language_dicts=language_repo.all_dictionaries(),
         hide_pronunciation=hide_pronunciation,
         tags=repo.get_term_tags(),
         embedded_in_reading_frame=embedded_in_reading_frame,
