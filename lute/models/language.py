@@ -113,19 +113,6 @@ class Language(
     def sentence_dict_uris(self):
         return self.active_dict_uris("sentences")
 
-    @classmethod
-    def all_dictionaries(cls):
-        """
-        All dictionaries for all languages.
-        """
-        lang_dicts = {}
-        for lang in Language.query.all():
-            lang_dicts[lang.id] = {
-                "term": lang.active_dict_uris("terms"),
-                "sentence": lang.active_dict_uris("sentences"),
-            }
-        return lang_dicts
-
     @property
     def parser(self):
         "Note: this throws if the parser is not supported!!!"

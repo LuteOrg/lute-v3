@@ -10,7 +10,7 @@ from lute.term.model import Repository
 from lute.term.routes import handle_term_form
 from lute.settings.current import current_settings
 from lute.models.book import Text
-from lute.models.repositories import BookRepository
+from lute.models.repositories import BookRepository, LanguageRepository
 from lute.db import db
 
 
@@ -23,7 +23,8 @@ def _render_book_page(book, pagenum):
     """
     lang = book.language
     show_highlights = current_settings["show_highlights"]
-    term_dicts = lang.all_dictionaries()[lang.id]["term"]
+    lang_repo = LanguageRepository(db.session)
+    term_dicts = lang_repo.all_dictionaries()[lang.id]["term"]
 
     return render_template(
         "read/index.html",
