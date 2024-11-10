@@ -6,6 +6,7 @@ User audio files are stored in the database in books table.
 
 import os
 from flask import Blueprint, send_file, current_app
+from lute.db import db
 from lute.models.repositories import BookRepository
 
 bp = Blueprint("useraudio", __name__, url_prefix="/useraudio")
