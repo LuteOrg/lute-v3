@@ -66,6 +66,7 @@ def test_end_of_sentence_stored_in_parsed_tokens(khmer):
         ("របស់", True),
         ("ខ្ញុំ", True),
         ("។", False, True),
+        (" ", False),
         ("ចុះ", True),
         ("អ្នក", True),
         ("វិញ", True),
