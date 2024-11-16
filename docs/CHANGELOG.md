@@ -1,4 +1,17 @@
 
+# 3.6.0 (2024-11-15)
+
+Feature changes:
+
+* New khmer parser plugin (`lute3-khmer`).  By @jaydom28 in #513.
+* #302: change term/sentence translation placeholder from `###` to `[LUTE]`.
+* #302: `[LUTE]` placeholder not required, some dictionaries don't support extra arguments.
+
+Code changes:
+
+* #509: refactor all library code to use db.session argument
+
+
 # 3.5.9 (2024-11-02)
 
 Feature changes:
