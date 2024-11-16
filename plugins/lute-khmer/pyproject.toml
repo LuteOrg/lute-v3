@@ -1,0 +1,26 @@
+# TODO fix names
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.module]
+name = "lute_khmer_parser"
+
+[project]
+name = "lute3-khmer"
+dynamic = ['version']
+description = "Learning Using Texts - Khmer Parser"
+requires-python = ">=3.8"
+authors = [
+  {name = "Justin Dom"}
+]
+readme = "README_PyPi.md"
+
+dependencies = [
+  "lute3>=3.4.2",
+  "khmer-nltk==1.6"
+]
+
+
+[project.entry-points."lute.plugin.parse"]
+lute_khmer = "lute_khmer_parser.parser:KhmerParser"
