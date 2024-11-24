@@ -2,12 +2,59 @@
 
 {% block title %}Reading &quot;{{ html_title }}&quot;{% endblock %}
 
+{% block preloadassets %}
+  {# TIPPY DEMO -- REMOVE THIS.  Extra tippy js, css. #}
+  <script type="text/javascript" src="{{ url_for('static', filename='vendor/tippy/popper.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='vendor/tippy/tippy.umd.min.js') }}"></script>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/tippy/tippy.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/tippy/themes/light.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/tippy/themes/light-border.css') }}" />
+{% endblock %}
+
 {% block body %}
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
+
+<!-- TIPPY DEMO -- REMOVE THIS -->
+<br /><br />&nbsp;&nbsp;<button id="myButton"><b>Hover for tippy demo</b></button><br /><br />
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+
+    // Outer Tippy with AJAX content
+    tippy('#myButton', {
+      content: 'Loading...', // Placeholder while content loads
+      interactive: true,
+      allowHTML: true,
+      theme: 'light',
+      onShow(instance) {
+        // Simulate AJAX load
+        setTimeout(() => {
+          const ajaxContent = `
+          <div>
+            This is the loaded content.
+            <br />
+            <span class="childterm" data-termid="11">Nested term 1</span>
+            <br />
+            <span class="childterm" data-termid="22">Nested term 2</span>
+          </div>
+        `;
+          instance.setContent(ajaxContent);
+          // Initialize nested Tippy after content is loaded
+          $('.childterm').each(function () {
+            tippy(this, {
+              content: $(this).data('termid'),
+              theme: 'light',
+            });
+          });
+        }, 500); // Simulate AJAX delay
+      },
+    });
+});
+</script>
+<!-- END TIPPY DEMO -- REMOVE THIS -->
 
 <div id="rendering_controls" style="display: none">
   <pre>
