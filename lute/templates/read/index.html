@@ -21,37 +21,49 @@
 <!-- TIPPY DEMO -- REMOVE THIS -->
 <br /><br />&nbsp;&nbsp;<button id="myButton"><b>Hover for tippy demo</b></button><br /><br />
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
 
-    // Outer Tippy with AJAX content
-    tippy('#myButton', {
+  let make_term_tippy_hash = function(termid, trigger_type='mouseenter focus') {
+    return {
       content: 'Loading...', // Placeholder while content loads
       interactive: true,
+      hideOnClick: true,
+      trigger: trigger_type,
+      interactiveDebounce: 75, // milliseconds
+      interactiveBorder: 30, // px
+      placement: 'auto',
       allowHTML: true,
       theme: 'light',
       onShow(instance) {
-        // Simulate AJAX load
+        // Simulate AJAX load.
+        //
+        // The parent${termid} is added to the class so that each
+        // parent's children can have their own tippy.  If each child
+        // only had "childterm" as the html class, then the subsequent
+        // $('.childterm') matcher might somehow make multiple tippies
+        // for a given child anywhere in the tree.
         setTimeout(() => {
           const ajaxContent = `
           <div>
-            This is the loaded content.
+            <b>Term ${termid}</b>.
             <br />
-            <span class="childterm" data-termid="11">Nested term 1</span>
+            <span class="parent${termid}-childterm" data-termid="${termid}1">Nested term ${termid}1</span>
             <br />
-            <span class="childterm" data-termid="22">Nested term 2</span>
+            <span class="parent${termid}-childterm" data-termid="${termid}2">Nested term ${termid}2</span>
           </div>
         `;
           instance.setContent(ajaxContent);
           // Initialize nested Tippy after content is loaded
-          $('.childterm').each(function () {
-            tippy(this, {
-              content: $(this).data('termid'),
-              theme: 'light',
-            });
+          $(`.parent${termid}-childterm`).each(function () {
+            tippy(this, make_term_tippy_hash($(this).data('termid'), 'click'));
           });
         }, 500); // Simulate AJAX delay
       },
-    });
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Outer Tippy with AJAX content
+    tippy('#myButton', make_term_tippy_hash(4));
 });
 </script>
 <!-- END TIPPY DEMO -- REMOVE THIS -->
