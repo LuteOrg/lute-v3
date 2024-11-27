@@ -527,11 +527,26 @@ Feature: Term import
 
     Scenario: Duplicate term throws
         Given import file:
-            language,term
-            Spanish,gato
-            Spanish,gato
+            language,term,translation
+            Spanish,gato,cat
+            Spanish,gato,kitty
         Then import should fail with message:
             Duplicate terms in import: Spanish: gato
+
+
+    Scenario: Duplicate term but identical line imports ok
+        Given import file:
+            language,term,translation
+            Spanish,gato,cat
+            Spanish,gato,cat
+            Spanish,perro,dog
+            Spanish,gato,cat
+            Spanish,perro,dog
+        When import with create true, update false
+        Then import should succeed with 2 created, 0 updated, 0 skipped
+        And sql "select WoText, WoStatus from words order by WoText" should return:
+            gato; 1
+            perro; 1
 
 
     Scenario: Fix issue 51: mandarin duplicate term throws
