@@ -39,6 +39,7 @@ class Service:
 
     def _load_import_file(self, filename, encoding="utf-8-sig"):
         "Create array of hashes from file."
+        unique_rows = set()
         importdata = []
         with open(filename, "r", encoding=encoding) as f:
             reader = csv.DictReader(f)
@@ -57,7 +58,10 @@ class Service:
                     raise BadImportFileError(f"Missing values on line {line_num}")
                 if None in line.keys():
                     raise BadImportFileError(f"Extra values on line {line_num}")
-                importdata.append(line)
+                line_tuple = tuple(line.items())
+                if line_tuple not in unique_rows:
+                    unique_rows.add(line_tuple)
+                    importdata.append(line)
 
         if len(importdata) == 0:
             raise BadImportFileError("No terms in file")
