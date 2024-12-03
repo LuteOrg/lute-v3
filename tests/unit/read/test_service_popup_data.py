@@ -46,21 +46,16 @@ def test_popup_shown_if_parent_exists_even_if_no_other_data(
     assert d is not None, "Has parent, popup, even if no other data."
 
 
-def test_popup_data_is_none_for_unknown(spanish, app_context, service):
+def test_popup_data_is_shown_if_have_data_regardless_of_status(
+    spanish, app_context, service
+):
     "Return None if no-popup statuses."
     t = Term(spanish, "gato")
-    db.session.add(t)
-    db.session.commit()
     t.translation = "hello"
-    d = service.get_popup_data(t.id)
-    assert d is not None, "Have data, popup"
-
-    t.status = Status.UNKNOWN
-    d = service.get_popup_data(t.id)
-    assert d is None, "No popup for UNKNOWN words"
-
-    for s in [1, Status.IGNORED]:
+    for s in [1, Status.UNKNOWN, Status.IGNORED]:
         t.status = s
+        db.session.add(t)
+        db.session.commit()
         d = service.get_popup_data(t.id)
         assert d is not None, f"Have data for status {s}"
 
