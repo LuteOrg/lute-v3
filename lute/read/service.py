@@ -100,9 +100,6 @@ class Service:
         "Get popup data, or None if popup shouldn't be shown."
         term = self.session.get(Term, termid)
 
-        if term.status == Status.UNKNOWN:
-            return None
-
         def has_popup_data(cterm):
             return (
                 (cterm.translation or "").strip() != ""
