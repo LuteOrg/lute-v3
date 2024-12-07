@@ -1,4 +1,9 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/lute-hotkey-utils.js') }}" charset="utf-8"></script>
+<script type="text/javascript">
+  const LUTE_USER_SETTINGS = {{ user_settings | safe }}
+</script>
+
 
 {% if duplicated_term %}
 {#
@@ -312,8 +317,8 @@
 
     // "Save" shortcut
     $(document).keydown(function(event) {
-      console.log(event);
-      if (event.ctrlKey && event.key === "Enter") {
+      const s = get_pressed_keys_as_string(event);
+      if (s == LUTE_USER_SETTINGS.hotkey_SaveTerm) {
         $("#btnsubmit").click();
       }
     });

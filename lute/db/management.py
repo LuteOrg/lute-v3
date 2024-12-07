@@ -113,6 +113,7 @@ def add_default_user_settings(session, default_user_backup_path):
         "hotkey_Status5": "5",
         "hotkey_StatusIgnore": "i",
         "hotkey_StatusWellKnown": "w",
+        "hotkey_SaveTerm": "ctrl+enter",
         # New hotkeys.  These must have empty values, because
         # users may have already setup their hotkeys, and we can't
         # assume that a given key combination is free:
