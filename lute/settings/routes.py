@@ -157,6 +157,7 @@ def _get_categorized_hotkeys():
             "hotkey_NextTheme",
             "hotkey_ToggleHighlight",
             "hotkey_ToggleFocus",
+            "hotkey_SaveTerm",
         ],
     }
 
@@ -214,6 +215,7 @@ def edit_shortcuts():
         "hotkey_StatusWellKnown": "Set status to Well Known",
         "hotkey_DeleteTerm": "Delete term (set status to Unknown)",
         "hotkey_EditPage": "Edit the current page",
+        "hotkey_SaveTerm": "Save term in term form",
     }
 
     return render_template(

@@ -29,6 +29,6 @@ function get_pressed_keys_as_string(event) {
 
   keys.push(actual_key);
   const ret = keys.join('+');
-  // window.alert(`got hotkey = ${ret}`);
+  // console.log(`got hotkey = ${ret}`);
   return ret;
 }
