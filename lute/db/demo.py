@@ -38,6 +38,14 @@ def _demo_languages():
     ]
 
 
+def should_load_demo_data(session):
+    """
+    True if LoadDemoData setting is true.
+    """
+    repo = SystemSettingRepository(session)
+    return bool(repo.get_value("LoadDemoData"))
+
+
 def contains_demo_data(session):
     """
     True if IsDemoData setting is present.
