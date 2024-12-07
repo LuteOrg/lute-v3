@@ -38,12 +38,22 @@ def _demo_languages():
     ]
 
 
+def set_load_demo_flag(session, flag_value):
+    "Set the flag."
+    repo = SystemSettingRepository(session)
+    repo.set_value("LoadDemoData", flag_value)
+    session.commit()
+
+
 def should_load_demo_data(session):
     """
     True if LoadDemoData setting is true.
     """
     repo = SystemSettingRepository(session)
-    return bool(repo.get_value("LoadDemoData"))
+    s = repo.get_value("LoadDemoData")
+    if s is None:
+        return False
+    return bool(int(s))
 
 
 def contains_demo_data(session):
@@ -138,8 +148,12 @@ def load_demo_data(session):
     """
     Load the data.
     """
+    repo = SystemSettingRepository(session)
+    if not bool(repo.get_value("LoadDemoData")):
+        return
+
     load_demo_languages(session)
     load_demo_stories(session)
-    repo = SystemSettingRepository(session)
     repo.set_value("IsDemoData", True)
+    repo.set_value("LoadDemoData", False)
     session.commit()

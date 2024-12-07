@@ -23,6 +23,7 @@ from sqlalchemy import text
 import pytest
 from lute.db import db
 from lute.db.demo import (
+    set_load_demo_flag,
     should_load_demo_data,
     contains_demo_data,
     remove_flag,
@@ -43,6 +44,22 @@ def test_new_db_is_demo(app_context):
     "New db created from the baseline has the demo flag set."
     assert contains_demo_data(db.session) is True, "new db contains demo."
     assert should_load_demo_data(db.session) is False, "don't reload demo data."
+
+
+def test_empty_db_is_not_demo_shouldnt_load(empty_db):
+    "Wiping everything wipes everything!"
+    assert contains_demo_data(db.session) is False, "empty, no demo."
+    assert should_load_demo_data(db.session) is False, "empty, don't reload."
+
+
+def test_smoke_test_load_demo_works(empty_db):
+    "Wipe everything, but set the flag and then start."
+    set_load_demo_flag(db.session, True)
+    assert should_load_demo_data(db.session) is True, " should reload demo data."
+    load_demo_data(db.session)
+    assert contains_demo_data(db.session) is True, "demo loaded."
+    assert tutorial_book_id(db.session) > 0, "Have tutorial"
+    assert should_load_demo_data(db.session) is False, "loaded once, don't reload."
 
 
 def todo_tests():
