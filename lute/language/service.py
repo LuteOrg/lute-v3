@@ -77,8 +77,8 @@ class Service:
         ret.sort(key=lambda x: x["language"].name)
         return ret
 
-    def predefined_languages(self):
-        "Languages defined in yaml files."
+    def supported_predefined_languages(self):
+        "Supported Languages defined in yaml files."
         return [d["language"] for d in self.get_supported_defs()]
 
     def get_language_def(self, lang_name):

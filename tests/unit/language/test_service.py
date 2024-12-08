@@ -21,10 +21,10 @@ def test_get_all_lang_defs(app_context):
     assert titles == ["Tutorial", "Tutorial follow-up"], "book titles"
 
 
-def test_predefined_languages(app_context):
-    "Get all lang names"
+def test_supported_predefined_languages(app_context):
+    "Get supported lang names"
     service = Service(db.session)
-    predefs = service.predefined_languages()
+    predefs = service.supported_predefined_languages()
     assert len(predefs) > 1, "Have predefined"
     langnames = [lang.name for lang in predefs]
     assert "English" in langnames, "Have English"
