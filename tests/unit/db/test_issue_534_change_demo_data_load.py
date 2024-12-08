@@ -10,13 +10,8 @@ In the new setup, the baseline db only contains a flag, "LoadDemoData"
 starts up, if that flag is True, it loads the demo data, and sets
 "LoadDemoData" to False, and "IsDemoData" to True.
 
-Since these tests use the app context, the app startup is called,
-which goes through all of the above automatically.  Some of these
-tests therefore need to re-wipe the database to force a reload.  It's
-a bit hacky; a better way to do this would be to have db
-initialization done completely outside of the application, but that
-requires some rework of how the db is initialized and the various data
-models loaded.
+If the LoadDemoData flag is set, the demo data is loaded from the
+startup scripts (devstart and lute.main)
 """
 
 from sqlalchemy import text
@@ -40,36 +35,30 @@ from tests.dbasserts import assert_record_count_equals, assert_sql_result
 # ========================================
 
 
-def test_new_db_is_demo(app_context):
+def test_new_db_doesnt_contain_anything(app_context):
     "New db created from the baseline has the demo flag set."
-    assert contains_demo_data(db.session) is True, "new db contains demo."
-    assert should_load_demo_data(db.session) is False, "don't reload demo data."
+    assert should_load_demo_data(db.session) is True, "has LoadDemoData flag."
+    assert contains_demo_data(db.session) is False, "no demo data."
 
 
-def test_empty_db_is_not_demo_shouldnt_load(empty_db):
-    "Wiping everything wipes everything!"
-    assert contains_demo_data(db.session) is False, "empty, no demo."
-    assert should_load_demo_data(db.session) is False, "empty, don't reload."
-
-
-def test_smoke_test_load_demo_works(empty_db):
+def test_smoke_test_load_demo_works(app_context):
     "Wipe everything, but set the flag and then start."
-    set_load_demo_flag(db.session, True)
-    assert should_load_demo_data(db.session) is True, " should reload demo data."
+    assert should_load_demo_data(db.session) is True, "should reload demo data."
     load_demo_data(db.session)
     assert contains_demo_data(db.session) is True, "demo loaded."
     assert tutorial_book_id(db.session) > 0, "Have tutorial"
     assert should_load_demo_data(db.session) is False, "loaded once, don't reload."
 
 
-def test_load_not_run_if_data_exists_even_if_flag_is_set(empty_db):
-    set_load_demo_flag(db.session, True)
+def test_load_not_run_if_data_exists_even_if_flag_is_set(app_context):
+    assert should_load_demo_data(db.session) is True, "should reload demo data."
     load_demo_data(db.session)
     assert tutorial_book_id(db.session) > 0, "Have tutorial"
     assert should_load_demo_data(db.session) is False, "loaded once, don't reload."
 
     remove_flag(db.session)
     set_load_demo_flag(db.session, True)
+    assert should_load_demo_data(db.session) is True, "should re-reload demo data."
     load_demo_data(db.session)  # if this works, it didn't throw :-P
     assert should_load_demo_data(db.session) is False, "already loaded once."
 
