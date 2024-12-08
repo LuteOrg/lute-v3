@@ -369,7 +369,7 @@ def db_export_baseline(c):
     fname = os.path.join(_schema_dir(), "baseline.sql")
     print(f"Verifying {fname}")
     with open(fname, "r", encoding="utf-8") as f:
-        checkstring = "Tutorial follow-up"
+        checkstring = 'CREATE TABLE IF NOT EXISTS "languages"'
         if checkstring in f.read():
             print(f'"{checkstring}" found, likely ok.')
         else:
