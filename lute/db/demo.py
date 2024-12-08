@@ -15,6 +15,8 @@ from lute.book.stats import Service as StatsService
 from lute.models.repositories import SystemSettingRepository
 import lute.db.management
 
+from lute.utils.debug_helpers import DebugTimer
+
 
 def _demo_languages():
     """
@@ -114,13 +116,19 @@ def load_demo_languages(session):
 
     This method will also be called during acceptance tests, so it's public.
     """
+    dt = DebugTimer("load_demo_languages")
     demo_langs = _demo_languages()
+    dt.step("demo_langs")
     service = Service(session)
     langs = [service.get_language_def(langname)["language"] for langname in demo_langs]
+    dt.step("langs")
     supported = [lang for lang in langs if lang.is_supported]
+    dt.step("supported")
     for lang in supported:
         session.add(lang)
+    dt.step("added to session")
     session.commit()
+    dt.step("commit")
 
 
 def load_demo_stories(session):
@@ -133,6 +141,7 @@ def load_demo_stories(session):
     r = Repository(session)
     for d in langdefs:
         for b in d["books"]:
+            print(b.title, flush=True)
             r.add(b)
     r.commit()
 
@@ -144,16 +153,37 @@ def load_demo_stories(session):
     svc.refresh_stats()
 
 
+def _db_has_data(session):
+    "True of the db contains any language data."
+    sql = "select LgID from languages limit 1"
+    r = session.execute(text(sql)).first()
+    return r is not None
+
+
 def load_demo_data(session):
     """
     Load the data.
     """
-    repo = SystemSettingRepository(session)
-    if not bool(repo.get_value("LoadDemoData")):
+    if _db_has_data(session):
+        set_load_demo_flag(session, False)
         return
 
+    repo = SystemSettingRepository(session)
+    do_load = repo.get_value("LoadDemoData")
+    if do_load is None:
+        # Only load if flag is explicitly set.
+        return
+
+    do_load = bool(int(do_load))
+    if not do_load:
+        return
+
+    dt = DebugTimer("load_demo_data")
     load_demo_languages(session)
+    dt.step("load_demo_languages")
     load_demo_stories(session)
+    dt.step("load_demo_stories")
     repo.set_value("IsDemoData", True)
     repo.set_value("LoadDemoData", False)
     session.commit()
+    DebugTimer.total_summary()

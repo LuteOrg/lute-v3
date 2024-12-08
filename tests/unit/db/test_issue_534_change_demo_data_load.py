@@ -62,6 +62,18 @@ def test_smoke_test_load_demo_works(empty_db):
     assert should_load_demo_data(db.session) is False, "loaded once, don't reload."
 
 
+def test_load_not_run_if_data_exists_even_if_flag_is_set(empty_db):
+    set_load_demo_flag(db.session, True)
+    load_demo_data(db.session)
+    assert tutorial_book_id(db.session) > 0, "Have tutorial"
+    assert should_load_demo_data(db.session) is False, "loaded once, don't reload."
+
+    remove_flag(db.session)
+    set_load_demo_flag(db.session, True)
+    load_demo_data(db.session)  # if this works, it didn't throw :-P
+    assert should_load_demo_data(db.session) is False, "already loaded once."
+
+
 def todo_tests():
     """Some tests to add
 
