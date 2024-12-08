@@ -15,8 +15,6 @@ from lute.book.stats import Service as StatsService
 from lute.models.repositories import SystemSettingRepository
 import lute.db.management
 
-from lute.utils.debug_helpers import DebugTimer
-
 
 def _demo_languages():
     """
@@ -116,19 +114,13 @@ def load_demo_languages(session):
 
     This method will also be called during acceptance tests, so it's public.
     """
-    dt = DebugTimer("load_demo_languages")
     demo_langs = _demo_languages()
-    dt.step("demo_langs")
     service = Service(session)
     langs = [service.get_language_def(langname)["language"] for langname in demo_langs]
-    dt.step("langs")
     supported = [lang for lang in langs if lang.is_supported]
-    dt.step("supported")
     for lang in supported:
         session.add(lang)
-    dt.step("added to session")
     session.commit()
-    dt.step("commit")
 
 
 def load_demo_stories(session):
@@ -141,7 +133,6 @@ def load_demo_stories(session):
     r = Repository(session)
     for d in langdefs:
         for b in d["books"]:
-            print(b.title, flush=True)
             r.add(b)
     r.commit()
 
@@ -178,12 +169,8 @@ def load_demo_data(session):
     if not do_load:
         return
 
-    dt = DebugTimer("load_demo_data")
     load_demo_languages(session)
-    dt.step("load_demo_languages")
     load_demo_stories(session)
-    dt.step("load_demo_stories")
     repo.set_value("IsDemoData", True)
     repo.set_value("LoadDemoData", False)
     session.commit()
-    DebugTimer.total_summary()
