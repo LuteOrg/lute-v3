@@ -10,6 +10,9 @@ import pytest
 from lute.backup.service import Service, BackupException, DatabaseBackupFile
 from lute.models.repositories import UserSettingRepository
 from lute.db import db
+from lute.language.service import Service as LanguageService
+
+from tests.dbasserts import assert_record_count_equals
 
 # pylint: disable=missing-function-docstring
 # Test method names are pretty descriptive already.
@@ -186,6 +189,13 @@ def test_warn_if_last_backup_never_happened_or_is_old(backup_settings):
     backup_settings.backup_warn = True
     backup_settings.last_backup_datetime = None
     service = Service(db.session)
+
+    assert_record_count_equals("select * from books", 0, "sanity check, no books")
+    assert service.backup_warning(backup_settings) == "", "no warning if db empty"
+
+    langsvc = LanguageService(db.session)
+    langsvc.load_language_def("English")
+    assert_record_count_equals("select * from books", 2, "sanity check, have books")
     assert service.backup_warning(backup_settings) == "Never backed up."
 
     backup_settings.last_backup_datetime = one_week_ago + 10
