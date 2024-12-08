@@ -12,7 +12,7 @@ from sqlalchemy import text
 from lute.language.service import Service
 from lute.book.model import Repository
 from lute.book.stats import Service as StatsService
-from lute.models.repositories import SystemSettingRepository
+from lute.models.repositories import SystemSettingRepository, LanguageRepository
 import lute.db.management
 
 
@@ -124,15 +124,22 @@ def load_demo_languages(session):
 
 
 def load_demo_stories(session):
-    "Load the stories."
+    "Load the stories for any languages already loaded."
     demo_langs = _demo_languages()
     service = Service(session)
     langdefs = [service.get_language_def(langname) for langname in demo_langs]
-    langdefs = [d for d in langdefs if d["language"].is_supported]
+
+    langrepo = LanguageRepository(session)
+    langdefs = [
+        d
+        for d in langdefs
+        if d.language.is_supported
+        and langrepo.find_by_name(d.language.name) is not None
+    ]
 
     r = Repository(session)
     for d in langdefs:
-        for b in d["books"]:
+        for b in d.books:
             r.add(b)
     r.commit()
 
