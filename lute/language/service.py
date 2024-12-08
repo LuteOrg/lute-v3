@@ -46,45 +46,34 @@ class Service:
 
     def __init__(self, session):
         self.session = session
-        self.language_from_lang_defs_cache = None
+        self.lang_defs_cache = self._get_langdefs_cache()
 
-    def _language_defs_path(self):
-        "Path to the definitions and stories."
+    def _get_langdefs_cache(self):
+        "Load cache."
         thisdir = os.path.dirname(__file__)
-        d = os.path.join(thisdir, "..", "db", "language_defs")
-        return os.path.abspath(d)
+        langdefs_dir = os.path.join(thisdir, "..", "db", "language_defs")
+        langdefs_dir = os.path.abspath(langdefs_dir)
 
-    def _load_lang_defs_cache(self):
-        "Cache Languages build from lang defs."
-        if self.language_from_lang_defs_cache is not None:
-            return
-        cache = {}
-        def_glob = os.path.join(self._language_defs_path(), "**", "definition.yaml")
+        cache = []
+        def_glob = os.path.join(langdefs_dir, "**", "definition.yaml")
         for f in glob(def_glob):
             lang_dir, def_yaml = os.path.split(f)
-            ld = LangDef(lang_dir)
-            cache[ld.language.name] = ld
-        self.language_from_lang_defs_cache = cache
+            cache.append(LangDef(lang_dir))
+        return cache
 
     def get_supported_defs(self):
         "Return supported language definitions."
-        self._load_lang_defs_cache()
-        ret = [
-            {"language": ld.language, "books": ld.books}
-            for _, ld in self.language_from_lang_defs_cache.items()
-            if ld.language.is_supported
-        ]
-        ret.sort(key=lambda x: x["language"].name)
+        ret = [ld for ld in self.lang_defs_cache if ld.language.is_supported]
+        ret.sort(key=lambda x: x.language.name)
         return ret
 
     def supported_predefined_languages(self):
         "Supported Languages defined in yaml files."
-        return [d["language"] for d in self.get_supported_defs()]
+        return [d.language for d in self.get_supported_defs()]
 
     def get_language_def(self, lang_name):
         "Get a lang def and its stories."
-        defs = self.get_supported_defs()
-        ret = [d for d in defs if d["language"].name == lang_name]
+        ret = [ld for ld in self.lang_defs_cache if ld.language.name == lang_name]
         if len(ret) == 0:
             raise RuntimeError(f"Missing language def name {lang_name}")
         return ret[0]
@@ -92,12 +81,15 @@ class Service:
     def load_language_def(self, lang_name):
         "Load a language def and its stories, save to database."
         load_def = self.get_language_def(lang_name)
-        lang = load_def["language"]
+        lang = load_def.language
+        if not lang.is_supported:
+            raise RuntimeError(f"{lang_name} not supported, can't be loaded.")
+
         self.session.add(lang)
         self.session.commit()
 
         r = Repository(self.session)
-        for b in load_def["books"]:
+        for b in load_def.books:
             r.add(b)
         r.commit()
 
