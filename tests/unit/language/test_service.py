@@ -1,11 +1,11 @@
 """
-Read service tests.
+Language service tests.
 """
 
-# from lute.db import db
 from lute.language.service import Service
 from lute.db import db
 from tests.dbasserts import assert_sql_result
+from lute.utils.debug_helpers import DebugTimer
 
 
 def test_get_all_lang_defs(app_context):
@@ -63,8 +63,14 @@ def test_load_def_loads_lang_and_stories(app_context):
     assert_sql_result(lang_sql, [], "no langs")
     assert_sql_result(story_sql, [], "nothing loaded")
 
+    dt = DebugTimer("Loading", False)
+    dt.step("start")
     service = Service(db.session)
+    dt.step("Service()")
     lang_id = service.load_language_def("English")
+    dt.step("load_language_def")
+    dt.summary()
+
     assert lang_id > 0, "ID returned, used for filtering"
     assert_sql_result(lang_sql, ["English"], "eng loaded")
     assert_sql_result(story_sql, ["Tutorial", "Tutorial follow-up"], "stories loaded")

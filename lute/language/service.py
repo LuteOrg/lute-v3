@@ -7,14 +7,30 @@ import yaml
 from lute.models.language import Language
 from lute.book.model import Book, Repository
 
+# from lute.utils.debug_helpers import DebugTimer
+
 
 class LangDef:
     "Language, built from language definition.yml, and .txt book files."
 
     def __init__(self, directory):
         "Build from files."
-        self.language = self._load_lang_def(directory)
-        self.books = self._get_books(directory, self.language.name)
+        self.directory = directory
+        self.language_name = self._get_name(directory)
+
+    def _get_name(self, directory):
+        def_file = os.path.join(directory, "definition.yaml")
+        with open(def_file, "r", encoding="utf-8") as df:
+            d = yaml.safe_load(df)
+            return d["name"]
+
+    @property
+    def language(self):
+        return self._load_lang_def(self.directory)
+
+    @property
+    def books(self):
+        return self._get_books(self.directory, self.language_name)
 
     def _load_lang_def(self, directory):
         "Load from file, must exist."
@@ -50,21 +66,29 @@ class Service:
 
     def _get_langdefs_cache(self):
         "Load cache."
+        # dt = DebugTimer("_get_langdefs_cache", False)
+        # dt.step("start")
         thisdir = os.path.dirname(__file__)
         langdefs_dir = os.path.join(thisdir, "..", "db", "language_defs")
         langdefs_dir = os.path.abspath(langdefs_dir)
-
+        # dt.step("got base directory")
         cache = []
         def_glob = os.path.join(langdefs_dir, "**", "definition.yaml")
-        for f in glob(def_glob):
+        def_list = glob(def_glob)
+        # dt.step("globbed")
+        def_list.sort()
+        for f in def_list:
             lang_dir, def_yaml = os.path.split(f)
-            cache.append(LangDef(lang_dir))
+            ld = LangDef(lang_dir)
+            # dt.step(f"build ld {ld.language_name}".ljust(30))
+            cache.append(ld)
+        # dt.summary()
         return cache
 
     def get_supported_defs(self):
         "Return supported language definitions."
         ret = [ld for ld in self.lang_defs_cache if ld.language.is_supported]
-        ret.sort(key=lambda x: x.language.name)
+        ret.sort(key=lambda x: x.language_name)
         return ret
 
     def supported_predefined_languages(self):
@@ -73,7 +97,7 @@ class Service:
 
     def get_language_def(self, lang_name):
         "Get a lang def and its stories."
-        ret = [ld for ld in self.lang_defs_cache if ld.language.name == lang_name]
+        ret = [ld for ld in self.lang_defs_cache if ld.language_name == lang_name]
         if len(ret) == 0:
             raise RuntimeError(f"Missing language def name {lang_name}")
         return ret[0]
