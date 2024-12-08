@@ -110,13 +110,13 @@ def delete_demo_data(session):
 
 def load_demo_languages(session):
     """
-    Load selected predefined languages.  Assume everything is supported.
+    Load selected predefined languages, if they're supported.
 
     This method will also be called during acceptance tests, so it's public.
     """
     demo_langs = _demo_languages()
     service = Service(session)
-    langs = [service.get_language_def(langname)["language"] for langname in demo_langs]
+    langs = [service.get_language_def(langname).language for langname in demo_langs]
     supported = [lang for lang in langs if lang.is_supported]
     for lang in supported:
         session.add(lang)

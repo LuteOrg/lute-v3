@@ -108,7 +108,7 @@ def _get_test_language(lang_name):
     if lang is not None:
         return lang
     service = Service(db.session)
-    lang = service.get_language_def(lang_name)["language"]
+    lang = service.get_language_def(lang_name).language
     return lang
 
 
