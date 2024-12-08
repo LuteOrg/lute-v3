@@ -11,6 +11,7 @@ from pytest_bdd import given, when, then, scenarios, parsers
 
 from lute.db import db
 from lute.models.language import Language
+from lute.language.service import Service as LanguageService
 from lute.models.term import Term
 from lute.models.repositories import LanguageRepository, TermRepository
 from lute.termimport.service import Service, BadImportFileError
@@ -30,7 +31,10 @@ scenarios("term_import_status_0.feature")
 
 @given("demo data")
 def given_demo_data(app_context):
-    "Calling app_context loads the demo data."
+    "Load languages necessary for imports."
+    svc = LanguageService(db.session)
+    for lang in ["Spanish", "English", "Classical Chinese"]:
+        svc.load_language_def(lang)
 
 
 @given(parsers.parse("import file:\n{newcontent}"))
