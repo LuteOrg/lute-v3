@@ -296,6 +296,17 @@ def db_wipe(c):
 
 
 @task(pre=[_ensure_test_db])
+def db_rebaseline(c):
+    """
+    Set up the database to baseline state for new installations, with LoadDemoData system flag set.
+
+    Can only be run on a testing db.
+    """
+    c.run("pytest -m dbrebaseline")
+    print("ok")
+
+
+@task(pre=[_ensure_test_db])
 def db_reset(c):
     """
     Reset the database to the demo data.
@@ -347,7 +358,7 @@ def db_export_baseline(c):
     # Running the delete task before this one as a pre- step was
     # causing problems (sqlite file not in correct state), so this
     # asks the user to verify.
-    text = input("Have you reset the db?  (y/n): ")
+    text = input("Have you (reset) **REBASELINED** the db?  (y/n): ")
     if text != "y":
         print("quitting.")
         return
@@ -400,6 +411,7 @@ def db_newscript(c, suffix):  # pylint: disable=unused-argument
 
 
 dbtasks = Collection("db")
+dbtasks.add_task(db_rebaseline, "rebaseline")
 dbtasks.add_task(db_reset, "reset")
 dbtasks.add_task(db_wipe, "wipe")
 dbtasks.add_task(db_newscript, "newscript")

@@ -6,6 +6,7 @@ from sqlalchemy import text
 import pytest
 from lute.db import db
 from lute.db.demo import (
+    set_load_demo_flag,
     contains_demo_data,
     remove_flag,
     delete_demo_data,
@@ -59,6 +60,29 @@ def test_tutorial_id_returned_if_present(app_context):
 
 
 # Loading.
+
+
+@pytest.mark.dbrebaseline
+def test_rebaseline(app_context):
+    """
+    This test is also used from "inv db.rebaseline" in tasks.py
+    (see .pytest.ini).
+    """
+    delete_demo_data(db.session)
+    assert contains_demo_data(db.session) is False, "not a demo."
+    assert_record_count_equals("languages", 0, "wiped out")
+
+    # Wipe out all user settings!!!  When user installs and first
+    # starts up, the user settings need to be loaded with values from
+    # _their_ config and environment.
+    sql = "delete from settings where StKeyType = 'user'"
+    db.session.execute(text(sql))
+    db.session.commit()
+
+    set_load_demo_flag(db.session, True)
+
+    sql = "select stkeytype, stkey, stvalue from settings"
+    assert_sql_result(sql, ["system; LoadDemoData; 1"], "only this key is set.")
 
 
 @pytest.mark.dbdemoload
