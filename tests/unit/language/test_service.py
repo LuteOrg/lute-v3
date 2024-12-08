@@ -21,6 +21,16 @@ def test_get_all_lang_defs(app_context):
     assert titles == ["Tutorial", "Tutorial follow-up"], "book titles"
 
 
+def test_predefined_languages(app_context):
+    "Get all lang names"
+    service = Service(db.session)
+    predefs = service.predefined_languages()
+    assert len(predefs) > 1, "Have predefined"
+    langnames = [lang.name for lang in predefs]
+    assert "English" in langnames, "Have English"
+    assert "French" in langnames, "Have French"
+
+
 def test_get_language_def():
     """
     Smoke test, can load a new language from yaml definition.
