@@ -109,6 +109,8 @@ def _get_test_language(lang_name):
         return lang
     service = Service(db.session)
     lang = service.get_language_def(lang_name).language
+    db.session.add(lang)
+    db.session.commit()
     return lang
 
 
