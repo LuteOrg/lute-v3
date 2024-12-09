@@ -284,17 +284,6 @@ ns.add_task(black)
 # DB tasks
 
 
-@task(pre=[_ensure_test_db])
-def db_reset(c):
-    """
-    Reset the database to baseline state for new installations, with LoadDemoData system flag set.
-
-    Can only be run on a testing db.
-    """
-    c.run("pytest -m dbreset")
-    print("ok")
-
-
 def _schema_dir():
     "Return full path to schema dir."
     thisdir = os.path.dirname(os.path.realpath(__file__))
@@ -330,16 +319,8 @@ def _do_schema_export(c, destfile, header_notes, taskname):
 @task
 def db_export_baseline(c):
     """
-    Reset the db, and create a new baseline db file from the current db.
+    Create a new baseline db file from the current db.
     """
-
-    # Running the delete task before this one as a pre- step was
-    # causing problems (sqlite file not in correct state), so this
-    # asks the user to verify.
-    text = input("Have you reset the db?  (y/n): ")
-    if text != "y":
-        print("quitting.")
-        return
     _do_schema_export(
         c,
         "baseline.sql",
@@ -356,6 +337,17 @@ def db_export_baseline(c):
         else:
             print(f'"{checkstring}" NOT FOUND, SOMETHING LIKELY WRONG.')
             raise RuntimeError(f'Missing "{checkstring}" in exported file.')
+
+
+@task(pre=[_ensure_test_db], post=[db_export_baseline])
+def db_reset(c):
+    """
+    Reset the database to baseline state for new installations, with LoadDemoData system flag set.
+
+    Can only be run on a testing db.
+    """
+    c.run("pytest -m dbreset")
+    print("\nok, exporting baseline.sql.\n")
 
 
 @task(help={"suffix": "suffix to add to filename."})
