@@ -18,16 +18,7 @@ startup scripts (devstart and lute.main)
 from sqlalchemy import text
 import pytest
 from lute.db import db
-from lute.db.demo import (
-    set_load_demo_flag,
-    remove_load_demo_flag,
-    should_load_demo_data,
-    contains_demo_data,
-    remove_flag,
-    delete_demo_data,
-    tutorial_book_id,
-    load_demo_data,
-)
+from lute.db.demo import Service
 import lute.parse.registry
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
 
@@ -37,103 +28,108 @@ from tests.dbasserts import assert_record_count_equals, assert_sql_result
 # ========================================
 
 
-def test_new_db_doesnt_contain_anything(app_context):
+@pytest.fixture(name="service")
+def service(app_context):
+    return Service(db.session)
+
+
+def test_new_db_doesnt_contain_anything(service):
     "New db created from the baseline has the demo flag set."
-    assert should_load_demo_data(db.session) is True, "has LoadDemoData flag."
-    assert contains_demo_data(db.session) is False, "no demo data."
+    assert service.should_load_demo_data() is True, "has LoadDemoData flag."
+    assert service.contains_demo_data() is False, "no demo data."
 
 
-def test_empty_db_not_loaded_if_load_flag_not_set(app_context):
+def test_empty_db_not_loaded_if_load_flag_not_set(service):
     "Even if it's empty, nothing happens."
-    remove_load_demo_flag(db.session)
-    assert contains_demo_data(db.session) is False, "no demo data."
+    service.remove_load_demo_flag()
+    assert service.contains_demo_data() is False, "no demo data."
     assert_record_count_equals("select * from languages", 0, "empty")
-    load_demo_data(db.session)
-    assert contains_demo_data(db.session) is False, "no demo data."
-    assert should_load_demo_data(db.session) is False, "still no reload."
+    service.load_demo_data()
+    assert service.contains_demo_data() is False, "no demo data."
+    assert service.should_load_demo_data() is False, "still no reload."
     assert_record_count_equals("select * from languages", 0, "still empty")
 
 
-def test_smoke_test_load_demo_works(app_context):
+def test_smoke_test_load_demo_works(service):
     "Wipe everything, but set the flag and then start."
-    assert should_load_demo_data(db.session) is True, "should reload demo data."
-    load_demo_data(db.session)
-    assert contains_demo_data(db.session) is True, "demo loaded."
-    assert tutorial_book_id(db.session) > 0, "Have tutorial"
-    assert should_load_demo_data(db.session) is False, "loaded once, don't reload."
+    assert service.should_load_demo_data() is True, "should reload demo data."
+    service.load_demo_data()
+    assert service.contains_demo_data() is True, "demo loaded."
+    assert service.tutorial_book_id() > 0, "Have tutorial"
+    assert service.should_load_demo_data() is False, "loaded once, don't reload."
 
 
-def test_load_not_run_if_data_exists_even_if_flag_is_set(app_context):
-    assert should_load_demo_data(db.session) is True, "should reload demo data."
-    load_demo_data(db.session)
-    assert tutorial_book_id(db.session) > 0, "Have tutorial"
-    assert should_load_demo_data(db.session) is False, "loaded once, don't reload."
+def test_load_not_run_if_data_exists_even_if_flag_is_set(service):
+    assert service.should_load_demo_data() is True, "should reload demo data."
+    service.load_demo_data()
+    assert service.tutorial_book_id() > 0, "Have tutorial"
+    assert service.should_load_demo_data() is False, "loaded once, don't reload."
 
-    remove_flag(db.session)
-    set_load_demo_flag(db.session)
-    assert should_load_demo_data(db.session) is True, "should re-reload demo data."
-    load_demo_data(db.session)  # if this works, it didn't throw :-P
-    assert should_load_demo_data(db.session) is False, "already loaded once."
+    service.remove_flag()
+    service.set_load_demo_flag()
+    assert service.should_load_demo_data() is True, "should re-reload demo data."
+    service.load_demo_data()  # if this works, it didn't throw :-P
+    assert service.should_load_demo_data() is False, "already loaded once."
 
 
-def test_removing_flag_means_not_demo(app_context):
+def test_removing_flag_means_not_demo(service):
     "Unsetting the flag means the db is not a demo."
-    assert should_load_demo_data(db.session) is True, "should reload demo data."
-    load_demo_data(db.session)
-    assert contains_demo_data(db.session) is True, "demo loaded."
-    remove_flag(db.session)
-    assert contains_demo_data(db.session) is False, "not a demo now."
+    assert service.should_load_demo_data() is True, "should reload demo data."
+    service.load_demo_data()
+    assert service.contains_demo_data() is True, "demo loaded."
+    service.remove_flag()
+    assert service.contains_demo_data() is False, "not a demo now."
 
 
-def test_wiping_db_clears_flag(app_context):
+def test_wiping_db_clears_flag(service):
     "No longer a demo if the demo is wiped out!"
-    assert should_load_demo_data(db.session) is True, "should reload demo data."
-    load_demo_data(db.session)
-    assert contains_demo_data(db.session) is True, "demo loaded."
-    delete_demo_data(db.session)
-    assert contains_demo_data(db.session) is False, "not a demo."
+    assert service.should_load_demo_data() is True, "should reload demo data."
+    service.load_demo_data()
+    assert service.contains_demo_data() is True, "demo loaded."
+    service.delete_demo_data()
+    assert service.contains_demo_data() is False, "not a demo."
 
 
-def test_wipe_db_only_works_if_flag_is_set(app_context):
+def test_wipe_db_only_works_if_flag_is_set(service):
     "Can only wipe a demo db!"
-    assert should_load_demo_data(db.session) is True, "should reload demo data."
-    load_demo_data(db.session)
-    assert contains_demo_data(db.session) is True, "demo loaded."
-    remove_flag(db.session)
+    assert service.should_load_demo_data() is True, "should reload demo data."
+    service.load_demo_data()
+    assert service.contains_demo_data() is True, "demo loaded."
+    service.remove_flag()
     with pytest.raises(Exception):
-        delete_demo_data(db.session)
+        service.delete_demo_data()
 
 
-def test_tutorial_id_returned_if_present(app_context):
+def test_tutorial_id_returned_if_present(service):
     "Sanity check."
-    assert should_load_demo_data(db.session) is True, "should reload demo data."
-    load_demo_data(db.session)
-    assert tutorial_book_id(db.session) > 0, "have tutorial"
+    assert service.should_load_demo_data() is True, "should reload demo data."
+    service.load_demo_data()
+    assert service.tutorial_book_id() > 0, "have tutorial"
 
     sql = 'update books set bktitle = "xxTutorial" where bktitle = "Tutorial"'
     db.session.execute(text(sql))
     db.session.commit()
-    assert tutorial_book_id(db.session) is None, "no tutorial"
+    assert service.tutorial_book_id() is None, "no tutorial"
 
     sql = 'update books set bktitle = "Tutorial" where bktitle = "xxTutorial"'
     db.session.execute(text(sql))
     db.session.commit()
-    assert tutorial_book_id(db.session) > 0, "have tutorial again"
+    assert service.tutorial_book_id() > 0, "have tutorial again"
 
-    delete_demo_data(db.session)
-    assert tutorial_book_id(db.session) is None, "no tutorial"
+    service.delete_demo_data()
+    assert service.tutorial_book_id() is None, "no tutorial"
 
 
 # Loading.
 
 
 @pytest.mark.dbreset
-def test_rebaseline(app_context):
+def test_rebaseline(service):
     """
     This test is also used from "inv db.reset" in tasks.py
     (see .pytest.ini).
     """
-    assert contains_demo_data(db.session) is False, "not a demo."
+    assert service.contains_demo_data() is False, "not a demo."
     assert_record_count_equals("languages", 0, "wiped out")
 
     # Wipe out all user settings!!!  When user installs and first
@@ -143,7 +139,7 @@ def test_rebaseline(app_context):
     db.session.execute(text(sql))
     db.session.commit()
 
-    set_load_demo_flag(db.session)
+    service.set_load_demo_flag()
 
     sql = "select stkeytype, stkey, stvalue from settings"
     assert_sql_result(sql, ["system; LoadDemoData; 1"], "only this key is set.")

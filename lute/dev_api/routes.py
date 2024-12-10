@@ -22,7 +22,7 @@ from lute.models.repositories import UserSettingRepository
 import lute.parse.registry
 from lute.db import db
 import lute.db.management
-import lute.db.demo
+from lute.db.demo import Service as DemoService
 
 
 bp = Blueprint("dev_api", __name__, url_prefix="/dev_api")
@@ -47,8 +47,9 @@ def wipe_db():
 def load_demo():
     "Clean out everything, and load the demo."
     lute.db.management.delete_all_data(db.session)
-    lute.db.demo.set_load_demo_flag(db.session)
-    lute.db.demo.load_demo_data(db.session)
+    demosvc = DemoService(db.session)
+    demosvc.set_load_demo_flag()
+    demosvc.load_demo_data()
     flash("demo loaded")
     return redirect("/", 302)
 
@@ -57,7 +58,8 @@ def load_demo():
 def load_demo_languages():
     "Clean out everything, and load the demo langs with dummy dictionaries."
     lute.db.management.delete_all_data(db.session)
-    lute.db.demo.load_demo_languages(db.session)
+    demosvc = DemoService(db.session)
+    demosvc.load_demo_languages()
     langs = db.session.query(Language).all()
     for lang in langs:
         d = lang.dictionaries[0]
@@ -71,7 +73,8 @@ def load_demo_languages():
 @bp.route("/load_demo_stories", methods=["GET"])
 def load_demo_stories():
     "Stories only.  No db wipe."
-    lute.db.demo.load_demo_stories(db.session)
+    demosvc = DemoService(db.session)
+    demosvc.load_demo_stories()
     flash("stories loaded")
     return redirect("/", 302)
 
