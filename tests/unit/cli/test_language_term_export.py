@@ -6,13 +6,14 @@ from lute.models.term import Term, TermTag
 from lute.models.repositories import TermRepository, LanguageRepository
 from lute.models.book import Book
 from lute.db import db
-from lute.db.demo import load_demo_data
+from lute.db.demo import Service as DemoService
 from tests.dbasserts import assert_sql_result, assert_record_count_equals
 
 
 def test_language_term_export_smoke_test(app_context, tmp_path):
     "dump data."
-    load_demo_data(db.session)
+    demosvc = DemoService(db.session)
+    demosvc.load_demo_data()
     sql = """select * from books
       where BkLgID = (select LgID from languages where LgName='English')
     """

@@ -8,8 +8,8 @@ import pytest
 
 from lute.config.app_config import AppConfig
 from lute.db import db
+import lute.db.management
 from lute.language.service import Service
-import lute.db.demo
 from lute.app_factory import create_app
 
 from lute.models.language import Language
