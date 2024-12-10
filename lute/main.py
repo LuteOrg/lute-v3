@@ -83,7 +83,7 @@ def _start(args):
     with app.app_context():
         demosvc = DemoService(db.session)
         if demosvc.should_load_demo_data():
-            _print(f"Loading demo data.")
+            _print("Loading demo data.")
             demosvc.load_demo_data()
 
     close_msg = """

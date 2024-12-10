@@ -29,7 +29,7 @@ from tests.dbasserts import assert_record_count_equals, assert_sql_result
 
 
 @pytest.fixture(name="service")
-def service(app_context):
+def _service(app_context):
     return Service(db.session)
 
 
@@ -60,6 +60,7 @@ def test_smoke_test_load_demo_works(service):
 
 
 def test_load_not_run_if_data_exists_even_if_flag_is_set(service):
+    "Just in case."
     assert service.should_load_demo_data() is True, "should reload demo data."
     service.load_demo_data()
     assert service.tutorial_book_id() > 0, "Have tutorial"
