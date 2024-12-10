@@ -53,10 +53,10 @@ class DebugTimer:
 
     def summary(self):
         "Print final step summary."
-        print(f"{self.name} summary ------------------")
+        print(f"{self.name} summary ------------------", flush=True)
         for k, v in self.step_map.items():
             print(f"  {k}: {v:.6f}", flush=True)
-        print(f"end {self.name} summary --------------")
+        print(f"end {self.name} summary --------------", flush=True)
 
     @classmethod
     def clear_total_summary(cls):
@@ -65,7 +65,7 @@ class DebugTimer:
     @classmethod
     def total_summary(cls):
         "Print final step summary."
-        print("global summary ------------------")
+        print("global summary ------------------", flush=True)
         for k, v in cls.global_step_map.items():
             print(f"  {k}: {v:.6f}", flush=True)
-        print("end global summary --------------")
+        print("end global summary --------------", flush=True)

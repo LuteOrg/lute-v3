@@ -5,6 +5,7 @@ Low value but ensure that the db mapping is correct.
 """
 
 from lute.db import db
+from lute.db.demo import Service as DemoService
 from lute.models.language import Language
 from lute.models.repositories import LanguageRepository
 from tests.dbasserts import assert_sql_result
@@ -15,6 +16,8 @@ def test_demo_has_preloaded_languages(app_context):
     When users get the initial demo, it has English, French, etc,
     pre-defined.
     """
+    demosvc = DemoService(db.session)
+    demosvc.load_demo_data()
     sql = """
     select LgName
     from languages
@@ -42,6 +45,10 @@ def test_can_find_lang_by_name(app_context):
     """
     Returns lang if found, or None
     """
+    lang = Language()
+    lang.name = "English"
+    db.session.add(lang)
+    db.session.commit()
     repo = LanguageRepository(db.session)
     e = repo.find_by_name("English")
     assert e.name == "English", "case match"
@@ -64,6 +71,8 @@ def test_language_word_char_regex_returns_python_compatible_regex(app_context):
 
     u0600-u06FFuFE70-uFEFC  (where u = backslash-u)
     """
+    demosvc = DemoService(db.session)
+    demosvc.load_demo_data()
     repo = LanguageRepository(db.session)
     a = repo.find_by_name("Arabic")
     assert a.word_characters == r"\u0600-\u06FF\uFE70-\uFEFC"
@@ -75,6 +84,8 @@ def test_lang_to_dict_from_dict_returns_same_thing(app_context):
     A dictionary is used as the intermediary form, so the
     same language should return the same data.
     """
+    demosvc = DemoService(db.session)
+    demosvc.load_demo_data()
     repo = LanguageRepository(db.session)
     e = repo.find_by_name("English")
     e_dict = e.to_dict()

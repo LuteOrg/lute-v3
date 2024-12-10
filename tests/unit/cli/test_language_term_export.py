@@ -3,15 +3,24 @@
 from lute.cli.language_term_export import generate_language_file, generate_book_file
 
 from lute.models.term import Term, TermTag
-from lute.models.repositories import TermRepository
+from lute.models.repositories import TermRepository, LanguageRepository
 from lute.models.book import Book
 from lute.db import db
-from tests.dbasserts import assert_sql_result
+from lute.db.demo import Service as DemoService
+from tests.dbasserts import assert_sql_result, assert_record_count_equals
 
 
-def test_smoke_test(app_context, tmp_path, english):
+def test_language_term_export_smoke_test(app_context, tmp_path):
     "dump data."
-    t = Term(english, "the")
+    demosvc = DemoService(db.session)
+    demosvc.load_demo_data()
+    sql = """select * from books
+      where BkLgID = (select LgID from languages where LgName='English')
+    """
+    assert_record_count_equals(sql, 2, "have books")
+    langrepo = LanguageRepository(db.session)
+    eng = langrepo.find_by_name("English")
+    t = Term(eng, "the")
     t.translation = "article"
     t.add_term_tag(TermTag("a"))
     t.add_term_tag(TermTag("b"))

@@ -117,7 +117,7 @@ def new(langname):
     Create a new language.
     """
     service = Service(db.session)
-    predefined = service.predefined_languages()
+    predefined = service.supported_predefined_languages()
     language = Language()
     if langname is not None:
         candidates = [lang for lang in predefined if lang.name == langname]
@@ -163,9 +163,9 @@ def delete(langid):
 
 @bp.route("/list_predefined", methods=["GET"])
 def list_predefined():
-    "Show predefined languages that are not already in the db."
+    "Show supported predefined languages that are not already in the db."
     service = Service(db.session)
-    predefined = service.predefined_languages()
+    predefined = service.supported_predefined_languages()
     existing_langs = db.session.query(Language).all()
     existing_names = [l.name for l in existing_langs]
     new_langs = [p for p in predefined if p.name not in existing_names]

@@ -8,8 +8,8 @@ import pytest
 
 from lute.config.app_config import AppConfig
 from lute.db import db
+import lute.db.management
 from lute.language.service import Service
-import lute.db.demo
 from lute.app_factory import create_app
 
 from lute.models.language import Language
@@ -108,7 +108,9 @@ def _get_test_language(lang_name):
     if lang is not None:
         return lang
     service = Service(db.session)
-    lang = service.get_language_def(lang_name)["language"]
+    lang = service.get_language_def(lang_name).language
+    db.session.add(lang)
+    db.session.commit()
     return lang
 
 

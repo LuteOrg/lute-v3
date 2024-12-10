@@ -28,7 +28,7 @@ from lute.db.setup.main import setup_db
 from lute.db.management import add_default_user_settings
 from lute.db.data_cleanup import clean_data
 from lute.backup.service import Service as BackupService
-import lute.db.demo
+from lute.db.demo import Service as DemoService
 import lute.utils.formutils
 
 from lute.parse.registry import init_parser_plugins, supported_parsers
@@ -128,7 +128,8 @@ def _add_base_routes(app, app_config):
 
     @app.route("/")
     def index():
-        is_production = not lute.db.demo.contains_demo_data(db.session)
+        demosvc = DemoService(db.session)
+        is_production = not demosvc.contains_demo_data()
         us_repo = UserSettingRepository(db.session)
         bkp_settings = us_repo.get_backup_settings()
 
@@ -153,13 +154,14 @@ def _add_base_routes(app, app_config):
             and warning_msg != ""
         )
 
+        demosvc = DemoService(db.session)
         response = make_response(
             render_template(
                 "index.html",
                 hide_homelink=True,
                 dbname=app_config.dbname,
                 datapath=app_config.datapath,
-                tutorial_book_id=lute.db.demo.tutorial_book_id(db.session),
+                tutorial_book_id=demosvc.tutorial_book_id(),
                 have_books=have_books,
                 have_languages=have_languages,
                 language_choices=language_choices,
@@ -181,8 +183,9 @@ def _add_base_routes(app, app_config):
 
     @app.route("/wipe_database")
     def wipe_db():
-        if lute.db.demo.contains_demo_data(db.session):
-            lute.db.demo.delete_demo_data(db.session)
+        demosvc = DemoService(db.session)
+        if demosvc.contains_demo_data():
+            demosvc.delete_demo_data()
             msg = """
             The database has been wiped clean.  Have fun! <br /><br />
             <i>(Lute has automatically enabled backups --
@@ -193,8 +196,9 @@ def _add_base_routes(app, app_config):
 
     @app.route("/remove_demo_flag")
     def remove_demo():
-        if lute.db.demo.contains_demo_data(db.session):
-            lute.db.demo.remove_flag(db.session)
+        demosvc = DemoService(db.session)
+        if demosvc.contains_demo_data():
+            demosvc.remove_flag()
             msg = """
             Demo mode deactivated. Have fun! <br /><br />
             <i>(Lute has automatically enabled backups --

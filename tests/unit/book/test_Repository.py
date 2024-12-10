@@ -23,6 +23,10 @@ def fixture_book(english):
     Term business object with some defaults,
     no tags or parents.
     """
+    if english.id is None:
+        db.session.add(english)
+        db.session.commit()
+    assert english.id is not None, "have english lang sanity check"
     b = Book()
     b.language_id = english.id
     b.title = "HELLO"
@@ -32,7 +36,7 @@ def fixture_book(english):
     return b
 
 
-def test_save_new(app_context, new_book, repo):
+def test_save_new_book(app_context, new_book, repo):
     """
     Saving a simple Book object loads the database.
     """
