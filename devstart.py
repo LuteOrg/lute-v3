@@ -24,6 +24,8 @@ import logging
 from lute import __version__
 from lute.app_factory import create_app
 from lute.config.app_config import AppConfig
+from lute.db import db
+from lute.db.demo import load_demo_data
 
 log = logging.getLogger("werkzeug")
 log.setLevel(logging.ERROR)
@@ -46,6 +48,8 @@ def start(port):
     config_file = AppConfig.default_config_filename()
     dev_print("")
     app = create_app(config_file, output_func=dev_print)
+    with app.app_context():
+        load_demo_data(db.session)
 
     ac = AppConfig(config_file)
     dev_print(f"\nversion {__version__}")

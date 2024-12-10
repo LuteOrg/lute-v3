@@ -13,12 +13,9 @@ from lute.db.management import delete_all_data, add_default_user_settings
 from tests.dbasserts import assert_record_count_equals
 
 
-@pytest.mark.dbwipe
 def test_wiping_db_clears_out_all_tables(app_context):
     """
     DB is wiped clean if requested ... settings are left!
-
-    This test is also used from /tasks.py; see .pytest.ini.
     """
     old_user_settings = db.session.query(UserSetting).all()
 

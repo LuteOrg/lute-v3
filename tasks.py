@@ -284,28 +284,6 @@ ns.add_task(black)
 # DB tasks
 
 
-@task(pre=[_ensure_test_db])
-def db_wipe(c):
-    """
-    Wipe the data from the testing db; factory reset settings. :-)
-
-    Can only be run on a testing db.
-    """
-    c.run("pytest -m dbwipe")
-    print("ok")
-
-
-@task(pre=[_ensure_test_db])
-def db_reset(c):
-    """
-    Reset the database to the demo data.
-
-    Can only be run on a testing db.
-    """
-    c.run("pytest -m dbdemoload")
-    print("ok")
-
-
 def _schema_dir():
     "Return full path to schema dir."
     thisdir = os.path.dirname(os.path.realpath(__file__))
@@ -341,24 +319,19 @@ def _do_schema_export(c, destfile, header_notes, taskname):
 @task
 def db_export_baseline(c):
     """
-    Reset the db, and create a new baseline db file from the current db.
+    Create a new baseline db file from the current db.
     """
-
-    # Running the delete task before this one as a pre- step was
-    # causing problems (sqlite file not in correct state), so this
-    # asks the user to verify.
-    text = input("Have you reset the db?  (y/n): ")
-    if text != "y":
-        print("quitting.")
-        return
     _do_schema_export(
-        c, "baseline.sql", "Baseline db with demo data.", "db.export.baseline"
+        c,
+        "baseline.sql",
+        "Baseline db with flag to load demo data.",
+        "db.export.baseline",
     )
 
     fname = os.path.join(_schema_dir(), "baseline.sql")
     print(f"Verifying {fname}")
     with open(fname, "r", encoding="utf-8") as f:
-        checkstring = "Tutorial follow-up"
+        checkstring = 'CREATE TABLE IF NOT EXISTS "languages"'
         if checkstring in f.read():
             print(f'"{checkstring}" found, likely ok.')
         else:
@@ -366,22 +339,15 @@ def db_export_baseline(c):
             raise RuntimeError(f'Missing "{checkstring}" in exported file.')
 
 
-@task
-def db_export_empty(c):
+@task(pre=[_ensure_test_db], post=[db_export_baseline])
+def db_reset(c):
     """
-    Create a new empty db file from the current db.
+    Reset the database to baseline state for new installations, with LoadDemoData system flag set.
 
-    This assumes that the current db is in data/test_lute.db.
+    Can only be run on a testing db.
     """
-
-    # Running the delete task before this one as a pre- step was
-    # causing problems (sqlite file not in correct state), so this
-    # asks the user to verify.
-    text = input("Have you **WIPED** the db?  (y/n): ")
-    if text != "y":
-        print("quitting.")
-        return
-    _do_schema_export(c, "empty.sql", "EMPTY DB.", "db.export.empty")
+    c.run("pytest -m dbreset")
+    print("\nok, exporting baseline.sql.\n")
 
 
 @task(help={"suffix": "suffix to add to filename."})
@@ -401,11 +367,9 @@ def db_newscript(c, suffix):  # pylint: disable=unused-argument
 
 dbtasks = Collection("db")
 dbtasks.add_task(db_reset, "reset")
-dbtasks.add_task(db_wipe, "wipe")
 dbtasks.add_task(db_newscript, "newscript")
 dbexport = Collection("export")
 dbexport.add_task(db_export_baseline, "baseline")
-dbexport.add_task(db_export_empty, "empty")
 dbtasks.add_collection(dbexport)
 
 ns.add_collection(dbtasks)

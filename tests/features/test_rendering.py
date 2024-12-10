@@ -7,6 +7,7 @@ from pytest_bdd import given, then, scenarios, parsers
 
 from lute.db import db
 from lute.models.language import Language
+from lute.language.service import Service as LanguageService
 from lute.term.model import Repository
 from lute.read.render.service import Service as RenderService
 from lute.read.service import Service
@@ -27,10 +28,13 @@ scenarios("rendering.feature")
 @given("demo data")
 def given_demo_data(app_context):
     "Calling app_context loads the demo data."
+    # TODO remove this
 
 
 @given(parsers.parse("language {langname}"))
 def given_lang(langname):
+    svc = LanguageService(db.session)
+    svc.load_language_def(langname)
     global language  # pylint: disable=global-statement
     lang = db.session.query(Language).filter(Language.name == langname).first()
     assert lang.name == langname, "sanity check"
