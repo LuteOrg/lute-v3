@@ -285,24 +285,13 @@ ns.add_task(black)
 
 
 @task(pre=[_ensure_test_db])
-def db_wipe(c):
-    """
-    Wipe the data from the testing db; factory reset settings. :-)
-
-    Can only be run on a testing db.
-    """
-    c.run("pytest -m dbwipe")
-    print("ok")
-
-
-@task(pre=[_ensure_test_db])
 def db_reset(c):
     """
-    Reset the database to the demo data.
+    Reset the database to baseline state for new installations, with LoadDemoData system flag set.
 
     Can only be run on a testing db.
     """
-    c.run("pytest -m dbdemoload")
+    c.run("pytest -m dbreset")
     print("ok")
 
 
@@ -352,36 +341,21 @@ def db_export_baseline(c):
         print("quitting.")
         return
     _do_schema_export(
-        c, "baseline.sql", "Baseline db with demo data.", "db.export.baseline"
+        c,
+        "baseline.sql",
+        "Baseline db with flag to load demo data.",
+        "db.export.baseline",
     )
 
     fname = os.path.join(_schema_dir(), "baseline.sql")
     print(f"Verifying {fname}")
     with open(fname, "r", encoding="utf-8") as f:
-        checkstring = "Tutorial follow-up"
+        checkstring = 'CREATE TABLE IF NOT EXISTS "languages"'
         if checkstring in f.read():
             print(f'"{checkstring}" found, likely ok.')
         else:
             print(f'"{checkstring}" NOT FOUND, SOMETHING LIKELY WRONG.')
             raise RuntimeError(f'Missing "{checkstring}" in exported file.')
-
-
-@task
-def db_export_empty(c):
-    """
-    Create a new empty db file from the current db.
-
-    This assumes that the current db is in data/test_lute.db.
-    """
-
-    # Running the delete task before this one as a pre- step was
-    # causing problems (sqlite file not in correct state), so this
-    # asks the user to verify.
-    text = input("Have you **WIPED** the db?  (y/n): ")
-    if text != "y":
-        print("quitting.")
-        return
-    _do_schema_export(c, "empty.sql", "EMPTY DB.", "db.export.empty")
 
 
 @task(help={"suffix": "suffix to add to filename."})
@@ -401,11 +375,9 @@ def db_newscript(c, suffix):  # pylint: disable=unused-argument
 
 dbtasks = Collection("db")
 dbtasks.add_task(db_reset, "reset")
-dbtasks.add_task(db_wipe, "wipe")
 dbtasks.add_task(db_newscript, "newscript")
 dbexport = Collection("export")
 dbexport.add_task(db_export_baseline, "baseline")
-dbexport.add_task(db_export_empty, "empty")
 dbtasks.add_collection(dbexport)
 
 ns.add_collection(dbtasks)

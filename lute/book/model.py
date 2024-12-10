@@ -101,6 +101,9 @@ class Repository:
             lang = lang_repo.find(book.language_id)
         elif book.language_name:
             lang = lang_repo.find_by_name(book.language_name)
+        if lang is None:
+            msg = f"No language matching id={book.language_id} or name={book.language_name}"
+            raise RuntimeError(msg)
 
         b = None
         if book.id is None:

@@ -7,7 +7,7 @@ import pytest
 from lute.models.language import Language
 from lute.book.datatables import get_data_tables_list
 from lute.db import db
-from lute.db.demo import load_demo_stories
+from lute.db.demo import load_demo_data
 from tests.utils import make_book
 
 
@@ -35,7 +35,7 @@ def test_smoke_book_datatables_query_runs(app_context, _dt_params):
     """
     Smoke test only, ensure query runs.
     """
-    load_demo_stories(db.session)
+    load_demo_data(db.session)
     get_data_tables_list(_dt_params, False, db.session)
     # print(d['data'])
     a = 1
@@ -46,7 +46,7 @@ def test_book_query_only_returns_supported_language_books(app_context, _dt_param
     """
     Smoke test only, ensure query runs.
     """
-    load_demo_stories(db.session)
+    load_demo_data(db.session)
     for lang in db.session.query(Language).all():
         lang.parser_type = "unknown"
         db.session.add(lang)

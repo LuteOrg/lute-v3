@@ -47,6 +47,7 @@ def wipe_db():
 def load_demo():
     "Clean out everything, and load the demo."
     lute.db.management.delete_all_data(db.session)
+    lute.db.demo.set_load_demo_flag(db.session)
     lute.db.demo.load_demo_data(db.session)
     flash("demo loaded")
     return redirect("/", 302)
