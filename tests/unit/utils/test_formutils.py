@@ -6,6 +6,8 @@ from lute.db import db
 from lute.utils.formutils import language_choices, valid_current_language_id
 from lute.models.repositories import UserSettingRepository
 
+# pylint: disable=unused-argument
+
 
 def test_language_choices(app_context, spanish, english):
     "Gets all languages."

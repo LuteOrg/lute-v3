@@ -90,7 +90,7 @@ class Service:
         # dt.step("globbed")
         def_list.sort()
         for f in def_list:
-            lang_dir, def_yaml = os.path.split(f)
+            lang_dir, _ = os.path.split(f)
             ld = LangDef(lang_dir)
             # dt.step(f"build ld {ld.language_name}".ljust(30))
             cache.append(ld)

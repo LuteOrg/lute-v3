@@ -4,8 +4,8 @@ Language service tests.
 
 from lute.language.service import Service
 from lute.db import db
-from tests.dbasserts import assert_sql_result
 from lute.utils.debug_helpers import DebugTimer
+from tests.dbasserts import assert_sql_result
 
 
 def test_get_all_lang_defs(app_context):
