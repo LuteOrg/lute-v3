@@ -17,6 +17,8 @@ from waitress import serve
 from lute import __version__
 from lute.app_factory import create_app
 from lute.config.app_config import AppConfig
+from lute.db import db
+from lute.db.demo import should_load_demo_data, load_demo_data
 
 logging.getLogger("waitress.queue").setLevel(logging.ERROR)
 logging.getLogger("natto").setLevel(logging.CRITICAL)
@@ -78,6 +80,10 @@ def _start(args):
 
     config_file_path = _get_config_file_path(args.config)
     app = create_app(config_file_path, output_func=_print)
+    with app.app_context():
+        if should_load_demo_data(db.session):
+            _print(f"Loading demo data.")
+            load_demo_data(db.session)
 
     close_msg = """
     When you're finished reading, stop this process
