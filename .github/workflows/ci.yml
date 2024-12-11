@@ -2,9 +2,9 @@ name: ci
 
 on:
   push:
-    # A branch github-ci-updates can be created and used for ci
+    # A branch github-ci can be created and used for ci
     # experiments and tweaks.
-    branches: [ "develop", "master", "github-ci", "windows", "pr_413_continued_plugins" ]
+    branches: [ "develop", "master", "github-ci", "windows" ]
   pull_request:
     branches: [ "develop", "master" ]
 
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        python_version: [ '3.8', '3.9', '3.10', '3.11', '3.12' ]
+        python_version: [ '3.8', '3.9', '3.10', '3.11', '3.12', '3.13' ]
 
     steps:
 
@@ -45,7 +45,12 @@ jobs:
         python-version: ${{ matrix.python_version }}
         cache: 'pip' # caching pip dependencies
 
-    - run: pip install -r requirements-dev.txt
+    - name: Install packages using flit
+      run: |
+        pip install flit
+        # --only-deps: Installs only the dependencies, not Lute itself
+        # --deps develop: both regular and optional dependencies.
+        flit install --only-deps --deps develop
 
     - name: Setup config
       run: |
@@ -63,7 +68,9 @@ jobs:
         export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
         pytest
 
+    # Skipping acceptance tests for 3.8, just to save some time.
     - name: Acceptance testing
+      if: matrix.python_version != '3.8'
       uses: nick-fields/retry@v3
       with:
         max_attempts: 3
@@ -130,7 +137,10 @@ jobs:
         python-version: ${{ matrix.python_version }}
         cache: 'pip' # caching pip dependencies
 
-    - run: pip install -r requirements-dev.txt
+    - name: Install packages using flit
+      run: |
+        pip install flit
+        flit install --only-deps --deps develop
 
     - name: Setup config
       run: |
@@ -192,14 +202,14 @@ jobs:
 
     - name: test all plugins
       run: |
+        # Lute reqs, such as pytest.
+        # This also installs Lute itself,
+        # so that it can be found
+        # by each plugin's own "pip install ."
+        pip install flit
+        flit install --deps develop
+
         for plugin in $(ls plugins); do
-          # Lute reqs, such as pytest.
-          pip install -r requirements-dev.txt
-
-          # Lute itself, via toml, so that it can be found
-          # by each plugin's own "pip install ."
-          pip install .
-
           pushd plugins/$plugin
             pip install .
             # Note for future: some plugins may have extra reqs not covered by pip
@@ -237,7 +247,9 @@ jobs:
         python-version: ${{ matrix.python_version }}
         cache: 'pip' # caching pip dependencies
 
-    - run: pip install -r requirements-dev.txt
+    - run: |
+        pip install flit
+        flit install --only-deps --deps develop
 
     - name: Lint
       run: inv lint
@@ -261,7 +273,9 @@ jobs:
       with:
         python-version: 3.11
         cache: 'pip' # caching pip dependencies
-    - run: pip install -r requirements-dev.txt
+    - run: |
+        pip install flit
+        flit install --only-deps --deps develop
     - name: Test docker build
       run: |
         docker build -f docker/Dockerfile --build-arg INSTALL_EVERYTHING=false -t lute3 .
@@ -310,7 +324,9 @@ jobs:
         [System.IO.File]::WriteAllText("${{ github.workspace }}\lute\config\config.yml", $content)
         Get-Content -Path "${{ github.workspace }}\lute\config\config.yml"
 
-    - run: pip install -r requirements-dev.txt
+    - run: |
+        pip install flit
+        flit install --only-deps --deps develop
 
     # Can't get playwright to run reliably on Windows.
     # - name: Playwright install
