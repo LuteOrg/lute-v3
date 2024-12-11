@@ -73,7 +73,7 @@ class Setup:  # pylint: disable=too-few-public-methods
     Main setup class, coordinates other classes.
     """
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         db_filename: str,
         baseline_schema_file: str,

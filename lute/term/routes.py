@@ -117,7 +117,7 @@ def handle_term_form(
     form_template_name,
     return_on_success,
     embedded_in_reading_frame=False,
-):  # pylint: disable=too-many-arguments
+):  # pylint: disable=too-many-arguments,too-many-positional-arguments
     """
     Handle a form post.
 

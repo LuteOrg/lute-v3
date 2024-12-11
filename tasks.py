@@ -176,7 +176,7 @@ def _run_browser_tests(c, port, run_test):
         "verbose": "make verbose",
     },
 )
-def accept(  # pylint: disable=too-many-arguments
+def accept(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     c,
     port=5001,
     show=False,
