@@ -26,15 +26,7 @@ from lute.config.app_config import AppConfig
 @task
 def lint(c):
     "Run pylint on lute/ and tests/."
-    # pylint is currently busted for some versions ... :-(
-    # ref https://github.com/pylint-dev/pylint/issues/10133
     print("Starting lint")
-    pyversion = int(sys.version_info.minor)
-    if pyversion > 9:
-        print("WARNING: SKIPPING LINT for python version > 9", flush=True)
-        print("Ref https://github.com/pylint-dev/pylint/issues/10133", flush=True)
-        return
-
     # Formats: https://pylint.pycqa.org/en/latest/user_guide/usage/output.html
     msgfmt = [
         "--ignore-patterns='zz_.*.py'",
@@ -184,7 +176,7 @@ def _run_browser_tests(c, port, run_test):
         "verbose": "make verbose",
     },
 )
-def accept(  # pylint: disable=too-many-arguments
+def accept(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     c,
     port=5001,
     show=False,
