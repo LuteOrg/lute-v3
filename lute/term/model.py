@@ -50,7 +50,7 @@ class TermReference:
 
     def __init__(
         self, bookid, txid, pgnum, title, sentence=None
-    ):  # pylint: disable=too-many-arguments
+    ):  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self.book_id = bookid
         self.text_id = txid
         self.page_number = pgnum

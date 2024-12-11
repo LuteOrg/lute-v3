@@ -8,7 +8,7 @@ from lute.db import db
 from tests.dbasserts import assert_sql_result
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-arguments,too-many-positional-arguments
 def assert_add(book, pagenum, before, text, expected, msg=""):
     "Assert that adding results in expected table content."
     sql = f"""
