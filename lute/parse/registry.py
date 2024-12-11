@@ -26,6 +26,8 @@ def init_parser_plugins():
     Initialize parsers from plugins
     """
 
+    # Handle API breakage of entry_points.
+    # pylint: disable=no-member
     vmaj = version_info.major
     vmin = version_info.minor
     if vmaj == 3 and vmin in (8, 9, 10, 11):

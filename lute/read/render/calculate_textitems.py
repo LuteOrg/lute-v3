@@ -58,7 +58,7 @@ def get_string_indexes(strings, content):
     return ret
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-arguments,too-many-positional-arguments
 def _make_textitem(index, text, text_lc, count, sentence_number, term):
     "Make a TextItem."
     r = TextItem()
