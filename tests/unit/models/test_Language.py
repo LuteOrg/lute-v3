@@ -75,7 +75,11 @@ def test_language_word_char_regex_returns_python_compatible_regex(app_context):
     demosvc.load_demo_data()
     repo = LanguageRepository(db.session)
     a = repo.find_by_name("Arabic")
-    assert a.word_characters == r"\u0600-\u06FF\uFE70-\uFEFC"
+    # pylint: disable=line-too-long
+    assert (
+        a.word_characters
+        == r"\u0600-\u0608\u060B\u060E-\u061A\u061C\u0620-\u0669\u066E-\u06D3\u06D5-\u06FF\uFE70-\uFEFC"
+    )
 
 
 def test_lang_to_dict_from_dict_returns_same_thing(app_context):
