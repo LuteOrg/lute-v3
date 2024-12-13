@@ -3,7 +3,7 @@ Term popup data tests.
 """
 
 import pytest
-from lute.models.term import Term, Status
+from lute.models.term import Term, TermTag, Status
 from lute.read.service import Service
 from lute.db import db
 
@@ -26,6 +26,17 @@ def test_popup_data_is_none_if_no_data(spanish, app_context, service):
     t.translation = "hello"
     d = service.get_popup_data(t.id)
     assert d is not None, "Have data, popup"
+
+
+def test_popup_data_shown_if_have_tag(spanish, app_context, service):
+    "Return None if no popup."
+    t = Term(spanish, "gato")
+    t.add_term_tag(TermTag("animal"))
+    db.session.add(t)
+    db.session.commit()
+    d = service.get_popup_data(t.id)
+    assert d is not None, "Have tag, show popup"
+    assert d["term_tags"] == ["animal"]
 
 
 def test_popup_shown_if_parent_exists_even_if_no_other_data(

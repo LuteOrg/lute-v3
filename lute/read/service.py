@@ -105,6 +105,7 @@ class Service:
                 (cterm.translation or "").strip() != ""
                 or (cterm.romanization or "").strip() != ""
                 or cterm.get_current_image() is not None
+                or len(cterm.term_tags) != 0
             )
 
         if not has_popup_data(term) and len(term.parents) == 0:
