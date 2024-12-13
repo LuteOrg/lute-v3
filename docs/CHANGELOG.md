@@ -1,4 +1,21 @@
 
+# 3.6.1 (2024-12-13)
+
+Feature changes:
+
+* Show term popup if term has tag.
+* #525: add Save Term customizable hotkey.
+* #517: show page fraction even if book completed.
+* #524: show popup for terms with data, ignoring status.
+* #522: allow term import with identical lines.
+* Update arabic language definition.
+
+Back end changes:
+
+* use pyproject.toml and flit only for managing dependencies
+* #534: change how Lute loads demo data for new installs
+
+
 # 3.6.0 (2024-11-15)
 
 Feature changes:
