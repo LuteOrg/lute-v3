@@ -105,7 +105,7 @@ jobs:
         flit -f ${{ github.workspace }}/pyproject.toml install
 
         python -m lute.main &   # Start in background process
-        sleep 2
+        sleep 10
 
         # Verify with utils script back in the workspace
         # (verify.py is not included in flit install)
