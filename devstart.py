@@ -42,7 +42,7 @@ def start(port):
             #  why-does-running-the-flask-dev-server-run-itself-twice
             # Reloading, do nothing.
             return
-        print(s)
+        print(s, flush=True)
 
     config_file = AppConfig.default_config_filename()
     dev_print("")
