@@ -203,6 +203,10 @@ class TermRepository:
     def __init__(self, session):
         self.session = session
 
+    def find(self, term_id):
+        "Get by ID."
+        return self.session.query(Term).filter(Term.id == term_id).first()
+
     def find_by_spec(self, spec):
         """
         Find by the given spec term's language ID and text.
