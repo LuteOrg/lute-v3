@@ -897,6 +897,43 @@ def test_get_references_only_includes_read_texts(spanish, repo):
     assert len(refs["term"]) == 2, "have refs once text is read"
 
 
+def _make_read_text(title, body, lang):
+    "Make a text, mark it read."
+    text = make_text(title, body, lang)
+    text.read_date = datetime.now()
+    db.session.add(text)
+    db.session.commit()
+    return text
+
+
+@pytest.mark.sentences
+def test_issue_531_spanish_ref_search_case_insens_normal(spanish, repo):
+    "Spanish was finding 'normal' upper/lower chars that sqlite could handle."
+    _make_read_text("hola", "TENGO.  tengo.", spanish)
+    t = add_terms(spanish, ["tengo"])[0]
+
+    refs = repo.find_references(t)
+    assert len(refs["term"]) == 2, "both found"
+
+
+@pytest.mark.sentences
+def test_issue_531_spanish_ref_search_case_insens_accented(spanish, repo):
+    "Spanish wasn't finding different case of accented chars."
+    _make_read_text("hola", "Ábrelo.  ábrelo.", spanish)
+    t = add_terms(spanish, ["ábrelo"])[0]
+    refs = repo.find_references(t)
+    assert len(refs["term"]) == 2, "both found"
+
+
+@pytest.mark.sentences
+def test_issue_531_turkish_ref_search_is_case_insensitive(turkish, repo):
+    "Turkish upper/lower case letters are quite different!."
+    _make_read_text("Test", "ışık. Işık", turkish)
+    t = add_terms(turkish, ["ışık"])[0]
+    refs = repo.find_references(t)
+    assert len(refs["term"]) == 2, "both found"
+
+
 @pytest.mark.sentences
 def test_get_references_only_includes_refs_in_same_language(spanish, english, repo):
     "Like it says above."

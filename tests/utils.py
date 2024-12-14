@@ -12,10 +12,13 @@ def add_terms(language, term_array):
     """
     Make and save terms.
     """
+    ret = []
     for term in term_array:
         t = Term(language, term)
         db.session.add(t)
+        ret.append(t)
     db.session.commit()
+    return ret
 
 
 def make_book(title, content, language):

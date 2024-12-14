@@ -418,6 +418,14 @@ class Repository:
         return ret
 
     def _get_references(self, term):
+        """
+        Search the sentences.text_content (or textlc_content if needed).
+
+        sentence.textlc_content is set to '*' if a call to sqlite's LOWER
+        returns the same data as using the sentence Language.parser.  This
+        saves a pile of space, at least in my case with Spanish, as only
+        0.5% of the lowercased sentences actually differ.
+        """
         if term is None:
             return []
 
@@ -439,7 +447,8 @@ class Repository:
                 GROUP BY TxBkID
             ) pc ON pc.TxBkID = texts.TxBkID
             WHERE TxReadDate IS NOT NULL
-            AND LOWER(SeText) LIKE :pattern
+            AND SeText IS NOT NULL
+            AND CASE WHEN SeTextLC == '*' THEN SeText ELSE SeTextLC END LIKE :pattern
             AND BkLgID = {term.language.id}
             LIMIT 20
         """
