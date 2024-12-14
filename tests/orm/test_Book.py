@@ -12,7 +12,7 @@ from tests.dbasserts import assert_sql_result, assert_record_count_equals
 @pytest.fixture(name="simple_book")
 def fixture_simple_book(english):
     "Single page book with some associated objects."
-    b = Book.create_book("hi", english, "some text")
+    b = Book.create_book("hi", english, "SOME TEXT")
     b.texts[0].read_date = datetime.now()
     bt = BookTag.make_book_tag("hola")
     b.book_tags.append(bt)
@@ -31,10 +31,10 @@ def test_save_book(empty_db, simple_book):
     assert_sql_result(sql, ["1; hi; 1"], "book")
 
     sql = "select TxID, TxBkID, TxText from texts"
-    assert_sql_result(sql, ["1; 1; some text"], "texts")
+    assert_sql_result(sql, ["1; 1; SOME TEXT"], "texts")
 
     sql = "select * from sentences"
-    assert_sql_result(sql, ["1; 1; 1; /some/ /text/"], "sentences")
+    assert_sql_result(sql, ["1; 1; 1; /SOME/ /TEXT/; *"], "sentences")
 
     sql = "select * from booktags"
     assert_sql_result(sql, ["1; 1"], "booktags")
@@ -116,7 +116,7 @@ def test_delete_book_cascade_deletes_bookmarks(empty_db, simple_book):
     sql = "select BkID, BkTitle, BkLgID from books"
     assert_sql_result(sql, ["1; hi; 1"], "book")
     sql = "select TxID, TxBkID, TxText from texts"
-    assert_sql_result(sql, ["1; 1; some text"], "texts")
+    assert_sql_result(sql, ["1; 1; SOME TEXT"], "texts")
     sql = "select TbID, TbTxID, TbTitle from textbookmarks"
     assert_sql_result(sql, ["1; 1; hello"], "bookmarks")
 

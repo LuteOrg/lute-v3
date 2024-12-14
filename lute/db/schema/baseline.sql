@@ -48,6 +48,7 @@ INSERT INTO _migrations VALUES('20240207_02_drop_old_language_fields.sql');
 INSERT INTO _migrations VALUES('20240525_create_textbookmarks.sql');
 INSERT INTO _migrations VALUES('20240815_clean_up_bad_wordtags.sql');
 INSERT INTO _migrations VALUES('20241103_change_lastbackup_to_user_setting.sql');
+INSERT INTO _migrations VALUES('20241214_add_SeTextLC.sql');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
@@ -92,7 +93,7 @@ CREATE TABLE IF NOT EXISTS "sentences" (
 	"SeID" INTEGER NOT NULL  ,
 	"SeTxID" INTEGER NOT NULL  ,
 	"SeOrder" SMALLINT NOT NULL  ,
-	"SeText" TEXT NULL  ,
+	"SeText" TEXT NULL  , SeTextLC TEXT null,
 	PRIMARY KEY ("SeID"),
 	FOREIGN KEY("SeTxID") REFERENCES "texts" ("TxID") ON UPDATE NO ACTION ON DELETE CASCADE
 );
