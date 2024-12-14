@@ -409,3 +409,24 @@ def create_app(
     _init_parser_plugins(app_config.plugin_datapath, outfunc)
 
     return app
+
+
+def data_initialization(session, output_func=None):
+    """
+    Any extra data setup.
+
+    TODO: rework data initialization.  The DB setup can be handled
+    outside of the application context, as IMO it's clearer to manage
+    the data separately from the thing that uses the data.  This
+    requires moving from flask-sqlalchemy to plain sqlalchemy.
+    """
+
+    def _null_print(s):  # pylint: disable=unused-argument
+        pass
+
+    outfunc = output_func or _null_print
+
+    demosvc = DemoService(session)
+    if demosvc.should_load_demo_data():
+        outfunc("Loading demo data.")
+        demosvc.load_demo_data()

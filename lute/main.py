@@ -15,10 +15,9 @@ import logging
 import textwrap
 from waitress import serve
 from lute import __version__
-from lute.app_factory import create_app
+from lute.app_factory import create_app, data_initialization
 from lute.config.app_config import AppConfig
 from lute.db import db
-from lute.db.demo import Service as DemoService
 
 logging.getLogger("waitress.queue").setLevel(logging.ERROR)
 logging.getLogger("natto").setLevel(logging.CRITICAL)
@@ -81,10 +80,7 @@ def _start(args):
     config_file_path = _get_config_file_path(args.config)
     app = create_app(config_file_path, output_func=_print)
     with app.app_context():
-        demosvc = DemoService(db.session)
-        if demosvc.should_load_demo_data():
-            _print("Loading demo data.")
-            demosvc.load_demo_data()
+        data_initialization(db.session, _print)
 
     close_msg = """
     When you're finished reading, stop this process
