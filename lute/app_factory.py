@@ -319,8 +319,6 @@ def _create_app(app_config, extra_config):
         db.create_all()
         add_default_user_settings(db.session, app_config.default_user_backup_path)
         refresh_global_settings(db.session)
-        # TODO valid parsers: do parser check, mark valid as active, invalid as inactive.
-        clean_data(db.session)
     app.db = db
 
     _add_base_routes(app, app_config)
@@ -430,3 +428,7 @@ def data_initialization(session, output_func=None):
     if demosvc.should_load_demo_data():
         outfunc("Loading demo data.")
         demosvc.load_demo_data()
+
+    # TODO valid parsers: do parser check, mark valid as active, invalid as inactive.
+
+    clean_data(session, outfunc)
