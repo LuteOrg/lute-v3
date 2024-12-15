@@ -61,7 +61,7 @@ class Service:
         repo.commit()
 
     def bulk_remove_tags(self, tagtexts, termids):
-        "Add tag for all terms."
+        "Remove tag for all terms."
         if len(termids) == 0:
             return
 
