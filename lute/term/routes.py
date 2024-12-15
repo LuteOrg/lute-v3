@@ -4,6 +4,7 @@
 
 import os
 import csv
+from dataclasses import dataclass
 from flask import (
     Blueprint,
     request,
@@ -301,6 +302,33 @@ def bulk_set_parent():
         return jsonify({"success": True}), 200
     except TermServiceException as ex:
         return jsonify({"success": False, "reason": str(ex)}), 400
+
+
+@dataclass
+class TagPostData:
+    "Post data for tags :-)"
+    tags: list
+    termids: list
+
+
+def _get_tag_post_data(request):
+    data = request.get_json()
+    termids = [int(tid) for tid in data.get("wordids")]
+    return TagPostData(tags=data.get("tagtexts"), termids=termids)
+
+
+@bp.route("/bulk_add_tags", methods=["POST"])
+def bulk_add_tags():
+    "add tags."
+    data = _get_tag_post_data(request)
+    TermService(db.session).bulk_add_tags(data.tags, data.termids)
+
+
+@bp.route("/bulk_remove_tags", methods=["POST"])
+def bulk_remove_tags():
+    "remove tags."
+    data = _get_tag_post_data(request)
+    TermService(db.session).bulk_remove_tags(data.tags, data.termids)
 
 
 @bp.route("/bulk_delete", methods=["POST"])
