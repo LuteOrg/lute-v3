@@ -23,6 +23,7 @@ from lute.models.repositories import (
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list
 from lute.term.model import Repository, Term
+from lute.term.service import Service as TermService, TermServiceException
 from lute.db import db
 from lute.term.forms import TermForm
 import lute.utils.formutils
@@ -294,19 +295,12 @@ def bulk_set_parent():
     data = request.get_json()
     termids = data.get("wordids")
     parenttext = data.get("parenttext")
-    parent = None
-    repo = Repository(db.session)
-    for tid in termids:
-        term = repo.load(int(tid))
-        if parent is None:
-            parent = repo.find(term.language_id, parenttext)
-        if term.parents != [parenttext]:
-            term.parents = [parenttext]
-            term.status = parent.status
-            term.sync_status = True
-        repo.add(term)
-    repo.commit()
-    return jsonify("ok")
+    svc = TermService(db.session)
+    try:
+        svc.bulk_set_parent(parenttext, [int(tid) for tid in termids])
+        return jsonify({"success": True}), 200
+    except TermServiceException as ex:
+        return jsonify({"success": False, "reason": str(ex)}), 400
 
 
 @bp.route("/bulk_delete", methods=["POST"])
