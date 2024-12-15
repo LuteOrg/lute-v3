@@ -210,7 +210,7 @@
   };
 
   let render_checkbox = function (data, type, row, meta) {
-    return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row['WoID']}" langid="${row['LgID']}" onclick="handleChkClick()">`;
+    return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row['WoID']}" langid="${row['LgID']}">`;
   };
 
   let render_translation = function ( data, type, row, meta ) {
@@ -235,39 +235,15 @@
     $('.chkWord').each(function(i) {
       $(this).prop('checked', v);
     });
-    handleChkClick(true);
   }
-
-  let handleChkClick = function(leave_checkAll = false) {
-    if (! leave_checkAll)
-      $('#chkAll').prop('checked', false);
-    const n = $('.chkWord:checked').length;
-    const disabled = (n == 0);
-    $("#txtSetParent").prop('disabled', disabled);
-    $(".actionButton").prop('disabled', disabled);
-  }
-
 
   /** Deactivate term Actions, activate if they're possible. */
   function activate_term_actions() {
-    const disabled = "actionDisabled";
     const checked_count = $('.chkWord:checked').length;
     const lang_id = get_lang_id();
-
-    c = $("#term_action_set_parent");
-    c.addClass(disabled);
-    if (checked_count > 0 && lang_id != null)
-      c.removeClass(disabled);
-
-    const actions = [
-      "#term_action_bulk_delete",
-      "#term_action_set_status",
-      "#term_action_add_tags",
-      "#term_action_remove_tags",
-    ];
-    actions.forEach(selector => {
+    $(".actionDiv").forEach(selector => {
       const element = $(selector);
-      element.toggleClass(disabled, checked_count === 0);
+      element.toggleClass("actionDisabled", checked_count === 0 || lang_id == null);
     });
   }
 
