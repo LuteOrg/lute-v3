@@ -34,8 +34,7 @@ function start_hover_mode(should_clear_frames = true) {
   }
 
   if (should_clear_frames) {
-    $('#wordframeid').attr('src', '/read/empty');
-    $('.dictcontainer').hide();
+    hide_term_edit_form();
   }
 
   clear_newmultiterm_elements();
@@ -191,6 +190,12 @@ function show_term_edit_form(el) {
 }
 
 
+function hide_term_edit_form() {
+  $('#wordframeid').attr('src', '/read/empty');
+  $('.dictcontainer').hide();
+}
+
+
 function show_multiword_term_edit_form(selected) {
   if (selected.length == 0)
     return;
@@ -311,6 +316,10 @@ let word_clicked = function(el, e) {
   }
   el.addClass('kwordmarked');
   el.removeClass('hasflash');
+
+  if ($('span.kwordmarked').length > 1) {
+    hide_term_edit_form();
+  }
 }
 
 
