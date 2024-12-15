@@ -183,18 +183,20 @@ function _show_wordframe_url(url) {
   applyInitialPaneSizes();  // in resize.js
 }
 
-
 function show_term_edit_form(el) {
   const wid = parseInt(el.data('wid'));
   _show_wordframe_url(`/read/edit_term/${wid}`);
 }
 
-
-function hide_term_edit_form() {
-  $('#wordframeid').attr('src', '/read/empty');
+function show_bulk_term_edit_form(el) {
   $('.dictcontainer').hide();
+  _show_wordframe_url(`/read/show_bulk_edit_term_form`);
 }
 
+function hide_term_edit_form() {
+  $('.dictcontainer').hide();
+  $('#wordframeid').attr('src', '/read/empty');
+}
 
 function show_multiword_term_edit_form(selected) {
   if (selected.length == 0)
@@ -318,7 +320,7 @@ let word_clicked = function(el, e) {
   el.removeClass('hasflash');
 
   if ($('span.kwordmarked').length > 1) {
-    hide_term_edit_form();
+    show_bulk_term_edit_form();
   }
 }
 

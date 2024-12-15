@@ -224,6 +224,16 @@ def edit_term_form(term_id):
     )
 
 
+@bp.route("/show_bulk_edit_term_form", methods=["GET"])
+def show_bulk_edit_term_form():
+    """
+    show_bulk_form
+    """
+    return render_template(
+        "term/bulk_edit_term_form.html",
+    )
+
+
 @bp.route("/termpopup/<int:termid>", methods=["GET"])
 def term_popup(termid):
     """

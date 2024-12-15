@@ -1,0 +1,27 @@
+<html>
+
+  <head>
+    <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lute-hotkey-utils.js') }}" charset="utf-8"></script>
+    <script type="text/javascript">
+      const LUTE_USER_SETTINGS = {{ user_settings | safe }}
+    </script>
+  </head>
+
+<body>
+  <p>BULK TERM HERE</p>
+
+  <input type="button" onclick="get_ids();">click</input>
+
+  <script>
+    function get_ids() {
+      const elements = $(parent.document).find("span.kwordmarked");
+      const wordIds = elements.map(function () {
+        return $(this).data("wid");
+      }).get();
+      window.alert(wordIds.join(","));
+    }
+  </script>
+</body>
+</html>
