@@ -65,7 +65,7 @@ class Repository:
     def get_book_tags(self):
         "Get all available book tags, helper method."
         bts = self.session.query(BookTag).all()
-        return [t.text for t in bts]
+        return sorted([t.text for t in bts])
 
     def add(self, book):
         """

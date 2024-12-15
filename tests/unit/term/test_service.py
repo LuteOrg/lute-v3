@@ -35,6 +35,16 @@ def test_bulk_parent_update_no_terms_ok(app_context, spanish):
     # ok.
 
 
+def test_bulk_parent_update_passing_empty_string_removes_parent(app_context, spanish):
+    "Update parent of term."
+    [t, _] = add_terms(spanish, ["t", "p"])
+    svc = Service(db.session)
+    svc.bulk_set_parent("p", [t.id])
+    assert_parents(t.id, ["p"], "P added as parent")
+    svc.bulk_set_parent("", [t.id])
+    assert_parents(t.id, [], "removed")
+
+
 def test_existing_parent_replaced(app_context, spanish):
     "Update parent of term."
     [t, u, _] = add_terms(spanish, ["t", "u", "p"])

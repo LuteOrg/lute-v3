@@ -2117,7 +2117,7 @@ input[type="checkbox"][disabled] + label {
 }
 
 .term-action-dropdown,
-#set_parent_div {
+.actionDiv {
     display: flex;
     align-items: center;
     margin-right: 10px;

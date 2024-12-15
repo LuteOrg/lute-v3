@@ -42,11 +42,13 @@ def index(search):
     langopts = [(lang.id, lang.name) for lang in languages]
     langopts = [(0, "(all)")] + langopts
     statuses = [s for s in db.session.query(Status).all() if s.id != Status.UNKNOWN]
+    r = Repository(db.session)
     return render_template(
         "term/index.html",
         initial_search=search,
         language_options=langopts,
         statuses=statuses,
+        tags=r.get_term_tags(),
     )
 
 

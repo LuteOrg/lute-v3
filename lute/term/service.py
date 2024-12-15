@@ -33,18 +33,21 @@ class Service:
         if len(lang_ids) > 1:
             raise TermServiceException("Terms not all the same language")
 
-        lang_id = lang_ids[0]
-        parent = repo.find(lang_id, parenttext)
-
-        if parent is None:
-            msg = f"Parent {parenttext} not found."
-            raise TermServiceException(msg)
+        parent_list = []
+        if parenttext.strip() != "":
+            lang_id = lang_ids[0]
+            parent = repo.find(lang_id, parenttext)
+            if parent is None:
+                msg = f"Parent {parenttext} not found."
+                raise TermServiceException(msg)
+            parent_list = [parenttext]
 
         for term in terms:
-            if term.parents != [parenttext]:
-                term.parents = [parenttext]
-                term.status = parent.status
+            if term.parents != parent_list:
+                term.parents = parent_list
                 term.sync_status = True
+            if parent is not None:
+                term.status = parent.status
             repo.add(term)
         repo.commit()
 

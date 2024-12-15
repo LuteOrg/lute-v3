@@ -75,24 +75,32 @@
     <button class="term-action-button">Actions</button>
     <div class="term-action-content">
       <a href="/term/new">Create new</a>
-      <a id="term_action_set_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
-      <a id="term_action_set_status" href="#" onclick="show_hide_set_status(event);">Set status</a>
+      <a id="term_action_set_parent" href="#" onclick="show_action_div(event, this, 'set_parent_div', 'txtSetParent');">Set parent</a>
+      <a id="term_action_set_status" href="#" onclick="show_action_div(event, this, 'set_status_div', 'selSetStatus');">Set status</a>
+      <a id="term_action_add_tags" href="#" onclick="show_action_div(event, this, 'divAddTags', 'txtAddTags');">Add tags</a>
+      <a id="term_action_remove_tags" href="#" onclick="show_action_div(event, this, 'devRemoveTags', 'txtRemoveTags');">Remove tags</a>
       <a id="term_action_bulk_delete" href="#" onclick="bulk_delete(event);">Delete selected</a>
       <a id="term_action_export_csv" href="#" onclick="export_csv(event);">Export CSV</a>
     </div>
   </div>
 
-  <div id="set_parent_div" style="display: none;">
-    <p>Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" disabled >go</button></p>
+  <div id="set_parent_div" class="actionDiv" style="display: none;">
+    <p>Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" class="actionButton" disabled >go</button></p>
   </div>
-  <div id="set_status_div" style="display: none;">
+  <div id="set_status_div" class="actionDiv" style="display: none;">
     <p>Set status:
       <select id="selSetStatus">
         {% for s in statuses %}
         <option value="{{ s.id }}">{{ s.text }}</option>
         {% endfor %}
       </select>
-      <button id="btnSetStatus">go</button></p>
+      <button id="btnSetStatus" class="actionButton">go</button></p>
+  </div>
+  <div id="divAddTags" class="actionDiv" style="display: none;">
+    <p>Add tags: <input id="txtAddTags" /><button id="btnAddTags" class="actionButton" disabled >go</button></p>
+  </div>
+  <div id="devRemoveTags" class="actionDiv" style="display: none;">
+    <p>Remove tags: <input id="txtRemoveTags" /><button id="btnRemoveTags" class="actionButton" disabled >go</button></p>
   </div>
 
 </div>
@@ -234,10 +242,9 @@
     if (! leave_checkAll)
       $('#chkAll').prop('checked', false);
     const n = $('.chkWord:checked').length;
-    const lang_id = get_lang_id();
-    const disabled = ((n == 0) || lang_id == null);
+    const disabled = (n == 0);
     $("#txtSetParent").prop('disabled', disabled);
-    $("#btnSetParent").prop('disabled', disabled);
+    $(".actionButton").prop('disabled', disabled);
   }
 
 
@@ -247,37 +254,31 @@
     const checked_count = $('.chkWord:checked').length;
     const lang_id = get_lang_id();
 
-    let c = $("#term_action_bulk_delete");
-    c.addClass(disabled);
-    if (checked_count > 0)
-      c.removeClass(disabled);
-
     c = $("#term_action_set_parent");
     c.addClass(disabled);
     if (checked_count > 0 && lang_id != null)
       c.removeClass(disabled);
 
-    c = $("#term_action_set_status");
-    c.addClass(disabled);
-    if (checked_count > 0)
-      c.removeClass(disabled);
+    const actions = [
+      "#term_action_bulk_delete",
+      "#term_action_set_status",
+      "#term_action_add_tags",
+      "#term_action_remove_tags",
+    ];
+    actions.forEach(selector => {
+      const element = $(selector);
+      element.toggleClass(disabled, checked_count === 0);
+    });
   }
 
 
-  function show_hide_set_parent(event) {
+  function show_action_div(event, el, displaydiv, focusel) {
     event.preventDefault();
-    if ($("#term_action_set_parent").hasClass("actionDisabled"))
+    $(".actionDiv").css("display", "none");
+    if ($(el).hasClass("actionDisabled"))
       return;
-    $("#set_parent_div").css("display", "flex");
-    $("#txtSetParent").focus();
-  }
-
-  function show_hide_set_status(event) {
-    event.preventDefault();
-    if ($("#term_action_set_status").hasClass("actionDisabled"))
-      return;
-    $("#set_status_div").css("display", "flex");
-    $("#selSetStatus").focus();
+    $(`#${displaydiv}`).css("display", "flex");
+    $(`#${focusel}`).focus();
   }
 
   // Return the clicked checkboxes' language ID,
@@ -294,16 +295,21 @@
     return null;
   }
 
+  let _get_checked_wordids = function() {
+    const wordids = [];
+    $('.chkWord:checked').each(function(i) {
+      wordids.push($(this).attr('wordid'));
+    });
+    return wordids;
+  };
+
   let handle_set_parent_click = function() {
     const lang_id = get_lang_id();
     if (lang_id == null) {
       alert("All terms must be of the same language.");
       return;
     }
-    let wordids = [];
-    $('.chkWord:checked').each(function(i) {
-      wordids.push($(this).attr('wordid'));
-    });
+    let wordids = _get_checked_wordids();
     const ptxt = $('#txtSetParent').val();
 
     const resp = confirm(`Change parent for ${wordids.length} term(s) to "${ptxt}"?  Note this will *remove* any existing parents for these terms.`);
@@ -369,13 +375,25 @@
     });
   };
 
+  // tags are passed in from the route.
+  var TAGS = {{ tags | safe }};
+
+  let setup_tags_tagify = function(input_id, enforceWhitelist) {
+    const input = document.getElementById(input_id);
+    const tagify = new Tagify(input, {
+      placeholder: 'Tags',
+      editTags: false,
+      autoComplete: { enabled: true, rightKey: true, tabKey: true },
+      dropdown: { enabled: 1 },
+      enforceWhitelist: enforceWhitelist,
+      whitelist: TAGS
+    });  // end tagify
+    return tagify;
+  };
+
 
   let handle_set_status_click = function() {
-    let wordids = [];
-    $('.chkWord:checked').each(function(i) {
-      wordids.push($(this).attr('wordid'));
-    });
-
+    let wordids = _get_checked_wordids();
     const resp = confirm(`Change status for ${wordids.length} term(s)?`);
     if (! resp)
       return;
@@ -393,6 +411,44 @@
     });
   }
 
+  let _get_tags_text = function(elid) {
+    // Sample text box entry: '[{"value":"hello"},{"value":"elephant"}]'
+    const data = $(elid).val();
+    if (data == null || data == '') {
+      console.log("No tags entered");
+      return null;
+    }
+    const d = JSON.parse(data);
+    return d.map(item => item.value);
+  };
+
+  let _handle_tags_impl = function(textbox_id, action, url) {
+    const wordids = _get_checked_wordids();
+    const tagstext = _get_tags_text(textbox_id);
+    if (wordids.length == 0 || tagstext == null)
+      return;
+    const resp = confirm(`${action} ${tagstext.length} tag(s) for ${wordids.length} term(s)?`);
+    if (! resp)
+      return;
+    const data = {wordids: wordids, tagtexts: tagstext};
+    $.ajax({
+      url: url,
+      method: 'POST',
+      data: JSON.stringify(data),
+      contentType: "application/json; charset=utf-8",
+      success: function(data) {
+        location.reload();
+      }
+    });
+  };
+
+  let handle_add_tags_click = function() {
+    _handle_tags_impl('#txtAddTags', 'Add', '/term/bulk_add_tags');
+  };
+
+  let handle_remove_tags_click = function() {
+    _handle_tags_impl('#txtRemoveTags', 'Remove', '/term/bulk_remove_tags');
+  };
 
   function bulk_delete(event) {
     event.preventDefault();
@@ -508,8 +564,14 @@
   $(document).ready(function () {
     setup_term_datatable("{{ initial_search or '' }}");
     set_up_parent_autocomplete();
+
+    const txtAddTags_tagify = setup_tags_tagify('txtAddTags', false);
+    const txtRemoveTags_tagify = setup_tags_tagify('txtRemoveTags', true);
+
     $('#btnSetParent').click(handle_set_parent_click);
     $('#btnSetStatus').click(handle_set_status_click);
+    $('#btnAddTags').click(handle_add_tags_click);
+    $('#btnRemoveTags').click(handle_remove_tags_click);
     $('#showHideFilters').click(handle_show_hide_filter_click);
 
     $('#filtLanguage').change(handle_filter_update);
