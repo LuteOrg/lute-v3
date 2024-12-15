@@ -320,9 +320,14 @@
       method: 'POST',
       data: JSON.stringify(data),
       contentType: "application/json; charset=utf-8",
-      success: function(data) {
+      success: function(response) {
         location.reload();
-      }
+      },
+      error: function(response, status, err) {
+        j = JSON.parse(response.responseText);
+        alert(`Error: ${j.reason}`);
+        console.log(`Status: ${status}, Error: ${err}, Response: ${response.responseText}`);
+      },
     });
   }
 
