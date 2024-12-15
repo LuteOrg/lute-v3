@@ -82,7 +82,7 @@ def test_bulk_parent_update_all_terms_must_be_same_lang(app_context, spanish, en
 
 def assert_tags(termid, tarray, msg=""):
     newt = TermRepository(db.session).find(termid)
-    assert [tp.text for tp in newt.term_tags] == tarray, msg
+    assert sorted([tp.text for tp in newt.term_tags]) == sorted(tarray), msg
 
 
 def test_bulk_tag_add_and_remove_smoke_test(app_context, spanish):
@@ -93,6 +93,7 @@ def test_bulk_tag_add_and_remove_smoke_test(app_context, spanish):
 
     svc.bulk_add_tags(["x", "y"], [t1.id, t2.id])
     assert_tags(t1.id, ["hello", "x", "y"], "x, y added to t")
+    assert_tags(t1.id, ["hello", "y", "x"], "x, y added to t - assert sort")
     assert_tags(t2.id, ["x", "y"], "x, y added to p")
 
     svc.bulk_add_tags(["x"], [t1.id, t2.id])
