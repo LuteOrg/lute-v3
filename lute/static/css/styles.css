@@ -1279,6 +1279,12 @@ div.help-text {
     gap: 0.2rem;
 }
 
+#term-bulk-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
 #term-form #text {
     width: 100%;
 }
