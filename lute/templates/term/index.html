@@ -75,6 +75,7 @@
     <button class="term-action-button">Actions</button>
     <div class="term-action-content">
       <a href="/term/new">Create new</a>
+      <a id="term_action_bulk_edit" class="bulkActionLink" href="#" onclick="show_action_div(event, this, 'bulkEditDiv', 'blah');">Bulk edit</a>
       <a id="term_action_set_parent" class="bulkActionLink" href="#" onclick="show_action_div(event, this, 'set_parent_div', 'txtSetParent');">Set parent</a>
       <a id="term_action_set_status" class="bulkActionLink" href="#" onclick="show_action_div(event, this, 'set_status_div', 'selSetStatus');">Set status</a>
       <a id="term_action_add_tags" class="bulkActionLink" href="#" onclick="show_action_div(event, this, 'divAddTags', 'txtAddTags');">Add tags</a>
@@ -84,6 +85,9 @@
     </div>
   </div>
 
+  <div id="bulkEditDiv" class="actionDiv" style="display: none;">
+    <p>FORM TO COME HERE<button id="btnPostBulkEdit" class="actionButton" disabled >go</button></p>
+  </div>
   <div id="set_parent_div" class="actionDiv" style="display: none;">
     <p>Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" class="actionButton" disabled >go</button></p>
   </div>
