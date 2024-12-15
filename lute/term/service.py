@@ -29,7 +29,7 @@ class Service:
         repo = Repository(self.session)
         terms = [repo.load(tid) for tid in termids]
 
-        lang_ids = list(set([term.language_id for term in terms]))
+        lang_ids = list({term.language_id for term in terms})
         if len(lang_ids) > 1:
             raise TermServiceException("Terms not all the same language")
 
