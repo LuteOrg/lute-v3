@@ -84,24 +84,32 @@
   <div id="bulkEditDiv" class="actionDiv" style="display: inline;">  <!-- TODO change to display: none -->
     <table>
       <tr>
-        <td>Remove existing parents</td><td><input type="checkbox" id="chkRemoveParents" /></td>
+        <td>Remove parents</td><td><input type="checkbox" id="chkRemoveParents" /> <label for="chkRemoveParents">Remove parents</label></td>
       </tr>
       <tr>
-        <td>Add parent</td><td><input id="txtSetParent" /></td>
+        <td>Set parent</td><td><input id="txtSetParent" /></td>
+      </tr>
+      <tr>
+        <td>Change status</td><td><input type="checkbox" id="chkChangeStatus" /> <label for="chkChangeStatus">Change status</label></td>
       </tr>
       <tr>
         <td>Set status</td>
         <td>
-          <select id="selSetStatus">
-            <option value="">(no change)</option>
-            {% for s in statuses %}
-            <option value="{{ s.id }}">{{ s.text }}</option>
-            {% endfor %}
-          </select>
+          <div id="status-container">
+            <ul id="status">
+              <li><input id="status-0" name="status" type="radio" value="1x"> <label for="status-0">1</label></li>
+              <li><input id="status-1" name="status" type="radio" value="2"> <label for="status-1">2</label></li>
+              <li><input id="status-2" name="status" type="radio" value="3"> <label for="status-2">3</label></li>
+              <li><input id="status-3" name="status" type="radio" value="4"> <label for="status-3">4</label></li>
+              <li><input id="status-4" name="status" type="radio" value="5"> <label for="status-4">5</label></li>
+              <li><input id="status-5" name="status" type="radio" value="99"> <label for="status-5">Wkn</label></li>
+              <li><input id="status-6" name="status" type="radio" value="98"> <label for="status-6">Ign</label></li>
+            </ul>
+          </div>
+          <!-- get current clicked value with
+               $("input[name='status']:checked").val();
+            -->
         </td>
-      </tr>
-      <tr>
-        <td>Follow parent status if possible</td><td><input type="checkbox" id="chkFollowParent" /></td>
       </tr>
       <tr>
         <td>Add tags</td><td><input id="txtAddTags" /></td>
@@ -112,11 +120,10 @@
       <tr>
         <td><button id="btnPostBulkEdit" class="actionButton">go</button></td>
       </tr>
-      </table>
+    </table>
+
   </div>
-
 </div>
-
 
 <table id="termtable" class="table dataTable stripe">
   <thead>
@@ -570,6 +577,8 @@
     $('#filtStatusMax').change(handle_filter_update);
     $('#filtIncludeIgnored').change(handle_filter_update);
     $('#clearFilters').click(handle_clear_filters);
+
+    $("input[name='status']").prop('disabled', true);
 
     load_filters_from_storage();
   });
