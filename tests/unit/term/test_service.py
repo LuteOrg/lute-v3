@@ -4,6 +4,7 @@ Term service tests.
 
 import pytest
 from lute.models.repositories import TermRepository
+from lute.models.term import TermTag
 from lute.db import db
 from lute.term.service import Service, TermServiceException
 from tests.utils import add_terms
@@ -64,3 +65,36 @@ def test_bulk_parent_update_all_terms_must_be_same_lang(app_context, spanish, en
     svc = Service(db.session)
     with pytest.raises(TermServiceException, match="Terms not all the same language"):
         svc.bulk_set_parent("p", [t.id, e.id])
+
+
+# Bulk tag add/remove
+
+
+def assert_tags(termid, tarray, msg=""):
+    newt = TermRepository(db.session).find(termid)
+    assert [tp.text for tp in newt.term_tags] == tarray, msg
+
+
+def test_bulk_tag_add_and_remove_smoke_test(app_context, spanish):
+    "Update parent of term."
+    [t1, t2] = add_terms(spanish, ["t", "p"])
+    t1.add_term_tag(TermTag("hello"))
+    svc = Service(db.session)
+
+    svc.bulk_add_tags(["x", "y"], [t1.id, t2.id])
+    assert_tags(t1.id, ["hello", "x", "y"], "x, y added to t")
+    assert_tags(t2.id, ["x", "y"], "x, y added to p")
+
+    svc.bulk_add_tags(["x"], [t1.id, t2.id])
+    assert_tags(t1.id, ["hello", "x", "y"], "add twice ok")
+
+    svc.bulk_add_tags(["p", "p"], [t1.id, t2.id])
+    assert_tags(t1.id, ["hello", "x", "y", "p"], "p added ok")
+
+    svc.bulk_remove_tags(["x", "y", "p"], [t1.id, t2.id])
+    assert_tags(t1.id, ["hello"], "x, y removed from t")
+    assert_tags(t2.id, [], "x, y removed from p")
+
+    svc.bulk_remove_tags(["unused"], [t1.id, t2.id])
+    assert_tags(t1.id, ["hello"], "same")
+    assert_tags(t2.id, [], "same")

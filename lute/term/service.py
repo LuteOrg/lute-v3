@@ -47,3 +47,27 @@ class Service:
                 term.sync_status = True
             repo.add(term)
         repo.commit()
+
+    def bulk_add_tags(self, tagtexts, termids):
+        "Add tag for all terms."
+        if len(termids) == 0:
+            return
+
+        repo = Repository(self.session)
+        terms = [repo.load(tid) for tid in termids]
+        for term in terms:
+            term.term_tags.extend(tagtexts)
+            repo.add(term)
+        repo.commit()
+
+    def bulk_remove_tags(self, tagtexts, termids):
+        "Add tag for all terms."
+        if len(termids) == 0:
+            return
+
+        repo = Repository(self.session)
+        terms = [repo.load(tid) for tid in termids]
+        for term in terms:
+            term.term_tags = [t for t in term.term_tags if t not in tagtexts]
+            repo.add(term)
+        repo.commit()
