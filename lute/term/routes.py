@@ -322,6 +322,7 @@ def bulk_add_tags():
     "add tags."
     data = _get_tag_post_data(request)
     TermService(db.session).bulk_add_tags(data.tags, data.termids)
+    return jsonify({"success": True}), 200
 
 
 @bp.route("/bulk_remove_tags", methods=["POST"])
@@ -329,6 +330,7 @@ def bulk_remove_tags():
     "remove tags."
     data = _get_tag_post_data(request)
     TermService(db.session).bulk_remove_tags(data.tags, data.termids)
+    return jsonify({"success": True}), 200
 
 
 @bp.route("/bulk_delete", methods=["POST"])
