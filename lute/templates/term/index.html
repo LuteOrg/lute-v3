@@ -76,35 +76,43 @@
     <div class="term-action-content">
       <a href="/term/new">Create new</a>
       <a id="term_action_bulk_edit" class="bulkActionLink" href="#" onclick="show_action_div(event, this, 'bulkEditDiv', 'blah');">Bulk edit</a>
-      <a id="term_action_set_parent" class="bulkActionLink" href="#" onclick="show_action_div(event, this, 'set_parent_div', 'txtSetParent');">Set parent</a>
-      <a id="term_action_set_status" class="bulkActionLink" href="#" onclick="show_action_div(event, this, 'set_status_div', 'selSetStatus');">Set status</a>
-      <a id="term_action_add_tags" class="bulkActionLink" href="#" onclick="show_action_div(event, this, 'divAddTags', 'txtAddTags');">Add tags</a>
-      <a id="term_action_remove_tags" class="bulkActionLink" href="#" onclick="show_action_div(event, this, 'devRemoveTags', 'txtRemoveTags');">Remove tags</a>
       <a id="term_action_bulk_delete" class="bulkActionLink" href="#" onclick="bulk_delete(event);">Delete selected</a>
       <a id="term_action_export_csv" href="#" onclick="export_csv(event);">Export CSV</a>
     </div>
   </div>
 
-  <div id="bulkEditDiv" class="actionDiv" style="display: none;">
-    <p>FORM TO COME HERE<button id="btnPostBulkEdit" class="actionButton" disabled >go</button></p>
-  </div>
-  <div id="set_parent_div" class="actionDiv" style="display: none;">
-    <p>Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" class="actionButton" disabled >go</button></p>
-  </div>
-  <div id="set_status_div" class="actionDiv" style="display: none;">
-    <p>Set status:
-      <select id="selSetStatus">
-        {% for s in statuses %}
-        <option value="{{ s.id }}">{{ s.text }}</option>
-        {% endfor %}
-      </select>
-      <button id="btnSetStatus" class="actionButton">go</button></p>
-  </div>
-  <div id="divAddTags" class="actionDiv" style="display: none;">
-    <p>Add tags: <input id="txtAddTags" /><button id="btnAddTags" class="actionButton" disabled >go</button></p>
-  </div>
-  <div id="devRemoveTags" class="actionDiv" style="display: none;">
-    <p>Remove tags: <input id="txtRemoveTags" /><button id="btnRemoveTags" class="actionButton" disabled >go</button></p>
+  <div id="bulkEditDiv" class="actionDiv" style="display: inline;">  <!-- TODO change to display: none -->
+    <table>
+      <tr>
+        <td>Remove existing parents</td><td><input type="checkbox" id="chkRemoveParents" /></td>
+      </tr>
+      <tr>
+        <td>Add parent</td><td><input id="txtSetParent" /></td>
+      </tr>
+      <tr>
+        <td>Set status</td>
+        <td>
+          <select id="selSetStatus">
+            <option value="">(no change)</option>
+            {% for s in statuses %}
+            <option value="{{ s.id }}">{{ s.text }}</option>
+            {% endfor %}
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Follow parent status if possible</td><td><input type="checkbox" id="chkFollowParent" /></td>
+      </tr>
+      <tr>
+        <td>Add tags</td><td><input id="txtAddTags" /></td>
+      </tr>
+      <tr>
+        <td>Remove tags</td><td><input id="txtRemoveTags" /></td>
+      </tr>
+      <tr>
+        <td><button id="btnPostBulkEdit" class="actionButton">go</button></td>
+      </tr>
+      </table>
   </div>
 
 </div>
@@ -245,7 +253,9 @@
   function activate_term_actions() {
     const checked_count = $('.chkWord:checked').length;
     const lang_id = get_lang_id();
-    const should_disable = (checked_count === 0 || lang_id == null);
+    let should_disable = (checked_count === 0 || lang_id == null);
+    should_disable = false;  // TODO REMOVE THIS
+    // TODO REMOVE THE ABOVE ===============================================
     $(".bulkActionLink").toggleClass("actionDisabled", should_disable);
   }
 
@@ -255,7 +265,7 @@
     $(".actionDiv").css("display", "none");
     if ($(el).hasClass("actionDisabled"))
       return;
-    $(`#${displaydiv}`).css("display", "flex");
+    $(`#${displaydiv}`).css("display", "inline");
     $(`#${focusel}`).focus();
   }
 
@@ -356,10 +366,10 @@
   // tags are passed in from the route.
   var TAGS = {{ tags | safe }};
 
-  let setup_tags_tagify = function(input_id, enforceWhitelist) {
+  let setup_tags_tagify = function(input_id, placeholder, enforceWhitelist) {
     const input = document.getElementById(input_id);
     const tagify = new Tagify(input, {
-      placeholder: 'Tags',
+      placeholder: placeholder,
       editTags: false,
       autoComplete: { enabled: true, rightKey: true, tabKey: true },
       dropdown: { enabled: 1 },
@@ -543,8 +553,8 @@
     setup_term_datatable("{{ initial_search or '' }}");
     set_up_parent_autocomplete();
 
-    const txtAddTags_tagify = setup_tags_tagify('txtAddTags', false);
-    const txtRemoveTags_tagify = setup_tags_tagify('txtRemoveTags', true);
+    const txtAddTags_tagify = setup_tags_tagify('txtAddTags', 'Add tags', false);
+    const txtRemoveTags_tagify = setup_tags_tagify('txtRemoveTags', 'Remove tags', true);
 
     $('#btnSetParent').click(handle_set_parent_click);
     $('#btnSetStatus').click(handle_set_status_click);
