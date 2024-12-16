@@ -39,6 +39,10 @@ function start_hover_mode(should_clear_frames = true) {
 
   clear_newmultiterm_elements();
 
+  // HACK DURING DEV
+  // TODO REMOVE THIS!!!!
+  show_bulk_term_edit_form();
+
   // https://stackoverflow.com/questions/35022716/keydown-not-detected-until-window-is-clicked
   $(window).focus();
 }
@@ -188,7 +192,7 @@ function show_term_edit_form(el) {
   _show_wordframe_url(`/read/edit_term/${wid}`);
 }
 
-function show_bulk_term_edit_form(el) {
+function show_bulk_term_edit_form() {
   $('.dictcontainer').hide();
   _show_wordframe_url('/read/term_bulk_edit_form');
 }
