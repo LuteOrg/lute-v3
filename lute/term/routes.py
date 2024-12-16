@@ -180,7 +180,7 @@ def _handle_form(term, repo, redirect_to="/term/index"):
     Handle the form post, redirecting to specified url.
     """
     return handle_term_form(
-        term, repo, db.session, "/term/formframes.html", redirect(redirect_to, 302)
+        term, repo, db.session, "/term/form.html", redirect(redirect_to, 302)
     )
 
 

@@ -198,7 +198,7 @@ def term_form(langid, text):
         term,
         repo,
         db.session,
-        "/read/frameform.html",
+        "/read/term_edit_form.html",
         render_template("/read/updated.html", term_text=term.text),
         embedded_in_reading_frame=True,
     )
@@ -218,7 +218,7 @@ def edit_term_form(term_id):
         term,
         repo,
         db.session,
-        "/read/frameform.html",
+        "/read/term_edit_form.html",
         render_template("/read/updated.html", term_text=term.text),
         embedded_in_reading_frame=True,
     )
