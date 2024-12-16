@@ -1,3 +1,5 @@
+{# This form is "included" into other .html files. #}
+
 <script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/lute-hotkey-utils.js') }}" charset="utf-8"></script>
 <script type="text/javascript">
@@ -329,7 +331,7 @@
     // so the left-and-right arrows don't work within the reading pane.
     // The reading pane arrows are more important than the focus being set, IMO.
     // Perhaps this can be changed later to set the focus if the form is opened
-    // from the term listing (i.e. move this to templates/term/formframes.html).
+    // from the term listing (i.e. move this to templates/term/form.html).
     const langId = $("#language_id")
     const text = $("#text")
     const translation = $("#translation")
