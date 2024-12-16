@@ -27,10 +27,6 @@
   </head>
 
   <body>
-    {% if term.flash_message %}
-    <p class='small-flash-notice'>{{ term.flash_message }}</p>
-    {% endif %}
-
     {% block include_term_form %}{% endblock %}
   </body>
 

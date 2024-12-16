@@ -1,5 +1,8 @@
 {% extends 'read/term_form_base.html' %}
 
 {% block include_term_form %}
+  {% if term.flash_message %}
+    <p class='small-flash-notice'>{{ term.flash_message }}</p>
+  {% endif %}
   {% include 'term/_form.html' %}
 {% endblock %}

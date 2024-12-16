@@ -224,13 +224,15 @@ def edit_term_form(term_id):
     )
 
 
-@bp.route("/show_bulk_edit_term_form", methods=["GET"])
-def show_bulk_edit_term_form():
+@bp.route("/term_bulk_edit_form", methods=["GET"])
+def term_bulk_edit_form():
     """
     show_bulk_form
     """
+    repo = Repository(db.session)
     return render_template(
-        "term/bulk_edit_term_form.html",
+        "read/term_bulk_edit_form.html",
+        tags=repo.get_term_tags(),
     )
 
 

@@ -190,7 +190,7 @@ function show_term_edit_form(el) {
 
 function show_bulk_term_edit_form(el) {
   $('.dictcontainer').hide();
-  _show_wordframe_url(`/read/show_bulk_edit_term_form`);
+  _show_wordframe_url('/read/term_bulk_edit_form');
 }
 
 function hide_term_edit_form() {
