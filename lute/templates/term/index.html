@@ -85,12 +85,14 @@
 </script>
 
 <div id="bulkEditDiv" class="actionDiv">  <!-- TODO change to display: none -->
-  <div id="term-bulk-form-fields">
-    {% include "term/_bulk_edit_form_fields.html" %}
-    <div>
-      <button id="btnPostBulkEdit" class="actionButton">go</button>
+  <form id="term-form" name="term_bulk_form" method="POST">
+    <div id="term-bulk-form-fields">
+      {% include "term/_bulk_edit_form_fields.html" %}
+      <div id="term-button-container">
+        <button id="btnsubmit" type="submit" class="btn btn-primary">Save</button>
+      </div>
     </div>
-  </div>
+  </form>
 </div>
 
 <table id="termtable" class="table dataTable stripe">
