@@ -89,7 +89,7 @@
     <div id="term-bulk-form-fields">
       {% include "term/_bulk_edit_form_fields.html" %}
       <div id="term-button-container">
-        <button id="btnsubmit" type="submit" class="btn btn-primary">Save</button>
+        <button id="btnsubmit" type="submit" class="btn btn-primary" onclick="set_bulk_wordids(); return false;">Save</button>
       </div>
     </div>
   </form>
@@ -267,6 +267,10 @@
     });
     return wordids;
   };
+
+  function set_bulk_wordids() {
+    $("#txtWordIds").val(_get_checked_wordids().join(","));
+  }
 
   let handle_set_parent_click = function() {
     const lang_id = get_lang_id();
