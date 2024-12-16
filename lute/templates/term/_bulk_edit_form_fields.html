@@ -22,7 +22,6 @@
     <li><input id="status-6" name="status" type="radio" value="98"> <label for="status-6">Ign</label></li>
   </ul>
 </div>
-<!-- get current clicked value with: $("input[name='status']:checked").val(); -->
 <div>
   <input id="txtAddTags" />
 </div>
@@ -160,12 +159,23 @@
     return tagify;
   };
 
+  let handle_change_status_checkbox_change = function(is_checked) {
+    $("input[name='status']").prop('disabled', !is_checked);
+
+    if (!is_checked) {
+      // unselect all radios so nothing is submitted.
+      $('input[name="status"]').prop('checked', false);
+    }
+  };
+
   $(document).ready(function () {
     const parents_tagify = setup_parent_tagify('txtSetParent');
     const txtAddTags_tagify = setup_tags_tagify('txtAddTags', 'Add tags', false);
     const txtRemoveTags_tagify = setup_tags_tagify('txtRemoveTags', 'Remove tags', true);
 
-    // TODO - enable as needed
-    $("input[name='status']").prop('disabled', true);
+    handle_change_status_checkbox_change(false);
+    $('#chkChangeStatus').change(function () {
+      handle_change_status_checkbox_change($(this).is(':checked'));
+    });
   });
 </script>
