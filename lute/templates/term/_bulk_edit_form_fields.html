@@ -1,38 +1,29 @@
-<div id="term-form-container">
-
-  <div id="term-bulk-form">
-    <div>
-      <input type="checkbox" id="chkRemoveParents" /> <label for="chkRemoveParents">Remove parents</label>
-    </div>
-    <div>
-      <input id="txtSetParent" />
-    </div>
-    <div>
-      <input type="checkbox" id="chkChangeStatus" /> <label for="chkChangeStatus">Change status</label>
-    </div>
-    <div id="status-container">
-      <ul id="status">
-        <li><input id="status-0" name="status" type="radio" value="1x"> <label for="status-0">1</label></li>
-        <li><input id="status-1" name="status" type="radio" value="2"> <label for="status-1">2</label></li>
-        <li><input id="status-2" name="status" type="radio" value="3"> <label for="status-2">3</label></li>
-        <li><input id="status-3" name="status" type="radio" value="4"> <label for="status-3">4</label></li>
-        <li><input id="status-4" name="status" type="radio" value="5"> <label for="status-4">5</label></li>
-        <li><input id="status-5" name="status" type="radio" value="99"> <label for="status-5">Wkn</label></li>
-        <li><input id="status-6" name="status" type="radio" value="98"> <label for="status-6">Ign</label></li>
-      </ul>
-    </div>
-    <!-- get current clicked value with: $("input[name='status']:checked").val(); -->
-    <div>
-      <input id="txtAddTags" />
-    </div>
-    <div>
-      <input id="txtRemoveTags" />
-    </div>
-    <div>
-      <button id="btnPostBulkEdit" class="actionButton">go</button>
-    </div>
-  </div>
-
+<div>
+  <input type="checkbox" id="chkRemoveParents" /> <label for="chkRemoveParents">Remove parents</label>
+</div>
+<div>
+  <input id="txtSetParent" />
+</div>
+<div>
+  <input type="checkbox" id="chkChangeStatus" /> <label for="chkChangeStatus">Change status</label>
+</div>
+<div id="status-container">
+  <ul id="status">
+    <li><input id="status-0" name="status" type="radio" value="1x"> <label for="status-0">1</label></li>
+    <li><input id="status-1" name="status" type="radio" value="2"> <label for="status-1">2</label></li>
+    <li><input id="status-2" name="status" type="radio" value="3"> <label for="status-2">3</label></li>
+    <li><input id="status-3" name="status" type="radio" value="4"> <label for="status-3">4</label></li>
+    <li><input id="status-4" name="status" type="radio" value="5"> <label for="status-4">5</label></li>
+    <li><input id="status-5" name="status" type="radio" value="99"> <label for="status-5">Wkn</label></li>
+    <li><input id="status-6" name="status" type="radio" value="98"> <label for="status-6">Ign</label></li>
+  </ul>
+</div>
+<!-- get current clicked value with: $("input[name='status']:checked").val(); -->
+<div>
+  <input id="txtAddTags" />
+</div>
+<div>
+  <input id="txtRemoveTags" />
 </div>
 
 <script>

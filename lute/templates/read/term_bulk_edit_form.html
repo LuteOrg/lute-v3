@@ -1,5 +1,13 @@
 {% extends 'read/term_form_base.html' %}
 
 {% block include_term_form %}
-  {% include 'term/_bulk_edit_form.html' %}
+  <div id="term-form-container">
+    <form id="term-form" name="term_form" method="POST">
+      <p>Hidden field for IDs here ...</p>
+      {% include 'term/_bulk_edit_form_fields.html' %}
+      <div id="term-button-container">
+        <button id="btnsubmit" type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
 {% endblock %}
