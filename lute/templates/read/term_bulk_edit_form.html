@@ -3,11 +3,13 @@
 {% block include_term_form %}
   <div id="term-form-container">
     <form id="term-form" name="term_form" method="POST">
+      <div id="term-bulk-form-fields">
       <p>Hidden field for IDs here ...</p>
       {% include 'term/_bulk_edit_form_fields.html' %}
       <div id="term-button-container">
         <button id="btnsubmit" type="submit" class="btn btn-primary">Save</button>
       </div>
+      <div id="term">
     </form>
   </div>
 {% endblock %}

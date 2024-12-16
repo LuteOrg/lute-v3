@@ -1279,7 +1279,7 @@ div.help-text {
     gap: 0.2rem;
 }
 
-#term-bulk-form {
+#term-bulk-form-fields {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
