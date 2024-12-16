@@ -143,9 +143,6 @@
     return parents;
   };
 
-  // tags WILL BE passed in from the route. \\ tags | safe //;
-  var TAGS = [ "hello", "there" ];
-
   let setup_tags_tagify = function(input_id, placeholder, enforceWhitelist) {
     const input = document.getElementById(input_id);
     const tagify = new Tagify(input, {
