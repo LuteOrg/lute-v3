@@ -74,7 +74,7 @@
   <button class="term-action-button">Actions</button>
   <div class="term-action-content">
     <a href="/term/new">Create new</a>
-    <a id="term_action_bulk_edit" class="bulkActionLink" href="#" onclick="show_action_div(event, this, 'bulkEditDiv', 'blah');">Bulk edit</a>
+    <a id="term_action_bulk_edit" class="bulkActionLink" href="#" onclick="show_bulk_form(event, this);">Bulk edit</a>
     <a id="term_action_bulk_delete" class="bulkActionLink" href="#" onclick="bulk_delete(event);">Delete selected</a>
     <a id="term_action_export_csv" href="#" onclick="export_csv(event);">Export CSV</a>
   </div>
@@ -84,7 +84,7 @@
   var TAGS = {{ tags | safe }}
 </script>
 
-<div id="bulkEditDiv" class="actionDiv">  <!-- TODO change to display: none -->
+<div id="bulkEditDiv" class="actionDiv" style="display: none;">
   <form id="term-form" name="term_bulk_form" method="POST" action="/term/bulk_edit_from_index">
     <div id="term-bulk-form-fields">
       {% include "term/_bulk_edit_form_fields.html" %}
@@ -231,19 +231,15 @@
     const checked_count = $('.chkWord:checked').length;
     const lang_id = get_lang_id();
     let should_disable = (checked_count === 0 || lang_id == null);
-    should_disable = false;  // TODO REMOVE THIS
-    // TODO REMOVE THE ABOVE ===============================================
     $(".bulkActionLink").toggleClass("actionDisabled", should_disable);
   }
 
 
-  function show_action_div(event, el, displaydiv, focusel) {
+  function show_bulk_edit_form(event, el, displaydiv, focusel) {
     event.preventDefault();
-    $(".actionDiv").css("display", "none");
     if ($(el).hasClass("actionDisabled"))
       return;
-    $(`#${displaydiv}`).css("display", "inline");
-    $(`#${focusel}`).focus();
+    $(`#bulkEditDiv`).css("display", "inline");
   }
 
   // Return the clicked checkboxes' language ID,
@@ -271,99 +267,6 @@
   function set_bulk_wordids() {
     $("#txtWordIds").val(_get_checked_wordids().join(","));
   }
-
-  let handle_set_parent_click = function() {
-    const lang_id = get_lang_id();
-    if (lang_id == null) {
-      alert("All terms must be of the same language.");
-      return;
-    }
-    let wordids = _get_checked_wordids();
-    const ptxt = $('#txtSetParent').val();
-
-    const resp = confirm(`Change parent for ${wordids.length} term(s) to "${ptxt}"?  Note this will *remove* any existing parents for these terms.`);
-    if (! resp)
-      return;
-
-    data = {
-      wordids: wordids,
-      langid: lang_id,
-      parenttext: ptxt
-    };
-    $.ajax({
-      url: '/term/bulk_set_parent',
-      method: 'POST',
-      data: JSON.stringify(data),
-      contentType: "application/json; charset=utf-8",
-      success: function(response) {
-        location.reload();
-      },
-      error: function(response, status, err) {
-        j = JSON.parse(response.responseText);
-        alert(`Error: ${j.reason}`);
-        console.log(`Status: ${status}, Error: ${err}, Response: ${response.responseText}`);
-      },
-    });
-  }
-
-
-  let handle_set_status_click = function() {
-    let wordids = _get_checked_wordids();
-    const resp = confirm(`Change status for ${wordids.length} term(s)?`);
-    if (! resp)
-      return;
-
-    const sval=$('#selSetStatus').val();
-    data = {updates: [{ new_status: sval, termids: wordids }]};
-    $.ajax({
-      url: '/term/bulk_update_status',
-      method: 'POST',
-      data: JSON.stringify(data),
-      contentType: "application/json; charset=utf-8",
-      success: function(data) {
-        location.reload();
-      }
-    });
-  }
-
-  let _get_tags_text = function(elid) {
-    // Sample text box entry: '[{"value":"hello"},{"value":"elephant"}]'
-    const data = $(elid).val();
-    if (data == null || data == '') {
-      console.log("No tags entered");
-      return null;
-    }
-    const d = JSON.parse(data);
-    return d.map(item => item.value);
-  };
-
-  let _handle_tags_impl = function(textbox_id, action, url) {
-    const wordids = _get_checked_wordids();
-    const tagstext = _get_tags_text(textbox_id);
-    if (wordids.length == 0 || tagstext == null)
-      return;
-    const resp = confirm(`${action} ${tagstext.length} tag(s) for ${wordids.length} term(s)?`);
-    if (! resp)
-      return;
-    const data = {wordids: wordids, tagtexts: tagstext};
-    $.ajax({
-      url: url,
-      method: 'POST',
-      data: JSON.stringify(data),
-      contentType: "application/json; charset=utf-8",
-      success: function(data) {
-        location.reload();
-      }
-    });
-  };
-
-  let handle_add_tags_click = function() {
-    _handle_tags_impl('#txtAddTags', 'Add', '/term/bulk_add_tags');
-  };
-
-  let handle_remove_tags_click = function() {
-    _handle_tags_impl('#txtRemoveTags', 'Remove', '/term/bulk_remove_tags');
-  };
 
   function bulk_delete(event) {
     event.preventDefault();
@@ -479,16 +382,7 @@
   $(document).ready(function () {
     setup_term_datatable("{{ initial_search or '' }}");
 
-    const parents_tagify = setup_parent_tagify('txtSetParent');
-    const txtAddTags_tagify = setup_tags_tagify('txtAddTags', 'Add tags', false);
-    const txtRemoveTags_tagify = setup_tags_tagify('txtRemoveTags', 'Remove tags', true);
-
-    $('#btnSetParent').click(handle_set_parent_click);
-    $('#btnSetStatus').click(handle_set_status_click);
-    $('#btnAddTags').click(handle_add_tags_click);
-    $('#btnRemoveTags').click(handle_remove_tags_click);
     $('#showHideFilters').click(handle_show_hide_filter_click);
-
     $('#filtLanguage').change(handle_filter_update);
     $('#filtParentsOnly').change(handle_filter_update);
     $('#filtAgeMin').keyup(handle_filter_update);
@@ -497,8 +391,6 @@
     $('#filtStatusMax').change(handle_filter_update);
     $('#filtIncludeIgnored').change(handle_filter_update);
     $('#clearFilters').click(handle_clear_filters);
-
-    $("input[name='status']").prop('disabled', true);
 
     load_filters_from_storage();
   });
