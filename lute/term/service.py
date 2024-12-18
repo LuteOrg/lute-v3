@@ -72,6 +72,8 @@ class Service:
             if parent is not None:
                 term.remove_all_parents()
                 term.add_parent(parent)
+                term.sync_status = True
+                term.status = parent.status
 
             if (
                 bulk_update_data.change_status is True
