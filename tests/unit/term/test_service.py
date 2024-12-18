@@ -6,7 +6,7 @@ import pytest
 from lute.models.repositories import TermRepository
 from lute.models.term import TermTag
 from lute.db import db
-from lute.term.service import Service, TermServiceException
+from lute.term.service import Service, TermServiceException, BulkTermUpdateData
 from tests.utils import add_terms
 
 # Bulk parent update
@@ -30,6 +30,41 @@ def test_sanity_smoke_stringize(app_context, spanish):
     t = add_terms(spanish, ["t"])[0]
     expected = {"parents": [], "status": 1, "tags": []}
     assert_stringized(t.id, expected, "initial")
+
+
+def _apply_updates(bud):
+    "Apply BulkTermUpdateData bud."
+    svc = Service(db.session)
+    svc.apply_bulk_updates(bud)
+
+
+def test_bulk_updates_all_terms_must_be_same_lang(app_context, spanish, english):
+    "Update parent of term."
+    t, p = add_terms(spanish, ["t", "p"])
+    [e] = add_terms(english, ["e"])
+    bud = BulkTermUpdateData(term_ids=[t.id, e.id], parent_id=p.id)
+    svc = Service(db.session)
+    with pytest.raises(TermServiceException, match="Terms not all the same language"):
+        svc.apply_bulk_updates(bud)
+
+
+def xxx_test_add_parent_by_id(app_context, spanish):
+    [t, p] = add_terms(spanish, ["t", "p"])
+    bud = BulkTermUpdateData(parent_id=p.id)
+    _apply_updates(bud)
+    expected = {"parents": ["p"], "status": 1, "tags": []}
+    assert_stringized(t.id, expected, "parent added")
+
+
+# add a parent by id
+# add parent by text
+# add parent by id ignores text
+# remove all parents
+# leave status
+# change status
+# ... tag tests
+# all terms have to be of the same language
+# no updates = nothing happens, ok.
 
 
 def assert_parents(termid, parray, msg=""):

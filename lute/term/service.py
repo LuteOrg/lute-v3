@@ -36,6 +36,16 @@ class Service:
 
     def apply_bulk_updates(self, bulk_update_data):
         "Apply all updates."
+        if len(bulk_update_data.term_ids) == 0:
+            return
+
+        parent = None
+        repo = Repository(self.session)
+        terms = [repo.load(tid) for tid in bulk_update_data.term_ids]
+
+        lang_ids = list({term.language_id for term in terms})
+        if len(lang_ids) > 1:
+            raise TermServiceException("Terms not all the same language")
 
     def bulk_set_parent(self, parenttext, termids):
         "Set parent for all terms, replace existing."
