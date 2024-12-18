@@ -3,6 +3,7 @@
 """
 
 from dataclasses import dataclass, field
+from lute.models.term import Status
 from lute.models.repositories import TermRepository, TermTagRepository
 from lute.term.model import Repository
 
@@ -69,9 +70,11 @@ class Service:
         for term in terms:
             if bulk_update_data.remove_parents:
                 term.remove_all_parents()
+                term.sync_status = False
             if parent is not None:
                 term.remove_all_parents()
                 term.add_parent(parent)
+            if parent is not None and parent.status != Status.UNKNOWN:
                 term.sync_status = True
                 term.status = parent.status
 
@@ -114,8 +117,8 @@ class Service:
         for term in terms:
             if term.parents != parent_list:
                 term.parents = parent_list
-                term.sync_status = True
             if parent is not None:
+                term.sync_status = True
                 term.status = parent.status
             repo.add(term)
         repo.commit()

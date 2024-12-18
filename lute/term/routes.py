@@ -91,8 +91,9 @@ def _get_bulk_update_from_form(form):
     bud.term_ids = [int(tid.strip()) for tid in term_ids.split(",")]
 
     bud.remove_parents = form.get("remove_parents", "off") == "on"
-    pdata = json.loads(form.get("parent", "[]"))
-    print(pdata, flush=True)
+    pdata = []
+    if form.get("parent", "") != "":
+        pdata = json.loads(form.get("parent"))
     if len(pdata) == 1:
         pdata = pdata[0]
         bud.parent_text = pdata.get("value")
@@ -104,7 +105,9 @@ def _get_bulk_update_from_form(form):
         bud.status_value = int(form.get("status"))
 
     def _get_tags(form_field_name):
-        return [td["value"] for td in json.loads(form.get(form_field_name, "[]"))]
+        if form.get(form_field_name, "") == "":
+            return []
+        return [td["value"] for td in json.loads(form.get(form_field_name))]
 
     bud.add_tags = _get_tags("add_tags")
     bud.remove_tags = _get_tags("remove_tags")
