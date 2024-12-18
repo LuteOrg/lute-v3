@@ -1,15 +1,14 @@
-<!-- TODO hide the termid text box -->
 <div>
-  <input id="txtWordIds" />
+  <input type="hidden" id="txtWordIds" name="term_ids" />
 </div>
 <div>
-  <input type="checkbox" id="chkRemoveParents" /> <label for="chkRemoveParents">Remove parents</label>
+  <input type="checkbox" name="remove_parents" id="chkRemoveParents" /> <label for="chkRemoveParents">Remove parents</label>
 </div>
 <div>
-  <input id="txtSetParent" />
+  <input id="txtSetParent" name="parent" />
 </div>
 <div>
-  <input type="checkbox" id="chkChangeStatus" /> <label for="chkChangeStatus">Change status</label>
+  <input type="checkbox" name="change_status" id="chkChangeStatus" /> <label for="chkChangeStatus">Change status</label>
 </div>
 <div id="status-container">
   <ul id="status">
@@ -23,10 +22,10 @@
   </ul>
 </div>
 <div>
-  <input id="txtAddTags" />
+  <input id="txtAddTags" name="add_tags" />
 </div>
 <div>
-  <input id="txtRemoveTags" />
+  <input id="txtRemoveTags" name="remove_tags" />
 </div>
 
 <script>
@@ -103,6 +102,7 @@
       let build_whitelist = function(data) {
         const this_term_text = $("#original_text").val();
         const whitelist = data.map((a) => ({
+          "id": a.id,
           "value": a.text,
           "suggestion": make_dropdown(a),
           "status": a.status,

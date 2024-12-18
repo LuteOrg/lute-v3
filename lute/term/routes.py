@@ -4,6 +4,7 @@
 
 import os
 import csv
+import json
 from dataclasses import dataclass
 from flask import (
     Blueprint,
@@ -24,7 +25,11 @@ from lute.models.repositories import (
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list
 from lute.term.model import Repository, Term
-from lute.term.service import Service as TermService, TermServiceException
+from lute.term.service import (
+    Service as TermService,
+    TermServiceException,
+    BulkTermUpdateData,
+)
 from lute.db import db
 from lute.term.forms import TermForm
 import lute.utils.formutils
@@ -75,6 +80,44 @@ def datatables_active_source():
     _load_term_custom_filters(request.form, parameters)
     data = get_data_tables_list(parameters, db.session)
     return jsonify(data)
+
+
+def _get_bulk_update_from_form(form):
+    "Load the BulkTermUpdateData from the form."
+    bud = BulkTermUpdateData()
+    term_ids = form.get("term_ids").strip()
+    if term_ids == "":
+        return bud
+    bud.term_ids = [int(tid.strip()) for tid in term_ids.split(",")]
+
+    bud.remove_parents = form.get("remove_parents", "off") == "on"
+    pdata = json.loads(form.get("parent", "[]"))
+    print(pdata, flush=True)
+    if len(pdata) == 1:
+        pdata = pdata[0]
+        bud.parent_text = pdata.get("value")
+        if "id" in pdata:
+            bud.parent_id = int(pdata.get("id"))
+
+    bud.change_status = form.get("change_status", "off") == "on"
+    if "status" in form:
+        bud.status_value = int(form.get("status"))
+
+    def _get_tags(form_field_name):
+        return [td["value"] for td in json.loads(form.get(form_field_name, "[]"))]
+
+    bud.add_tags = _get_tags("add_tags")
+    bud.remove_tags = _get_tags("remove_tags")
+
+    return bud
+
+
+@bp.route("/bulk_edit_from_index", methods=["POST"])
+def bulk_edit_from_index():
+    bud = _get_bulk_update_from_form(request.form)
+    svc = TermService(db.session)
+    svc.apply_bulk_updates(bud)
+    return redirect(f"/term/index", 302)
 
 
 @bp.route("/export_terms", methods=["POST"])

@@ -85,11 +85,11 @@
 </script>
 
 <div id="bulkEditDiv" class="actionDiv">  <!-- TODO change to display: none -->
-  <form id="term-form" name="term_bulk_form" method="POST">
+  <form id="term-form" name="term_bulk_form" method="POST" action="/term/bulk_edit_from_index">
     <div id="term-bulk-form-fields">
       {% include "term/_bulk_edit_form_fields.html" %}
       <div id="term-button-container">
-        <button id="btnsubmit" type="submit" class="btn btn-primary" onclick="set_bulk_wordids(); return false;">Save</button>
+        <button id="btnsubmit" type="submit" class="btn btn-primary" onclick="set_bulk_wordids(); return true;">Save</button>
       </div>
     </div>
   </form>

@@ -2,6 +2,7 @@
 /term service for routes to use
 """
 
+from dataclasses import dataclass, field
 from lute.term.model import Repository
 
 
@@ -14,11 +15,27 @@ class TermServiceException(Exception):
     """
 
 
+@dataclass
+class BulkTermUpdateData:
+    "Bulk updates"
+    term_ids: list[int] = field(default_factory=list)
+    remove_parents: bool = False
+    parent_id: int = None
+    parent_text: str = None
+    change_status: bool = False
+    status_value: int = None
+    add_tags: list[str] = field(default_factory=list)
+    remove_tags: list[str] = field(default_factory=list)
+
+
 class Service:
     "Service."
 
     def __init__(self, session):
         self.session = session
+
+    def apply_bulk_updates(self, bulk_update_data):
+        "Apply all updates."
 
     def bulk_set_parent(self, parenttext, termids):
         "Set parent for all terms, replace existing."

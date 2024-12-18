@@ -14,6 +14,24 @@ from tests.utils import add_terms
 # pylint: disable=unbalanced-tuple-unpacking
 
 
+def assert_stringized(termid, expected, msg=""):
+    "Return a term as a string for fast asserts."
+    t = TermRepository(db.session).find(termid)
+    actual = {
+        "parents": sorted([p.text for p in t.parents]),
+        "status": t.status,
+        "tags": sorted([tag.text for tag in t.term_tags]),
+    }
+    assert actual == expected, msg
+
+
+def test_sanity_smoke_stringize(app_context, spanish):
+    "Check only"
+    t = add_terms(spanish, ["t"])[0]
+    expected = {"parents": [], "status": 1, "tags": []}
+    assert_stringized(t.id, expected, "initial")
+
+
 def assert_parents(termid, parray, msg=""):
     newt = TermRepository(db.session).find(termid)
     assert [tp.text for tp in newt.parents] == parray, msg
