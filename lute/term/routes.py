@@ -14,6 +14,7 @@ from flask import (
     redirect,
     current_app,
     send_file,
+    flash,
 )
 from lute.models.language import Language
 from lute.models.term import Status
@@ -119,7 +120,10 @@ def _get_bulk_update_from_form(form):
 def bulk_edit_from_index():
     bud = _get_bulk_update_from_form(request.form)
     svc = TermService(db.session)
-    svc.apply_bulk_updates(bud)
+    try:
+        svc.apply_bulk_updates(bud)
+    except TermServiceException as ex:
+        flash(f"Error: {str(ex)}", "notice")
     return redirect(f"/term/index", 302)
 
 
