@@ -48,9 +48,9 @@ def test_bulk_updates_all_terms_must_be_same_lang(app_context, spanish, english)
         svc.apply_bulk_updates(bud)
 
 
-def xxx_test_add_parent_by_id(app_context, spanish):
+def test_add_parent_by_id(app_context, spanish):
     [t, p] = add_terms(spanish, ["t", "p"])
-    bud = BulkTermUpdateData(parent_id=p.id)
+    bud = BulkTermUpdateData(term_ids=[t.id], parent_id=p.id)
     _apply_updates(bud)
     expected = {"parents": ["p"], "status": 1, "tags": []}
     assert_stringized(t.id, expected, "parent added")

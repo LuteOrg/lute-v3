@@ -3,6 +3,7 @@
 """
 
 from dataclasses import dataclass, field
+from lute.models.repositories import TermRepository
 from lute.term.model import Repository
 
 
@@ -40,12 +41,25 @@ class Service:
             return
 
         parent = None
-        repo = Repository(self.session)
-        terms = [repo.load(tid) for tid in bulk_update_data.term_ids]
+        repo = TermRepository(self.session)
+        terms = [repo.find(tid) for tid in bulk_update_data.term_ids]
 
-        lang_ids = list({term.language_id for term in terms})
+        lang_ids = list({term.language.id for term in terms})
         if len(lang_ids) > 1:
             raise TermServiceException("Terms not all the same language")
+
+        # parent is found either by the ID, or if that returns None, by a text search.
+        if bulk_update_data.parent_id is not None:
+            parent = repo.find(bulk_update_data.parent_id)
+
+        for term in terms:
+            if bulk_update_data.remove_parents:
+                term.remove_all_parents()
+            if parent is not None:
+                term.remove_all_parents()
+                term.add_parent(parent)
+            self.session.add(term)
+            self.session.commit()
 
     def bulk_set_parent(self, parenttext, termids):
         "Set parent for all terms, replace existing."
