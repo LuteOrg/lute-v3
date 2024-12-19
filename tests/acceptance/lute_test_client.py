@@ -141,6 +141,33 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     ################################
     # Terms
 
+    def _fill_tagify_field(self, b, fieldid, text):
+        "Fill in field in browser b with text."
+        xpath = [
+            # input w/ id
+            f'//input[@id="{fieldid}"]',
+            # <tags> before it.
+            "/preceding-sibling::tags",
+            # <span> within the <tags> with class.
+            '/span[@class="tagify__input"]',
+        ]
+        xpath = "".join(xpath)
+
+        # Sometimes test runs couldn't find the parent
+        # tagify input, so hacky loop to get it and retry.
+        span = None
+        attempts = 0
+        while span is None and attempts < 10:
+            time.sleep(0.2)  # seconds
+            attempts += 1
+            span = b.find_by_xpath(xpath)
+        if span is None:
+            raise RuntimeError(f"unable to find {fieldid}")
+
+        span.type(text, slowly=False)
+        span.type(Keys.RETURN)
+        time.sleep(0.3)  # seconds
+
     def _fill_term_form(self, b, updates):
         "Fill in the term form."
         for k, v in updates.items():
@@ -167,28 +194,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                 b.find_by_css("#romanization").fill(v)
             elif k == "parents":
                 for p in updates["parents"]:
-                    xpath = [
-                        # input w/ id
-                        '//input[@id="parentslist"]',
-                        # <tags> before it.
-                        "/preceding-sibling::tags",
-                        # <span> within the <tags> with class.
-                        '/span[@class="tagify__input"]',
-                    ]
-                    xpath = "".join(xpath)
-
-                    # Sometimes test runs couldn't find the parent
-                    # tagify input, so hacky loop to get it and retry.
-                    span = None
-                    attempts = 0
-                    while span is None and attempts < 10:
-                        time.sleep(0.2)  # seconds
-                        attempts += 1
-                        span = b.find_by_xpath(xpath)
-
-                    span.type(p, slowly=False)
-                    span.type(Keys.RETURN)
-                    time.sleep(0.3)  # seconds
+                    self._fill_tagify_field(b, "parentslist", p)
             elif k == "sync_status":
                 if v:
                     b.check("sync_status")
@@ -206,28 +212,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                 else:
                     b.uncheck("remove_parents")
             elif k == "parent":
-                xpath = [
-                    # input w/ id
-                    '//input[@id="txtSetParent"]',
-                    # <tags> before it.
-                    "/preceding-sibling::tags",
-                    # <span> within the <tags> with class.
-                    '/span[@class="tagify__input"]',
-                ]
-                xpath = "".join(xpath)
-
-                # Sometimes test runs couldn't find the parent
-                # tagify input, so hacky loop to get it and retry.
-                span = None
-                attempts = 0
-                while span is None and attempts < 10:
-                    time.sleep(0.2)  # seconds
-                    attempts += 1
-                    span = b.find_by_xpath(xpath)
-
-                span.type(v, slowly=False)
-                span.type(Keys.RETURN)
-                time.sleep(0.3)  # seconds
+                self._fill_tagify_field(b, "txtSetParent", v)
             elif k == "change status":
                 if v:
                     b.check("change_status")
@@ -250,30 +235,8 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                 label.click()
             elif k in ("add tags", "remove tags"):
                 fields = {"add tags": "txtAddTags", "remove tags": "txtRemoveTags"}
-                fld = fields[k]
                 for tag in updates[k].split(", "):
-                    xpath = [
-                        # input w/ id
-                        f'//input[@id="{fld}"]',
-                        # <tags> before it.
-                        "/preceding-sibling::tags",
-                        # <span> within the <tags> with class.
-                        '/span[@class="tagify__input"]',
-                    ]
-                    xpath = "".join(xpath)
-
-                    # Sometimes test runs couldn't find the parent
-                    # tagify input, so hacky loop to get it and retry.
-                    span = None
-                    attempts = 0
-                    while span is None and attempts < 10:
-                        time.sleep(0.2)  # seconds
-                        attempts += 1
-                        span = b.find_by_xpath(xpath)
-
-                    span.type(tag, slowly=False)
-                    span.type(Keys.RETURN)
-                    time.sleep(0.3)  # seconds
+                    self._fill_tagify_field(b, fields[k], tag)
             else:
                 raise RuntimeError(f"unhandled key {k}")
 
