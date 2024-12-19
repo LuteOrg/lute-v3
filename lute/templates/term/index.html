@@ -357,9 +357,6 @@
     $('#filtStatusMin').val(parseInt(store.filtStatusMin));
     $('#filtStatusMax').val(parseInt(store.filtStatusMax));
     $('#filtIncludeIgnored').prop('checked', store.filtIncludeIgnored);
-
-    // Have to re-load the data table, now that the filters have changed.
-    $('#termtable').DataTable().draw();
   };
   
   let handle_show_hide_filter_click = function() {
@@ -385,8 +382,6 @@
   };
 
   $(document).ready(function () {
-    setup_term_datatable("{{ initial_search or '' }}");
-
     $('#showHideFilters').click(handle_show_hide_filter_click);
     $('#filtLanguage').change(handle_filter_update);
     $('#filtParentsOnly').change(handle_filter_update);
@@ -398,6 +393,10 @@
     $('#clearFilters').click(handle_clear_filters);
 
     load_filters_from_storage();
+
+    // Setting up the datatable now, so the filters are
+    // taken into account.
+    setup_term_datatable("{{ initial_search or '' }}");
   });
 
 
