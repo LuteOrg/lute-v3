@@ -1279,6 +1279,12 @@ div.help-text {
     gap: 0.2rem;
 }
 
+#term-bulk-form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
 #term-form #text {
     width: 100%;
 }
@@ -1783,6 +1789,12 @@ input[type="checkbox"][disabled] + label {
     background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" /></svg>');
 }
 
+input[name='status']:disabled + label {
+    color: grey; /* Make the label text grey */
+    cursor: not-allowed; /* Change cursor to indicate non-interactivity */
+    opacity: 0.6; /* Dim the appearance */
+}
+
 /* SETTINGS TABLE */
 #custom_styles {
     height: 100px;
@@ -2116,11 +2128,20 @@ input[type="checkbox"][disabled] + label {
     display: flex;
 }
 
+/*
 .term-action-dropdown,
-#set_parent_div {
+.actionDiv {
     display: flex;
     align-items: center;
     margin-right: 10px;
+}
+*/
+
+#bulkEditDiv {
+    margin: 0.5rem;
+    padding: 1rem;
+    width: 50%;
+    border: 1px solid lightgrey;
 }
 
 /* The container <div> to position the dropdown content */
