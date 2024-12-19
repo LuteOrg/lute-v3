@@ -70,33 +70,27 @@
 </div>
 
 
-<div class="term-action-container">
-  <div id="term_actions" class="term-action-dropdown" onmouseover="activate_term_actions();">
-    <button class="term-action-button">Actions</button>
-    <div class="term-action-content">
-      <a href="/term/new">Create new</a>
-      <a id="term_action_set_parent" href="#" onclick="show_hide_set_parent(event);">Set parent</a>
-      <a id="term_action_set_status" href="#" onclick="show_hide_set_status(event);">Set status</a>
-      <a id="term_action_bulk_delete" href="#" onclick="bulk_delete(event);">Delete selected</a>
-      <a id="term_action_export_csv" href="#" onclick="export_csv(event);">Export CSV</a>
-    </div>
+<div id="term_actions" class="term-action-dropdown" onmouseover="activate_term_actions();">
+  <button class="term-action-button">Actions</button>
+  <div class="term-action-content">
+    <a href="/term/new">Create new</a>
+    <a id="term_action_bulk_edit" class="bulkActionLink" href="#" onclick="show_bulk_edit_form(event, this);">Bulk edit</a>
+    <a id="term_action_bulk_delete" class="bulkActionLink" href="#" onclick="bulk_delete(event);">Delete selected</a>
+    <a id="term_action_export_csv" href="#" onclick="export_csv(event);">Export CSV</a>
   </div>
-
-  <div id="set_parent_div" style="display: none;">
-    <p>Set parent: <input id="txtSetParent" disabled /><button id="btnSetParent" disabled >go</button></p>
-  </div>
-  <div id="set_status_div" style="display: none;">
-    <p>Set status:
-      <select id="selSetStatus">
-        {% for s in statuses %}
-        <option value="{{ s.id }}">{{ s.text }}</option>
-        {% endfor %}
-      </select>
-      <button id="btnSetStatus">go</button></p>
-  </div>
-
 </div>
 
+<div id="bulkEditDiv" class="actionDiv" style="display: none;">
+  <form id="term-form" name="term_bulk_form" method="POST" action="/term/bulk_edit_from_index">
+    <div id="term-bulk-form-fields">
+      {% include "term/_bulk_edit_form_fields.html" %}
+      <div id="term-button-container">
+        <button id="btnsubmit" type="submit" class="btn btn-primary" onclick="set_bulk_wordids(); return true;">Save</button>
+        <button id="btnsubmit" type="submit" class="btn btn-primary" onclick="hide_bulk_edit_form(); return false;">Cancel</button>
+      </div>
+    </div>
+  </form>
+</div>
 
 <table id="termtable" class="table dataTable stripe">
   <thead>
@@ -202,7 +196,7 @@
   };
 
   let render_checkbox = function (data, type, row, meta) {
-    return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row['WoID']}" langid="${row['LgID']}" onclick="handleChkClick()">`;
+    return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row['WoID']}" langid="${row['LgID']}">`;
   };
 
   let render_translation = function ( data, type, row, meta ) {
@@ -227,57 +221,30 @@
     $('.chkWord').each(function(i) {
       $(this).prop('checked', v);
     });
-    handleChkClick(true);
   }
-
-  let handleChkClick = function(leave_checkAll = false) {
-    if (! leave_checkAll)
-      $('#chkAll').prop('checked', false);
-    const n = $('.chkWord:checked').length;
-    const lang_id = get_lang_id();
-    const disabled = ((n == 0) || lang_id == null);
-    $("#txtSetParent").prop('disabled', disabled);
-    $("#btnSetParent").prop('disabled', disabled);
-  }
-
 
   /** Deactivate term Actions, activate if they're possible. */
   function activate_term_actions() {
-    const disabled = "actionDisabled";
     const checked_count = $('.chkWord:checked').length;
     const lang_id = get_lang_id();
-
-    let c = $("#term_action_bulk_delete");
-    c.addClass(disabled);
-    if (checked_count > 0)
-      c.removeClass(disabled);
-
-    c = $("#term_action_set_parent");
-    c.addClass(disabled);
-    if (checked_count > 0 && lang_id != null)
-      c.removeClass(disabled);
-
-    c = $("#term_action_set_status");
-    c.addClass(disabled);
-    if (checked_count > 0)
-      c.removeClass(disabled);
+    let should_disable = (checked_count === 0 || lang_id == null);
+    $(".bulkActionLink").toggleClass("actionDisabled", should_disable);
   }
 
 
-  function show_hide_set_parent(event) {
+  function show_bulk_edit_form(event, el, displaydiv, focusel) {
     event.preventDefault();
-    if ($("#term_action_set_parent").hasClass("actionDisabled"))
+    if ($(el).hasClass("actionDisabled"))
       return;
-    $("#set_parent_div").css("display", "flex");
-    $("#txtSetParent").focus();
+    $(`#bulkEditDiv`).css("display", "block");
   }
 
-  function show_hide_set_status(event) {
-    event.preventDefault();
-    if ($("#term_action_set_status").hasClass("actionDisabled"))
-      return;
-    $("#set_status_div").css("display", "flex");
-    $("#selSetStatus").focus();
+
+  function hide_bulk_edit_form() {
+    const f = $("#term-form");
+    f.find("input, textarea, select").val("");
+    f.find("input:checkbox, input:radio").prop("checked", false);
+    $(`#bulkEditDiv`).css("display", "none");
   }
 
   // Return the clicked checkboxes' language ID,
@@ -294,105 +261,17 @@
     return null;
   }
 
-  let handle_set_parent_click = function() {
-    const lang_id = get_lang_id();
-    if (lang_id == null) {
-      alert("All terms must be of the same language.");
-      return;
-    }
-    let wordids = [];
+  let _get_checked_wordids = function() {
+    const wordids = [];
     $('.chkWord:checked').each(function(i) {
       wordids.push($(this).attr('wordid'));
     });
-    const ptxt = $('#txtSetParent').val();
-
-    const resp = confirm(`Change parent for ${wordids.length} term(s) to "${ptxt}"?  Note this will *remove* any existing parents for these terms.`);
-    if (! resp)
-      return;
-
-    data = {
-      wordids: wordids,
-      langid: lang_id,
-      parenttext: ptxt
-    };
-    $.ajax({
-      url: '/term/bulk_set_parent',
-      method: 'POST',
-      data: JSON.stringify(data),
-      contentType: "application/json; charset=utf-8",
-      success: function(response) {
-        location.reload();
-      },
-      error: function(response, status, err) {
-        j = JSON.parse(response.responseText);
-        alert(`Error: ${j.reason}`);
-        console.log(`Status: ${status}, Error: ${err}, Response: ${response.responseText}`);
-      },
-    });
-  }
-
-
-  let set_up_parent_autocomplete = function() {
-    $("#txtSetParent").autocomplete({
-      source: function(request, response) {
-        const lang_id = get_lang_id();
-        if (lang_id == null) {
-          // This should never occur; the text
-          // box should be disabled if lang_id is null.
-          response([], null);
-        }
-
-        const s = encodeURIComponent(request.term);
-        $.ajax({
-          url: `/term/search/${s}/${lang_id}`,
-          type: 'GET',
-          dataType: 'json',
-          minLength: 2,
-          success: function(data) {
-            arr = data.map(function(word) {
-              let label = word.text;
-              if (word.translation != null && word.translation != '') {
-                label = `${label} (${word.translation})`;
-              }
-              const obj = {
-                label: label,
-                value: word.text,
-                word: word.text,
-                translation: word.translation
-              };
-              return obj;
-            });
-            response(arr, data);
-          }
-        })
-      }
-    });
+    return wordids;
   };
 
-
-  let handle_set_status_click = function() {
-    let wordids = [];
-    $('.chkWord:checked').each(function(i) {
-      wordids.push($(this).attr('wordid'));
-    });
-
-    const resp = confirm(`Change status for ${wordids.length} term(s)?`);
-    if (! resp)
-      return;
-
-    const sval=$('#selSetStatus').val();
-    data = {updates: [{ new_status: sval, termids: wordids }]};
-    $.ajax({
-      url: '/term/bulk_update_status',
-      method: 'POST',
-      data: JSON.stringify(data),
-      contentType: "application/json; charset=utf-8",
-      success: function(data) {
-        location.reload();
-      }
-    });
+  function set_bulk_wordids() {
+    $("#txtWordIds").val(_get_checked_wordids().join(","));
   }
-
 
   function bulk_delete(event) {
     event.preventDefault();
@@ -507,11 +386,8 @@
 
   $(document).ready(function () {
     setup_term_datatable("{{ initial_search or '' }}");
-    set_up_parent_autocomplete();
-    $('#btnSetParent').click(handle_set_parent_click);
-    $('#btnSetStatus').click(handle_set_status_click);
-    $('#showHideFilters').click(handle_show_hide_filter_click);
 
+    $('#showHideFilters').click(handle_show_hide_filter_click);
     $('#filtLanguage').change(handle_filter_update);
     $('#filtParentsOnly').change(handle_filter_update);
     $('#filtAgeMin').keyup(handle_filter_update);
