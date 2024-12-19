@@ -249,7 +249,8 @@ class Term(
             self.term_tags.append(term_tag)
 
     def remove_term_tag(self, term_tag):
-        self.term_tags.remove(term_tag)
+        if term_tag in self.term_tags:
+            self.term_tags.remove(term_tag)
 
     def remove_all_parents(self):
         self.parents = []
