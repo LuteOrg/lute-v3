@@ -1,0 +1,201 @@
+{#
+in_term_index_listing boolean shows certain fields,
+as some bulk edit fields only make sense when
+doing these edits from the term index.
+#}
+
+<div>
+  <input type="hidden" id="txtWordIds" name="term_ids" />
+</div>
+{% if in_term_index_listing %}
+  <div>
+    <input type="checkbox" name="lowercase_terms" id="chkLowercaseTerms" /> <label for="chkLowercaseTerms">Convert terms to lowercase</label>
+  </div>
+{% endif %}
+<div>
+  <input type="checkbox" name="remove_parents" id="chkRemoveParents" /> <label for="chkRemoveParents">Remove parents</label>
+</div>
+<div>
+  <input id="txtSetParent" name="parent" />
+</div>
+<div>
+  <input type="checkbox" name="change_status" id="chkChangeStatus" /> <label for="chkChangeStatus">Change status</label>
+</div>
+<div id="status-container">
+  <ul id="status">
+    <li><input id="status-0" name="status" type="radio" value="1"> <label for="status-0">1</label></li>
+    <li><input id="status-1" name="status" type="radio" value="2"> <label for="status-1">2</label></li>
+    <li><input id="status-2" name="status" type="radio" value="3"> <label for="status-2">3</label></li>
+    <li><input id="status-3" name="status" type="radio" value="4"> <label for="status-3">4</label></li>
+    <li><input id="status-4" name="status" type="radio" value="5"> <label for="status-4">5</label></li>
+    <li><input id="status-5" name="status" type="radio" value="99"> <label for="status-5">Wkn</label></li>
+    <li><input id="status-6" name="status" type="radio" value="98"> <label for="status-6">Ign</label></li>
+  </ul>
+</div>
+<div>
+  <input id="txtAddTags" name="add_tags" />
+</div>
+<div>
+  <input id="txtRemoveTags" name="remove_tags" />
+</div>
+
+<script>
+  var TAGS = {{ tags | safe }}
+
+  let setup_parent_tagify = function(input_id) {
+    const input = document.getElementById(input_id);
+    const tagify = new Tagify(input, {
+      placeholder: 'Set parent (limit one)',
+      editTags: false,
+      maxTags: 1,
+      pasteAsTags: false,
+      backspace: true,
+      addTagOnBlur: false,
+      autoComplete: { enabled: true, rightKey: true, tabKey: true },
+      enforceWhitelist: false,
+      whitelist: [],
+      dropdown: {
+        enabled: 1,
+        maxItems: 15,
+        mapValueTo: 'suggestion',  // Field to display
+        placeAbove: false,  // Always put the dropdown below the textbox
+      },
+      templates: {
+        dropdownFooter(suggestions) {
+          var hasMore = suggestions.length - this.settings.dropdown.maxItems;
+          if (hasMore <= 0)
+            return '';
+          return `<footer data-selector='tagify-suggestions-footer' class="${this.settings.classNames.dropdownFooter}">
+            (more items available, please refine your search.)</footer>`;
+        }
+      },
+    });  // end tagify
+
+
+    // Autocomplete
+    var controller;
+    tagify.on('input', onInput);
+    function onInput(e) {
+      const langid = get_lang_id();
+      if (langid == null)
+        return;
+
+      tagify.whitelist = null;  // Reset whitelist.
+      if (e.detail.value == '' || e.detail.value.length < 1) {
+        controller && controller.abort();
+        tagify.whitelist = [];
+        tagify.loading(false).dropdown.hide();
+        return;
+      }
+      const s = encodeURIComponent(e.detail.value);
+      // console.log(s);
+
+      // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
+      controller && controller.abort()
+      controller = new AbortController()
+
+      let make_dropdown = function(hsh) {
+        // console.log(`text: ${hsh.text}`);
+        const txt = decodeURIComponent(hsh.text);
+        let t = hsh.translation ?? '';
+        if (t == '') {
+          return txt;
+        }
+        t = t.replaceAll("\n", "; ").replaceAll("\r", "");
+        const maxlen = 70
+        if (t.length > maxlen) {
+          t = t.substring(0, maxlen) + "...";
+        }
+        return `${txt} (${t})`;
+      };
+
+      // Build whitelist from returned ajax data.  Remove current term
+      // since a term should not be assigned as its own parent.
+      let build_whitelist = function(data) {
+        const this_term_text = $("#original_text").val();
+        const whitelist = data.map((a) => ({
+          "id": a.id,
+          "value": a.text,
+          "suggestion": make_dropdown(a),
+          "status": a.status,
+        })).filter((hsh) => hsh.value != this_term_text);
+        return whitelist;
+      };
+
+      tagify.loading(true);  // spinning animation during fetch.
+      fetch(`/term/search/${s}/${langid}`, {signal:controller.signal})
+        .then(RES => RES.json())
+        .then(function(data) {
+          tagify.whitelist = build_whitelist(data); // update whitelist Array in-place
+          const sdecode = decodeURIComponent(s);
+          tagify.loading(false).dropdown.show(sdecode); // render the suggestions dropdown
+        }).catch(err => {
+          if (err.name === 'AbortError') {
+            // Do nothing, fetch was aborted due to another fetch.
+            // console.log('AbortError: Fetch request aborted');
+          }
+          else {
+            console.log(`error: ${err}`);
+          }
+        });
+    };  // end function onInput
+
+    return tagify;
+  };  // end setup_parent_tagify
+
+  // Parents are in the tagify-managed #txtSetParent input box.
+  let get_parents = function() {
+    // During form load, and in "steady state" (i.e., after the tags
+    // have been added or removed, and the focus has switched to
+    // another control) the #sync_status text box is loaded with the
+    // values.
+    const pdata = $('#txtSetParent').val();
+    if ((pdata ?? '') == '') {
+      return [];
+    }
+    const j = JSON.parse(pdata);
+    const parents = j.map(e => e.value);
+    return parents;
+  };
+
+  let setup_tags_tagify = function(input_id, placeholder, enforceWhitelist) {
+    const input = document.getElementById(input_id);
+    const tagify = new Tagify(input, {
+      placeholder: placeholder,
+      editTags: false,
+      autoComplete: { enabled: true, rightKey: true, tabKey: true },
+      dropdown: { enabled: 1 },
+      enforceWhitelist: enforceWhitelist,
+      whitelist: TAGS
+    });  // end tagify
+    return tagify;
+  };
+
+  let handle_change_status_checkbox_change = function(is_checked) {
+    $("input[name='status']").prop('disabled', !is_checked);
+
+    if (!is_checked) {
+      // unselect all radios so nothing is submitted.
+      $('input[name="status"]').prop('checked', false);
+    }
+  };
+
+  $(document).ready(function () {
+    const txtAddTags_tagify = setup_tags_tagify('txtAddTags', 'Add tags', false);
+    const txtRemoveTags_tagify = setup_tags_tagify('txtRemoveTags', 'Remove tags', true);
+
+    handle_change_status_checkbox_change(false);
+    $('#chkChangeStatus').change(function () {
+      handle_change_status_checkbox_change($(this).is(':checked'));
+    });
+
+    let disable_parent_txt = false;
+    if (typeof get_lang_id !== "function") {
+      console.log("missing get_lang_id in surrounding context of _bulk_edit_form_fields");
+      $('#txtSetParent').prop("disabled", true);
+    }
+    else {
+      const parents_tagify = setup_parent_tagify('txtSetParent');
+    }
+  });
+</script>
