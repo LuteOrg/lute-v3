@@ -15,7 +15,11 @@
   <body>
 
     <div id="flash" class="flash">
+      {% if term_text %}
       <p>&quot;{{ term_text }}&quot; updated.</p>
+      {% else %}
+      <p>Updated.</p>
+      {% endif %}
     </div>
 
     <script>

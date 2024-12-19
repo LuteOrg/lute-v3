@@ -403,6 +403,13 @@ def when_click_word_edit_form(luteclient, word, content):
     luteclient.click_word_fill_form(word, updates)
 
 
+@when(parsers.parse("I edit the bulk edit form:\n{content}"))
+def when_post_bulk_edits_while_reading(luteclient, content):
+    "The content is assumed to be yaml."
+    updates = yaml.safe_load(content)
+    luteclient.fill_reading_bulk_edit_form(updates)
+
+
 @then(parsers.parse('the reading page term form frame contains "{text}"'))
 def then_reading_page_term_form_iframe_contains(luteclient, text):
     "Have to get and read the iframe content, it's not in the main browser page."
