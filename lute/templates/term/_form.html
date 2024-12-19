@@ -177,7 +177,6 @@
       $.post(frm.attr('action'), formData, function(response) {
         window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
         window.location.href = url;
-        window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
       });
     });
 
