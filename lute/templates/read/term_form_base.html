@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Form</title>
+    
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/jquery/jquery-ui.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/tagify/tagify.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/tagify/tagify_overrides.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+
+    <link rel="stylesheet" type="text/css" href="/theme/current">
+    <link rel="stylesheet" type="text/css" href="/theme/custom_styles">
+
+    <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.scrollTo.min.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery-ui.min.js') }}"  charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.jeditable.mini.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='vendor/tagify/tagify.min.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='vendor/tagify/tagify.polyfills.min.js') }}" charset="utf-8"></script>
+
+  </head>
+
+  <body>
+    {% block include_term_form %}{% endblock %}
+  </body>
+
+</html>
