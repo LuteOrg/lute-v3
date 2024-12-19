@@ -1,0 +1,58 @@
+{% extends 'read/term_form_base.html' %}
+
+{% block include_term_form %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/lute-hotkey-utils.js') }}" charset="utf-8"></script>
+<script type="text/javascript">
+  const LUTE_USER_SETTINGS = {{ user_settings | safe }}
+</script>
+
+<div id="term-form-container">
+    <div style="margin-bottom: 1em;">
+      <i><span id="bulkUpdateCount">Updating terms</span></i>
+    </div>
+    <form id="term-form" name="term_form" method="POST" action="/term/bulk_edit_from_reading_pane">
+      <div id="term-bulk-form-fields">
+      {% include 'term/_bulk_edit_form_fields.html' %}
+      <div id="term-button-container">
+        <button id="btnsubmit" type="submit" class="btn btn-primary" onclick="return get_selected_word_ids();">Save</button>
+      </div>
+      <div id="term">
+    </form>
+  </div>
+
+  <script>
+    /** Get the selected words, submit if any selected. */      
+    function get_selected_word_ids() {
+      const elements = $(parent.document).find("span.kwordmarked");
+      const wordIds = elements.map(function () {
+        return $(this).data("wid");
+      }).get();
+      if (wordIds.length == 0)
+        return false;
+      $("#txtWordIds").val(wordIds.join(","));
+      return true;
+    }
+
+    /** Function required by _bulk_edit_form_fields.html */
+    // Probably a better way to do this ...
+    function get_lang_id() {
+      const elements = $(parent.document).find("span.word");
+      if (elements.length == 0) {
+        console.log("No words on page ...");
+        return -999;  // dummy
+      }
+      const first = elements.first();
+      return $(first).data("lang-id");
+    }
+
+    // "Save" shortcut
+    $(document).keydown(function(event) {
+      const s = get_pressed_keys_as_string(event);
+      if (s == LUTE_USER_SETTINGS.hotkey_SaveTerm) {
+        $("#btnsubmit").click();
+      }
+    });
+
+  </script>      
+
+{% endblock %}

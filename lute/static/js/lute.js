@@ -21,7 +21,7 @@ let LUTE_CURR_TERM_DATA_ORDER = -1;  // initially not set.
  * The template lute/templates/read/page_content.html calls
  * this method on reload to reset the cursor etc.
  */
-function start_hover_mode(should_clear_frames = true) {
+function start_hover_mode() {
   $('span.kwordmarked').removeClass('kwordmarked');
 
   const curr_word = $('span.word').filter(function() {
@@ -33,14 +33,11 @@ function start_hover_mode(should_clear_frames = true) {
     apply_status_class($(w));
   }
 
-  if (should_clear_frames) {
-    $('#wordframeid').attr('src', '/read/empty');
-    $('.dictcontainer').hide();
-  }
-
+  _hide_term_edit_form();
   clear_newmultiterm_elements();
 
-  // https://stackoverflow.com/questions/35022716/keydown-not-detected-until-window-is-clicked
+  // Refocus on window so keyboard events work.
+  // ref https://stackoverflow.com/questions/35022716
   $(window).focus();
 }
 
@@ -184,12 +181,37 @@ function _show_wordframe_url(url) {
   applyInitialPaneSizes();  // in resize.js
 }
 
-
 function show_term_edit_form(el) {
   const wid = parseInt(el.data('wid'));
   _show_wordframe_url(`/read/edit_term/${wid}`);
 }
 
+function show_bulk_term_edit_form(count_of_terms) {
+  const url = '/read/term_bulk_edit_form';
+
+  const wordFrame = top.frames.wordframe;
+
+  function updateSpanContent() {
+    const frameDocument = wordFrame.document;
+    const spanElement = $(frameDocument).find('#bulkUpdateCount');
+    if (spanElement.length) {
+      spanElement.text(`Updating ${count_of_terms} term(s)`);
+    }
+  }
+
+  if (!wordFrame.location.href.endsWith(url))
+    wordFrame.location.href = url;
+  else
+    updateSpanContent();
+}
+
+function _hide_term_edit_form() {
+  $('.dictcontainer').hide();
+  const curr_url = top.frames.wordframe.location.href;
+  if (curr_url.includes('edit_term') || curr_url.includes('term_bulk_edit_form')) {
+    $('#wordframeid').attr('src', '/read/empty');
+  }
+}
 
 function show_multiword_term_edit_form(selected) {
   if (selected.length == 0)
@@ -292,25 +314,31 @@ function hover_out(e) {
 let word_clicked = function(el, e) {
   el.removeClass('wordhover');
   save_curr_data_order(el);
+  el.toggleClass('kwordmarked');
 
-  // If already clicked, remove the click marker.
-  if (el.hasClass('kwordmarked')) {
-    el.removeClass('kwordmarked');
-    if ($('span.kwordmarked').length == 0) {
-      el.addClass('wordhover');
-      start_hover_mode();
+  // If Shift isn't held, this is a regular click.
+  if (! e.shiftKey) {
+    // No other elements should be marked clicked.
+    $('span.kwordmarked').not(el).removeClass('kwordmarked');
+    if (el.hasClass('kwordmarked')) {
+      el.removeClass('hasflash');
+      show_term_edit_form(el);
+    }
+    else {
+      _hide_term_edit_form();
     }
     return;
   }
 
-  // Not already clicked.
-  if (! e.shiftKey) {
-    // Only one element should be marked clicked.
-    $('span.kwordmarked').removeClass('kwordmarked');
-    show_term_edit_form(el);
+  // Shift is held ... have 0 or more elements clicked.
+  const count_marked = $('span.kwordmarked').length;
+  if (count_marked == 0) {
+    el.addClass('wordhover');
+    start_hover_mode();
   }
-  el.addClass('kwordmarked');
-  el.removeClass('hasflash');
+  else {
+    show_bulk_term_edit_form(count_marked);
+  }
 }
 
 
@@ -378,7 +406,7 @@ function select_ended(el, e) {
   const selected = get_selected_in_range(selection_start_el, el);
   if (selection_start_shift_held) {
     copy_text_to_clipboard(selected.toArray());
-    start_hover_mode(false);
+    start_hover_mode();
     return;
   }
 

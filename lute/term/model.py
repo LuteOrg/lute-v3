@@ -231,7 +231,7 @@ class Repository:
     def get_term_tags(self):
         "Get all available term tags, helper method."
         tags = self.session.query(TermTag).all()
-        return [t.text for t in tags]
+        return sorted([t.text for t in tags])
 
     def add(self, term):
         """

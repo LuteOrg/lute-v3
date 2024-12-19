@@ -141,6 +141,33 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     ################################
     # Terms
 
+    def _fill_tagify_field(self, b, fieldid, text):
+        "Fill in field in browser b with text."
+        xpath = [
+            # input w/ id
+            f'//input[@id="{fieldid}"]',
+            # <tags> before it.
+            "/preceding-sibling::tags",
+            # <span> within the <tags> with class.
+            '/span[@class="tagify__input"]',
+        ]
+        xpath = "".join(xpath)
+
+        # Sometimes test runs couldn't find the parent
+        # tagify input, so hacky loop to get it and retry.
+        span = None
+        attempts = 0
+        while span is None and attempts < 10:
+            time.sleep(0.2)  # seconds
+            attempts += 1
+            span = b.find_by_xpath(xpath)
+        if span is None:
+            raise RuntimeError(f"unable to find {fieldid}")
+
+        span.type(text, slowly=False)
+        span.type(Keys.RETURN)
+        time.sleep(0.3)  # seconds
+
     def _fill_term_form(self, b, updates):
         "Fill in the term form."
         for k, v in updates.items():
@@ -167,33 +194,49 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                 b.find_by_css("#romanization").fill(v)
             elif k == "parents":
                 for p in updates["parents"]:
-                    xpath = [
-                        # input w/ id
-                        '//input[@id="parentslist"]',
-                        # <tags> before it.
-                        "/preceding-sibling::tags",
-                        # <span> within the <tags> with class.
-                        '/span[@class="tagify__input"]',
-                    ]
-                    xpath = "".join(xpath)
-
-                    # Sometimes test runs couldn't find the parent
-                    # tagify input, so hacky loop to get it and retry.
-                    span = None
-                    attempts = 0
-                    while span is None and attempts < 10:
-                        time.sleep(0.2)  # seconds
-                        attempts += 1
-                        span = b.find_by_xpath(xpath)
-
-                    span.type(p, slowly=False)
-                    span.type(Keys.RETURN)
-                    time.sleep(0.3)  # seconds
+                    self._fill_tagify_field(b, "parentslist", p)
             elif k == "sync_status":
                 if v:
                     b.check("sync_status")
                 else:
                     b.uncheck("sync_status")
+            else:
+                raise RuntimeError(f"unhandled key {k}")
+
+    def _fill_bulk_term_edit_form(self, b, updates):
+        "Fill in the term bulk edit form."
+        for k, v in updates.items():
+            if k == "remove parents":
+                if v:
+                    b.check("remove_parents")
+                else:
+                    b.uncheck("remove_parents")
+            elif k == "parent":
+                self._fill_tagify_field(b, "txtSetParent", v)
+            elif k == "change status":
+                if v:
+                    b.check("change_status")
+                else:
+                    b.uncheck("change_status")
+            elif k == "status":
+                # This line didn't work:
+                # iframe.choose('status', updates['status'])
+                s = updates["status"]
+                xp = "".join(
+                    [
+                        "//input[@type='radio'][@name='status']",
+                        f"[@value='{s}']",
+                        "/following-sibling::label",
+                    ]
+                )
+                labels = b.find_by_xpath(xp)
+                assert len(labels) == 1, "have matching radio button"
+                label = labels[0]
+                label.click()
+            elif k in ("add tags", "remove tags"):
+                fields = {"add tags": "txtAddTags", "remove tags": "txtRemoveTags"}
+                for tag in updates[k].split(", "):
+                    self._fill_tagify_field(b, fields[k], tag)
             else:
                 raise RuntimeError(f"unhandled key {k}")
 
@@ -291,6 +334,31 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             ac = ac.click(e)
         ac = ac.key_up(Keys.SHIFT)
         ac.perform()
+
+    def fill_reading_bulk_edit_form(self, updates=None):
+        """
+        Click a word in the reading frame, fill in the term form iframe.
+        """
+        updates = updates or {}
+        should_refresh = False
+        with self.browser.get_iframe("wordframe") as iframe:
+            time.sleep(0.4)  # Hack, test failing.
+            self._fill_bulk_term_edit_form(iframe, updates)
+            time.sleep(0.4)  # Hack, test failing.
+            iframe.find_by_css("#btnsubmit").first.click()
+            time.sleep(0.4)  # Hack, test failing.
+
+            # Only refresh the reading frame if everything was ok.
+            # Some submits will fail due to validation errors,
+            # and we want to look at them.
+            if "updated" in iframe.html:
+                should_refresh = True
+
+        # Have to refresh the content to query the dom ...
+        # Unfortunately, I can't see how to refresh without reloading
+        if should_refresh:
+            self.browser.reload()
+            time.sleep(0.2)  # Hack, test failing.
 
     def press_hotkey(self, hotkey):
         "Send a hotkey."
