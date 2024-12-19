@@ -34,6 +34,7 @@ function start_hover_mode() {
   }
 
   _hide_term_edit_form();
+  _hide_dictionaries();
   clear_newmultiterm_elements();
 
   // Refocus on window so keyboard events work.
@@ -205,8 +206,11 @@ function show_bulk_term_edit_form(count_of_terms) {
     updateSpanContent();
 }
 
-function _hide_term_edit_form() {
+function _hide_dictionaries() {
   $('.dictcontainer').hide();
+}
+
+function _hide_term_edit_form() {
   const curr_url = top.frames.wordframe.location.href;
   if (curr_url.includes('edit_term') || curr_url.includes('term_bulk_edit_form')) {
     $('#wordframeid').attr('src', '/read/empty');
@@ -325,6 +329,7 @@ let word_clicked = function(el, e) {
       show_term_edit_form(el);
     }
     else {
+      _hide_dictionaries();
       _hide_term_edit_form();
     }
     return;
@@ -337,6 +342,7 @@ let word_clicked = function(el, e) {
     start_hover_mode();
   }
   else {
+    _hide_dictionaries();
     show_bulk_term_edit_form(count_marked);
   }
 }
