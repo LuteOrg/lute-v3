@@ -1,6 +1,11 @@
 {% extends 'read/term_form_base.html' %}
 
 {% block include_term_form %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/lute-hotkey-utils.js') }}" charset="utf-8"></script>
+<script type="text/javascript">
+  const LUTE_USER_SETTINGS = {{ user_settings | safe }}
+</script>
+
 <div id="term-form-container">
     <div style="margin-bottom: 1em;">
       <i><span id="bulkUpdateCount">Updating terms</span></i>
@@ -39,6 +44,15 @@
       const first = elements.first();
       return $(first).data("lang-id");
     }
+
+    // "Save" shortcut
+    $(document).keydown(function(event) {
+      const s = get_pressed_keys_as_string(event);
+      if (s == LUTE_USER_SETTINGS.hotkey_SaveTerm) {
+        $("#btnsubmit").click();
+      }
+    });
+
   </script>      
 
 {% endblock %}
