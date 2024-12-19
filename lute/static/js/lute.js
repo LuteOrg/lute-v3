@@ -189,12 +189,29 @@ function _show_wordframe_url(url) {
   applyInitialPaneSizes();  // in resize.js
 }
 
-
 function show_term_edit_form(el) {
   const wid = parseInt(el.data('wid'));
   _show_wordframe_url(`/read/edit_term/${wid}`);
 }
 
+function show_bulk_term_edit_form(count_of_terms) {
+  const url = '/read/term_bulk_edit_form';
+
+  const wordFrame = top.frames.wordframe;
+
+  function updateSpanContent() {
+    const frameDocument = wordFrame.document;
+    const spanElement = $(frameDocument).find('#bulkUpdateCount');
+    if (spanElement.length) {
+      spanElement.text(`Updating ${count_of_terms} term(s)`);
+    }
+  }
+
+  if (!wordFrame.location.href.endsWith(url))
+    wordFrame.location.href = url;
+  else
+    updateSpanContent();
+}
 
 function show_multiword_term_edit_form(selected) {
   if (selected.length == 0)
@@ -298,24 +315,26 @@ let word_clicked = function(el, e) {
   el.removeClass('wordhover');
   save_curr_data_order(el);
 
-  // If already clicked, remove the click marker.
-  if (el.hasClass('kwordmarked')) {
-    el.removeClass('kwordmarked');
-    if ($('span.kwordmarked').length == 0) {
-      el.addClass('wordhover');
-      start_hover_mode();
-    }
-    return;
-  }
-
-  // Not already clicked.
+  // If Shift isn't held, this is a regular click.
   if (! e.shiftKey) {
     // Only one element should be marked clicked.
     $('span.kwordmarked').removeClass('kwordmarked');
+    el.addClass('kwordmarked');
+    el.removeClass('hasflash');
     show_term_edit_form(el);
+    return;
   }
-  el.addClass('kwordmarked');
-  el.removeClass('hasflash');
+
+  // Shift is held ... have 0 or more elements clicked.
+  el.toggleClass('kwordmarked');
+  const count_marked = $('span.kwordmarked').length;
+  if (count_marked == 0) {
+    el.addClass('wordhover');
+    start_hover_mode();
+  }
+  else {
+    show_bulk_term_edit_form(count_marked);
+  }
 }
 
 

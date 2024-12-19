@@ -4,6 +4,7 @@
 
 import os
 import csv
+import json
 from flask import (
     Blueprint,
     request,
@@ -12,6 +13,7 @@ from flask import (
     redirect,
     current_app,
     send_file,
+    flash,
 )
 from lute.models.language import Language
 from lute.models.term import Status
@@ -23,7 +25,11 @@ from lute.models.repositories import (
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list
 from lute.term.model import Repository, Term
-from lute.term.service import Service as TermService, TermServiceException
+from lute.term.service import (
+    Service as TermService,
+    TermServiceException,
+    BulkTermUpdateData,
+)
 from lute.db import db
 from lute.term.forms import TermForm
 import lute.utils.formutils
@@ -41,11 +47,14 @@ def index(search):
     langopts = [(lang.id, lang.name) for lang in languages]
     langopts = [(0, "(all)")] + langopts
     statuses = [s for s in db.session.query(Status).all() if s.id != Status.UNKNOWN]
+    r = Repository(db.session)
     return render_template(
         "term/index.html",
         initial_search=search,
         language_options=langopts,
         statuses=statuses,
+        tags=r.get_term_tags(),
+        in_term_index_listing=True,
     )
 
 
@@ -72,6 +81,65 @@ def datatables_active_source():
     _load_term_custom_filters(request.form, parameters)
     data = get_data_tables_list(parameters, db.session)
     return jsonify(data)
+
+
+def get_bulk_update_from_form(form):
+    "Load the BulkTermUpdateData from the _bulk_edit_form_fields.html form."
+    bud = BulkTermUpdateData()
+    term_ids = form.get("term_ids").strip()
+    if term_ids == "":
+        return bud
+    bud.term_ids = [int(tid.strip()) for tid in term_ids.split(",")]
+
+    bud.lowercase_terms = form.get("lowercase_terms", "off") == "on"
+    bud.remove_parents = form.get("remove_parents", "off") == "on"
+    pdata = []
+    if form.get("parent", "") != "":
+        pdata = json.loads(form.get("parent"))
+    if len(pdata) == 1:
+        pdata = pdata[0]
+        bud.parent_text = pdata.get("value")
+        if "id" in pdata:
+            bud.parent_id = int(pdata.get("id"))
+
+    bud.change_status = form.get("change_status", "off") == "on"
+    if "status" in form:
+        bud.status_value = int(form.get("status"))
+
+    def _get_tags(form_field_name):
+        if form.get(form_field_name, "") == "":
+            return []
+        return [td["value"] for td in json.loads(form.get(form_field_name))]
+
+    bud.add_tags = _get_tags("add_tags")
+    bud.remove_tags = _get_tags("remove_tags")
+
+    return bud
+
+
+@bp.route("/bulk_edit_from_index", methods=["POST"])
+def bulk_edit_from_index():
+    "Edit from the term index listing."
+    bud = get_bulk_update_from_form(request.form)
+    svc = TermService(db.session)
+    try:
+        svc.apply_bulk_updates(bud)
+    except TermServiceException as ex:
+        flash(f"Error: {str(ex)}", "notice")
+    return redirect("/term/index", 302)
+
+
+@bp.route("/bulk_edit_from_reading_pane", methods=["POST"])
+def bulk_edit_from_reading_pane():
+    "Reading pane updates requires special redirect."
+    bud = get_bulk_update_from_form(request.form)
+    svc = TermService(db.session)
+    try:
+        svc.apply_bulk_updates(bud)
+    except TermServiceException as ex:
+        flash(f"Error: {str(ex)}", "notice")
+        return redirect("/read/term_bulk_edit_form", 302)
+    return render_template("/read/updated.html", term_text=None)
 
 
 @bp.route("/export_terms", methods=["POST"])
@@ -287,20 +355,6 @@ def bulk_update_status():
             repo.add(term)
     repo.commit()
     return jsonify("ok")
-
-
-@bp.route("/bulk_set_parent", methods=["POST"])
-def bulk_set_parent():
-    "Set the parent for terms."
-    data = request.get_json()
-    termids = data.get("wordids")
-    parenttext = data.get("parenttext")
-    svc = TermService(db.session)
-    try:
-        svc.bulk_set_parent(parenttext, [int(tid) for tid in termids])
-        return jsonify({"success": True}), 200
-    except TermServiceException as ex:
-        return jsonify({"success": False, "reason": str(ex)}), 400
 
 
 @bp.route("/bulk_delete", methods=["POST"])
