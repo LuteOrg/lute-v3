@@ -41,14 +41,6 @@ function start_hover_mode() {
   $(window).focus();
 }
 
-function _hide_term_edit_form() {
-  $('.dictcontainer').hide();
-  const curr_url = top.frames.wordframe.location.href;
-  if (curr_url.includes('edit_term') || curr_url.includes('term_bulk_edit_form')) {
-    $('#wordframeid').attr('src', '/read/empty');
-  }
-}
-
 /* ========================================= */
 /** Interactions. */
 
@@ -213,6 +205,14 @@ function show_bulk_term_edit_form(count_of_terms) {
     updateSpanContent();
 }
 
+function _hide_term_edit_form() {
+  $('.dictcontainer').hide();
+  const curr_url = top.frames.wordframe.location.href;
+  if (curr_url.includes('edit_term') || curr_url.includes('term_bulk_edit_form')) {
+    $('#wordframeid').attr('src', '/read/empty');
+  }
+}
+
 function show_multiword_term_edit_form(selected) {
   if (selected.length == 0)
     return;
@@ -314,19 +314,23 @@ function hover_out(e) {
 let word_clicked = function(el, e) {
   el.removeClass('wordhover');
   save_curr_data_order(el);
+  el.toggleClass('kwordmarked');
 
   // If Shift isn't held, this is a regular click.
   if (! e.shiftKey) {
-    // Only one element should be marked clicked.
-    $('span.kwordmarked').removeClass('kwordmarked');
-    el.addClass('kwordmarked');
-    el.removeClass('hasflash');
-    show_term_edit_form(el);
+    // No other elements should be marked clicked.
+    $('span.kwordmarked').not(el).removeClass('kwordmarked');
+    if (el.hasClass('kwordmarked')) {
+      el.removeClass('hasflash');
+      show_term_edit_form(el);
+    }
+    else {
+      _hide_term_edit_form();
+    }
     return;
   }
 
   // Shift is held ... have 0 or more elements clicked.
-  el.toggleClass('kwordmarked');
   const count_marked = $('span.kwordmarked').length;
   if (count_marked == 0) {
     el.addClass('wordhover');
