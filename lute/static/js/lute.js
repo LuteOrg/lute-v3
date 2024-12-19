@@ -21,7 +21,7 @@ let LUTE_CURR_TERM_DATA_ORDER = -1;  // initially not set.
  * The template lute/templates/read/page_content.html calls
  * this method on reload to reset the cursor etc.
  */
-function start_hover_mode(should_clear_frames = true) {
+function start_hover_mode() {
   $('span.kwordmarked').removeClass('kwordmarked');
 
   const curr_word = $('span.word').filter(function() {
@@ -33,15 +33,20 @@ function start_hover_mode(should_clear_frames = true) {
     apply_status_class($(w));
   }
 
-  if (should_clear_frames) {
-    $('#wordframeid').attr('src', '/read/empty');
-    $('.dictcontainer').hide();
-  }
-
+  _hide_term_edit_form();
   clear_newmultiterm_elements();
 
-  // https://stackoverflow.com/questions/35022716/keydown-not-detected-until-window-is-clicked
+  // Refocus on window so keyboard events work.
+  // ref https://stackoverflow.com/questions/35022716
   $(window).focus();
+}
+
+function _hide_term_edit_form() {
+  $('.dictcontainer').hide();
+  const curr_url = top.frames.wordframe.location.href;
+  if (curr_url.includes('edit_term') || curr_url.includes('term_bulk_edit_form')) {
+    $('#wordframeid').attr('src', '/read/empty');
+  }
 }
 
 /* ========================================= */
@@ -378,7 +383,7 @@ function select_ended(el, e) {
   const selected = get_selected_in_range(selection_start_el, el);
   if (selection_start_shift_held) {
     copy_text_to_clipboard(selected.toArray());
-    start_hover_mode(false);
+    start_hover_mode();
     return;
   }
 
