@@ -3,6 +3,7 @@
 """
 
 from dataclasses import dataclass, field
+from typing import List, Optional
 from lute.models.term import Status
 from lute.models.repositories import TermRepository, TermTagRepository
 from lute.term.model import Repository
@@ -21,15 +22,15 @@ class TermServiceException(Exception):
 @dataclass
 class BulkTermUpdateData:
     "Bulk updates"
-    term_ids: list[int] = field(default_factory=list)
+    term_ids: List[int] = field(default_factory=list)
     lowercase_terms: bool = False
     remove_parents: bool = False
-    parent_id: int = None
-    parent_text: str = None
+    parent_id: Optional[int] = None
+    parent_text: Optional[str] = None
     change_status: bool = False
-    status_value: int = None
-    add_tags: list[str] = field(default_factory=list)
-    remove_tags: list[str] = field(default_factory=list)
+    status_value: Optional[int] = None
+    add_tags: List[str] = field(default_factory=list)
+    remove_tags: List[str] = field(default_factory=list)
 
 
 class Service:
