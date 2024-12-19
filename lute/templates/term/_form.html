@@ -175,10 +175,9 @@
       const frm = $('#term-form');
       const formData = frm.serialize();
       $.post(frm.attr('action'), formData, function(response) {
-        if (in_reading_frame) {
-          window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
-        }
+        window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
         window.location.href = url;
+        window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
       });
     });
 
