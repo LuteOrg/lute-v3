@@ -220,6 +220,44 @@ Feature: User can actually read and stuff.
             Tengo (1)/ /otro/ /amigo (1)/.
 
 
+    Scenario: Bulk editing terms while reading
+        Given a Spanish book "Hola" with content:
+            Tengo otro amigo.
+        When I shift click:
+            amigo
+            Tengo
+        And I edit the bulk edit form:
+            parent: gato
+            change status: true
+            status: 4
+            add tags: hello, hi
+        Then the reading pane shows:
+            Tengo (4)/ /otro/ /amigo (4)/.
+        Then the term table contains:
+            ; Tengo; gato; ; Spanish; hello, hi; Learning (4)
+            ; amigo; gato; ; Spanish; hello, hi; Learning (4)
+            ; gato; ; ; Spanish; ; Learning (4)
+
+        Given a Spanish book "Nuevo" with content:
+            Tengo otro amigo.
+        When I shift click:
+            amigo
+            otro
+        And I edit the bulk edit form:
+            remove parents: true
+            change status: true
+            status: 3
+            add tags: newtag
+            remove tags: hello, badtag
+        Then the reading pane shows:
+            Tengo (4)/ /otro (3)/ /amigo (3)/.
+        Then the term table contains:
+            ; Tengo; gato; ; Spanish; hello, hi; Learning (4)
+            ; amigo; ; ; Spanish; hi, newtag; Learning (3)
+            ; gato; ; ; Spanish; ; Learning (4)
+            ; otro; ; ; Spanish; newtag; Learning (3)
+
+
     Scenario: Up and down arrow sets status
         Given a Spanish book "Hola" with content:
             Tengo un amigo.
