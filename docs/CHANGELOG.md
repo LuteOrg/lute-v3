@@ -1,4 +1,16 @@
 
+# 3.7.0 (2024-12-20)
+
+Feature changes:
+
+* #537: add "bulk term actions" to reading screen and Term listing
+
+Fixes:
+
+* #328: apply existing term filters when reloading Term listing after editing Term
+* #531: term reference search should handle casing correctly.
+
+
 # 3.6.1 (2024-12-13)
 
 Feature changes:
