@@ -7,6 +7,31 @@ let LUTE_CURR_TERM_DATA_ORDER = -1;  // initially not set.
 
 
 /**
+ * Reset the cursor.
+ *
+ * When read/page_content.html is rendered, the current
+ * cursor styling etc is wiped off the screen, so it needs
+ * to be restored.
+ */
+function reset_cursor_marker() {
+  $('span.kwordmarked').removeClass('kwordmarked');
+
+  const curr_word = $('span.word').filter(function() {
+    return _get_order($(this)) == LUTE_CURR_TERM_DATA_ORDER;
+  });
+  if (curr_word.length == 1) {
+    const w = $(curr_word[0]);
+    $(w).addClass('wordhover');
+    apply_status_class($(w));
+  }
+
+  // Refocus on window so keyboard events work.
+  // ref https://stackoverflow.com/questions/35022716
+  $(window).focus();
+}
+
+
+/**
  * When the reading pane is first loaded, it's in "hover mode",
  * meaning that when the user hovers over a word, that word becomes
  * the "active word" -- i.e., status update keyboard shortcuts should
@@ -22,24 +47,10 @@ let LUTE_CURR_TERM_DATA_ORDER = -1;  // initially not set.
  * this method on reload to reset the cursor etc.
  */
 function start_hover_mode() {
-  $('span.kwordmarked').removeClass('kwordmarked');
-
-  const curr_word = $('span.word').filter(function() {
-    return _get_order($(this)) == LUTE_CURR_TERM_DATA_ORDER;
-  });
-  if (curr_word.length == 1) {
-    const w = $(curr_word[0]);
-    $(w).addClass('wordhover');
-    apply_status_class($(w));
-  }
-
+  reset_cursor_marker();
   _hide_term_edit_form();
   _hide_dictionaries();
   clear_newmultiterm_elements();
-
-  // Refocus on window so keyboard events work.
-  // ref https://stackoverflow.com/questions/35022716
-  $(window).focus();
 }
 
 /* ========================================= */
