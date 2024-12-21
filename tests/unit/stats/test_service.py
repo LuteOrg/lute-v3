@@ -1,6 +1,7 @@
 "Stats service test."
 
 from datetime import datetime, timedelta
+from lute.models.book import WordsRead
 from lute.db import db
 from lute.stats.service import get_chart_data, get_table_data
 from tests.utils import make_text
@@ -9,8 +10,15 @@ from tests.utils import make_text
 def make_read_text(lang, content, readdate):
     "Make and save a text."
     t = make_text(content, content, lang)
-    t.read_date = readdate
+    # t.read_date = readdate
     db.session.add(t)
+    db.session.commit()
+
+    if readdate is None:
+        return
+
+    wr = WordsRead(t, readdate, t.word_count)
+    db.session.add(wr)
     db.session.commit()
 
 

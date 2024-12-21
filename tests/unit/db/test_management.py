@@ -33,6 +33,7 @@ def test_wiping_db_clears_out_all_tables(app_context):
         "wordimages",
         "wordparents",
         "words",
+        "wordsread",
         "wordtags",
     ]
     for t in tables:

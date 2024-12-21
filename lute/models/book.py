@@ -301,6 +301,32 @@ class Text(db.Model):
         self.sentences = []
 
 
+class WordsRead(db.Model):
+    """
+    Tracks reading events for Text entities.
+    """
+
+    __tablename__ = "wordsread"
+    id = db.Column("WrID", db.Integer, primary_key=True)
+    language_id = db.Column(
+        "WrLgID", db.Integer, db.ForeignKey("languages.LgID"), nullable=False
+    )
+    tx_id = db.Column(
+        "WrTxID",
+        db.Integer,
+        db.ForeignKey("texts.TxID", ondelete="SET NULL"),
+        nullable=True,
+    )
+    read_date = db.Column("WrReadDate", db.DateTime, nullable=False)
+    word_count = db.Column("WrWordCount", db.Integer, nullable=False)
+
+    def __init__(self, text, read_date, word_count):
+        self.tx_id = text.id
+        self.language_id = text.book.language.id
+        self.read_date = read_date
+        self.word_count = word_count
+
+
 class Sentence(db.Model):
     """
     Parsed sentences for a given Text.

@@ -2,9 +2,11 @@
 Reading helpers.
 """
 
+from datetime import datetime
 import functools
 from lute.models.term import Term, Status
-from lute.models.book import Text
+from lute.models.book import Text, WordsRead
+from lute.models.repositories import BookRepository
 from lute.book.stats import Service as StatsService
 from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
@@ -18,6 +20,20 @@ class Service:
 
     def __init__(self, session):
         self.session = session
+
+    def mark_page_read(self, bookid, pagenum, mark_rest_as_known):
+        "Mark page as read, record stats, rest as known."
+        br = BookRepository(self.session)
+        book = br.find(bookid)
+        text = book.text_at_page(pagenum)
+        d = datetime.now()
+        text.read_date = d
+        w = WordsRead(text, d, text.word_count)
+        self.session.add(text)
+        self.session.add(w)
+        self.session.commit()
+        if mark_rest_as_known:
+            self.set_unknowns_to_known(text)
 
     def set_unknowns_to_known(self, text: Text):
         """

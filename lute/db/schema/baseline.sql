@@ -49,6 +49,7 @@ INSERT INTO _migrations VALUES('20240525_create_textbookmarks.sql');
 INSERT INTO _migrations VALUES('20240815_clean_up_bad_wordtags.sql');
 INSERT INTO _migrations VALUES('20241103_change_lastbackup_to_user_setting.sql');
 INSERT INTO _migrations VALUES('20241214_add_SeTextLC.sql');
+INSERT INTO _migrations VALUES('20241221_add_wordsread_table.sql');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
@@ -197,6 +198,16 @@ CREATE TABLE textbookmarks (
 	"TbTitle" TEXT NOT NULL, 
 	PRIMARY KEY ("TbID"), 
 	FOREIGN KEY("TbTxID") REFERENCES texts ("TxID") ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "wordsread" (
+	"WrID" INTEGER NOT NULL,
+        "WrLgID" INTEGER NOT NULL,
+	"WrTxID" INTEGER NULL,
+        "WrReadDate" DATETIME NOT NULL,
+        "WrWordCount" INTEGER NOT NULL,
+	PRIMARY KEY ("WrID"),
+        FOREIGN KEY("WrTxID") REFERENCES "texts" ("TxID") ON DELETE SET NULL,
+        FOREIGN KEY("WrLgID") REFERENCES "languages" ("LgID") ON UPDATE NO ACTION ON DELETE CASCADE
 );
 CREATE UNIQUE INDEX "TgText" ON "tags" ("TgText");
 CREATE UNIQUE INDEX "T2Text" ON "tags2" ("T2Text");
