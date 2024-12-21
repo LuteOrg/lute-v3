@@ -10,6 +10,31 @@ from lute.db import db
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
 
 
+def test_mark_page_read(english, app_context):
+    "Sanity check, field set and stat added."
+    b = Book()
+    b.title = "blah"
+    b.language_id = english.id
+    b.text = "Dog CAT dog cat."
+    r = Repository(db.session)
+    dbbook = r.add(b)
+    r.commit()
+
+    sql_text_read = "select * from texts where TxReadDate is not null"
+    sql_wordsread = "select * from wordsread"
+    assert_record_count_equals(sql_text_read, 0, "not read")
+    assert_record_count_equals(sql_wordsread, 0, "not read")
+
+    svc = Service(db.session)
+    svc.mark_page_read(dbbook.id, 1, True)
+    assert_record_count_equals(sql_text_read, 1, "read, text")
+    assert_record_count_equals(sql_wordsread, 1, "read, wordsread")
+
+    svc.mark_page_read(dbbook.id, 1, True)
+    assert_record_count_equals(sql_text_read, 1, "still read")
+    assert_record_count_equals(sql_wordsread, 2, "extra record added")
+
+
 def test_set_unknowns_to_known(english, app_context):
     "Unknowns (status 0) or new are set to well known."
     t = Term(english, "dog")

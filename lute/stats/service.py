@@ -10,14 +10,11 @@ def _get_data_per_lang(session):
     "Return dict of lang name to dict[date_yyyymmdd}: count"
     ret = {}
     sql = """
-    select lang, dt, sum(TxWordCount) as count
+    select lang, dt, sum(WrWordCount) as count
     from (
-      select LgName as lang, strftime('%Y-%m-%d', TxReadDate) as dt, TxWordCount
-      from texts
-      inner join books on BkID = TxBkID
-      inner join languages on LgID = BkLgID
-      where TxWordCount is not null
-      and TxReadDate is not null
+      select LgName as lang, strftime('%Y-%m-%d', WrReadDate) as dt, WrWordCount
+      from wordsread
+      inner join languages on LgID = WrLgID
     ) raw
     group by lang, dt
     """

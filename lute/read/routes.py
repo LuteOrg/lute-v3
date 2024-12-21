@@ -2,7 +2,6 @@
 /read endpoints.
 """
 
-from datetime import datetime
 from flask import Blueprint, flash, request, render_template, redirect, jsonify
 from lute.read.service import Service
 from lute.read.forms import TextForm
@@ -92,14 +91,8 @@ def page_done():
     pagenum = int(data.get("pagenum"))
     restknown = data.get("restknown")
 
-    book = _find_book(bookid)
-    text = book.text_at_page(pagenum)
-    text.read_date = datetime.now()
-    db.session.add(text)
-    db.session.commit()
     service = Service(db.session)
-    if restknown:
-        service.set_unknowns_to_known(text)
+    service.mark_page_read(bookid, pagenum, restknown)
     return jsonify("ok")
 
 

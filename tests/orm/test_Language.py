@@ -5,8 +5,9 @@ Language mapping tests.
 import json
 from lute.models.language import Language, LanguageDictionary
 from lute.models.repositories import LanguageRepository
+from lute.read.service import Service as ReadService
 from lute.db import db
-from tests.dbasserts import assert_sql_result
+from tests.dbasserts import assert_sql_result, assert_record_count_equals
 from tests.utils import make_text, add_terms
 
 
@@ -110,12 +111,16 @@ def test_delete_language_removes_book_and_terms(app_context, spanish):
 
     db.session.commit()
 
+    svc = ReadService(db.session)
+    svc.mark_page_read(t.book.id, 1, False)
+
     sqlterms = "select WoText from words order by WoText"
     sqlbook = "select BkTitle from books where BkTitle = 'hola'"
     sqldict = "select LdDictURI from languagedicts where LdDictURI = 'something?[LUTE]'"
     assert_sql_result(sqlterms, ["gato", "perro"], "initial terms")
     assert_sql_result(sqlbook, ["hola"], "initial book")
     assert_sql_result(sqldict, ["something?[LUTE]"], "dict")
+    assert_record_count_equals("select * from wordsread", 1, "saved")
 
     repo = LanguageRepository(db.session)
     repo.delete(spanish)
@@ -123,3 +128,4 @@ def test_delete_language_removes_book_and_terms(app_context, spanish):
     assert_sql_result(sqlbook, [], "book deleted")
     assert_sql_result(sqlterms, [], "terms deleted")
     assert_sql_result(sqldict, [], "dicts deleted")
+    assert_record_count_equals("select * from wordsread", 0, "deleted")
