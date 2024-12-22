@@ -314,6 +314,7 @@ def _create_app(app_config, extra_config):
     @listens_for(Pool, "connect")
     def _pragmas_on_connect(dbapi_con, con_record):  # pylint: disable=unused-argument
         dbapi_con.execute("pragma recursive_triggers = on;")
+        dbapi_con.execute("pragma foreign_keys = on;")
 
     with app.app_context():
         db.create_all()

@@ -122,8 +122,8 @@ def test_delete_language_removes_book_and_terms(app_context, spanish):
     assert_sql_result(sqldict, ["something?[LUTE]"], "dict")
     assert_record_count_equals("select * from wordsread", 1, "saved")
 
-    repo = LanguageRepository(db.session)
-    repo.delete(spanish)
+    db.session.delete(spanish)
+    db.session.commit()
 
     assert_sql_result(sqlbook, [], "book deleted")
     assert_sql_result(sqlterms, [], "terms deleted")
