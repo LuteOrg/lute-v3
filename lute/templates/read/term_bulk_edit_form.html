@@ -48,8 +48,7 @@
 
     // "Save" shortcut
     $(document).keydown(function(event) {
-      const s = get_pressed_keys_as_string(event);
-      if (s == LUTE_USER_SETTINGS.hotkey_SaveTerm) {
+      if (get_hotkey_name(event) == "hotkey_SaveTerm") {
         $("#btnsubmit").click();
       }
     });

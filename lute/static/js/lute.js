@@ -893,54 +893,53 @@ function handle_keydown (e) {
     return; // Nothing to do.
   }
 
-  // User hotkeys are stored in LUTE_USER_SETTINGS
-  // hash in global space.
-  const k = LUTE_USER_SETTINGS;  // shorthand varname.
+  const hotkey_name = get_hotkey_name(e);
+  if (hotkey_name == null)
+    return;
 
   const next_incr = _lang_is_left_to_right() ? 1 : -1;
   const prev_incr = -1 * next_incr;
 
   // Map of shortcuts to lambdas:
   let map = {
-    [k.hotkey_StartHover]: () => start_hover_mode(),
-    [k.hotkey_PrevWord]: () => _move_cursor('span.word', prev_incr),
-    [k.hotkey_NextWord]: () => _move_cursor('span.word', next_incr),
-    [k.hotkey_PrevUnknownWord]: () => _move_cursor('span.word.status0', prev_incr),
-    [k.hotkey_NextUnknownWord]: () => _move_cursor('span.word.status0', next_incr),
-    [k.hotkey_PrevSentence]: () => _move_cursor('span.word.sentencestart', prev_incr),
-    [k.hotkey_NextSentence]: () => _move_cursor('span.word.sentencestart', next_incr),
-    [k.hotkey_StatusUp]: () => increment_status_for_selected_elements(+1),
-    [k.hotkey_StatusDown]: () => increment_status_for_selected_elements(-1),
-    [k.hotkey_Bookmark]: () => handle_bookmark(),
-    [k.hotkey_CopySentence]: () => handle_copy('sentence-id'),
-    [k.hotkey_CopyPara]: () => handle_copy('paragraph-id'),
-    [k.hotkey_CopyPage]: () => handle_copy(null),
-    [k.hotkey_EditPage]: () => handle_edit_page(),
-    [k.hotkey_TranslateSentence]: () => handle_translate('sentence-id'),
-    [k.hotkey_TranslatePara]: () => handle_translate('paragraph-id'),
-    [k.hotkey_TranslatePage]: () => handle_translate(null),
-    [k.hotkey_NextTheme]: () => next_theme(),
-    [k.hotkey_ToggleHighlight]: () => toggle_highlight(),
-    [k.hotkey_ToggleFocus]: () => toggleFocus(),
-    [k.hotkey_Status1]: () => update_status_for_marked_elements(1),
-    [k.hotkey_Status2]: () => update_status_for_marked_elements(2),
-    [k.hotkey_Status3]: () => update_status_for_marked_elements(3),
-    [k.hotkey_Status4]: () => update_status_for_marked_elements(4),
-    [k.hotkey_Status5]: () => update_status_for_marked_elements(5),
-    [k.hotkey_StatusIgnore]: () => update_status_for_marked_elements(98),
-    [k.hotkey_StatusWellKnown]: () => update_status_for_marked_elements(99),
-    [k.hotkey_DeleteTerm]: () => update_status_for_marked_elements(0),
+    "hotkey_StartHover": () => start_hover_mode(),
+    "hotkey_PrevWord": () => _move_cursor('span.word', prev_incr),
+    "hotkey_NextWord": () => _move_cursor('span.word', next_incr),
+    "hotkey_PrevUnknownWord": () => _move_cursor('span.word.status0', prev_incr),
+    "hotkey_NextUnknownWord": () => _move_cursor('span.word.status0', next_incr),
+    "hotkey_PrevSentence": () => _move_cursor('span.word.sentencestart', prev_incr),
+    "hotkey_NextSentence": () => _move_cursor('span.word.sentencestart', next_incr),
+    "hotkey_StatusUp": () => increment_status_for_selected_elements(+1),
+    "hotkey_StatusDown": () => increment_status_for_selected_elements(-1),
+    "hotkey_Bookmark": () => handle_bookmark(),
+    "hotkey_CopySentence": () => handle_copy('sentence-id'),
+    "hotkey_CopyPara": () => handle_copy('paragraph-id'),
+    "hotkey_CopyPage": () => handle_copy(null),
+    "hotkey_EditPage": () => handle_edit_page(),
+    "hotkey_TranslateSentence": () => handle_translate('sentence-id'),
+    "hotkey_TranslatePara": () => handle_translate('paragraph-id'),
+    "hotkey_TranslatePage": () => handle_translate(null),
+    "hotkey_NextTheme": () => next_theme(),
+    "hotkey_ToggleHighlight": () => toggle_highlight(),
+    "hotkey_ToggleFocus": () => toggleFocus(),
+    "hotkey_Status1": () => update_status_for_marked_elements(1),
+    "hotkey_Status2": () => update_status_for_marked_elements(2),
+    "hotkey_Status3": () => update_status_for_marked_elements(3),
+    "hotkey_Status4": () => update_status_for_marked_elements(4),
+    "hotkey_Status5": () => update_status_for_marked_elements(5),
+    "hotkey_StatusIgnore": () => update_status_for_marked_elements(98),
+    "hotkey_StatusWellKnown": () => update_status_for_marked_elements(99),
+    "hotkey_DeleteTerm": () => update_status_for_marked_elements(0),
   }
 
-  const ks = get_pressed_keys_as_string(e);
-  if (ks in map) {
+  if (hotkey_name in map) {
     // Override any existing event - e.g., if "up" arrow is in the map,
     // don't scroll screen.
     e.preventDefault();
-    map[ks]();
+    map[hotkey_name]();
   }
   else {
-    // console.log('unhandled key ' + ks);
+    // console.log(`hotkey "${hotkey_name}" not found in map`);
   }
 }
 
