@@ -38,23 +38,23 @@
       <td>Status range</td>
       <td>
         <select id="filtStatusMin">
-          <option value=0>(all)</option>
-          <option value=1>New (1)</option>
-          <option value=2>New (2)</option>
-          <option value=3>Learn (3)</option>
-          <option value=4>Learn (4)</option>
-          <option value=5>Learned</option>
-          <option value=99>Well Known</option>
+          <option value="0" selected>Unknown</option>
+          <option value="1">New (1)</option>
+          <option value="2">New (2)</option>
+          <option value="3">Learn (3)</option>
+          <option value="4">Learn (4)</option>
+          <option value="5">Learned</option>
+          <option value="99">Well Known</option>
         </select>
         to
         <select id="filtStatusMax">
-          <option value=0>(all)</option>
-          <option value=1>New (1)</option>
-          <option value=2>New (2)</option>
-          <option value=3>Learn (3)</option>
-          <option value=4>Learn (4)</option>
-          <option value=5>Learned</option>
-          <option value=99>Well Known</option>
+          <option value="0">Unknown</option>
+          <option value="1">New (1)</option>
+          <option value="2">New (2)</option>
+          <option value="3">Learn (3)</option>
+          <option value="4">Learn (4)</option>
+          <option value="5">Learned</option>
+          <option value="99" selected>Well Known</option>
         </select>
       </td>
     </tr>
@@ -344,9 +344,6 @@
     store = JSON.parse(fs);
     $('#filterControls').css('display', store.filtDisplay);
 
-    if (store.filtDisplay == 'none')
-      return;
-
     $('#showHideFilters').prop('src', "{{ url_for('static', filename='icn/minus-button.png') }}");
     $('#filtLanguage').val(parseInt(store.filtLanguage ?? '0'));
     $('#filtParentsOnly').prop('checked', store.filtParentsOnly ?? false);
@@ -354,8 +351,8 @@
       $('#filtAgeMin').val(parseInt(store.filtAgeMin));
     if ((store.filtAgeMax ?? '') != '')
     $('#filtAgeMax').val(parseInt(store.filtAgeMax));
-    $('#filtStatusMin').val(parseInt(store.filtStatusMin));
-    $('#filtStatusMax').val(parseInt(store.filtStatusMax));
+    $('#filtStatusMin').val(parseInt(store.filtStatusMin ?? '1'));
+    $('#filtStatusMax').val(parseInt(store.filtStatusMax ?? '99'));
     $('#filtIncludeIgnored').prop('checked', store.filtIncludeIgnored);
   };
   
@@ -364,8 +361,7 @@
     const is_hidden = (fc.css('display') == 'none');
     const new_src = is_hidden ? "{{ url_for('static', filename='icn/minus-button.png') }}" : "{{ url_for('static', filename='icn/plus-button.png') }}";
     $('#showHideFilters').prop('src', new_src);
-    if (! is_hidden)
-      handle_clear_filters();
+    handle_clear_filters();
     fc.css('display', is_hidden ? 'block' : 'none');
     handle_filter_update();
   };
@@ -375,8 +371,8 @@
     $('#filtParentsOnly').prop('checked', false);
     $('#filtAgeMin').val('');
     $('#filtAgeMax').val('');
-    $('#filtStatusMin').val(0);
-    $('#filtStatusMax').val(0);
+    $('#filtStatusMin').val(1);
+    $('#filtStatusMax').val(99);
     $('#filtIncludeIgnored').prop('checked', false);
     handle_filter_update();
   };
