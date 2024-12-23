@@ -366,9 +366,24 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
     def press_hotkey(self, hotkey):
         "Send a hotkey."
+        key_to_code_map = {
+            "1": "Digit1",
+            "2": "Digit2",
+            "3": "Digit3",
+            "4": "Digit4",
+            "5": "Digit5",
+            "arrowdown": "ArrowDown",
+            "arrowup": "ArrowUp",
+            "h": "KeyH",
+            "i": "KeyI",
+            "m": "KeyM",
+            "w": "KeyW",
+        }
+        if hotkey not in key_to_code_map:
+            raise RuntimeError(f"Missing {hotkey} in acceptance test map")
         event_parts = [
             "type: 'keydown'",
-            f"key: '{hotkey.lower()}'",
+            f"code: '{key_to_code_map[hotkey]}'",
         ]
         if hotkey in ["C", "T"]:
             event_parts.append("shiftKey: true")
