@@ -35,7 +35,11 @@ from lute.parse.registry import init_parser_plugins, supported_parsers
 
 from lute.models.book import Book
 from lute.models.language import Language
-from lute.settings.current import refresh_global_settings, current_settings
+from lute.settings.current import (
+    refresh_global_settings,
+    current_settings,
+    current_hotkeys,
+)
 from lute.models.repositories import UserSettingRepository
 from lute.book.stats import Service as StatsService
 
@@ -123,6 +127,7 @@ def _add_base_routes(app, app_config):
             "backup_last_display_date": bs.last_backup_display_date,
             "backup_time_since": bs.time_since_last_backup,
             "user_settings": json.dumps(current_settings),
+            "user_hotkeys": json.dumps(current_hotkeys),
         }
         return ret
 
