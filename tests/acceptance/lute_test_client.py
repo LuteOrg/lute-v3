@@ -259,7 +259,9 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         self.visit("/")
         self.browser.find_by_css("#menu_terms").mouse_over()
         self.browser.find_by_id("term_index").first.click()
-        css = "#termtable tbody tr"
+
+        # clear any filters!
+        self.browser.find_by_id("showHideFilters").first.click()
 
         # The last column of the table is the "date added", but that's
         # a hassle to check, so ignore it.
@@ -271,8 +273,10 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                 return ret
             return "; ".join(rowtext[:-1]).strip()
 
+        css = "#termtable tbody tr"
         rows = list(self.browser.find_by_css(css))
-        return "\n".join([_to_string(row) for row in rows])
+        rowstring = [_to_string(row) for row in rows]
+        return "\n".join(rowstring)
 
     ################################3
     # Reading/rendering
