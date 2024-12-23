@@ -12,16 +12,26 @@ from lute.models.setting import UserSetting
 # The current user settings, key/value dict.
 current_settings = {}
 
+# Current user hotkey mappings, mapping to mapping_name dict.
+current_hotkeys = {}
+
 
 def refresh_global_settings(session):
     "Refresh all settings dictionary."
     # Have to reload to not mess up any references
     # (e.g. during testing).
     current_settings.clear()
+    current_hotkeys.clear()
 
     settings = session.query(UserSetting).all()
     for s in settings:
         current_settings[s.key] = s.value
+
+    hotkeys = [
+        s for s in settings if s.key.startswith("hotkey_") and (s.value or "") != ""
+    ]
+    for h in hotkeys:
+        current_hotkeys[h.value] = h.key
 
     # Convert some ints into bools.
     boolkeys = [
