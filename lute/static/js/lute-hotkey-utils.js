@@ -12,7 +12,10 @@ function get_pressed_keys_as_string(event) {
   if (event.altKey) keys.push('alt');
   if (event.metaKey) keys.push('meta');
 
-  keys.push(event.code);
+  let code = event.code ?? event.originalEvent?.code;
+  // console.log(`event.code = ${code}`);
+  // console.log('event = ', event)
+  keys.push(code);
   const ret = keys.join('+');
   // console.log(`got hotkey = ${ret}`);
   return ret;
@@ -45,7 +48,6 @@ function _legacy_pressed_key_string(event) {
   };
 
   if (event.key == null) {
-    // window.alert("no key for event?");
     return null;
   }
 
@@ -55,7 +57,7 @@ function _legacy_pressed_key_string(event) {
 
   keys.push(actual_key);
   const ret = keys.join('+');
-  // console.log(`got hotkey = ${ret}`);
+  // console.log(`got legacy hotkey = ${ret}`);
   return ret;
 }
 
@@ -70,11 +72,12 @@ function _legacy_pressed_key_string(event) {
  * Returns null if no match found.
  */
 function get_hotkey_name(event) {
-  let s = get_pressed_keys_as_string(event);
+  const s = get_pressed_keys_as_string(event);
   if (s in LUTE_USER_HOTKEYS)
     return LUTE_USER_HOTKEYS[s];
-  s = _legacy_pressed_key_string(event);
-  if (s in LUTE_USER_HOTKEYS)
-    return LUTE_USER_HOTKEYS[s];
+  const legacy_s = _legacy_pressed_key_string(event);
+  if (legacy_s in LUTE_USER_HOTKEYS)
+    return LUTE_USER_HOTKEYS[legacy_s];
+  // console.log(`No match for hotkey ${s} or legacy hotkey ${legacy_s}`);
   return null;
 }
