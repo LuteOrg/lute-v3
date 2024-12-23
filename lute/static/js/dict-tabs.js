@@ -250,8 +250,8 @@ class DictButton extends LookupButton {
 
     let url = this._get_lookup_url(dicturl, text);
 
-    const is_bing = (dicturl.indexOf('www.bing.com') != -1);
-    if (is_bing) {
+    const is_bing_image_search = (dicturl.indexOf('www.bing.com/images') != -1);
+    if (is_bing_image_search) {
       // TODO handle_image_lookup_separately: don't mix term lookups with image lookups.
       let use_text = text;
       const binghash = dicturl.replace('https://www.bing.com/images/search?', '');
