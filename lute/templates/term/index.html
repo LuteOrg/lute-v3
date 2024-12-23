@@ -344,9 +344,6 @@
     store = JSON.parse(fs);
     $('#filterControls').css('display', store.filtDisplay);
 
-    if (store.filtDisplay == 'none')
-      return;
-
     $('#showHideFilters').prop('src', "{{ url_for('static', filename='icn/minus-button.png') }}");
     $('#filtLanguage').val(parseInt(store.filtLanguage ?? '0'));
     $('#filtParentsOnly').prop('checked', store.filtParentsOnly ?? false);
@@ -364,8 +361,7 @@
     const is_hidden = (fc.css('display') == 'none');
     const new_src = is_hidden ? "{{ url_for('static', filename='icn/minus-button.png') }}" : "{{ url_for('static', filename='icn/plus-button.png') }}";
     $('#showHideFilters').prop('src', new_src);
-    if (! is_hidden)
-      handle_clear_filters();
+    handle_clear_filters();
     fc.css('display', is_hidden ? 'block' : 'none');
     handle_filter_update();
   };
