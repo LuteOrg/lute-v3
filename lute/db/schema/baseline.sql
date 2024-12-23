@@ -50,6 +50,7 @@ INSERT INTO _migrations VALUES('20240815_clean_up_bad_wordtags.sql');
 INSERT INTO _migrations VALUES('20241103_change_lastbackup_to_user_setting.sql');
 INSERT INTO _migrations VALUES('20241214_add_SeTextLC.sql');
 INSERT INTO _migrations VALUES('20241221_add_wordsread_table.sql');
+INSERT INTO _migrations VALUES('20241221_clean_up_missing_relationships.sql');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,

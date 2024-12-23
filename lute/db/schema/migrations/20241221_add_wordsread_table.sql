@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS "wordsread" (
 );
 
 -- load initial data.
-insert into wordsread (WrTxID, WrReadDate, WrWordCount)
-select txid, txreaddate, txwordcount from texts where txreaddate is not null;
+insert into wordsread (WrLgID, WrTxID, WrReadDate, WrWordCount)
+select bklgid, txid, txreaddate, txwordcount from texts inner join books on bkid=txbkid where txreaddate is not null;
