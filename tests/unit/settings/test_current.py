@@ -23,5 +23,5 @@ def test_hotkey_strings_mapped_to_name(app_context):
     refresh_global_settings(db.session)
     hotkey_names = current_hotkeys.values()
     assert "hotkey_Status5" in hotkey_names, "this is set by default"
-    assert current_hotkeys["5"] == "hotkey_Status5", "mapped"
+    assert current_hotkeys["Digit5"] == "hotkey_Status5", "mapped"
     assert "" not in current_hotkeys, "No blank keyboard shortcuts"
