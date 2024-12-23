@@ -41,6 +41,9 @@
 
 <script>
 
+  // Check any duplicates.  All of the keyboard shortcuts are rendered
+  // into javascript as a dict, shortcut_string => shortcut_name, so
+  // each non-blank shortcut must be unique.
   let _check_dups = function() {
     let values = {};
 
