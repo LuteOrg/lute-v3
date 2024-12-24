@@ -426,11 +426,48 @@ def when_click_word(luteclient, word):
     luteclient.click_word(word)
 
 
+@then(parsers.parse('the reading page term form shows term "{text}"'))
+def then_reading_page_term_form_iframe_shows_term(luteclient, text):
+    "Have to get and read the iframe content, it's not in the main browser page."
+    with luteclient.browser.get_iframe("wordframe") as iframe:
+        time.sleep(0.4)  # Hack, test failing.
+        term_field = iframe.find_by_css("#text").first
+        zws = "\u200B"
+        val = term_field.value.replace(zws, "")
+        assert val == text, "check field value"
+
+
+@then("the bulk edit term form is shown")
+def then_reading_page_bulk_edit_term_form_is_shown(luteclient):
+    "Check content."
+    then_reading_page_term_form_iframe_contains(luteclient, "Updating")
+
+
+@then("the term form is hidden")
+def then_reading_page_term_form_is_hidden(luteclient):
+    "Set to blankn"
+    iframe_element = luteclient.browser.find_by_id("wordframeid").first
+    iframe_src = iframe_element["src"]
+    assert iframe_src == "about:blank"
+
+
 @when(parsers.parse("I shift click:\n{words}"))
 def shift_click_terms(luteclient, words):
     "Shift-click"
     words = words.split("\n")
     luteclient.shift_click_words(words)
+
+
+@when(parsers.parse('I shift-drag from "{wstart}" to "{wend}"'))
+def shift_drag(luteclient, wstart, wend):
+    "shift-drag highlights multiple words, copies to clipboard."
+    luteclient.shift_drag(wstart, wend)
+
+
+@when(parsers.parse('I drag from "{wstart}" to "{wend}"'))
+def drag(luteclient, wstart, wend):
+    "shift-drag highlights multiple words, copies to clipboard."
+    luteclient.drag(wstart, wend)
 
 
 @when(parsers.parse('I click "{word}" and press hotkey "{hotkey}"'))
