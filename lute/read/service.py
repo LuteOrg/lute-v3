@@ -112,6 +112,32 @@ class Service:
 
         return paragraphs
 
+    def _sort_components(self, term, components):
+        "Sort components by min position in string and length."
+        component_and_pos = []
+        for c in components:
+            c_indices = [
+                loc[1] for loc in get_string_indexes([c.text_lc], term.text_lc)
+            ]
+
+            # Sometimes the components aren't found
+            # in the string, which makes no sense ...
+            # ref https://github.com/LuteOrg/lute-v3/issues/474
+            if len(c_indices) > 0:
+                component_and_pos.append([c, min(c_indices)])
+
+        def compare(a, b):
+            # Lowest position (closest to front of string) sorts first.
+            if a[1] != b[1]:
+                return -1 if (a[1] < b[1]) else 1
+            # Longest sorts first.
+            alen = len(a[0].text)
+            blen = len(b[0].text)
+            return -1 if (alen > blen) else 1
+
+        component_and_pos.sort(key=functools.cmp_to_key(compare))
+        return [c[0] for c in component_and_pos]
+
     def get_popup_data(self, termid):
         "Get popup data, or None if popup shouldn't be shown."
         term = self.session.get(Term, termid)
@@ -119,7 +145,7 @@ class Service:
         components = [
             c
             for c in rs.find_all_Terms_in_string(term.text, term.language)
-            if c.id != term.id
+            if c.id != term.id and c.status != Status.UNKNOWN
         ]
 
         def has_popup_data(cterm):
@@ -138,7 +164,7 @@ class Service:
         def make_array(t):
             ret = {
                 "term": t.text,
-                "roman": t.romanization,
+                "roman": (t.romanization or "").strip(),
                 "trans": (t.translation or "").strip(),
                 "tags": [tt.text for tt in t.term_tags],
             }
@@ -153,9 +179,11 @@ class Service:
             if translation == ptrans:
                 parent_data[0]["trans"] = ""
 
-        images = [term.get_current_image()] if term.get_current_image() else []
-        pimages = [p.get_current_image() for p in term.parents if p.get_current_image()]
-        images.extend(pimages)
+        images = [
+            t.get_current_image()
+            for t in [term, *term.parents]
+            if t.get_current_image()
+        ]
         # DISABLED CODE: Don't include component images in the hover for now,
         # it can get confusing!
         # ref https://github.com/LuteOrg/lute-v3/issues/355
@@ -164,31 +192,13 @@ class Service:
         #         images.append(c.get_current_image())
         images = list(set(images))
 
-        def sort_components(components):
-            # Sort components by min position in string and length.
-            component_and_pos = []
-            for c in components:
-                c_indices = [
-                    loc[1] for loc in get_string_indexes([c.text_lc], term.text_lc)
-                ]
+        component_data = [
+            make_array(c) for c in self._sort_components(term, components)
+        ]
 
-                # Sometimes the components aren't found
-                # in the string, which makes no sense ...
-                # ref https://github.com/LuteOrg/lute-v3/issues/474
-                if len(c_indices) > 0:
-                    component_and_pos.append([c, min(c_indices)])
-
-            def compare(a, b):
-                # Lowest position (closest to front of string) sorts first.
-                if a[1] != b[1]:
-                    return -1 if (a[1] < b[1]) else 1
-                # Longest sorts first.
-                alen = len(a[0].text)
-                blen = len(b[0].text)
-                return -1 if (alen > blen) else 1
-
-            component_and_pos.sort(key=functools.cmp_to_key(compare))
-            return [c[0] for c in component_and_pos]
+        def arr_has_popup_data(arr):
+            checks = [arr["roman"] != "", arr["trans"] != "", len(arr["tags"]) > 0]
+            return len([b for b in checks if b]) > 0
 
         ret = {
             "term": term,
@@ -196,9 +206,9 @@ class Service:
             "term_tags": [tt.text for tt in term.term_tags],
             "term_translation": translation,
             "term_images": images,
-            "parentdata": parent_data,
+            "parentdata": [p for p in parent_data if arr_has_popup_data(p)],
             "parentterms": ", ".join([p.text for p in term.parents]),
-            "components": [make_array(c) for c in sort_components(components)],
+            "components": [c for c in component_data if arr_has_popup_data(c)],
         }
         # print(ret, flush=True)
         return ret

@@ -83,6 +83,26 @@ def test_term_with_no_parents(spanish, app_context, service):
     assert d["parentterms"] == "", "no parents"
 
 
+def test_parent_not_shown_if_has_no_useful_data(spanish, app_context, service):
+    "No need for dup data"
+    t = Term(spanish, "gato")
+    p = Term(spanish, "perro")
+    p.translation = "cat"
+    t.parents.append(p)
+    db.session.add(t)
+    db.session.commit()
+
+    d = service.get_popup_data(t.id)
+    assert d["term_translation"] == "cat", "trans promoted"
+    assert len(d["parentdata"]) == 0, "no data"
+
+    p.romanization = "hello"
+    db.session.add(p)
+    db.session.commit()
+    d = service.get_popup_data(t.id)
+    assert len(d["parentdata"]) == 1, "some data"
+
+
 def test_single_parent_translation_moved_to_term_if_term_translation_blank(
     spanish, app_context, service
 ):
@@ -90,6 +110,7 @@ def test_single_parent_translation_moved_to_term_if_term_translation_blank(
     t = Term(spanish, "gato")
     p = Term(spanish, "perro")
     p.translation = "cat"
+    p.romanization = "hello"  # need extra data
     t.parents.append(p)
     db.session.add(t)
     db.session.commit()
@@ -107,6 +128,7 @@ def test_single_parent_translation_removed_if_same_as_child(
     t.translation = "cat"
     p = Term(spanish, "perro")
     p.translation = "cat"
+    p.romanization = "hello"  # need extra data
     t.parents.append(p)
     db.session.add(t)
     db.session.commit()
@@ -148,7 +170,7 @@ def test_parent_data_returned(spanish, app_context, service):
     d = service.get_popup_data(t.id)
     expected_p_data = {
         "term": "perro",
-        "roman": None,
+        "roman": "",
         "trans": "kitty",
         "tags": [],
     }
@@ -170,8 +192,8 @@ def test_parent_data_always_added_if_multiple_parents(spanish, app_context, serv
     db.session.commit()
 
     d = service.get_popup_data(t.id)
-    expected_p1_data = {"term": "perro", "roman": None, "trans": "kitty", "tags": []}
-    expected_p2_data = {"term": "hombre", "roman": None, "trans": "kitteh", "tags": []}
+    expected_p1_data = {"term": "perro", "roman": "", "trans": "kitty", "tags": []}
+    expected_p2_data = {"term": "hombre", "roman": "", "trans": "kitteh", "tags": []}
     expected = [expected_p1_data, expected_p2_data]
     assert d["parentdata"] == expected, "extra parent data added"
     assert d["parentterms"] == "perro, hombre", "parents"
@@ -211,17 +233,25 @@ def test_single_term_not_included_in_own_components(spanish, app_context, servic
     assert d["components"] == [], "no components"
 
 
-def test_component_without_translation_still_returned(spanish, app_context, service):
+def test_component_without_useful_data_not_returned(spanish, app_context, service):
     "Component word is returned."
     t = Term(spanish, "un gato")
     t.translation = "a cat"
+    g = Term(spanish, "gato")
     db.session.add(t)
-    make_terms([("gato", "")], spanish)
+    db.session.add(g)
     db.session.commit()
 
     d = service.get_popup_data(t.id)
-    expected = {"roman": None, "tags": [], "term": "gato", "trans": ""}
-    assert d["components"][0] == expected, "component data"
+    assert len(d["components"]) == 0, "no component data"
+
+    g.translation = "something"
+    db.session.add(g)
+    db.session.commit()
+    d = service.get_popup_data(t.id)
+    assert len(d["components"]) == 1, "have data"
+    expected = {"roman": "", "tags": [], "term": "gato", "trans": "something"}
+    assert d["components"][0] == expected, "check"
 
 
 def test_component_word_with_translation_returned(spanish, app_context, service):
