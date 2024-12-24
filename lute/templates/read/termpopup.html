@@ -18,8 +18,8 @@
 <p><i>{{ term.romanization }}</i></p>
 {% endif %}
 
-{% for img in term_images %}
-<img class="tooltip-image" src="{{ img }}" />
+{% for img, tooltip in term_images.items() %}
+<img class="tooltip-image" src="{{ img }}" tooltip="{{ tooltip }}"/>
 {% endfor %}
 
 {% if term_translation != "" %}

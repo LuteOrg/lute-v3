@@ -103,6 +103,31 @@ def test_parent_not_shown_if_has_no_useful_data(spanish, app_context, service):
     assert len(d["parentdata"]) == 1, "some data"
 
 
+def test_images_combined_in_popup(spanish, app_context, service):
+    "combine images as needed."
+    t = Term(spanish, "gato")
+    t.set_current_image("gato.jpg")
+    p = Term(spanish, "perro")
+    t.parents.append(p)
+    db.session.add(t)
+    db.session.commit()
+
+    d = service.get_popup_data(t.id)
+    assert d["term_images"] == {"gato.jpg": "gato"}
+
+    p.set_current_image("perro.jpg")
+    db.session.add(p)
+    db.session.commit()
+    d = service.get_popup_data(t.id)
+    assert d["term_images"] == {"gato.jpg": "gato", "perro.jpg": "perro"}
+
+    p.set_current_image("gato.jpg")
+    db.session.add(p)
+    db.session.commit()
+    d = service.get_popup_data(t.id)
+    assert d["term_images"] == {"gato.jpg": "gato, perro"}
+
+
 def test_single_parent_translation_moved_to_term_if_term_translation_blank(
     spanish, app_context, service
 ):
