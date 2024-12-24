@@ -5,6 +5,9 @@
     ({{ parentterms }})
     {% endif %}
   </b>
+  {% for t in term_tags %}
+  <span class="termpopup-tag">{{ t }}</span>
+  {% endfor %}
 </p>
 
 {% if flashmsg %}
@@ -19,74 +22,48 @@
 <img class="tooltip-image" src="{{ img }}" />
 {% endfor %}
 
-{% if term.translation %}
-<p>{{ term.translation | replace("\n", '<br />') | safe }}</p>
+{% if term_translation != "" %}
+<p>{{ term_translation | replace("\n", '<br />') | safe }}</p>
 {% endif %}
 
 <p>
-  {% for t in term_tags %}
-  <span class="termpopup-tag">{{ t }}</span>
-  {% endfor %}
 </p>
 
 {% if parentdata | length > 0 %}
-
-<table>
-
-  {% if componentdata | length > 0 %}
-  <tr><td>Parents</td></tr>
-  {% endif %}
-
+<div style="margin-top: 1.5em;">
   {% for p in parentdata %}
-  <tr>
-    <td style="vertical-align: top;">
-      <b>{{ p.term }}</b>
-      {% if p.roman %}
-      <br /><i>({{ p.roman }})</i>
-      {% endif %}
-    </td>
-    <td style="vertical-align: top;">
-      {{ p.trans | replace("\n", '<br />') | safe }}
-      <p>
-        {% for t in p.tags %}
-        <span class="termpopup-tag">{{ t }}</span>
-        {% endfor %}
-      </p>
-    </td>
-  </tr>
+  <p>
+    <b>{{ p.term }}</b>
+    {% if p.roman %}<i>({{ p.roman }})</i>{% endif %}
+    {% for t in p.tags %}
+    <span class="termpopup-tag">{{ t }}</span>
+    {% endfor %}
+    {% if p.trans != "" %}
+    <br />
+    {{ p.trans | replace("\n", '<br />') | safe }}
+    {% endif %}
+  </p>
   {% endfor %}
-
-</table>
-
+</div>
 {% endif %}
 
 {% if componentdata | length > 0 %}
 
-<table>
-
-  {% if parentdata | length > 0 %}
-  <tr><td>Components</td></tr>
-  {% endif %}
+<div style="margin-top: 1.5em;">
+  <p><i>Components</i></p>
 
   {% for p in componentdata %}
-  <tr>
-    <td style="vertical-align: top;">
-      <b>{{ p.term }}</b>
-      {% if p.roman %}
-      <br /><i>({{ p.roman }})</i>
-      {% endif %}
-    </td>
-    <td style="vertical-align: top;">
-      {{ p.trans | replace("\n", '<br />') | safe }}
-      <p>
-        {% for t in p.tags %}
-        <span class="termpopup-tag">{{ t }}</span>
-        {% endfor %}
-      </p>
-    </td>
-  </tr>
+  <p>
+    <b>{{ p.term }}</b>
+    {% if p.roman %}<i>({{ p.roman }})</i>{% endif %}
+    {% for t in p.tags %}
+    <span class="termpopup-tag">{{ t }}</span>
+    {% endfor %}
+    {% if p.trans != "" %}
+    <br />
+    {{ p.trans | replace("\n", '<br />') | safe }}
+    {% endif %}
+  </p>
   {% endfor %}
-
-</table>
-
+</div>
 {% endif %}

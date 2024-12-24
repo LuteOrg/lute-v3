@@ -243,6 +243,7 @@ def term_popup(termid):
         term=d["term"],
         flashmsg=d["flashmsg"],
         term_tags=d["term_tags"],
+        term_translation=d["term_translation"],
         term_images=d["term_images"],
         parentdata=d["parentdata"],
         parentterms=d["parentterms"],
