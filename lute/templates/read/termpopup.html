@@ -34,7 +34,7 @@
   {% for p in parentdata %}
   <p>
     <b>{{ p.term }}</b>
-    {% if p.roman %}<i>({{ p.roman }})</i>{% endif %}
+    {% if p.roman != "" %}<i>({{ p.roman }})</i>{% endif %}
     {% for t in p.tags %}
     <span class="termpopup-tag">{{ t }}</span>
     {% endfor %}
@@ -55,7 +55,7 @@
   {% for p in componentdata %}
   <p>
     <b>{{ p.term }}</b>
-    {% if p.roman %}<i>({{ p.roman }})</i>{% endif %}
+    {% if p.roman != "" %}<i>({{ p.roman }})</i>{% endif %}
     {% for t in p.tags %}
     <span class="termpopup-tag">{{ t }}</span>
     {% endfor %}
