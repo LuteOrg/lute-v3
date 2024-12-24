@@ -2,6 +2,7 @@
 Reading helpers.
 """
 
+from collections import defaultdict
 from datetime import datetime
 import functools
 from lute.models.term import Term, Status
@@ -112,6 +113,20 @@ class Service:
 
         return paragraphs
 
+    def _get_popup_image_data(self, terms):
+        "Get images"
+        # Don't include component images in the hover for now,
+        # it can get confusing!
+        # ref https://github.com/LuteOrg/lute-v3/issues/355
+        images = [
+            (t.get_current_image(), t.text) for t in terms if t.get_current_image()
+        ]
+        imageresult = defaultdict(list)
+        for key, value in images:
+            imageresult[key].append(value)
+        # Convert lists to comma-separated strings
+        return {k: ", ".join(v) for k, v in imageresult.items()}
+
     def _sort_components(self, term, components):
         "Sort components by min position in string and length."
         component_and_pos = []
@@ -179,19 +194,6 @@ class Service:
             if translation == ptrans:
                 parent_data[0]["trans"] = ""
 
-        images = [
-            t.get_current_image()
-            for t in [term, *term.parents]
-            if t.get_current_image()
-        ]
-        # DISABLED CODE: Don't include component images in the hover for now,
-        # it can get confusing!
-        # ref https://github.com/LuteOrg/lute-v3/issues/355
-        # for c in components:
-        #     if c.get_current_image():
-        #         images.append(c.get_current_image())
-        images = list(set(images))
-
         component_data = [
             make_array(c) for c in self._sort_components(term, components)
         ]
@@ -205,7 +207,7 @@ class Service:
             "flashmsg": term.get_flash_message(),
             "term_tags": [tt.text for tt in term.term_tags],
             "term_translation": translation,
-            "term_images": images,
+            "term_images": self._get_popup_image_data([term, *term.parents]),
             "parentdata": [p for p in parent_data if arr_has_popup_data(p)],
             "parentterms": ", ".join([p.text for p in term.parents]),
             "components": [c for c in component_data if arr_has_popup_data(c)],
