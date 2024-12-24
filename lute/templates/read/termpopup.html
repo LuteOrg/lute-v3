@@ -22,8 +22,8 @@
 <img class="tooltip-image" src="{{ img }}" />
 {% endfor %}
 
-{% if term.translation %}
-<p>{{ term.translation | replace("\n", '<br />') | safe }}</p>
+{% if term_translation != "" %}
+<p>{{ term_translation | replace("\n", '<br />') | safe }}</p>
 {% endif %}
 
 <p>
@@ -38,7 +38,7 @@
     {% for t in p.tags %}
     <span class="termpopup-tag">{{ t }}</span>
     {% endfor %}
-    {% if p.trans != "-" %}
+    {% if p.trans != "" %}
     <br />
     {{ p.trans | replace("\n", '<br />') | safe }}
     {% endif %}
@@ -59,7 +59,7 @@
     {% for t in p.tags %}
     <span class="termpopup-tag">{{ t }}</span>
     {% endfor %}
-    {% if p.trans != "-" %}
+    {% if p.trans != "" %}
     <br />
     {{ p.trans | replace("\n", '<br />') | safe }}
     {% endif %}
