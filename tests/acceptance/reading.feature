@@ -220,6 +220,34 @@ Feature: User can actually read and stuff.
             Tengo (1)/ /otro/ /amigo (1)/.
 
 
+    Scenario: Edit forms are shown at appropriate times
+        Given a Spanish book "Hola" with content:
+            Tengo un amigo y una bebida.
+
+        When I click "amigo"
+        Then the reading page term form shows term "amigo"
+        When I shift-drag from "Tengo" to "un"
+        Then the reading page term form shows term "amigo"
+
+        When I shift click:
+            una
+            bebida
+        Then the bulk edit term form is shown
+        When I press hotkey "1"
+        Then the term form is hidden
+
+        When I drag from "una" to "bebida"
+        Then the reading page term form shows term "una bebida"
+
+        When I press hotkey "escape"
+        Then the term form is hidden
+
+        When I drag from "una" to "bebida"
+        Then the reading page term form shows term "una bebida"
+        When I shift-drag from "Tengo" to "un"
+        Then the reading page term form shows term "una bebida"
+
+
     Scenario: Bulk editing terms while reading
         Given a Spanish book "Hola" with content:
             Tengo otro amigo.
