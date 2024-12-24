@@ -83,10 +83,26 @@ def test_term_with_no_parents(spanish, app_context, service):
     assert d["parentterms"] == "", "no parents"
 
 
-def test_single_parent_data_not_added_if_same_translation(
+def test_single_parent_translation_moved_to_term_if_term_translation_blank(
     spanish, app_context, service
 ):
-    "Extra data added for display."
+    "No need for dup data"
+    t = Term(spanish, "gato")
+    p = Term(spanish, "perro")
+    p.translation = "cat"
+    t.parents.append(p)
+    db.session.add(t)
+    db.session.commit()
+
+    d = service.get_popup_data(t.id)
+    assert d["term_translation"] == "cat", "trans promoted"
+    assert d["parentdata"][0]["trans"] == "", "moved up"
+
+
+def test_single_parent_translation_removed_if_same_as_child(
+    spanish, app_context, service
+):
+    "No need for dup data"
     t = Term(spanish, "gato")
     t.translation = "cat"
     p = Term(spanish, "perro")
@@ -96,13 +112,30 @@ def test_single_parent_data_not_added_if_same_translation(
     db.session.commit()
 
     d = service.get_popup_data(t.id)
-    assert d["parentdata"] == [], "no extra parent data"
-    assert d["parentterms"] == "perro", "one parent"
+    assert d["term_translation"] == "cat", "trans promoted"
+    assert d["parentdata"][0]["trans"] == "", "moved up"
 
 
-def test_parent_data_added_if_parent_translation_is_different(
+def test_multiple_parents_translations_left_alone_even_if_blank(
     spanish, app_context, service
 ):
+    "No need for dup data"
+    t = Term(spanish, "gato")
+    p = Term(spanish, "perro")
+    p.translation = "cat"
+    p2 = Term(spanish, "otro")
+    p2.translation = "cat"
+    t.parents.append(p)
+    t.parents.append(p2)
+    db.session.add(t)
+    db.session.commit()
+
+    d = service.get_popup_data(t.id)
+    assert d["term_translation"] == "", "still blank"
+    assert d["parentdata"][0]["trans"] == "cat", "not moved up"
+
+
+def test_parent_data_returned(spanish, app_context, service):
     "Extra data added for display."
     t = Term(spanish, "gato")
     t.translation = "cat"
@@ -178,7 +211,7 @@ def test_single_term_not_included_in_own_components(spanish, app_context, servic
     assert d["components"] == [], "no components"
 
 
-def test_component_without_translation_not_returned(spanish, app_context, service):
+def test_component_without_translation_still_returned(spanish, app_context, service):
     "Component word is returned."
     t = Term(spanish, "un gato")
     t.translation = "a cat"
@@ -187,7 +220,8 @@ def test_component_without_translation_not_returned(spanish, app_context, servic
     db.session.commit()
 
     d = service.get_popup_data(t.id)
-    assert d["components"] == [], "no data"
+    expected = {"roman": None, "tags": [], "term": "gato", "trans": ""}
+    assert d["components"][0] == expected, "component data"
 
 
 def test_component_word_with_translation_returned(spanish, app_context, service):

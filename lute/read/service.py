@@ -115,6 +115,12 @@ class Service:
     def get_popup_data(self, termid):
         "Get popup data, or None if popup shouldn't be shown."
         term = self.session.get(Term, termid)
+        rs = RenderService(self.session)
+        components = [
+            c
+            for c in rs.find_all_Terms_in_string(term.text, term.language)
+            if c.id != term.id
+        ]
 
         def has_popup_data(cterm):
             return (
@@ -124,27 +130,39 @@ class Service:
                 or len(cterm.term_tags) != 0
             )
 
-        if not has_popup_data(term) and len(term.parents) == 0:
+        if not has_popup_data(term) and len(term.parents) == 0 and len(components) == 0:
             return None
 
-        term_tags = [tt.text for tt in term.term_tags]
+        translation = (term.translation or "").strip()
 
         def make_array(t):
             ret = {
                 "term": t.text,
                 "roman": t.romanization,
-                "trans": t.translation if t.translation else "-",
+                "trans": (t.translation or "").strip(),
                 "tags": [tt.text for tt in t.term_tags],
             }
             return ret
 
-        parent_terms = [p.text for p in term.parents]
-        parent_terms = ", ".join(parent_terms)
+        parent_data = [make_array(p) for p in term.parents]
 
-        parents = term.parents
-        if len(parents) == 1 and parents[0].translation == term.translation:
-            parents = []
-        parent_data = [make_array(p) for p in parents]
+        if len(parent_data) == 1:
+            ptrans = parent_data[0]["trans"]
+            if translation == "":
+                translation = ptrans
+            if translation == ptrans:
+                parent_data[0]["trans"] = ""
+
+        images = [term.get_current_image()] if term.get_current_image() else []
+        pimages = [p.get_current_image() for p in term.parents if p.get_current_image()]
+        images.extend(pimages)
+        # DISABLED CODE: Don't include component images in the hover for now,
+        # it can get confusing!
+        # ref https://github.com/LuteOrg/lute-v3/issues/355
+        # for c in components:
+        #     if c.get_current_image():
+        #         images.append(c.get_current_image())
+        images = list(set(images))
 
         def sort_components(components):
             # Sort components by min position in string and length.
@@ -172,36 +190,15 @@ class Service:
             component_and_pos.sort(key=functools.cmp_to_key(compare))
             return [c[0] for c in component_and_pos]
 
-        rs = RenderService(self.session)
-        components = [
-            c
-            for c in rs.find_all_Terms_in_string(term.text, term.language)
-            if c.id != term.id
-        ]
-        components = sort_components(components)
-
-        component_data = [make_array(c) for c in components]
-        component_data = [c for c in component_data if c["trans"] != "-"]
-
-        images = [term.get_current_image()] if term.get_current_image() else []
-        for p in term.parents:
-            if p.get_current_image():
-                images.append(p.get_current_image())
-        # DISABLED CODE: Don't include component images in the hover for now,
-        # it can get confusing!
-        # ref https://github.com/LuteOrg/lute-v3/issues/355
-        # for c in components:
-        #     if c.get_current_image():
-        #         images.append(c.get_current_image())
-
-        images = list(set(images))
-
-        return {
+        ret = {
             "term": term,
             "flashmsg": term.get_flash_message(),
-            "term_tags": term_tags,
+            "term_tags": [tt.text for tt in term.term_tags],
+            "term_translation": translation,
             "term_images": images,
             "parentdata": parent_data,
-            "parentterms": parent_terms,
-            "components": component_data,
+            "parentterms": ", ".join([p.text for p in term.parents]),
+            "components": [make_array(c) for c in sort_components(components)],
         }
+        # print(ret, flush=True)
+        return ret
