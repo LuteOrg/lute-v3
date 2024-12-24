@@ -370,6 +370,7 @@ let selection_start_shift_held = false;
 let clear_newmultiterm_elements = function() {
   $('.newmultiterm').removeClass('newmultiterm');
   selection_start_el = null;
+  selection_start_shift_held = false;
 }
 
 function handle_select_started(e) {
@@ -425,7 +426,7 @@ function select_ended(el, e) {
   const selected = get_selected_in_range(selection_start_el, el);
   if (selection_start_shift_held) {
     copy_text_to_clipboard(selected.toArray());
-    start_hover_mode();
+    clear_newmultiterm_elements();
     return;
   }
 
