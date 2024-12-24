@@ -221,9 +221,11 @@ function _hide_dictionaries() {
   $('.dictcontainer').hide();
 }
 
+/* Hide word editing form if present. */
 function _hide_term_edit_form() {
-  const curr_url = top.frames.wordframe.location.href;
-  if (curr_url.includes('edit_term') || curr_url.includes('term_bulk_edit_form')) {
+  const hide_me = ['read/edit_term', 'read/term_bulk_edit_form', 'read/termform'];
+  const c = top.frames.wordframe.location.href;
+  if (hide_me.some(path => c.includes(path))) {
     $('#wordframeid').attr('src', '/read/empty');
   }
 }
