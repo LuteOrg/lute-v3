@@ -1,4 +1,20 @@
 
+# 3.8.0 (2024-12-24)
+
+Tweaks:
+
+* #540: revise popup: include more data, but make layout more compact.
+* #541: change hotkeys to use "code" rather than "key letter pressed" so that people switching keyboard layouts can have constant shortcuts.
+* #544: allow showing "Unknown" Terms in filtered Term listing.
+* #527: Track words read in new wordsread table, allows for multiple re-reads of same page to be tracked in "words read" stats graph.
+
+Fixes:
+
+* #460: Set cascade delete database pragma on connect - ensures no orphaned data.
+* #546: fix Bing translation lookups, Bing can be embedded for Term and Sentence lookups.
+* Shift-drag copy shouldn't close form.
+
+
 # 3.7.0 (2024-12-20)
 
 Feature changes:
