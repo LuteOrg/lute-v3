@@ -448,7 +448,8 @@ def then_reading_page_term_form_is_hidden(luteclient):
     "Set to blankn"
     iframe_element = luteclient.browser.find_by_id("wordframeid").first
     iframe_src = iframe_element["src"]
-    assert iframe_src == "about:blank"
+    blanks = ["about:blank", "http://localhost:5001/read/empty"]
+    assert iframe_src in blanks, "Is blank"
 
 
 @when(parsers.parse("I shift click:\n{words}"))

@@ -221,13 +221,18 @@ function _hide_dictionaries() {
   $('.dictcontainer').hide();
 }
 
-/* Hide word editing form if present. */
+/* Hide word editing form. */
 function _hide_term_edit_form() {
+  $('#wordframeid').attr('src', '/read/empty');
+  // NOTE: checking for specific URLs or fragments in the location.href
+  // causes security errors in some cases.
+  /*
   const hide_me = ['read/edit_term', 'read/term_bulk_edit_form', 'read/termform'];
   const c = top.frames.wordframe.location.href;
   if (hide_me.some(path => c.includes(path))) {
     $('#wordframeid').attr('src', '/read/empty');
   }
+  */
 }
 
 function show_multiword_term_edit_form(selected) {
