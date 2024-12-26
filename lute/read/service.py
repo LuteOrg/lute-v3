@@ -156,6 +156,9 @@ class Service:
     def get_popup_data(self, termid):
         "Get popup data, or None if popup shouldn't be shown."
         term = self.session.get(Term, termid)
+        if term is None:
+            return None
+
         rs = RenderService(self.session)
         components = [
             c
