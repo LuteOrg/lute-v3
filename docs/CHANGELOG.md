@@ -1,4 +1,15 @@
 
+# 3.8.1 (2024-12-26)
+
+Tweaks:
+
+* #547: add some basic "Term Popup" settings.
+
+Fixes:
+
+* #550: fix Bing sentence lookup.
+
+
 # 3.8.0 (2024-12-24)
 
 Tweaks:
