@@ -40,6 +40,11 @@ class UserSettingsForm(FlaskForm):
         render_kw={"title": "Number of pages to use for book stats calculation."},
     )
 
+    term_popup_promote_parent_translation = BooleanField(
+        "Promote parent translation to term translation if possible"
+    )
+    term_popup_show_components = BooleanField("Show component terms")
+
     mecab_path = StringField("MECAB_PATH environment variable")
     reading_choices = [
         ("katakana", "Katakana"),

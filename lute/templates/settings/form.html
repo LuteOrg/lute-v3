@@ -99,6 +99,21 @@
 
     <tr>
       <td>
+        <h2>Term Popups</h2>
+      </td>
+    </tr>
+    {% for f in [
+    form.term_popup_promote_parent_translation,
+    form.term_popup_show_components,
+    ]%}
+    <tr>
+      <td>{{ f.label }}</td>
+      <td>{{ f(class="form-control") }}</td>
+    </tr>
+    {% endfor %}
+
+    <tr>
+      <td>
         <h2>Japanese</h2>
       </td>
     </tr>

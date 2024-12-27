@@ -38,6 +38,8 @@ def refresh_global_settings(session):
         "open_popup_in_new_tab",
         "stop_audio_on_term_form_open",
         "show_highlights",
+        "term_popup_promote_parent_translation",
+        "term_popup_show_components",
     ]
     for k in boolkeys:
         current_settings[k] = current_settings[k] == "1"
