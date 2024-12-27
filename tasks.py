@@ -36,6 +36,12 @@ def lint(c):
 
 
 @task
+def lint_changed(c):
+    "Run pylint on changed files only.  (*nix machines only)"
+    c.run("for p in `git diff --name-only | grep py`; do echo $p; pylint $p; done")
+
+
+@task
 def todos(c):
     """
     Print code TODOs.
@@ -271,6 +277,7 @@ ns = Collection()
 ns.add_task(fulltest)
 ns.add_task(full)
 ns.add_task(lint)
+ns.add_task(lint_changed)
 ns.add_task(test)
 ns.add_task(accept)
 ns.add_task(playwright)
