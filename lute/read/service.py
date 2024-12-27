@@ -22,17 +22,29 @@ class TermPopup:
     # pylint: disable=too-many-instance-attributes
     def __init__(self, term):
         self.term = term
-        self.term_text = term.text
-        self.parents_text = ", ".join([p.text for p in term.parents])
-        self.translation = (term.translation or "").strip()
-        self.romanization = (term.romanization or "").strip()
+        self.term_text = self._clean(term.text)
+        self.parents_text = ", ".join([self._clean(p.text) for p in term.parents])
+        self.translation = self._clean(term.translation)
+        self.romanization = self._clean(term.romanization)
         self.tags = [tt.text for tt in term.term_tags]
-        self.flash = term.get_flash_message()
+        self.flash = self._clean(term.get_flash_message())
         self.image = term.get_current_image()
         self.popup_image_data = self._get_popup_image_data()
+
+        checks = [self.romanization != "", self.translation != "", len(self.tags) > 0]
+        self.show = len([b for b in checks if b]) > 0
+
         # Final data to include in popup.
         self.parents = []
         self.components = []
+
+    def _clean(self, t):
+        "Clean text for popup usage."
+        zws = "\u200B"
+        ret = (t or "").strip()
+        ret = ret.replace(zws, "")
+        ret = ret.replace("\n", "<br />")
+        return ret
 
     def term_and_parents_text(self):
         "Return term text with parents if any."
@@ -40,11 +52,6 @@ class TermPopup:
         if self.parents_text != "":
             ret = f"{ret} ({self.parents_text})"
         return ret
-
-    def has_popup_data(self):
-        "True if basic data is present."
-        checks = [self.romanization != "", self.translation != "", len(self.tags) > 0]
-        return len([b for b in checks if b]) > 0
 
     def _get_popup_image_data(self):
         "Get images"
@@ -57,7 +64,7 @@ class TermPopup:
         ]
         imageresult = defaultdict(list)
         for key, value in images:
-            imageresult[key].append(value)
+            imageresult[key].append(self._clean(value))
         # Convert lists to comma-separated strings
         return {k: ", ".join(v) for k, v in imageresult.items()}
 
@@ -200,7 +207,7 @@ class Service:
 
         t = TermPopup(term)
         if (
-            t.has_popup_data() is False
+            t.show is False
             and t.image is None
             and len(term.parents) == 0
             and len(components) == 0
@@ -219,6 +226,6 @@ class Service:
 
         component_data = [TermPopup(c) for c in self._sort_components(term, components)]
 
-        t.parents = [p for p in parent_data if p.has_popup_data()]
-        t.components = [c for c in component_data if c.has_popup_data()]
+        t.parents = [p for p in parent_data if p.show]
+        t.components = [c for c in component_data if c.show]
         return t
