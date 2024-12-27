@@ -2,12 +2,11 @@
 Term mapping tests.
 """
 
-import pytest
-from bs4 import BeautifulSoup
 import html
+from bs4 import BeautifulSoup
 from lute.models.term import Term, TermTag
+from lute.models.repositories import UserSettingRepository
 from lute.db import db
-from tests.dbasserts import assert_sql_result
 
 
 def test_smoke_popup_response(client, empty_db, spanish):
@@ -42,20 +41,27 @@ def test_smoke_popup_response(client, empty_db, spanish):
     db.session.add(component)
     db.session.commit()
 
-    response = client.get(f"/read/termpopup/{term.id}")
+    def _get_pretty_response(term_id):
+        "Response for term popup."
+        response = client.get(f"/read/termpopup/{term_id}")
+        decoded_response = response.data.decode("utf-8")
+        unescaped_response = html.unescape(decoded_response)
+        soup = BeautifulSoup(unescaped_response, "html.parser")
+        pretty_response = soup.prettify()
+        return pretty_response
 
-    decoded_response = response.data.decode(
-        "utf-8"
-    )  # Decode byte string to regular string
-    unescaped_response = html.unescape(decoded_response)  # Unescape HTML entities
-
-    # Optionally format the HTML for readability
-    soup = BeautifulSoup(unescaped_response, "html.parser")
-    pretty_response = soup.prettify()
-
+    pretty_response = _get_pretty_response(term.id)
     print(pretty_response, flush=True)
-
     for t in ["t", "p", "c"]:
         for part in ["trans", "rom", "tag"]:
             s = f"{t}_{part}"
             assert s in pretty_response, s
+
+    us_repo = UserSettingRepository(db.session)
+    us_repo.set_value("term_popup_show_components", False)
+    db.session.commit()
+    pretty_response = _get_pretty_response(term.id)
+    print(pretty_response, flush=True)
+    for part in ["trans", "rom", "tag"]:
+        s = f"c_{part}"
+        assert s not in pretty_response, s

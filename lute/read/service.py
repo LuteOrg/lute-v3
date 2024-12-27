@@ -7,7 +7,7 @@ from datetime import datetime
 import functools
 from lute.models.term import Term, Status
 from lute.models.book import Text, WordsRead
-from lute.models.repositories import BookRepository
+from lute.models.repositories import BookRepository, UserSettingRepository
 from lute.book.stats import Service as StatsService
 from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
@@ -31,9 +31,6 @@ class TermPopup:
         self.image = term.get_current_image()
         self.popup_image_data = self._get_popup_image_data()
 
-        checks = [self.romanization != "", self.translation != "", len(self.tags) > 0]
-        self.show = len([b for b in checks if b]) > 0
-
         # Final data to include in popup.
         self.parents = []
         self.components = []
@@ -45,6 +42,12 @@ class TermPopup:
         ret = ret.replace(zws, "")
         ret = ret.replace("\n", "<br />")
         return ret
+
+    @property
+    def show(self):
+        "Calc if should show.  Must be deferred as values can be changed."
+        checks = [self.romanization != "", self.translation != "", len(self.tags) > 0]
+        return len([b for b in checks if b]) > 0
 
     def term_and_parents_text(self):
         "Return term text with parents if any."
@@ -198,12 +201,16 @@ class Service:
         if term is None:
             return None
 
-        rs = RenderService(self.session)
-        components = [
-            c
-            for c in rs.find_all_Terms_in_string(term.text, term.language)
-            if c.id != term.id and c.status != Status.UNKNOWN
-        ]
+        repo = UserSettingRepository(self.session)
+        show_components = int(repo.get_value("term_popup_show_components")) == 1
+        components = []
+        if show_components:
+            rs = RenderService(self.session)
+            components = [
+                c
+                for c in rs.find_all_Terms_in_string(term.text, term.language)
+                if c.id != term.id and c.status != Status.UNKNOWN
+            ]
 
         t = TermPopup(term)
         if (
@@ -217,7 +224,10 @@ class Service:
 
         parent_data = [TermPopup(p) for p in term.parents]
 
-        if len(term.parents) == 1:
+        promote_parent_trans = int(
+            repo.get_value("term_popup_promote_parent_translation")
+        )
+        if (promote_parent_trans == 1) and len(term.parents) == 1:
             ptrans = parent_data[0].translation
             if t.translation == "":
                 t.translation = ptrans

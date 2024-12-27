@@ -4,6 +4,7 @@ Term popup data tests.
 
 import pytest
 from lute.models.term import Term, TermTag, Status
+from lute.models.repositories import UserSettingRepository
 from lute.read.service import Service
 from lute.db import db
 
@@ -128,7 +129,7 @@ def test_images_combined_in_popup(spanish, app_context, service):
     assert d.popup_image_data == {"gato.jpg": "gato, perro"}
 
 
-def test_single_parent_translation_moved_to_term_if_term_translation_blank(
+def test_single_parent_translation_can_be_promoted_to_term_if_term_translation_blank(
     spanish, app_context, service
 ):
     "No need for dup data"
@@ -144,8 +145,16 @@ def test_single_parent_translation_moved_to_term_if_term_translation_blank(
     assert d.translation == "cat", "trans promoted"
     assert d.parents[0].translation == "", "moved up"
 
+    repo = UserSettingRepository(db.session)
+    repo.set_value("term_popup_promote_parent_translation", False)
+    db.session.commit()
 
-def test_single_parent_translation_removed_if_same_as_child(
+    d = service.get_popup_data(t.id)
+    assert d.translation == "", "trans not promoted"
+    assert d.parents[0].translation == "cat", "translation left with parent"
+
+
+def test_single_parent_translation_may_be_removed_if_same_as_child(
     spanish, app_context, service
 ):
     "No need for dup data"
@@ -161,6 +170,14 @@ def test_single_parent_translation_removed_if_same_as_child(
     d = service.get_popup_data(t.id)
     assert d.translation == "cat", "trans promoted"
     assert d.parents[0].translation == "", "moved up"
+
+    repo = UserSettingRepository(db.session)
+    repo.set_value("term_popup_promote_parent_translation", False)
+    db.session.commit()
+
+    d = service.get_popup_data(t.id)
+    assert d.translation == "cat", "trans left"
+    assert d.parents[0].translation == "cat", "translation also left with parent"
 
 
 def test_multiple_parents_translations_left_alone_even_if_blank(
@@ -285,7 +302,9 @@ def test_component_word_with_translation_returned(spanish, app_context, service)
     assert_components(d, ["gato; cat"], "one component")
 
 
-def test_nested_multiword_components(spanish, app_context, service):
+def test_nested_multiword_components_returned_depending_on_setting(
+    spanish, app_context, service
+):
     "Complete components are returned."
     t = Term(spanish, "un gato gordo")
     t.translation = "a fat cat"
@@ -295,6 +314,13 @@ def test_nested_multiword_components(spanish, app_context, service):
 
     d = service.get_popup_data(t.id)
     assert_components(d, ["un gato; a cat", "gato; cat"], "components")
+
+    repo = UserSettingRepository(db.session)
+    repo.set_value("term_popup_show_components", False)
+    db.session.commit()
+
+    d = service.get_popup_data(t.id)
+    assert_components(d, [], "no components shown")
 
 
 def test_multiword_components_returned_in_order_of_appearance(
