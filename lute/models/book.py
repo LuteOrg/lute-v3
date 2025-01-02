@@ -194,6 +194,7 @@ class Text(db.Model):
     id = db.Column("TxID", db.Integer, primary_key=True)
     _text = db.Column("TxText", db.String, nullable=False)
     order = db.Column("TxOrder", db.Integer)
+    start_date = db.Column("TxStartDate", db.DateTime, nullable=True)
     _read_date = db.Column("TxReadDate", db.DateTime, nullable=True)
     bk_id = db.Column("TxBkID", db.Integer, db.ForeignKey("books.BkID"), nullable=False)
     word_count = db.Column("TxWordCount", db.Integer, nullable=True)

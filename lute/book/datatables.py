@@ -16,6 +16,7 @@ def get_data_tables_list(parameters, is_archived, session):
         BkTitle,
         case when currtext.TxID is null then 1 else currtext.TxOrder end as PageNum,
         textcounts.pagecount AS PageCount,
+        booklastopened.lastopeneddate AS LastOpenedDate,
         BkArchived,
         tags.taglist AS TagList,
         textcounts.wc AS WordCount,
@@ -28,6 +29,9 @@ def get_data_tables_list(parameters, is_archived, session):
     FROM books b
     INNER JOIN languages ON LgID = b.BkLgID
     LEFT OUTER JOIN texts currtext ON currtext.TxID = BkCurrentTxID
+    INNER JOIN (
+        select TxBkID, max(TxStartDate) as lastopeneddate from texts group by TxBkID
+    ) booklastopened on booklastopened.TxBkID = b.BkID
     INNER JOIN (
         SELECT TxBkID, SUM(TxWordCount) as wc, COUNT(TxID) AS pagecount
         FROM texts

@@ -20,13 +20,16 @@ def test_mark_page_read(english, app_context):
     dbbook = r.add(b)
     r.commit()
 
+    sql_text_started = "select * from texts where TxStartDate is not null"
     sql_text_read = "select * from texts where TxReadDate is not null"
     sql_wordsread = "select * from wordsread"
+    assert_record_count_equals(sql_text_started, 0, "not started, sanity check")
     assert_record_count_equals(sql_text_read, 0, "not read")
     assert_record_count_equals(sql_wordsread, 0, "not read")
 
     svc = Service(db.session)
     svc.mark_page_read(dbbook.id, 1, True)
+    assert_record_count_equals(sql_text_started, 1, "started, sanity check")
     assert_record_count_equals(sql_text_read, 1, "read, text")
     assert_record_count_equals(sql_wordsread, 1, "read, wordsread")
 
@@ -76,10 +79,14 @@ def test_smoke_start_reading(english, app_context):
     dbbook = r.add(b)
     r.commit()
 
-    assert_record_count_equals("select * from sentences", 0, "before start")
+    sql_sentence = "select * from sentences"
+    sql_text_started = "select * from texts where TxStartDate is not null"
+    assert_record_count_equals(sql_sentence, 0, "before start")
+    assert_record_count_equals(sql_text_started, 0, "before start")
     service = Service(db.session)
     service.start_reading(dbbook, 1)
-    assert_record_count_equals("select * from sentences", 2, "after start")
+    assert_record_count_equals(sql_sentence, 2, "after start")
+    assert_record_count_equals(sql_text_started, 1, "text after start")
 
 
 def test_start_reading_creates_Terms_for_unknown_words(english, app_context):
