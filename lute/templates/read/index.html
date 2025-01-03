@@ -223,15 +223,11 @@
     localStorage.setItem(`focusMode-book${book_id}`, `${focusChk.checked}`)
   })
 
-  let _close_menu_on_click_away = function(event) {
-    const menu = document.getElementById("reading_menu");
-    const menu_clicked = event.target.closest("#reading_menu");
-    const menuBtn_clicked = event.target.closest(".hamburger-btn");
-    const rightPaneClicked = event.target.closest("#read_pane_right");
-    if(!menu_clicked && !menuBtn_clicked)
-      menu.classList.remove("open-menu");
-    // close rightPane if it's not click, it's children not clicked or a word is not clicked
-    if(!rightPaneClicked && event.target.parentNode != readPaneRight && !event.target.classList.contains("textitem")) {
+  let _close_slide_in_menu_on_click_away = function(event) {
+    const tgt = event.target;
+    if (!tgt.closest("#reading_menu") && !tgt.closest(".hamburger-btn"))
+      $("#reading_menu").removeClass("open-menu");
+    if (!tgt.closest("#read_pane_right") && tgt.parentNode != readPaneRight && !tgt.classList.contains("textitem")) {
       closeRightPane();
     }
   };
@@ -298,7 +294,7 @@
     }
     goto_relative_page(0, true);
 
-    $(document).click(_close_menu_on_click_away);
+    $(document).click(_close_slide_in_menu_on_click_away);
   });
 
   // mobile view
