@@ -458,7 +458,7 @@
 
     updateReadSlider(actualPage);
 
-    const url = `/read/renderpage/${bookid}/${actualPage}`;
+    const url = `/read/start_reading/${bookid}/${actualPage}`;
     $.get(
       url,
       function(data, status) {

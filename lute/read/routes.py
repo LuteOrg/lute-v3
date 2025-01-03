@@ -157,9 +157,9 @@ def save_player_data():
     return jsonify("ok")
 
 
-@bp.route("/renderpage/<int:bookid>/<int:pagenum>", methods=["GET"])
-def render_page(bookid, pagenum):
-    "Method called by ajax, render the given page."
+@bp.route("/start_reading/<int:bookid>/<int:pagenum>", methods=["GET"])
+def start_reading(bookid, pagenum):
+    "Called by ajax.  Update the text.start_date, and render page."
     book = _find_book(bookid)
     if book is None:
         flash(f"No book matching id {bookid}")
