@@ -223,6 +223,19 @@
     localStorage.setItem(`focusMode-book${book_id}`, `${focusChk.checked}`)
   })
 
+  let _close_menu_on_click_away = function(event) {
+    const menu = document.getElementById("reading_menu");
+    const menu_clicked = event.target.closest("#reading_menu");
+    const menuBtn_clicked = event.target.closest(".hamburger-btn");
+    const rightPaneClicked = event.target.closest("#read_pane_right");
+    if(!menu_clicked && !menuBtn_clicked)
+      menu.classList.remove("open-menu");
+    // close rightPane if it's not click, it's children not clicked or a word is not clicked
+    if(!rightPaneClicked && event.target.parentNode != readPaneRight && !event.target.classList.contains("textitem")) {
+      closeRightPane();
+    }
+  };
+
   $(document).ready(function () {
     const theTextReloadObs = new MutationObserver((mutationList, observer) => {
       if (scrollYBeforeReload) window.scrollTo(0, scrollYBeforeReload);
@@ -285,22 +298,7 @@
     }
     goto_relative_page(0, true);
 
-    // If the css slide-in menu is open, clicking away from it closes the menu.
-    $(document).click(function(event) {
-      const menu = document.getElementById("reading_menu");
-      // const menuBtn = document.querySelector(".hamburger-btn");
-      const menu_clicked = event.target.closest("#reading_menu");
-      const menuBtn_clicked = event.target.closest(".hamburger-btn");
-      const rightPaneClicked = event.target.closest("#read_pane_right");
-      // if (event.target != menuBtn || event.target.parentNode != menuBtn) 
-      if(!menu_clicked && !menuBtn_clicked)
-        menu.classList.remove("open-menu");
-
-      // close rightPane if it's not click, it's children not clicked or a word is not clicked
-      if(!rightPaneClicked && event.target.parentNode != readPaneRight && !event.target.classList.contains("textitem")) {
-          closeRightPane();
-        }
-    });
+    $(document).click(_close_menu_on_click_away);
   });
 
   // mobile view
