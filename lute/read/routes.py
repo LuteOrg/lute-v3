@@ -71,8 +71,6 @@ def read(bookid):
 def read_page(bookid, pagenum):
     """
     Read a particular page of a book.
-
-    Called from term Sentences link.
     """
     book = _find_book(bookid)
     if book is None:
