@@ -150,11 +150,11 @@ class Service:
             self.session.add(ti.term)
         self.session.commit()
 
-    def start_reading(self, dbbook, pagenum):
-        "Start reading a page in the book, getting paragraphs."
-
+    def _get_reading_data(self, dbbook, pagenum, set_text_start_date=False):
+        "Get paragraphs, set text.start_date if needed."
         text = dbbook.text_at_page(pagenum)
-        text.start_date = datetime.now()
+        if set_text_start_date:
+            text.start_date = datetime.now()
         text.load_sentences()
 
         svc = StatsService(self.session)
@@ -170,6 +170,14 @@ class Service:
         self._save_new_status_0_terms(paragraphs)
 
         return paragraphs
+
+    def get_paragraphs(self, dbbook, pagenum):
+        "Get the paragraphs for the book."
+        return self._get_reading_data(dbbook, pagenum, False)
+
+    def start_reading(self, dbbook, pagenum):
+        "Start reading a page in the book, getting paragraphs."
+        return self._get_reading_data(dbbook, pagenum, True)
 
     def _sort_components(self, term, components):
         "Sort components by min position in string and length."

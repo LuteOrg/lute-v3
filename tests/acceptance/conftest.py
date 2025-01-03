@@ -391,7 +391,7 @@ def when_go_to_page(luteclient, position):
         linkid = "navPrev"
     b = luteclient.browser
     b.find_by_id(linkid).first.click()
-    time.sleep(0.1)  # Assume this is necessary for ajax reload.
+    time.sleep(0.5)  # Assume this is necessary for ajax reload.
     # Don't reload, as it seems to nullify the nav click.
     # b.reload()
 
