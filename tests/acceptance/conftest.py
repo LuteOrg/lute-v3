@@ -138,6 +138,11 @@ def fixture_restore_jp_parser(luteclient):
 ## STEP DEFS
 
 
+@given("terminate the test")
+def terminate_test():
+    raise RuntimeError("Test terminated intentionally :wave:")
+
+
 # Setup
 
 
@@ -165,6 +170,12 @@ def disable_japanese_parser(luteclient, _restore_jp_parser):
 @given('I enable the "japanese" parser')
 def enable_jp_parser(luteclient):
     luteclient.change_parser_registry_key("disabled_japanese", "japanese")
+
+
+@given("all page start dates are set to null")
+def set_txstartdate_to_null(luteclient):
+    "Hack data."
+    luteclient.set_txstartdate_to_null()
 
 
 # Browsing
@@ -269,6 +280,11 @@ def check_book_table(luteclient, content):
     "Check the table, e.g. content like 'Hola; Spanish; ; 4 (0%);'"
     time.sleep(1)
     assert content == luteclient.get_book_table_content()
+
+
+@then(parsers.parse("book pages with start dates are:\n{content}"))
+def book_page_start_dates_are(luteclient, content):
+    assert content == luteclient.get_book_page_start_dates()
 
 
 # Terms

@@ -15,6 +15,7 @@ to get nicer assertion details.
 """
 
 import time
+import json
 import requests
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
@@ -142,6 +143,25 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
         rows = list(self.browser.find_by_css(css))
         return "\n".join([_to_string(row) for row in rows])
+
+    def get_book_page_start_dates(self):
+        "get content from sql check"
+        sql = """select bktitle, txorder
+        from books
+        inner join texts on txbkid = bkid
+        where txstartdate is not null
+        order by bktitle, txorder"""
+        response = requests.get(f"{self.home}/dev_api/sqlresult/{sql}", timeout=1)
+        ret = "\n".join(json.loads(response.text))
+        if ret == "":
+            ret = "-"
+        return ret
+
+    def set_txstartdate_to_null(self):
+        "hack back end to keep test data sane."
+        sql = "update texts set txstartdate = null"
+        response = requests.get(f"{self.home}/dev_api/execsql/{sql}", timeout=1)
+        return response.text
 
     ################################
     # Terms
