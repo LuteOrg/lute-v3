@@ -480,3 +480,26 @@ Feature: User can actually read and stuff.
             three/.
         And book pages with start dates are:
             Hola; 3
+
+
+    # Issue 530: "peeking" at page doesn't set page data.
+    Scenario: Peeking at page does not set current page or start date.
+        Given a Spanish book "Hola" with content:
+            Uno.
+            ---
+            Dos.
+        Then the reading pane shows:
+            Uno/.
+        And book pages with start dates are:
+            Hola; 1
+
+        Given I peek at page 2
+        Then the reading pane shows:
+            Dos/.
+        And book pages with start dates are:
+            Hola; 1
+
+        Given I visit "/"
+        When I set the book table filter to "Hola"
+        Then the book table contains:
+            Hola; Spanish; ; 2;

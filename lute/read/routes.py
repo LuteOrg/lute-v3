@@ -16,7 +16,7 @@ from lute.db import db
 bp = Blueprint("read", __name__, url_prefix="/read")
 
 
-def _render_book_page(book, pagenum):
+def _render_book_page(book, pagenum, track_page_open=True):
     """
     Render a particular book page.
     """
@@ -36,6 +36,7 @@ def _render_book_page(book, pagenum):
         page_count=book.page_count,
         show_highlights=show_highlights,
         lang_id=lang.id,
+        track_page_open=track_page_open,
         term_dicts=term_dicts,
     )
 
@@ -79,6 +80,20 @@ def read_page(bookid, pagenum):
 
     pagenum = book.page_in_range(pagenum)
     return _render_book_page(book, pagenum)
+
+
+@bp.route("/<int:bookid>/peek/<int:pagenum>", methods=["GET"])
+def peek_page(bookid, pagenum):
+    """
+    Peek at a page; i.e. render it, but don't set the current text or start date.
+    """
+    book = _find_book(bookid)
+    if book is None:
+        flash(f"No book matching id {bookid}")
+        return redirect("/", 302)
+
+    pagenum = book.page_in_range(pagenum)
+    return _render_book_page(book, pagenum, track_page_open=False)
 
 
 @bp.route("/page_done", methods=["post"])

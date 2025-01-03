@@ -396,6 +396,14 @@ def when_go_to_page(luteclient, position):
     # b.reload()
 
 
+@given(parsers.parse("I peek at page {pagenum}"))
+def given_peek_at_page(luteclient, pagenum):
+    "Peek at a page of the current book."
+    currurl = luteclient.browser.url
+    peekurl = re.sub(r"/page/.*", f"/peek/{pagenum}", currurl)
+    luteclient.browser.visit(peekurl)
+
+
 @when(parsers.parse("I delete the current page"))
 def when_delete_current_page(luteclient):
     "Delete the current page."
