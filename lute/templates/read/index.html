@@ -360,21 +360,16 @@
   let enable_page_nav_links = function() {
     const pagenum = parseInt($('#page_num').val());
     const maxpage = parseInt($('#page_count').val());
-    if (pagenum > 1) {
-      $('#navPrev').removeClass('read_page_disabled');
-    }
-    else {
-      $('#navPrev').addClass('read_page_disabled');
-    }
-    if (pagenum < maxpage) {
-      $('#navNext').removeClass('read_page_disabled');
-    }
-    else {
-      $('#navNext').addClass('read_page_disabled');
-    }
-    //toggleSliderStatus();
+    const set_enable = function(el_id, should_enable) {
+      const c = 'read_page_disabled';
+      if (should_enable)
+        $(el_id).removeClass(c);
+      else
+        $(el_id).addClass(c);
+    };
+    set_enable('#navPrev', pagenum > 1);
+    set_enable('#navNext', pagenum < maxpage);
   };
-
 
   // Show/hide footer controls.
   let set_footer_control_visibility = function() {
