@@ -138,6 +138,11 @@ def fixture_restore_jp_parser(luteclient):
 ## STEP DEFS
 
 
+@given("terminate the test")
+def terminate_test():
+    raise RuntimeError("Test terminated intentionally :wave:")
+
+
 # Setup
 
 
@@ -165,6 +170,12 @@ def disable_japanese_parser(luteclient, _restore_jp_parser):
 @given('I enable the "japanese" parser')
 def enable_jp_parser(luteclient):
     luteclient.change_parser_registry_key("disabled_japanese", "japanese")
+
+
+@given("all page start dates are set to null")
+def set_txstartdate_to_null(luteclient):
+    "Hack data."
+    luteclient.set_txstartdate_to_null()
 
 
 # Browsing
@@ -271,6 +282,11 @@ def check_book_table(luteclient, content):
     assert content == luteclient.get_book_table_content()
 
 
+@then(parsers.parse("book pages with start dates are:\n{content}"))
+def book_page_start_dates_are(luteclient, content):
+    assert content == luteclient.get_book_page_start_dates()
+
+
 # Terms
 
 
@@ -375,7 +391,7 @@ def when_go_to_page(luteclient, position):
         linkid = "navPrev"
     b = luteclient.browser
     b.find_by_id(linkid).first.click()
-    time.sleep(0.1)  # Assume this is necessary for ajax reload.
+    time.sleep(0.5)  # Assume this is necessary for ajax reload.
     # Don't reload, as it seems to nullify the nav click.
     # b.reload()
 
@@ -498,7 +514,7 @@ def when_press_hotkey(luteclient, hotkey):
 @when(parsers.parse("I click the footer green check"))
 def when_click_footer_check(luteclient):
     "Click footer."
-    luteclient.browser.find_by_id("footerMarkRestAsKnown").click()
+    luteclient.browser.find_by_id("footerMarkRestAsKnownNextPage").click()
     time.sleep(0.1)  # Leave this, remove and test fails.
 
 

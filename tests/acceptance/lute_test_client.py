@@ -15,6 +15,7 @@ to get nicer assertion details.
 """
 
 import time
+import json
 import requests
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
@@ -142,6 +143,25 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
         rows = list(self.browser.find_by_css(css))
         return "\n".join([_to_string(row) for row in rows])
+
+    def get_book_page_start_dates(self):
+        "get content from sql check"
+        sql = """select bktitle, txorder
+        from books
+        inner join texts on txbkid = bkid
+        where txstartdate is not null
+        order by bktitle, txorder"""
+        response = requests.get(f"{self.home}/dev_api/sqlresult/{sql}", timeout=1)
+        ret = "\n".join(json.loads(response.text))
+        if ret == "":
+            ret = "-"
+        return ret
+
+    def set_txstartdate_to_null(self):
+        "hack back end to keep test data sane."
+        sql = "update texts set txstartdate = null"
+        response = requests.get(f"{self.home}/dev_api/execsql/{sql}", timeout=1)
+        return response.text
 
     ################################
     # Terms
@@ -374,6 +394,32 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         actions.release()
         actions.perform()
 
+    def _refresh_browser(self):
+        """
+        Term actions (edits, hotkeys) cause updated content to be ajaxed in.
+        For the splinter browser to be aware of it, the browser has to be
+        reloaded, but calling a self.browser.reload() has other side effects
+        (sets the page start date, etc).
+
+        The below weird js hack causes the browser to be updated,
+        and then the js events have to be reattached too.
+        """
+        # self.browser.reload()
+        # ??? ChatGPT suggested:
+        self.browser.execute_script(
+            """
+            // Trigger re-render of the entire body
+            var body = document.querySelector('body');
+            var content = body.innerHTML;
+            body.innerHTML = '';
+            body.innerHTML = content;
+
+            // Re-attach text interactions.
+            window.prepareTextInteractions();
+            """
+        )
+        time.sleep(0.2)  # Hack, test failing.
+
     def fill_reading_bulk_edit_form(self, updates=None):
         """
         Click a word in the reading frame, fill in the term form iframe.
@@ -393,11 +439,9 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             if "updated" in iframe.html:
                 should_refresh = True
 
-        # Have to refresh the content to query the dom ...
-        # Unfortunately, I can't see how to refresh without reloading
+        # Have to refresh the content to query the dom.
         if should_refresh:
-            self.browser.reload()
-            time.sleep(0.2)  # Hack, test failing.
+            self._refresh_browser()
 
     def press_hotkey(self, hotkey):
         "Send a hotkey."
@@ -431,10 +475,8 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         self.browser.execute_script(script, el._element)
         time.sleep(0.2)  # Or it's too fast.
         # print(script)
-        # Have to refresh the content to query the dom ...
-        # Unfortunately, I can't see how to refresh without reloading
-        self.browser.reload()
-        time.sleep(0.2)  # Hack, test failing.
+        # Have to refresh the content to query the dom.
+        self._refresh_browser()
 
     def click_word_fill_form(self, word, updates=None):
         """
@@ -457,11 +499,9 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             if "updated" in iframe.html:
                 should_refresh = True
 
-        # Have to refresh the content to query the dom ...
-        # Unfortunately, I can't see how to refresh without reloading
+        # Have to refresh the content to query the dom.
         if should_refresh:
-            self.browser.reload()
-            time.sleep(0.2)  # Hack, test failing.
+            self._refresh_browser()
 
     ################################3
     # Misc.

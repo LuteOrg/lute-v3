@@ -118,6 +118,14 @@ def sql_result(sql):
     return jsonify(content)
 
 
+@bp.route("/execsql/<string:sql>", methods=["GET"])
+def exec_sql(sql):
+    "Execute arbitrary sql!!!  NO CHECKS ARE DONE!"
+    db.session.execute(text(sql))
+    db.session.commit()
+    return jsonify("ok")
+
+
 @bp.route("/dummy_dict/<string:langname>/<string:term>", methods=["GET"])
 def dummy_language_dict(langname, term):
     "Fake language dictionary/term lookup."

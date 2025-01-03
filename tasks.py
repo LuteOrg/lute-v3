@@ -347,7 +347,7 @@ def db_export_baseline(c):
             raise RuntimeError(f'Missing "{checkstring}" in exported file.')
 
 
-@task(pre=[_ensure_test_db], post=[db_export_baseline])
+@task(pre=[_ensure_test_db])
 def db_reset(c):
     """
     Reset the database to baseline state for new installations, with LoadDemoData system flag set.
@@ -355,7 +355,7 @@ def db_reset(c):
     Can only be run on a testing db.
     """
     c.run("pytest -m dbreset")
-    print("\nok, exporting baseline.sql.\n")
+    print("\nok, export baseline.sql if needed.\n")
 
 
 @task(help={"suffix": "suffix to add to filename."})

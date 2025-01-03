@@ -252,7 +252,7 @@
       if (event.data.event === "LuteTermFormPosted") {
         const bookid = $('#book_id').val();
         const pagenum = $('#page_num').val();
-        const url = `/read/renderpage/${bookid}/${pagenum}`;
+        const url = `/read/refresh_page/${bookid}/${pagenum}`;
         const marked = $('.kwordmarked');
         let marked_id = "nomatches"
         if (marked.length != 0) {
@@ -458,7 +458,7 @@
 
     updateReadSlider(actualPage);
 
-    const url = `/read/renderpage/${bookid}/${actualPage}`;
+    const url = `/read/start_reading/${bookid}/${actualPage}`;
     $.get(
       url,
       function(data, status) {

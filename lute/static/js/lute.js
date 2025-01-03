@@ -1011,7 +1011,7 @@ function post_bulk_update(updates) {
   let reload_text_div = function() {
     const bookid = $('#book_id').val();
     const pagenum = $('#page_num').val();
-    const url = `/read/renderpage/${bookid}/${pagenum}`;
+    const url = `/read/refresh_page/${bookid}/${pagenum}`;
     const repel = $('#thetext');
     repel.load(url, re_mark_selected_ids);
   };
