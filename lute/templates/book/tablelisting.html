@@ -15,6 +15,7 @@
       <th style="text-align: left">Statuses
         <a href="/refresh_all_stats" class="refresh" title="Refresh stats for all books"></a>
       </th>
+      <th style="text-align: left">Opened</th>
       <th style="text-align: left">Actions</th>
     </tr>
   </thead>
@@ -94,6 +95,7 @@
         { name: "TagList", width: "10%", data: "TagList" },
         { name: "WordCount", width: "10%", data: "WordCount" },
         { name: "UnknownPercent", "searchable": false, render: render_book_stats_graph_placeholder },
+        { name: "LastOpenedDate", "searchable": false, render: render_last_opened_date },
         { width: "8%", "searchable": false, "orderable": false, render: render_book_actions },
       ],
       createdRow: function(row, data, dataIndex) { ajax_in_book_stats(row, data, dataIndex); },
@@ -284,6 +286,14 @@
     return ret;
   };
 
+  let render_last_opened_date = function ( data, type, row, meta ) {
+    const dt = row["LastOpenedDate"];
+    if (dt == null) {
+      return '';
+    }
+    const datepart = dt.split(' ')[0];
+    return `<span title="${dt}">${datepart}</span>`;
+  };
 
   let render_book_actions = function ( data, type, row, meta ) {
     // TODO zzfuture fix: security - add CSRF token

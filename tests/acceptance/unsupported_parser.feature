@@ -23,7 +23,7 @@ Feature: Unsupported language data is hidden
 
         When I set the book table filter to "Hola"
         Then the book table contains:
-            Hola; Spanish; ; 4; ; …
+            Hola; Spanish; ; 4;
         Then the term table contains:
             ; gato; ; cat; Spanish; ; New (1)
 
@@ -36,8 +36,8 @@ Feature: Unsupported language data is hidden
 
         When I set the book table filter to "Hola"
         Then the book table contains:
-            Hola; Japanese; ; 1; ; …
-            Hola; Spanish; ; 4; ; …
+            Hola; Japanese; ; 1;
+            Hola; Spanish; ; 4;
         Then the term table contains:
             ; gato; ; cat; Japanese; ; New (1)
             ; gato; ; cat; Spanish; ; New (1)
