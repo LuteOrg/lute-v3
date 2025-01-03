@@ -3,7 +3,7 @@ Reading helpers.
 """
 
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime
 import functools
 from lute.models.term import Term, Status
 from lute.models.book import Text, WordsRead
@@ -84,9 +84,6 @@ class Service:
         book = br.find(bookid)
         text = book.text_at_page(pagenum)
         d = datetime.now()
-        if text.start_date is None:
-            # Set start_date if missing (e.g. old data, prior to addition of text.start_date)
-            text.start_date = d - timedelta(minutes=10)
         text.read_date = d
 
         w = WordsRead(text, d, text.word_count)

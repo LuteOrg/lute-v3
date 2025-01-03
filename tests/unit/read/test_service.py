@@ -29,7 +29,7 @@ def test_mark_page_read(english, app_context):
 
     svc = Service(db.session)
     svc.mark_page_read(dbbook.id, 1, True)
-    assert_record_count_equals(sql_text_started, 1, "started, sanity check")
+    assert_record_count_equals(sql_text_started, 0, "still not started!")
     assert_record_count_equals(sql_text_read, 1, "read, text")
     assert_record_count_equals(sql_wordsread, 1, "read, wordsread")
 
