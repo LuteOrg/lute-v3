@@ -150,16 +150,17 @@ class Service:
             self.session.add(ti.term)
         self.session.commit()
 
-    def _get_reading_data(self, dbbook, pagenum, set_text_start_date=False):
+    def _get_reading_data(self, dbbook, pagenum, track_page_open=False):
         "Get paragraphs, set text.start_date if needed."
         text = dbbook.text_at_page(pagenum)
-        if set_text_start_date:
-            text.start_date = datetime.now()
         text.load_sentences()
-
         svc = StatsService(self.session)
         svc.mark_stale(dbbook)
-        dbbook.current_tx_id = text.id
+
+        if track_page_open:
+            text.start_date = datetime.now()
+            dbbook.current_tx_id = text.id
+
         self.session.add(dbbook)
         self.session.add(text)
         self.session.commit()
