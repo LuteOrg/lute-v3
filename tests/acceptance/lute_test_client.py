@@ -130,10 +130,15 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         "Get book table content."
         css = "#booktable tbody tr"
 
+        # Skip the last two columns:
+        # - "last opened" date is a hassle to check
+        # - "actions" is just "..."
         def _to_string(row):
             tds = row.find_by_css("td")
             rowtext = [td.text.strip() for td in tds]
-            return "; ".join(rowtext).strip()
+            ret = "; ".join(rowtext[:-2]).strip()
+            # print(ret, flush=True)
+            return ret
 
         rows = list(self.browser.find_by_css(css))
         return "\n".join([_to_string(row) for row in rows])
