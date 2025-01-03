@@ -169,6 +169,18 @@ def render_page(bookid, pagenum):
     return render_template("read/page_content.html", paragraphs=paragraphs)
 
 
+@bp.route("/refresh_page/<int:bookid>/<int:pagenum>", methods=["GET"])
+def refresh_page(bookid, pagenum):
+    "Refreshes the page content, but doesn't set the text's start_date."
+    book = _find_book(bookid)
+    if book is None:
+        flash(f"No book matching id {bookid}")
+        return redirect("/", 302)
+    service = Service(db.session)
+    paragraphs = service.get_paragraphs(book, pagenum)
+    return render_template("read/page_content.html", paragraphs=paragraphs)
+
+
 @bp.route("/empty", methods=["GET"])
 def empty():
     "Show an empty/blank page."

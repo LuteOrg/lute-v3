@@ -380,3 +380,103 @@ Feature: User can actually read and stuff.
         And I press hotkey "m"
         Then the reading pane shows:
             Tengo (1)/ /un (2)/ /amigo (3)/ /y/ /otro/.
+
+
+    Scenario: Page start date is set correctly during reading
+        Given a Spanish book "Hola" with content:
+            page one here.
+            ---
+            two.
+            ---
+            three.
+        Then book pages with start dates are:
+            Hola; 1
+        And the reading pane shows:
+            page/ /one/ /here/.
+
+        Given all page start dates are set to null
+        Then book pages with start dates are:
+            -
+
+        # Single form post:
+        When I click "page" and edit the form:
+            text: page
+        Then the reading pane shows:
+            page (1)/ /one/ /here/.
+        And book pages with start dates are:
+            -
+
+        # Bulk edit:
+        When I press hotkey "escape"
+        And I shift click:
+            one
+            here
+        And I edit the bulk edit form:
+            change status: true
+            status: 3
+        Then the reading pane shows:
+            page (1)/ /one (3)/ /here (3)/.
+        And book pages with start dates are:
+            -
+
+        # Hotkey:
+        When I press hotkey "escape"
+        And I click "here" and press hotkey "2"
+        Then the reading pane shows:
+            page (1)/ /one (3)/ /here (2)/.
+        And book pages with start dates are:
+            -
+
+        # Bulk update with hotkey:
+        When I press hotkey "escape"
+        And I shift click:
+            page
+            one
+        When I press hotkey "arrowup"
+        Then the reading pane shows:
+            page (2)/ /one (4)/ /here (2)/.
+        And book pages with start dates are:
+            -
+
+        When I press hotkey "escape"
+        And I shift click:
+            one
+            here
+        When I press hotkey "1"
+        Then the reading pane shows:
+            page (2)/ /one (1)/ /here (1)/.
+        And book pages with start dates are:
+            -
+
+        When I go to the next page
+        Then the reading pane shows:
+            two/.
+        And book pages with start dates are:
+            Hola; 2
+
+        When I go to the previous page
+        Then the reading pane shows:
+            page (2)/ /one (1)/ /here (1)/.
+        And book pages with start dates are:
+            Hola; 1
+            Hola; 2
+
+        Given all page start dates are set to null
+        Then book pages with start dates are:
+            -
+
+        When I click the footer next page
+        Then the reading pane shows:
+            two/.
+        And book pages with start dates are:
+            Hola; 2
+
+        Given all page start dates are set to null
+        Then book pages with start dates are:
+            -
+
+        When I click the footer green check
+        Then the reading pane shows:
+            three/.
+        And book pages with start dates are:
+            Hola; 3
