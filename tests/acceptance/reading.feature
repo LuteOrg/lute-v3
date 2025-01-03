@@ -64,12 +64,18 @@ Feature: User can actually read and stuff.
         When I click "Hola" and press hotkey "1"
         Then the reading pane shows:
             Hola (1)/. /Adios/ /amigo/.
-        When I click "Hola" and press hotkey "5"
+
+        When I press hotkey "escape"
+        And I click "Hola" and press hotkey "5"
         Then the reading pane shows:
             Hola (5)/. /Adios/ /amigo/.
+
+        When I press hotkey "escape"
         When I click "Hola" and press hotkey "i"
         Then the reading pane shows:
             Hola (98)/. /Adios/ /amigo/.
+
+        When I press hotkey "escape"
         When I click "Hola" and press hotkey "w"
         Then the reading pane shows:
             Hola (99)/. /Adios/ /amigo/.
@@ -295,7 +301,8 @@ Feature: User can actually read and stuff.
         Then the reading pane shows:
             Tengo (1)/ /un (2)/ /amigo (3)/.
 
-        When I shift click:
+        When I press hotkey "escape"
+        And I shift click:
             Tengo
             un
             amigo
@@ -303,7 +310,8 @@ Feature: User can actually read and stuff.
         Then the reading pane shows:
             Tengo (2)/ /un (3)/ /amigo (4)/.
 
-        When I shift click:
+        When I press hotkey "escape"
+        And I shift click:
             Tengo
             un
             amigo
@@ -311,7 +319,8 @@ Feature: User can actually read and stuff.
         Then the reading pane shows:
             Tengo (3)/ /un (4)/ /amigo (5)/.
 
-        When I shift click:
+        When I press hotkey "escape"
+        And I shift click:
             Tengo
             un
             amigo
@@ -319,7 +328,8 @@ Feature: User can actually read and stuff.
         Then the reading pane shows:
             Tengo (4)/ /un (5)/ /amigo (99)/.
 
-        When I shift click:
+        When I press hotkey "escape"
+        And I shift click:
             Tengo
             un
             amigo
@@ -327,7 +337,8 @@ Feature: User can actually read and stuff.
         Then the reading pane shows:
             Tengo (5)/ /un (99)/ /amigo (99)/.
 
-        When I shift click:
+        When I press hotkey "escape"
+        And I shift click:
             Tengo
             un
             amigo
@@ -335,14 +346,15 @@ Feature: User can actually read and stuff.
         Then the reading pane shows:
             Tengo (4)/ /un (5)/ /amigo (5)/.
 
-        When I click "Tengo" and press hotkey "arrowdown"
+        When I press hotkey "escape"
         And I click "Tengo" and press hotkey "arrowdown"
-        And I click "Tengo" and press hotkey "arrowdown"
-        And I click "Tengo" and press hotkey "arrowdown"
-        And I click "Tengo" and press hotkey "arrowdown"
-        And I click "Tengo" and press hotkey "arrowdown"
-        And I click "Tengo" and press hotkey "arrowdown"
-        And I click "Tengo" and press hotkey "arrowdown"
+        And I press hotkey "arrowdown"
+        And I press hotkey "arrowdown"
+        And I press hotkey "arrowdown"
+        And I press hotkey "arrowdown"
+        And I press hotkey "arrowdown"
+        And I press hotkey "arrowdown"
+        And I press hotkey "arrowdown"
         Then the reading pane shows:
             Tengo (1)/ /un (5)/ /amigo (5)/.
 
