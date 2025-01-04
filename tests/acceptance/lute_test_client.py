@@ -406,6 +406,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         """
         # self.browser.reload()
         # ??? ChatGPT suggested:
+        time.sleep(0.5)  # Hack for ci.
         self.browser.execute_script(
             """
             // Trigger re-render of the entire body
@@ -418,7 +419,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             window.prepareTextInteractions();
             """
         )
-        time.sleep(0.2)  # Hack, test failing.
+        time.sleep(0.5)  # Hack for ci.
 
     def fill_reading_bulk_edit_form(self, updates=None):
         """
