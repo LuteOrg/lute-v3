@@ -232,6 +232,52 @@
     }
   };
 
+  let _lute_form_event_handler = function(event) {
+    if (event.data.event === "LuteTermFormOpened") {
+      LookupButton.TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
+      loadDictionaries();
+    }
+
+    if (event.data.event === "LuteTermFormOpened" && mediaTablet.matches) {
+      const viewportHeight = document.documentElement.clientHeight;
+      const mousePosPercent = mouseY / viewportHeight * 100;
+      // move the rightPane to the mouse position + some offset
+      readPaneRight.classList.add("open-dict");
+      btmMarginCont.classList.add("open-dict");
+      document.querySelector("#read_pane_right.open-dict").style.transform = `translateY(${Math.round(mousePosPercent) + 10}%)`;
+      readPaneRight.style.opacity = "1";
+      // add margin to the bottom of readLeft so it's fully scrollable to the bottom when the dict is over text
+      document.querySelector(".open-dict.btm-margin-container").style.marginTop = `calc(${viewportHeight - mouseY + 70}px - var(--player-height))`;
+      // sometimes there's an unnecessary text scroll when clicking on a word. return to the previous scroll position
+      window.scrollTo(0, scrollY);
+    }
+
+    // When term form posts data (either updating or deleting terms),
+    // reload the full reading screen.
+    if (event.data.event === "LuteTermFormPosted") {
+      const bookid = $('#book_id').val();
+      const pagenum = $('#page_num').val();
+      const url = `/read/refresh_page/${bookid}/${pagenum}`;
+      const marked = $('.kwordmarked');
+      let marked_id = "nomatches"
+      if (marked.length != 0) {
+        marked_id = $(marked[0]).attr('id');
+      }
+
+      // Force remove the old popup.
+      // ref https://stackoverflow.com/questions/19266886/tooltip-not-disappearing
+      $('div.ui-tooltip').remove();
+
+      $(".dictcontainer").css('display', 'none');
+
+      $('#thetext').load(url, function() {
+        const re_marked = $(`#${marked_id}`);
+        re_marked.removeClass('kwordmarked');
+        re_marked.addClass('wordhover');
+      });
+    };
+  };
+
   $(document).ready(function () {
     const theTextReloadObs = new MutationObserver((mutationList, observer) => {
       if (scrollYBeforeReload) window.scrollTo(0, scrollYBeforeReload);
@@ -250,40 +296,9 @@
     }
     
     createLookupButtons();
+    $(document).click(_close_slide_in_menu_on_click_away);
 
-    window.addEventListener("message", function(event) {
-      if (event.data.event === "LuteTermFormOpened") {
-        LookupButton.TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
-        loadDictionaries();
-      }
-
-      // When term form posts data (either updating or deleting terms),
-      // reload the full reading screen.
-      if (event.data.event === "LuteTermFormPosted") {
-        const bookid = $('#book_id').val();
-        const pagenum = $('#page_num').val();
-        const url = `/read/refresh_page/${bookid}/${pagenum}`;
-        const marked = $('.kwordmarked');
-        let marked_id = "nomatches"
-        if (marked.length != 0) {
-          marked_id = $(marked[0]).attr('id');
-        }
-
-        // Force remove the old popup.
-        // ref https://stackoverflow.com/questions/19266886/
-        //   tooltip-not-disappearing
-        $('div.ui-tooltip').remove();
-
-        $(".dictcontainer").css('display', 'none');
-
-        $('#thetext').load(url, function() {
-          const re_marked = $(`#${marked_id}`);
-          re_marked.removeClass('kwordmarked');
-          re_marked.addClass('wordhover');
-        });
-      };
-
-    });
+    window.addEventListener("message", _lute_form_event_handler);
 
     if (have_audio_file()) {
       // Don't actually load the source -- for some reason,
@@ -292,26 +307,8 @@
       // is handled in load_player_source().
       $('div.audio-player-container').show();
     }
+
     goto_relative_page(0, true);
-
-    $(document).click(_close_slide_in_menu_on_click_away);
-  });
-
-  // mobile view
-  window.addEventListener("message", function(event) {
-    if (event.data.event === "LuteTermFormOpened" && mediaTablet.matches) {
-        const viewportHeight = document.documentElement.clientHeight;
-        const mousePosPercent = mouseY / viewportHeight * 100;
-        // move the rightPane to the mouse position + some offset
-        readPaneRight.classList.add("open-dict");
-        btmMarginCont.classList.add("open-dict");
-        document.querySelector("#read_pane_right.open-dict").style.transform = `translateY(${Math.round(mousePosPercent) + 10}%)`;
-        readPaneRight.style.opacity = "1";
-        // add margin to the bottom of readLeft so it's fully scrollable to the bottom when the dict is over text
-        document.querySelector(".open-dict.btm-margin-container").style.marginTop = `calc(${viewportHeight - mouseY + 70}px - var(--player-height))`;
-        // sometimes there's an unnecessary text scroll when clicking on a word. return to the previous scroll position
-        window.scrollTo(0, scrollY);
-    }
   });
 
   let have_audio_file = function() {
