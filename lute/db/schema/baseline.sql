@@ -51,6 +51,7 @@ INSERT INTO _migrations VALUES('20241103_change_lastbackup_to_user_setting.sql')
 INSERT INTO _migrations VALUES('20241214_add_SeTextLC.sql');
 INSERT INTO _migrations VALUES('20241221_add_wordsread_table.sql');
 INSERT INTO _migrations VALUES('20241221_clean_up_missing_relationships.sql');
+INSERT INTO _migrations VALUES('20250102_add_TxStartDate.sql');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
@@ -137,7 +138,7 @@ CREATE TABLE IF NOT EXISTS "texts" (
 	"TxBkID" INTEGER NOT NULL  ,
 	"TxOrder" INTEGER NOT NULL  ,
         "TxText" TEXT NOT NULL  ,
-	TxReadDate datetime null, TxWordCount INTEGER null,
+	TxReadDate datetime null, TxWordCount INTEGER null, TxStartDate datetime null,
 	PRIMARY KEY ("TxID"),
 	FOREIGN KEY("TxBkID") REFERENCES "books" ("BkID") ON UPDATE NO ACTION ON DELETE CASCADE
 );
