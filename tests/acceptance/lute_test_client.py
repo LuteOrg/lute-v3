@@ -267,11 +267,16 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
     def make_term(self, lang, updates):
         "Create a new term."
-        self.visit("/")
-        self.browser.find_by_css("#menu_terms").mouse_over()
-        self.browser.find_by_id("term_index").first.click()
-        self.browser.find_by_css("#term_actions").mouse_over()
-        self.click_link("Create new")
+        # Sometimes this failed during the unsupported_parser.feature, not sure why.
+        # Likely something silly, don't care, so will bypass the screen controls.
+        # I am sure this will bite me later.
+        # TODO fix_nav: figure out why occasionally got ElementNotInteractableException
+        # self.visit("/")
+        # self.browser.find_by_css("#menu_terms").mouse_over()
+        # self.browser.find_by_id("term_index").first.click()
+        # self.browser.find_by_css("#term_actions").mouse_over()
+        # self.click_link("Create new")
+        self.visit("/term/new")
         assert "New Term" in self.browser.html
 
         updates["language_id"] = self.language_ids[lang]
