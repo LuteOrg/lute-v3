@@ -216,8 +216,11 @@ def given_demo_langs_loaded(luteclient):
 def given_demo_stories_loaded(luteclient):
     "Load the demo stories."
     luteclient.load_demo_stories()
+    _sleep(1)  # Hack!
     luteclient.visit("/")
+    _sleep(1)  # Hack!
     luteclient.clear_book_filter()
+    _sleep(0.5)  # Hack!
 
 
 @given("I clear the book filter")
