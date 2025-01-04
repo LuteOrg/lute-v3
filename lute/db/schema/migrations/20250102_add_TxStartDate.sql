@@ -1,6 +1,11 @@
 -- Add field
 alter table texts add column TxStartDate datetime null;
 
+-- Originally I had set the TxStartDate using best guesses, but now
+-- feel that that isn't justified.  Too many assumptions, too much to
+-- mess up.
+
+/*
 -- Assume that pages were started 10 mins before the TxReadDate.
 update texts set TxStartDate = datetime(TxReadDate, '-10 minutes') WHERE TxReadDate is not null;
 
@@ -25,7 +30,7 @@ AND TxBkID IN (
     FROM texts
     WHERE TxReadDate IS NOT NULL
 );
-
+*/
 
 -- After check:
 /*
