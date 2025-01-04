@@ -37,6 +37,28 @@
 <form id="actionposter" method="post" action="">
 </form>
 
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/dayjs/dayjs.min.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/dayjs/relativeTime.js') }}" charset="utf-8"></script>
+<script>
+  var thresholds = [
+  { l: 's', r: 1 },
+  { l: 'm', r: 1 },
+  { l: 'mm', r: 55, d: 'minute' },
+  { l: 'h', r: 1 },
+  { l: 'hh', r: 22, d: 'hour' },
+  { l: 'd', r: 1 },
+  { l: 'dd', r: 25, d: 'day' },
+  { l: 'M', r: 1 },
+  { l: 'MM', r: 11, d: 'month' },
+  { l: 'y', r: 1 },
+  { l: 'yy', d: 'year' }
+  ];
+  var config = {
+    thresholds: thresholds
+  }
+  dayjs.extend(dayjs_plugin_relativeTime, config);
+</script>
+
 <script>
 
   /* The book listing. */
@@ -291,8 +313,9 @@
     if (dt == null) {
       return '';
     }
-    const datepart = dt.split(' ')[0];
-    return `<span title="${dt}">${datepart}</span>`;
+    const djs = dayjs(dt);
+    const txt = djs.fromNow();
+    return `<span title="${dt}">${txt}</span>`;
   };
 
   let render_book_actions = function ( data, type, row, meta ) {
