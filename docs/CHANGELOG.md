@@ -1,4 +1,13 @@
 
+# 3.9.0 (2025-01-04)
+
+Feature changes:
+
+* Add black and white theme.  By @Christhomas17 in #557.
+* #543: track starting reading of each page, show in book listing.
+* #530: add 'peek' route to display page without tracking it, use for sentence lookups.
+
+
 # 3.8.1 (2024-12-26)
 
 Tweaks:
