@@ -22,6 +22,8 @@ import requests
 from invoke import task, Collection
 from lute.config.app_config import AppConfig
 
+# pylint: disable=unused-argument
+
 
 @task
 def lint(c):
@@ -91,24 +93,13 @@ def test(c):
 
 
 def _site_is_running(useport=None):
-    """
-    Return true if site is running on port, or default 5001.
-    """
-    if useport is None:
-        useport = 5001
-
-    url = f"http://localhost:{useport}"
+    "Return True if running on port."
     try:
-        print(f"checking for site at {url} ...")
-        resp = requests.get(url, timeout=5)
+        resp = requests.get(f"http://localhost:{useport}", timeout=5)
         if resp.status_code != 200:
             raise RuntimeError(f"Got code {resp.status_code} ... ???")
-        print("Site running, using that for tests.")
-        print()
         return True
     except requests.exceptions.ConnectionError:
-        print(f"URL {url} not reachable, will start new server at that port.")
-        print()
         return False
 
 
@@ -117,12 +108,13 @@ def _wait_for_running_site(port):
     url = f"http://localhost:{port}"
     is_running = False
     attempt_count = 0
-    print(f"Wait until site is running at {url}.", flush=True)
+    print(f"Wait until site is running at {url} ...", flush=True)
     while attempt_count < 10 and not is_running:
         attempt_count += 1
         try:
-            print(f"  Attempt {attempt_count}", flush=True)
+            # print(f"  Attempt {attempt_count}", flush=True)
             requests.get(url, timeout=5)
+            print(f"Site is running (succeeded on attempt {attempt_count})", flush=True)
             is_running = True
         except requests.exceptions.ConnectionError:
             time.sleep(1)
@@ -130,64 +122,53 @@ def _wait_for_running_site(port):
         raise Exception("Site didn't start?")  # pylint: disable=broad-exception-raised
 
 
-def _run_browser_tests(c, port, run_test):
-    "Start server on port if necessary, and run tests."
+def _run_browser_tests(port, run_test):
+    "Start server on port, and run tests."
     tests_failed = False
     if _site_is_running(port):
-        c.run(" ".join(run_test))
-    else:
+        raise RuntimeError(f"Site already running on port {port}, quitting")
 
-        def print_subproc_output(pipe, label):
-            """Prints output from a given pipe with a label."""
-            for line in iter(pipe.readline, b""):
-                print(f"[{label}] {line.decode().strip()}", flush=True)
-            pipe.close()
+    def print_subproc_output(pipe, label):
+        """Prints output from a given pipe with a label."""
+        for line in iter(pipe.readline, b""):
+            print(f"[{label}] {line.decode().strip()}", flush=True)
+        pipe.close()
 
-        cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{port}"]
-        with subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        ) as app_process:
-            _wait_for_running_site(port)
-            stdout_thread = threading.Thread(
-                target=print_subproc_output, args=(app_process.stdout, "STDOUT")
-            )
-            stderr_thread = threading.Thread(
-                target=print_subproc_output, args=(app_process.stderr, "STDERR")
-            )
-            stdout_thread.start()
-            stderr_thread.start()
-            try:
-                subprocess.run(run_test, check=True)
-            except subprocess.CalledProcessError:
-                # This just means a test failed.  We don't need to see
-                # a stack trace, the assert failures are already displayed.
-                tests_failed = True
-            finally:
-                app_process.terminate()
-                stdout_thread.join()
-                stderr_thread.join()
+    cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{port}"]
+    with subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ) as app_process:
+        _wait_for_running_site(port)
+        stdout_thread = threading.Thread(
+            target=print_subproc_output, args=(app_process.stdout, "STDOUT")
+        )
+        stderr_thread = threading.Thread(
+            target=print_subproc_output, args=(app_process.stderr, "STDERR")
+        )
+        stdout_thread.start()
+        stderr_thread.start()
+        try:
+            subprocess.run(run_test, check=True)
+        except subprocess.CalledProcessError:
+            # This just means a test failed.  We don't need to see
+            # a stack trace, the assert failures are already displayed.
+            tests_failed = True
+        finally:
+            app_process.terminate()
+            stdout_thread.join()
+            stderr_thread.join()
 
     if tests_failed:
         raise RuntimeError("tests failed")
 
 
-@task(
-    pre=[_ensure_test_db],
-    help={
-        "port": "optional port to run on; creates server if needed.",
-        "show": "print data",
-        "noheadless": "run as non-headless (default is headless, i.e. not shown)",
-        "kflag": "optional -k flag argument",
-        "exitfirst": "exit on first failure",
-        "verbose": "make verbose",
-    },
-)
-def accept(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+def _run_acceptance(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     c,
     port=5001,
     show=False,
     noheadless=False,
     kflag=None,
+    mobile=False,
     exitfirst=False,
     verbose=False,
 ):
@@ -217,8 +198,73 @@ def accept(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         run_test.append("--exitfirst")
     if verbose:
         run_test.append("-vv")
+    if mobile:
+        run_test.append("-m mobile")
+        run_test.append("--mobile")
 
-    _run_browser_tests(c, 5001, run_test)
+    _run_browser_tests(5001, run_test)
+
+
+acceptance_help = {
+    "port": "optional port to run on; creates server if needed.",
+    "show": "print data",
+    "noheadless": "run as non-headless (default is headless, i.e. not shown)",
+    "kflag": "optional -k flag argument",
+    "exitfirst": "exit on first failure",
+    "verbose": "make verbose",
+}
+
+
+@task(
+    pre=[_ensure_test_db],
+    help=acceptance_help,
+)
+def accept(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    c,
+    port=5001,
+    show=False,
+    noheadless=False,
+    kflag=None,
+    exitfirst=False,
+    verbose=False,
+):
+    "Run acceptance tests, full browser."
+    _run_acceptance(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        c,
+        port=port,
+        show=show,
+        noheadless=noheadless,
+        kflag=kflag,
+        mobile=False,
+        exitfirst=exitfirst,
+        verbose=verbose,
+    )
+
+
+@task(
+    pre=[_ensure_test_db],
+    help=acceptance_help,
+)
+def acceptmobile(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    c,
+    port=5001,
+    show=False,
+    noheadless=False,
+    kflag=None,
+    exitfirst=False,
+    verbose=False,
+):
+    "Run acceptance tests, mobile emulation, tests marked @mobile."
+    _run_acceptance(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        c,
+        port=port,
+        show=show,
+        noheadless=noheadless,
+        kflag=kflag,
+        mobile=True,
+        exitfirst=exitfirst,
+        verbose=verbose,
+    )
 
 
 @task(pre=[_ensure_test_db])
@@ -231,7 +277,7 @@ def playwright(c):
     If Lute's not running on specified port, start a server.
     """
     run_test = ["pytest", "tests/playwright/playwright.py", "-s"]
-    _run_browser_tests(c, 5001, run_test)
+    _run_browser_tests(5001, run_test)
 
 
 @task(pre=[_ensure_test_db], help={"html": "open html report"})
@@ -257,7 +303,7 @@ def black(c):
     c.run("python -m black .")
 
 
-@task(pre=[test, accept, playwright])
+@task(pre=[test, accept, acceptmobile, playwright])
 def fulltest(c):  # pylint: disable=unused-argument
     """
     Run full tests check.
@@ -280,6 +326,7 @@ ns.add_task(lint)
 ns.add_task(lint_changed)
 ns.add_task(test)
 ns.add_task(accept)
+ns.add_task(acceptmobile)
 ns.add_task(playwright)
 ns.add_task(coverage)
 ns.add_task(todos)

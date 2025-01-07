@@ -7,6 +7,7 @@ Feature: User can actually read and stuff.
         And demo languages
 
 
+    @mobile
     Scenario: Book elements are rendered correctly
         Given a Spanish book "Hola" with content:
             Hola. Adios amigo.
@@ -15,6 +16,7 @@ Feature: User can actually read and stuff.
             Hola/. /Adios/ /amigo/.
 
 
+    @mobile
     Scenario: Updating term status updates the reading frame
         Given a Spanish book "Hola" with content:
             Hola. Adios amigo.
