@@ -91,24 +91,13 @@ def test(c):
 
 
 def _site_is_running(useport=None):
-    """
-    Return true if site is running on port, or default 5001.
-    """
-    if useport is None:
-        useport = 5001
-
-    url = f"http://localhost:{useport}"
+    "Return True if running on port."
     try:
-        print(f"checking for site at {url} ...")
-        resp = requests.get(url, timeout=5)
+        resp = requests.get(f"http://localhost:{useport}", timeout=5)
         if resp.status_code != 200:
             raise RuntimeError(f"Got code {resp.status_code} ... ???")
-        print("Site running, using that for tests.")
-        print()
         return True
     except requests.exceptions.ConnectionError:
-        print(f"URL {url} not reachable, will start new server at that port.")
-        print()
         return False
 
 
@@ -117,12 +106,13 @@ def _wait_for_running_site(port):
     url = f"http://localhost:{port}"
     is_running = False
     attempt_count = 0
-    print(f"Wait until site is running at {url}.", flush=True)
+    print(f"Wait until site is running at {url} ...", flush=True)
     while attempt_count < 10 and not is_running:
         attempt_count += 1
         try:
-            print(f"  Attempt {attempt_count}", flush=True)
+            # print(f"  Attempt {attempt_count}", flush=True)
             requests.get(url, timeout=5)
+            print(f"Site is running (succeeded on attempt {attempt_count})", flush=True)
             is_running = True
         except requests.exceptions.ConnectionError:
             time.sleep(1)
@@ -131,41 +121,40 @@ def _wait_for_running_site(port):
 
 
 def _run_browser_tests(c, port, run_test):
-    "Start server on port if necessary, and run tests."
+    "Start server on port, and run tests."
     tests_failed = False
     if _site_is_running(port):
-        c.run(" ".join(run_test))
-    else:
+        raise RuntimeError(f"Site already running on port {port}, quitting")
 
-        def print_subproc_output(pipe, label):
-            """Prints output from a given pipe with a label."""
-            for line in iter(pipe.readline, b""):
-                print(f"[{label}] {line.decode().strip()}", flush=True)
-            pipe.close()
+    def print_subproc_output(pipe, label):
+        """Prints output from a given pipe with a label."""
+        for line in iter(pipe.readline, b""):
+            print(f"[{label}] {line.decode().strip()}", flush=True)
+        pipe.close()
 
-        cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{port}"]
-        with subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        ) as app_process:
-            _wait_for_running_site(port)
-            stdout_thread = threading.Thread(
-                target=print_subproc_output, args=(app_process.stdout, "STDOUT")
-            )
-            stderr_thread = threading.Thread(
-                target=print_subproc_output, args=(app_process.stderr, "STDERR")
-            )
-            stdout_thread.start()
-            stderr_thread.start()
-            try:
-                subprocess.run(run_test, check=True)
-            except subprocess.CalledProcessError:
-                # This just means a test failed.  We don't need to see
-                # a stack trace, the assert failures are already displayed.
-                tests_failed = True
-            finally:
-                app_process.terminate()
-                stdout_thread.join()
-                stderr_thread.join()
+    cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{port}"]
+    with subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ) as app_process:
+        _wait_for_running_site(port)
+        stdout_thread = threading.Thread(
+            target=print_subproc_output, args=(app_process.stdout, "STDOUT")
+        )
+        stderr_thread = threading.Thread(
+            target=print_subproc_output, args=(app_process.stderr, "STDERR")
+        )
+        stdout_thread.start()
+        stderr_thread.start()
+        try:
+            subprocess.run(run_test, check=True)
+        except subprocess.CalledProcessError:
+            # This just means a test failed.  We don't need to see
+            # a stack trace, the assert failures are already displayed.
+            tests_failed = True
+        finally:
+            app_process.terminate()
+            stdout_thread.join()
+            stderr_thread.join()
 
     if tests_failed:
         raise RuntimeError("tests failed")
