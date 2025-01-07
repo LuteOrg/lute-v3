@@ -160,23 +160,13 @@ def _run_browser_tests(c, port, run_test):
         raise RuntimeError("tests failed")
 
 
-@task(
-    pre=[_ensure_test_db],
-    help={
-        "port": "optional port to run on; creates server if needed.",
-        "show": "print data",
-        "noheadless": "run as non-headless (default is headless, i.e. not shown)",
-        "kflag": "optional -k flag argument",
-        "exitfirst": "exit on first failure",
-        "verbose": "make verbose",
-    },
-)
-def accept(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+def _run_acceptance(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     c,
     port=5001,
     show=False,
     noheadless=False,
     kflag=None,
+    mobile=False,
     exitfirst=False,
     verbose=False,
 ):
@@ -206,8 +196,73 @@ def accept(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         run_test.append("--exitfirst")
     if verbose:
         run_test.append("-vv")
+    if mobile:
+        run_test.append("-m mobile")
+        run_test.append("--mobile")
 
     _run_browser_tests(c, 5001, run_test)
+
+
+acceptance_help = {
+    "port": "optional port to run on; creates server if needed.",
+    "show": "print data",
+    "noheadless": "run as non-headless (default is headless, i.e. not shown)",
+    "kflag": "optional -k flag argument",
+    "exitfirst": "exit on first failure",
+    "verbose": "make verbose",
+}
+
+
+@task(
+    pre=[_ensure_test_db],
+    help=acceptance_help,
+)
+def accept(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    c,
+    port=5001,
+    show=False,
+    noheadless=False,
+    kflag=None,
+    exitfirst=False,
+    verbose=False,
+):
+    "Run acceptance tests, full browser."
+    _run_acceptance(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        c,
+        port=port,
+        show=show,
+        noheadless=noheadless,
+        kflag=kflag,
+        mobile=False,
+        exitfirst=exitfirst,
+        verbose=verbose,
+    )
+
+
+@task(
+    pre=[_ensure_test_db],
+    help=acceptance_help,
+)
+def acceptmobile(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    c,
+    port=5001,
+    show=False,
+    noheadless=False,
+    kflag=None,
+    exitfirst=False,
+    verbose=False,
+):
+    "Run acceptance tests, mobile emulation, tests marked @mobile."
+    _run_acceptance(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        c,
+        port=port,
+        show=show,
+        noheadless=noheadless,
+        kflag=kflag,
+        mobile=True,
+        exitfirst=exitfirst,
+        verbose=verbose,
+    )
 
 
 @task(pre=[_ensure_test_db])
@@ -246,7 +301,7 @@ def black(c):
     c.run("python -m black .")
 
 
-@task(pre=[test, accept, playwright])
+@task(pre=[test, accept, acceptmobile, playwright])
 def fulltest(c):  # pylint: disable=unused-argument
     """
     Run full tests check.
@@ -269,6 +324,7 @@ ns.add_task(lint)
 ns.add_task(lint_changed)
 ns.add_task(test)
 ns.add_task(accept)
+ns.add_task(acceptmobile)
 ns.add_task(playwright)
 ns.add_task(coverage)
 ns.add_task(todos)

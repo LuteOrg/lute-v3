@@ -12,6 +12,7 @@ Feature: Books and stats are available
     ##     And the reading pane shows:
     ##         Hola/. /Tengo/ /un/ /perro/.
 
+    @mobile
     Scenario: I can import text.
         Given I visit "/"
         Given a Spanish book "Hola" with content:
@@ -30,6 +31,7 @@ Feature: Books and stats are available
         And the reading pane shows:
             Hola/. /Tengo/ /un/ /gato/.
 
+    @mobile
     Scenario: I can import a text file.
         Given I visit "/"
         Given a Spanish book "Hola" from file hola.txt

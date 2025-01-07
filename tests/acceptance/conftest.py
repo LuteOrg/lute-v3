@@ -27,6 +27,7 @@ def pytest_addoption(parser):
     """
     parser.addoption("--port", action="store", type=int, help="Specify the port number")
     parser.addoption("--headless", action="store_true", help="Run the test as headless")
+    parser.addoption("--mobile", action="store_true", help="Run tests tagged @mobile")
 
 
 @pytest.fixture(name="_environment_check", scope="session")
@@ -103,6 +104,19 @@ def session_chrome_browser(request, _environment_check):
         # https://stackoverflow.com/questions/43541925/
         #   how-can-i-set-the-browser-window-size-when-using-google-chrome-headless
         chrome_options.add_argument("window-size=1920,1080")
+
+    mobile = request.config.getoption("--mobile")
+    if mobile:
+        useragent = [
+            "Mozilla/5.0 (Linux; Android 4.2.1; en-us; Nexus 5 Build/JOP40D)",
+            "AppleWebKit/535.19 (KHTML, like Gecko)",
+            "Chrome/18.0.1025.166 Mobile Safari/535.19",
+        ]
+        mobile_emulation = {
+            "deviceMetrics": {"width": 375, "height": 812, "pixelRatio": 3.0},
+            "userAgent": " ".join(useragent),
+        }
+        chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
 
     # Initialize the browser with ChromeOptions
     browser = Browser("chrome", options=chrome_options)
