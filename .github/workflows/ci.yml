@@ -80,15 +80,30 @@ jobs:
           exit_code=0
           # Have to explicitly set MECAB_PATH for natto-py.
           export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
-          inv accept --show --verbose || exit_code=$?
+          inv accept --show || exit_code=$?
           if [ "$exit_code" -ne 0 ]; then
               echo "Command failed with exit code $exit_code, retrying..."
           fi
           exit $exit_code
 
-    # Playwright tests were hanging far too often on github ci,
-    # but not consistently.  No idea what was going wrong.
-    # TODO github ci: fix playwright hanging.
+    # Skipping acceptance tests for 3.8, just to save some time.
+    - name: Mobile acceptance testing
+      if: matrix.python_version != '3.8'
+      uses: nick-fields/retry@v3
+      with:
+        max_attempts: 3
+        timeout_minutes: 30
+        command: |
+          # handle errors manually, so that the retry works.
+          exit_code=0
+          # Have to explicitly set MECAB_PATH for natto-py.
+          export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
+          inv acceptmobile --show || exit_code=$?
+          if [ "$exit_code" -ne 0 ]; then
+              echo "Command failed with exit code $exit_code, retrying..."
+          fi
+          exit $exit_code
+
     - name: Playwright install
       run: playwright install
 
