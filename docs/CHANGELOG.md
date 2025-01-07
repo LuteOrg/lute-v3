@@ -1,4 +1,10 @@
 
+# 3.9.1 (2025-01-07)
+
+* Fix mobile javascript bug
+* Add ci for checking mobile
+
+
 # 3.9.0 (2025-01-04)
 
 Feature changes:
