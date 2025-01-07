@@ -186,9 +186,9 @@
   LookupButton.LANG_ID = {{ lang_id | safe }};
   LookupButton.TERM_DICTS = {{ term_dicts | safe }};
 
-  let mouseY;
-  let scrollY;
-  let scrollYBeforeReload;
+  let mouseY = 0;
+  let scrollY = 0;
+  let scrollYBeforeReload = 0;
   const mediaTablet = window.matchMedia("(max-width: 980px)");
   const readPaneRight = document.getElementById("read_pane_right");
   const btmMarginCont = document.querySelector(".btm-margin-container");
@@ -243,6 +243,7 @@
       readPaneRight.classList.add("open-dict");
       btmMarginCont.classList.add("open-dict");
 
+      const viewportHeight = document.documentElement.clientHeight;
       const mousePosPercent = mouseY / viewportHeight * 100;
       const dict_transform = `translateY(${Math.round(mousePosPercent) + 10}%)`;
       document.querySelector("#read_pane_right.open-dict").style.transform = dict_transform;
@@ -250,7 +251,6 @@
 
       // Add margin to the bottom of readLeft so it's fully scrollable
       // to the bottom when the dict is over text
-      const viewportHeight = document.documentElement.clientHeight;
       const mt = `calc(${viewportHeight - mouseY + 70}px - var(--player-height))`;
       document.querySelector(".open-dict.btm-margin-container").style.marginTop = mt;
 
