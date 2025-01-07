@@ -80,7 +80,7 @@ jobs:
           exit_code=0
           # Have to explicitly set MECAB_PATH for natto-py.
           export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
-          inv accept --show --verbose || exit_code=$?
+          inv accept --show || exit_code=$?
           if [ "$exit_code" -ne 0 ]; then
               echo "Command failed with exit code $exit_code, retrying..."
           fi
@@ -98,15 +98,12 @@ jobs:
           exit_code=0
           # Have to explicitly set MECAB_PATH for natto-py.
           export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
-          inv acceptmobile --show --verbose || exit_code=$?
+          inv acceptmobile --show || exit_code=$?
           if [ "$exit_code" -ne 0 ]; then
               echo "Command failed with exit code $exit_code, retrying..."
           fi
           exit $exit_code
 
-    # Playwright tests were hanging far too often on github ci,
-    # but not consistently.  No idea what was going wrong.
-    # TODO github ci: fix playwright hanging.
     - name: Playwright install
       run: playwright install
 
