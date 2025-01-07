@@ -22,6 +22,8 @@ import requests
 from invoke import task, Collection
 from lute.config.app_config import AppConfig
 
+# pylint: disable=unused-argument
+
 
 @task
 def lint(c):
@@ -120,7 +122,7 @@ def _wait_for_running_site(port):
         raise Exception("Site didn't start?")  # pylint: disable=broad-exception-raised
 
 
-def _run_browser_tests(c, port, run_test):
+def _run_browser_tests(port, run_test):
     "Start server on port, and run tests."
     tests_failed = False
     if _site_is_running(port):
@@ -200,7 +202,7 @@ def _run_acceptance(  # pylint: disable=too-many-arguments,too-many-positional-a
         run_test.append("-m mobile")
         run_test.append("--mobile")
 
-    _run_browser_tests(c, 5001, run_test)
+    _run_browser_tests(5001, run_test)
 
 
 acceptance_help = {
@@ -275,7 +277,7 @@ def playwright(c):
     If Lute's not running on specified port, start a server.
     """
     run_test = ["pytest", "tests/playwright/playwright.py", "-s"]
-    _run_browser_tests(c, 5001, run_test)
+    _run_browser_tests(5001, run_test)
 
 
 @task(pre=[_ensure_test_db], help={"html": "open html report"})
