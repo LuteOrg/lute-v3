@@ -89,8 +89,14 @@ class Book:  # pylint: disable=too-many-instance-attributes
         # Overrides the self.text if not None.
         self.text_source_path = None
 
+        self.text_stream = None
+        self.text_stream_filename = None
+
         # The source file used for audio.
         self.audio_source_path = None
+
+        self.audio_stream = None
+        self.audio_stream_filename = None
 
     def __repr__(self):
         return f"<Book (id={self.id}, title='{self.title}')>"
