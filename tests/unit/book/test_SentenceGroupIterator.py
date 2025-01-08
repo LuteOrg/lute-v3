@@ -2,7 +2,7 @@
 SentenceGroupIterator tests.
 """
 
-from lute.book.service import SentenceGroupIterator
+from lute.book.model import SentenceGroupIterator
 from lute.parse.space_delimited_parser import SpaceDelimitedParser
 
 

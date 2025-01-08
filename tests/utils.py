@@ -3,7 +3,7 @@ Utility methods for tests.
 """
 
 from lute.models.term import Term
-from lute.book.service import Service as BookService
+from lute.models.book import Book, Text
 from lute.read.render.service import Service
 from lute.db import db
 
@@ -21,12 +21,19 @@ def add_terms(language, term_array):
     return ret
 
 
-def make_book(title, content, language, max_words_per_page=250):
+def make_book(title, content, language):
     """
     Make a book.
     """
-    svc = BookService()
-    b = svc.create_book(title, language, content, max_words_per_page)
+    b = Book()
+    b.title = title
+    b.language = language
+    if isinstance(content, str):
+        content = [content]
+    n = 0
+    for c in content:
+        n += 1
+        _ = Text(b, c, n)
     return b
 
 
