@@ -21,11 +21,11 @@ def add_terms(language, term_array):
     return ret
 
 
-def make_book(title, content, language):
+def make_book(title, content, language, max_words_per_page=250):
     """
     Make a book.
     """
-    b = Book.create_book(title, language, content)
+    b = Book.create_book(title, language, content, max_words_per_page)
     return b
 
 

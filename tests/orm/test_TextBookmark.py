@@ -5,13 +5,14 @@ from datetime import datetime
 import pytest
 from lute.models.book import Book, Text, TextBookmark
 from lute.db import db
+from tests.utils import make_book
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
 
 
 @pytest.fixture(name="sample_book")
 def fixture_sample_book(english):
     "Sample Book"
-    b = Book.create_book("Book Title", english, "some text")
+    b = make_book("Book Title", "some text", english)
     b.texts[0].read_date = datetime.now()
     return b
 

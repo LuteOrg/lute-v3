@@ -8,13 +8,14 @@ from lute.models.book import Book, BookTag, TextBookmark, BookStats
 from lute.read.service import Service
 from lute.book.stats import Service as BookStatsService
 from lute.db import db
+from tests.utils import make_book
 from tests.dbasserts import assert_sql_result, assert_record_count_equals
 
 
 @pytest.fixture(name="simple_book")
 def fixture_simple_book(english):
     "Single page book with some associated objects."
-    b = Book.create_book("hi", english, "SOME TEXT")
+    b = make_book("hi", "SOME TEXT", english)
     b.texts[0].read_date = datetime.now()
     bt = BookTag.make_book_tag("hola")
     b.book_tags.append(bt)
@@ -82,7 +83,7 @@ def test_save_and_delete_created_book(english):
     Verify book orm mappings.
     """
     content = "Some text here. Some more text"
-    b = Book.create_book("test", english, content, 3)
+    b = make_book("test", content, english, 3)
     db.session.add(b)
     db.session.commit()
     sql = f"select TxOrder, TxText from texts where TxBkID = {b.id}"
