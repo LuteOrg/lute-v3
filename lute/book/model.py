@@ -8,6 +8,7 @@ from lute.models.repositories import (
     BookTagRepository,
     LanguageRepository,
 )
+from lute.book.service import Service
 
 
 class Book:  # pylint: disable=too-many-instance-attributes
@@ -107,7 +108,8 @@ class Repository:
 
         b = None
         if book.id is None:
-            b = DBBook.create_book(book.title, lang, book.text, book.max_page_tokens)
+            svc = Service()
+            b = svc.create_book(book.title, lang, book.text, book.max_page_tokens)
         else:
             b = self.book_repo.find(book.id)
         b.title = book.title
