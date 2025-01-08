@@ -6,9 +6,8 @@ import os
 from io import StringIO
 from datetime import datetime
 
-# pylint: disable=unused-import
-from dataclasses import dataclass, field
-from tempfile import TemporaryFile, SpooledTemporaryFile
+from dataclasses import dataclass
+from tempfile import TemporaryFile
 import requests
 from bs4 import BeautifulSoup
 from flask import current_app, flash
@@ -16,7 +15,6 @@ from openepub import Epub, EpubError
 from pypdf import PdfReader
 from subtitle_parser import SrtParser, WebVttParser
 from werkzeug.utils import secure_filename
-from lute.book.model import Book
 from lute.models.book import Book as DBBook, Text as DBText
 from lute.parse.base import SentenceGroupIterator
 
