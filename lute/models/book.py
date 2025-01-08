@@ -5,7 +5,6 @@ Book entity.
 import sqlite3
 from contextlib import closing
 from lute.db import db
-from lute.parse.base import SentenceGroupIterator
 
 booktags = db.Table(
     "booktags",
@@ -138,49 +137,6 @@ class Book(
     def is_supported(self):
         "True if the book's language's parser is supported."
         return self.language.is_supported
-
-    @staticmethod
-    def create_book(title, language, fulltext, max_word_tokens_per_text=250):
-        """
-        Create a book with given fulltext content,
-        splitting the content into separate Text objects with max
-        token count.
-        """
-
-        def split_text_at_page_breaks(txt):
-            "Break fulltext manually at lines consisting of '---' only."
-            # Tried doing this with a regex without success.
-            segments = []
-            current_segment = ""
-            for line in txt.split("\n"):
-                if line.strip() == "---":
-                    segments.append(current_segment.strip())
-                    current_segment = ""
-                else:
-                    current_segment += line + "\n"
-            if current_segment:
-                segments.append(current_segment.strip())
-            return segments
-
-        pages = []
-        for segment in split_text_at_page_breaks(fulltext):
-            tokens = language.parser.get_parsed_tokens(segment, language)
-            it = SentenceGroupIterator(tokens, max_word_tokens_per_text)
-            while toks := it.next():
-                s = (
-                    "".join([t.token for t in toks])
-                    .replace("\r", "")
-                    .replace("¶", "\n")
-                    .strip()
-                )
-                pages.append(s)
-        pages = [p for p in pages if p.strip() != ""]
-
-        b = Book(title, language)
-        for index, page in enumerate(pages):
-            t = Text(b, page, index + 1)
-
-        return b
 
 
 # TODO zzfuture fix: rename class and table to Page/pages
