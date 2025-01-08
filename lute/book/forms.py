@@ -79,8 +79,9 @@ class NewBookForm(FlaskForm):
         obj.book_tags = _values(self.book_tags.data)
 
         service = Service()
-        if self.textfile.data:
-            obj.text = service.get_file_content(self.textfile.data)
+        tfd = self.textfile.data
+        if tfd:
+            obj.text = service.get_file_content(tfd.filename, tfd.stream)
         f = self.audiofile.data
         if f:
             obj.audio_filename = service.save_audio_file(f)
