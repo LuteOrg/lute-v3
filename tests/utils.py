@@ -3,7 +3,6 @@ Utility methods for tests.
 """
 
 from lute.models.term import Term
-from lute.models.book import Book
 from lute.book.service import Service as BookService
 from lute.read.render.service import Service
 from lute.db import db

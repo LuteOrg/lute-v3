@@ -2,7 +2,7 @@
 Book domain objects.
 """
 
-from lute.models.book import Book as DBBook, BookTag
+from lute.models.book import BookTag
 from lute.models.repositories import (
     BookRepository,
     BookTagRepository,
