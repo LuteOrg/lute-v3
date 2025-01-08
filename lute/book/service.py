@@ -16,6 +16,8 @@ from pypdf import PdfReader
 from subtitle_parser import SrtParser, WebVttParser
 from werkzeug.utils import secure_filename
 from lute.book.model import Book
+from lute.models.book import Book as DBBook, Text as DBText
+from lute.parse.base import SentenceGroupIterator
 
 
 class BookImportException(Exception):
@@ -199,4 +201,52 @@ class Service:
         b.title = short_title
         b.source_uri = url
         b.text = "\n\n".join(extracted_text)
+        return b
+
+    def split_text_at_page_breaks(self, txt):
+        "Break fulltext manually at lines consisting of '---' only."
+        # Tried doing this with a regex without success.
+        segments = []
+        current_segment = ""
+        for line in txt.split("\n"):
+            if line.strip() == "---":
+                segments.append(current_segment.strip())
+                current_segment = ""
+            else:
+                current_segment += line + "\n"
+        if current_segment:
+            segments.append(current_segment.strip())
+        return segments
+
+    def split_by_sentences(self, language, fulltext, max_word_tokens_per_text=250):
+        "Split fulltext into pages, respecting sentences."
+
+        pages = []
+        for segment in self.split_text_at_page_breaks(fulltext):
+            tokens = language.parser.get_parsed_tokens(segment, language)
+            it = SentenceGroupIterator(tokens, max_word_tokens_per_text)
+            while toks := it.next():
+                s = (
+                    "".join([t.token for t in toks])
+                    .replace("\r", "")
+                    .replace("¶", "\n")
+                    .strip()
+                )
+                pages.append(s)
+        pages = [p for p in pages if p.strip() != ""]
+
+        return pages
+
+    def create_book(self, title, language, fulltext, max_word_tokens_per_text=250):
+        """
+        Create a book with given fulltext content,
+        splitting the content into separate Text objects with max
+        token count.
+        """
+        pages = self.split_by_sentences(language, fulltext, max_word_tokens_per_text)
+
+        b = DBBook(title, language)
+        for index, page in enumerate(pages):
+            t = DBText(b, page, index + 1)
+
         return b
