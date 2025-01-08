@@ -27,6 +27,7 @@ def test_split_sentences_scenario(fulltext, maxwords, expected, english):
 
 
 def test_create_book(english):
+    "Sanity check only."
     svc = Service()
     b = svc.create_book("hi", english, "Hello there.", 200)
     assert b.page_count == 1

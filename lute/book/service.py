@@ -7,6 +7,7 @@ from io import StringIO
 from datetime import datetime
 
 # pylint: disable=unused-import
+from dataclasses import dataclass, field
 from tempfile import TemporaryFile, SpooledTemporaryFile
 import requests
 from bs4 import BeautifulSoup
@@ -29,6 +30,14 @@ class BookImportException(Exception):
         self.cause = cause
         self.message = message
         super().__init__(message)
+
+
+@dataclass
+class BookDataFromUrl:
+    "Data class"
+    title: str = None
+    source_uri: str = None
+    text: str = None
 
 
 class Service:
@@ -170,8 +179,11 @@ class Service:
             msg = f"Could not parse {vtt_file_field_data.filename} (error: {str(e)})"
             raise BookImportException(message=msg, cause=e) from e
 
-    def book_from_url(self, url):
-        "Parse the url and load a new Book."
+    def book_data_from_url(self, url):
+        """
+        Parse the url and load source data for a new Book.
+        This returns a domain object, as the book is still unparsed.
+        """
         s = None
         try:
             timeout = 20  # seconds
@@ -197,7 +209,7 @@ class Service:
         if len(orig_title) > 150:
             short_title += " ..."
 
-        b = Book()
+        b = BookDataFromUrl()
         b.title = short_title
         b.source_uri = url
         b.text = "\n\n".join(extracted_text)
@@ -244,9 +256,7 @@ class Service:
         token count.
         """
         pages = self.split_by_sentences(language, fulltext, max_word_tokens_per_text)
-
         b = DBBook(title, language)
         for index, page in enumerate(pages):
-            t = DBText(b, page, index + 1)
-
+            _ = DBText(b, page, index + 1)
         return b

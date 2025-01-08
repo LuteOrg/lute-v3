@@ -12,7 +12,7 @@ from flask import (
     flash,
 )
 from lute.utils.data_tables import DataTablesFlaskParamParser
-from lute.book.service import Service, BookImportException
+from lute.book.service import Service, BookImportException, BookDataFromUrl
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm
 from lute.book.stats import Service as StatsService
@@ -83,14 +83,18 @@ def datatables_archived_source():
 
 
 def _book_from_url(url):
-    "Create a new book, or flash an error if can't parse."
-    b = Book()
+    "Get data for a new book, or flash an error if can't parse."
     service = Service()
+    bd = None
     try:
-        b = service.book_from_url(url)
+        bd = service.book_data_from_url(url)
     except BookImportException as e:
         flash(e.message, "notice")
-        b = Book()
+        bd = BookDataFromUrl()
+    b = Book()
+    b.title = bd.title
+    b.source_uri = bd.source_uri
+    b.text = bd.text
     return b
 
 
