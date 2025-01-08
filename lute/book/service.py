@@ -3,9 +3,10 @@ book helper routines.
 """
 
 import os
+import shutil
 from io import StringIO, TextIOWrapper
 from datetime import datetime
-
+import uuid
 from dataclasses import dataclass
 from tempfile import TemporaryFile
 import requests
@@ -14,7 +15,7 @@ from flask import current_app, flash
 from openepub import Epub, EpubError
 from pypdf import PdfReader
 from subtitle_parser import SrtParser, WebVttParser
-from werkzeug.utils import secure_filename
+from lute.book.model import Repository
 
 
 class BookImportException(Exception):
@@ -39,20 +40,22 @@ class BookDataFromUrl:
 class Service:
     "Service."
 
-    def _secure_unique_fname(self, filename):
+    def _unique_fname(self, filename):
         """
         Return secure name pre-pended with datetime string.
         """
         current_datetime = datetime.now()
         formatted_datetime = current_datetime.strftime("%Y%m%d_%H%M%S")
-        f = "_".join([formatted_datetime, secure_filename(filename)])
-        return f
+        _, ext = os.path.splitext(filename)
+        ext = (ext or "").lower()
+        newfilename = uuid.uuid4().hex
+        return f"{formatted_datetime}_{newfilename}{ext}"
 
     def save_audio_file(self, audio_file_field_data):
         """
         Save the file to disk, return its filename.
         """
-        filename = self._secure_unique_fname(audio_file_field_data.filename)
+        filename = self._unique_fname(audio_file_field_data.filename)
         fp = os.path.join(current_app.env_config.useraudiopath, filename)
         audio_file_field_data.save(fp)
         return filename
@@ -204,3 +207,50 @@ class Service:
         b.source_uri = url
         b.text = "\n\n".join(extracted_text)
         return b
+
+    def import_book(self, book, session):
+        """
+        Save the book as a dbbook, parsing and saving files as needed.
+        """
+
+        def _raise_if_file_missing(p, fldname):
+            if not os.path.exists(p):
+                raise BookImportException(f"Missing file {p} given in {fldname}")
+
+        def _raise_if_none(p, fldname):
+            if p is None:
+                raise BookImportException(f"Must set {fldname}")
+
+        if book.text_source_path:
+            _raise_if_file_missing(book.text_source_path, "text_source_path")
+            tsp = book.text_source_path
+            with open(tsp, mode="rb") as stream:
+                book.text = self.get_file_content(tsp, stream)
+
+        if book.text_stream:
+            _raise_if_none(book.text_stream_filename, "text_stream_filename")
+            book.text = self.get_file_content(
+                book.text_stream_filename, book.text_stream
+            )
+
+        if book.audio_source_path:
+            _raise_if_file_missing(book.audio_source_path, "audio_source_path")
+            newname = self._unique_fname(book.audio_source_path)
+            fp = os.path.join(current_app.env_config.useraudiopath, newname)
+            shutil.copy(book.audio_source_path, fp)
+            book.audio_filename = newname
+
+        if book.audio_stream:
+            _raise_if_none(book.audio_stream_filename, "audio_stream_filename")
+            newname = self._unique_fname(book.audio_stream_filename)
+            fp = os.path.join(current_app.env_config.useraudiopath, newname)
+            with open(fp, mode="wb") as fcopy:  # Use "wb" to write in binary mode
+                while chunk := book.audio_stream.read(
+                    8192
+                ):  # Read the stream in chunks (e.g., 8 KB)
+                    fcopy.write(chunk)
+            book.audio_filename = newname
+
+        repo = Repository(session)
+        repo.add(book)
+        repo.commit()
