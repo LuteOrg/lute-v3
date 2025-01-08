@@ -82,8 +82,8 @@ def test_save_and_delete_created_book(english):
     """
     Verify book orm mappings.
     """
-    content = "Some text here. Some more text"
-    b = make_book("test", content, english, 3)
+    content = ["Some text here.", "Some more text"]
+    b = make_book("test", content, english)
     db.session.add(b)
     db.session.commit()
     sql = f"select TxOrder, TxText from texts where TxBkID = {b.id}"

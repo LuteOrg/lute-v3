@@ -2,7 +2,6 @@
 Book tests.
 """
 
-import textwrap
 from lute.db import db
 from tests.utils import make_book
 from tests.dbasserts import assert_sql_result
@@ -43,16 +42,7 @@ def assert_remove(book, pagenum, expected, msg):
 
 def test_can_add_page(app_context, english):
     "Add page before and after."
-    fulltext = textwrap.dedent(
-        """\
-      1
-      ---
-      2
-      ---
-      3
-    """
-    )
-    b = make_book("hi", fulltext, english)
+    b = make_book("hi", ["1", "2", "3"], english)
     db.session.add(b)
     db.session.commit()
 
@@ -91,16 +81,7 @@ def test_add_page_after_last(app_context, english):
 
 def test_can_remove_page(app_context, english):
     "Remove pages before and after."
-    fulltext = textwrap.dedent(
-        """\
-      1
-      ---
-      2
-      ---
-      3
-    """
-    )
-    b = make_book("hi", fulltext, english)
+    b = make_book("hi", ["1", "2", "3"], english)
     db.session.add(b)
     db.session.commit()
 

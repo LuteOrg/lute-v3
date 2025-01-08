@@ -2,13 +2,65 @@
 Book domain objects.
 """
 
-from lute.models.book import BookTag
+from lute.models.book import BookTag, Book as DBBook, Text as DBText
 from lute.models.repositories import (
     BookRepository,
     BookTagRepository,
     LanguageRepository,
 )
-from lute.book.service import Service
+
+
+class SentenceGroupIterator:
+    """
+    An iterator of ParsedTokens that groups them by sentence, up
+    to a maximum number of tokens.
+    """
+
+    def __init__(self, tokens, maxcount=500):
+        self.tokens = tokens
+        self.maxcount = maxcount
+        self.currpos = 0
+
+    def count(self):
+        """
+        Get count of groups that will be returned.
+        """
+        old_currpos = self.currpos
+        c = 0
+        while self.next():
+            c += 1
+        self.currpos = old_currpos
+        return c
+
+    def next(self):
+        """
+        Get next sentence group.
+        """
+        if self.currpos >= len(self.tokens):
+            return False
+
+        curr_tok_count = 0
+        last_eos = -1
+        i = self.currpos
+
+        while (curr_tok_count <= self.maxcount or last_eos == -1) and i < len(
+            self.tokens
+        ):
+            tok = self.tokens[i]
+            if tok.is_end_of_sentence == 1:
+                last_eos = i
+            if tok.is_word == 1:
+                curr_tok_count += 1
+            i += 1
+
+        if curr_tok_count <= self.maxcount or last_eos == -1:
+            ret = self.tokens[self.currpos : i]
+            self.currpos = i + 1
+        else:
+            ret = self.tokens[self.currpos : last_eos + 1]
+            self.currpos = last_eos + 1
+
+        return ret
 
 
 class Book:  # pylint: disable=too-many-instance-attributes
@@ -32,6 +84,13 @@ class Book:  # pylint: disable=too-many-instance-attributes
         self.audio_current_pos = None
         self.audio_bookmarks = None
         self.book_tags = []
+
+        # The source file used for the book text.
+        # Overrides the self.text if not None.
+        self.text_source_path = None
+
+        # The source file used for audio.
+        self.audio_source_path = None
 
     def __repr__(self):
         return f"<Book (id={self.id}, title='{self.title}')>"
@@ -93,6 +152,40 @@ class Repository:
         """
         self.session.commit()
 
+    def _split_text_at_page_breaks(self, txt):
+        "Break fulltext manually at lines consisting of '---' only."
+        # Tried doing this with a regex without success.
+        segments = []
+        current_segment = ""
+        for line in txt.split("\n"):
+            if line.strip() == "---":
+                segments.append(current_segment.strip())
+                current_segment = ""
+            else:
+                current_segment += line + "\n"
+        if current_segment:
+            segments.append(current_segment.strip())
+        return segments
+
+    def _split_by_sentences(self, language, fulltext, max_word_tokens_per_text=250):
+        "Split fulltext into pages, respecting sentences."
+
+        pages = []
+        for segment in self._split_text_at_page_breaks(fulltext):
+            tokens = language.parser.get_parsed_tokens(segment, language)
+            it = SentenceGroupIterator(tokens, max_word_tokens_per_text)
+            while toks := it.next():
+                s = (
+                    "".join([t.token for t in toks])
+                    .replace("\r", "")
+                    .replace("¶", "\n")
+                    .strip()
+                )
+                pages.append(s)
+        pages = [p for p in pages if p.strip() != ""]
+
+        return pages
+
     def _build_db_book(self, book):
         "Convert a book business object to a DBBook."
 
@@ -108,10 +201,13 @@ class Repository:
 
         b = None
         if book.id is None:
-            svc = Service()
-            b = svc.create_book(book.title, lang, book.text, book.max_page_tokens)
+            pages = self._split_by_sentences(lang, book.text, book.max_page_tokens)
+            b = DBBook(book.title, lang)
+            for index, page in enumerate(pages):
+                _ = DBText(b, page, index + 1)
         else:
             b = self.book_repo.find(book.id)
+
         b.title = book.title
         b.source_uri = book.source_uri
         b.audio_filename = book.audio_filename

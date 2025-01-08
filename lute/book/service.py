@@ -15,7 +15,6 @@ from openepub import Epub, EpubError
 from pypdf import PdfReader
 from subtitle_parser import SrtParser, WebVttParser
 from werkzeug.utils import secure_filename
-from lute.models.book import Book as DBBook, Text as DBText
 
 
 class BookImportException(Exception):
@@ -27,59 +26,6 @@ class BookImportException(Exception):
         self.cause = cause
         self.message = message
         super().__init__(message)
-
-
-class SentenceGroupIterator:
-    """
-    An iterator of ParsedTokens that groups them by sentence, up
-    to a maximum number of tokens.
-    """
-
-    def __init__(self, tokens, maxcount=500):
-        self.tokens = tokens
-        self.maxcount = maxcount
-        self.currpos = 0
-
-    def count(self):
-        """
-        Get count of groups that will be returned.
-        """
-        old_currpos = self.currpos
-        c = 0
-        while self.next():
-            c += 1
-        self.currpos = old_currpos
-        return c
-
-    def next(self):
-        """
-        Get next sentence group.
-        """
-        if self.currpos >= len(self.tokens):
-            return False
-
-        curr_tok_count = 0
-        last_eos = -1
-        i = self.currpos
-
-        while (curr_tok_count <= self.maxcount or last_eos == -1) and i < len(
-            self.tokens
-        ):
-            tok = self.tokens[i]
-            if tok.is_end_of_sentence == 1:
-                last_eos = i
-            if tok.is_word == 1:
-                curr_tok_count += 1
-            i += 1
-
-        if curr_tok_count <= self.maxcount or last_eos == -1:
-            ret = self.tokens[self.currpos : i]
-            self.currpos = i + 1
-        else:
-            ret = self.tokens[self.currpos : last_eos + 1]
-            self.currpos = last_eos + 1
-
-        return ret
 
 
 @dataclass
@@ -257,50 +203,4 @@ class Service:
         b.title = short_title
         b.source_uri = url
         b.text = "\n\n".join(extracted_text)
-        return b
-
-    def split_text_at_page_breaks(self, txt):
-        "Break fulltext manually at lines consisting of '---' only."
-        # Tried doing this with a regex without success.
-        segments = []
-        current_segment = ""
-        for line in txt.split("\n"):
-            if line.strip() == "---":
-                segments.append(current_segment.strip())
-                current_segment = ""
-            else:
-                current_segment += line + "\n"
-        if current_segment:
-            segments.append(current_segment.strip())
-        return segments
-
-    def split_by_sentences(self, language, fulltext, max_word_tokens_per_text=250):
-        "Split fulltext into pages, respecting sentences."
-
-        pages = []
-        for segment in self.split_text_at_page_breaks(fulltext):
-            tokens = language.parser.get_parsed_tokens(segment, language)
-            it = SentenceGroupIterator(tokens, max_word_tokens_per_text)
-            while toks := it.next():
-                s = (
-                    "".join([t.token for t in toks])
-                    .replace("\r", "")
-                    .replace("¶", "\n")
-                    .strip()
-                )
-                pages.append(s)
-        pages = [p for p in pages if p.strip() != ""]
-
-        return pages
-
-    def create_book(self, title, language, fulltext, max_word_tokens_per_text=250):
-        """
-        Create a book with given fulltext content,
-        splitting the content into separate Text objects with max
-        token count.
-        """
-        pages = self.split_by_sentences(language, fulltext, max_word_tokens_per_text)
-        b = DBBook(title, language)
-        for index, page in enumerate(pages):
-            _ = DBText(b, page, index + 1)
         return b
