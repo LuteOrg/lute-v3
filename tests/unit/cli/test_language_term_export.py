@@ -4,9 +4,9 @@ from lute.cli.language_term_export import generate_language_file, generate_book_
 
 from lute.models.term import Term, TermTag
 from lute.models.repositories import TermRepository, LanguageRepository
-from lute.models.book import Book
 from lute.db import db
 from lute.db.demo import Service as DemoService
+from tests.utils import make_book
 from tests.dbasserts import assert_sql_result, assert_record_count_equals
 
 
@@ -49,7 +49,7 @@ def test_single_book_export(app_context, empty_db, tmp_path, english):
     assert_sql_result("select * from words", [], "no terms")
 
     fulltext = "a b c d e A B C\n---\nG H I c d e d"
-    b = Book.create_book("hi", english, fulltext)
+    b = make_book("hi", fulltext, english)
     db.session.add(b)
     db.session.commit()
 

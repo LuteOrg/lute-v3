@@ -3,8 +3,8 @@ Book tests.
 """
 
 import textwrap
-from lute.models.book import Book
 from lute.db import db
+from tests.utils import make_book
 from tests.dbasserts import assert_sql_result
 
 
@@ -52,7 +52,7 @@ def test_can_add_page(app_context, english):
       3
     """
     )
-    b = Book.create_book("hi", english, fulltext)
+    b = make_book("hi", fulltext, english)
     db.session.add(b)
     db.session.commit()
 
@@ -68,7 +68,7 @@ def test_can_add_page(app_context, english):
 
 def test_add_page_before_first(app_context, english):
     "Add page before and after."
-    b = Book.create_book("hi", english, "hi")
+    b = make_book("hi", "hi", english)
     db.session.add(b)
     db.session.commit()
 
@@ -80,7 +80,7 @@ def test_add_page_before_first(app_context, english):
 
 def test_add_page_after_last(app_context, english):
     "Add page after last."
-    b = Book.create_book("hi", english, "hi")
+    b = make_book("hi", "hi", english)
     db.session.add(b)
     db.session.commit()
 
@@ -100,7 +100,7 @@ def test_can_remove_page(app_context, english):
       3
     """
     )
-    b = Book.create_book("hi", english, fulltext)
+    b = make_book("hi", fulltext, english)
     db.session.add(b)
     db.session.commit()
 
