@@ -53,59 +53,6 @@ class ParsedToken:
         return f'<"{self.token}" ({attrs})>'
 
 
-class SentenceGroupIterator:
-    """
-    An iterator of ParsedTokens that groups them by sentence, up
-    to a maximum number of tokens.
-    """
-
-    def __init__(self, tokens, maxcount=500):
-        self.tokens = tokens
-        self.maxcount = maxcount
-        self.currpos = 0
-
-    def count(self):
-        """
-        Get count of groups that will be returned.
-        """
-        old_currpos = self.currpos
-        c = 0
-        while self.next():
-            c += 1
-        self.currpos = old_currpos
-        return c
-
-    def next(self):
-        """
-        Get next sentence group.
-        """
-        if self.currpos >= len(self.tokens):
-            return False
-
-        curr_tok_count = 0
-        last_eos = -1
-        i = self.currpos
-
-        while (curr_tok_count <= self.maxcount or last_eos == -1) and i < len(
-            self.tokens
-        ):
-            tok = self.tokens[i]
-            if tok.is_end_of_sentence == 1:
-                last_eos = i
-            if tok.is_word == 1:
-                curr_tok_count += 1
-            i += 1
-
-        if curr_tok_count <= self.maxcount or last_eos == -1:
-            ret = self.tokens[self.currpos : i]
-            self.currpos = i + 1
-        else:
-            ret = self.tokens[self.currpos : last_eos + 1]
-            self.currpos = last_eos + 1
-
-        return ret
-
-
 class AbstractParser(ABC):
     """
     Abstract parser, inherited from by all parsers.
