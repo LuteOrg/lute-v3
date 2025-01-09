@@ -3,7 +3,7 @@ Utility methods for tests.
 """
 
 from lute.models.term import Term
-from lute.models.book import Book
+from lute.models.book import Book, Text
 from lute.read.render.service import Service
 from lute.db import db
 
@@ -25,7 +25,15 @@ def make_book(title, content, language):
     """
     Make a book.
     """
-    b = Book.create_book(title, language, content)
+    b = Book()
+    b.title = title
+    b.language = language
+    if isinstance(content, str):
+        content = [content]
+    n = 0
+    for c in content:
+        n += 1
+        _ = Text(b, c, n)
     return b
 
 
