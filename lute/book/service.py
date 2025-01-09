@@ -211,6 +211,7 @@ class Service:
     def import_book(self, book, session):
         """
         Save the book as a dbbook, parsing and saving files as needed.
+        Returns new book created.
         """
 
         def _raise_if_file_missing(p, fldname):
@@ -252,5 +253,6 @@ class Service:
             book.audio_filename = newname
 
         repo = Repository(session)
-        repo.add(book)
+        dbbook = repo.add(book)
         repo.commit()
+        return dbbook
