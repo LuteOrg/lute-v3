@@ -6,6 +6,7 @@ import os
 from sqlalchemy import text
 from flask import current_app
 from lute.models.setting import UserSetting
+from lute.settings.hotkey_data import initial_hotkey_defaults
 from lute.models.repositories import UserSettingRepository
 
 
@@ -70,6 +71,16 @@ def add_default_user_settings(session, default_user_backup_path):
     """
     repo = UserSettingRepository(session)
 
+    def add_initial_vals_if_needed(hsh):
+        "Add settings as required."
+        for k, v in hsh.items():
+            if not repo.key_exists(k):
+                s = UserSetting()
+                s.key = k
+                s.value = v
+                session.add(s)
+        session.commit()
+
     # These keys are rendered into the global javascript namespace var
     # LUTE_USER_SETTINGS, so if any of these keys change, check the usage
     # of that variable as well.
@@ -93,49 +104,8 @@ def add_default_user_settings(session, default_user_backup_path):
         # Term popups:
         "term_popup_promote_parent_translation": True,
         "term_popup_show_components": True,
-        # Keyboard shortcuts.  These have default values assigned
-        # as they were the hotkeys defined in the initial Lute
-        # release.
-        "hotkey_Bookmark": "KeyB",
-        "hotkey_CopyPara": "shift+KeyC",
-        "hotkey_CopySentence": "KeyC",
-        "hotkey_NextTheme": "KeyM",
-        "hotkey_NextWord": "ArrowRight",
-        "hotkey_PrevWord": "ArrowLeft",
-        "hotkey_SaveTerm": "ctrl+Enter",
-        "hotkey_StartHover": "Escape",
-        "hotkey_Status1": "Digit1",
-        "hotkey_Status2": "Digit2",
-        "hotkey_Status3": "Digit3",
-        "hotkey_Status4": "Digit4",
-        "hotkey_Status5": "Digit5",
-        "hotkey_StatusDown": "ArrowDown",
-        "hotkey_StatusIgnore": "KeyI",
-        "hotkey_StatusUp": "ArrowUp",
-        "hotkey_StatusWellKnown": "KeyW",
-        "hotkey_ToggleFocus": "KeyF",
-        "hotkey_ToggleHighlight": "KeyH",
-        "hotkey_TranslatePara": "shift+KeyT",
-        "hotkey_TranslateSentence": "KeyT",
-        # New hotkeys.  These must have empty values, because
-        # users may have already setup their hotkeys, and we can't
-        # assume that a given key combination is free:
-        "hotkey_CopyPage": "",
-        "hotkey_DeleteTerm": "",
-        "hotkey_EditPage": "",
-        "hotkey_TranslatePage": "",
-        "hotkey_PrevUnknownWord": "",
-        "hotkey_NextUnknownWord": "",
-        "hotkey_PrevSentence": "",
-        "hotkey_NextSentence": "",
     }
-    for k, v in keys_and_defaults.items():
-        if not repo.key_exists(k):
-            s = UserSetting()
-            s.key = k
-            s.value = v
-            session.add(s)
-    session.commit()
+    add_initial_vals_if_needed(keys_and_defaults)
 
     # Revise the mecab path if necessary.
     # Note this is done _after_ the defaults are loaded,
@@ -145,3 +115,5 @@ def add_default_user_settings(session, default_user_backup_path):
     revised_mecab_path = _revised_mecab_path(repo)
     repo.set_value("mecab_path", revised_mecab_path)
     session.commit()
+
+    add_initial_vals_if_needed(initial_hotkey_defaults())
