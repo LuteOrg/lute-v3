@@ -43,6 +43,10 @@ class ParsedToken:
         if self.is_end_of_sentence:
             ParsedToken.cls_sentence_number += 1
 
+    @property
+    def is_end_of_paragraph(self):
+        return self.token.strip() == "¶"
+
     def __repr__(self):
         attrs = [
             f"word: {self.is_word}",

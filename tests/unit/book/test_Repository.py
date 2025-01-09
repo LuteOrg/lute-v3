@@ -79,7 +79,8 @@ def test_save_new_respects_book_words_per_page_count(app_context, new_book, repo
     sql = "select BkTitle from books where BkTitle = 'HELLO'"
     assert_sql_result(sql, [], "empty table")
 
-    new_book.max_page_tokens = 10
+    new_book.threshold_page_tokens = 3
+    new_book.split_by = "sentences"
     new_book.text = (
         "One two three four. One two three four five six seven eight nine ten eleven."
     )
@@ -97,30 +98,67 @@ def test_save_new_respects_book_words_per_page_count(app_context, new_book, repo
 
 
 @pytest.mark.parametrize(
-    "fulltext,maxwords,expected",
+    "fulltext,threshold,expected",
     [
         ("Test.", 200, ["Test."]),
-        ("Here is a dog. And a cat.", 5, ["Here is a dog.", "And a cat."]),
+        ("Here is a dog. And a cat.", 3, ["Here is a dog.", "And a cat."]),
         ("Here is a dog. And a cat.", 500, ["Here is a dog. And a cat."]),
         ("Here is a dog.\nAnd a cat.", 500, ["Here is a dog.\nAnd a cat."]),
         ("\nHere is a dog.\n\nAnd a cat.\n", 500, ["Here is a dog.\n\nAnd a cat."]),
         ("Here is a dog.\n---\nAnd a cat.", 200, ["Here is a dog.", "And a cat."]),
-        ("Here is a dog. A cat. A thing.", 7, ["Here is a dog. A cat.", "A thing."]),
+        ("Here is a dog. A cat. A thing.", 5, ["Here is a dog. A cat.", "A thing."]),
         ("Dog.\n---\n---\nCat.\n---\n", 5, ["Dog.", "Cat."]),
     ],
 )
 def test_split_sentences_scenario(
-    fulltext, maxwords, expected, app_context, repo, english
+    fulltext, threshold, expected, app_context, repo, english
 ):
     "Check scenarios."
     b = Book()
     b.title = "Hola"
     b.language_id = english.id
     b.text = fulltext
-    b.max_page_tokens = maxwords
+    b.threshold_page_tokens = threshold
+    b.split_by = "sentences"
     dbbook = repo.add(b)
     actuals = [t.text for t in dbbook.texts]
-    assert "/".join(actuals) == "/".join(expected), f"scen {maxwords}, {fulltext}"
+    assert "/".join(actuals) == "/".join(expected), f"scen {threshold}, {fulltext}"
+
+
+@pytest.mark.parametrize(
+    "fulltext,threshold,expected",
+    [
+        ("Test.", 200, ["Test."]),
+        (
+            "Here is a dog. And a cat.\nNew paragraph.",
+            5,
+            ["Here is a dog. And a cat.", "New paragraph."],
+        ),
+        (
+            "Here is a dog. And a cat.\nNew paragraph.",
+            500,
+            ["Here is a dog. And a cat.\nNew paragraph."],
+        ),
+        ("Here is a dog.\nAnd a cat.", 500, ["Here is a dog.\nAnd a cat."]),
+        ("\nHere is a dog.\n\nAnd a cat.\n", 500, ["Here is a dog.\n\nAnd a cat."]),
+        ("Here is a dog.\n---\nAnd a cat.", 200, ["Here is a dog.", "And a cat."]),
+        ("Here is a dog. A cat. A thing.", 7, ["Here is a dog. A cat. A thing."]),
+        ("Dog.\n---\n---\nCat.\n---\n", 5, ["Dog.", "Cat."]),
+    ],
+)
+def test_split_by_paragraphs_scenario(
+    fulltext, threshold, expected, app_context, repo, english
+):
+    "Check scenarios."
+    b = Book()
+    b.title = "Hola"
+    b.language_id = english.id
+    b.text = fulltext
+    b.threshold_page_tokens = threshold
+    b.split_by = "paragraphs"
+    dbbook = repo.add(b)
+    actuals = [t.text for t in dbbook.texts]
+    assert "/".join(actuals) == "/".join(expected), f"scen {threshold}, {fulltext}"
 
 
 def test_get_tags(app_context, new_book, repo):

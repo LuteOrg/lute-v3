@@ -10,31 +10,50 @@ from lute.models.repositories import (
 )
 
 
-def sentence_group_iterator(tokens, maxcount=500):
+def token_group_generator(tokens, group_type, threshold=500):
     """
-    A generator that yields groups of ParsedTokens grouped by sentence,
-    up to a maximum number of tokens.
+    A generator that yields groups of ParsedTokens grouped by sentence or paragraph
+    with each group containing at least the threshold number of tokens.
     """
-    currpos = 0
-    while currpos < len(tokens):
-        curr_tok_count = 0
-        last_eos = -1
-        i = currpos
+    current_group = []
+    buff = []
 
-        while (curr_tok_count <= maxcount or last_eos == -1) and i < len(tokens):
-            tok = tokens[i]
-            if tok.is_end_of_sentence:
-                last_eos = i
-            if tok.is_word:
-                curr_tok_count += 1
-            i += 1
+    def trim_paras(tok_array):
+        "Remove para tokens from beginning and end."
+        while tok_array and tok_array[0].is_end_of_paragraph:
+            tok_array.pop(0)
+        while tok_array and tok_array[-1].is_end_of_paragraph:
+            tok_array.pop()
+        return tok_array
 
-        if curr_tok_count <= maxcount or last_eos == -1:
-            yield tokens[currpos:i]
-            currpos = i
-        else:
-            yield tokens[currpos : last_eos + 1]
-            currpos = last_eos + 1
+    def _matches_group_delimiter(tok):
+        if group_type == "sentences":
+            return tok.is_end_of_sentence
+        if group_type == "paragraphs":
+            return tok.is_end_of_paragraph
+        raise RuntimeError("Unhandled type " + group_type)
+
+    for token in tokens:
+        buff.append(token)
+        if _matches_group_delimiter(token):
+            current_group.extend(buff)
+            # pylint: disable=consider-using-generator
+            current_count = sum([1 for t in current_group if t.is_word])
+            buff = []
+
+            # Yield if threshold exceeded.
+            # Remove the final paragreph marker if it's there, it's not needed.
+            if current_count > threshold:
+                current_group = trim_paras(current_group)
+                yield current_group
+                current_group = []
+
+    # Add any remaining tokens
+    if buff:
+        current_group.extend(buff)
+    current_group = trim_paras(current_group)
+    if current_group:
+        yield current_group
 
 
 class Book:  # pylint: disable=too-many-instance-attributes
@@ -52,12 +71,14 @@ class Book:  # pylint: disable=too-many-instance-attributes
         self.language_name = None
         self.title = None
         self.text = None
-        self.max_page_tokens = 250
         self.source_uri = None
         self.audio_filename = None
         self.audio_current_pos = None
         self.audio_bookmarks = None
         self.book_tags = []
+
+        self.threshold_page_tokens = 250
+        self.split_by = "paragraphs"
 
         # The source file used for the book text.
         # Overrides the self.text if not None.
@@ -147,20 +168,18 @@ class Repository:
             segments.append(current_segment.strip())
         return segments
 
-    def _split_by_sentences(self, language, fulltext, max_word_tokens_per_text=250):
+    def _split_pages(self, book, language):
         "Split fulltext into pages, respecting sentences."
 
         pages = []
-        for segment in self._split_text_at_page_breaks(fulltext):
+        for segment in self._split_text_at_page_breaks(book.text):
             tokens = language.parser.get_parsed_tokens(segment, language)
-            for toks in sentence_group_iterator(tokens, max_word_tokens_per_text):
-                s = (
-                    "".join([t.token for t in toks])
-                    .replace("\r", "")
-                    .replace("¶", "\n")
-                    .strip()
-                )
-                pages.append(s)
+            for toks in token_group_generator(
+                tokens, book.split_by, book.threshold_page_tokens
+            ):
+                s = "".join([t.token for t in toks])
+                s = s.replace("\r", "").replace("¶", "\n")
+                pages.append(s.strip())
         pages = [p for p in pages if p.strip() != ""]
 
         return pages
@@ -180,7 +199,7 @@ class Repository:
 
         b = None
         if book.id is None:
-            pages = self._split_by_sentences(lang, book.text, book.max_page_tokens)
+            pages = self._split_pages(book, lang)
             b = DBBook(book.title, lang)
             for index, page in enumerate(pages):
                 _ = DBText(b, page, index + 1)
