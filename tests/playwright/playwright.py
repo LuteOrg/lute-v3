@@ -254,6 +254,12 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     )
     page.get_by_role("button", name="Save").click()
 
+    # Custom style.
+    _print("Keyboard shortcuts.")
+    page.locator("#menu_settings").hover()
+    page.get_by_role("link", name="Keyboard shortcuts").click()
+    page.get_by_role("button", name="Save").click()
+
     # ---------------------
     context.close()
     browser.close()
