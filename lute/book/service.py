@@ -37,28 +37,8 @@ class BookDataFromUrl:
     text: str = None
 
 
-class Service:
-    "Service."
-
-    def _unique_fname(self, filename):
-        """
-        Return secure name pre-pended with datetime string.
-        """
-        current_datetime = datetime.now()
-        formatted_datetime = current_datetime.strftime("%Y%m%d_%H%M%S")
-        _, ext = os.path.splitext(filename)
-        ext = (ext or "").lower()
-        newfilename = uuid.uuid4().hex
-        return f"{formatted_datetime}_{newfilename}{ext}"
-
-    def save_audio_file(self, audio_file_field_data):
-        """
-        Save the file to disk, return its filename.
-        """
-        filename = self._unique_fname(audio_file_field_data.filename)
-        fp = os.path.join(current_app.env_config.useraudiopath, filename)
-        audio_file_field_data.save(fp)
-        return filename
+class FileTextExtraction:
+    "Utility to extract text from various file formats."
 
     def get_file_content(self, filename, filestream):
         """
@@ -172,6 +152,30 @@ class Service:
             msg = f"Could not parse {filename} (error: {str(e)})"
             raise BookImportException(message=msg, cause=e) from e
 
+
+class Service:
+    "Service."
+
+    def _unique_fname(self, filename):
+        """
+        Return secure name pre-pended with datetime string.
+        """
+        current_datetime = datetime.now()
+        formatted_datetime = current_datetime.strftime("%Y%m%d_%H%M%S")
+        _, ext = os.path.splitext(filename)
+        ext = (ext or "").lower()
+        newfilename = uuid.uuid4().hex
+        return f"{formatted_datetime}_{newfilename}{ext}"
+
+    def save_audio_file(self, audio_file_field_data):
+        """
+        Save the file to disk, return its filename.
+        """
+        filename = self._unique_fname(audio_file_field_data.filename)
+        fp = os.path.join(current_app.env_config.useraudiopath, filename)
+        audio_file_field_data.save(fp)
+        return filename
+
     def book_data_from_url(self, url):
         """
         Parse the url and load source data for a new Book.
@@ -222,15 +226,16 @@ class Service:
             if p is None:
                 raise BookImportException(f"Must set {fldname}")
 
+        fte = FileTextExtraction()
         if book.text_source_path:
             _raise_if_file_missing(book.text_source_path, "text_source_path")
             tsp = book.text_source_path
             with open(tsp, mode="rb") as stream:
-                book.text = self.get_file_content(tsp, stream)
+                book.text = fte.get_file_content(tsp, stream)
 
         if book.text_stream:
             _raise_if_none(book.text_stream_filename, "text_stream_filename")
-            book.text = self.get_file_content(
+            book.text = fte.get_file_content(
                 book.text_stream_filename, book.text_stream
             )
 
