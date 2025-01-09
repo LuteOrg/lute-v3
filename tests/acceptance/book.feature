@@ -39,10 +39,6 @@ Feature: Books and stats are available
         And the reading pane shows:
             Tengo/ /un/ /amigo/.
 
-    Scenario: Non-utf-8 text files are rejected.
-        Given I visit "/"
-        Given a Spanish book "Hola" from file non_utf_8.txt
-        Then the page contains "non_utf_8.txt is not utf-8 encoding"
 
     Scenario: I can import a url.
         Given I visit "/"
@@ -51,58 +47,37 @@ Feature: Books and stats are available
         And the reading pane shows:
             Hola/. /Tengo/ /un/ /perro/.
 
-    Scenario: I can import an epub file.
+
+    Scenario Outline: I can import several text file types.
         Given I visit "/"
-        Given a Spanish book "Hola" from file Hola.epub
+        Given a Spanish book "Hola" from file <filename>
         Then the page title is Reading "Hola"
         And the reading pane shows:
-            Tengo/ /un/ /amigo/.
+            <content>
 
-    Scenario: Invalid epub files are rejected.
-        Given I visit "/"
-        Given a Spanish book "Hola" from file invalid.epub
-        Then the page contains "Could not parse invalid.epub"
+        Examples:
+        | filename  | content |
+        | Hola.srt  | Tengo/ /un/ /amigo/. |
+        | hola.txt  | Tengo/ /un/ /amigo/. |
+        | Hola.epub | Tengo/ /un/ /amigo/. |
+        | Hola.pdf  | Tengo/ /un/ /amigo/. |
+        | Hola.vtt  | Tengo/ /un/ /amigo/. |
 
-    Scenario: Empty files are rejected.
-        Given I visit "/"
-        Given a Spanish book "Hola" from file invalid_empty.epub
-        Then the page contains "invalid_empty.epub is empty."
 
-    Scenario: I can import a PDF file.
+    Scenario Outline: Bad text files are rejected.
         Given I visit "/"
-        Given a Spanish book "Hola" from file Hola.pdf
-        Then the page title is Reading "Hola"
-        And the reading pane shows:
-            Tengo/ /un/ /amigo/.
+        Given a Spanish book "Hola" from file <filename>
+        Then the page contains "<failure>"
 
-    Scenario: Invalid PDF files are rejected.
-        Given I visit "/"
-        Given a Spanish book "Hola" from file invalid.pdf
-        Then the page contains "Could not parse invalid.pdf"
+        Examples:
+        | filename  | failure |
+        | non_utf_8.txt | non_utf_8.txt is not utf-8 encoding |
+        | invalid.epub | Could not parse invalid.epub |
+        | invalid_empty.epub  | invalid_empty.epub is empty. |
+        | invalid.pdf | Could not parse invalid.pdf |
+        | invalid.srt | Could not parse invalid.srt |
+        | invalid.vtt | Could not parse invalid.vtt |
 
-    Scenario: I can import a srt file.
-        Given I visit "/"
-        Given a Spanish book "Hola" from file Hola.srt
-        Then the page title is Reading "Hola"
-        And the reading pane shows:
-            Tengo/ /un/ /amigo/.
-
-    Scenario: Invalid srt files are rejected.
-        Given I visit "/"
-        Given a Spanish book "Hola" from file invalid.srt
-        Then the page contains "Could not parse invalid.srt"
-
-    Scenario: I can import a vtt file.
-        Given I visit "/"
-        Given a Spanish book "Hola" from file Hola.vtt
-        Then the page title is Reading "Hola"
-        And the reading pane shows:
-            Tengo/ /un/ /amigo/.
-
-    Scenario: Invalid vtt files are rejected.
-        Given I visit "/"
-        Given a Spanish book "Hola" from file invalid.vtt
-        Then the page contains "Could not parse invalid.vtt"
 
     Scenario: Books and stats are shown on the first page.
         Given I visit "/"

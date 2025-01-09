@@ -12,13 +12,16 @@ from flask import (
     flash,
 )
 from lute.utils.data_tables import DataTablesFlaskParamParser
-from lute.book.service import Service, BookImportException
+from lute.book.service import (
+    Service as BookService,
+    BookImportException,
+    BookDataFromUrl,
+)
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm
 from lute.book.stats import Service as StatsService
 import lute.utils.formutils
 from lute.db import db
-
 from lute.models.language import Language
 from lute.models.repositories import (
     BookRepository,
@@ -83,14 +86,18 @@ def datatables_archived_source():
 
 
 def _book_from_url(url):
-    "Create a new book, or flash an error if can't parse."
-    b = Book()
-    service = Service()
+    "Get data for a new book, or flash an error if can't parse."
+    service = BookService()
+    bd = None
     try:
-        b = service.book_from_url(url)
+        bd = service.book_data_from_url(url)
     except BookImportException as e:
         flash(e.message, "notice")
-        b = Book()
+        bd = BookDataFromUrl()
+    b = Book()
+    b.title = bd.title
+    b.source_uri = bd.source_uri
+    b.text = bd.text
     return b
 
 
@@ -119,8 +126,8 @@ def new():
     if form.validate_on_submit():
         try:
             form.populate_obj(b)
-            book = repo.add(b)
-            repo.commit()
+            svc = BookService()
+            book = svc.import_book(b, db.session)
             return redirect(f"/read/{book.id}/page/1", 302)
         except BookImportException as e:
             flash(e.message, "notice")
@@ -149,8 +156,8 @@ def edit(bookid):
 
     if form.validate_on_submit():
         form.populate_obj(b)
-        repo.add(b)
-        repo.commit()
+        svc = BookService()
+        svc.import_book(b, db.session)
         flash(f"{b.title} updated.")
         return redirect("/", 302)
 
