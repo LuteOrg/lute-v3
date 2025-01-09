@@ -4,7 +4,7 @@ book helper routines.
 
 import os
 import shutil
-from io import StringIO, TextIOWrapper
+from io import StringIO, TextIOWrapper, BytesIO
 from datetime import datetime
 import uuid
 from dataclasses import dataclass
@@ -74,8 +74,26 @@ class FileTextExtraction:
 
     def _get_text_stream_content(self, fstream, encoding="utf-8"):
         "Gets content from simple text stream."
-        with TextIOWrapper(fstream, encoding=encoding) as decoded_stream:
-            return decoded_stream.read()
+
+        usestream = fstream
+        # May have to convert the fstream to a a BytesIO stream.
+        # GitHub CI caught this, and per ChatGPT: In Python 3.10,
+        # SpooledTemporaryFile no longer automatically gains all
+        # file-like methods when rolled over to a regular temporary
+        # file. Specifically, it seems that the object lacks the
+        # readable method required by TextIOWrapper to validate the
+        # stream ...
+        #
+        # I haven't looked into this deeply, but when running Python
+        # 3.10.16 on my mac, "inv accept -k bad_text_files" failed on
+        # line "with TextIOWrapper(fstream, encoding=encoding) as
+        # decoded:" with "AttributeError: 'SpooledTemporaryFile'
+        # object has no attribute 'readable'. Did you mean:
+        # 'readline'?"..  Converting usestream to BytesIO fixed it.
+        if not hasattr(fstream, "readable"):
+            usestream = BytesIO(fstream.read())  # Wrap in BytesIO if needed
+        with TextIOWrapper(usestream, encoding=encoding) as decoded:
+            return decoded.read()
 
     def _get_textfile_content(self, filename, filestream):
         "Get content as a single string."
