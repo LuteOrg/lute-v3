@@ -9,7 +9,6 @@ from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from lute.book.service import Service
 
 
 def _tag_values(field_data):
