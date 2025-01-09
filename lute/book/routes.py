@@ -26,6 +26,7 @@ from lute.models.repositories import (
     LanguageRepository,
 )
 from lute.book.model import Book, Repository
+from lute.book.service import Service as BookService
 
 
 bp = Blueprint("book", __name__, url_prefix="/book")
@@ -123,8 +124,8 @@ def new():
     if form.validate_on_submit():
         try:
             form.populate_obj(b)
-            book = repo.add(b)
-            repo.commit()
+            svc = BookService()
+            book = svc.import_book(b, db.session)
             return redirect(f"/read/{book.id}/page/1", 302)
         except BookImportException as e:
             flash(e.message, "notice")
@@ -153,8 +154,8 @@ def edit(bookid):
 
     if form.validate_on_submit():
         form.populate_obj(b)
-        repo.add(b)
-        repo.commit()
+        svc = BookService()
+        book = svc.import_book(b, db.session)
         flash(f"{b.title} updated.")
         return redirect("/", 302)
 

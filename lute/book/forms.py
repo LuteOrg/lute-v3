@@ -12,6 +12,14 @@ from flask_wtf.file import FileField, FileAllowed
 from lute.book.service import Service
 
 
+def _tag_values(field_data):
+    "Convert field data to array."
+    ret = []
+    if field_data:
+        ret = [h["value"] for h in json.loads(field_data)]
+    return ret
+
+
 class NewBookForm(FlaskForm):
     """
     New book.  All fields can be entered.
@@ -68,23 +76,15 @@ class NewBookForm(FlaskForm):
     def populate_obj(self, obj):
         "Call the populate_obj method from the parent class, then mine."
         super().populate_obj(obj)
-
-        def _values(field_data):
-            "Convert field data to array."
-            ret = []
-            if field_data:
-                ret = [h["value"] for h in json.loads(field_data)]
-            return ret
-
-        obj.book_tags = _values(self.book_tags.data)
-
-        service = Service()
+        obj.book_tags = _tag_values(self.book_tags.data)
         tfd = self.textfile.data
         if tfd:
-            obj.text = service.get_file_content(tfd.filename, tfd.stream)
-        f = self.audiofile.data
-        if f:
-            obj.audio_filename = service.save_audio_file(f)
+            obj.text_stream = tfd.stream
+            obj.text_stream_filename = tfd.filename
+        afd = self.audiofile.data
+        if afd:
+            obj.audio_stream = afd.stream
+            obj.audio_stream_filename = afd.filename
 
     def validate_language_id(self, field):  # pylint: disable=unused-argument
         "Language must be set."
@@ -140,19 +140,11 @@ class EditBookForm(FlaskForm):
     def populate_obj(self, obj):
         "Call the populate_obj method from the parent class, then mine."
         super().populate_obj(obj)
+        obj.book_tags = _tag_values(self.book_tags.data)
 
-        def _values(field_data):
-            "Convert field data to array."
-            ret = []
-            if field_data:
-                ret = [h["value"] for h in json.loads(field_data)]
-            return ret
-
-        obj.book_tags = _values(self.book_tags.data)
-
-        f = self.audiofile.data
-        service = Service()
-        if f:
-            obj.audio_filename = service.save_audio_file(f)
+        afd = self.audiofile.data
+        if afd:
+            obj.audio_stream = afd.stream
+            obj.audio_stream_filename = afd.filename
             obj.audio_bookmarks = None
             obj.audio_current_pos = None
