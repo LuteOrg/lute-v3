@@ -20,6 +20,7 @@ def test_sgi_scenarios(english):
         parser = SpaceDelimitedParser()
         tokens = parser.get_parsed_tokens(s, english)
 
+        # pylint: disable=unnecessary-comprehension
         groups = [g for g in sentence_group_iterator(tokens, maxcount)]
         gs = [toks_to_string(g) for g in groups]
         assert "||".join(gs) == "||".join(
