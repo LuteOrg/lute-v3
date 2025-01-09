@@ -12,13 +12,16 @@ from flask import (
     flash,
 )
 from lute.utils.data_tables import DataTablesFlaskParamParser
-from lute.book.service import Service, BookImportException, BookDataFromUrl
+from lute.book.service import (
+    Service as BookService,
+    BookImportException,
+    BookDataFromUrl,
+)
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm
 from lute.book.stats import Service as StatsService
 import lute.utils.formutils
 from lute.db import db
-
 from lute.models.language import Language
 from lute.models.repositories import (
     BookRepository,
@@ -26,7 +29,6 @@ from lute.models.repositories import (
     LanguageRepository,
 )
 from lute.book.model import Book, Repository
-from lute.book.service import Service as BookService
 
 
 bp = Blueprint("book", __name__, url_prefix="/book")
@@ -85,7 +87,7 @@ def datatables_archived_source():
 
 def _book_from_url(url):
     "Get data for a new book, or flash an error if can't parse."
-    service = Service()
+    service = BookService()
     bd = None
     try:
         bd = service.book_data_from_url(url)
@@ -155,7 +157,7 @@ def edit(bookid):
     if form.validate_on_submit():
         form.populate_obj(b)
         svc = BookService()
-        book = svc.import_book(b, db.session)
+        svc.import_book(b, db.session)
         flash(f"{b.title} updated.")
         return redirect("/", 302)
 
