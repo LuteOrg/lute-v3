@@ -33,13 +33,10 @@
     </tr>
 
     <tr>
-      <td>{{ form.textfile.label }} <i>(.txt, .epub, .pdf, .srt, .vtt)</i></td>
+      <td>{{ form.textfile.label }}<br />
+        <span class="formfieldcomment">txt, epub, pdf, srt, vtt</span>
+      </td>
       <td>{{ form.textfile() }}</td>
-    </tr>
-
-    <tr>
-        <td> {{ form.max_page_tokens.label }}</td>
-        <td> {{ form.max_page_tokens(class="form-control") }}</td>
     </tr>
 
     <tr>
@@ -48,7 +45,9 @@
     </tr>
 
     <tr>
-      <td>{{ form.audiofile.label }} <i>(.mp3, .m4a, .wav, .ogg, .opus)</i></td>
+      <td>{{ form.audiofile.label }}<br />
+        <span class="formfieldcomment">mp3, m4a, wav, ogg, opus</span>
+      </td>
       <td>{{ form.audiofile() }}</td>
     </tr>
 
@@ -57,13 +56,23 @@
       <td>{{ form.book_tags(class="form-control") }}</td>
     </tr>
 
+    <tr>
+      <td> {{ form.split_by.label }}</td>
+      <td> {{ form.split_by(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td> {{ form.threshold_page_tokens.label }}</td>
+      <td> {{ form.threshold_page_tokens(class="form-control") }}</td>
+    </tr>
+
   </tbody>
   </table>
 
   <button id="save" type="submit" class="btn btn-primary">Save</button>
+  <button id="cancel" onclick="window.location = '/'; return false;" class="btn">Cancel</button>
 </form>
 
-<button onclick="window.location = '/'">Cancel</button>
 
 <script type="text/javascript">
   var TAGS = {{ tags | safe }};

@@ -649,6 +649,11 @@ input[type=text].form-control-narrower {
     box-sizing: border-box;
 }
 
+.formfieldcomment {
+    font-size: 0.85em;
+    font-style: italic;
+}
+
 .nomarginblock {
     margin-block-start: 0px;
     margin-block-end: 0px;
@@ -1811,7 +1816,7 @@ input[name='status']:disabled + label {
 #language_id,
 #txtSetParent,
 #predefined,
-#max_page_tokens,
+#threshold_page_tokens,
 #dict_tabs,
 .dict-type,
 .dict-usefor {

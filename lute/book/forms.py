@@ -42,9 +42,12 @@ class NewBookForm(FlaskForm):
             )
         ],
     )
-    max_page_tokens = IntegerField(
+    split_by = SelectField(
+        "Split by", choices=[("paragraphs", "Paragraphs"), ("sentences", "Sentences")]
+    )
+    threshold_page_tokens = IntegerField(
         "Words per page",
-        validators=[NumberRange(min=10, max=1500)],
+        validators=[NumberRange(min=1, max=1500)],
         default=250,
     )
     source_uri = StringField("Text source", validators=[Length(max=1000)])
