@@ -44,28 +44,31 @@ class FileTextExtraction:
         """
         Get the content of the file.
         """
-        content = None
         _, ext = os.path.splitext(filename)
         ext = (ext or "").lower()
-        if ext == ".txt":
-            content = self.get_textfile_content(filename, filestream)
-        if ext == ".epub":
-            content = self.get_epub_content(filename, filestream)
-        if ext == ".pdf":
-            msg = """
+
+        messages = {
+            ".pdf": """
             Note: pdf imports can be inaccurate, due to how PDFs are encoded.
             Please be aware of this while reading.
             """
+        }
+        msg = messages.get(ext)
+        if msg is not None:
             flash(msg, "notice")
-            content = self.get_pdf_content(filename, filestream)
-        if ext == ".srt":
-            content = self.get_srt_content(filename, filestream)
-        if ext == ".vtt":
-            content = self.get_vtt_content(filename, filestream)
 
-        if content is None:
+        handlers = {
+            ".txt": self._get_textfile_content,
+            ".epub": self._get_epub_content,
+            ".pdf": self._get_pdf_content,
+            ".srt": self._get_srt_content,
+            ".vtt": self._get_vtt_content,
+        }
+        handler = handlers.get(ext)
+        if handler is None:
             raise ValueError(f'Unknown file extension "{ext}"')
-        if content.strip() == "":
+        content = handler(filename, filestream).strip()
+        if content == "":
             raise BookImportException(f"{filename} is empty.")
         return content
 
@@ -74,7 +77,7 @@ class FileTextExtraction:
         with TextIOWrapper(fstream, encoding=encoding) as decoded_stream:
             return decoded_stream.read()
 
-    def get_textfile_content(self, filename, filestream):
+    def _get_textfile_content(self, filename, filestream):
         "Get content as a single string."
         try:
             return self._get_text_stream_content(filestream)
@@ -83,7 +86,7 @@ class FileTextExtraction:
             msg = f"{f} is not utf-8 encoding, please convert it to utf-8 first (error: {str(e)})"
             raise BookImportException(message=msg, cause=e) from e
 
-    def get_epub_content(self, filename, filestream):
+    def _get_epub_content(self, filename, filestream):
         """
         Get the content of the epub as a single string.
         """
@@ -106,7 +109,7 @@ class FileTextExtraction:
             raise BookImportException(message=msg, cause=e) from e
         return content
 
-    def get_pdf_content(self, filename, filestream):
+    def _get_pdf_content(self, filename, filestream):
         "Get content as a single string from a PDF file using PyPDF2."
         content = ""
         try:
@@ -118,7 +121,7 @@ class FileTextExtraction:
             msg = f"Could not parse {filename} (error: {str(e)})"
             raise BookImportException(message=msg, cause=e) from e
 
-    def get_srt_content(self, filename, filestream):
+    def _get_srt_content(self, filename, filestream):
         """
         Get the content of the srt as a single string.
         """
@@ -133,7 +136,7 @@ class FileTextExtraction:
             msg = f"Could not parse {filename} (error: {str(e)})"
             raise BookImportException(message=msg, cause=e) from e
 
-    def get_vtt_content(self, filename, filestream):
+    def _get_vtt_content(self, filename, filestream):
         """
         Get the content of the vtt as a single string.
         """
