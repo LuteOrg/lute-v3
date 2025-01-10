@@ -1,4 +1,14 @@
 
+# 3.9.2 (2025-01-09)
+
+* Issue #475: allow split by sentences or by paragraphs.
+* Issue #555: add page navigation hotkeys.
+
+Back end changes:
+
+* Refactor book creation, break dependency on http/forms
+
+
 # 3.9.1 (2025-01-07)
 
 * Fix mobile javascript bug
