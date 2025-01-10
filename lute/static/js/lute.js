@@ -82,6 +82,8 @@ const _isUserUsingMobile = () => {
     return false;
   if (s == 'mobile')
     return true;
+  if (s == 'mobile-focus')
+    return true;
 
   // User agent string method
   let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -109,6 +111,16 @@ const _isUserUsingMobile = () => {
   }
 
   return isMobile
+
+}
+
+//Determine if Mobile focus has been turned on
+const _is_mobile_focus = () => {
+  const s = localStorage.getItem('screen_interactions_type');
+  if (s == 'mobile-focus')
+    return true
+  else
+    return false
 }
 
 
@@ -572,7 +584,14 @@ function _single_tap(el, e) {
   clear_newmultiterm_elements();
   const term_is_status_0 = (el.data("status-class") == "status0");
   if (term_is_status_0) {
-    show_term_edit_form(el);
+    if(_is_mobile_focus){
+      el.addClass('kwordmarked')
+      el.addClass('wordhover')
+      update_status_for_marked_elements(1)
+    }  
+    else{
+      show_term_edit_form(el);
+    }    
   }
 }
 
