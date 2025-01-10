@@ -428,12 +428,15 @@
   
   function getActualPage(p) {
     const pagenum = parseInt($('#page_num').val());
+    const m = parseInt($('#page_count').val());
+    // console.log(`in getActualPage, pagenum = ${pagenum}`);
     let actualPage = pagenum + p;
     if (actualPage < 1)
       actualPage = 1;
-    if (actualPage > maxpage)
+    if (actualPage > m)
       actualPage = maxpage;
 
+    // console.log(`in getActualPage, return actualPage = ${actualPage}`);
     return actualPage;
   }
 

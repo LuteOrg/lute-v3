@@ -46,6 +46,18 @@ Navigation:
 - hotkey: hotkey_NextSentence
   desc: Move to next sentence
 
+Paging:
+- hotkey: hotkey_PreviousPage
+  desc: Go to previous page, do not mark current page read
+- hotkey: hotkey_NextPage
+  desc: Go to next page, do not mark current page read
+- hotkey: hotkey_MarkReadWellKnown
+  desc: Set remaining unknown words to Well Known, mark page as read, go to next page
+- hotkey: hotkey_MarkRead
+  desc: Mark page as read, go to next page
+- hotkey: hotkey_MarkReadWellKnown
+  desc: Set remaining unknown words to Well Known, mark page as read, go to next page
+
 Translate:
 - hotkey: hotkey_TranslateSentence
   desc: Translate the sentence of the current word
@@ -130,10 +142,13 @@ def categorized_hotkeys():
     ordered_keys = [
         "Navigation",
         "Update status",
+        "Paging",
         "Translate",
         "Copy",
         "Misc",
     ]
+    if set(ordered_keys) != set(y.keys()):
+        raise RuntimeError("ordered_keys doesn't match expected")
     ret = {k: [h["hotkey"] for h in y[k]] for k in ordered_keys}
     return ret
 

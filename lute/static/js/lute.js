@@ -609,6 +609,18 @@ let handle_edit_page = function() {
   edit_current_page();
 }
 
+let handle_mark_read_hotkey = function() {
+  // Function defined in read/index.html ... yuck, need to reorganize this js code.
+  // TODO javascript: reorganize
+  handle_page_done(false, 1);
+}
+
+let handle_mark_read_well_known_hotkey = function() {
+  // Function defined in read/index.html ... yuck, need to reorganize this js code.
+  // TODO javascript: reorganize
+  handle_page_done(true, 1);
+}
+
 /** Copy the text of the textitemspans to the clipboard, and add a
  * color flash. */
 let handle_copy = function(span_attribute) {
@@ -938,6 +950,13 @@ function handle_keydown (e) {
     "hotkey_StatusIgnore": () => update_status_for_marked_elements(98),
     "hotkey_StatusWellKnown": () => update_status_for_marked_elements(99),
     "hotkey_DeleteTerm": () => update_status_for_marked_elements(0),
+
+    // Functions defined in read/index.html, or refer to them
+    // TODO javascript_hotkeys: fix javascript sprawl
+    "hotkey_MarkRead": () => handle_mark_read_hotkey(),
+    "hotkey_MarkReadWellKnown": () => handle_mark_read_well_known_hotkey(),
+    "hotkey_PreviousPage": () => goto_relative_page(-1),
+    "hotkey_NextPage": () => goto_relative_page(1),
   }
 
   if (hotkey_name in map) {

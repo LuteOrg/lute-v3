@@ -157,6 +157,19 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             ret = "-"
         return ret
 
+    def get_book_page_read_dates(self):
+        "get content from sql check"
+        sql = """select bktitle, txorder
+        from books
+        inner join texts on txbkid = bkid
+        where txreaddate is not null
+        order by bktitle, txorder"""
+        response = requests.get(f"{self.home}/dev_api/sqlresult/{sql}", timeout=1)
+        ret = "\n".join(json.loads(response.text))
+        if ret == "":
+            ret = "-"
+        return ret
+
     def set_txstartdate_to_null(self):
         "hack back end to keep test data sane."
         sql = "update texts set txstartdate = null"
@@ -449,6 +462,17 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         if should_refresh:
             self._refresh_browser()
 
+    def hack_set_hotkey(self, hotkey, value):
+        "Hack set hotkey directly through dev api.  Trashy."
+        sql = f"""update settings
+        set StValue='{value}' where StKey='{hotkey}'"""
+        requests.get(f"{self.home}/dev_api/execsql/{sql}", timeout=1)
+        # NOTE! Hacking is dumb, it bypassing the global state which is rendered in JS.
+        # Have to visit and save settings to re-set the JS values that will be rendered.
+        # Big time waste finding this out.
+        self.visit("settings/shortcuts")
+        self.browser.find_by_css("#btnSubmit").first.click()
+
     def press_hotkey(self, hotkey):
         "Send a hotkey."
         key_to_code_map = {
@@ -464,20 +488,24 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             "i": "KeyI",
             "m": "KeyM",
             "w": "KeyW",
+            # Manually added.
+            "8": "Digit8",
+            "9": "Digit9",
         }
-        if hotkey not in key_to_code_map:
+        if hotkey.lower() not in key_to_code_map:
             raise RuntimeError(f"Missing {hotkey} in acceptance test map")
         event_parts = [
             "type: 'keydown'",
-            f"code: '{key_to_code_map[hotkey]}'",
+            f"code: '{key_to_code_map[hotkey.lower()]}'",
         ]
-        if hotkey in ["C", "T"]:
+        if hotkey != hotkey.lower():
             event_parts.append("shiftKey: true")
         script = f"""jQuery.event.trigger({{
           {', '.join(event_parts)}
         }});"""
+        # print(script, flush=True)
         # pylint: disable=protected-access
-        el = self.browser.find_by_tag("body")
+        el = self.browser.find_by_id("thetext")
         self.browser.execute_script(script, el._element)
         time.sleep(0.2)  # Or it's too fast.
         # print(script)

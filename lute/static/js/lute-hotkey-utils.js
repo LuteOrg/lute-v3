@@ -73,11 +73,16 @@ function _legacy_pressed_key_string(event) {
  */
 function get_hotkey_name(event) {
   const s = get_pressed_keys_as_string(event);
-  if (s in LUTE_USER_HOTKEYS)
+  // console.log(`pressed keys = ${s}`);
+  if (s in LUTE_USER_HOTKEYS) {
+    // console.log('maps to ' + LUTE_USER_HOTKEYS[s]);
     return LUTE_USER_HOTKEYS[s];
+  }
   const legacy_s = _legacy_pressed_key_string(event);
-  if (legacy_s in LUTE_USER_HOTKEYS)
+  if (legacy_s in LUTE_USER_HOTKEYS) {
+    // console.log('maps to legacy ' + LUTE_USER_HOTKEYS[legacy_s]);
     return LUTE_USER_HOTKEYS[legacy_s];
+  }
   // console.log(`No match for hotkey ${s} or legacy hotkey ${legacy_s}`);
   return null;
 }
