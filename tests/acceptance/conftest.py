@@ -118,6 +118,8 @@ def session_chrome_browser(request, _environment_check):
         }
         chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
 
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+
     # Initialize the browser with ChromeOptions
     browser = Browser("chrome", options=chrome_options)
 
@@ -304,6 +306,11 @@ def book_page_start_dates_are(luteclient, content):
     assert content == luteclient.get_book_page_start_dates()
 
 
+@then(parsers.parse("book pages with read dates are:\n{content}"))
+def book_page_read_dates_are(luteclient, content):
+    assert content == luteclient.get_book_page_read_dates()
+
+
 # Terms
 
 
@@ -363,8 +370,17 @@ def check_exported_file(luteclient, content):
 @then(parsers.parse("the reading pane shows:\n{content}"))
 def then_read_content(luteclient, content):
     "Check rendered content."
+    c = content.replace("\n", "/")
+    timeout = 3  # seconds
+    poll_frequency = 0.25
+    start_time = time.time()
     displayed = luteclient.displayed_text()
-    assert content.replace("\n", "/") == displayed
+    while time.time() - start_time < timeout:
+        if c == displayed:
+            break
+        time.sleep(poll_frequency)
+    else:
+        assert c == displayed
 
 
 @when(parsers.parse("I change the current text content to:\n{content}"))
@@ -529,8 +545,14 @@ def when_hover(luteclient, word):
 
 @when(parsers.parse('I press hotkey "{hotkey}"'))
 def when_press_hotkey(luteclient, hotkey):
-    "Click word and press hotkey."
+    "Press hotkey."
     luteclient.press_hotkey(hotkey)
+
+
+@given(parsers.parse('I set hotkey "{hotkey}" to "{value}"'))
+def given_set_hotkey(luteclient, hotkey, value):
+    "Set a hotkey to be X."
+    luteclient.hack_set_hotkey(hotkey, value)
 
 
 # Reading, paging

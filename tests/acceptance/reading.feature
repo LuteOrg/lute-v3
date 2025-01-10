@@ -384,6 +384,104 @@ Feature: User can actually read and stuff.
             Tengo (1)/ /un (2)/ /amigo (3)/ /y/ /otro/.
 
 
+    # DISABLING TEST, can't figure out what is wrong.
+    # When a book has multiple pages, the hotkey actions during
+    # acceptance testing somehow seem "stuck" on page 1.
+    #
+    # i.e. if I'm on page 1, and hit the "hotkey_MarkRead",
+    # the page does go to page 2, and the hidden control
+    # "#page_num" is updated to 2; however, subsequent calls
+    # to handle_page_done() (in read/index.html) **always** post
+    # the pagenum as 1, even though it should read from the field
+    # parseInt($('#page_num').val()).
+    #
+    # The hotkeys work correctly when run from the browser,
+    # so either:
+    # * something is wrong how selenium runs the browser/js
+    # * I'm not simulating the keypress correctly
+    # * there's _somehow_ some weird state being held on to.
+    #
+    ### Scenario: Can use hotkeys to move to next pages
+    ###     Given I set hotkey "hotkey_MarkRead" to "Digit8"
+    ###     And I set hotkey "hotkey_MarkReadWellKnown" to "Digit9"
+    ###     And a Spanish book "Hola" with content:
+    ###         Tengo una GATITA.
+    ###         ---
+    ###         Tengo una bebida.
+    ###         ---
+    ###         Tengo LAAAAAAA BEBIDA.
+    ###     Then the reading pane shows:
+    ###         Tengo/ /una/ /GATITA/.
+
+    ###     When I press hotkey "8"
+    ###     And sleep for 2
+    ###     Then the reading pane shows:
+    ###         Tengo/ /una/ /bebida/.
+    ###     And book pages with read dates are:
+    ###         Hola; 1
+
+    ###     When I press hotkey "9"
+    ###     Then the reading pane shows:
+    ###         Tengo (99)/ /LAAAAAAA/ /BEBIDA (99)/.
+    ###     And book pages with read dates are:
+    ###         Hola; 1
+    ###         Hola; 2
+
+
+    Scenario: Can use hotkeys to go to previous and next pages
+        Given I set hotkey "hotkey_PreviousPage" to "Digit8"
+        And I set hotkey "hotkey_NextPage" to "Digit9"
+        And a Spanish book "Hola" with content:
+            one.
+            ---
+            two.
+        Then the reading pane shows:
+            one/.
+
+        When I press hotkey "9"
+        Then the reading pane shows:
+            two/.
+        And book pages with read dates are:
+            -
+
+        When I press hotkey "8"
+        Then the reading pane shows:
+            one/.
+        And book pages with read dates are:
+            -
+
+
+    Scenario: Can use hotkeys to mark the page as read
+        Given I set hotkey "hotkey_MarkRead" to "Digit8"
+        And a Spanish book "Hola" with content:
+            Tengo una GATITA.
+            ---
+            Tengo una bebida.
+        Then the reading pane shows:
+            Tengo/ /una/ /GATITA/.
+
+        When I press hotkey "8"
+        Then the reading pane shows:
+            Tengo/ /una/ /bebida/.
+        And book pages with read dates are:
+            Hola; 1
+
+    Scenario: Can use hotkeys to mark unknown terms as known and the page as read
+        Given I set hotkey "hotkey_MarkReadWellKnown" to "Digit9"
+        And a Spanish book "Hola" with content:
+            Tengo una GATITA.
+            ---
+            Tengo una bebida.
+        Then the reading pane shows:
+            Tengo/ /una/ /GATITA/.
+
+        When I press hotkey "9"
+        Then the reading pane shows:
+            Tengo (99)/ /una (99)/ /bebida/.
+        And book pages with read dates are:
+            Hola; 1
+
+
     Scenario: Page start date is set correctly during reading
         Given a Spanish book "Hola" with content:
             page one here.
