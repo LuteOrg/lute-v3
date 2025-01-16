@@ -142,3 +142,51 @@
     </div>
   </li>
 </ul>
+
+<script>
+
+  /**
+   * Clicking top-level menu items for mobile should expand the
+   * submenu items, and hide other submenu items.
+   *
+   * In mobile, the submenu items are shown below the top menu
+   * items, eg
+   *
+   *   - Edit
+   *     - sub action 1
+   *     - sub action 2
+   *   + Bookmarks
+   *   other links
+   *
+   * Clicking a top-level menu item (such as "Bookmarks") should only
+   * open the submenu for Bookmarks, and close the submenu for Edit.
+   * Without this method, if the Edit menu was open and the Bookmarks
+   * menu was clicked, a link _further down the page_ would be
+   * clicked, as other elements were hidden and shown.
+   */
+  function _handle_top_level_menu_clicks_for_mobile() {
+    $(".reading-menu-top-level-li").on("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Close all submenus except this one.
+      const submenu = $(this).find(".reading-menu-sublist").first();
+      if (submenu.length) {
+        const isActive = submenu.hasClass("active");
+        $(".reading-menu-sublist.active").removeClass("active");
+        if (!isActive) {
+          submenu.addClass("active");
+        }
+      }
+    });
+
+    // Prevent submenu clicks from triggering parent actions
+    $(".reading-menu-sublist").on("click", function (e) {
+      e.stopPropagation();
+    });
+  }
+
+  $(document).ready(function () {
+    _handle_top_level_menu_clicks_for_mobile();
+  });
+</script>
