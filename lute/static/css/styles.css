@@ -576,7 +576,6 @@ span.hamburger {
 .reading-menu-sublist {
     display: none;
     position: absolute;
-
     left: 100%;
     width: 100%;
     background-color: #d5e9fa;
@@ -648,6 +647,10 @@ span.hamburger {
         border-bottom-right-radius: 0;
         border-top-left-radius: 4px; /* Optional: Adjust corners */
         border-bottom-left-radius: 4px;
+    }
+
+    .reading-menu-sublist.active {
+        display: block;
     }
 
     #page-operations-li:hover #page-operations-menu,
