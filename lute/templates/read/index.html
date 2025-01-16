@@ -233,7 +233,7 @@
   let _close_slide_in_menu_on_click_away = function(event) {
     const tgt = event.target;
     if (!tgt.closest("#reading_menu") && !tgt.closest(".hamburger-btn"))
-      $("#reading_menu").removeClass("open-menu");
+      closeMenu();
     if (!tgt.closest("#read_pane_right") && tgt.parentNode != readPaneRight && !tgt.classList.contains("textitem")) {
       closeRightPane();
     }
@@ -503,13 +503,12 @@
   }
 
   function closeMenu() {
-    const menu = document.getElementById("reading_menu");
-    menu.classList.remove("open-menu");
+    $(".reading-menu-sublist.active").removeClass("active");
+    $("#reading_menu").removeClass("open-menu");
   }
 
   function toggleMenu() {
-    const menu = document.getElementById("reading_menu");
-    menu.classList.toggle("open-menu");
+    $("#reading_menu").toggleClass("open-menu");
   }
 
   function closeRightPane() {
