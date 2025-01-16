@@ -435,7 +435,6 @@ span.hamburger {
 .text-options-button:hover {
     background-color: #d5e9fa;
     cursor: pointer;
-    /* color: var(--background-color); */
 }
 
 .close-btn {
@@ -466,7 +465,6 @@ span.hamburger {
 }
 
 .text-options-btn-container {
-  /* background-color: #d3ebffc9; */
   padding: 0.2rem;
   border-radius: 5px;
 }
@@ -578,7 +576,6 @@ span.hamburger {
 .reading-menu-sublist {
     display: none;
     position: absolute;
-
     left: 100%;
     width: 100%;
     background-color: #d5e9fa;
@@ -589,14 +586,80 @@ span.hamburger {
     border-bottom-right-radius: 4px;
 }
 
-#page-operations-li:hover #page-operations-menu, #screen-interactions-li:hover #screen-interactions-menu {
+#page-operations-li:hover #page-operations-menu,
+#bookmark-operations-li:hover #bookmark-operations-menu,
+#screen-interactions-li:hover #screen-interactions-menu {
     display: block;
 }
 
-#page-operations-menu .reading-menu-item:hover, #screen-interactions-menu .reading-menu-item:hover {
+#page-operations-menu .reading-menu-item:hover,
+#bookmark-operations-menu .reading-menu-item:hover,
+#screen-interactions-menu .reading-menu-item:hover {
     background-color: #e4f2fe;
 }
 
+/* Reading menu, mobile */
+@media screen and (max-width: 980px) {
+
+    #reading_menu {
+        width: 90%;
+    }
+
+    .reading_menu_logo_container {
+        margin-bottom: 2.2rem;
+    }
+
+    #focus-container {
+        display: none;
+    }
+
+    #tap_sets_status-container {
+        display: flex;
+    }
+
+    .text-options-container {
+        gap: 0.3rem !important;
+        grid-template-columns: max-content max-content !important;
+    }
+
+    .text-options-button {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    .text-options-btn-container:nth-child(3),
+    .text-options-btn-container:nth-child(4) {
+        display: none;
+    }
+
+    .reading-menu-item {
+        font-size: 1.2rem;
+        padding: 0.5rem 0.5rem;
+    }
+
+    .reading-menu-sublist {
+        position: relative; /* relative to the parent */
+        left: 0; /* below the parent */
+        top: 0; /* at the same level as the parent */
+        width: 100%; /* Full width of the parent container */
+        border-right: none;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-top-left-radius: 4px; /* Optional: Adjust corners */
+        border-bottom-left-radius: 4px;
+    }
+
+    .reading-menu-sublist.active {
+        display: block;
+    }
+
+    #page-operations-li:hover #page-operations-menu,
+    #screen-interactions-li:hover #screen-interactions-menu {
+        position: relative; /* Prevent overflow issues */
+    }
+
+}
+/* End reading menu, mobile */
 
 /* End reader slide-in hamburger menu. *********************/
 
@@ -1859,14 +1922,6 @@ input[name='status']:disabled + label {
         padding: 0 1rem;
     }
 
-    .reading-menu-item {
-        font-size: 1.6rem;
-    }
-
-    .reading_menu_logo_container {
-        margin-bottom: 2.2rem;
-    }
-
     div#reading-footer span {
         margin-right: 30px;
     }
@@ -1876,31 +1931,8 @@ input[name='status']:disabled + label {
         height: 2rem;
     }
 
-    .text-options-button {
-        width: 3rem;
-        height: 3rem;
-    }
-
-    .text-options-btn-container:nth-child(3),
-    .text-options-btn-container:nth-child(4) {
-        display: none;
-    }
-
-    .text-options-container {
-        gap: 0.3rem !important;
-        grid-template-columns: max-content max-content !important;
-    }
-
     .close-btn {
         padding: 1.3rem;
-    }
-
-    #focus-container {
-        display: none;
-    }
-
-    #tap_sets_status-container {
-        display: flex;
     }
 
     .read-pane-right-close-btn {
