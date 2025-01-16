@@ -631,7 +631,26 @@ span.hamburger {
 
     .reading-menu-item {
         font-size: 1.2rem;
+        padding: 0.5rem 0.5rem;
     }
+
+    .reading-menu-sublist {
+        position: relative; /* relative to the parent */
+        left: 0; /* below the parent */
+        top: 0; /* at the same level as the parent */
+        width: 100%; /* Full width of the parent container */
+        border-right: none;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-top-left-radius: 4px; /* Optional: Adjust corners */
+        border-bottom-left-radius: 4px;
+    }
+
+    #page-operations-li:hover #page-operations-menu,
+    #screen-interactions-li:hover #screen-interactions-menu {
+        position: relative; /* Prevent overflow issues */
+    }
+
 }
 /* End reading menu, mobile */
 
