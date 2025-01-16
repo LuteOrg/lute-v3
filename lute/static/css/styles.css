@@ -587,11 +587,15 @@ span.hamburger {
     border-bottom-right-radius: 4px;
 }
 
-#page-operations-li:hover #page-operations-menu, #screen-interactions-li:hover #screen-interactions-menu {
+#page-operations-li:hover #page-operations-menu,
+#bookmark-operations-li:hover #bookmark-operations-menu,
+#screen-interactions-li:hover #screen-interactions-menu {
     display: block;
 }
 
-#page-operations-menu .reading-menu-item:hover, #screen-interactions-menu .reading-menu-item:hover {
+#page-operations-menu .reading-menu-item:hover,
+#bookmark-operations-menu .reading-menu-item:hover,
+#screen-interactions-menu .reading-menu-item:hover {
     background-color: #e4f2fe;
 }
 
