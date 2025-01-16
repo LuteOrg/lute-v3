@@ -487,7 +487,8 @@ span.hamburger {
   padding: 0.9rem 1.5rem;
 }
 
-#focus-container {
+#focus-container,
+#tap_sets_status-container {
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -508,7 +509,8 @@ span.hamburger {
     transition: background-color 0.2s
 }
 
-#focus-container label {
+#focus-container label,
+#tap_sets_status-container label {
     font-weight: bold;
 }
 
@@ -534,13 +536,6 @@ span.hamburger {
 .tap_sets_status-active #tap_sets_status {
     background-color: #b197fc;
     border-color: #b197fc;
-}
-
-#tap_sets_status-container {
-    display: flex;
-    justify-content: left;
-    gap: 0.2rem;
-    align-items: center;
 }
 
 #tap_sets_status-container label,
