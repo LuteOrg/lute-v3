@@ -598,6 +598,10 @@ span.hamburger {
 /* Reading menu, mobile */
 @media screen and (max-width: 980px) {
 
+    #reading_menu {
+        width: 90%;
+    }
+
     .reading_menu_logo_container {
         margin-bottom: 2.2rem;
     }
@@ -626,7 +630,7 @@ span.hamburger {
     }
 
     .reading-menu-item {
-        font-size: 1.6rem;
+        font-size: 1.2rem;
     }
 }
 /* End reading menu, mobile */
