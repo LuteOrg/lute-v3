@@ -108,7 +108,7 @@ const _isUserUsingMobile = () => {
     isMobile = window.getComputedStyle(bodyElement).getPropertyValue('content').indexOf('mobile') !== -1;
   }
 
-  return isMobile
+  return isMobile;
 }
 
 
@@ -567,11 +567,27 @@ function _double_tap(el, e) {
   show_term_edit_form(el);
 }
 
+/**
+ * Mobile handler, single tap.
+ **/
 function _single_tap(el, e) {
-  // console.log('single tap');
   clear_newmultiterm_elements();
+
   const term_is_status_0 = (el.data("status-class") == "status0");
-  if (term_is_status_0) {
+  if (!term_is_status_0) {
+    return;
+  }
+
+  const _tap_sets_status = () => {
+    const s = localStorage.getItem('tap_sets_status');
+    return (s === "true");
+  }
+
+  if (_tap_sets_status()) {
+    el.addClass('kwordmarked');
+    update_status_for_marked_elements(1);
+  }
+  else {
     show_term_edit_form(el);
   }
 }
