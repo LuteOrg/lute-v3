@@ -494,7 +494,8 @@ span.hamburger {
     align-items: center;
 }
 
-#focus {
+#focus,
+#tap_sets_status {
     appearance: none;
     display: block;
     background-color: #ffffff;
@@ -511,7 +512,8 @@ span.hamburger {
     font-weight: bold;
 }
 
-#focus::after {
+#focus::after,
+#tap_sets_status::after {
     content: "";
     display: block;
     background-color: #616161;
@@ -522,14 +524,29 @@ span.hamburger {
     transition: transform 0.2s;
 }
 
-.focus-mode-active #focus::after {
+.focus-mode-active #focus::after,
+.tap_sets_status-active #tap_sets_status::after {
     transform: translate(100%, 0);
     background-color: #7950f2;
 }
 
-.focus-mode-active #focus{
+.focus-mode-active #focus,
+.tap_sets_status-active #tap_sets_status {
     background-color: #b197fc;
     border-color: #b197fc;
+}
+
+#tap_sets_status-container {
+    display: flex;
+    justify-content: left;
+    gap: 0.2rem;
+    align-items: center;
+}
+
+#tap_sets_status-container label,
+#tap_sets_status-container input {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .focus-mode-active #read_pane_right {
