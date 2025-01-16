@@ -487,14 +487,21 @@ span.hamburger {
   padding: 0.9rem 1.5rem;
 }
 
-#focus-container {
+#focus-container,
+#tap_sets_status-container {
     display: flex;
     justify-content: center;
     gap: 1rem;
     align-items: center;
 }
 
-#focus {
+#tap_sets_status-container {
+    /* Toggled later in mobile media check. */
+    display:none;
+}
+
+#focus,
+#tap_sets_status {
     appearance: none;
     display: block;
     background-color: #ffffff;
@@ -507,11 +514,13 @@ span.hamburger {
     transition: background-color 0.2s
 }
 
-#focus-container label {
+#focus-container label,
+#tap_sets_status-container label {
     font-weight: bold;
 }
 
-#focus::after {
+#focus::after,
+#tap_sets_status::after {
     content: "";
     display: block;
     background-color: #616161;
@@ -522,14 +531,22 @@ span.hamburger {
     transition: transform 0.2s;
 }
 
-.focus-mode-active #focus::after {
+.focus-mode-active #focus::after,
+.tap_sets_status-active #tap_sets_status::after {
     transform: translate(100%, 0);
     background-color: #7950f2;
 }
 
-.focus-mode-active #focus{
+.focus-mode-active #focus,
+.tap_sets_status-active #tap_sets_status {
     background-color: #b197fc;
     border-color: #b197fc;
+}
+
+#tap_sets_status-container label,
+#tap_sets_status-container input {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .focus-mode-active #read_pane_right {
@@ -1880,6 +1897,10 @@ input[name='status']:disabled + label {
 
     #focus-container {
         display: none;
+    }
+
+    #tap_sets_status-container {
+        display: flex;
     }
 
     .read-pane-right-close-btn {

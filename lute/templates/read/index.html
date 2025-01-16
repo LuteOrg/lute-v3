@@ -194,6 +194,7 @@
   const btmMarginCont = document.querySelector(".btm-margin-container");
   const theText = document.getElementById("thetext");
   const focusChk = document.getElementById("focus");
+  const tap_sets_statusChk = document.getElementById("tap_sets_status");
 
   // Fixes a dev-only "bug" where the right pane doesn't translate up
   // to zero, due to the inline transform property, if it's first
@@ -222,6 +223,11 @@
     const book_id = $('#book_id').val();
     readPaneContainer.classList.toggle("focus-mode-active");
     localStorage.setItem(`focusMode-book${book_id}`, `${focusChk.checked}`)
+  })
+
+  tap_sets_statusChk.addEventListener("change", () => {
+    readPaneContainer.classList.toggle("tap_sets_status-active");
+    localStorage.setItem("tap_sets_status", `${tap_sets_statusChk.checked}`)
   })
 
   let _close_slide_in_menu_on_click_away = function(event) {
@@ -301,7 +307,14 @@
         focusChk.checked = true;
       }
     }
-    
+
+    if (mediaTablet.matches) {
+      if (localStorage.getItem("tap_sets_status") === "true") {
+        readPaneContainer.classList.add("tap_sets_status-active");
+        tap_sets_statusChk.checked = true;
+      }
+    }
+
     createLookupButtons();
     $(document).click(_close_slide_in_menu_on_click_away);
 
