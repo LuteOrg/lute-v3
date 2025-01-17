@@ -17,4 +17,4 @@ it in the application version screen.
 Flit pulls into the pyproject.toml using "dynamic".
 """
 
-__version__ = "3.9.2"
+__version__ = "3.9.3b1"
