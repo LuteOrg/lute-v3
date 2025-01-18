@@ -1,4 +1,10 @@
 
+# 3.9.3 (2025-01-18)
+
+* add "Quick set status" mode for mobile - tap sets a word to status 1
+* clean up reading slide-out menu for mobile
+* Data fix for subsequent migration script.
+
 # 3.9.2 (2025-01-09)
 
 * Issue #475: allow split by sentences or by paragraphs.
