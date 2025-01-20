@@ -138,32 +138,52 @@
           placeAbove: false,
         },
 
-        // TODO re-add templates
-        // TOOD re-add hooks
-      }); // end tagify
-      
-      function debugSanity(e) {
-        console.log('Tagify input event triggered');
-      }
+        templates: {
+          dropdownFooter(suggestions) {
+            var hasMore = suggestions.length - this.settings.dropdown.maxItems;
+            if (hasMore <= 0)
+              return '';
+            return `<footer data-selector='tagify-suggestions-footer' class="${this.settings.classNames.dropdownFooter}">
+            (more items available, please refine your search.)</footer>`;
+          }
+        },
 
-      let make_dropdown_entry = function(hsh) {
-        console.log(`text: ${hsh.text}`);
-        const txt = decodeURIComponent(hsh.text);
-        let t = hsh.translation ?? '';
-        if (t == '') {
-          return txt;
-        }
-        t = t.replaceAll("\n", "; ").replaceAll("\r", "");
-        const maxlen = 70
-        if (t.length > maxlen) {
-          t = t.substring(0, maxlen) + "...";
-        }
-        return `${txt} (${t})`;
-      };
+        // Use a hook to force build_autocomplete_dropdown.
+        // Pasting from the clipboard doesn't fire the
+        // tagify.on('input') event, so intercept it and handle
+        // it manually.
+        hooks: {
+          beforePaste : function(content) {
+            return new Promise((resolve, reject) => {
+              clipboardData = content.clipboardData || window.clipboardData;
+              pastedData = clipboardData.getData('Text');
+              // console.log("pasting => " + pastedData);
+              let e = { detail: { value: pastedData } };
+              build_autocomplete_dropdown(e);
+              resolve();
+            });
+          }
+        },
+      }); // end tagify
       
       // Build whitelist from returned ajax data.  Remove current term
       // since a term should not be assigned as its own parent.
-      let build_whitelist = function(data) {
+      let _build_whitelist = function(data) {
+
+        const make_dropdown_entry = function(hsh) {
+          const txt = decodeURIComponent(hsh.text);
+          let t = hsh.translation ?? '';
+          if (t == '') {
+            return txt;
+          }
+          t = t.replaceAll("\n", "; ").replaceAll("\r", "");
+          const maxlen = 70
+          if (t.length > maxlen) {
+            t = t.substring(0, maxlen) + "...";
+          }
+          return `${txt} (${t})`;
+        };
+
         const whitelist = data.map((a) => ({
           "value": a.text,
           "suggestion": make_dropdown_entry(a),
@@ -173,22 +193,22 @@
       };
 
       // Do the fetch and build the whitelist.
-      let fetch_whitelist = function(mytagify, e_detail_value, controller) {
+      let _fetch_whitelist = function(mytagify, e_detail_value, controller) {
         const s = encodeURIComponent(e_detail_value);
-        console.log(`got call value ${s}`);
         const url = `/term/search/${s}/${language_id}`;
-        console.log(`Calling url ${url}`);
+        // console.log(`Calling url ${url}`);
 
+        tagify.loading(true);
         fetch(url, {signal:controller.signal})
           .then(RES => RES.json())
           .then(function(data) {
-            mytagify.whitelist = build_whitelist(data); // update whitelist Array in-place
+            mytagify.whitelist = _build_whitelist(data); // update whitelist Array in-place
             const sdecode = decodeURIComponent(s);
             mytagify.loading(false).dropdown.show(sdecode); // render the suggestions dropdown
           }).catch(err => {
             if (err.name === 'AbortError') {
               // Do nothing, fetch was aborted due to another fetch.
-              console.log('AbortError: Fetch request aborted');
+              // console.log('AbortError: Fetch request aborted');
             }
             else {
               console.log(`error: ${err}`);
@@ -196,11 +216,12 @@
           });
       };
 
+      // Controller to handle cancellations/aborts of calls.
+      // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
       var controller;
-      function build_autocomplete_dropdown(e) {
-        console.log("show_dropdown");
-        console.log(`got e.detail.value = ${e.detail.value}`);
 
+      // Build whitelist in response to user input.
+      function build_autocomplete_dropdown(e) {
         if (e.detail.value == '' || e.detail.value.length < 1) {
           controller && controller.abort();
           tagify.whitelist = [];
@@ -208,17 +229,12 @@
           return;
         }
 
-        // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
-        console.log("Aborting prior call, if any");
         controller && controller.abort()
         controller = new AbortController()
-
-        tagify.loading(true);
-        fetch_whitelist(tagify, e.detail.value, controller);
+        _fetch_whitelist(tagify, e.detail.value, controller);
       }
 
       tagify.on('input', function (e) {
-        debugSanity(e);
         build_autocomplete_dropdown(e)
       });
 
