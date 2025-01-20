@@ -116,6 +116,18 @@
 
     var table;
 
+    const edparcellhack = function (td, cellData, rowData, row, col) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = cellData; // Set the cell value
+        $(td).empty().append(input);
+
+        const tagify = new Tagify(input);
+        tagify.on('input', function (e) {
+          console.log('Tagify input event triggered:', e.detail);
+        });
+    };
+     
     const editableParentsCell = function (td, cellData, rowData, row, col) {
       let original = rowData["TagList"];
       td.setAttribute('contenteditable', true);
@@ -227,12 +239,15 @@
         const input = document.createElement('input');
         input.type = 'text';
         input.value = original; // Set the original content as the input value
-        input.focus();
+        // input.focus();
 
         // Append the input to the cell
         td.appendChild(input);
 
-        const tagify = setup_parent_tagify(input);
+      console.log('Input type:', input.type); // Should log 'text'
+      const tagify = setup_parent_tagify(input);
+      console.log('Tagify instance:', tagify);
+        tagify.on('input', function(e) { console.log("aoeaoeu"); });
 
         // TODO - likely won't handle parents with commas
 
@@ -382,7 +397,7 @@
       columns: [
         { searchable: false, orderable: false, render: render_checkbox },
         { name: "WoText", render: render_text },
-        { name: "ParentText", data: "ParentText", createdCell: editableParentsCell },
+        { name: "ParentText", data: "ParentText", createdCell: edparcellhack },
         { name: "WoTranslation", width: "40%", searchable: true, data: "WoTranslation", createdCell: editableTranslationCell },
         { name: "TagList", data: "TagList", createdCell: editableTagsCell },
         { name: "StID", data: "StID", createdCell: editableStatusCell },
