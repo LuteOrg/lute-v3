@@ -134,6 +134,44 @@
       });
     };
 
+    const editableStatusCell = function (td, cellData, rowData, row, col) {
+      let original;
+      td.setAttribute('contenteditable', true);
+
+      function makeDropdown(td) {
+        const select = document.createElement('select');
+        select.innerHTML = `
+      <option value="option1">Option 1</option>
+      <option value="option2">Option 2</option>
+      <option value="option3">Option 3</option>
+    `;
+        select.addEventListener('change', function () {
+          td.innerText = select.value; // Replace the dropdown with the selected value
+          // TODO post change
+        });
+        td.innerHTML = ''; // Clear the cell content
+        td.appendChild(select);
+        select.focus(); // Focus the dropdown immediately
+      }
+
+      td.textContent = rowData["StText"];
+
+      td.addEventListener('focus', function(e) {
+        makeDropdown(td);
+        original = e.target.textContent;
+      })
+
+      /** handle change on select change
+      td.addEventListener('blur', function(e) {
+        if (original !== e.target.textContent) {
+          const row = table.row(e.target.parentElement);
+          row.invalidate();
+          console.log('Status row changed: ', row.data());
+        }
+        });
+      */
+    };
+
     table = $('#termtable').DataTable({
       layout: {
         topStart: 'pageLength',
@@ -174,15 +212,21 @@
         { name: "WoTranslation", width: "40%", searchable: true, data: "WoTranslation" },
         { name: "LgName", data: "LgName" },
         { name: "TagList", data: "TagList" },
-        { name: "StID", render: render_status },
+        { name: "StID", data: "StID" },
         { name: "WoCreated", render: render_date_created },
         { name: "WoID", data: "WoID", visible: false },
         { name: "LgID", data: "LgID", visible: false },
       ],
-      columnDefs: [{ 
-        targets: [2,3,5],
-        createdCell: editableCell
-      }],
+      columnDefs: [
+        { 
+          targets: [2,3,5],
+          createdCell: editableCell
+        },
+        { 
+          targets: [6],
+          createdCell: editableStatusCell
+        },
+      ],
 
       // Ajax call
       ajax: {
@@ -214,11 +258,13 @@
     return `<a href="/term/edit/${row['WoID']}">${row['WoText']}</a>`;
   };
 
+  /** DIS
   // Use the status ID for sorting, so Well Known comes after Learned (5),
   // but use the status text ("New (1)") for the cell display.
   let render_status = function ( data, type, row, meta ) {
     return row["StText"];
   };
+  ABLED **/
 
   let render_checkbox = function (data, type, row, meta) {
     return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row['WoID']}" langid="${row['LgID']}">`;
