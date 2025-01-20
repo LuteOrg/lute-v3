@@ -172,7 +172,7 @@
       };
 
       // Do the fetch and build the whitelist.
-      let fetch_whitelist = function(mytagify, e_detail_value) {
+      let fetch_whitelist = function(mytagify, e_detail_value, controller) {
         const s = encodeURIComponent(e_detail_value);
         console.log(`got call value ${s}`);
         const url = `/term/search/${s}/${language_id}`;
@@ -198,7 +198,7 @@
         controller = new AbortController()
 
         tagify.loading(true);
-        fetch_whitelist(tagify, e.detail.value);
+        fetch_whitelist(tagify, e.detail.value, controller);
       }
 
       tagify.on('input', function (e) {
