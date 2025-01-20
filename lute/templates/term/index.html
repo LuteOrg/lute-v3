@@ -116,7 +116,7 @@
 
     var table;
 
-    const createdCell = function (td, cellData, rowData, row, col) {
+    const editableCell = function (td, cellData, rowData, row, col) {
       let original;
       console.log("created")
       td.setAttribute('contenteditable', true);
@@ -181,7 +181,7 @@
       ],
       columnDefs: [{ 
         targets: [2,3,5],
-        createdCell: createdCell
+        createdCell: editableCell
       }],
 
       // Ajax call
