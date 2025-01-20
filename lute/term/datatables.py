@@ -9,8 +9,9 @@ def get_data_tables_list(parameters, session):
     "Term json data for datatables."
 
     base_sql = """SELECT
-    w.WoID as WoID, LgName, L.LgID as LgID, w.WoText as WoText, parents.parentlist as ParentText, w.WoTranslation,
-    w.WoRomanization,
+    w.WoID as WoID, LgName, L.LgID as LgID, w.WoText as WoText, parents.parentlist as ParentText,
+    replace(w.WoTranslation, X'0D0A', '<br />') as WoTranslation,
+    WoRomanization,
     replace(wi.WiSource, '.jpeg', '') as WiSource,
     ifnull(tags.taglist, '') as TagList,
     StText,
