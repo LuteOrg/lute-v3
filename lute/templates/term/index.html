@@ -116,7 +116,7 @@
 
     var table;
 
-    let setup_hack_parent_tagify = function(input, language_id, this_term_text) {
+    let setup_parent_tagify = function(input, language_id, this_term_text) {
       if (input._tagify) {
         console.log('Tagify already initialized for this input.');
         return input._tagify;
@@ -241,14 +241,14 @@
       return tagify;
     }
 
-    const edparcellhack = function (td, cellData, rowData, row, col) {
+    const editableParentsCell = function (td, cellData, rowData, row, col) {
       const language_id = parseInt(rowData["LgID"]);
       const this_term_text = rowData["WoText"];
       const input = document.createElement('input');
       input.type = 'text';
-      input.value = cellData; // Set the cell value
+      input.value = cellData;
       $(td).empty().append(input);
-      const tagify = setup_hack_parent_tagify(input, language_id, this_term_text);
+      const tagify = setup_parent_tagify(input, language_id, this_term_text);
     };
 
     const editableTranslationCell = function(td, cellData, rowData, row, col) {
@@ -372,7 +372,7 @@
       columns: [
         { searchable: false, orderable: false, render: render_checkbox },
         { name: "WoText", render: render_text },
-        { name: "ParentText", data: "ParentText", createdCell: edparcellhack },
+        { name: "ParentText", data: "ParentText", createdCell: editableParentsCell },
         { name: "WoTranslation", width: "40%", searchable: true, data: "WoTranslation", createdCell: editableTranslationCell },
         { name: "TagList", data: "TagList", createdCell: editableTagsCell },
         { name: "StID", data: "StID", createdCell: editableStatusCell },
