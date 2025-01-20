@@ -117,7 +117,7 @@
     var table;
 
     const editableParentsCell = function (td, cellData, rowData, row, col) {
-      let original;
+      let original = rowData["TagList"];
       td.setAttribute('contenteditable', true);
 
       const this_term_text = rowData["WoText"];
@@ -129,7 +129,7 @@
           editTags: false,
           pasteAsTags: false,
           backspace: true,
-          addTagOnBlur: false,
+          addTagOnBlur: true,   // note different
           autoComplete: { enabled: true, rightKey: true, tabKey: true },
           enforceWhitelist: false,
           whitelist: [],
@@ -139,38 +139,18 @@
             mapValueTo: 'suggestion',  // Field to display
             placeAbove: false,  // Always put the dropdown below the textbox
           },
-          templates: {
-            dropdownFooter(suggestions) {
-              var hasMore = suggestions.length - this.settings.dropdown.maxItems;
-              if (hasMore <= 0)
-                return '';
-              return `<footer data-selector='tagify-suggestions-footer' class="${this.settings.classNames.dropdownFooter}">
-            (more items available, please refine your search.)</footer>`;
-            }
-          },
 
-          // Use a hook to fire the onInput event!
-          // Pasting from the clipboard doesn't fire the
-          // tagify.on('input') event, so intercept it and handle
-          // it manually.
-          hooks: {
-            beforePaste : function(content) {
-              return new Promise((resolve, reject) => {
-                clipboardData = content.clipboardData || window.clipboardData;
-                pastedData = clipboardData.getData('Text');
-                // console.log("pasting => " + pastedData);
-                let e = { detail: { value: pastedData } };
-                onInput(e);
-                resolve();
-              });
-            }
-          },
+          // TODO re-add templates
+          // TOOD re-add hooks
         });  // end tagify
+
+        tagify.on('input', function(e) { console.log("zzz"); });
 
         // Autocomplete
         var controller;
-        tagify.on('input', onInput);
+        tagify.on('xxxxinput', onInput);
         function onInput(e) {
+          console.log("xxxxxxxxxxxxx");
           console.log(`got e.detail.value = ${e.detail.value}`);
           tagify.whitelist = null;  // Reset whitelist.
           if (e.detail.value == '' || e.detail.value.length < 1) {
@@ -233,10 +213,7 @@
         return tagify;
       }  // end setup_parent_tagify
 
-      td.addEventListener('focus', function (e) {
-
-        // Store the original content
-        original = e.target.textContent;
+      // td.addEventListener('focus', function (e) {
 
         // Clear the cell content
         td.textContent = '';
@@ -248,10 +225,13 @@
 
         // Append the input to the cell
         td.appendChild(input);
+        input.focus();
+
         const tagify = setup_parent_tagify(input);
 
         // Automatically focus the input
-        // input.focus();
+
+        // TODO - likely won't handle parents with commas
 
         // Handle blur event on the input
         input.addEventListener('blur', function () {
@@ -269,7 +249,7 @@
           // Replace the input with the final content
           // td.textContent = newContent; -- post and update
         });
-      });  // end add focus listener
+      // });  // end add focus listener
 
       // Optional: Add a click listener to prevent accidental deselection
       td.addEventListener('click', function (e) {
