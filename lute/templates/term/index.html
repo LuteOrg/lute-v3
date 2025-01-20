@@ -146,7 +146,7 @@
 
         tagify.on('input', function(e) { console.log("zzz"); });
 
-        console.log('done tagify');
+        // console.log('done tagify');
         return tagify;
 
         // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx early out
@@ -227,10 +227,10 @@
         const input = document.createElement('input');
         input.type = 'text';
         input.value = original; // Set the original content as the input value
+        input.focus();
 
         // Append the input to the cell
         td.appendChild(input);
-        input.focus();
 
         const tagify = setup_parent_tagify(input);
 
