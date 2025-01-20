@@ -145,7 +145,7 @@
         console.log('Tagify input event triggered');
       }
 
-      let make_dropdown = function(hsh) {
+      let make_dropdown_entry = function(hsh) {
         console.log(`text: ${hsh.text}`);
         const txt = decodeURIComponent(hsh.text);
         let t = hsh.translation ?? '';
@@ -165,20 +165,20 @@
       let build_whitelist = function(data) {
         const whitelist = data.map((a) => ({
           "value": a.text,
-          "suggestion": make_dropdown(a),
+          "suggestion": make_dropdown_entry(a),
           "status": a.status,
         })).filter((hsh) => hsh.value != this_term_text);
         return whitelist;
       };
 
-      function show_dropdown(e) {
+      function build_autocomplete_dropdown(e) {
         console.log("show_dropdown");
         console.log(`got e.detail.value = ${e.detail.value}`);
       }
 
       tagify.on('input', function (e) {
         debugSanity(e);
-        show_dropdown(e)
+        build_autocomplete_dropdown(e)
       });
 
       return tagify;
