@@ -120,17 +120,162 @@
       let original;
       td.setAttribute('contenteditable', true);
 
-      td.addEventListener('focus', function(e) {
-        original = e.target.textContent;
-      })
+      const this_term_text = rowData["WoText"];
+      const langid = parseInt(rowData["LgID"]);
 
-      td.addEventListener('blur', function(e) {
-        if (original !== e.target.textContent) {
-          const row = table.row(e.target.parentElement);
-          row.invalidate();
-          console.log('Row changed: ', row.data());
-        }
+      let setup_parent_tagify = function(input) {
+        const tagify = new Tagify(input, {
+          placeholder: 'Parents',
+          editTags: false,
+          pasteAsTags: false,
+          backspace: true,
+          addTagOnBlur: false,
+          autoComplete: { enabled: true, rightKey: true, tabKey: true },
+          enforceWhitelist: false,
+          whitelist: [],
+          dropdown: {
+            enabled: 1,
+            maxItems: 15,
+            mapValueTo: 'suggestion',  // Field to display
+            placeAbove: false,  // Always put the dropdown below the textbox
+          },
+          templates: {
+            dropdownFooter(suggestions) {
+              var hasMore = suggestions.length - this.settings.dropdown.maxItems;
+              if (hasMore <= 0)
+                return '';
+              return `<footer data-selector='tagify-suggestions-footer' class="${this.settings.classNames.dropdownFooter}">
+            (more items available, please refine your search.)</footer>`;
+            }
+          },
+
+          // Use a hook to fire the onInput event!
+          // Pasting from the clipboard doesn't fire the
+          // tagify.on('input') event, so intercept it and handle
+          // it manually.
+          hooks: {
+            beforePaste : function(content) {
+              return new Promise((resolve, reject) => {
+                clipboardData = content.clipboardData || window.clipboardData;
+                pastedData = clipboardData.getData('Text');
+                // console.log("pasting => " + pastedData);
+                let e = { detail: { value: pastedData } };
+                onInput(e);
+                resolve();
+              });
+            }
+          },
+        });  // end tagify
+
+        // Autocomplete
+        var controller;
+        tagify.on('input', onInput);
+        function onInput(e) {
+          console.log(`got e.detail.value = ${e.detail.value}`);
+          tagify.whitelist = null;  // Reset whitelist.
+          if (e.detail.value == '' || e.detail.value.length < 1) {
+            controller && controller.abort();
+            tagify.whitelist = [];
+            tagify.loading(false).dropdown.hide();
+            return;
+          }
+          const s = encodeURIComponent(e.detail.value);
+          // console.log(s);
+
+          // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
+          controller && controller.abort()
+          controller = new AbortController()
+
+          let make_dropdown = function(hsh) {
+            console.log(`text: ${hsh.text}`);
+            const txt = decodeURIComponent(hsh.text);
+            let t = hsh.translation ?? '';
+            if (t == '') {
+              return txt;
+            }
+            t = t.replaceAll("\n", "; ").replaceAll("\r", "");
+            const maxlen = 70
+            if (t.length > maxlen) {
+              t = t.substring(0, maxlen) + "...";
+            }
+            return `${txt} (${t})`;
+          };
+
+          // Build whitelist from returned ajax data.  Remove current term
+          // since a term should not be assigned as its own parent.
+          let build_whitelist = function(data) {
+            const whitelist = data.map((a) => ({
+              "value": a.text,
+              "suggestion": make_dropdown(a),
+              "status": a.status,
+            })).filter((hsh) => hsh.value != this_term_text);
+            return whitelist;
+          };
+
+          tagify.loading(true);  // spinning animation during fetch.
+          fetch(`/term/search/${s}/${langid}`, {signal:controller.signal})
+            .then(RES => RES.json())
+            .then(function(data) {
+              tagify.whitelist = build_whitelist(data); // update whitelist Array in-place
+              const sdecode = decodeURIComponent(s);
+              tagify.loading(false).dropdown.show(sdecode); // render the suggestions dropdown
+            }).catch(err => {
+              if (err.name === 'AbortError') {
+                // Do nothing, fetch was aborted due to another fetch.
+                // console.log('AbortError: Fetch request aborted');
+              }
+              else {
+                console.log(`error: ${err}`);
+              }
+            });  // end fetch
+        };  // end function onInput
+
+        return tagify;
+      }  // end setup_parent_tagify
+
+      td.addEventListener('focus', function (e) {
+
+        // Store the original content
+        original = e.target.textContent;
+
+        // Clear the cell content
+        td.textContent = '';
+
+        // Create an input element
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = original; // Set the original content as the input value
+
+        // Append the input to the cell
+        td.appendChild(input);
+        const tagify = setup_parent_tagify(input);
+
+        // Automatically focus the input
+        // input.focus();
+
+        // Handle blur event on the input
+        input.addEventListener('blur', function () {
+          const newContent = tagify.value.map(tag => tag.value).join(', '); // Get the Tagify values
+          tagify.destroy()
+          td.textContent = newContent;
+
+          // If content has changed, update the row and cell
+          if (original !== newContent) {
+            const row = table.row(td.parentElement); // Get the corresponding row
+            row.invalidate(); // Invalidate the row to trigger a re-draw
+            console.log('Row changed: ', row.data());
+          }
+
+          // Replace the input with the final content
+          // td.textContent = newContent; -- post and update
+        });
+      });  // end add focus listener
+
+      // Optional: Add a click listener to prevent accidental deselection
+      td.addEventListener('click', function (e) {
+        e.stopPropagation();
       });
+
     };
 
     const editableTranslationCell = function(td, cellData, rowData, row, col) {
@@ -464,7 +609,7 @@
     $('#filtStatusMax').val(parseInt(store.filtStatusMax ?? '99'));
     $('#filtIncludeIgnored').prop('checked', store.filtIncludeIgnored);
   };
-  
+
   let handle_show_hide_filter_click = function() {
     const fc = $('#filterControls');
     const is_hidden = (fc.css('display') == 'none');
