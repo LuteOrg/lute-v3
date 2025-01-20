@@ -116,7 +116,7 @@
 
     var table;
 
-    let setup_hack_parent_tagify = function(input) {
+    let setup_hack_parent_tagify = function(input, language_id) {
       if (input._tagify) {
         console.log('Tagify already initialized for this input.');
         return input._tagify;
@@ -191,6 +191,9 @@
         controller = new AbortController()
 
         tagify.loading(true);
+        const url = `/term/search/${s}/${language_id}`;
+        console.log(`Calling url ${url}`);
+        
       }
 
       tagify.on('input', function (e) {
@@ -202,11 +205,12 @@
     }
 
     const edparcellhack = function (td, cellData, rowData, row, col) {
+      const language_id = parseInt(rowData["LgID"]);
       const input = document.createElement('input');
       input.type = 'text';
       input.value = cellData; // Set the cell value
       $(td).empty().append(input);
-      const tagify = setup_hack_parent_tagify(input);
+      const tagify = setup_hack_parent_tagify(input, language_id);
     };
      
     const editableParentsCell = function (td, cellData, rowData, row, col) {
