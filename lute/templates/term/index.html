@@ -121,50 +121,56 @@
         console.log('Tagify already initialized for this input.');
         return input._tagify;
       }
-      const tagify = new Tagify(input, {
-        placeholder: 'Parents',
-        editTags: false,
-        pasteAsTags: false,
-        backspace: true,
-        addTagOnBlur: true,   // note different
-        autoComplete: { enabled: true, rightKey: true, tabKey: true },
-        delimiters: ';;',  // special delimiter to handle parents with commas.
-        enforceWhitelist: false,
-        whitelist: [],
-        dropdown: {
-          enabled: 1,
-          maxItems: 10,
-          mapValueTo: 'suggestion',
-          placeAbove: false,
-        },
 
-        templates: {
-          dropdownFooter(suggestions) {
-            var hasMore = suggestions.length - this.settings.dropdown.maxItems;
-            if (hasMore <= 0)
-              return '';
-            return `<footer data-selector='tagify-suggestions-footer' class="${this.settings.classNames.dropdownFooter}">
+      const _make_base_Tagify_for = function(input) {
+        const ret = new Tagify(input, {
+          placeholder: 'Parents',
+          editTags: false,
+          pasteAsTags: false,
+          backspace: true,
+          addTagOnBlur: true,   // note different
+          autoComplete: { enabled: true, rightKey: true, tabKey: true },
+          delimiters: ';;',  // special delimiter to handle parents with commas.
+          enforceWhitelist: false,
+          whitelist: [],
+          dropdown: {
+            enabled: 1,
+            maxItems: 10,
+            mapValueTo: 'suggestion',
+            placeAbove: false,
+          },
+          templates: {
+            dropdownFooter(suggestions) {
+              var hasMore = suggestions.length - this.settings.dropdown.maxItems;
+              if (hasMore <= 0)
+                return '';
+              return `<footer data-selector='tagify-suggestions-footer' class="${this.settings.classNames.dropdownFooter}">
             (more items available, please refine your search.)</footer>`;
-          }
-        },
+            }
+          },
+          
+          // Use a hook to force build_autocomplete_dropdown.
+          // Pasting from the clipboard doesn't fire the
+          // tagify.on('input') event, so intercept it and handle
+          // it manually.
+          hooks: {
+            beforePaste : function(content) {
+              return new Promise((resolve, reject) => {
+                clipboardData = content.clipboardData || window.clipboardData;
+                pastedData = clipboardData.getData('Text');
+                // console.log("pasting => " + pastedData);
+                let e = { detail: { value: pastedData } };
+                build_autocomplete_dropdown(e);
+                resolve();
+              });
+            }
+          },
+        });
 
-        // Use a hook to force build_autocomplete_dropdown.
-        // Pasting from the clipboard doesn't fire the
-        // tagify.on('input') event, so intercept it and handle
-        // it manually.
-        hooks: {
-          beforePaste : function(content) {
-            return new Promise((resolve, reject) => {
-              clipboardData = content.clipboardData || window.clipboardData;
-              pastedData = clipboardData.getData('Text');
-              // console.log("pasting => " + pastedData);
-              let e = { detail: { value: pastedData } };
-              build_autocomplete_dropdown(e);
-              resolve();
-            });
-          }
-        },
-      }); // end tagify
+        return ret;
+      };
+      
+      const tagify = _make_base_Tagify_for(input);
       
       // Build whitelist from returned ajax data.  Remove current term
       // since a term should not be assigned as its own parent.
@@ -239,8 +245,9 @@
       });
 
       return tagify;
-    }
+    } // end setup_parent_tagify
 
+    
     const editableParentsCell = function (td, cellData, rowData, row, col) {
       const language_id = parseInt(rowData["LgID"]);
       const this_term_text = rowData["WoText"];
@@ -249,6 +256,12 @@
       input.value = cellData;
       $(td).empty().append(input);
       const tagify = setup_parent_tagify(input, language_id, this_term_text);
+
+      tagify.on('blur', function (e) {
+        console.log('blur, post');
+        console.log(tagify);
+      });
+
     };
 
     const editableTranslationCell = function(td, cellData, rowData, row, col) {
@@ -276,7 +289,7 @@
       td.addEventListener('blur', function(e) {
         if (original !== e.target.textContent) {
           const row = table.row(e.target.parentElement);
-          row.invalidate();
+          // row.invalidate();
           console.log('Row changed: ', row.data());
         }
       });
@@ -294,7 +307,7 @@
       td.addEventListener('blur', function(e) {
         if (original !== e.target.textContent) {
           const row = table.row(e.target.parentElement);
-          row.invalidate();
+          // row.invalidate();
           console.log('Row changed: ', row.data());
         }
       });
