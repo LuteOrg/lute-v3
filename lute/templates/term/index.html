@@ -112,6 +112,25 @@
 
 <script>
 
+  const createdCell = function(cell) {
+    let original
+
+    cell.setAttribute('contenteditable', true)
+    cell.setAttribute('spellcheck', false)
+
+    cell.addEventListener('focus', function(e) {
+      original = e.target.textContent
+    })
+
+    cell.addEventListener('blur', function(e) {
+      if (original !== e.target.textContent) {
+        const row = table.row(e.target.parentElement)
+        row.invalidate()
+        console.log('Row changed: ', row.data())
+      }
+    })
+  }
+
   let setup_term_datatable = function(initial_search) {
     var table = $('#termtable').DataTable({
       layout: {
@@ -158,6 +177,10 @@
         { name: "WoID", data: "WoID", visible: false },
         { name: "LgID", data: "LgID", visible: false },
       ],
+      columnDefs: [{ 
+        targets: '_all',
+        createdCell: createdCell
+      }],
 
       // Ajax call
       ajax: {
