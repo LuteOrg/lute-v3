@@ -132,7 +132,9 @@
         whitelist: ['Option 1', 'Option 2', 'Option 3'], // Simple test data
         dropdown: {
           enabled: 1,
-          maxItems: 10, // Ensure this is a reasonable number
+          maxItems: 10,
+          mapValueTo: 'suggestion',
+          placeAbove: false,
         },
       });
       
