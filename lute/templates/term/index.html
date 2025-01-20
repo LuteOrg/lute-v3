@@ -116,7 +116,7 @@
 
     var table;
 
-    let setup_hack_parent_tagify = function(input, language_id) {
+    let setup_hack_parent_tagify = function(input, language_id, this_term_text) {
       if (input._tagify) {
         console.log('Tagify already initialized for this input.');
         return input._tagify;
@@ -178,6 +178,21 @@
         const url = `/term/search/${s}/${language_id}`;
         console.log(`Calling url ${url}`);
 
+        fetch(url, {signal:controller.signal})
+          .then(RES => RES.json())
+          .then(function(data) {
+            mytagify.whitelist = build_whitelist(data); // update whitelist Array in-place
+            const sdecode = decodeURIComponent(s);
+            mytagify.loading(false).dropdown.show(sdecode); // render the suggestions dropdown
+          }).catch(err => {
+            if (err.name === 'AbortError') {
+              // Do nothing, fetch was aborted due to another fetch.
+              console.log('AbortError: Fetch request aborted');
+            }
+            else {
+              console.log(`error: ${err}`);
+            }
+          });
       };
 
       var controller;
@@ -211,11 +226,12 @@
 
     const edparcellhack = function (td, cellData, rowData, row, col) {
       const language_id = parseInt(rowData["LgID"]);
+      const this_term_text = rowData["WoText"];
       const input = document.createElement('input');
       input.type = 'text';
       input.value = cellData; // Set the cell value
       $(td).empty().append(input);
-      const tagify = setup_hack_parent_tagify(input, language_id);
+      const tagify = setup_hack_parent_tagify(input, language_id, this_term_text);
     };
      
     const editableParentsCell = function (td, cellData, rowData, row, col) {
