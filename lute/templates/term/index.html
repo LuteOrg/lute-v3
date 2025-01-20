@@ -145,6 +145,32 @@
         console.log('Tagify input event triggered');
       }
 
+      let make_dropdown = function(hsh) {
+        console.log(`text: ${hsh.text}`);
+        const txt = decodeURIComponent(hsh.text);
+        let t = hsh.translation ?? '';
+        if (t == '') {
+          return txt;
+        }
+        t = t.replaceAll("\n", "; ").replaceAll("\r", "");
+        const maxlen = 70
+        if (t.length > maxlen) {
+          t = t.substring(0, maxlen) + "...";
+        }
+        return `${txt} (${t})`;
+      };
+      
+      // Build whitelist from returned ajax data.  Remove current term
+      // since a term should not be assigned as its own parent.
+      let build_whitelist = function(data) {
+        const whitelist = data.map((a) => ({
+          "value": a.text,
+          "suggestion": make_dropdown(a),
+          "status": a.status,
+        })).filter((hsh) => hsh.value != this_term_text);
+        return whitelist;
+      };
+
       function show_dropdown(e) {
         console.log("show_dropdown");
         console.log(`got e.detail.value = ${e.detail.value}`);
