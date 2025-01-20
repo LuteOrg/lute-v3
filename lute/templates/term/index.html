@@ -171,7 +171,7 @@
         { searchable: false, orderable: false, render: render_checkbox },
         { name: "WoText", render: render_text },
         { name: "ParentText", data: "ParentText" },
-        { name: "WoTranslation", width: "40%", searchable: true, render: render_translation },
+        { name: "WoTranslation", width: "40%", searchable: true, data: "WoTranslation" },
         { name: "LgName", data: "LgName" },
         { name: "TagList", data: "TagList" },
         { name: "StID", render: render_status },
@@ -180,7 +180,7 @@
         { name: "LgID", data: "LgID", visible: false },
       ],
       columnDefs: [{ 
-        targets: [2],
+        targets: [2,3],
         createdCell: createdCell
       }],
 
@@ -224,6 +224,7 @@
     return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row['WoID']}" langid="${row['LgID']}">`;
   };
 
+  /*** DISABLED FOR INLINE EDIT
   let render_translation = function ( data, type, row, meta ) {
     let tx = row["WoTranslation"] ?? '';
     tx = tx.replaceAll("\r\n", "<br />");
@@ -233,6 +234,7 @@
     let ret = [ tx, imgsrc ].filter((s) => s != '');
     return ret.join('<br />');
   };
+  ***/
 
   let render_date_created = function (data, type, row, meta) {
     const dt = row["WoCreated"];
