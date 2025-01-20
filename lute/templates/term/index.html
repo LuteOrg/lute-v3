@@ -180,6 +180,10 @@
           td.innerText = select.value; // Replace the dropdown with the selected value
           // TODO post change
         });
+        select.addEventListener('blur', function() {
+          // TODO something
+          td.innerText = select.value;
+        });
         td.innerHTML = ''; // Clear the cell content
         td.appendChild(select);
         select.focus(); // Focus the dropdown immediately
@@ -192,15 +196,9 @@
         original = e.target.textContent;
       })
 
-      /** handle change on select change
-      td.addEventListener('blur', function(e) {
-        if (original !== e.target.textContent) {
-          const row = table.row(e.target.parentElement);
-          row.invalidate();
-          console.log('Status row changed: ', row.data());
-        }
-        });
-      */
+      // blur can't be attached to td, or it immediatly fires when the
+      // select is added.
+      // td.addEventListener('blur', function(e) { ... NOPE.
     };
 
     table = $('#termtable').DataTable({
