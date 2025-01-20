@@ -114,6 +114,9 @@
 
   let setup_term_datatable = function(initial_search) {
 
+    // TODO: extract reusable setup function and use here and
+    // elsewhere - term form, bulk edit thing, maybe elsewhere.  Will
+    // be some differences, so will need to param the func sig.
     let setup_parent_tagify = function(input, language_id, this_term_text) {
       if (input._tagify) {
         console.log('Tagify already initialized for this input.');
@@ -296,21 +299,37 @@
       });
 
     }
-    
+
+    var TAGS = {{ tags | safe }};
+    let setup_term_tags_tagify = function(input) {
+      const tagify = new Tagify(input, {
+        placeholder: 'Tags',
+        delimiters: ';;', // special delim to handle tags w/ commas
+        editTags: false,
+        autoComplete: { enabled: true, rightKey: true, tabKey: true },
+        dropdown: { enabled: 1 },
+        enforceWhitelist: false,
+        whitelist: TAGS
+      });  // end tagify
+      return tagify;
+    };
+
+    const post_term_tags = function(tagify) {
+      let parents = tagify.value.map(el => el.value);
+      parents = parents.filter(p => p.trim() != "")
+      console.log('post');
+      console.log(parents);
+      // TODO post
+    }
+
     const editableTagsCell = function (td, cellData, rowData, row, col) {
-      let original;
-      td.setAttribute('contenteditable', true);
-
-      td.addEventListener('focus', function(e) {
-        original = e.target.textContent;
-      })
-
-      td.addEventListener('blur', function(e) {
-        if (original !== e.target.textContent) {
-          const row = table.row(e.target.parentElement);
-          // row.invalidate();
-          console.log('tags field Row changed: ', row.data());
-        }
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = cellData;
+      $(td).empty().append(input);
+      const tagify = setup_term_tags_tagify(input);
+      tagify.on('blur', function (e) {
+        post_term_tags(tagify);
       });
     };
 
