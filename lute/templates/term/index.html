@@ -141,9 +141,20 @@
         // TOOD re-add hooks
       }); // end tagify
       
+      function debugSanity(e) {
+        console.log('Tagify input event triggered');
+      }
+
+      function show_dropdown(e) {
+        console.log("show_dropdown");
+        console.log(`got e.detail.value = ${e.detail.value}`);
+      }
+
       tagify.on('input', function (e) {
-        console.log('Tagify input event triggered:', e.detail);
+        debugSanity(e);
+        show_dropdown(e)
       });
+
       return tagify;
     }
 
