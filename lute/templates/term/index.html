@@ -238,6 +238,13 @@
       return tagify;
     } // end setup_parent_tagify
 
+    const post_parent_tags = function(tagify) {
+      let parents = tagify.value.map(el => el.value);
+      parents = parents.filter(p => p.trim() != "")
+      console.log('post');
+      console.log(parents);
+      // TODO post
+    }
     
     const editableParentsCell = function (td, cellData, rowData, row, col) {
       const language_id = parseInt(rowData["LgID"]);
@@ -249,8 +256,7 @@
       const tagify = setup_parent_tagify(input, language_id, this_term_text);
 
       tagify.on('blur', function (e) {
-        console.log('blur, post');
-        console.log(tagify);
+        post_parent_tags(tagify);
       });
 
     };
@@ -278,10 +284,14 @@
       })
 
       td.addEventListener('blur', function(e) {
-        if (original !== e.target.textContent) {
+        const new_content = e.target.innerHTML.replaceAll("<br>", "\r\n").trim();
+        console.log(original)
+        console.log(new_content)
+        if (original.trim() !== new_content) {
           const row = table.row(e.target.parentElement);
           // row.invalidate();
-          console.log('Row changed: ', row.data());
+          console.log('wotransl field Row changed: ', row.data());
+          // TODO POST
         }
       });
 
@@ -299,7 +309,7 @@
         if (original !== e.target.textContent) {
           const row = table.row(e.target.parentElement);
           // row.invalidate();
-          console.log('Row changed: ', row.data());
+          console.log('tags field Row changed: ', row.data());
         }
       });
     };
