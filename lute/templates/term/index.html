@@ -120,7 +120,68 @@
         return input._tagify;
       }
 
-      const _make_base_Tagify_for = function(input) {
+      // Do the fetch and build the whitelist.
+      const _fetch_whitelist = function(mytagify, e_detail_value, controller) {
+        const s = encodeURIComponent(e_detail_value);
+        const url = `/term/search/${s}/${language_id}`;
+        // console.log(`Calling url ${url}`);
+
+        mytagify.loading(true);
+
+        // Create entry like "cat (a furry thing...)"
+        const _make_dropdown_entry = function(hsh) {
+          const txt = decodeURIComponent(hsh.text);
+          let t = hsh.translation?.replace(/[\n\r]/g, "; ") ?? '';
+          if (t.length > 70)
+            t = t.slice(0, 70) + "...";
+          return t ? `${txt} (${t})` : txt;
+        };
+
+        // Build whitelist from returned ajax data.  Remove current term
+        // since a term should not be assigned as its own parent.
+        const _build_whitelist = function(data) {
+          return data.map((a) => ({
+            "value": a.text,
+            "suggestion": _make_dropdown_entry(a),
+            "status": a.status,
+          })).filter((hsh) => hsh.value != this_term_text);
+        };
+        
+        fetch(url, {signal:controller.signal})
+          .then(RES => RES.json())
+          .then(function(data) {
+            mytagify.whitelist = _build_whitelist(data); // update whitelist Array in-place
+            const sdecode = decodeURIComponent(s);
+            mytagify.loading(false).dropdown.show(sdecode); // render the suggestions dropdown
+          }).catch(err => {
+            if (err.name === 'AbortError') {
+              // Do nothing, fetch was aborted due to another fetch.
+              // console.log('AbortError: Fetch request aborted');
+            }
+            else {
+              console.log(`error: ${err}`);
+            }
+          });
+      };
+
+      // Controller to handle cancellations/aborts of calls.
+      // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
+      var controller;
+
+      // Build whitelist in response to user input.
+      function build_autocomplete_dropdown(mytagify, e) {
+        if (e.detail.value == '' || e.detail.value.length < 1) {
+          controller && controller.abort();
+          mytagify.whitelist = [];
+          mytagify.loading(false).dropdown.hide();
+          return;
+        }
+        controller && controller.abort()
+        controller = new AbortController()
+        _fetch_whitelist(mytagify, e.detail.value, controller);
+      }
+
+      const make_Tagify_for = function(input) {
         const ret = new Tagify(input, {
           placeholder: 'Parents',
           editTags: false,
@@ -168,93 +229,11 @@
         return ret;
       };
       
-      // Build whitelist from returned ajax data.  Remove current term
-      // since a term should not be assigned as its own parent.
-      let _build_whitelist = function(data) {
-
-        const make_dropdown_entry = function(hsh) {
-          const txt = decodeURIComponent(hsh.text);
-          let t = hsh.translation ?? '';
-          if (t == '') {
-            return txt;
-          }
-          t = t.replaceAll("\n", "; ").replaceAll("\r", "");
-          const maxlen = 70
-          if (t.length > maxlen) {
-            t = t.substring(0, maxlen) + "...";
-          }
-          return `${txt} (${t})`;
-        };
-
-        const whitelist = data.map((a) => ({
-          "value": a.text,
-          "suggestion": make_dropdown_entry(a),
-          "status": a.status,
-        })).filter((hsh) => hsh.value != this_term_text);
-        return whitelist;
-      };
-
-      // Do the fetch and build the whitelist.
-      let _fetch_whitelist = function(mytagify, e_detail_value, controller) {
-        const s = encodeURIComponent(e_detail_value);
-        const url = `/term/search/${s}/${language_id}`;
-        // console.log(`Calling url ${url}`);
-
-        mytagify.loading(true);
-        fetch(url, {signal:controller.signal})
-          .then(RES => RES.json())
-          .then(function(data) {
-            mytagify.whitelist = _build_whitelist(data); // update whitelist Array in-place
-            const sdecode = decodeURIComponent(s);
-            mytagify.loading(false).dropdown.show(sdecode); // render the suggestions dropdown
-          }).catch(err => {
-            if (err.name === 'AbortError') {
-              // Do nothing, fetch was aborted due to another fetch.
-              // console.log('AbortError: Fetch request aborted');
-            }
-            else {
-              console.log(`error: ${err}`);
-            }
-          });
-      };
-
-      // Controller to handle cancellations/aborts of calls.
-      // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
-      var controller;
-
-      // Build whitelist in response to user input.
-      function build_autocomplete_dropdown(mytagify, e) {
-        if (e.detail.value == '' || e.detail.value.length < 1) {
-          controller && controller.abort();
-          mytagify.whitelist = [];
-          mytagify.loading(false).dropdown.hide();
-          return;
-        }
-        controller && controller.abort()
-        controller = new AbortController()
-        _fetch_whitelist(mytagify, e.detail.value, controller);
-      }
-
-      const tagify = _make_base_Tagify_for(input);
+      const tagify = make_Tagify_for(input);
 
       tagify.on('input', function (e) {
         build_autocomplete_dropdown(tagify, e)
       });
-
-      /*
-      tagify.hooks = {
-        beforePaste : function(content) {
-          return new Promise((resolve, reject) => {
-            clipboardData = content.clipboardData || window.clipboardData;
-            pastedData = clipboardData.getData('Text');
-            // console.log("pasting => " + pastedData);
-            let e = { detail: { value: pastedData } };
-            build_autocomplete_dropdown(tagify, e);
-            resolve();
-          });
-        }
-      };
-      */
 
       return tagify;
     } // end setup_parent_tagify
