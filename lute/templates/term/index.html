@@ -117,15 +117,18 @@
     var table;
 
     const edparcellhack = function (td, cellData, rowData, row, col) {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = cellData; // Set the cell value
-        $(td).empty().append(input);
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = cellData; // Set the cell value
+      $(td).empty().append(input);
 
-        const tagify = new Tagify(input);
-        tagify.on('input', function (e) {
-          console.log('Tagify input event triggered:', e.detail);
-        });
+      const tagify = new Tagify(input, {
+        whitelist: ['cat'],
+      });
+      
+      tagify.on('input', function (e) {
+        console.log('Tagify input event triggered:', e.detail);
+      });
     };
      
     const editableParentsCell = function (td, cellData, rowData, row, col) {
