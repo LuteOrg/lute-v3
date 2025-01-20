@@ -112,27 +112,29 @@
 
 <script>
 
-  const createdCell = function(cell) {
-    let original
-
-    cell.setAttribute('contenteditable', true)
-    cell.setAttribute('spellcheck', false)
-
-    cell.addEventListener('focus', function(e) {
-      original = e.target.textContent
-    })
-
-    cell.addEventListener('blur', function(e) {
-      if (original !== e.target.textContent) {
-        const row = table.row(e.target.parentElement)
-        row.invalidate()
-        console.log('Row changed: ', row.data())
-      }
-    })
-  }
-
   let setup_term_datatable = function(initial_search) {
-    var table = $('#termtable').DataTable({
+
+    var table;
+
+    const createdCell = function (td, cellData, rowData, row, col) {
+      let original;
+      console.log("created")
+      td.setAttribute('contenteditable', true);
+
+      td.addEventListener('focus', function(e) {
+        original = e.target.textContent;
+      })
+
+      td.addEventListener('blur', function(e) {
+        if (original !== e.target.textContent) {
+          const row = table.row(e.target.parentElement);
+          row.invalidate();
+          console.log('Row changed: ', row.data());
+        }
+      });
+    };
+
+    table = $('#termtable').DataTable({
       layout: {
         topStart: 'pageLength',
         topEnd: 'search',
@@ -178,7 +180,7 @@
         { name: "LgID", data: "LgID", visible: false },
       ],
       columnDefs: [{ 
-        targets: '_all',
+        targets: [2],
         createdCell: createdCell
       }],
 
