@@ -171,6 +171,15 @@
         return whitelist;
       };
 
+      // Do the fetch and build the whitelist.
+      let fetch_whitelist = function(mytagify, e_detail_value) {
+        const s = encodeURIComponent(e_detail_value);
+        console.log(`got call value ${s}`);
+        const url = `/term/search/${s}/${language_id}`;
+        console.log(`Calling url ${url}`);
+
+      };
+
       var controller;
       function build_autocomplete_dropdown(e) {
         console.log("show_dropdown");
@@ -182,8 +191,6 @@
           tagify.loading(false).dropdown.hide();
           return;
         }
-        const s = encodeURIComponent(e.detail.value);
-        console.log(`got call value ${s}`);
 
         // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
         console.log("Aborting prior call, if any");
@@ -191,9 +198,7 @@
         controller = new AbortController()
 
         tagify.loading(true);
-        const url = `/term/search/${s}/${language_id}`;
-        console.log(`Calling url ${url}`);
-        
+        fetch_whitelist(tagify, e.detail.value);
       }
 
       tagify.on('input', function (e) {
