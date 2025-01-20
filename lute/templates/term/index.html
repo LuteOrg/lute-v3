@@ -116,6 +116,23 @@
 
     var table;
 
+    const editableParentsCell = function (td, cellData, rowData, row, col) {
+      let original;
+      td.setAttribute('contenteditable', true);
+
+      td.addEventListener('focus', function(e) {
+        original = e.target.textContent;
+      })
+
+      td.addEventListener('blur', function(e) {
+        if (original !== e.target.textContent) {
+          const row = table.row(e.target.parentElement);
+          row.invalidate();
+          console.log('Row changed: ', row.data());
+        }
+      });
+    };
+
     const editableTranslationCell = function(td, cellData, rowData, row, col) {
 
       function _get_content(row) {
@@ -148,7 +165,7 @@
 
     }
     
-    const editableCell = function (td, cellData, rowData, row, col) {
+    const editableTagsCell = function (td, cellData, rowData, row, col) {
       let original;
       td.setAttribute('contenteditable', true);
 
@@ -237,25 +254,14 @@
       columns: [
         { searchable: false, orderable: false, render: render_checkbox },
         { name: "WoText", render: render_text },
-        { name: "ParentText", data: "ParentText" },
-        { name: "WoTranslation", width: "40%", searchable: true, data: "WoTranslation" },
+        { name: "ParentText", data: "ParentText", createdCell: editableParentsCell },
+        { name: "WoTranslation", width: "40%", searchable: true, data: "WoTranslation", createdCell: editableTranslationCell },
         { name: "LgName", data: "LgName" },
-        { name: "TagList", data: "TagList" },
-        { name: "StID", data: "StID" },
+        { name: "TagList", data: "TagList", createdCell: editableTagsCell },
+        { name: "StID", data: "StID", createdCell: editableStatusCell },
         { name: "WoCreated", render: render_date_created },
         { name: "WoID", data: "WoID", visible: false },
         { name: "LgID", data: "LgID", visible: false },
-      ],
-      columnDefs: [
-        { 
-          targets: [2,5],
-          createdCell: editableCell
-        },
-        { targets: 3, createdCell: editableTranslationCell },
-        { 
-          targets: [6],
-          createdCell: editableStatusCell
-        },
       ],
 
       // Ajax call
