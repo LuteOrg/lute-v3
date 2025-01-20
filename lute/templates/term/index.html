@@ -146,6 +146,11 @@
 
         tagify.on('input', function(e) { console.log("zzz"); });
 
+        console.log('done tagify');
+        return tagify;
+
+        // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx early out
+
         // Autocomplete
         var controller;
         tagify.on('xxxxinput', onInput);
@@ -228,8 +233,6 @@
         input.focus();
 
         const tagify = setup_parent_tagify(input);
-
-        // Automatically focus the input
 
         // TODO - likely won't handle parents with commas
 
