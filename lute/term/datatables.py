@@ -10,7 +10,7 @@ def get_data_tables_list(parameters, session):
 
     base_sql = """SELECT
     w.WoID as WoID, LgName, L.LgID as LgID, w.WoText as WoText, parents.parentlist as ParentText,
-    replace(replace(w.WoTranslation, CHAR(10), "<br />"), CHAR(13), '') as WoTranslation,
+    WoTranslation,
     WoRomanization,
     replace(wi.WiSource, '.jpeg', '') as WiSource,
     ifnull(tags.taglist, '') as TagList,
