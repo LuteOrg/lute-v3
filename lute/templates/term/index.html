@@ -349,10 +349,10 @@
     };
 
     const post_term_tags = function(tagify) {
-      let parents = tagify.value.map(el => el.value);
-      parents = parents.filter(p => p.trim() != "")
+      let tt = tagify.value.map(el => el.value);
+      tt = tt.filter(p => p.trim() != "")
       console.log('post');
-      console.log(parents);
+      console.log(tt);
       // TODO post
     }
 
