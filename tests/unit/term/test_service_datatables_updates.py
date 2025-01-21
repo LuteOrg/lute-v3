@@ -18,11 +18,13 @@ def assert_updated(termid, expected, msg=""):
     "Return a term as a string for fast asserts."
     t = TermRepository(db.session).find(termid)
     bad_keys = [
-        k for k in expected.keys() if k not in ["parents", "status", "tags", "text"]
+        k
+        for k in expected.keys()
+        if k not in ["parents", "status", "tags", "translation"]
     ]
     assert len(bad_keys) == 0, "no bad keys " + ", ".join(bad_keys)
-    if "text" in expected:
-        assert expected["text"] == t.text, msg
+    if "translation" in expected:
+        assert expected["translation"] == t.translation, msg
     if "parents" in expected:
         assert expected["parents"] == sorted([p.text for p in t.parents]), msg
     if "status" in expected:
@@ -45,7 +47,7 @@ def test_smoke_test(app_context, spanish):
     _apply_updates(t.id, "term_tags", ["tag1", "tag2"])
     _apply_updates(t.id, "translation", "new_translation")
     expected = {
-        "text": "new_translation",
+        "translation": "new_translation",
         "parents": ["P", "X"],
         "status": 4,
         "tags": ["tag1", "tag2"],

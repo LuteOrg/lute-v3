@@ -99,4 +99,12 @@ class Service:
 
     def apply_datatables_update(self, term_id, update_type, values):
         "Apply single update from datatables updatable cells interactions."
-        pass
+
+        repo = TermRepository(self.session)
+        term = repo.find(term_id)
+
+        if update_type == "translation":
+            term.translation = values
+
+        self.session.add(term)
+        self.session.commit()
