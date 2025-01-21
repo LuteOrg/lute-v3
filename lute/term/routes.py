@@ -159,7 +159,7 @@ def ajax_edit_from_index():
     except ValueError as ex:
         print(ex, flush=True)
         return jsonify({"error": f"Invalid input ({ex})"}), 400
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-exception-caught
         return jsonify({"error": f"An unexpected error occurred ({ex})"}), 500
     return jsonify({"status": "ok"})
 

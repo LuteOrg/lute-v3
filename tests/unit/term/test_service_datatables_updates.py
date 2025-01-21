@@ -11,7 +11,7 @@ from lute.term.service import Service, TermServiceException
 from tests.utils import add_terms
 from tests.dbasserts import assert_sql_result
 
-# pylint: disable=unbalanced-tuple-unpacking
+# pylint: disable=unbalanced-tuple-unpacking,missing-function-docstring
 
 
 def assert_updated(termid, expected, msg=""):
