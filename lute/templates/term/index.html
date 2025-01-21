@@ -252,13 +252,12 @@
     const editableParentsCell = function (td, cellData, rowData, row, col) {
       const language_id = parseInt(rowData["LgID"]);
       const this_term_text = rowData["WoText"];
-      const placeholder = null;
+      const placeholder = null;  // 'Parents';
       const input = document.createElement('input');
       input.type = 'text';
       input.value = cellData;
       $(td).empty().append(input);
       const tagify = setup_parent_tagify(input, language_id, this_term_text, placeholder);
-
       tagify.on('blur', function (e) {
         post_parent_tags(tagify);
       });

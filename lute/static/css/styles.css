@@ -2182,6 +2182,14 @@ input[name='status']:disabled + label {
 
 /** Term listing (/term) action dropdown. ********************/
 
+table#termtable .tagify {
+    border: 0px;
+}
+
+table#termtable .tagify:hover {
+    border: 1px solid;
+}
+
 .term-action-container {
     display: flex;
 }
