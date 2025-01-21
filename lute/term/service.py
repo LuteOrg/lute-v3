@@ -4,7 +4,7 @@
 
 from dataclasses import dataclass, field
 from typing import List, Optional
-from lute.models.term import Status
+from lute.models.term import Term, Status
 from lute.models.repositories import TermRepository, TermTagRepository
 from lute.term.model import Repository
 
@@ -105,6 +105,16 @@ class Service:
 
         if update_type == "translation":
             term.translation = values
+
+        if update_type == "parents":
+            term.remove_all_parents()
+            for ptext in values:
+                # ptext already has zero-width spaces, if the term was looked
+                # up using the dropdown box.
+                pspec = Term.create_term_no_parsing(term.language, ptext)
+                parent = repo.find_by_spec(pspec)
+                use_parent = parent or pspec
+                term.add_parent(use_parent)
 
         self.session.add(term)
         self.session.commit()
