@@ -249,7 +249,6 @@
     } // end setup_parent_tagify
 
     const post_parent_tags = function(mytagify, input) {
-      console.log(`input = ${input.value}`);
       let parents = mytagify.value.map(el => el.value);
       parents = parents.filter(p => p.trim() != "")
       console.log('post');
@@ -267,18 +266,8 @@
       $(td).empty().append(input);
       const tagify = setup_parent_tagify(input, language_id, this_term_text, placeholder);
       tagify.on('blur', function (e) {
-        setTimeout(function () {
-          post_parent_tags(tagify, input);
-        }, 0);  // Use setTimeout to ensure Tagify is done with its own operatio
-        // post_parent_tags(tagify, input);
+        post_parent_tags(tagify, input);
       });
-      /*
-      $(input).on('focusout', function (e) {
-        setTimeout(function () {
-          post_parent_tags(tagify);
-        }, 0);  // Use setTimeout to ensure Tagify is done with its own operations
-      });
-      */
     };
 
     const post_translation = function(new_translation) {
