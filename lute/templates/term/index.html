@@ -272,8 +272,8 @@
 
     const editableTranslationCell = function(td, cellData, rowData, row, col) {
 
-      function _get_content(row) {
-        let tx = row["WoTranslation"] ?? '';
+      function _get_content(translation, row) {
+        let tx = translation ?? '';
         tx = tx.replaceAll("\r\n", "<br />");
         let imgsrc = row["WiSource"] ?? '';
         if (imgsrc != '')
@@ -283,7 +283,7 @@
       }
 
       td.setAttribute('contenteditable', true);
-      td.innerHTML = _get_content(rowData)
+      td.innerHTML = _get_content(rowData["WoTranslation"], rowData)
 
       td.addEventListener('focus', function(e) {
         let tx = rowData["WoTranslation"] ?? '';
@@ -301,6 +301,7 @@
           // row.invalidate();
           console.log('wotransl field Row changed: ', row.data());
           post_translation(new_content);
+          td.innerHTML = _get_content(new_content, rowData)
           // TODO POST
         }
       });
