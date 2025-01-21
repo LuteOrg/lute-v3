@@ -228,21 +228,10 @@
         let settings = { ...base_settings, ...opt_settings };
         return new Tagify(input, settings);
       };
-      
+
       const tagify = make_Tagify_for(input);
       tagify.on('input', function (e) {
         build_autocomplete_dropdown(tagify, e)
-      });
-
-      // After add/remove, set focus on the tagify input span again,
-      // so that tagify.on('blur') is fired when leaving the input box.
-      // Annoying but vital hack.
-      tagify.on('add remove', function() {
-        setTimeout(function() {
-          const s = $(tagify.DOM.scope);
-          const lastSpan = s.find("span.tagify__input").last();
-          lastSpan.focus();
-        }, 0);
       });
 
       return tagify;
@@ -289,7 +278,36 @@
         original = newvals;
       }
 
+      // Adding tags or clicking tag removal causes the tagify to lose
+      // focus, which can kick off the 'blur' event.  Suppress the
+      // blur event as needed.
+      let suppressBlur = false;
+
+      $(tagify.DOM.scope).on('mousedown', '.tagify__tag__removeBtn', function () {
+        console.log('setting suppressBlur to true on tag remove click');
+        suppressBlur = true;
+      });
+      
+      // After add/remove, set focus on the tagify input span again,
+      // so that tagify.on('blur') is fired when leaving the input box.
+      // Annoying but vital hack.
+      tagify.on('add remove', function() {
+        // console.log('setting suppressBlur to true');
+        suppressBlur = true;
+        setTimeout(function() {
+          const s = $(tagify.DOM.scope);
+          const lastSpan = s.find("span.tagify__input").last();
+          lastSpan.focus();
+          // console.log('setting suppressBlur to false');
+          suppressBlur = false;
+        }, 0);
+      });
+
       tagify.on('blur', function (e) {
+        if (suppressBlur) {
+          console.log('Blur suppressed');
+          return;
+        }
         add_pending_tags_and_post();
       });
 
@@ -360,18 +378,6 @@
       }
       const settings = { ...base_settings, ...opt_settings };
       const tagify = new Tagify(input, settings);
-
-      // After add/remove, set focus on the tagify input span again,
-      // so that tagify.on('blur') is fired when leaving the input box.
-      // Annoying but vital hack.
-      tagify.on('add remove', function() {
-        setTimeout(function() {
-          const s = $(tagify.DOM.scope);
-          const lastSpan = s.find("span.tagify__input").last();
-          lastSpan.focus();
-        }, 0);
-      });
-
       return tagify;
     };
 
