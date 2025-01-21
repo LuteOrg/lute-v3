@@ -109,7 +109,7 @@
     // TODO: extract reusable setup function and use here and
     // elsewhere - term form, bulk edit thing, maybe elsewhere.  Will
     // be some differences, so will need to param the func sig.
-    let setup_parent_tagify = function(input, language_id, this_term_text) {
+    let setup_parent_tagify = function(input, language_id, this_term_text, placeholder) {
       if (input._tagify) {
         console.log('Tagify already initialized for this input.');
         return input._tagify;
@@ -177,8 +177,7 @@
       }
 
       const make_Tagify_for = function(input) {
-        const ret = new Tagify(input, {
-          placeholder: 'Parents',
+        const base_settings = {
           editTags: false,
           pasteAsTags: false,
           backspace: true,
@@ -219,13 +218,22 @@
               });
             }
           },
-        });
+        };
+
+        let opt_settings = {};
+        if (placeholder != null) {
+          opt_settings = {
+            placeholder: placeholder
+          };
+        };
+
+        let settings = { ...base_settings, ...opt_settings };
+        const ret = new Tagify(input, settings);
 
         return ret;
       };
       
       const tagify = make_Tagify_for(input);
-
       tagify.on('input', function (e) {
         build_autocomplete_dropdown(tagify, e)
       });
@@ -244,11 +252,12 @@
     const editableParentsCell = function (td, cellData, rowData, row, col) {
       const language_id = parseInt(rowData["LgID"]);
       const this_term_text = rowData["WoText"];
+      const placeholder = null;
       const input = document.createElement('input');
       input.type = 'text';
       input.value = cellData;
       $(td).empty().append(input);
-      const tagify = setup_parent_tagify(input, language_id, this_term_text);
+      const tagify = setup_parent_tagify(input, language_id, this_term_text, placeholder);
 
       tagify.on('blur', function (e) {
         post_parent_tags(tagify);
