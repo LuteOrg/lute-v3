@@ -220,17 +220,13 @@
           },
         };
 
-        let opt_settings = {};
+        const opt_settings = {};
         if (placeholder != null) {
-          opt_settings = {
-            placeholder: placeholder
-          };
+          opt_settings.placeholder = placeholder;
         };
 
         let settings = { ...base_settings, ...opt_settings };
-        const ret = new Tagify(input, settings);
-
-        return ret;
+        return new Tagify(input, settings);
       };
       
       const tagify = make_Tagify_for(input);
@@ -308,18 +304,22 @@
 
     }
 
-    var TAGS = {{ tags | safe }};
-    let setup_term_tags_tagify = function(input) {
-      const tagify = new Tagify(input, {
-        placeholder: 'Tags',
+    // TODO - extract reusable routine.
+    let setup_term_tags_tagify = function(input, tags, placeholder) {
+      const base_settings = {
         delimiters: ';;', // special delim to handle tags w/ commas
         editTags: false,
         autoComplete: { enabled: true, rightKey: true, tabKey: true },
         dropdown: { enabled: 1 },
         enforceWhitelist: false,
-        whitelist: TAGS
-      });  // end tagify
-      return tagify;
+        whitelist: tags,
+      };
+      const opt_settings = {};
+      if (placeholder != null) {
+        opt_settings.placeholder = placeholder;
+      }
+      const settings = { ...base_settings, ...opt_settings };
+      return new Tagify(input, settings);
     };
 
     const post_term_tags = function(tagify) {
@@ -330,12 +330,14 @@
       // TODO post
     }
 
+    var TAGS = {{ tags | safe }};
     const editableTagsCell = function (td, cellData, rowData, row, col) {
       const input = document.createElement('input');
+      const placeholder = null;
       input.type = 'text';
       input.value = cellData;
       $(td).empty().append(input);
-      const tagify = setup_term_tags_tagify(input);
+      const tagify = setup_term_tags_tagify(input, TAGS, placeholder);
       tagify.on('blur', function (e) {
         post_term_tags(tagify);
       });
