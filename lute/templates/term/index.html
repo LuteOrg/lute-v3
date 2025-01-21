@@ -336,8 +336,6 @@
     const editableStatusCell = function (td, cellData, rowData, row, col) {
       let original;
       td.setAttribute('contenteditable', true);
-      const stid = parseInt(rowData["StID"]);
-      console.log(`got stid = ${stid}`);
 
       function makeDropdown(td) {
         const select = document.createElement('select');
@@ -346,9 +344,8 @@
         {% for s in statuses %}
         options_string += '<option value="{{s.id}}">{{ s.text }}</option>';
         {% endfor %}
-        console.log(`options = ${options_string}`);
         select.innerHTML = options_string;
-        select.value = stid;
+        select.value = parseInt(rowData["StID"]);
 
         select.addEventListener('change', function () {
           td.innerText = select.value; // Replace the dropdown with the selected value
@@ -363,12 +360,7 @@
         select.focus(); // Focus the dropdown immediately
       }
 
-      td.textContent = rowData["StText"];
-
-      td.addEventListener('focus', function(e) {
-        makeDropdown(td);
-        original = e.target.textContent;
-      })
+      makeDropdown(td);
 
       // blur can't be attached to td, or it immediatly fires when the
       // select is added.
