@@ -237,6 +237,14 @@
       return tagify;
     } // end setup_parent_tagify
 
+
+    function post_update(term_id, type, newvalue) {
+      const vals = [term_id, type, newvalue].map(el => `${el}`);
+      console.log(`posting ${vals}`)
+      console.log('TODO xxxxxxxxxxxxxxxxxxxxxxxxx');
+    }
+
+ 
     const editableTagifyCell = function(
       td, cellData, rowData, row, col,
       setupTagify, setupParams,
@@ -259,11 +267,9 @@
 
       const handle_post_tags = function() {
         const vals = tagify.value.
-            map(el => el.value).
-            filter(p => p.trim() != "")
-        console.log('post as ' + post_tags_as);
-        console.log(vals);
-        // TODO post
+              map(el => el.value).
+              filter(p => p.trim() != "");
+        post_update(rowData["WoID"], post_tags_as, vals);
       }
 
       const add_pending_tags_and_post = function() {
@@ -353,9 +359,7 @@
               .trim();
         if (original.trim() !== new_content) {
           const row = table.row(e.target.parentElement);
-          // row.invalidate();
-          post_translation(new_content);
-          // TODO POST
+          post_update(rowData["WoID"], 'translation', new_content);
           original = new_content;  // don't repost if just entering and exiting
         }
       });
@@ -390,15 +394,7 @@
       );
     };
 
-    const post_status = function(new_status) {
-      console.log(`post ${new_status}`);
-      // TODO post
-    }
-
     const editableStatusCell = function (td, cellData, rowData, row, col) {
-      let original;
-      // td.setAttribute('contenteditable', true);
-
       function makeDropdown(td) {
         const select = document.createElement('select');
 
@@ -409,20 +405,19 @@
         select.innerHTML = options_string;
         select.value = parseInt(rowData["StID"]);
 
-        select.addEventListener('change', function () {
-          post_status(select.value);
-          // TODO post change
-        });
-        select.addEventListener('blur', function() {
-          // TODO something?
-        });
-
         td.innerHTML = '';
         td.appendChild(select);
-        select.focus(); // Focus the dropdown immediately
+        return select;
       }
 
-      makeDropdown(td);
+      const select = makeDropdown(td);
+      select.addEventListener('change', function () {
+        post_update(rowData["WoID"], 'status', select.value);
+      });
+      select.addEventListener('blur', function() {
+        // TODO something?
+      });
+      select.focus(); // Focus the dropdown immediately
 
       // blur can't be attached to td, or it immediatly fires when the
       // select is added.
