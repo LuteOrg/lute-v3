@@ -249,10 +249,15 @@
     } // end setup_parent_tagify
 
 
-    function post_update(term_id, type, newvalue) {
-      const vals = [term_id, type, newvalue].map(el => `${el}`);
-      console.log(`posting ${vals}`)
-      console.log('TODO xxxxxxxxxxxxxxxxxxxxxxxxx');
+    function post_update(term_id, update_type, update) {
+      const payload = {
+        term_id: term_id,
+        update_type: update_type,
+        values: update
+      }
+      console.log(`posting ${JSON.stringify(payload)}`)
+      // TODO
+      throw Exception("TODO");
     }
 
  
