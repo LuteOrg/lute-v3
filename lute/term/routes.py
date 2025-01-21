@@ -46,13 +46,15 @@ def index(search):
     languages = db.session.query(Language).order_by(Language.name).all()
     langopts = [(lang.id, lang.name) for lang in languages]
     langopts = [(0, "(all)")] + langopts
-    statuses = [s for s in db.session.query(Status).all() if s.id != Status.UNKNOWN]
+    filter_statuses = [
+        s for s in db.session.query(Status).all() if s.id != Status.IGNORED
+    ]
     r = Repository(db.session)
     return render_template(
         "term/index.html",
         initial_search=search,
         language_options=langopts,
-        statuses=statuses,
+        statuses=filter_statuses,
         tags=r.get_term_tags(),
         in_term_index_listing=True,
     )
