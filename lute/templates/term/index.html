@@ -254,7 +254,7 @@
       return vs;
     }
 
-    const post_parent_tags = function(mytagify, input) {
+    const post_parent_tags = function(mytagify) {
       let parents = mytagify.value.map(el => el.value);
       parents = parents.filter(p => p.trim() != "")
       console.log('post');
