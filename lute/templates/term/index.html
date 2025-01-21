@@ -117,28 +117,20 @@
 
       // Do the fetch and build the whitelist.
       const _fetch_whitelist = function(mytagify, e_detail_value, controller) {
-        const s = encodeURIComponent(e_detail_value);
-        const url = `/term/search/${s}/${language_id}`;
-        // console.log(`Calling url ${url}`);
-
-        mytagify.loading(true);
-
         // Create entry like "cat (a furry thing...)"
         const _make_dropdown_entry = function(hsh) {
-          // console.log(`making entry with ${JSON.stringify(hsh)}`);
+          let translation = hsh.translation?.replace(/[\n\r]/g, "; ") ?? '';
+          if (translation.length > 50)
+            translation = translation.slice(0, 50) + "...";
+          translation = translation ? `(${translation})` : '';
           const txt = decodeURIComponent(hsh.text);
-          let t = hsh.translation?.replace(/[\n\r]/g, "; ") ?? '';
-          if (t.length > 70)
-            t = t.slice(0, 70) + "...";
-          const ret = t ? `${txt} (${t})` : txt;
-          // console.log(`entry = ${ret}`);
+          const ret = [txt, translation].join(' ');
+          console.log(ret);
           return ret;
         };
 
-        // Build whitelist from returned ajax data.  Remove current term
-        // since a term should not be assigned as its own parent.
+        // Build whitelist from returned ajax data.
         const _build_whitelist = function(data) {
-          // console.log(data);
           const _make_hash = function(a) {
             return {
               "value": a.text,
@@ -147,18 +139,20 @@
               "status": a.status,
             };
           };
-          let ret = data.map((a) => _make_hash(a));
-          return ret.filter(hsh => hsh.text != this_term_text);
+          return data.map((a) => _make_hash(a));
         };
         
+        const encoded_value = encodeURIComponent(e_detail_value);
+        const url = `/term/search/${encoded_value}/${language_id}`;
+        mytagify.loading(true);
         fetch(url, {signal:controller.signal})
           .then(RES => RES.json())
           .then(function(data) {
-            mytagify.whitelist = _build_whitelist(data); // update whitelist Array in-place
-            // console.log(`whitelist = `);
-            // console.log(JSON.stringify(mytagify.whitelist));
-            const sdecode = decodeURIComponent(s);
-            mytagify.loading(false).dropdown.show(sdecode); // render the suggestions dropdown
+            // Update whitelist and render in place.
+            const whitelist = _build_whitelist(data).
+                  filter(hsh => hsh.text != this_term_text);
+            mytagify.whitelist = whitelist;
+            mytagify.loading(false).dropdown.show(e_detail_value);
           }).catch(err => {
             if (err.name === 'AbortError') {
               // Do nothing, fetch was aborted due to another fetch.
@@ -167,6 +161,7 @@
             else {
               console.log(`error: ${err}`);
             }
+            mytagify.loading(false);
           });
       };
 
