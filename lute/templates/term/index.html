@@ -126,7 +126,7 @@
         // Create entry like "cat (a furry thing...)"
         const _make_dropdown_entry = function(hsh) {
           console.log(`making entry with ${JSON.stringify(hsh)}`);
-          const txt = decodeURIComponent(hsh.text);
+          const txt = decodeURIComponent(hsh.value);
           let t = hsh.translation?.replace(/[\n\r]/g, "; ") ?? '';
           if (t.length > 70)
             t = t.slice(0, 70) + "...";
@@ -141,8 +141,8 @@
           // console.log(data);
           const _make_hash = function(a) {
             return {
-              "value": a.id,
-              "text": a.text,
+              "value": a.text,
+              "id": a.id,
               "suggestion": _make_dropdown_entry(a),
               "status": a.status,
             };
