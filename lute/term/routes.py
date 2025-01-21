@@ -144,6 +144,26 @@ def bulk_edit_from_reading_pane():
     return render_template("/read/updated.html", term_text=None)
 
 
+@bp.route("/ajax_edit_from_index", methods=["POST"])
+def ajax_edit_from_index():
+    "Ajax edit from the term index listing."
+    svc = TermService(db.session)
+    try:
+        data = request.get_json()
+        term_id = int(data.get("term_id", 0))
+        update_type = data.get("update_type", "")
+        values = data.get("values")
+        svc.apply_datatables_update(term_id, update_type, values)
+    except TermServiceException as ex:
+        return jsonify({"error": str(ex)}), 400
+    except ValueError as ex:
+        print(ex, flush=True)
+        return jsonify({"error": f"Invalid input ({ex})"}), 400
+    except Exception as ex:
+        return jsonify({"error": f"An unexpected error occurred ({ex})"}), 500
+    return jsonify({"status": "ok"})
+
+
 @bp.route("/export_terms", methods=["POST"])
 def export_terms():
     "Generate export file of terms."

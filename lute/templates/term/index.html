@@ -256,8 +256,25 @@
         values: update
       }
       console.log(`posting ${JSON.stringify(payload)}`)
-      // TODO
-      throw Exception("TODO");
+
+      const url = '/term/ajax_edit_from_index';
+
+      $.ajax({
+        url: url,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(payload),
+        success: function(response) {
+          console.log('Success:', response.status);
+        },
+        error: function(xhr) {
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            console.error('Error:', xhr.responseJSON.error);
+          } else {
+            console.error('Unexpected error:', xhr.statusText);
+          }
+        }
+      });
     }
 
  
