@@ -1,5 +1,5 @@
 """
-Term service apply_datatables_update tests.
+Term service apply_ajax_update tests.
 
 Generally smoke tests.
 """
@@ -39,7 +39,7 @@ def assert_updated(termid, expected, msg=""):
 def _apply_updates(term_id, update_type, values):
     "Apply updates."
     svc = Service(db.session)
-    svc.apply_datatables_update(term_id, update_type, values)
+    svc.apply_ajax_update(term_id, update_type, values)
 
 
 def test_smoke_test(app_context, spanish):
@@ -61,21 +61,21 @@ def test_smoke_test(app_context, spanish):
 def test_bad_term_id_throws(app_context):
     svc = Service(db.session)
     with pytest.raises(TermServiceException, match="No term with id -99"):
-        svc.apply_datatables_update(-99, "status", 99)
+        svc.apply_ajax_update(-99, "status", 99)
 
 
 def test_bad_update_type_throws(app_context, spanish):
     svc = Service(db.session)
     [t] = add_terms(spanish, ["T"])
     with pytest.raises(TermServiceException, match="Bad update type"):
-        svc.apply_datatables_update(t.id, "trash", 99)
+        svc.apply_ajax_update(t.id, "trash", 99)
 
 
 def test_bad_status_throws(app_context, spanish):
     svc = Service(db.session)
     [t] = add_terms(spanish, ["T"])
     with pytest.raises(TermServiceException, match="Bad status value"):
-        svc.apply_datatables_update(t.id, "status", 42)
+        svc.apply_ajax_update(t.id, "status", 42)
 
 
 def test_can_remove_values(app_context, spanish):

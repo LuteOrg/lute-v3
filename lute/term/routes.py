@@ -153,7 +153,7 @@ def ajax_edit_from_index():
         term_id = int(data.get("term_id", 0))
         update_type = data.get("update_type", "")
         values = data.get("values")
-        svc.apply_datatables_update(term_id, update_type, values)
+        svc.apply_ajax_update(term_id, update_type, values)
     except TermServiceException as ex:
         return jsonify({"error": str(ex)}), 400
     except ValueError as ex:

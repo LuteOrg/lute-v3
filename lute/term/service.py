@@ -97,7 +97,7 @@ class Service:
             self.session.add(term)
             self.session.commit()
 
-    def apply_datatables_update(self, term_id, update_type, value):
+    def apply_ajax_update(self, term_id, update_type, value):
         "Apply single update from datatables updatable cells interactions."
 
         repo = TermRepository(self.session)
