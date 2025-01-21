@@ -317,10 +317,17 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
             rowtext = [""]  # first field is empty checkbox
             rowtext.append(tds[1].text.strip())  # term
-            rowtext.append(tds[2].text.strip())  # parent tags (?)
+
+            parenttags = tds[2].text.strip()
+            parenttags = ", ".join(parenttags.split("\n"))
+            rowtext.append(parenttags)
+
             rowtext.append(tds[3].text.strip())  # translation
             rowtext.append(tds[6].text.strip())  # language
-            rowtext.append(tds[4].text.strip())  # term tags (?)
+
+            termtags = tds[4].text.strip()
+            termtags = ", ".join(termtags.split("\n"))
+            rowtext.append(termtags)
 
             select_element = row.find_by_css("select")
             selected_value = select_element.value
