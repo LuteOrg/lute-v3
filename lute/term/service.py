@@ -97,24 +97,27 @@ class Service:
             self.session.add(term)
             self.session.commit()
 
-    def apply_datatables_update(self, term_id, update_type, values):
+    def apply_datatables_update(self, term_id, update_type, value):
         "Apply single update from datatables updatable cells interactions."
 
         repo = TermRepository(self.session)
         term = repo.find(term_id)
 
         if update_type == "translation":
-            term.translation = values
+            term.translation = value
 
         if update_type == "parents":
             term.remove_all_parents()
-            for ptext in values:
+            for ptext in value:
                 # ptext already has zero-width spaces, if the term was looked
                 # up using the dropdown box.
                 pspec = Term.create_term_no_parsing(term.language, ptext)
                 parent = repo.find_by_spec(pspec)
                 use_parent = parent or pspec
                 term.add_parent(use_parent)
+
+        if update_type == "status":
+            term.status = value
 
         self.session.add(term)
         self.session.commit()
