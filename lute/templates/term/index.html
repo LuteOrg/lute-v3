@@ -111,7 +111,7 @@
     // be some differences, so will need to param the func sig.
     let setup_parent_tagify = function(input, language_id, this_term_text, placeholder) {
       if (input._tagify) {
-        console.log('Tagify already initialized for this input.');
+        // console.log('Tagify already initialized for this input.');
         return input._tagify;
       }
 
@@ -274,7 +274,7 @@
         contentType: 'application/json',
         data: JSON.stringify(payload),
         success: function(response) {
-          console.log('Success:', response.status);
+          // console.log('Success:', response.status);
           _show_saved_checkmark(td);
         },
         error: function(xhr) {
@@ -333,7 +333,7 @@
       let suppressBlur = false;
 
       $(tagify.DOM.scope).on('mousedown', '.tagify__tag__removeBtn', function () {
-        console.log('setting suppressBlur to true on tag remove click');
+        // console.log('setting suppressBlur to true on tag remove click');
         suppressBlur = true;
       });
       
@@ -354,7 +354,7 @@
 
       tagify.on('blur', function (e) {
         if (suppressBlur) {
-          console.log('Blur suppressed');
+          // console.log('Blur suppressed');
           return;
         }
         add_pending_tags_and_post();
