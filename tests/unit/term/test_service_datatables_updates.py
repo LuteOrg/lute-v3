@@ -53,11 +53,12 @@ def test_smoke_test(app_context, spanish):
     assert_updated(t.id, expected, "smoke all items")
 
 
-# missing status fails
-# empty translation
-# empty tags
-# empty parents
+# bad term id throws
 # bad update type fails
+# missing status throws
+# empty translation ok
+# empty tags ok
+# empty parents ok
 # new parent created in db if needed
 # single parent = sync status
 # multi = no sync
