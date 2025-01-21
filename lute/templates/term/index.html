@@ -254,10 +254,10 @@
       return vs;
     }
 
-    const post_parent_tags = function(mytagify) {
+    const handle_post_tags = function(post_as, mytagify) {
       let parents = mytagify.value.map(el => el.value);
       parents = parents.filter(p => p.trim() != "")
-      console.log('post');
+      console.log('post as ' + post_as);
       console.log(parents);
       // TODO post
     }
@@ -265,7 +265,7 @@
     const editableTagifyCell = function(
       td, cellData, rowData, row, col,
       setupTagify, setupParams,
-      postTags
+      post_tags_as
     ) {
       const input = document.createElement('input');
       input.type = 'text';
@@ -285,7 +285,7 @@
 
         let newvals = tagify_values(tagify);
         if (newvals.join(';;') != original.join(';;'))
-          postTags(tagify);
+          handle_post_tags(post_tags_as, tagify);
         original = newvals;
       });
     };
@@ -295,7 +295,7 @@
         td, cellData, rowData, row, col,
         setup_parent_tagify,
         [parseInt(rowData["LgID"]), rowData["WoText"], null],
-        post_parent_tags
+        'parents'
       );
     };
 
@@ -367,20 +367,12 @@
       return tagify;
     };
 
-    const post_term_tags = function(tagify) {
-      let tt = tagify.value.map(el => el.value);
-      tt = tt.filter(p => p.trim() != "")
-      console.log('post');
-      console.log(tt);
-      // TODO post
-    }
-
     var TAGS = {{ tags | safe }};
     const editableTagsCell = function (td, cellData, rowData, row, col) {
       editableTagifyCell(
         td, cellData, rowData, row, col,
         setup_term_tags_tagify, [TAGS, null],
-        post_term_tags
+        'term_tags'
       );
     };
 
