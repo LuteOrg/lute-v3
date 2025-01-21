@@ -235,12 +235,7 @@
         rowData["WoText"],
         {}
       );
-      editableTagifyCell(
-        rowData["WoID"],
-        td,
-        tagify,
-        'parents'
-      );
+      editableTagifyCell(rowData["WoID"], td, tagify, 'parents');
     };
 
     const editableTranslationCell = function(td, cellData, rowData, row, col) {
@@ -295,12 +290,7 @@
     const editableTagsCell = function (td, cellData, rowData, row, col) {
       const input = _make_tagify_text_control(td, cellData);
       const tagify = setup_term_tags_tagify(input, TAGS, {});
-      editableTagifyCell(
-        rowData["WoID"],
-        td,
-        tagify,
-        'term_tags'
-      );
+      editableTagifyCell(rowData["WoID"], td, tagify, 'term_tags');
     };
 
     const editableStatusCell = function (td, cellData, rowData, row, col) {
