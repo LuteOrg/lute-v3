@@ -267,39 +267,32 @@
     }
 
     const editableTranslationCell = function(td, cellData, rowData, row, col) {
-
-      function _get_content(translation, row) {
-        let tx = translation ?? '';
-        tx = tx.replaceAll("\r\n", "<br />");
-        let imgsrc = row["WiSource"] ?? '';
-        if (imgsrc != '')
-          imgsrc = `<img class="term-listing-image" style="margin-top: 5px;" src="${imgsrc}" />`;
-        let ret = [ tx, imgsrc ].filter((s) => s != '');
-        return ret.join('<br />');
+      const div = document.createElement('div');
+      $(div).addClass("translationDiv");
+      div.setAttribute('contenteditable', true);
+      div.innerHTML = (cellData ?? '').replace(/\r\n/g, '<br />');
+      $(td).empty().append(div);
+      let imgsrc = rowData["WiSource"] ?? '';
+      if (imgsrc != '') {
+        imgsrc = `<img class="term-listing-image" style="margin-top: 5px;" src="${imgsrc}" />`;
       }
+      $(td).append(imgsrc);
 
-      td.setAttribute('contenteditable', true);
-      td.innerHTML = _get_content(rowData["WoTranslation"], rowData)
+      div.addEventListener('blur', function(e) {
+        const original = (cellData ?? '');
 
-      td.addEventListener('focus', function(e) {
-        let tx = rowData["WoTranslation"] ?? '';
-        tx = tx.replaceAll("\r\n", "<br />");
-        td.innerHTML = tx;
-        original = rowData["WoTranslation"];
-      })
-
-      td.addEventListener('blur', function(e) {
-        const new_content = e.target.innerHTML.replaceAll("<br>", "\r\n").trim();
-        console.log(original)
-        console.log(new_content)
+        // contenteditable puts each line into its own div.
+        const new_content = div.innerHTML
+              .replace(/<div>/g, '\r\n')
+              .replace(/<\/div>/g, '')
+              .replace(/<br\s*\/?>/g, '\r\n')
+              .trim();
         if (original.trim() !== new_content) {
           const row = table.row(e.target.parentElement);
           // row.invalidate();
-          console.log('wotransl field Row changed: ', row.data());
           post_translation(new_content);
           // TODO POST
         }
-        td.innerHTML = _get_content(new_content, rowData)
       });
 
     }
