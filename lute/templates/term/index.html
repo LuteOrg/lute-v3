@@ -125,9 +125,7 @@
             translation = translation.slice(0, max_translation_len) + "...";
           translation = translation ? `(${translation})` : '';
           const txt = decodeURIComponent(hsh.text);
-          const ret = [txt, translation].join(' ');
-          console.log(ret);
-          return ret;
+          return [txt, translation].join(' ');
         };
 
         // Build whitelist from returned ajax data.
