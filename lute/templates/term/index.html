@@ -336,14 +336,20 @@
     const editableStatusCell = function (td, cellData, rowData, row, col) {
       let original;
       td.setAttribute('contenteditable', true);
+      const stid = parseInt(rowData["StID"]);
+      console.log(`got stid = ${stid}`);
 
       function makeDropdown(td) {
         const select = document.createElement('select');
-        select.innerHTML = `
-      <option value="option1">Option 1</option>
-      <option value="option2">Option 2</option>
-      <option value="option3">Option 3</option>
-    `;
+
+        let options_string = '';
+        {% for s in statuses %}
+        options_string += '<option value="{{s.id}}">{{ s.text }}</option>';
+        {% endfor %}
+        console.log(`options = ${options_string}`);
+        select.innerHTML = options_string;
+        select.value = stid;
+
         select.addEventListener('change', function () {
           td.innerText = select.value; // Replace the dropdown with the selected value
           // TODO post change
