@@ -262,22 +262,34 @@
       // TODO post
     }
     
-    const editableParentsCell = function (td, cellData, rowData, row, col) {
-      const language_id = parseInt(rowData["LgID"]);
-      const this_term_text = rowData["WoText"];
-      const placeholder = null;  // 'Parents';
+    const editableTagifyCell = function(
+      td, cellData, rowData, row, col,
+      setupTagify, setupParams,
+      postTags
+    ) {
       const input = document.createElement('input');
       input.type = 'text';
       input.value = cellData;
       $(td).empty().append(input);
-      const tagify = setup_parent_tagify(input, language_id, this_term_text, placeholder);
+
+      const tagify = setupTagify(input, ...setupParams);
       let original = tagify_values(tagify);
+
       tagify.on('blur', function (e) {
         let newvals = tagify_values(tagify);
         if (newvals.join(';;') != original.join(';;'))
-          post_parent_tags(tagify, input);
+          postTags(tagify);
         original = newvals;
       });
+    };
+
+    const editableParentsCell = function (td, cellData, rowData, row, col) {
+      editableTagifyCell(
+        td, cellData, rowData, row, col,
+        setup_parent_tagify,
+        [parseInt(rowData["LgID"]), rowData["WoText"], null],
+        post_parent_tags
+      );
     };
 
     const post_translation = function(new_translation) {
@@ -358,19 +370,11 @@
 
     var TAGS = {{ tags | safe }};
     const editableTagsCell = function (td, cellData, rowData, row, col) {
-      const input = document.createElement('input');
-      const placeholder = null;
-      input.type = 'text';
-      input.value = cellData;
-      $(td).empty().append(input);
-      const tagify = setup_term_tags_tagify(input, TAGS, placeholder);
-      let original = tagify_values(tagify);
-      tagify.on('blur', function (e) {
-        let newvals = tagify_values(tagify);
-        if (newvals.join(';;') != original.join(';;'))
-          post_term_tags(tagify);
-        original = newvals;
-      });
+      editableTagifyCell(
+        td, cellData, rowData, row, col,
+        setup_term_tags_tagify, [TAGS, null],
+        post_term_tags
+      );
     };
 
     const post_status = function(new_status) {
