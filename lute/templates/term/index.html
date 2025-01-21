@@ -276,6 +276,13 @@
       let original = tagify_values(tagify);
 
       tagify.on('blur', function (e) {
+        const s = $(tagify.DOM.scope);
+        const lastSpan = s.find("span.tagify__input").last();
+        const pending_tag = lastSpan.text().trim();
+        if (pending_tag != '') {
+          tagify.addTags([pending_tag], false, true);
+        }
+
         let newvals = tagify_values(tagify);
         if (newvals.join(';;') != original.join(';;'))
           postTags(tagify);
