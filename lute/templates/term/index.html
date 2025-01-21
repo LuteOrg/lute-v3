@@ -277,6 +277,7 @@
     }
 
     const editableTranslationCell = function(td, cellData, rowData, row, col) {
+      let original = (cellData ?? '');
       const div = document.createElement('div');
       $(div).addClass("translationDiv");
       div.setAttribute('contenteditable', true);
@@ -289,8 +290,6 @@
       $(td).append(imgsrc);
 
       div.addEventListener('blur', function(e) {
-        const original = (cellData ?? '');
-
         // contenteditable puts each line into its own div.
         const new_content = div.innerHTML
               .replace(/<div>/g, '\r\n')
@@ -302,6 +301,7 @@
           // row.invalidate();
           post_translation(new_content);
           // TODO POST
+          original = new_content;  // don't repost if just entering and exiting
         }
       });
 
