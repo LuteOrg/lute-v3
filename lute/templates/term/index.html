@@ -109,6 +109,11 @@
     // TODO: extract reusable setup function and use here and
     // elsewhere - term form, bulk edit thing, maybe elsewhere.  Will
     // be some differences, so will need to param the func sig.
+    /* /term/search used here:
+      lute/templates/term/index.html:        const url = `/term/search/${encoded_value}/${language_id}`;
+      lute/templates/term/_bulk_edit_form_fields.html:      fetch(`/term/search/${s}/${langid}`, {signal:controller.signal})
+      lute/templates/term/_form.html:
+    */
     let setup_parent_tagify = function(input, language_id, this_term_text, placeholder) {
       if (input._tagify) {
         // console.log('Tagify already initialized for this input.');
