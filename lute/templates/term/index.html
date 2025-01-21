@@ -198,7 +198,7 @@
           enforceWhitelist: false,
           whitelist: [],
           dropdown: {
-            enabled: 2,  // TODO -- CHANGE BACK TO 1
+            enabled: 1,
             maxItems: 10,
             mapValueTo: 'suggestion',
             placeAbove: false,
@@ -374,12 +374,6 @@
       );
     };
 
-    const post_translation = function(new_translation) {
-      console.log('post txn');
-      console.log(new_translation);
-      // TODO post
-    }
-
     const editableTranslationCell = function(td, cellData, rowData, row, col) {
       let original = (cellData ?? '');
       const div = document.createElement('div');
@@ -457,14 +451,9 @@
       select.addEventListener('change', function () {
         post_update(td, rowData["WoID"], 'status', select.value);
       });
-      select.addEventListener('blur', function() {
-        // TODO something?
-      });
-      select.focus(); // Focus the dropdown immediately
-
-      // blur can't be attached to td, or it immediatly fires when the
-      // select is added.
-      // td.addEventListener('blur', function(e) { ... NOPE.
+      // "td.addEventListener('blur', function(e)" is not possible, as
+      // it immediatly fires when the select is added.  The change
+      // listener is sufficient.
     };
 
     table = $('#termtable').DataTable({
