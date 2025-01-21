@@ -300,6 +300,7 @@
           const row = table.row(e.target.parentElement);
           // row.invalidate();
           console.log('wotransl field Row changed: ', row.data());
+          post_translation(new_content);
           // TODO POST
         }
       });
