@@ -69,7 +69,13 @@ def test_bad_update_type_throws(app_context, spanish):
         svc.apply_datatables_update(t.id, "trash", 99)
 
 
-# missing status throws
+def test_bad_status_throws(app_context, spanish):
+    svc = Service(db.session)
+    [t] = add_terms(spanish, ["T"])
+    with pytest.raises(TermServiceException, match="Bad status value"):
+        svc.apply_datatables_update(t.id, "status", 42)
+
+
 # empty translation ok
 # empty tags ok
 # empty parents ok

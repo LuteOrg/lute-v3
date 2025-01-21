@@ -126,6 +126,8 @@ class Service:
                 term.add_term_tag(tag)
 
         elif update_type == "status":
+            if value not in Status.ALLOWED:
+                raise TermServiceException("Bad status value")
             term.status = value
 
         else:
