@@ -149,7 +149,7 @@
  
     const editableTagifyCell = function(
       td, cellData, rowData, row, col,
-      setupTagify, setupParams,
+      setup_tagify_callback,
       post_tags_as
     ) {
       const input = document.createElement('input');
@@ -157,7 +157,7 @@
       input.value = cellData;
       $(td).empty().append(input);
 
-      const tagify = setupTagify(input, ...setupParams);
+      const tagify = setup_tagify_callback(input);
 
       const tagify_values = function(tagify) {
         const vs = tagify.value.map(el => el.value).
@@ -225,11 +225,18 @@
     };
 
     const editableParentsCell = function (td, cellData, rowData, row, col) {
+      const setup_parent_tagify_callback = function(input) {
+        const lang_id = parseInt(rowData["LgID"]);
+        return lute_tagify_utils_setup_parent_tagify(
+          input,
+          lang_id,
+          rowData["WoText"],
+          {}
+        );
+      }
       editableTagifyCell(
         td, cellData, rowData, row, col,
-        lute_tagify_utils_setup_parent_tagify,
-        [parseInt(rowData["LgID"]), rowData["WoText"], {}],
-        'parents'
+        setup_parent_tagify_callback, 'parents'
       );
     };
 
@@ -263,7 +270,11 @@
     }
 
     // TODO - extract reusable routine.
-    let setup_term_tags_tagify = function(input, tags, placeholder) {
+    let setup_term_tags_tagify = function(
+      input,
+      tags,
+      override_base_settings = {},
+    ) {
       const base_settings = {
         delimiters: ';;', // special delim to handle tags w/ commas
         editTags: false,
@@ -272,21 +283,19 @@
         enforceWhitelist: false,
         whitelist: tags,
       };
-      const opt_settings = {};
-      if (placeholder != null) {
-        opt_settings.placeholder = placeholder;
-      }
-      const settings = { ...base_settings, ...opt_settings };
+      const settings = { ...base_settings, ...override_base_settings };
       const tagify = new Tagify(input, settings);
       return tagify;
     };
 
     var TAGS = {{ tags | safe }};
     const editableTagsCell = function (td, cellData, rowData, row, col) {
+      const setup_term_tags_tagify_callback = function(input) {
+        return setup_term_tags_tagify(input, TAGS, {});
+      };
       editableTagifyCell(
         td, cellData, rowData, row, col,
-        setup_term_tags_tagify, [TAGS, null],
-        'term_tags'
+        setup_term_tags_tagify_callback, 'term_tags'
       );
     };
 
