@@ -102,11 +102,13 @@ class Service:
 
         repo = TermRepository(self.session)
         term = repo.find(term_id)
+        if term is None:
+            raise TermServiceException(f"No term with id {term_id}")
 
         if update_type == "translation":
             term.translation = value
 
-        if update_type == "parents":
+        elif update_type == "parents":
             term.remove_all_parents()
             for ptext in value:
                 # ptext already has zero-width spaces, if the term was looked
@@ -116,15 +118,18 @@ class Service:
                 use_parent = parent or pspec
                 term.add_parent(use_parent)
 
-        if update_type == "term_tags":
+        elif update_type == "term_tags":
             ttrepo = TermTagRepository(self.session)
             add_tags = [ttrepo.find_or_create_by_text(a) for a in value]
             term.remove_all_term_tags()
             for tag in add_tags:
                 term.add_term_tag(tag)
 
-        if update_type == "status":
+        elif update_type == "status":
             term.status = value
+
+        else:
+            raise TermServiceException("Bad update type")
 
         self.session.add(term)
         self.session.commit()

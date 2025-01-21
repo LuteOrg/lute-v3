@@ -4,9 +4,10 @@ Term service apply_datatables_update tests.
 Generally smoke tests.
 """
 
+import pytest
 from lute.models.repositories import TermRepository
 from lute.db import db
-from lute.term.service import Service
+from lute.term.service import Service, TermServiceException
 from tests.utils import add_terms
 
 # from tests.dbasserts import assert_sql_result
@@ -55,8 +56,19 @@ def test_smoke_test(app_context, spanish):
     assert_updated(t.id, expected, "smoke all items")
 
 
-# bad term id throws
-# bad update type fails
+def test_bad_term_id_throws(app_context):
+    svc = Service(db.session)
+    with pytest.raises(TermServiceException, match="No term with id -99"):
+        svc.apply_datatables_update(-99, "status", 99)
+
+
+def test_bad_update_type_throws(app_context, spanish):
+    svc = Service(db.session)
+    [t] = add_terms(spanish, ["T"])
+    with pytest.raises(TermServiceException, match="Bad update type"):
+        svc.apply_datatables_update(t.id, "trash", 99)
+
+
 # missing status throws
 # empty translation ok
 # empty tags ok
