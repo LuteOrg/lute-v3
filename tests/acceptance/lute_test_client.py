@@ -311,10 +311,24 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         def _to_string(row):
             tds = row.find_by_css("td")
             rowtext = [td.text.strip() for td in tds]
-            ret = "; ".join(rowtext).strip()
-            if ret == "No data available in table":
-                return ret
-            return "; ".join(rowtext[:-1]).strip()
+            check = "; ".join(rowtext).strip()
+            if check == "No data available in table":
+                return check
+
+            rowtext = [""]  # first field is empty checkbox
+            rowtext.append(tds[1].text.strip())  # term
+            rowtext.append(tds[2].text.strip())  # parent tags (?)
+            rowtext.append(tds[3].text.strip())  # translation
+            rowtext.append(tds[6].text.strip())  # language
+            rowtext.append(tds[4].text.strip())  # term tags (?)
+
+            select_element = row.find_by_css("select")
+            selected_value = select_element.value
+            selected_option = select_element.find_by_css(
+                f'option[value="{selected_value}"]'
+            )
+            rowtext.append(selected_option.text)  # status select
+            return "; ".join(rowtext).strip()
 
         css = "#termtable tbody tr"
         rows = list(self.browser.find_by_css(css))
