@@ -249,16 +249,37 @@
     } // end setup_parent_tagify
 
 
-    function post_update(term_id, update_type, update) {
+    // On success, show checkmark near the td where post happened.
+    function _show_saved_checkmark(td) {
+      // Create a tooltip element
+      const tooltip = $('<div>&#10003;</div>') // Checkmark symbol ✔
+            .css({
+              position: 'absolute',
+              padding: '5px 10px',
+              background: 'green',
+              color: 'white',
+              borderRadius: '5px',
+              fontSize: '14px',
+              boxShadow: '0px 2px 5px rgba(0,0,0,0.2)',
+              zIndex: 1000,
+            })
+            .hide();
+      $('body').append(tooltip);
+
+      const targetElement = $(td);
+      const offset = targetElement.offset();
+      tooltip.css({ top: offset.top, left: offset.left });
+      tooltip.fadeIn(200);
+      setTimeout(() => { tooltip.fadeOut(200, function() { $(this).remove(); }); }, 1000);      
+    }
+
+    function post_update(td, term_id, update_type, update) {
       const payload = {
         term_id: term_id,
         update_type: update_type,
         values: update
       }
-      console.log(`posting ${JSON.stringify(payload)}`)
-
       const url = '/term/ajax_edit_from_index';
-
       $.ajax({
         url: url,
         type: 'POST',
@@ -266,6 +287,7 @@
         data: JSON.stringify(payload),
         success: function(response) {
           console.log('Success:', response.status);
+          _show_saved_checkmark(td);
         },
         error: function(xhr) {
           if (xhr.responseJSON && xhr.responseJSON.error) {
@@ -302,7 +324,7 @@
         const vals = tagify.value.
               map(el => el.value).
               filter(p => p.trim() != "");
-        post_update(rowData["WoID"], post_tags_as, vals);
+        post_update(td, rowData["WoID"], post_tags_as, vals);
       }
 
       const add_pending_tags_and_post = function() {
@@ -392,7 +414,7 @@
               .trim();
         if (original.trim() !== new_content) {
           const row = table.row(e.target.parentElement);
-          post_update(rowData["WoID"], 'translation', new_content);
+          post_update(td, rowData["WoID"], 'translation', new_content);
           original = new_content;  // don't repost if just entering and exiting
         }
       });
@@ -445,7 +467,7 @@
 
       const select = makeDropdown(td);
       select.addEventListener('change', function () {
-        post_update(rowData["WoID"], 'status', select.value);
+        post_update(td, rowData["WoID"], 'status', select.value);
       });
       select.addEventListener('blur', function() {
         // TODO something?
