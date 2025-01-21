@@ -148,17 +148,11 @@
 
  
     const editableTagifyCell = function(
-      td, cellData, rowData,
-      setup_tagify_callback,
-      post_tags_as
+      word_id,
+      td,
+      tagify,
+      post_tags_as,
     ) {
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.value = cellData;
-      $(td).empty().append(input);
-
-      const tagify = setup_tagify_callback(input);
-
       const tagify_values = function(tagify) {
         const vs = tagify.value.map(el => el.value).
             filter(p => p.trim() != "");
@@ -171,7 +165,7 @@
         const vals = tagify.value.
               map(el => el.value).
               filter(p => p.trim() != "");
-        post_update(td, rowData["WoID"], post_tags_as, vals);
+        post_update(td, word_id, post_tags_as, vals);
       }
 
       const add_pending_tags_and_post = function() {
@@ -224,19 +218,28 @@
       });
     };
 
+    const _make_tagify_text_control = function(td, cellData) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = cellData;
+      $(td).empty().append(input);
+      return input;
+    };
+
     const editableParentsCell = function (td, cellData, rowData, row, col) {
-      const setup_parent_tagify_callback = function(input) {
-        const lang_id = parseInt(rowData["LgID"]);
-        return lute_tagify_utils_setup_parent_tagify(
-          input,
-          lang_id,
-          rowData["WoText"],
-          {}
-        );
-      }
+      const input = _make_tagify_text_control(td, cellData);
+      const lang_id = parseInt(rowData["LgID"]);
+      const tagify = lute_tagify_utils_setup_parent_tagify(
+        input,
+        lang_id,
+        rowData["WoText"],
+        {}
+      );
       editableTagifyCell(
-        td, cellData, rowData,
-        setup_parent_tagify_callback, 'parents'
+        rowData["WoID"],
+        td,
+        tagify,
+        'parents'
       );
     };
 
@@ -290,12 +293,13 @@
 
     var TAGS = {{ tags | safe }};
     const editableTagsCell = function (td, cellData, rowData, row, col) {
-      const setup_term_tags_tagify_callback = function(input) {
-        return setup_term_tags_tagify(input, TAGS, {});
-      };
+      const input = _make_tagify_text_control(td, cellData);
+      const tagify = setup_term_tags_tagify(input, TAGS, {});
       editableTagifyCell(
-        td, cellData, rowData,
-        setup_term_tags_tagify_callback, 'term_tags'
+        rowData["WoID"],
+        td,
+        tagify,
+        'term_tags'
       );
     };
 
