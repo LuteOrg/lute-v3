@@ -255,10 +255,10 @@
     }
 
     const handle_post_tags = function(post_as, mytagify) {
-      let parents = mytagify.value.map(el => el.value);
-      parents = parents.filter(p => p.trim() != "")
+      let vals = mytagify.value.map(el => el.value);
+      vals = vals.filter(p => p.trim() != "")
       console.log('post as ' + post_as);
-      console.log(parents);
+      console.log(vals);
       // TODO post
     }
     
