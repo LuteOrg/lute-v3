@@ -234,11 +234,23 @@
         build_autocomplete_dropdown(tagify, e)
       });
 
+      // After add/remove, set focus on the tagify input span again,
+      // so that tagify.on('blur') is fired when leaving the input box.
+      // Annoying but vital hack.
+      tagify.on('add remove', function() {
+        setTimeout(function() {
+          const s = $(tagify.DOM.scope);
+          const lastSpan = s.find("span.tagify__input").last();
+          lastSpan.focus();
+        }, 0);
+      });
+
       return tagify;
     } // end setup_parent_tagify
 
-    const post_parent_tags = function(tagify) {
-      let parents = tagify.value.map(el => el.value);
+    const post_parent_tags = function(mytagify, input) {
+      console.log(`input = ${input.value}`);
+      let parents = mytagify.value.map(el => el.value);
       parents = parents.filter(p => p.trim() != "")
       console.log('post');
       console.log(parents);
@@ -255,9 +267,18 @@
       $(td).empty().append(input);
       const tagify = setup_parent_tagify(input, language_id, this_term_text, placeholder);
       tagify.on('blur', function (e) {
-        post_parent_tags(tagify);
+        setTimeout(function () {
+          post_parent_tags(tagify, input);
+        }, 0);  // Use setTimeout to ensure Tagify is done with its own operatio
+        // post_parent_tags(tagify, input);
       });
-
+      /*
+      $(input).on('focusout', function (e) {
+        setTimeout(function () {
+          post_parent_tags(tagify);
+        }, 0);  // Use setTimeout to ensure Tagify is done with its own operations
+      });
+      */
     };
 
     const post_translation = function(new_translation) {
