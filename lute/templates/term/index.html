@@ -322,8 +322,27 @@
         opt_settings.placeholder = placeholder;
       }
       const settings = { ...base_settings, ...opt_settings };
-      return new Tagify(input, settings);
+      const tagify = new Tagify(input, settings);
+
+      // After add/remove, set focus on the tagify input span again,
+      // so that tagify.on('blur') is fired when leaving the input box.
+      // Annoying but vital hack.
+      tagify.on('add remove', function() {
+        setTimeout(function() {
+          const s = $(tagify.DOM.scope);
+          const lastSpan = s.find("span.tagify__input").last();
+          lastSpan.focus();
+        }, 0);
+      });
+
+      return tagify;
     };
+
+    const tagify_values = function(tagify) {
+      let vs = tagify.value.map(el => el.value).filter(p => p.trim() != "");
+      vs.sort();
+      return vs;
+    }
 
     const post_term_tags = function(tagify) {
       let parents = tagify.value.map(el => el.value);
@@ -341,8 +360,12 @@
       input.value = cellData;
       $(td).empty().append(input);
       const tagify = setup_term_tags_tagify(input, TAGS, placeholder);
+      let original = tagify_values(tagify);
       tagify.on('blur', function (e) {
-        post_term_tags(tagify);
+        let newvals = tagify_values(tagify);
+        if (newvals.join(';;') != original.join(';;'))
+          post_term_tags(tagify);
+        original = newvals;
       });
     };
 
