@@ -293,9 +293,9 @@
           // row.invalidate();
           console.log('wotransl field Row changed: ', row.data());
           post_translation(new_content);
-          td.innerHTML = _get_content(new_content, rowData)
           // TODO POST
         }
+        td.innerHTML = _get_content(new_content, rowData)
       });
 
     }
@@ -333,9 +333,14 @@
       });
     };
 
+    const post_status = function(new_status) {
+      console.log(`post ${new_status}`);
+      // TODO post
+    }
+
     const editableStatusCell = function (td, cellData, rowData, row, col) {
       let original;
-      td.setAttribute('contenteditable', true);
+      // td.setAttribute('contenteditable', true);
 
       function makeDropdown(td) {
         const select = document.createElement('select');
@@ -348,14 +353,14 @@
         select.value = parseInt(rowData["StID"]);
 
         select.addEventListener('change', function () {
-          td.innerText = select.value; // Replace the dropdown with the selected value
+          post_status(select.value);
           // TODO post change
         });
         select.addEventListener('blur', function() {
-          // TODO something
-          td.innerText = select.value;
+          // TODO something?
         });
-        td.innerHTML = ''; // Clear the cell content
+
+        td.innerHTML = '';
         td.appendChild(select);
         select.focus(); // Focus the dropdown immediately
       }
