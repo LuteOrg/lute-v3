@@ -148,7 +148,7 @@
 
  
     const editableTagifyCell = function(
-      td, cellData, rowData, row, col,
+      td, cellData, rowData,
       setup_tagify_callback,
       post_tags_as
     ) {
@@ -235,7 +235,7 @@
         );
       }
       editableTagifyCell(
-        td, cellData, rowData, row, col,
+        td, cellData, rowData,
         setup_parent_tagify_callback, 'parents'
       );
     };
@@ -294,7 +294,7 @@
         return setup_term_tags_tagify(input, TAGS, {});
       };
       editableTagifyCell(
-        td, cellData, rowData, row, col,
+        td, cellData, rowData,
         setup_term_tags_tagify_callback, 'term_tags'
       );
     };
