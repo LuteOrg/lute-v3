@@ -116,6 +116,13 @@ class Service:
                 use_parent = parent or pspec
                 term.add_parent(use_parent)
 
+        if update_type == "term_tags":
+            ttrepo = TermTagRepository(self.session)
+            add_tags = [ttrepo.find_or_create_by_text(a) for a in value]
+            term.remove_all_term_tags()
+            for tag in add_tags:
+                term.add_term_tag(tag)
+
         if update_type == "status":
             term.status = value
 
