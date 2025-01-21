@@ -125,13 +125,13 @@
 
         // Create entry like "cat (a furry thing...)"
         const _make_dropdown_entry = function(hsh) {
-          console.log(`making entry with ${JSON.stringify(hsh)}`);
+          // console.log(`making entry with ${JSON.stringify(hsh)}`);
           const txt = decodeURIComponent(hsh.text);
           let t = hsh.translation?.replace(/[\n\r]/g, "; ") ?? '';
           if (t.length > 70)
             t = t.slice(0, 70) + "...";
           const ret = t ? `${txt} (${t})` : txt;
-          console.log(`entry = ${ret}`);
+          // console.log(`entry = ${ret}`);
           return ret;
         };
 
@@ -155,8 +155,8 @@
           .then(RES => RES.json())
           .then(function(data) {
             mytagify.whitelist = _build_whitelist(data); // update whitelist Array in-place
-            console.log(`whitelist = `);
-            console.log(JSON.stringify(mytagify.whitelist));
+            // console.log(`whitelist = `);
+            // console.log(JSON.stringify(mytagify.whitelist));
             const sdecode = decodeURIComponent(s);
             mytagify.loading(false).dropdown.show(sdecode); // render the suggestions dropdown
           }).catch(err => {
