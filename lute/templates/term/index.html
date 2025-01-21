@@ -248,6 +248,12 @@
       return tagify;
     } // end setup_parent_tagify
 
+    const tagify_values = function(tagify) {
+      let vs = tagify.value.map(el => el.value).filter(p => p.trim() != "");
+      vs.sort();
+      return vs;
+    }
+
     const post_parent_tags = function(mytagify, input) {
       let parents = mytagify.value.map(el => el.value);
       parents = parents.filter(p => p.trim() != "")
@@ -265,8 +271,12 @@
       input.value = cellData;
       $(td).empty().append(input);
       const tagify = setup_parent_tagify(input, language_id, this_term_text, placeholder);
+      let original = tagify_values(tagify);
       tagify.on('blur', function (e) {
-        post_parent_tags(tagify, input);
+        let newvals = tagify_values(tagify);
+        if (newvals.join(';;') != original.join(';;'))
+          post_parent_tags(tagify, input);
+        original = newvals;
       });
     };
 
@@ -337,12 +347,6 @@
 
       return tagify;
     };
-
-    const tagify_values = function(tagify) {
-      let vs = tagify.value.map(el => el.value).filter(p => p.trim() != "");
-      vs.sort();
-      return vs;
-    }
 
     const post_term_tags = function(tagify) {
       let parents = tagify.value.map(el => el.value);
