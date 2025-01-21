@@ -15,7 +15,7 @@ function lute_tagify_utils_setup_parent_tagify(
   input,
   language_id,
   this_term_text,
-  placeholder,
+  override_base_settings = {}
 ) {
   if (input._tagify) {
     // console.log('Tagify already initialized for this input.');
@@ -138,12 +138,7 @@ function lute_tagify_utils_setup_parent_tagify(
       },
     };
 
-    let opt_settings = {};
-    if (placeholder != null) {
-      opt_settings.placeholder = placeholder;
-    };
-
-    let settings = { ...base_settings, ...opt_settings };
+    let settings = { ...base_settings, ...override_base_settings };
     return new Tagify(input, settings);
   };
 
