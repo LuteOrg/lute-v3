@@ -96,3 +96,7 @@ class Service:
 
             self.session.add(term)
             self.session.commit()
+
+    def apply_datatables_update(self, term_id, update_type, values):
+        "Apply single update from datatables updatable cells interactions."
+        pass
