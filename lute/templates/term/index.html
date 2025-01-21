@@ -248,12 +248,6 @@
       return tagify;
     } // end setup_parent_tagify
 
-    const tagify_values = function(tagify) {
-      let vs = tagify.value.map(el => el.value).filter(p => p.trim() != "");
-      vs.sort();
-      return vs;
-    }
-
     const handle_post_tags = function(post_as, mytagify) {
       let vals = mytagify.value.map(el => el.value);
       vals = vals.filter(p => p.trim() != "")
@@ -273,18 +267,22 @@
       $(td).empty().append(input);
 
       const tagify = setupTagify(input, ...setupParams);
+
+      const tagify_values = function(tagify) {
+        let vs = tagify.value.map(el => el.value).filter(p => p.trim() != "");
+        vs.sort();
+        return vs.join(';;');
+      }
       let original = tagify_values(tagify);
 
       tagify.on('blur', function (e) {
-        const s = $(tagify.DOM.scope);
-        const lastSpan = s.find("span.tagify__input").last();
-        const pending_tag = lastSpan.text().trim();
-        if (pending_tag != '') {
+        const s = $(tagify.DOM.scope).find("span.tagify__input").last();
+        const pending_tag = s.text().trim();
+        if (pending_tag != '')
           tagify.addTags([pending_tag], false, true);
-        }
 
         let newvals = tagify_values(tagify);
-        if (newvals.join(';;') != original.join(';;'))
+        if (newvals != original.join)
           handle_post_tags(post_tags_as, tagify);
         original = newvals;
       });
