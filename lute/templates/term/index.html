@@ -119,9 +119,10 @@
       const _fetch_whitelist = function(mytagify, e_detail_value, controller) {
         // Create entry like "cat (a furry thing...)"
         const _make_dropdown_entry = function(hsh) {
+          const max_translation_len = 40;
           let translation = hsh.translation?.replace(/[\n\r]/g, "; ") ?? '';
-          if (translation.length > 50)
-            translation = translation.slice(0, 50) + "...";
+          if (translation.length > max_translation_len)
+            translation = translation.slice(0, max_translation_len) + "...";
           translation = translation ? `(${translation})` : '';
           const txt = decodeURIComponent(hsh.text);
           const ret = [txt, translation].join(' ');
