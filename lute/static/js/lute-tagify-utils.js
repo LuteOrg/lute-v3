@@ -7,9 +7,9 @@
 
 
 /* /term/search used here:
-  lute/templates/term/index.html:        const url = `/term/search/${encoded_value}/${language_id}`;
-  lute/templates/term/_bulk_edit_form_fields.html:      fetch(`/term/search/${s}/${langid}`, {signal:controller.signal})
-  lute/templates/term/_form.html:
+  lute/templates/term/index.html
+  lute/templates/term/_bulk_edit_form_fields.html
+  lute/templates/term/_form.html
 */
 function lute_tagify_utils_setup_parent_tagify(
   input,
@@ -26,12 +26,18 @@ function lute_tagify_utils_setup_parent_tagify(
   const _fetch_whitelist = function(mytagify, e_detail_value, controller) {
     // Create entry like "cat (a furry thing...)"
     const _make_dropdown_entry = function(hsh) {
+      const txt = decodeURIComponent(hsh.text);
+      let translation = hsh.translation ?? '';
+      translation = translation.
+        replaceAll("\n", "; ").
+        replaceAll("\r", "").
+        trim();
+      if (translation == '')
+        return txt;
       const max_translation_len = 40;
-      let translation = hsh.translation?.replace(/[\n\r]/g, "; ") ?? '';
       if (translation.length > max_translation_len)
         translation = translation.slice(0, max_translation_len) + "...";
       translation = translation ? `(${translation})` : '';
-      const txt = decodeURIComponent(hsh.text);
       return [txt, translation].join(' ');
     };
 
