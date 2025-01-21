@@ -106,7 +106,10 @@ class Service:
             raise TermServiceException(f"No term with id {term_id}")
 
         if update_type == "translation":
-            term.translation = value
+            trans = (value or "").strip()
+            if trans == "":
+                trans = None
+            term.translation = trans
 
         elif update_type == "parents":
             term.remove_all_parents()
@@ -117,6 +120,8 @@ class Service:
                 parent = repo.find_by_spec(pspec)
                 use_parent = parent or pspec
                 term.add_parent(use_parent)
+            if len(value) == 1:
+                term.sync_status = True
 
         elif update_type == "term_tags":
             ttrepo = TermTagRepository(self.session)
