@@ -251,26 +251,14 @@
 
     // On success, show checkmark near the td where post happened.
     function _show_saved_checkmark(td) {
-      // Create a tooltip element
-      const tooltip = $('<div>&#10003;</div>') // Checkmark symbol ✔
-            .css({
-              position: 'absolute',
-              padding: '5px 10px',
-              background: 'green',
-              color: 'white',
-              borderRadius: '5px',
-              fontSize: '14px',
-              boxShadow: '0px 2px 5px rgba(0,0,0,0.2)',
-              zIndex: 1000,
-            })
-            .hide();
+      const tooltip = $('<div class="ajax-saved-checkmark">&#10003;</div>').hide();
       $('body').append(tooltip);
-
       const targetElement = $(td);
       const offset = targetElement.offset();
-      tooltip.css({ top: offset.top, left: offset.left });
-      tooltip.fadeIn(200);
-      setTimeout(() => { tooltip.fadeOut(200, function() { $(this).remove(); }); }, 1000);      
+      const offset_left = offset.left + targetElement.outerWidth() - tooltip.outerWidth() + 5;
+      tooltip.css({ top: offset.top + 5, left: offset_left });
+      tooltip.fadeIn(100);
+      setTimeout(() => { tooltip.fadeOut(200, function() { $(this).remove(); }); }, 800);      
     }
 
     function post_update(td, term_id, update_type, update) {
