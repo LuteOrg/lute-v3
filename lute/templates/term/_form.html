@@ -3,8 +3,21 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/lute-hotkey-utils.js') }}" charset="utf-8"></script>
 <script type="text/javascript">
-  const LUTE_USER_SETTINGS = {{ user_settings | safe }}
-  const LUTE_USER_HOTKEYS = {{ user_hotkeys | safe }}
+  /**
+   * Sometimes this file is included within the context of base.html
+   * which already defines these two global vars, but other times it
+   * is shown standalone.
+   *
+   * The typeof check ensures that we only load the const once,
+   * avoiding "Identifier 'LUTE_USER...' has already been declared'
+   * errors.
+   */
+  if (typeof LUTE_USER_SETTINGS === "undefined") {
+    const LUTE_USER_SETTINGS = {{ user_settings | safe }};
+  }
+  if (typeof LUTE_USER_HOTKEYS === "undefined") {
+    const LUTE_USER_HOTKEYS = {{ user_hotkeys | safe }};
+  }
 </script>
 
 
@@ -84,6 +97,9 @@
 </div>
 
 
+<script type="text/javascript" src="/static/js/never_cache/lute-tagify-utils.js" charset="utf-8"></script>
+
+
 <script type="text/javascript">
 
   /** TERM IMAGE. ***************/
@@ -110,7 +126,7 @@
 
   let setup_parent_tagify = function(input) {
     const tagify = new Tagify(input, {
-      placeholder: 'Parents',
+      placeholder: 'Parents',  // DIFFERENT
       editTags: false,
       pasteAsTags: false,
       backspace: true,
@@ -152,64 +168,6 @@
       },
     });  // end tagify
 
-    tagify.on('click', function (e) {
-      // Exit early if language not set - will not handle, too complicated.
-      const langid = document.getElementById("language_id").value;
-      const clickedTagText = e.detail.data.value;
-      if (langid === "0" || clickedTagText === '') {
-        return;
-      }
-
-      if (form_changed) {
-        const msg = 'You have unsaved changes.  Click OK to save these changes and go to the parent term, or Cancel to continue editing.';
-        if (!confirm(msg))
-          return;
-      }
-
-      const in_reading_frame = ("{{ embedded_in_reading_frame }}" == "True");
-      let url = `/term/editbytext/${langid}/${clickedTagText}`;
-      if (in_reading_frame) {
-        url = `/read/termform/${langid}/${clickedTagText}`;
-      }
-
-      // Manually post, tell the reading screen to update, then go to the url.
-      const frm = $('#term-form');
-      const formData = frm.serialize();
-      $.post(frm.attr('action'), formData, function(response) {
-        window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
-        window.location.href = url;
-      });
-    });
-
-    tagify.on('add remove', function (e) {
-      // The #parents_list text box isn't changed consistently
-      // during events, so we have to check the tagify var
-      // itself, which has an accurate list of current tags.
-      // console.log(e);
-      // console.log(e.detail);
-      const single_parent = (parents_tagify.value.length == 1);
-      const cb = $("#sync_status");
-      cb.prop("checked", single_parent);
-      if (single_parent)
-        cb.removeAttr("disabled");
-      else
-        cb.attr("disabled", true);
-
-      // If adding a single parent, inherit its status.
-      if (e.type == 'add' && single_parent) {
-        if (e.detail && e.detail.data && e.detail.data.status) {
-          const targetValue = e.detail.data.status;
-          var radioButtons = document.getElementsByName('status');
-          for (var i = 0; i < radioButtons.length; i++) {
-            if (radioButtons[i].value == targetValue) {
-              // console.log(`found at i = ${i}`);
-              radioButtons[i].checked = true;
-              break;
-            }
-          }
-        }
-      }
-    });
 
     // Autocomplete
     var controller;
@@ -365,7 +323,81 @@
     });
 
     var parentslist = document.getElementById('parentslist');
-    parents_tagify = setup_parent_tagify(parentslist);
+    const this_term_text = $("#original_text").val();
+    console.log(`this_term_text = ${this_term_text}`);
+    const lang_id_func = () => parseInt($('#language_id').val());
+    let override_settings = {
+      placeholder: 'Parents',  // DIFFERENT
+    };
+
+    // parents_tagify = setup_parent_tagify(parentslist);
+
+    parents_tagify = lute_tagify_utils_setup_parent_tagify(
+        parentslist,
+        lang_id_func,
+        this_term_text,
+        override_settings
+    );
+
+    parents_tagify.on('click', function (e) {
+      // Exit early if language not set - will not handle, too complicated.
+      const langid = document.getElementById("language_id").value;
+      const clickedTagText = e.detail.data.value;
+      if (langid === "0" || clickedTagText === '') {
+        return;
+      }
+
+      if (form_changed) {
+        const msg = 'You have unsaved changes.  Click OK to save these changes and go to the parent term, or Cancel to continue editing.';
+        if (!confirm(msg))
+          return;
+      }
+
+      const in_reading_frame = ("{{ embedded_in_reading_frame }}" == "True");
+      let url = `/term/editbytext/${langid}/${clickedTagText}`;
+      if (in_reading_frame) {
+        url = `/read/termform/${langid}/${clickedTagText}`;
+      }
+
+      // Manually post, tell the reading screen to update, then go to the url.
+      const frm = $('#term-form');
+      const formData = frm.serialize();
+      $.post(frm.attr('action'), formData, function(response) {
+        window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
+        window.location.href = url;
+      });
+    });
+
+    parents_tagify.on('add remove', function (e) {
+      // The #parents_list text box isn't changed consistently
+      // during events, so we have to check the tagify var
+      // itself, which has an accurate list of current tags.
+      // console.log(e);
+      // console.log(e.detail);
+      const single_parent = (parents_tagify.value.length == 1);
+      const cb = $("#sync_status");
+      cb.prop("checked", single_parent);
+      if (single_parent)
+        cb.removeAttr("disabled");
+      else
+        cb.attr("disabled", true);
+
+      // If adding a single parent, inherit its status.
+      if (e.type == 'add' && single_parent) {
+        if (e.detail && e.detail.data && e.detail.data.status) {
+          const targetValue = e.detail.data.status;
+          var radioButtons = document.getElementsByName('status');
+          for (var i = 0; i < radioButtons.length; i++) {
+            if (radioButtons[i].value == targetValue) {
+              // console.log(`found at i = ${i}`);
+              radioButtons[i].checked = true;
+              break;
+            }
+          }
+        }
+      }
+    });
+
     var termtagslist = document.getElementById('termtagslist');
     var termtags_tagify = setup_term_tags_tagify(termtagslist);
     

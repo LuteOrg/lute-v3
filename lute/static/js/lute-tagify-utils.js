@@ -83,8 +83,7 @@ function lute_tagify_utils_setup_parent_tagify(
       .then(function(data) {
         // Update whitelist and render in place.
         let whitelist = _build_whitelist(data);
-        if (this_term_text != null)
-          whitelist = whitelist.filter(hsh => hsh.text != this_term_text);
+        whitelist = whitelist.filter(hsh => hsh.value != this_term_text);
         mytagify.whitelist = whitelist;
         mytagify.loading(false).dropdown.show(e_detail_value);
       }).catch(err => {
