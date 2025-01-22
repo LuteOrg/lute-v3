@@ -31,6 +31,7 @@ def fixture_dt_params():
         "filtStatusMin": "0",
         "filtStatusMax": "0",
         "filtIncludeIgnored": "false",
+        "filtTermIDs": "",
     }
     return params
 
@@ -54,4 +55,5 @@ def test_smoke_query_with_filter_params_runs(app_context, _dt_params):
     _dt_params["filtStatusMin"] = "2"
     _dt_params["filtStatusMax"] = "4"
     _dt_params["filtIncludeIgnored"] = "true"
+    _dt_params["filtTermIDs"] = "42,43"
     get_data_tables_list(_dt_params, db.session)

@@ -2182,18 +2182,20 @@ input[name='status']:disabled + label {
 
 /** Term listing (/term) action dropdown. ********************/
 
+table#termtable .tagify,
+table#termtable .translationDiv {
+    border: 1px solid transparent;  /* Prevent elements pushing others around on hover. */
+    box-sizing: border-box;
+}
+
+table#termtable .tagify:hover,
+table#termtable .translationDiv:hover {
+    border: 1px solid;
+}
+
 .term-action-container {
     display: flex;
 }
-
-/*
-.term-action-dropdown,
-.actionDiv {
-    display: flex;
-    align-items: center;
-    margin-right: 10px;
-}
-*/
 
 #bulkEditDiv {
     margin: 0.5rem;
@@ -2254,6 +2256,19 @@ div#termtable_wrapper div.dt-buttons {
     display: none;
 }
 
+.ajax-saved-checkmark {
+    position: absolute;
+    width: 1.5em; /* Define the size of the circle */
+    height: 1.5em; /* Make it a perfect circle */
+    background: green;
+    color: white;
+    border-radius: 50%; /* Turns the square into a circle */
+    font-size: 1em; /* Adjust size of the checkmark */
+    text-align: center;
+    line-height: 1.5em; /* Vertically center the checkmark */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 2004;
+}
 
 /** Term image search ****************/
 

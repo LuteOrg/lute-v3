@@ -23,7 +23,8 @@ def get_data_tables_list(parameters, session):
     INNER JOIN languages L on L.LgID = w.WoLgID
     INNER JOIN statuses S on S.StID = w.WoStatus
     LEFT OUTER JOIN (
-      SELECT WpWoID as WoID, GROUP_CONCAT(PText, ', ') AS parentlist
+      /* Special concat used for easy parsing on client. */
+      SELECT WpWoID as WoID, GROUP_CONCAT(PText, ';;') AS parentlist
       FROM
       (
         select WpWoID, WoText as PText
@@ -34,7 +35,8 @@ def get_data_tables_list(parameters, session):
       GROUP BY WpWoID
     ) AS parents on parents.WoID = w.WoID
     LEFT OUTER JOIN (
-      SELECT WtWoID as WoID, GROUP_CONCAT(TgText, ', ') AS taglist
+      /* Special concat used for easy parsing on client. */
+      SELECT WtWoID as WoID, GROUP_CONCAT(TgText, ';;') AS taglist
       FROM
       (
         select WtWoID, TgText
@@ -87,6 +89,10 @@ def get_data_tables_list(parameters, session):
     if parameters["filtIncludeIgnored"] == "true":
         st_where = f"({st_where} OR StID = 98)"
     wheres.append(st_where)
+
+    termids = parameters["filtTermIDs"].strip()
+    if termids != "":
+        wheres.append(f"w.WoID in ({termids})")
 
     # Phew.
     return DataTablesSqliteQuery.get_data(

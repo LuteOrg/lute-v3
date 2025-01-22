@@ -38,23 +38,15 @@
       <td>Status range</td>
       <td>
         <select id="filtStatusMin">
-          <option value="0" selected>Unknown</option>
-          <option value="1">New (1)</option>
-          <option value="2">New (2)</option>
-          <option value="3">Learn (3)</option>
-          <option value="4">Learn (4)</option>
-          <option value="5">Learned</option>
-          <option value="99">Well Known</option>
+          {% for s in filter_statuses %}
+          <option value="{{s.id}}" {%if s.id==1 %}selected{% endif %}>{{ s.text }}</option>
+          {% endfor %}
         </select>
         to
         <select id="filtStatusMax">
-          <option value="0">Unknown</option>
-          <option value="1">New (1)</option>
-          <option value="2">New (2)</option>
-          <option value="3">Learn (3)</option>
-          <option value="4">Learn (4)</option>
-          <option value="5">Learned</option>
-          <option value="99" selected>Well Known</option>
+          {% for s in filter_statuses %}
+          <option value="{{s.id}}" {%if s.id==99 %}selected{% endif %}>{{ s.text }}</option>
+          {% endfor %}
         </select>
       </td>
     </tr>
@@ -62,6 +54,13 @@
       <td>Include Ignored</td>
       <td>
         <input id="filtIncludeIgnored" type="checkbox" />
+      </td>
+    </tr>
+    <tr id="filtTermIDs_row" style="display: none">
+      <td>Term IDs</td>
+      <td>
+        <span id="filtTermIDs_message">(msg here)</span>
+        <input type="hidden" id="filtTermIDs" />
       </td>
     </tr>
   </table>
@@ -98,11 +97,11 @@
       <th style="width: 20px;"><input type="checkbox" id="chkAll" onclick="handleChkAll()"></th>
       <!-- adding text-align because sometimes datatables seemed to align them to right. -->
       <th style="text-align: left">Term</th>
-      <th style="text-align: left">Parent</th>
+      <th style="text-align: left">Parents</th>
       <th style="text-align: left">Translation</th>
-      <th style="text-align: left">Language</th>
       <th style="text-align: left">Tags</th>
       <th style="text-align: left">Status</th>
+      <th style="text-align: left">Language</th>
       <th style="text-align: left">Added</th>
       <th style="text-align: left">TermID</th>
       <th style="text-align: left">LanguageID</th>
@@ -110,10 +109,175 @@
   </thead>
 </table>
 
+<script type="text/javascript" src="/static/js/never_cache/lute-tagify-utils.js" charset="utf-8"></script>
+
 <script>
 
   let setup_term_datatable = function(initial_search) {
-    var table = $('#termtable').DataTable({
+
+    // On success, show checkmark near the td where post happened.
+    function _show_saved_checkmark(td) {
+      const tooltip = $('<div class="ajax-saved-checkmark">&#10003;</div>').hide();
+      $('body').append(tooltip);
+      const targetElement = $(td);
+      const offset = targetElement.offset();
+      const offset_left = offset.left + targetElement.outerWidth() - tooltip.outerWidth() + 5;
+      tooltip.css({ top: offset.top + 5, left: offset_left });
+      tooltip.fadeIn(100);
+      setTimeout(() => { tooltip.fadeOut(200, function() { $(this).remove(); }); }, 800);
+    }
+
+    function post_update(td, term_id, update_type, update) {
+      const payload = {
+        term_id: term_id,
+        update_type: update_type,
+        values: update
+      }
+      const url = '/term/ajax_edit_from_index';
+      $.ajax({
+        url: url,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(payload),
+        success: function(response) {
+          // console.log('Success:', response.status);
+          _show_saved_checkmark(td);
+          $('#termtable').DataTable().draw();
+        },
+        error: function(xhr) {
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            console.error('Error:', xhr.responseJSON.error);
+          } else {
+            console.error('Unexpected error:', xhr.statusText);
+          }
+        }
+      });
+    }
+
+    /**
+     * Self-monitoring cell with a tagify instance that posts on lost
+     * focus, if the state has changed.
+     */
+    const editableTagifyCell = function(
+      word_id, td, tagify, post_tags_as,
+    ) {
+      // tagify loses focus when adding tags or clicking tag removal,
+      // calling the 'blur' event when not wanted; suppress that if needed.
+      let suppressBlur = false;
+
+      $(tagify.DOM.scope).on('mousedown', '.tagify__tag__removeBtn', function () {
+        suppressBlur = true;
+      });
+
+      // After add/remove, set focus on the tagify input span again,
+      // so that tagify.on('blur') is fired when leaving the input box.
+      tagify.on('add remove', function() {
+        suppressBlur = true;
+        setTimeout(function() {
+          const s = $(tagify.DOM.scope);
+          s.find("span.tagify__input").last().focus();
+          suppressBlur = false;
+        }, 0);
+      });
+
+      const add_pending_tags = function() {
+        const s = $(tagify.DOM.scope).find("span.tagify__input").last();
+        const pending_tag = s.text().trim();
+        if (pending_tag != '')
+          tagify.addTags([pending_tag], false, true);
+      };
+
+      // Save tag list state, only post on change.
+      const curr_tags = () => tagify.value.map(e => e.value).filter(e => e.trim() != "");
+      const curr_state = () => curr_tags().sort().join(';;');
+      let old_state = curr_state();
+      const post_if_changed = function() {
+        if (old_state != curr_state())
+          post_update(td, word_id, post_tags_as, curr_tags());
+        old_state = curr_state();
+      }
+
+      tagify.on('blur', function (e) {
+        if (!suppressBlur) {
+          add_pending_tags();
+          post_if_changed();
+        }
+      });
+    };
+
+    const _make_tagify_text_control = function(td, cellData) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = cellData;
+      $(td).empty().append(input);
+      return input;
+    };
+
+    const editableParentsCell = function (td, cellData, rowData, row, col) {
+      const input = _make_tagify_text_control(td, cellData);
+      const lang_id = parseInt(rowData["LgID"]);
+      const lang_id_func = () => lang_id;
+      const tagify = lute_tagify_utils_setup_parent_tagify(
+        input, lang_id_func, rowData["WoText"], {}
+      );
+      editableTagifyCell(rowData["WoID"], td, tagify, 'parents');
+    };
+
+    const editableTranslationCell = function(td, cellData, rowData, row, col) {
+      const div = document.createElement('div');
+      $(div).addClass("translationDiv");
+      div.setAttribute('contenteditable', true);
+      div.innerHTML = (cellData ?? '').replace(/\r\n/g, '<br />');
+      $(td).empty().append(div);
+      const imgsrc = rowData["WiSource"]
+            ? `<img class="term-listing-image" style="margin-top: 5px;" src="${rowData["WiSource"]}" />` 
+            : '';
+      $(td).append(imgsrc);
+
+      let old_state = (cellData ?? '');
+      div.addEventListener('blur', function(e) {
+        // contenteditable puts each line into its own div.
+        const new_content = div.innerHTML
+              .replace(/<div>/g, '\r\n')
+              .replace(/<\/div>/g, '')
+              .replace(/<br\s*\/?>/g, '\r\n')
+              .trim();
+        if (old_state.trim() !== new_content) {
+          const row = table.row(e.target.parentElement);
+          post_update(td, rowData["WoID"], 'translation', new_content);
+          old_state = new_content;  // don't repost if just entering and exiting
+        }
+      });
+    };  // end editableTranslationCell
+
+    var TAGS = {{ tags | safe }};
+    const editableTagsCell = function (td, cellData, rowData, row, col) {
+      const input = _make_tagify_text_control(td, cellData);
+      const tagify = lute_tagify_utils_setup_term_tag_tagify(input, TAGS, {});
+      editableTagifyCell(rowData["WoID"], td, tagify, 'term_tags');
+    };
+
+    const editableStatusCell = function (td, cellData, rowData, row, col) {
+      function makeDropdown(td) {
+        const select = document.createElement('select');
+        select.innerHTML = '';
+        {% for s in update_statuses %}
+          select.innerHTML += '<option value="{{s.id}}">{{ s.text }}</option>';
+        {% endfor %}
+        select.value = parseInt(rowData["StID"]);
+
+        td.innerHTML = '';
+        td.appendChild(select);
+        return select;
+      }
+
+      const select = makeDropdown(td);
+      select.addEventListener('change', function () {
+        post_update(td, rowData["WoID"], 'status', select.value);
+      });
+    };
+
+    table = $('#termtable').DataTable({
       layout: {
         topStart: 'pageLength',
         topEnd: 'search',
@@ -149,11 +313,11 @@
       columns: [
         { searchable: false, orderable: false, render: render_checkbox },
         { name: "WoText", render: render_text },
-        { name: "ParentText", data: "ParentText" },
-        { name: "WoTranslation", width: "40%", searchable: true, render: render_translation },
+        { name: "ParentText", data: "ParentText", createdCell: editableParentsCell },
+        { name: "WoTranslation", width: "40%", searchable: true, data: "WoTranslation", createdCell: editableTranslationCell },
+        { name: "TagList", data: "TagList", createdCell: editableTagsCell },
+        { name: "StID", data: "StID", createdCell: editableStatusCell },
         { name: "LgName", data: "LgName" },
-        { name: "TagList", data: "TagList" },
-        { name: "StID", render: render_status },
         { name: "WoCreated", render: render_date_created },
         { name: "WoID", data: "WoID", visible: false },
         { name: "LgID", data: "LgID", visible: false },
@@ -175,7 +339,8 @@
           filtAgeMax: () => $('#filtAgeMax').val(),
           filtStatusMin: () => $('#filtStatusMin').val(),
           filtStatusMax: () => $('#filtStatusMax').val(),
-          filtIncludeIgnored: () => $('#filtIncludeIgnored').prop('checked')
+          filtIncludeIgnored: () => $('#filtIncludeIgnored').prop('checked'),
+          filtTermIDs: () => $('#filtTermIDs').val(),
         },
 
         dataType: "json"
@@ -189,24 +354,8 @@
     return `<a href="/term/edit/${row['WoID']}">${row['WoText']}</a>`;
   };
 
-  // Use the status ID for sorting, so Well Known comes after Learned (5),
-  // but use the status text ("New (1)") for the cell display.
-  let render_status = function ( data, type, row, meta ) {
-    return row["StText"];
-  };
-
   let render_checkbox = function (data, type, row, meta) {
     return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row['WoID']}" langid="${row['LgID']}">`;
-  };
-
-  let render_translation = function ( data, type, row, meta ) {
-    let tx = row["WoTranslation"] ?? '';
-    tx = tx.replaceAll("\r\n", "<br />");
-    let imgsrc = row["WiSource"] ?? '';
-    if (imgsrc != '')
-      imgsrc = `<img class="term-listing-image" style="margin-top: 5px;" src="${imgsrc}" />`;
-    let ret = [ tx, imgsrc ].filter((s) => s != '');
-    return ret.join('<br />');
   };
 
   let render_date_created = function (data, type, row, meta) {
@@ -255,10 +404,12 @@
       langids.push($(this).attr('langid'));
     });
     const unique_langids = [...new Set(langids)];
+    let ret = null;
     if (unique_langids.length == 1) {
-      return unique_langids[0];
+      ret = unique_langids[0];
     }
-    return null;
+    // console.log(`for langids ${langids}, get_lang_id returned ${ret}`);
+    return ret;
   }
 
   let _get_checked_wordids = function() {
@@ -319,22 +470,48 @@
   };
 
 
-  let handle_filter_update = function() {
+  let update_filter_storage = function() {
     const store = {
-      filtLanguage: $('#filtLanguage').val(),
       filtDisplay: $('#filterControls').css('display'),
+      filtLanguage: $('#filtLanguage').val(),
       filtParentsOnly: $('#filtParentsOnly').prop('checked'),
       filtAgeMin: $('#filtAgeMin').val(),
       filtAgeMax: $('#filtAgeMax').val(),
       filtStatusMin: $('#filtStatusMin').val(),
       filtStatusMax: $('#filtStatusMax').val(),
-      filtIncludeIgnored: $('#filtIncludeIgnored').prop('checked')
+      filtIncludeIgnored: $('#filtIncludeIgnored').prop('checked'),
+      filtTermIDs: $('#filtTermIDs').val(),
     };
     // console.log('saving: ' + JSON.stringify(store));
     sessionStorage.setItem('termtable_filters', JSON.stringify(store));
+  };
+
+  let wipe_filter_storage = function() {
+    $('#filtLanguage').val(0);
+    $('#filtParentsOnly').prop('checked', false);
+    $('#filtAgeMin').val('');
+    $('#filtAgeMax').val('');
+    $('#filtStatusMin').val(1);
+    $('#filtStatusMax').val(99);
+    $('#filtIncludeIgnored').prop('checked', false);
+    $('#filtTermIDs').val('');
+    $('#filtTermIDs_row').css('display', 'none');
+    update_filter_storage();
+  };
+
+  let handle_filter_update = function() {
+    update_filter_storage();
     $('#termtable').DataTable().draw();
   };
 
+
+  let update_filter_button_src = function(is_hidden) {
+    // console.log(`is_hidden = ${is_hidden}`);
+    const new_src = is_hidden ?
+          "{{ url_for('static', filename='icn/plus-button.png') }}" :
+          "{{ url_for('static', filename='icn/minus-button.png') }}";
+    $('#showHideFilters').prop('src', new_src);
+  }
 
   let load_filters_from_storage = function() {
     fs = sessionStorage.getItem('termtable_filters');
@@ -342,9 +519,9 @@
     if (fs == null)
       return;
     store = JSON.parse(fs);
-    $('#filterControls').css('display', store.filtDisplay);
 
-    $('#showHideFilters').prop('src', "{{ url_for('static', filename='icn/minus-button.png') }}");
+    $('#filterControls').css('display', store.filtDisplay);
+    update_filter_button_src(store.filtDisplay == "none");
     $('#filtLanguage').val(parseInt(store.filtLanguage ?? '0'));
     $('#filtParentsOnly').prop('checked', store.filtParentsOnly ?? false);
     if ((store.filtAgeMin ?? '') != '')
@@ -354,30 +531,45 @@
     $('#filtStatusMin').val(parseInt(store.filtStatusMin ?? '1'));
     $('#filtStatusMax').val(parseInt(store.filtStatusMax ?? '99'));
     $('#filtIncludeIgnored').prop('checked', store.filtIncludeIgnored);
+    if ((store.filtTermIDs ?? '') != '') {
+      $('#filtTermIDs').val(store.filtTermIDs);
+      $('#filtTermIDs_row').css('display', 'table-row');
+      $('#filtTermIDs_message').text('(Filtered from reading pane)');
+    }
   };
-  
+
   let handle_show_hide_filter_click = function() {
     const fc = $('#filterControls');
-    const is_hidden = (fc.css('display') == 'none');
-    const new_src = is_hidden ? "{{ url_for('static', filename='icn/minus-button.png') }}" : "{{ url_for('static', filename='icn/plus-button.png') }}";
-    $('#showHideFilters').prop('src', new_src);
-    handle_clear_filters();
-    fc.css('display', is_hidden ? 'block' : 'none');
-    handle_filter_update();
+    wipe_filter_storage();
+    const new_display = (fc.css('display') == 'none' ? 'block' : 'none');
+    fc.css('display', new_display);
+    update_filter_button_src(new_display == 'none');
+    update_filter_storage();  // to store new display setting.
+    $('#termtable').DataTable().draw();
   };
 
   let handle_clear_filters = function() {
-    $('#filtLanguage').val(0);
-    $('#filtParentsOnly').prop('checked', false);
-    $('#filtAgeMin').val('');
-    $('#filtAgeMax').val('');
-    $('#filtStatusMin').val(1);
-    $('#filtStatusMax').val(99);
-    $('#filtIncludeIgnored').prop('checked', false);
-    handle_filter_update();
+    wipe_filter_storage();
+    $('#termtable').DataTable().draw();
+  };
+
+  // Return the termids if those were passed, else null.
+  let get_termids_from_query_string = function() {
+    const queryString = window.location.search;
+    const params = new URLSearchParams(queryString);
+    if (!params.has('termids'))
+      return null;
+    let termids = params.get('termids');
+    // The termids are passed as "+" separated values,
+    // but the browser might replace them with spaces.
+    // Restore '+' for standard handling.
+    termids = termids.replaceAll(' ', '+');
+    const termidsArray = termids.split('+');
+    return termidsArray;
   };
 
   $(document).ready(function () {
+    // Handlers.
     $('#showHideFilters').click(handle_show_hide_filter_click);
     $('#filtLanguage').change(handle_filter_update);
     $('#filtParentsOnly').change(handle_filter_update);
@@ -386,7 +578,19 @@
     $('#filtStatusMin').change(handle_filter_update);
     $('#filtStatusMax').change(handle_filter_update);
     $('#filtIncludeIgnored').change(handle_filter_update);
+    // filtTermIDs are not interactive, no handler needed.
     $('#clearFilters').click(handle_clear_filters);
+
+    // If term ids were passed in, override any storage values.
+    // Filters are fast to apply, not concerned about this.
+    const termids = get_termids_from_query_string();
+    if (termids != null) {
+      wipe_filter_storage();
+      $('#filterControls').css('display', 'block');
+      $('#filtStatusMin').val(0);
+      $('#filtTermIDs').val(termids.join(','));
+      update_filter_storage();
+    }
 
     load_filters_from_storage();
 
