@@ -825,6 +825,27 @@ let show_translation_for_text = function(text) {
 };
 
 
+// Get all the word ids on the current page, open new tab with just those terms.
+function open_term_list_for_current_page() {
+  const ids = new Set();
+  $('span.word').each(function () {
+    ids.add($(this).data("wid"));
+  });
+  if (ids.length == 0)
+    return; // Nothing to do.
+
+  const idarray = Array.from(ids);
+  const idlist = idarray.join('+');
+
+  // console.log('passing ids:');
+  // console.log(idlist);
+  // let msg = idlist;
+  // window.alert(msg);
+  const url = `/term/index?termids=${idlist}`;
+  window.open(url);
+}
+
+
 /** Show the translation using the next dictionary. */
 function handle_translate(span_attribute) {
   const tis = get_textitems_spans(span_attribute);
