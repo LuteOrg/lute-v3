@@ -135,6 +135,7 @@
         success: function(response) {
           // console.log('Success:', response.status);
           _show_saved_checkmark(td);
+          $('#termtable').DataTable().draw();
         },
         error: function(xhr) {
           if (xhr.responseJSON && xhr.responseJSON.error) {
@@ -210,10 +211,7 @@
       const lang_id = parseInt(rowData["LgID"]);
       const lang_id_func = () => lang_id;
       const tagify = lute_tagify_utils_setup_parent_tagify(
-        input,
-        lang_id_func,
-        rowData["WoText"],
-        {}
+        input, lang_id_func, rowData["WoText"], {}
       );
       editableTagifyCell(rowData["WoID"], td, tagify, 'parents');
     };
