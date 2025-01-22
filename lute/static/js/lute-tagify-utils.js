@@ -11,9 +11,23 @@
   lute/templates/term/_bulk_edit_form_fields.html
   lute/templates/term/_form.html
 */
+/**
+ * Build a parent term dropdown list.
+ *
+ * args:
+ * - input: the input box tagify will control
+ * - language_id_func: zero-arg function that returns the language.
+ *
+ * notes:
+ *
+ * - language_id_func is passed, rather than a language_id, because in
+ * some cases such as bulk term editing the language isn't known at
+ * tagify setup time.  The func delegates the check until it's
+ * actually needed, in _fetch_whitelist.
+ */
 function lute_tagify_utils_setup_parent_tagify(
   input,
-  language_id = null,  // if null, autocomplete does nothing
+  language_id_func,  // if returns null, autocomplete does nothing
   this_term_text = null,  // set to non-null to filter whitelist
   override_base_settings = {}
 ) {
@@ -24,6 +38,13 @@ function lute_tagify_utils_setup_parent_tagify(
 
   // Do the fetch and build the whitelist.
   const _fetch_whitelist = function(mytagify, e_detail_value, controller) {
+    const language_id = language_id_func();
+    if (language_id == null) {
+      console.log("language_id not set or not consistent");
+      mytagify.loading(false);
+      return;
+    }
+
     // Create entry like "cat (a furry thing...)"
     const _make_dropdown_entry = function(hsh) {
       const txt = decodeURIComponent(hsh.text);
@@ -55,7 +76,7 @@ function lute_tagify_utils_setup_parent_tagify(
     };
     
     const encoded_value = encodeURIComponent(e_detail_value);
-    const url = `/term/search/${encoded_value}/${language_id}`;
+    const url = `/term/search/${encoded_value}/${language_id ?? -1}`;
     mytagify.loading(true);
     fetch(url, {signal:controller.signal})
       .then(RES => RES.json())
@@ -145,10 +166,6 @@ function lute_tagify_utils_setup_parent_tagify(
 
   const tagify = make_Tagify_for(input);
   tagify.on('input', function (e) {
-    if (language_id == null) {
-      console.log("language_id not set or not consistent");
-      return;
-    }
     build_autocomplete_dropdown(tagify, e)
   });
 

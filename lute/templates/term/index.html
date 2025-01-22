@@ -229,9 +229,10 @@
     const editableParentsCell = function (td, cellData, rowData, row, col) {
       const input = _make_tagify_text_control(td, cellData);
       const lang_id = parseInt(rowData["LgID"]);
+      const lang_id_func = () => lang_id;
       const tagify = lute_tagify_utils_setup_parent_tagify(
         input,
-        lang_id,
+        lang_id_func,
         rowData["WoText"],
         {}
       );
@@ -464,10 +465,12 @@
       langids.push($(this).attr('langid'));
     });
     const unique_langids = [...new Set(langids)];
+    let ret = null;
     if (unique_langids.length == 1) {
-      return unique_langids[0];
+      ret = unique_langids[0];
     }
-    return null;
+    // console.log(`for langids ${langids}, get_lang_id returned ${ret}`);
+    return ret;
   }
 
   let _get_checked_wordids = function() {
