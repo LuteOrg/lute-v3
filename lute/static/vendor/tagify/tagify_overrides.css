@@ -61,6 +61,9 @@
 .tagify__dropdown {
     background: white !important;
     color: black !important;
+    min-width: 400px !important;
+    max-width: 600px;
+    text-overflow: ellipsis;
 }
 
 .tagify__tag {
@@ -84,4 +87,3 @@
     padding: 0.1rem !important;
     font-size: 0.8rem;
 }
-

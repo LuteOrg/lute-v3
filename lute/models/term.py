@@ -322,6 +322,7 @@ class Status(db.Model):  # pylint: disable=too-few-public-methods
     UNKNOWN = 0
     WELLKNOWN = 99
     IGNORED = 98
+    ALLOWED = [UNKNOWN, 1, 2, 3, 4, 5, IGNORED, WELLKNOWN]
 
     __tablename__ = "statuses"
 
