@@ -90,6 +90,10 @@ def get_data_tables_list(parameters, session):
         st_where = f"({st_where} OR StID = 98)"
     wheres.append(st_where)
 
+    termids = parameters["filtTermIDs"].strip()
+    if termids != "":
+        wheres.append(f"w.WoID in ({termids})")
+
     # Phew.
     return DataTablesSqliteQuery.get_data(
         base_sql + " WHERE " + " AND ".join(wheres), parameters, session.connection()
