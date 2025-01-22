@@ -113,14 +113,17 @@ class Service:
 
         elif update_type == "parents":
             term.remove_all_parents()
+            last_parent = None
             for ptext in value:
                 # ptext already has zero-width spaces, if the term was looked
                 # up using the dropdown box.
                 pspec = Term.create_term_no_parsing(term.language, ptext)
                 parent = repo.find_by_spec(pspec)
                 use_parent = parent or pspec
+                last_parent = use_parent
                 term.add_parent(use_parent)
             if len(value) == 1:
+                term.status = last_parent.status
                 term.sync_status = True
 
         elif update_type == "term_tags":
