@@ -13,8 +13,8 @@
 */
 function lute_tagify_utils_setup_parent_tagify(
   input,
-  language_id,
-  this_term_text,
+  language_id = null,  // if null, autocomplete does nothing
+  this_term_text = null,  // set to non-null to filter whitelist
   override_base_settings = {}
 ) {
   if (input._tagify) {
@@ -61,8 +61,9 @@ function lute_tagify_utils_setup_parent_tagify(
       .then(RES => RES.json())
       .then(function(data) {
         // Update whitelist and render in place.
-        const whitelist = _build_whitelist(data).
-              filter(hsh => hsh.text != this_term_text);
+        let whitelist = _build_whitelist(data);
+        if (this_term_text != null)
+          whitelist = whitelist.filter(hsh => hsh.text != this_term_text);
         mytagify.whitelist = whitelist;
         mytagify.loading(false).dropdown.show(e_detail_value);
       }).catch(err => {
@@ -144,6 +145,10 @@ function lute_tagify_utils_setup_parent_tagify(
 
   const tagify = make_Tagify_for(input);
   tagify.on('input', function (e) {
+    if (language_id == null) {
+      console.log("language_id not set or not consistent");
+      return;
+    }
     build_autocomplete_dropdown(tagify, e)
   });
 
