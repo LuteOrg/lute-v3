@@ -128,7 +128,7 @@ function lute_tagify_utils_setup_parent_tagify(
       whitelist: [],
       dropdown: {
         enabled: 1,
-        maxItems: 10,
+        maxItems: 15,
         mapValueTo: 'suggestion',
         placeAbove: false,
       },
