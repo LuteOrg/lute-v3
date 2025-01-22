@@ -16,7 +16,7 @@
     const LUTE_USER_SETTINGS = {{ user_settings | safe }};
   }
   if (typeof LUTE_USER_HOTKEYS === "undefined") {
-    const LUTE_USER_HOTKEYS = {{ user_hotkeys | safe }};
+    window.LUTE_USER_HOTKEYS = {{ user_hotkeys | safe }};
   }
 </script>
 
@@ -149,17 +149,6 @@
 
   var TAGS = {{ tags | safe }};
 
-  let setup_term_tags_tagify = function(input) {
-    const tagify = new Tagify(input, {
-      placeholder: 'Tags',
-      editTags: false,
-      autoComplete: { enabled: true, rightKey: true, tabKey: true },
-      dropdown: { enabled: 1 },
-      enforceWhitelist: false,
-      whitelist: TAGS
-    });  // end tagify
-  };
-
   $(document).ready(function () {
 
     // "Save" shortcut
@@ -197,10 +186,7 @@
       placeholder: 'Parents',
     };
     parents_tagify = lute_tagify_utils_setup_parent_tagify(
-        parentslist,
-        lang_id_func,
-        this_term_text,
-        override_settings
+      parentslist, lang_id_func, this_term_text, override_settings
     );
 
     parents_tagify.on('click', function (e) {
@@ -263,7 +249,12 @@
     });
 
     var termtagslist = document.getElementById('termtagslist');
-    var termtags_tagify = setup_term_tags_tagify(termtagslist);
+    const overrides = {
+      placeholder: 'Tags'
+    };
+    var termtags_tagify = lute_tagify_utils_setup_term_tag_tagify(
+      termtagslist, TAGS, overrides
+    );
     
     // Post message re form opened.
     // Note have to use this rather than the better
