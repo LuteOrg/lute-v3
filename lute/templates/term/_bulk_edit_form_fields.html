@@ -39,109 +39,10 @@ doing these edits from the term index.
   <input id="txtRemoveTags" name="remove_tags" />
 </div>
 
+<script type="text/javascript" src="/static/js/never_cache/lute-tagify-utils.js" charset="utf-8"></script>
+
 <script>
   var TAGS = {{ tags | safe }}
-
-  let setup_parent_tagify = function(input_id) {
-    const input = document.getElementById(input_id);
-    const tagify = new Tagify(input, {
-      placeholder: 'Set parent (limit one)',
-      editTags: false,
-      maxTags: 1,
-      pasteAsTags: false,
-      backspace: true,
-      addTagOnBlur: false,
-      autoComplete: { enabled: true, rightKey: true, tabKey: true },
-      enforceWhitelist: false,
-      whitelist: [],
-      dropdown: {
-        enabled: 1,
-        maxItems: 15,
-        mapValueTo: 'suggestion',  // Field to display
-        placeAbove: false,  // Always put the dropdown below the textbox
-      },
-      templates: {
-        dropdownFooter(suggestions) {
-          var hasMore = suggestions.length - this.settings.dropdown.maxItems;
-          if (hasMore <= 0)
-            return '';
-          return `<footer data-selector='tagify-suggestions-footer' class="${this.settings.classNames.dropdownFooter}">
-            (more items available, please refine your search.)</footer>`;
-        }
-      },
-    });  // end tagify
-
-
-    // Autocomplete
-    var controller;
-    tagify.on('input', onInput);
-    function onInput(e) {
-      const langid = get_lang_id();
-      if (langid == null)
-        return;
-
-      tagify.whitelist = null;  // Reset whitelist.
-      if (e.detail.value == '' || e.detail.value.length < 1) {
-        controller && controller.abort();
-        tagify.whitelist = [];
-        tagify.loading(false).dropdown.hide();
-        return;
-      }
-      const s = encodeURIComponent(e.detail.value);
-      // console.log(s);
-
-      // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
-      controller && controller.abort()
-      controller = new AbortController()
-
-      let make_dropdown = function(hsh) {
-        // console.log(`text: ${hsh.text}`);
-        const txt = decodeURIComponent(hsh.text);
-        let t = hsh.translation ?? '';
-        if (t == '') {
-          return txt;
-        }
-        t = t.replaceAll("\n", "; ").replaceAll("\r", "");
-        const maxlen = 70
-        if (t.length > maxlen) {
-          t = t.substring(0, maxlen) + "...";
-        }
-        return `${txt} (${t})`;
-      };
-
-      // Build whitelist from returned ajax data.  Remove current term
-      // since a term should not be assigned as its own parent.
-      let build_whitelist = function(data) {
-        const this_term_text = $("#original_text").val();
-        const whitelist = data.map((a) => ({
-          "id": a.id,
-          "value": a.text,
-          "suggestion": make_dropdown(a),
-          "status": a.status,
-        })).filter((hsh) => hsh.value != this_term_text);
-        return whitelist;
-      };
-
-      tagify.loading(true);  // spinning animation during fetch.
-      fetch(`/term/search/${s}/${langid}`, {signal:controller.signal})
-        .then(RES => RES.json())
-        .then(function(data) {
-          tagify.whitelist = build_whitelist(data); // update whitelist Array in-place
-          const sdecode = decodeURIComponent(s);
-          tagify.loading(false).dropdown.show(sdecode); // render the suggestions dropdown
-        }).catch(err => {
-          if (err.name === 'AbortError') {
-            // Do nothing, fetch was aborted due to another fetch.
-            // console.log('AbortError: Fetch request aborted');
-          }
-          else {
-            console.log(`error: ${err}`);
-          }
-        });
-    };  // end function onInput
-
-    return tagify;
-  };  // end setup_parent_tagify
 
   // Parents are in the tagify-managed #txtSetParent input box.
   let get_parents = function() {
@@ -159,21 +60,17 @@ doing these edits from the term index.
   };
 
   let setup_tags_tagify = function(input_id, placeholder, enforceWhitelist) {
-    const input = document.getElementById(input_id);
-    const tagify = new Tagify(input, {
+    const override_base_settings = {
       placeholder: placeholder,
-      editTags: false,
-      autoComplete: { enabled: true, rightKey: true, tabKey: true },
-      dropdown: { enabled: 1 },
       enforceWhitelist: enforceWhitelist,
-      whitelist: TAGS
-    });  // end tagify
-    return tagify;
+    };
+    return lute_tagify_utils_setup_term_tag_tagify(
+      document.getElementById(input_id), TAGS, override_base_settings
+    );
   };
 
   let handle_change_status_checkbox_change = function(is_checked) {
     $("input[name='status']").prop('disabled', !is_checked);
-
     if (!is_checked) {
       // unselect all radios so nothing is submitted.
       $('input[name="status"]').prop('checked', false);
@@ -195,7 +92,16 @@ doing these edits from the term index.
       $('#txtSetParent').prop("disabled", true);
     }
     else {
-      const parents_tagify = setup_parent_tagify('txtSetParent');
+      const input = document.getElementById('txtSetParent');
+      const this_term_text = null;  // bulk edits = no "master term"
+      let override_settings = {
+        placeholder: 'Set parent (limit one)',
+        maxTags: 1,
+        addTagOnBlur: false,
+      };
+      const parents_tagify = lute_tagify_utils_setup_parent_tagify(
+        input, get_lang_id, this_term_text, override_settings
+      );
     }
   });
 </script>

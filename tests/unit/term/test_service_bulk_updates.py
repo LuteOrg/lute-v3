@@ -1,5 +1,5 @@
 """
-Term service tests.
+Term service apply_bulk_updates tests.
 """
 
 import pytest
@@ -9,8 +9,6 @@ from lute.db import db
 from lute.term.service import Service, TermServiceException, BulkTermUpdateData
 from tests.utils import add_terms
 from tests.dbasserts import assert_sql_result
-
-# Bulk parent update
 
 # pylint: disable=unbalanced-tuple-unpacking
 

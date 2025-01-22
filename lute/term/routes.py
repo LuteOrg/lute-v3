@@ -46,13 +46,20 @@ def index(search):
     languages = db.session.query(Language).order_by(Language.name).all()
     langopts = [(lang.id, lang.name) for lang in languages]
     langopts = [(0, "(all)")] + langopts
-    statuses = [s for s in db.session.query(Status).all() if s.id != Status.UNKNOWN]
+    all_statuses = db.session.query(Status).all()
+    filter_statuses = [s for s in all_statuses if s.id != Status.IGNORED]
+    # Add ignored to the end of the list ... annoying that the numbers
+    # are "out of order" (i.e., IGNORED comes before WELLKNOWN).
+    update_statuses = filter_statuses + [
+        s for s in all_statuses if s.id == Status.IGNORED
+    ]
     r = Repository(db.session)
     return render_template(
         "term/index.html",
         initial_search=search,
         language_options=langopts,
-        statuses=statuses,
+        filter_statuses=filter_statuses,
+        update_statuses=update_statuses,
         tags=r.get_term_tags(),
         in_term_index_listing=True,
     )
@@ -68,6 +75,7 @@ def _load_term_custom_filters(request_form, parameters):
         "filtStatusMin",
         "filtStatusMax",
         "filtIncludeIgnored",
+        "filtTermIDs",
     ]
     request_params = request_form.to_dict(flat=True)
     for p in filter_param_names:
@@ -140,6 +148,26 @@ def bulk_edit_from_reading_pane():
         flash(f"Error: {str(ex)}", "notice")
         return redirect("/read/term_bulk_edit_form", 302)
     return render_template("/read/updated.html", term_text=None)
+
+
+@bp.route("/ajax_edit_from_index", methods=["POST"])
+def ajax_edit_from_index():
+    "Ajax edit from the term index listing."
+    svc = TermService(db.session)
+    try:
+        data = request.get_json()
+        term_id = int(data.get("term_id", 0))
+        update_type = data.get("update_type", "")
+        values = data.get("values")
+        svc.apply_ajax_update(term_id, update_type, values)
+    except TermServiceException as ex:
+        return jsonify({"error": str(ex)}), 400
+    except ValueError as ex:
+        print(ex, flush=True)
+        return jsonify({"error": f"Invalid input ({ex})"}), 400
+    except Exception as ex:  # pylint: disable=broad-exception-caught
+        return jsonify({"error": f"An unexpected error occurred ({ex})"}), 500
+    return jsonify({"status": "ok"})
 
 
 @bp.route("/export_terms", methods=["POST"])
