@@ -146,75 +146,54 @@
       });
     }
 
- 
+    /**
+     * Self-monitoring cell with a tagify instance that posts on lost
+     * focus, if the state has changed.
+     */
     const editableTagifyCell = function(
-      word_id,
-      td,
-      tagify,
-      post_tags_as,
+      word_id, td, tagify, post_tags_as,
     ) {
-      const tagify_values = function(tagify) {
-        const vs = tagify.value.map(el => el.value).
-            filter(p => p.trim() != "");
-        vs.sort();
-        return vs.join(';;');
-      }
-      let original = tagify_values(tagify);
-
-      const handle_post_tags = function() {
-        const vals = tagify.value.
-              map(el => el.value).
-              filter(p => p.trim() != "");
-        post_update(td, word_id, post_tags_as, vals);
-      }
-
-      const add_pending_tags_and_post = function() {
-        const s = $(tagify.DOM.scope).find("span.tagify__input").last();
-        const pending_tag = s.text().trim();
-        if (pending_tag != '')
-          tagify.addTags([pending_tag], false, true);
-
-        let newvals = tagify_values(tagify);
-        if (newvals != original)
-          handle_post_tags();
-        original = newvals;
-      }
-
-      // Adding tags or clicking tag removal causes the tagify to lose
-      // focus, which can kick off the 'blur' event.  Suppress the
-      // blur event as needed.
+      // tagify loses focus when adding tags or clicking tag removal,
+      // calling the 'blur' event when not wanted; suppress that if needed.
       let suppressBlur = false;
 
       $(tagify.DOM.scope).on('mousedown', '.tagify__tag__removeBtn', function () {
-        // console.log('setting suppressBlur to true on tag remove click');
         suppressBlur = true;
       });
       
       // After add/remove, set focus on the tagify input span again,
       // so that tagify.on('blur') is fired when leaving the input box.
-      // Annoying but vital hack.
       tagify.on('add remove', function() {
-        // console.log('setting suppressBlur to true');
         suppressBlur = true;
         setTimeout(function() {
           const s = $(tagify.DOM.scope);
-          const lastSpan = s.find("span.tagify__input").last();
-          lastSpan.focus();
-          // console.log('setting suppressBlur to false');
+          s.find("span.tagify__input").last().focus();
           suppressBlur = false;
         }, 0);
       });
 
-      tagify.on('blur', function (e) {
-        if (suppressBlur) {
-          // console.log('Blur suppressed');
-          return;
-        }
-        add_pending_tags_and_post();
-      });
+      const add_pending_tags = function() {
+        const s = $(tagify.DOM.scope).find("span.tagify__input").last();
+        const pending_tag = s.text().trim();
+        if (pending_tag != '')
+          tagify.addTags([pending_tag], false, true);
+      };
 
-      tagify.on('keydown', function(e) {
-        // console.log(e);
+      // Save tag list state, only post on change.
+      const curr_tags = () => tagify.value.map(e => e.value).filter(e => e.trim() != "");
+      const curr_state = () => curr_tags().sort().join(';;');
+      let old_state = curr_state();
+      const post_if_changed = function() {
+        if (old_state != curr_state())
+          post_update(td, word_id, post_tags_as, curr_tags());
+        old_state = curr_state();
+      }
+
+      tagify.on('blur', function (e) {
+        if (!suppressBlur) {
+          add_pending_tags();
+          post_if_changed();
+        }
       });
     };
 
