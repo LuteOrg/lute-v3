@@ -395,29 +395,9 @@
     return `<a href="/term/edit/${row['WoID']}">${row['WoText']}</a>`;
   };
 
-  /** DIS
-  // Use the status ID for sorting, so Well Known comes after Learned (5),
-  // but use the status text ("New (1)") for the cell display.
-  let render_status = function ( data, type, row, meta ) {
-    return row["StText"];
-  };
-  ABLED **/
-
   let render_checkbox = function (data, type, row, meta) {
     return `<input type="checkbox" class="chkWord" name="wordids" wordid="${row['WoID']}" langid="${row['LgID']}">`;
   };
-
-  /*** DISABLED FOR INLINE EDIT
-  let render_translation = function ( data, type, row, meta ) {
-    let tx = row["WoTranslation"] ?? '';
-    tx = tx.replaceAll("\r\n", "<br />");
-    let imgsrc = row["WiSource"] ?? '';
-    if (imgsrc != '')
-      imgsrc = `<img class="term-listing-image" style="margin-top: 5px;" src="${imgsrc}" />`;
-    let ret = [ tx, imgsrc ].filter((s) => s != '');
-    return ret.join('<br />');
-  };
-  ***/
 
   let render_date_created = function (data, type, row, meta) {
     const dt = row["WoCreated"];
