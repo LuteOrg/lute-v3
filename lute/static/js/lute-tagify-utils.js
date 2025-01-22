@@ -7,7 +7,7 @@
 
 
 /**
- * Build a parent term dropdown list.
+ * Build a parent term tagify with autocomplete.
  *
  * args:
  * - input: the input box tagify will control
@@ -19,11 +19,6 @@
  * some cases such as bulk term editing the language isn't known at
  * tagify setup time.  The func delegates the check until it's
  * actually needed, in _fetch_whitelist.
- *
- * used in (at time of this writing):
- * - lute/templates/term/index.html
- * - lute/templates/term/_bulk_edit_form_fields.html
- * - lute/templates/term/_form.html
  */
 function lute_tagify_utils_setup_parent_tagify(
   input,
@@ -169,4 +164,35 @@ function lute_tagify_utils_setup_parent_tagify(
   });
 
   return tagify;
-} // end setup_parent_tagify
+} // end lute_tagify_utils_setup_parent_tagify
+
+
+/**
+ * Build a term tag tagify with autocomplete.
+ *
+ * args:
+ * - input: the input box tagify will control
+ * - tags: the tags array
+ * - override_base_settings: {} to override
+ */
+function lute_tagify_utils_setup_term_tag_tagify(
+  input,
+  tags,
+  override_base_settings = {}
+) {
+  if (input._tagify) {
+    return input._tagify;
+  }
+
+  const base_settings = {
+    delimiters: ';;', // special delim to handle tags w/ commas
+    editTags: false,
+    autoComplete: { enabled: true, rightKey: true, tabKey: true },
+    dropdown: { enabled: 1 },
+    enforceWhitelist: false,
+    whitelist: tags,
+  };
+  const settings = { ...base_settings, ...override_base_settings };
+  const tagify = new Tagify(input, settings);
+  return tagify;
+} // end lute_tagify_utils_setup_term_tag_tagify

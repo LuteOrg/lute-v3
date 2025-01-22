@@ -243,44 +243,22 @@
           old_state = new_content;  // don't repost if just entering and exiting
         }
       });
-
-    }
-
-    // TODO - extract reusable routine.
-    let setup_term_tags_tagify = function(
-      input,
-      tags,
-      override_base_settings = {},
-    ) {
-      const base_settings = {
-        delimiters: ';;', // special delim to handle tags w/ commas
-        editTags: false,
-        autoComplete: { enabled: true, rightKey: true, tabKey: true },
-        dropdown: { enabled: 1 },
-        enforceWhitelist: false,
-        whitelist: tags,
-      };
-      const settings = { ...base_settings, ...override_base_settings };
-      const tagify = new Tagify(input, settings);
-      return tagify;
-    };
+    };  // end editableTranslationCell
 
     var TAGS = {{ tags | safe }};
     const editableTagsCell = function (td, cellData, rowData, row, col) {
       const input = _make_tagify_text_control(td, cellData);
-      const tagify = setup_term_tags_tagify(input, TAGS, {});
+      const tagify = lute_tagify_utils_setup_term_tag_tagify(input, TAGS, {});
       editableTagifyCell(rowData["WoID"], td, tagify, 'term_tags');
     };
 
     const editableStatusCell = function (td, cellData, rowData, row, col) {
       function makeDropdown(td) {
         const select = document.createElement('select');
-
-        let options_string = '';
+        select.innerHTML = '';
         {% for s in statuses %}
-        options_string += '<option value="{{s.id}}">{{ s.text }}</option>';
+          select.innerHTML += '<option value="{{s.id}}">{{ s.text }}</option>';
         {% endfor %}
-        select.innerHTML = options_string;
         select.value = parseInt(rowData["StID"]);
 
         td.innerHTML = '';
@@ -292,9 +270,6 @@
       select.addEventListener('change', function () {
         post_update(td, rowData["WoID"], 'status', select.value);
       });
-      // "td.addEventListener('blur', function(e)" is not possible, as
-      // it immediatly fires when the select is added.  The change
-      // listener is sufficient.
     };
 
     table = $('#termtable').DataTable({
