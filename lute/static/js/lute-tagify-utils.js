@@ -6,11 +6,6 @@
  */
 
 
-/* /term/search used here:
-  lute/templates/term/index.html
-  lute/templates/term/_bulk_edit_form_fields.html
-  lute/templates/term/_form.html
-*/
 /**
  * Build a parent term dropdown list.
  *
@@ -24,6 +19,11 @@
  * some cases such as bulk term editing the language isn't known at
  * tagify setup time.  The func delegates the check until it's
  * actually needed, in _fetch_whitelist.
+ *
+ * used in (at time of this writing):
+ * - lute/templates/term/index.html
+ * - lute/templates/term/_bulk_edit_form_fields.html
+ * - lute/templates/term/_form.html
  */
 function lute_tagify_utils_setup_parent_tagify(
   input,
