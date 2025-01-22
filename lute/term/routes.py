@@ -46,13 +46,20 @@ def index(search):
     languages = db.session.query(Language).order_by(Language.name).all()
     langopts = [(lang.id, lang.name) for lang in languages]
     langopts = [(0, "(all)")] + langopts
-    statuses = [s for s in db.session.query(Status).all() if s.id != Status.UNKNOWN]
+    all_statuses = db.session.query(Status).all()
+    filter_statuses = [s for s in all_statuses if s.id != Status.IGNORED]
+    # Add ignored to the end of the list ... annoying that the numbers
+    # are "out of order" (i.e., IGNORED comes before WELLKNOWN).
+    update_statuses = filter_statuses + [
+        s for s in all_statuses if s.id == Status.IGNORED
+    ]
     r = Repository(db.session)
     return render_template(
         "term/index.html",
         initial_search=search,
         language_options=langopts,
-        statuses=statuses,
+        filter_statuses=filter_statuses,
+        update_statuses=update_statuses,
         tags=r.get_term_tags(),
         in_term_index_listing=True,
     )
