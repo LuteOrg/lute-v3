@@ -99,6 +99,7 @@ class Service:
 
     def apply_ajax_update(self, term_id, update_type, value):
         "Apply single update from datatables updatable cells interactions."
+        # pylint: disable=too-many-branches
 
         repo = TermRepository(self.session)
         term = repo.find(term_id)
