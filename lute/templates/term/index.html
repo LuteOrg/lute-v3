@@ -117,7 +117,7 @@
       const offset_left = offset.left + targetElement.outerWidth() - tooltip.outerWidth() + 5;
       tooltip.css({ top: offset.top + 5, left: offset_left });
       tooltip.fadeIn(100);
-      setTimeout(() => { tooltip.fadeOut(200, function() { $(this).remove(); }); }, 800);      
+      setTimeout(() => { tooltip.fadeOut(200, function() { $(this).remove(); }); }, 800);
     }
 
     function post_update(td, term_id, update_type, update) {
@@ -160,7 +160,7 @@
       $(tagify.DOM.scope).on('mousedown', '.tagify__tag__removeBtn', function () {
         suppressBlur = true;
       });
-      
+
       // After add/remove, set focus on the tagify input span again,
       // so that tagify.on('blur') is fired when leaving the input box.
       tagify.on('add remove', function() {

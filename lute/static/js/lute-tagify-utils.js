@@ -69,7 +69,7 @@ function lute_tagify_utils_setup_parent_tagify(
       };
       return data.map((a) => _make_hash(a));
     };
-    
+
     const encoded_value = encodeURIComponent(e_detail_value);
     const url = `/term/search/${encoded_value}/${language_id ?? -1}`;
     mytagify.loading(true);
@@ -135,7 +135,7 @@ function lute_tagify_utils_setup_parent_tagify(
         (more items available, please refine your search.)</footer>`;
         }
       },
-      
+
       // Use a hook to force build_autocomplete_dropdown.
       // Pasting from the clipboard doesnt fire the
       // tagify.on('input') event, so intercept it and handle
