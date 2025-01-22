@@ -2182,16 +2182,15 @@ input[name='status']:disabled + label {
 
 /** Term listing (/term) action dropdown. ********************/
 
-table#termtable .tagify {
-    border: 0px;
+table#termtable .tagify,
+table#termtable .translationDiv {
+    border: 1px solid transparent;  /* Prevent elements pushing others around on hover. */
+    box-sizing: border-box;
 }
 
-table#termtable .tagify:hover {
-    border: 1px solid;
-}
-
+table#termtable .tagify:hover,
 table#termtable .translationDiv:hover {
-    border: 1px solid;    
+    border: 1px solid;
 }
 
 .term-action-container {
