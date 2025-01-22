@@ -40,7 +40,7 @@
       const elements = $(parent.document).find("span.word");
       if (elements.length == 0) {
         console.log("No words on page ...");
-        return -999;  // dummy
+        return null;  // dummy
       }
       const first = elements.first();
       return $(first).data("lang-id");
