@@ -97,7 +97,7 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     page.get_by_role("link", name="Add bookmark").hover()
     page.get_by_role("link", name="Add bookmark").click()
 
-    page.get_by_role("link", name="List").click()
+    page.get_by_role("link", name="List bookmarks").click()
     page.get_by_text("…").first.hover()
     page.once("dialog", lambda dialog: dialog.accept())
     page.get_by_role("link", name="Delete").click()
