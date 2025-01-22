@@ -56,6 +56,13 @@
         <input id="filtIncludeIgnored" type="checkbox" />
       </td>
     </tr>
+    <tr id="filtTermIDs_row" style="display: none">
+      <td>Term IDs</td>
+      <td>
+        <span id="filtTermIDs_message">(msg here)</span>
+        <input type="hidden" id="filtTermIDs" />
+      </td>
+    </tr>
   </table>
   <button id="clearFilters">Clear all</button>
   <br />
@@ -332,7 +339,8 @@
           filtAgeMax: () => $('#filtAgeMax').val(),
           filtStatusMin: () => $('#filtStatusMin').val(),
           filtStatusMax: () => $('#filtStatusMax').val(),
-          filtIncludeIgnored: () => $('#filtIncludeIgnored').prop('checked')
+          filtIncludeIgnored: () => $('#filtIncludeIgnored').prop('checked'),
+          filtTermIDs: () => $('#filtTermIDs').val(),
         },
 
         dataType: "json"
@@ -462,22 +470,48 @@
   };
 
 
-  let handle_filter_update = function() {
+  let update_filter_storage = function() {
     const store = {
-      filtLanguage: $('#filtLanguage').val(),
       filtDisplay: $('#filterControls').css('display'),
+      filtLanguage: $('#filtLanguage').val(),
       filtParentsOnly: $('#filtParentsOnly').prop('checked'),
       filtAgeMin: $('#filtAgeMin').val(),
       filtAgeMax: $('#filtAgeMax').val(),
       filtStatusMin: $('#filtStatusMin').val(),
       filtStatusMax: $('#filtStatusMax').val(),
-      filtIncludeIgnored: $('#filtIncludeIgnored').prop('checked')
+      filtIncludeIgnored: $('#filtIncludeIgnored').prop('checked'),
+      filtTermIDs: $('#filtTermIDs').val(),
     };
     // console.log('saving: ' + JSON.stringify(store));
     sessionStorage.setItem('termtable_filters', JSON.stringify(store));
+  };
+
+  let wipe_filter_storage = function() {
+    $('#filtLanguage').val(0);
+    $('#filtParentsOnly').prop('checked', false);
+    $('#filtAgeMin').val('');
+    $('#filtAgeMax').val('');
+    $('#filtStatusMin').val(1);
+    $('#filtStatusMax').val(99);
+    $('#filtIncludeIgnored').prop('checked', false);
+    $('#filtTermIDs').val('');
+    $('#filtTermIDs_row').css('display', 'none');
+    update_filter_storage();
+  };
+
+  let handle_filter_update = function() {
+    update_filter_storage();
     $('#termtable').DataTable().draw();
   };
 
+
+  let update_filter_button_src = function(is_hidden) {
+    // console.log(`is_hidden = ${is_hidden}`);
+    const new_src = is_hidden ?
+          "{{ url_for('static', filename='icn/plus-button.png') }}" :
+          "{{ url_for('static', filename='icn/minus-button.png') }}";
+    $('#showHideFilters').prop('src', new_src);
+  }
 
   let load_filters_from_storage = function() {
     fs = sessionStorage.getItem('termtable_filters');
@@ -485,9 +519,9 @@
     if (fs == null)
       return;
     store = JSON.parse(fs);
-    $('#filterControls').css('display', store.filtDisplay);
 
-    $('#showHideFilters').prop('src', "{{ url_for('static', filename='icn/minus-button.png') }}");
+    $('#filterControls').css('display', store.filtDisplay);
+    update_filter_button_src(store.filtDisplay == "none");
     $('#filtLanguage').val(parseInt(store.filtLanguage ?? '0'));
     $('#filtParentsOnly').prop('checked', store.filtParentsOnly ?? false);
     if ((store.filtAgeMin ?? '') != '')
@@ -497,30 +531,45 @@
     $('#filtStatusMin').val(parseInt(store.filtStatusMin ?? '1'));
     $('#filtStatusMax').val(parseInt(store.filtStatusMax ?? '99'));
     $('#filtIncludeIgnored').prop('checked', store.filtIncludeIgnored);
+    if ((store.filtTermIDs ?? '') != '') {
+      $('#filtTermIDs').val(store.filtTermIDs);
+      $('#filtTermIDs_row').css('display', 'table-row');
+      $('#filtTermIDs_message').text('(Filtered from reading pane)');
+    }
   };
 
   let handle_show_hide_filter_click = function() {
     const fc = $('#filterControls');
-    const is_hidden = (fc.css('display') == 'none');
-    const new_src = is_hidden ? "{{ url_for('static', filename='icn/minus-button.png') }}" : "{{ url_for('static', filename='icn/plus-button.png') }}";
-    $('#showHideFilters').prop('src', new_src);
-    handle_clear_filters();
-    fc.css('display', is_hidden ? 'block' : 'none');
-    handle_filter_update();
+    wipe_filter_storage();
+    const new_display = (fc.css('display') == 'none' ? 'block' : 'none');
+    fc.css('display', new_display);
+    update_filter_button_src(new_display == 'none');
+    update_filter_storage();  // to store new display setting.
+    $('#termtable').DataTable().draw();
   };
 
   let handle_clear_filters = function() {
-    $('#filtLanguage').val(0);
-    $('#filtParentsOnly').prop('checked', false);
-    $('#filtAgeMin').val('');
-    $('#filtAgeMax').val('');
-    $('#filtStatusMin').val(1);
-    $('#filtStatusMax').val(99);
-    $('#filtIncludeIgnored').prop('checked', false);
-    handle_filter_update();
+    wipe_filter_storage();
+    $('#termtable').DataTable().draw();
+  };
+
+  // Return the termids if those were passed, else null.
+  let get_termids_from_query_string = function() {
+    const queryString = window.location.search;
+    const params = new URLSearchParams(queryString);
+    if (!params.has('termids'))
+      return null;
+    let termids = params.get('termids');
+    // The termids are passed as "+" separated values,
+    // but the browser might replace them with spaces.
+    // Restore '+' for standard handling.
+    termids = termids.replaceAll(' ', '+');
+    const termidsArray = termids.split('+');
+    return termidsArray;
   };
 
   $(document).ready(function () {
+    // Handlers.
     $('#showHideFilters').click(handle_show_hide_filter_click);
     $('#filtLanguage').change(handle_filter_update);
     $('#filtParentsOnly').change(handle_filter_update);
@@ -529,7 +578,19 @@
     $('#filtStatusMin').change(handle_filter_update);
     $('#filtStatusMax').change(handle_filter_update);
     $('#filtIncludeIgnored').change(handle_filter_update);
+    // filtTermIDs are not interactive, no handler needed.
     $('#clearFilters').click(handle_clear_filters);
+
+    // If term ids were passed in, override any storage values.
+    // Filters are fast to apply, not concerned about this.
+    const termids = get_termids_from_query_string();
+    if (termids != null) {
+      wipe_filter_storage();
+      $('#filterControls').css('display', 'block');
+      $('#filtStatusMin').val(0);
+      $('#filtTermIDs').val(termids.join(','));
+      update_filter_storage();
+    }
 
     load_filters_from_storage();
 
