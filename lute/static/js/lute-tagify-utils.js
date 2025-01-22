@@ -110,6 +110,10 @@ function lute_tagify_utils_setup_parent_tagify(
     _fetch_whitelist(mytagify, e.detail.value, controller);
   }
 
+  // Need a global tagify instance here
+  // so that hooks can use it.
+  var tagify_instance = null;
+
   const make_Tagify_for = function(input) {
     const base_settings = {
       editTags: false,
@@ -145,9 +149,8 @@ function lute_tagify_utils_setup_parent_tagify(
           return new Promise((resolve, reject) => {
             clipboardData = content.clipboardData || window.clipboardData;
             pastedData = clipboardData.getData('Text');
-            // console.log("pasting => " + pastedData);
             let e = { detail: { value: pastedData } };
-            build_autocomplete_dropdown(ret, e);
+            build_autocomplete_dropdown(tagify_instance, e);
             resolve();
           });
         }
@@ -155,7 +158,8 @@ function lute_tagify_utils_setup_parent_tagify(
     };
 
     let settings = { ...base_settings, ...override_base_settings };
-    return new Tagify(input, settings);
+    tagify_instance = new Tagify(input, settings);
+    return tagify_instance;
   };
 
   const tagify = make_Tagify_for(input);
