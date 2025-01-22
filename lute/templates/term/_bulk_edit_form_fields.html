@@ -60,21 +60,17 @@ doing these edits from the term index.
   };
 
   let setup_tags_tagify = function(input_id, placeholder, enforceWhitelist) {
-    const input = document.getElementById(input_id);
-    const tagify = new Tagify(input, {
+    const override_base_settings = {
       placeholder: placeholder,
-      editTags: false,
-      autoComplete: { enabled: true, rightKey: true, tabKey: true },
-      dropdown: { enabled: 1 },
       enforceWhitelist: enforceWhitelist,
-      whitelist: TAGS
-    });  // end tagify
-    return tagify;
+    };
+    return lute_tagify_utils_setup_term_tag_tagify(
+      document.getElementById(input_id), TAGS, override_base_settings
+    );
   };
 
   let handle_change_status_checkbox_change = function(is_checked) {
     $("input[name='status']").prop('disabled', !is_checked);
-
     if (!is_checked) {
       // unselect all radios so nothing is submitted.
       $('input[name="status"]').prop('checked', false);
@@ -104,10 +100,7 @@ doing these edits from the term index.
         addTagOnBlur: false,
       };
       const parents_tagify = lute_tagify_utils_setup_parent_tagify(
-        input,
-        get_lang_id,
-        this_term_text,
-        override_settings
+        input, get_lang_id, this_term_text, override_settings
       );
     }
   });
