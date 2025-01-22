@@ -4,7 +4,7 @@
 
 from dataclasses import dataclass, field
 from typing import List, Optional
-from lute.models.term import Status
+from lute.models.term import Term, Status
 from lute.models.repositories import TermRepository, TermTagRepository
 from lute.term.model import Repository
 
@@ -96,3 +96,48 @@ class Service:
 
             self.session.add(term)
             self.session.commit()
+
+    def apply_ajax_update(self, term_id, update_type, value):
+        "Apply single update from datatables updatable cells interactions."
+
+        repo = TermRepository(self.session)
+        term = repo.find(term_id)
+        if term is None:
+            raise TermServiceException(f"No term with id {term_id}")
+
+        if update_type == "translation":
+            trans = (value or "").strip()
+            if trans == "":
+                trans = None
+            term.translation = trans
+
+        elif update_type == "parents":
+            term.remove_all_parents()
+            for ptext in value:
+                # ptext already has zero-width spaces, if the term was looked
+                # up using the dropdown box.
+                pspec = Term.create_term_no_parsing(term.language, ptext)
+                parent = repo.find_by_spec(pspec)
+                use_parent = parent or pspec
+                term.add_parent(use_parent)
+            if len(value) == 1:
+                term.sync_status = True
+
+        elif update_type == "term_tags":
+            ttrepo = TermTagRepository(self.session)
+            add_tags = [ttrepo.find_or_create_by_text(a) for a in value]
+            term.remove_all_term_tags()
+            for tag in add_tags:
+                term.add_term_tag(tag)
+
+        elif update_type == "status":
+            sval = int(value)
+            if sval not in Status.ALLOWED:
+                raise TermServiceException("Bad status value")
+            term.status = sval
+
+        else:
+            raise TermServiceException("Bad update type")
+
+        self.session.add(term)
+        self.session.commit()
