@@ -58,6 +58,37 @@ def test_smoke_test(app_context, spanish):
     assert_updated(t.id, expected, "smoke all items")
 
 
+def test_term_gets_parent_status_if_parent_status_set(app_context, spanish):
+    "Smoke test."
+    [t, p] = add_terms(spanish, ["T", "P"])
+    t.status = 1
+    p.status = 4
+    db.session.add(t)
+    db.session.add(p)
+    db.session.commit()
+
+    _apply_updates(t.id, "parents", ["P"])
+    expected = {"status": 4}
+    assert_updated(t.id, expected, "gets parent's status")
+    assert_updated(p.id, expected, "parent keeps status")
+
+
+def test_term_keeps_status_if_parent_status_unknown(app_context, spanish):
+    "Smoke test."
+    [t, p] = add_terms(spanish, ["T", "P"])
+    t.status = 1
+    p.status = 0
+    db.session.add(t)
+    db.session.add(p)
+    db.session.commit()
+
+    _apply_updates(t.id, "parents", ["P"])
+    expected = {"status": 1}
+    assert_updated(t.id, expected, "keeps own status")
+    expected = {"status": 1}
+    assert_updated(p.id, expected, "parent gets child's status!")
+
+
 def test_bad_term_id_throws(app_context):
     svc = Service(db.session)
     with pytest.raises(TermServiceException, match="No term with id -99"):
