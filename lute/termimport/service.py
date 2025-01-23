@@ -224,6 +224,11 @@ class Service:
             if p is not None:
                 t.status = p.status
 
+        # If syncing, and the term status was explicitly set,
+        # use it for both the term and the parent.
+        if t.sync_status and len(t.parents) == 1 and "status" in rec:
+            t.override_parent_status = True
+
         repo.add(t)
 
     def _do_import(

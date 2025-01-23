@@ -39,10 +39,12 @@ class Term:  # pylint: disable=too-many-instance-attributes
         self.parents = []
         self.current_image = None
 
+        # Issue 387: During term imports, the import file may specify
+        # a child status, That should always be respected, regardless of status syncing.
+        self.override_parent_status = False
+
     def __repr__(self):
-        return (
-            f'<Term BO "{self.text}" lang_id={self.language_id} lang={self.language}>'
-        )
+        return f'<Term BO "{self.text}" lang_id={self.language_id}>'
 
 
 class TermReference:
@@ -264,7 +266,7 @@ class Repository:
 
     def _build_db_term(self, term):
         "Convert a term business object to a DBTerm."
-        # print(f"in _build_db_term, term id = {term.id}", flush=True)
+        # pylint: disable=too-many-branches
         if term.text is None:
             raise ValueError("Text not set for term")
 
@@ -318,6 +320,13 @@ class Repository:
 
         if len(termparents) != 1:
             t.sync_status = False
+
+        if t.sync_status and len(termparents) > 0 and not term.override_parent_status:
+            p = termparents[0]
+            if p.status != 0:
+                t.status = p.status
+            else:
+                p.status = t.status
 
         # print(f"in _build_db_term, returning db term with term id = {t.id}", flush=True)
         return t
