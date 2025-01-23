@@ -837,11 +837,11 @@ function open_term_list_for_current_page() {
   const idarray = Array.from(ids);
   const idlist = idarray.join('+');
 
-  // console.log('passing ids:');
-  // console.log(idlist);
-  // let msg = idlist;
-  // window.alert(msg);
-  const url = `/term/index?termids=${idlist}`;
+  // Pass the bookid and pagenum so datatables can
+  // use those for the savedState key.
+  const bookid = $("#book_id").val();
+  const pagenum = $("#page_num").val();
+  const url = `/term/index?bookid=${bookid}&pagenum=${pagenum}&termids=${idlist}`;
   window.open(url);
 }
 

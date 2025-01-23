@@ -113,7 +113,7 @@
 
 <script>
 
-  let setup_term_datatable = function(initial_search) {
+  let setup_term_datatable = function(table_state_key, initial_search) {
 
     // On success, show checkmark near the td where post happened.
     function _show_saved_checkmark(td) {
@@ -321,6 +321,13 @@
       processing: true,
       serverSide: true,
       stateSave: true,
+      stateSaveCallback: function(settings, data) {
+        localStorage.setItem(table_state_key, JSON.stringify(data));
+      },
+      stateLoadCallback: function(settings) {
+        const state = localStorage.getItem(table_state_key);
+        return state ? JSON.parse(state) : null;
+      },
       select: {
         style: 'multi',
         selector: 'td:first-child input[type="checkbox"]',
@@ -570,19 +577,24 @@
     $('#termtable').DataTable().draw();
   };
 
-  // Return the termids if those were passed, else null.
-  let get_termids_from_query_string = function() {
+  // Return the termids and params if those were passed, else null.
+  let get_termids_list_params_from_query_string = function() {
     const queryString = window.location.search;
     const params = new URLSearchParams(queryString);
     if (!params.has('termids'))
       return null;
+
     let termids = params.get('termids');
     // The termids are passed as "+" separated values,
     // but the browser might replace them with spaces.
     // Restore '+' for standard handling.
     termids = termids.replaceAll(' ', '+');
-    const termidsArray = termids.split('+');
-    return termidsArray;
+
+    return {
+      termids_string: termids.split('+').join(','),
+      bookid: params.get('bookid'),
+      pagenum: params.get('pagenum'),
+    };
   };
 
   $(document).ready(function () {
@@ -598,22 +610,30 @@
     // filtTermIDs are not interactive, no handler needed.
     $('#clearFilters').click(handle_clear_filters);
 
+    // Datatables state needs to be different for regular vs term
+    // list.  If they were the same, then setting the page number
+    // on the filtered term id list would also affect the default
+    // term listing.
+    let dt_saved_state_key = "saved_state_default";
+
     // If term ids were passed in, override any storage values.
     // Filters are fast to apply, not concerned about this.
-    const termids = get_termids_from_query_string();
-    if (termids != null) {
+    const hsh = get_termids_list_params_from_query_string();
+    if (hsh != null) {
       wipe_filter_storage();
       $('#filterControls').css('display', 'block');
       $('#filtStatusMin').val(0);
-      $('#filtTermIDs').val(termids.join(','));
+      $('#filtTermIDs').val(hsh.termids_string);
       update_filter_storage();
+      // Each book and page gets its own state.
+      dt_saved_state_key = `saved_state_${hsh.bookid}_${hsh.pagenum}`;
     }
 
     load_filters_from_storage();
 
     // Setting up the datatable now, so the filters are
     // taken into account.
-    setup_term_datatable("{{ initial_search or '' }}");
+    setup_term_datatable(dt_saved_state_key, "{{ initial_search or '' }}");
   });
 
 
