@@ -245,10 +245,14 @@
       div.setAttribute('contenteditable', true);
       div.innerHTML = (cellData ?? '').replace(/\r\n/g, '<br />');
       $(td).empty().append(div);
-      const imgsrc = rowData["WiSource"]
-            ? `<img class="term-listing-image" style="margin-top: 5px;" src="${rowData["WiSource"]}" />` 
-            : '';
-      $(td).append(imgsrc);
+
+      const imgsrc = rowData["WiSource"];
+      if (imgsrc) {
+        const img = document.createElement('img');
+        img.className = 'term-listing-image';
+        img.src = imgsrc;
+        $(td).append(img);
+      }
 
       let old_state = (cellData ?? '');
       div.addEventListener('blur', function(e) {
