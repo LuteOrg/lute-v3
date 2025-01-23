@@ -152,14 +152,23 @@ def bulk_edit_from_reading_pane():
 
 @bp.route("/ajax_edit_from_index", methods=["POST"])
 def ajax_edit_from_index():
-    "Ajax edit from the term index listing."
+    """
+    Ajax edit from the term index listing.
+
+    If successful, returns the term's new status.  Only the status is
+    returned, as that is the only thing that might change as a result
+    of an ajax update (e.g., if a parent is assigned.
+    """
     svc = TermService(db.session)
+    updated_term = None
     try:
         data = request.get_json()
         term_id = int(data.get("term_id", 0))
         update_type = data.get("update_type", "")
         values = data.get("values")
         svc.apply_ajax_update(term_id, update_type, values)
+        repo = TermRepository(db.session)
+        updated_term = repo.find(term_id)
     except TermServiceException as ex:
         return jsonify({"error": str(ex)}), 400
     except ValueError as ex:
@@ -167,7 +176,8 @@ def ajax_edit_from_index():
         return jsonify({"error": f"Invalid input ({ex})"}), 400
     except Exception as ex:  # pylint: disable=broad-exception-caught
         return jsonify({"error": f"An unexpected error occurred ({ex})"}), 500
-    return jsonify({"status": "ok"})
+
+    return jsonify({"status": updated_term.status})
 
 
 @bp.route("/export_terms", methods=["POST"])

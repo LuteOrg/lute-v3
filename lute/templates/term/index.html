@@ -127,7 +127,24 @@
       setTimeout(() => { tooltip.fadeOut(200, function() { $(this).remove(); }); }, 800);
     }
 
+    /**
+     * Post the update, and update the term status.
+     * We only need to update the status as that's the only
+     * thing that might change as a side-effect of setting
+     * the parent.
+     */
     function post_update(td, term_id, update_type, update) {
+
+      // Update via datatables dom manipulation, keeps the dt
+      // model consistent.
+      const _update_status_in_row = function(updated_status) {
+        const table = $('#termtable').DataTable();
+        const row = table.row(td.closest('tr'));
+        const select = row.node().querySelector('.term-status-select');
+        if (select)
+          select.value = updated_status;
+      };
+
       const payload = {
         term_id: term_id,
         update_type: update_type,
@@ -140,11 +157,8 @@
         contentType: 'application/json',
         data: JSON.stringify(payload),
         success: function(response) {
-          // console.log('Success:', response.status);
           _show_saved_checkmark(td);
-          // Stay on page 2 if editing an element on page 2. :-P
-          const change_current_page_on_redraw = false;
-          $('#termtable').DataTable().draw(change_current_page_on_redraw);
+          _update_status_in_row(response.status);
         },
         error: function(xhr) {
           if (xhr.responseJSON && xhr.responseJSON.error) {
@@ -262,6 +276,7 @@
     const editableStatusCell = function (td, cellData, rowData, row, col) {
       function makeDropdown(td) {
         const select = document.createElement('select');
+        select.classList.add('term-status-select');
         select.innerHTML = '';
         {% for s in update_statuses %}
           select.innerHTML += '<option value="{{s.id}}">{{ s.text }}</option>';
