@@ -92,7 +92,8 @@ def get_data_tables_list(parameters, session):
 
     termids = parameters["filtTermIDs"].strip()
     if termids != "":
-        wheres.append(f"w.WoID in ({termids})")
+        parentsql = f"select WpParentWoID from wordparents where WpWoID in ({termids})"
+        wheres.append(f"((w.WoID in ({termids})) OR (w.WoID in ({parentsql})))")
 
     # Phew.
     return DataTablesSqliteQuery.get_data(
