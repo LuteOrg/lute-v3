@@ -142,7 +142,9 @@
         success: function(response) {
           // console.log('Success:', response.status);
           _show_saved_checkmark(td);
-          $('#termtable').DataTable().draw();
+          // Stay on page 2 if editing an element on page 2. :-P
+          const change_current_page_on_redraw = false;
+          $('#termtable').DataTable().draw(change_current_page_on_redraw);
         },
         error: function(xhr) {
           if (xhr.responseJSON && xhr.responseJSON.error) {
