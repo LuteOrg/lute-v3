@@ -58,6 +58,7 @@ class Term:  # pylint: disable=too-many-instance-attributes
 
     @property
     def sync_status(self):
+        "Can only sync if one parent."
         if len(self.parents) != 1:
             return False
         return self._sync_status
@@ -346,6 +347,7 @@ class Repository:
 
         if t.sync_status and len(termparents) == 1:
             p = termparents[0]
+            # pylint: disable=protected-access
             if term._status_explicitly_set or p.status == 0:
                 p.status = t.status
             else:
@@ -410,6 +412,7 @@ class Repository:
         term.romanization = dbterm.romanization
         term.term_tags = [tt.text for tt in dbterm.term_tags]
 
+        # pylint: disable=protected-access
         term._status = dbterm.status
         term._sync_status = dbterm.sync_status
 
