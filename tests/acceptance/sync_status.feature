@@ -13,9 +13,9 @@ Feature: User can link child and parent term statuses.
     Scenario: Can link child and single parent term.
         When I click "Gato" and edit the form:
             translation: cat
-            status: 3
+            status: 1
         Then the reading pane shows:
-            Gato (3)/ /gatos/ /gatito/ /perro/.
+            Gato (1)/ /gatos/ /gatito/ /perro/.
 
         When I click "gatos" and edit the form:
             parents: [ 'Gato' ]
