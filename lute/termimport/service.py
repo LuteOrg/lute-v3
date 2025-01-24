@@ -211,23 +211,15 @@ class Service:
         t = repo.find(lang.id, rec["term"])
         parents = list(map(str.strip, rec["parent"].split(",")))
         t.parents = [p for p in parents if p != ""]
-        if "link_status" in rec and len(parents) == 1:
+        if "link_status" in rec:
             sync_status = rec["link_status"] or ""
             t.sync_status = sync_status.strip().lower() == "y"
-        if len(t.parents) != 1:
-            t.sync_status = False
 
-        # If syncing to parent, and the term status was not explicitly set,
-        # then "inherit" the parent status.
-        if t.sync_status and len(t.parents) == 1 and "status" not in rec:
-            p = repo.find(lang.id, t.parents[0])
-            if p is not None:
-                t.status = p.status
-
-        # If syncing, and the term status was explicitly set,
-        # use it for both the term and the parent.
-        if t.sync_status and len(t.parents) == 1 and "status" in rec:
-            t.override_parent_status = True
+        # Fallback: if the term status was explicitly set, always use it.
+        if "status" in rec:
+            status = self._get_status(rec["status"])
+            if status is not None:
+                t.status = int(status)
 
         repo.add(t)
 

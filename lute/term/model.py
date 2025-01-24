@@ -40,11 +40,8 @@ class Term:  # pylint: disable=too-many-instance-attributes
         # When loading the Term from a DBTerm,
         # assign to properties starting with "_" directly.
         self._status = 1
+        self._status_explicitly_set = False
         self._sync_status = False
-
-        # Issue 387: During term imports, the import file may specify
-        # a child status, That should always be respected, regardless of status syncing.
-        self.override_parent_status = False
 
     @property
     def status(self):
@@ -57,7 +54,7 @@ class Term:  # pylint: disable=too-many-instance-attributes
         any sync'd parent should get that status.
         """
         self._status = v
-        self.override_parent_status = True
+        self._status_explicitly_set = True
 
     @property
     def sync_status(self):
@@ -349,7 +346,7 @@ class Repository:
 
         if t.sync_status and len(termparents) == 1:
             p = termparents[0]
-            if term.override_parent_status or p.status == 0:
+            if term._status_explicitly_set or p.status == 0:
                 p.status = t.status
             else:
                 t.status = p.status
