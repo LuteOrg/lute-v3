@@ -30,18 +30,44 @@ class Term:  # pylint: disable=too-many-instance-attributes
         self.text_lc = None
         # The original text given to the DTO, to track changes.
         self.original_text = None
-        self.status = 1
         self.translation = None
         self.romanization = None
-        self.sync_status = False
         self.term_tags = []
         self.flash_message = None
         self.parents = []
         self.current_image = None
 
+        # When loading the Term from a DBTerm,
+        # assign to properties starting with "_" directly.
+        self._status = 1
+        self._sync_status = False
+
         # Issue 387: During term imports, the import file may specify
         # a child status, That should always be respected, regardless of status syncing.
         self.override_parent_status = False
+
+    @property
+    def status(self):
+        return self._status
+
+    @status.setter
+    def status(self, v):
+        """
+        If the status is specifically set,
+        any sync'd parent should get that status.
+        """
+        self._status = v
+        self.override_parent_status = True
+
+    @property
+    def sync_status(self):
+        if len(self.parents) != 1:
+            return False
+        return self._sync_status
+
+    @sync_status.setter
+    def sync_status(self, v):
+        self._sync_status = v
 
     def __repr__(self):
         return f'<Term BO "{self.text}" lang_id={self.language_id}>'
@@ -321,14 +347,13 @@ class Repository:
         if len(termparents) != 1:
             t.sync_status = False
 
-        if t.sync_status and len(termparents) > 0 and not term.override_parent_status:
+        if t.sync_status and len(termparents) == 1:
             p = termparents[0]
-            if p.status != 0:
-                t.status = p.status
-            else:
+            if term.override_parent_status or p.status == 0:
                 p.status = t.status
+            else:
+                t.status = p.status
 
-        # print(f"in _build_db_term, returning db term with term id = {t.id}", flush=True)
         return t
 
     def _find_or_create_parent(self, pt, language, term, termtags) -> DBTerm:
@@ -380,15 +405,16 @@ class Repository:
         term.original_text = text
         term.text = text
 
-        term.status = dbterm.status
         term.translation = dbterm.translation
         term.romanization = dbterm.romanization
-        term.sync_status = dbterm.sync_status
         term.current_image = dbterm.get_current_image()
         term.flash_message = dbterm.get_flash_message()
         term.parents = [p.text for p in dbterm.parents]
         term.romanization = dbterm.romanization
         term.term_tags = [tt.text for tt in dbterm.term_tags]
+
+        term._status = dbterm.status
+        term._sync_status = dbterm.sync_status
 
         return term
 
