@@ -968,6 +968,7 @@ function handle_keydown (e) {
     "hotkey_NextSentence": () => _move_cursor('span.word.sentencestart', next_incr),
     "hotkey_StatusUp": () => increment_status_for_selected_elements(+1),
     "hotkey_StatusDown": () => increment_status_for_selected_elements(-1),
+    "hotkey_PageTermList": () => open_term_list_for_current_page(),
     "hotkey_Bookmark": () => handle_bookmark(),
     "hotkey_CopySentence": () => handle_copy('sentence-id'),
     "hotkey_CopyPara": () => handle_copy('paragraph-id'),

@@ -17,6 +17,8 @@ Copy:
   desc: Copy the full page
 
 Misc:
+- hotkey: hotkey_PageTermList
+  desc: Show the term listing for the current page
 - hotkey: hotkey_Bookmark
   desc: Bookmark the current page
 - hotkey: hotkey_EditPage
