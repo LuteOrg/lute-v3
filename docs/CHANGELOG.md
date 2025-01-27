@@ -1,4 +1,10 @@
 
+# 3.9.4 (2025-01-26)
+
+* #573: make term listing editable, with "term list" menu entry to show the terms on the current page.  Brief usage notes are in [the manual](https://luteorg.github.io/lute-manual/usage/terms/edit-using-term-listing.html).
+* Add configurable hotkey for opening the Term list from the reading page.
+
+
 # 3.9.3 (2025-01-18)
 
 * add "Quick set status" mode for mobile - tap sets a word to status 1
