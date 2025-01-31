@@ -30,7 +30,7 @@
   </body>
 
   <script>
-    let update_term_form = function(filename) {
+    let _update_term_form_image = function(filename, new_url) {
       // Well, this took **far** too long to figure out ...
       let fr = window.parent.frames['wordframe'];
       if (fr == null) {
@@ -53,13 +53,8 @@
       img.style.gridColumn = "-1";
       img.style.display = "block";
 
-      // Ugly hack: we have to remove the .jpeg at the end, because
-      // Symfony doesn't handle params with periods.
-      // Ref https://github.com/symfony/symfony/issues/25541.
-      // The src/ImageController adds the .jpeg at the end again to
-      // find the actual file.
       var timestamp = new Date().getTime();
-      const newsrc = filename.replace('.jpeg', '') + `?${timestamp}`;
+      const newsrc = `${new_url}?${timestamp}`;
       // console.log(`switching source to ${newsrc}`);
       img.src = newsrc;
     }
@@ -76,7 +71,7 @@
         dataType: 'json',
         success: function(data) {
           // console.log("Saved: " + data + "\nStatus: " + status);
-          update_term_form(data.filename);
+          _update_term_form_image(data.filename, data.url);
           $('.saved').removeClass('saved');
           $('.highlight').addClass('saved').removeClass('highlight');
         }
@@ -104,7 +99,7 @@
           contentType: false,
           success: function(data) {
             // console.log("Saved: " + data + "\nStatus: " + status);
-            update_term_form(data.filename);
+            _update_term_form_image(data.filename, data.url);
           },
           error: function(xhr, status, error) {
             console.error(`Error submitting form.  ${error}; ${status}; ${xhr.responseText}`);

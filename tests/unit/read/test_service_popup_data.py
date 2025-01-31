@@ -114,19 +114,23 @@ def test_images_combined_in_popup(spanish, app_context, service):
     db.session.commit()
 
     d = service.get_popup_data(t.id)
-    assert d.popup_image_data == {"gato.jpg": "gato"}
+    img_url_start = f"/userimages/{spanish.id}/"
+    assert d.popup_image_data == {img_url_start + "gato.jpg": "gato"}
 
     p.set_current_image("perro.jpg")
     db.session.add(p)
     db.session.commit()
     d = service.get_popup_data(t.id)
-    assert d.popup_image_data == {"gato.jpg": "gato", "perro.jpg": "perro"}
+    assert d.popup_image_data == {
+        img_url_start + "gato.jpg": "gato",
+        img_url_start + "perro.jpg": "perro",
+    }
 
     p.set_current_image("gato.jpg")
     db.session.add(p)
     db.session.commit()
     d = service.get_popup_data(t.id)
-    assert d.popup_image_data == {"gato.jpg": "gato, perro"}
+    assert d.popup_image_data == {img_url_start + "gato.jpg": "gato, perro"}
 
 
 def test_single_parent_translation_can_be_promoted_to_term_if_term_translation_blank(
