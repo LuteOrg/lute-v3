@@ -132,7 +132,7 @@ class ImageLookupButton extends GeneralLookupButton {
 
       const raw_bing_url = 'https://www.bing.com/images/search?q=[LUTE]&form=HDRSC2&first=1&tsc=ImageHoverTitle';
       const binghash = raw_bing_url.replace('https://www.bing.com/images/search?', '');
-      const url = `/bing/search/${LookupButton.LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
+      const url = `/bing/search_page/${LookupButton.LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
 
       iframe.setAttribute("src", url);
     };  // end handler
