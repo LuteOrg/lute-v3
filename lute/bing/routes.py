@@ -7,10 +7,41 @@ import datetime
 import hashlib
 import re
 import urllib.request
-from flask import Blueprint, request, Response, render_template, jsonify, current_app
+from flask import (
+    Blueprint,
+    request,
+    Response,
+    render_template,
+    jsonify,
+    current_app,
+    url_for,
+)
 
 
 bp = Blueprint("bing", __name__, url_prefix="/bing")
+
+
+@bp.route(
+    "/search_page/<int:langid>/<string:text>/<string:searchstring>", methods=["GET"]
+)
+def bing_search_page(langid, text, searchstring):
+    """
+    Load initial empty search page, passing real URL for subsequent ajax call to get images.
+
+    Sometimes Bing image searches block or fail, so providing the initial empty search page
+    lets the user know work is in progress.  The user can therefore interact with the page
+    immediately. The template for this route then makes an ajax call to the "bing_search()"
+    method below which actually does the search.
+    """
+
+    # Create URL for bing_search and pass into template.
+    search_url = url_for(
+        "bing.bing_search", langid=langid, text=text, searchstring=searchstring
+    )
+
+    return render_template(
+        "imagesearch/index.html", langid=langid, text=text, search_url=search_url
+    )
 
 
 @bp.route("/search/<int:langid>/<string:text>/<string:searchstring>", methods=["GET"])
@@ -36,7 +67,10 @@ def bing_search(langid, text, searchstring):
             content = s.read().decode("utf-8")
     except urllib.error.URLError as e:
         content = ""
-        error_msg = e.reason
+        error_msg = str(e.reason)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        content = ""
+        error_msg = str(e)
 
     # Sample data returned by bing image search:
     # <img class="mimg vimgld" ... data-src="https:// ...">
@@ -62,13 +96,13 @@ def bing_search(langid, text, searchstring):
     # Also bing seems to throttle images if the count is higher (??).
     images = images[:25]
 
-    return render_template(
-        "imagesearch/index.html",
-        langid=langid,
-        text=text,
-        images=images,
-        error_message=error_msg,
-    )
+    ret = {
+        "langid": langid,
+        "text": text,
+        "images": images,
+        "error_message": error_msg,
+    }
+    return jsonify(ret)
 
 
 def _get_dir_and_filename(langid, text):

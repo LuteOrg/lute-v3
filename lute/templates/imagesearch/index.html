@@ -26,25 +26,12 @@
         then paste from your clipboard.
       </p>
 
-      {% for image in images %}
-      <span class="initial"
-            style="margin: 2px; display:inline-block;"
-            onmouseover="highlight_image(this);"
-            onmouseout="un_highlight_image(this);"
-            onclick='save_image_locally("{{ image['src'] }}", {{ langid }}, "{{ text }}")'
-            >
-        {{ image['html'] | safe }}
-      </span>
-      {% endfor %}
+      <p id="image_search_feedback"><i>Searching ...</i></p>
 
-      {% if error_message != "" %}
-      <p><i>Error contacting image server: {{ error_message }}</i></p>
-      {% endif %}
     </div>
   </body>
 
   <script>
-
     let _update_term_form_image = function(filename, new_url) {
       // Well, this took **far** too long to figure out ...
       let fr = window.parent.frames['wordframe'];
@@ -141,6 +128,61 @@
 
     });
 
+    $(document).ready(function() {
+      const searchUrl = '{{ search_url }}';
+      const container = document.getElementById('termimagesearch');
+
+      $.ajax({
+        url: searchUrl,
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+          if (data.error_message !== "") {
+            const msg = `Error: ${data.error_message}`;
+            console.error(msg);
+            $("#image_search_feedback").text(msg);
+            return;
+          }
+
+          $("#image_search_feedback").hide();
+          if (data.images.length === 0) {
+            const p = document.createElement('p');
+            p.textContent = 'No images found.';
+            container.appendChild(p);
+            return;
+          }
+
+          // Make Bing API call for images asynchronously
+          // This avoids blocking the page load
+          data.images.forEach(function(item) {
+            const imgWrapper = create_imageWrapper_element(item.src, data.langid, data.text);
+            container.appendChild(imgWrapper);
+          });
+        },
+        error: function(xhr, status, error) {
+          const msg = `Error ${error}; ${status}; ${xhr.responseText}`;
+          console.error(msg);
+          $("#image_search_feedback").val(msg);
+        }
+      });
+    });
+
+    function create_imageWrapper_element(src, langid, text) {
+      const imgWrapper = document.createElement('span');
+      imgWrapper.classList.add('initial');
+      imgWrapper.style.margin = '2px';
+      imgWrapper.style.display = 'inline-block';
+      imgWrapper.onmouseover = () => highlight_image(imgWrapper);
+      imgWrapper.onmouseout = () => un_highlight_image(imgWrapper);
+      imgWrapper.onclick = () => save_image_locally(src, langid, text);
+
+      const img = document.createElement('img');
+      img.src = src;
+      
+      imgWrapper.appendChild(img);
+
+      return imgWrapper;
+    }
   </script>
 
 </html>
