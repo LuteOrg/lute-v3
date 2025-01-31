@@ -26,6 +26,8 @@
         then paste from your clipboard.
       </p>
 
+      <p id="image_search_feedback"><i>Searching ...</i></p>
+
     </div>
   </body>
 
@@ -135,6 +137,14 @@
         type: 'GET',
         dataType: 'json',
         success: function(data) {
+          if (data.error_message !== "") {
+            const msg = `Error: ${data.error_message}`;
+            console.error(msg);
+            $("#image_search_feedback").text(msg);
+            return;
+          }
+
+          $("#image_search_feedback").hide();
           if (data.images.length === 0) {
             const p = document.createElement('p');
             p.textContent = 'No images found.';
@@ -150,7 +160,9 @@
           });
         },
         error: function(xhr, status, error) {
-          console.error(`Error ${error}; ${status}; ${xhr.responseText}`);
+          const msg = `Error ${error}; ${status}; ${xhr.responseText}`;
+          console.error(msg);
+          $("#image_search_feedback").val(msg);
         }
       });
     });

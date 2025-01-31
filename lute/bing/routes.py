@@ -67,7 +67,10 @@ def bing_search(langid, text, searchstring):
             content = s.read().decode("utf-8")
     except urllib.error.URLError as e:
         content = ""
-        error_msg = e.reason
+        error_msg = str(e.reason)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        content = ""
+        error_msg = str(e)
 
     # Sample data returned by bing image search:
     # <img class="mimg vimgld" ... data-src="https:// ...">
@@ -93,14 +96,13 @@ def bing_search(langid, text, searchstring):
     # Also bing seems to throttle images if the count is higher (??).
     images = images[:25]
 
-    return jsonify(
-        {
-            "langid": langid,
-            "text": text,
-            "images": images,
-            "error_message": error_msg,
-        }
-    )
+    ret = {
+        "langid": langid,
+        "text": text,
+        "images": images,
+        "error_message": error_msg,
+    }
+    return jsonify(ret)
 
 
 def _get_dir_and_filename(langid, text):
