@@ -250,7 +250,7 @@
       if (imgsrc) {
         const img = document.createElement('img');
         img.className = 'term-listing-image';
-        img.src = imgsrc;
+        img.src = `/userimages/${rowData["LgID"]}/${imgsrc}`;
         $(td).append(img);
       }
 
