@@ -69,7 +69,7 @@
              class="zoomableTermImage"
              id="term_image"
              tabindex="0"
-             src="{{ form.current_image.object_data or '' }}"
+             src="/userimages/{{ term.language_id or 0 }}/{{ form.current_image.object_data or '-' }}"
              onclick="clicked_zoomable_image(this);"
              />
       </div>

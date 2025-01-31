@@ -3,6 +3,8 @@ Getting and saving bing image search results.
 """
 
 import os
+import datetime
+import hashlib
 import re
 import urllib.request
 from flask import Blueprint, request, Response, render_template, jsonify, current_app
@@ -75,7 +77,11 @@ def _get_dir_and_filename(langid, text):
     image_dir = os.path.join(datapath, "userimages", langid)
     if not os.path.exists(image_dir):
         os.makedirs(image_dir)
-    filename = re.sub(r"\s+", "_", text) + ".jpeg"
+
+    now = datetime.datetime.now()
+    timestamp = now.strftime("%Y%m%d_%H%M%S%f")[:-3]
+    hash_part = hashlib.md5(text.encode()).hexdigest()[:8]
+    filename = f"{timestamp}_{hash_part}.jpeg"
     return [image_dir, filename]
 
 
@@ -94,9 +100,11 @@ def bing_save():
     with urllib.request.urlopen(src) as response, open(destfile, "wb") as out_file:
         out_file.write(response.read())
 
-    # This is the format of legacy Lute v2 data.
-    image_url = f"/userimages/{langid}/{filename}"
-    return jsonify({"filename": image_url})
+    ret = {
+        "url": f"/userimages/{langid}/{filename}",
+        "filename": filename,
+    }
+    return jsonify(ret)
 
 
 @bp.route("/manual_image_post", methods=["POST"])
@@ -120,6 +128,8 @@ def manual_image_post():
     destfile = os.path.join(imgdir, filename)
     f.save(destfile)
 
-    # This is the format of legacy Lute v2 data.
-    image_url = f"/userimages/{langid}/{filename}"
-    return jsonify({"filename": image_url})
+    ret = {
+        "url": f"/userimages/{langid}/{filename}",
+        "filename": filename,
+    }
+    return jsonify(ret)

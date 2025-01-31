@@ -62,9 +62,11 @@ class TermPopup:
         # it can get confusing!
         # ref https://github.com/LuteOrg/lute-v3/issues/355
         terms = [self.term, *self.term.parents]
-        images = [
-            (t.get_current_image(), t.text) for t in terms if t.get_current_image()
-        ]
+
+        def _make_image_url(t):
+            return f"/userimages/{t.language.id}/{t.get_current_image()}"
+
+        images = [(_make_image_url(t), t.text) for t in terms if t.get_current_image()]
         imageresult = defaultdict(list)
         for key, value in images:
             imageresult[key].append(self._clean(value))
