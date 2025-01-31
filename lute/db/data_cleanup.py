@@ -5,9 +5,10 @@ Sometimes required as data management changes.
 These cleanup routines will be called by the app_factory.
 """
 
-from sqlalchemy import text as sqltext
+from sqlalchemy import select, text as sqltext
 from lute.models.language import Language
 from lute.models.book import Text, Sentence
+from lute.models.term import TermImage
 
 
 class ProgressReporter:
@@ -138,7 +139,53 @@ def _load_sentence_textlc(session, output_function):
     output_function("Done.")
 
 
+def _update_term_images(session, output_function):
+    """
+    Fix TermImage sources (ref https://github.com/LuteOrg/lute-v3/issues/582)
+
+    Prior to issue 582, images were stored in the db as url-like items,
+    "/userimages/{language_id}/{term}.jpg".
+
+    e.g. wordimages.wisource = "/userimages/2/thiết_kế_nội_thất.jpeg", including
+    zero-width spaces.  This routine removes the "/userimages/{language_id}/"
+    from the start of the strings.
+
+    Also, some images didn't have ".jpg" at the end ... this adds that.
+    """
+
+    def _fix_source(s):
+        "Remove the leading userimages and languageid, add .jpeg if needed."
+        parts = s.split("/", 3)
+        ret = parts[-1]
+        if not ret.endswith(".jpeg"):
+            ret = f"{ret}.jpeg"
+        return ret
+
+    stmt = select(TermImage).where(TermImage.source.contains("userimages"))
+    recalc = session.execute(stmt).scalars().all()
+    if len(recalc) == 0:
+        # Nothing to calculate, quit.
+        return
+
+    batch_size = 1000
+    output_function(f"Fixing image sources for {len(recalc)} word images.")
+    pr = ProgressReporter(len(recalc), output_function, report_every=batch_size)
+    n = 0
+    for ti in recalc:
+        pr.increment()
+        ti.source = _fix_source(ti.source)
+        session.add(ti)
+        n += 1
+        if n % batch_size == 0:
+            session.commit()
+
+    # Any remaining.
+    session.commit()
+    output_function("Done.")
+
+
 def clean_data(session, output_function):
     "Clean all data as required, sending messages to output_function."
     _set_texts_word_count(session, output_function)
     _load_sentence_textlc(session, output_function)
+    _update_term_images(session, output_function)
