@@ -34,7 +34,7 @@ from pyparsing import (
     Literal,
 )
 
-from lute.term.model import Repository
+from lute.models.repositories import TermRepository
 import lute.app_factory
 from lute.db import db
 
@@ -46,16 +46,22 @@ def evaluate_selector(s, term):
     print(f"check selector {s} for {term}")
 
     def has_any_matching_tags(tagvals):
-        return any(e in term.tags for e in tagvals)
+        term_tags = [t.text for t in term.term_tags]
+        return any(e in term_tags for e in tagvals)
 
     def matches_lang(lang):
-        return term.language == lang[0]
+        return term.language.name == lang[0]
+
+    def check_has_images():
+        "True if term or any parent has image."
+        pi = [p.get_current_image() is not None for p in term.parents]
+        return term.get_current_image() is not None or any(pi)
 
     def check_has(args):
         "Check has:x"
         has_item = args[0]
         if has_item == "image":
-            return term.image is not None
+            return check_has_images()
         raise RuntimeError(f"Unhandled has check for {has_item}")
 
     def check_parent_count(args):
@@ -168,11 +174,6 @@ def run_test():
     kind = None
     kinder = None
 
-    with app.app_context():
-        repo = Repository(db.session)
-        kinder = repo.load(143771)
-        kind = repo.load(143770)
-
     all_mapping_data = [
         {
             "name": "Gender",
@@ -203,11 +204,15 @@ def run_test():
         },
     ]
 
-    for t in [kind, kinder]:
-        print("-" * 25)
-        print(t)
-        use_mappings = get_selected_mappings(all_mapping_data, t)
-        print(use_mappings)
+    with app.app_context():
+        repo = TermRepository(db.session)
+        kinder = repo.find(143771)
+        kind = repo.find(143770)
+        for t in [kind, kinder]:
+            print("-" * 25)
+            print(t)
+            use_mappings = get_selected_mappings(all_mapping_data, t)
+            print(use_mappings)
 
 
 if __name__ == "__main__":
