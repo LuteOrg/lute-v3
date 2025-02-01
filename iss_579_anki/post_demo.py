@@ -45,7 +45,7 @@ def evaluate_selector(s, term):
     "Parse the selector, return True or False for the given term."
     # pylint: disable=too-many-locals
 
-    print(f"check selector {s} for {term}")
+    print(f"selector: {s}")
 
     def has_any_matching_tags(tagvals):
         term_tags = [t.text for t in term.term_tags]
@@ -157,7 +157,7 @@ def evaluate_selector(s, term):
 
     result = multi_check.parseString(s)
     print(f"{result}, {result[0]}")
-    print(bool(result[0]))
+    # print(bool(result[0]))
     return bool(result[0])
 
 
@@ -165,6 +165,24 @@ def build_ankiconnect_post_json(
     term, mapping_string, img_root_dir, deck_name, model_name
 ):
     "Build post json for term using the mappings."
+
+    def all_terms():
+        "Term and any parents."
+        all_terms = [term]
+        all_terms.extend(term.parents)
+        return all_terms
+
+    def all_tags():
+        "Tags for term and all parents."
+        ret = [tt.text for t in all_terms() for tt in t.term_tags]
+        return list(set(ret))
+
+    def all_translations():
+        ret = [term.translation]
+        for p in term.parents:
+            if p.translation not in ret:
+                ret.append(p.translation)
+        return ret
 
     def parse_keys_needing_calculation(calculate_keys, post_actions):
         """
@@ -181,15 +199,13 @@ def build_ankiconnect_post_json(
         def get_filtered_tags(tagvals):
             "Get term tags matching the list."
             # tagvals is a pyparsing ParseResults, use list() to convert to strings.
-            ftags = [tt.text for tt in term.term_tags if tt.text in list(tagvals)]
+            ftags = [tt for tt in all_tags() if tt in list(tagvals)]
             return ", ".join(ftags)
 
         def handle_image(_):
-            all_terms = [term]
-            all_terms.extend(term.parents)
             id_images = [
                 (t.id, t.get_current_image())
-                for t in all_terms
+                for t in all_terms()
                 if t.get_current_image() is not None
             ]
             image_srcs = []
@@ -238,8 +254,8 @@ def build_ankiconnect_post_json(
         "term": term.text,
         "language": term.language.name,
         "parents": ", ".join([p.text for p in term.parents]),
-        "tags": ", ".join([tt.text for tt in term.term_tags]),
-        "translation": term.translation,
+        "tags": ", ".join(all_tags()),
+        "translation": "<br>".join(all_translations()),
     }
 
     calc_keys = [
@@ -298,24 +314,29 @@ def run_test():
     kind = None
     kinder = None
 
-    mapping = """\
-Extra_info_back: {{ id }}
-Word: {{ term }}
-Plural: some value {{ parents }}
-Article: {{ tags:["der", "die", "das"] }}: {{ term }}
-Picture: {{ image }}
-Sentence: some text {{ parents }} more text {{ parents }}
-Definition: {{ translation }}
-All_tags: {{ tags }}
+    gender_card_mapping = """\
+      Lute_term_id: {{ id }}
+      Front: {{ tags:["der", "die", "das"] }} {{ parents }}, plural
+      Picture: {{ image }}
+      Definition: {{ translation }}
+      Back: die {{ term }}
+    """
+
+    plural_card_mapping = """\
+      Lute_term_id: {{ id }}
+      Front: {{ tags:["der", "die", "das"] }} {{ parents }}, plural
+      Picture: {{ image }}
+      Definition: {{ translation }}
+      Back: die {{ term }}
     """
 
     all_mapping_data = [
         {
             "name": "Gender",
             "selector": 'language:"German" and tags:["der", "die", "das"] and has:image',
-            "deck_name": "x",
-            "note_type": "y",
-            "mapping": mapping,
+            "deck_name": "zzTestAnkiConnect",
+            "note_type": "Basic_vocab",
+            "mapping": gender_card_mapping,
             "active": True,
         },
         {
@@ -324,9 +345,9 @@ All_tags: {{ tags }}
                 'language:"German" and parents.count = 1 '
                 + 'and has:image and tags:["plural", "plural and singular"]'
             ),
-            "deck_name": "x",
-            "note_type": "y",
-            "mapping": mapping,
+            "deck_name": "zzTestAnkiConnect",
+            "note_type": "Basic_vocab",
+            "mapping": plural_card_mapping,
             "active": True,
         },
         {
@@ -334,7 +355,7 @@ All_tags: {{ tags }}
             "selector": "sel here",
             "deck_name": "x",
             "note_type": "y",
-            "mapping": mapping,
+            "mapping": "some mapping here",
             "active": False,
         },
     ]
@@ -347,7 +368,7 @@ All_tags: {{ tags }}
             print("-" * 25)
             print(t)
             use_mappings = get_selected_mappings(all_mapping_data, t)
-            print(use_mappings)
+            # print(use_mappings)
 
             IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data"
             for m in use_mappings:
