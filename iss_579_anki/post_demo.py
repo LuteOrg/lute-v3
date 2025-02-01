@@ -290,7 +290,7 @@ def build_ankiconnect_post_json(
                     "fields": get_field_mapping_json(
                         mapping_string, {**replacements, **calc_replacements}
                     ),
-                    "tags": ["lute"] + [tt.text for tt in term.term_tags],
+                    "tags": ["lute"] + all_tags(),
                 }
             },
         }
