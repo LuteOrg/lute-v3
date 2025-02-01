@@ -17,8 +17,10 @@ python -m iss_579_anki.post_demo
 
 """
 
+import os
 from typing import Callable, Iterable
-
+import json
+import re
 import pyparsing as pp
 from pyparsing import (
     infixNotation,
@@ -179,23 +181,36 @@ def build_ankiconnect_post_json(
         def get_filtered_tags(tagvals):
             "Get term tags matching the list."
             # tagvals is a pyparsing ParseResults, use list() to convert to strings.
-            ftags = [t for t in term.tags if t in list(tagvals)]
+            ftags = [tt.text for tt in term.term_tags if tt.text in list(tagvals)]
             return ", ".join(ftags)
 
         def handle_image(_):
-            if term.image is None:
-                return ""
-            new_filename = f"LUTE_TERM_{term.termid}.jpg"
-            hsh = {
-                "action": "storeMediaFile",
-                "params": {"filename": new_filename, "path": img_root_dir + term.image},
-            }
-            post_actions.append(hsh)
-            return f'<img src="{new_filename}">'
+            all_terms = [term]
+            all_terms.extend(term.parents)
+            id_images = [
+                (t.id, t.get_current_image())
+                for t in all_terms
+                if t.get_current_image() is not None
+            ]
+            image_srcs = []
+            for tid, imgfilename in id_images:
+                new_filename = f"LUTE_TERM_{tid}.jpg"
+                hsh = {
+                    "action": "storeMediaFile",
+                    "params": {
+                        "filename": new_filename,
+                        "path": os.path.join(img_root_dir, imgfilename),
+                    },
+                }
+                post_actions.append(hsh)
+                image_srcs.append(f'<img src="{new_filename}">')
+
+            return "".join(image_srcs)
 
         quotedString.setParseAction(pp.removeQuotes)
         tag_matcher = (
             Suppress("tags")
+            + Suppress(":")
             + Suppress("[")
             + pp.delimitedList(quotedString)
             + Suppress("]")
@@ -219,11 +234,11 @@ def build_ankiconnect_post_json(
     # One-for-one replacements in the mapping string.
     # e.g. "{{ id }}" is replaced by term.termid.
     replacements = {
-        "id": term.termid,
+        "id": term.id,
         "term": term.text,
-        "language": term.language,
-        "parents": ", ".join(term.parents),
-        "tags": ", ".join(term.tags),
+        "language": term.language.name,
+        "parents": ", ".join([p.text for p in term.parents]),
+        "tags": ", ".join([tt.text for tt in term.term_tags]),
         "translation": term.translation,
     }
 
@@ -259,7 +274,7 @@ def build_ankiconnect_post_json(
                     "fields": get_field_mapping_json(
                         mapping_string, {**replacements, **calc_replacements}
                     ),
-                    "tags": ["lute"] + term.tags,
+                    "tags": ["lute"] + [tt.text for tt in term.term_tags],
                 }
             },
         }
