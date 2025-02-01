@@ -165,10 +165,13 @@ def get_selected_mappings(mappings, term):
 def run_test():
     "Run test."
     app = lute.app_factory.create_app()
+    kind = None
+    kinder = None
+
     with app.app_context():
         repo = Repository(db.session)
-        t = repo.load(143770)
-    print(t)
+        kinder = repo.load(143771)
+        kind = repo.load(143770)
 
     all_mapping_data = [
         {
@@ -200,8 +203,11 @@ def run_test():
         },
     ]
 
-    use_mappings = get_selected_mappings(all_mapping_data, t)
-    print(use_mappings)
+    for t in [kind, kinder]:
+        print("-" * 25)
+        print(t)
+        use_mappings = get_selected_mappings(all_mapping_data, t)
+        print(use_mappings)
 
 
 if __name__ == "__main__":
