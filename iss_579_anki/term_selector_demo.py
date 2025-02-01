@@ -8,7 +8,7 @@ from pyparsing import (
     opAssoc,
     Keyword,
     Word,
-    ParserElement,
+    # ParserElement,
     nums,
     one_of,
     quotedString,
@@ -18,30 +18,9 @@ from pyparsing import (
 )
 
 
-quoteval = QuotedString(quoteChar='"')
-quotedString.setParseAction(pp.removeQuotes)
-list_of_values = pp.delimitedList(quotedString)
-
-tagvallist = Suppress("[") + list_of_values + Suppress("]")
-tagcrit = tagvallist | quoteval
-
-tag_matcher = Suppress("tags") + Suppress(":") + tagcrit
-
-lang_matcher = Suppress("language") + Suppress(":") + quoteval
-
-has_options = Literal("image")
-has_matcher = Suppress("has") + Suppress(":") + has_options
-
-comparison_op = one_of("< <= > >= != = == <>")
-integer = Word(nums).setParseAction(lambda x: int(x[0]))
-
-parent_count_matcher = (
-    Suppress("parents") + Suppress(".") + Suppress("count") + comparison_op + integer
-)
-
-
 def evaluate_selector(s, term):
     "Parse the selector, return True or False for the given term."
+    # pylint: disable=too-many-locals
 
     def has_any_matching_tags(tagvals):
         return any(e in term.tags for e in tagvals)
@@ -72,20 +51,16 @@ def evaluate_selector(s, term):
         pcount = len(term.parents)
         return oplambda(pcount, val)
 
-    class BoolNot:
-        "Not unary operator."
-
-        def __init__(self, t):
-            self.arg = t[0][1]
-
-        def __bool__(self) -> bool:
-            v = bool(self.arg)
-            return not v
-
-        def __str__(self) -> str:
-            return "~" + str(self.arg)
-
-        __repr__ = __str__
+    ### class BoolNot:
+    ###     "Not unary operator."
+    ###     def __init__(self, t):
+    ###         self.arg = t[0][1]
+    ###     def __bool__(self) -> bool:
+    ###         v = bool(self.arg)
+    ###         return not v
+    ###     def __str__(self) -> str:
+    ###         return "~" + str(self.arg)
+    ###     __repr__ = __str__
 
     class BoolBinOp:
         "Binary operation."
@@ -110,8 +85,30 @@ def evaluate_selector(s, term):
         repr_symbol = "|"
         eval_fn = any
 
-    AND = Keyword("and")
-    OR = Keyword("or")
+    quoteval = QuotedString(quoteChar='"')
+    quotedString.setParseAction(pp.removeQuotes)
+    list_of_values = pp.delimitedList(quotedString)
+
+    tagvallist = Suppress("[") + list_of_values + Suppress("]")
+    tagcrit = tagvallist | quoteval
+
+    tag_matcher = Suppress("tags") + Suppress(":") + tagcrit
+
+    lang_matcher = Suppress("language") + Suppress(":") + quoteval
+
+    has_options = Literal("image")
+    has_matcher = Suppress("has") + Suppress(":") + has_options
+
+    comparison_op = one_of("< <= > >= != = == <>")
+    integer = Word(nums).setParseAction(lambda x: int(x[0]))
+
+    parent_count_matcher = (
+        Suppress("parents")
+        + Suppress(".")
+        + Suppress("count")
+        + comparison_op
+        + integer
+    )
 
     multi_check = infixNotation(
         tag_matcher.set_parse_action(has_any_matching_tags)
@@ -119,8 +116,8 @@ def evaluate_selector(s, term):
         | has_matcher.set_parse_action(check_has)
         | parent_count_matcher.set_parse_action(check_parent_count),
         [
-            (AND, 2, opAssoc.LEFT, BoolAnd),
-            (OR, 2, opAssoc.LEFT, BoolOr),
+            (Keyword("and"), 2, opAssoc.LEFT, BoolAnd),
+            (Keyword("or"), 2, opAssoc.LEFT, BoolOr),
         ],
     )
 
@@ -130,49 +127,46 @@ def evaluate_selector(s, term):
     return bool(result[0])
 
 
-###############
-# CHECKS
-
-
-def test_matcher(title, examples, matcher):
-    "Try out matchers."
-    exes = [
-        ex for ex in examples.split("\n") if ex.strip() != "" and not ex.startswith("#")
-    ]
-    for ex in exes:
-        parsed = matcher.parseString(ex).asList()
-        # print(f"{title}: {ex} => {parsed}")
-
-
-parent_count_examples = """
-parents.count = 1
-parents.count > 0
-parents.count >= 2
-"""
-test_matcher("PCOUNT", parent_count_examples, parent_count_matcher)
-
-tag_examples = """
-tags:"m"
-tags:["m"]
-tags:["m", "f"]
-tags:["子供", "ko"]
-"""
-test_matcher("TAGS", tag_examples, tag_matcher)
-
-lang_examples = """
-language:"German"
-"""
-test_matcher("LANGS", lang_examples, lang_matcher)
-
-img_examples = """
-has:image
-# has:blah
-"""
-test_matcher("IMG", img_examples, has_matcher)
-
-###############
-
-# sys.exit(0)
+### ###############
+### # CHECKS
+###
+### def test_matcher(title, examples, matcher):
+###     "Try out matchers."
+###     exes = [
+###         ex for ex in examples.split("\n") if ex.strip() != "" and not ex.startswith("#")
+###     ]
+###     for ex in exes:
+###         parsed = matcher.parseString(ex).asList()
+###         # print(f"{title}: {ex} => {parsed}")
+###
+###
+### parent_count_examples = """
+### parents.count = 1
+### parents.count > 0
+### parents.count >= 2
+### """
+### test_matcher("PCOUNT", parent_count_examples, parent_count_matcher)
+###
+### tag_examples = """
+### tags:"m"
+### tags:["m"]
+### tags:["m", "f"]
+### tags:["子供", "ko"]
+### """
+### test_matcher("TAGS", tag_examples, tag_matcher)
+###
+### lang_examples = """
+### language:"German"
+### """
+### test_matcher("LANGS", lang_examples, lang_matcher)
+###
+### img_examples = """
+### has:image
+### # has:blah
+### """
+### test_matcher("IMG", img_examples, has_matcher)
+###
+### ###############
 
 
 class Term:
@@ -187,25 +181,31 @@ class Term:
         self.image = None
 
 
-term = Term()
-term.language = "German"
-term.parents = ["hello", "there"]
-term.tags = ["der", "blah"]
-term.image = "something.jpg"
+def run_test():
+    "Run a demo"
+    t = Term()
+    t.language = "German"
+    t.parents = ["hello", "there"]
+    t.tags = ["der", "blah"]
+    t.image = "something.jpg"
 
-final_examples = """
+    final_examples = """
 language:"German" and tags:["der", "die", "das"] and has:image
 language:"German" and parents.count = 1
 language:"German" and parents.count = 1 and has:image and tags:["plural", "plural and singular"]
 language:"German" and parents.count > 0 and tags:"part participle"
 language:"German" and parents.count >= 1 and has:image
-"""
-use_examples = [
-    e.strip()
-    for e in final_examples.split("\n")
-    if e.strip() != "" and not e.startswith("#")
-]
-for e in use_examples:
-    print(e)
-    ret = evaluate_selector(e, term)
-    print(ret)
+    """
+    use_examples = [
+        e.strip()
+        for e in final_examples.split("\n")
+        if e.strip() != "" and not e.startswith("#")
+    ]
+    for e in use_examples:
+        print(e)
+        ret = evaluate_selector(e, t)
+        print(ret)
+
+
+if __name__ == "__main__":
+    run_test()
