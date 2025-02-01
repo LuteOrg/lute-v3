@@ -46,16 +46,16 @@ def evaluate_selector(s, term):
     print(f"check selector {s} for {term}")
 
     def has_any_matching_tags(tagvals):
-        return any(e in term.term_tags for e in tagvals)
+        return any(e in term.tags for e in tagvals)
 
     def matches_lang(lang):
-        return term.language_name == lang[0]
+        return term.language == lang[0]
 
     def check_has(args):
         "Check has:x"
         has_item = args[0]
         if has_item == "image":
-            return term.current_image is not None
+            return term.image is not None
         raise RuntimeError(f"Unhandled has check for {has_item}")
 
     def check_parent_count(args):

@@ -24,15 +24,7 @@ class Term:  # pylint: disable=too-many-instance-attributes
     def __init__(self):
         # The ID of the DBTerm.
         self.id = None
-
-        # The language ID.
         self.language_id = None
-
-        # The language name is only included as a
-        # nice-to-have.  It is not used when mapping
-        # the Term business object to the DBTerm.
-        self.language_name = None
-
         # The text.
         self.text = None
         self.text_lc = None
@@ -382,7 +374,6 @@ class Repository:
         term = Term()
         term.id = dbterm.id
         term.language_id = dbterm.language.id
-        term.language_name = dbterm.language.name
 
         text = dbterm.text
         ## Remove zero-width spaces (zws) from strings for user forms.
