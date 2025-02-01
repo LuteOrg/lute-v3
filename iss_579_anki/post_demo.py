@@ -42,6 +42,8 @@ def evaluate_selector(s, term):
     "Parse the selector, return True or False for the given term."
     # pylint: disable=too-many-locals
 
+    print(f"check selector {s} for {term}")
+
     def has_any_matching_tags(tagvals):
         return any(e in term.term_tags for e in tagvals)
 
@@ -145,8 +147,8 @@ def evaluate_selector(s, term):
     )
 
     result = multi_check.parseString(s)
-    # print(f"{result}, {result[0]}")
-    # print(bool(result[0]))
+    print(f"{result}, {result[0]}")
+    print(bool(result[0]))
     return bool(result[0])
 
 
@@ -155,7 +157,7 @@ def get_selected_mappings(mappings, term):
     Get all mappings where the selector is True.
     """
     return [
-        m for m in mappings if evaluate_selector(m["selector"], term) and m["active"]
+        m for m in mappings if m["active"] and evaluate_selector(m["selector"], term)
     ]
 
 
