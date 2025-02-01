@@ -151,9 +151,9 @@ def get_selected_mappings(mappings, term):
     """
     Get all mappings where the selector is True.
     """
-    print(mappings)
-    print(term)
-    return "todo"
+    return [
+        m for m in mappings if evaluate_selector(m["selector"], term) and m["active"]
+    ]
 
 
 def run_test():
@@ -166,18 +166,23 @@ def run_test():
 
     all_mapping_data = [
         {
-            "name": "m1",
-            "selector": "sel here",
+            "name": "Gender",
+            "selector": 'language:"German" and tags:["der", "die", "das"] and has:image',
             "deck_name": "x",
             "note_type": "y",
             "mapping": "z",
+            "active": True,
         },
         {
-            "name": "m2",
-            "selector": "sel here",
+            "name": "Pluralization",
+            "selector": (
+                'language:"German" and parents.count = 1 '
+                + 'and has:image and tags:["plural", "plural and singular"]'
+            ),
             "deck_name": "x",
             "note_type": "y",
             "mapping": "z",
+            "active": True,
         },
         {
             "name": "m3",
@@ -185,6 +190,7 @@ def run_test():
             "deck_name": "x",
             "note_type": "y",
             "mapping": "z",
+            "active": False,
         },
     ]
 
