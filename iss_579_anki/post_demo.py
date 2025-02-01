@@ -130,14 +130,17 @@ def evaluate_selector(s, term):
         + integer
     )
 
+    and_keyword = Keyword("and")
+    or_keyword = Keyword("or")
+
     multi_check = infixNotation(
         tag_matcher.set_parse_action(has_any_matching_tags)
         | lang_matcher.set_parse_action(matches_lang)
         | has_matcher.set_parse_action(check_has)
         | parent_count_matcher.set_parse_action(check_parent_count),
         [
-            (Keyword("and"), 2, opAssoc.LEFT, BoolAnd),
-            (Keyword("or"), 2, opAssoc.LEFT, BoolOr),
+            (and_keyword, 2, opAssoc.LEFT, BoolAnd),
+            (or_keyword, 2, opAssoc.LEFT, BoolOr),
         ],
     )
 
