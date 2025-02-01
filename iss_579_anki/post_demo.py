@@ -159,6 +159,115 @@ def evaluate_selector(s, term):
     return bool(result[0])
 
 
+def build_ankiconnect_post_json(
+    term, mapping_string, img_root_dir, deck_name, model_name
+):
+    "Build post json for term using the mappings."
+
+    def parse_keys_needing_calculation(calculate_keys, post_actions):
+        """
+        Build a parser for some keys in the mapping string, return
+        calculated value to use in the mapping.  SIDE EFFECT:
+        adds ankiconnect post actions to post_actions if needed
+        (e.g. for image uploads).
+
+        e.g. the mapping "article: {{ tags["der", "die", "das"] }}"
+        needs to be parsed to extract certain tags from the current
+        term.
+        """
+
+        def get_filtered_tags(tagvals):
+            "Get term tags matching the list."
+            # tagvals is a pyparsing ParseResults, use list() to convert to strings.
+            ftags = [t for t in term.tags if t in list(tagvals)]
+            return ", ".join(ftags)
+
+        def handle_image(_):
+            if term.image is None:
+                return ""
+            new_filename = f"LUTE_TERM_{term.termid}.jpg"
+            hsh = {
+                "action": "storeMediaFile",
+                "params": {"filename": new_filename, "path": img_root_dir + term.image},
+            }
+            post_actions.append(hsh)
+            return f'<img src="{new_filename}">'
+
+        quotedString.setParseAction(pp.removeQuotes)
+        tag_matcher = (
+            Suppress("tags")
+            + Suppress("[")
+            + pp.delimitedList(quotedString)
+            + Suppress("]")
+        )
+        image_matcher = Suppress("image")
+
+        matcher = tag_matcher.set_parse_action(
+            get_filtered_tags
+        ) | image_matcher.set_parse_action(handle_image)
+
+        calc_replacements = {
+            # Matchers return the value that should be used as the
+            # replacement value for the given mapping string.  e.g.
+            # tags["der", "die"] returns "der" if term.tags = ["der", "x"]
+            k: matcher.parseString(k).asList()[0]
+            for k in calculate_keys
+        }
+
+        return calc_replacements
+
+    # One-for-one replacements in the mapping string.
+    # e.g. "{{ id }}" is replaced by term.termid.
+    replacements = {
+        "id": term.termid,
+        "term": term.text,
+        "language": term.language,
+        "parents": ", ".join(term.parents),
+        "tags": ", ".join(term.tags),
+        "translation": term.translation,
+    }
+
+    calc_keys = [
+        k
+        for k in set(re.findall(r"{{\s*(.*?)\s*}}", mapping_string))
+        if k not in replacements
+    ]
+
+    post_actions = []
+    calc_replacements = parse_keys_needing_calculation(calc_keys, post_actions)
+
+    def get_field_mapping_json(map_string, replacements):
+        "Apply the replacements in the mapping string, return field: value json."
+        final = map_string
+        for k, v in replacements.items():
+            pattern = rf"{{{{\s*{re.escape(k)}\s*}}}}"
+            final = re.sub(pattern, f"{v}", final)
+        postjson = {}
+        mappings = [s.strip() for s in final.split("\n") if s.strip() != ""]
+        for s in mappings:
+            field, val = s.split(":", 1)
+            postjson[field.strip()] = val.strip()
+        return postjson
+
+    post_actions.append(
+        {
+            "action": "addNote",
+            "params": {
+                "note": {
+                    "deckName": deck_name,
+                    "modelName": model_name,
+                    "fields": get_field_mapping_json(
+                        mapping_string, {**replacements, **calc_replacements}
+                    ),
+                    "tags": ["lute"] + term.tags,
+                }
+            },
+        }
+    )
+
+    return {"action": "multi", "params": {"actions": post_actions}}
+
+
 def get_selected_mappings(mappings, term):
     """
     Get all mappings where the selector is True.
@@ -174,13 +283,24 @@ def run_test():
     kind = None
     kinder = None
 
+    mapping = """\
+Extra_info_back: {{ id }}
+Word: {{ term }}
+Plural: some value {{ parents }}
+Article: {{ tags:["der", "die", "das"] }}: {{ term }}
+Picture: {{ image }}
+Sentence: some text {{ parents }} more text {{ parents }}
+Definition: {{ translation }}
+All_tags: {{ tags }}
+    """
+
     all_mapping_data = [
         {
             "name": "Gender",
             "selector": 'language:"German" and tags:["der", "die", "das"] and has:image',
             "deck_name": "x",
             "note_type": "y",
-            "mapping": "z",
+            "mapping": mapping,
             "active": True,
         },
         {
@@ -191,7 +311,7 @@ def run_test():
             ),
             "deck_name": "x",
             "note_type": "y",
-            "mapping": "z",
+            "mapping": mapping,
             "active": True,
         },
         {
@@ -199,7 +319,7 @@ def run_test():
             "selector": "sel here",
             "deck_name": "x",
             "note_type": "y",
-            "mapping": "z",
+            "mapping": mapping,
             "active": False,
         },
     ]
@@ -213,6 +333,15 @@ def run_test():
             print(t)
             use_mappings = get_selected_mappings(all_mapping_data, t)
             print(use_mappings)
+
+            IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data"
+            for m in use_mappings:
+                p = build_ankiconnect_post_json(
+                    t, m["mapping"], IMAGE_ROOT_DIR, m["deck_name"], m["note_type"]
+                )
+                print("=" * 25)
+                print(json.dumps(p, indent=2))
+                print("=" * 25)
 
 
 if __name__ == "__main__":
