@@ -7,8 +7,9 @@ Given term ID, get the term object:
 - then generate the post bodies for anki connect
 - do post
 
-> select woid from words where wotextlc = 'kinder';
-143771
+> select woid, wolgid, wotext from words where wotextlc in ['kinder', 'kind'];
+143771|3|Kinder
+143770|3|Kind
 
 To run this: from root directory:
 
@@ -166,7 +167,7 @@ def run_test():
     app = lute.app_factory.create_app()
     with app.app_context():
         repo = Repository(db.session)
-        t = repo.load(143771)
+        t = repo.load(143770)
     print(t)
 
     all_mapping_data = [
