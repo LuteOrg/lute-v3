@@ -18,9 +18,10 @@ python -m iss_579_anki.post_demo
 """
 
 import os
+import re
 from typing import Callable, Iterable
 import json
-import re
+import requests
 import pyparsing as pp
 from pyparsing import (
     infixNotation,
@@ -39,6 +40,10 @@ from pyparsing import (
 from lute.models.repositories import TermRepository
 import lute.app_factory
 from lute.db import db
+
+
+IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data/userimages"
+ANKI_CONNECT_URL = "http://localhost:8765"
 
 
 def evaluate_selector(s, term):
@@ -204,18 +209,19 @@ def build_ankiconnect_post_json(
 
         def handle_image(_):
             id_images = [
-                (t.id, t.get_current_image())
+                (t, t.get_current_image())
                 for t in all_terms()
                 if t.get_current_image() is not None
             ]
             image_srcs = []
-            for tid, imgfilename in id_images:
-                new_filename = f"LUTE_TERM_{tid}.jpg"
+            for t, imgfilename in id_images:
+                new_filename = f"LUTE_TERM_{t.id}.jpg"
+                image_path = os.path.join(img_root_dir, str(t.language.id), imgfilename)
                 hsh = {
                     "action": "storeMediaFile",
                     "params": {
                         "filename": new_filename,
-                        "path": os.path.join(img_root_dir, imgfilename),
+                        "path": image_path,
                     },
                 }
                 post_actions.append(hsh)
@@ -308,7 +314,7 @@ def get_selected_mappings(mappings, term):
     ]
 
 
-def run_test():
+def run_test(do_post):
     "Run test."
     app = lute.app_factory.create_app()
     kind = None
@@ -316,10 +322,10 @@ def run_test():
 
     gender_card_mapping = """\
       Lute_term_id: {{ id }}
-      Front: {{ tags:["der", "die", "das"] }} {{ parents }}, plural
+      Front: {{ term }}: der, die, oder das?
       Picture: {{ image }}
       Definition: {{ translation }}
-      Back: die {{ term }}
+      Back: {{ tags:["der", "die", "das"] }} {{ term }}
     """
 
     plural_card_mapping = """\
@@ -335,7 +341,7 @@ def run_test():
             "name": "Gender",
             "selector": 'language:"German" and tags:["der", "die", "das"] and has:image',
             "deck_name": "zzTestAnkiConnect",
-            "note_type": "Basic_vocab",
+            "note_type": "Lute_Basic_vocab",
             "mapping": gender_card_mapping,
             "active": True,
         },
@@ -346,7 +352,7 @@ def run_test():
                 + 'and has:image and tags:["plural", "plural and singular"]'
             ),
             "deck_name": "zzTestAnkiConnect",
-            "note_type": "Basic_vocab",
+            "note_type": "Lute_Basic_vocab",
             "mapping": plural_card_mapping,
             "active": True,
         },
@@ -370,7 +376,6 @@ def run_test():
             use_mappings = get_selected_mappings(all_mapping_data, t)
             # print(use_mappings)
 
-            IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data"
             for m in use_mappings:
                 p = build_ankiconnect_post_json(
                     t, m["mapping"], IMAGE_ROOT_DIR, m["deck_name"], m["note_type"]
@@ -379,6 +384,11 @@ def run_test():
                 print(json.dumps(p, indent=2))
                 print("=" * 25)
 
+                if do_post:
+                    ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
+                    rj = ret.json()
+                    print(rj)
+
 
 if __name__ == "__main__":
-    run_test()
+    run_test(True)
