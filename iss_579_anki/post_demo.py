@@ -20,6 +20,7 @@ python -m iss_579_anki.post_demo
 import os
 import re
 from typing import Callable, Iterable
+from dataclasses import dataclass
 import json
 import requests
 import pyparsing as pp
@@ -66,6 +67,41 @@ def all_anki_models_exists(model_names):
             f"Bad model names: {', '.join(bad_model_names)}"
         )
     return True
+
+
+@dataclass
+class FieldMappingData:
+    "Data class"
+    fieldname: str = None
+    value: str = None
+    processed_value: str = None
+
+
+def mapping_as_array(field_mapping):
+    """
+    Given "a: {{ somefield }}", returns
+    [ ("a", "{{ somefield }}") ]
+
+    Raises config error if dup fields.
+    """
+    ret = []
+    lines = [
+        s.strip()
+        for s in field_mapping.split("\n")
+        if s.strip() != "" and not s.strip().startswith("#")
+    ]
+    for lin in lines:
+        parts = lin.split(":", 1)
+        if len(parts) != 2:
+            raise AnkiExportConfigurationError(f'Bad mapping line "{lin}" in mapping')
+        field, val = parts
+        if field in [fmd.fieldname for fmd in ret]:
+            raise AnkiExportConfigurationError(f"Dup field {field} in mapping")
+        fmd = FieldMappingData()
+        fmd.fieldname = field
+        fmd.value = val
+        ret.append(fmd)
+    return ret
 
 
 def evaluate_selector(s, term):
@@ -422,7 +458,12 @@ def run_test():
         },
     ]
 
-    all_anki_models_exists(m["note_type"] for m in all_mapping_data if m["active"])
+    active_mappings = [m for m in all_mapping_data if m["active"]]
+    all_anki_models_exists(m["note_type"] for m in active_mappings)
+    for m in active_mappings:
+        print(mapping_as_array(m["mapping"]))
+
+    return
 
     kinder = 143771
     kind = 143770
