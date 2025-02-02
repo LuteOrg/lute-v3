@@ -38,6 +38,7 @@ from pyparsing import (
 )
 
 from lute.models.repositories import TermRepository
+from lute.term.model import ReferencesRepository
 import lute.app_factory
 from lute.db import db
 
@@ -166,8 +167,9 @@ def evaluate_selector(s, term):
     return bool(result[0])
 
 
+# pylint: disable=too-many-arguments,too-many-positional-arguments
 def build_ankiconnect_post_json(
-    term, mapping_string, img_root_dir, deck_name, model_name
+    term, refsrepo, mapping_string, img_root_dir, deck_name, model_name
 ):
     "Build post json for term using the mappings."
 
@@ -229,6 +231,14 @@ def build_ankiconnect_post_json(
 
             return "".join(image_srcs)
 
+        def handle_sentences(_):
+            "Get sample sentence for term."
+            refs = refsrepo.find_references_by_id(term.id)
+            term_refs = refs["term"] or []
+            if len(term_refs) == 0:
+                return ""
+            return term_refs[0].sentence
+
         quotedString.setParseAction(pp.removeQuotes)
         tag_matcher = (
             Suppress("tags")
@@ -237,11 +247,14 @@ def build_ankiconnect_post_json(
             + pp.delimitedList(quotedString)
             + Suppress("]")
         )
-        image_matcher = Suppress("image")
+        image = Suppress("image")
+        sentence = Suppress("sentence")
 
-        matcher = tag_matcher.set_parse_action(
-            get_filtered_tags
-        ) | image_matcher.set_parse_action(handle_image)
+        matcher = (
+            tag_matcher.set_parse_action(get_filtered_tags)
+            | image.set_parse_action(handle_image)
+            | sentence.set_parse_action(handle_sentences)
+        )
 
         calc_replacements = {
             # Matchers return the value that should be used as the
@@ -316,9 +329,8 @@ def get_selected_mappings(mappings, term):
 
 def get_selected_post_data(db_session, term_ids, all_mapping_data):
     "Run test."
-    kind = None
-    kinder = None
     repo = TermRepository(db_session)
+    refsrepo = ReferencesRepository(db_session)
     terms = [repo.find(termid) for termid in term_ids]
 
     ret = []
@@ -327,20 +339,27 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
         use_mappings = get_selected_mappings(all_mapping_data, t)
         for m in use_mappings:
             p = build_ankiconnect_post_json(
-                t, m["mapping"], IMAGE_ROOT_DIR, m["deck_name"], m["note_type"]
+                t,
+                refsrepo,
+                m["mapping"],
+                IMAGE_ROOT_DIR,
+                m["deck_name"],
+                m["note_type"],
             )
             ret.append(p)
 
     return ret
 
 
-if __name__ == "__main__":
+def run_test():
+    "Sample mapping and terms."
     gender_card_mapping = """\
       Lute_term_id: {{ id }}
       Front: {{ term }}: der, die, oder das?
       Picture: {{ image }}
       Definition: {{ translation }}
       Back: {{ tags:["der", "die", "das"] }} {{ term }}
+      Sentence: {{ sentence }}
     """
 
     plural_card_mapping = """\
@@ -349,6 +368,7 @@ if __name__ == "__main__":
       Picture: {{ image }}
       Definition: {{ translation }}
       Back: die {{ term }}
+      Sentence: {{ sentence }}
     """
 
     all_mapping_data = [
@@ -397,3 +417,7 @@ if __name__ == "__main__":
         ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
         rj = ret.json()
         print(rj)
+
+
+if __name__ == "__main__":
+    run_test()
