@@ -314,12 +314,27 @@ def get_selected_mappings(mappings, term):
     ]
 
 
-def run_test(do_post):
+def get_selected_post_data(db_session, term_ids, all_mapping_data):
     "Run test."
-    app = lute.app_factory.create_app()
     kind = None
     kinder = None
+    repo = TermRepository(db_session)
+    terms = [repo.find(termid) for termid in term_ids]
 
+    ret = []
+    for t in terms:
+        print(t)
+        use_mappings = get_selected_mappings(all_mapping_data, t)
+        for m in use_mappings:
+            p = build_ankiconnect_post_json(
+                t, m["mapping"], IMAGE_ROOT_DIR, m["deck_name"], m["note_type"]
+            )
+            ret.append(p)
+
+    return ret
+
+
+if __name__ == "__main__":
     gender_card_mapping = """\
       Lute_term_id: {{ id }}
       Front: {{ term }}: der, die, oder das?
@@ -366,29 +381,19 @@ def run_test(do_post):
         },
     ]
 
+    kinder = 143771
+    kind = 143770
+    termids = [kind, kinder]
+
+    app = lute.app_factory.create_app()
     with app.app_context():
-        repo = TermRepository(db.session)
-        kinder = repo.find(143771)
-        kind = repo.find(143770)
-        for t in [kind, kinder]:
-            print("-" * 25)
-            print(t)
-            use_mappings = get_selected_mappings(all_mapping_data, t)
-            # print(use_mappings)
+        jsons = get_selected_post_data(db.session, termids, all_mapping_data)
 
-            for m in use_mappings:
-                p = build_ankiconnect_post_json(
-                    t, m["mapping"], IMAGE_ROOT_DIR, m["deck_name"], m["note_type"]
-                )
-                print("=" * 25)
-                print(json.dumps(p, indent=2))
-                print("=" * 25)
+    print("=" * 25)
+    print(json.dumps(jsons, indent=2))
+    print("=" * 25)
 
-                if do_post:
-                    ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
-                    rj = ret.json()
-                    print(rj)
-
-
-if __name__ == "__main__":
-    run_test(True)
+    for p in jsons:
+        ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
+        rj = ret.json()
+        print(rj)
