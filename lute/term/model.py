@@ -525,7 +525,7 @@ class ReferencesRepository:
             LIMIT {self.limit}
         """
         )
-        print(query)
+        # print(query)
 
         pattern = f"%{chr(0x200B)}{term_lc}{chr(0x200B)}%"
         params = {"pattern": pattern}
