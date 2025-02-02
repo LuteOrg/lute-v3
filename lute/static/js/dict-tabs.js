@@ -97,6 +97,12 @@ class SentenceLookupButton extends GeneralLookupButton {
       const langid = `${LookupButton.LANG_ID ?? 0}`;
       if (langid == '0' || t == '')
         return;
+      // Doing lookups by the term text (from the "#text" control) is
+      // better than using a term ID, b/c it lets me search for new
+      // multi-word terms in existing text, even before those
+      // multi-word terms are actually created and saved.  e.g., I can
+      // highlight the text "a big thing" and see if that phrase has
+      // been used in anything I've read already.
       iframe.setAttribute("src", `/term/sentences/${LookupButton.LANG_ID}/${t}`);
     };
 
