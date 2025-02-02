@@ -496,6 +496,10 @@ class ReferencesRepository:
         if term is None:
             return []
 
+        only_include_read = "TxReadDate IS NOT NULL"
+        if self.include_unread:
+            only_include_read = "1=1"  # include everything.
+
         term_lc = term.text_lc
         query = sqlalchemy.text(
             f"""
@@ -513,14 +517,15 @@ class ReferencesRepository:
                 FROM texts
                 GROUP BY TxBkID
             ) pc ON pc.TxBkID = texts.TxBkID
-            WHERE TxReadDate IS NOT NULL
+            WHERE { only_include_read }
             AND SeText IS NOT NULL
             AND CASE WHEN SeTextLC == '*' THEN SeText ELSE SeTextLC END LIKE :pattern
             AND BkLgID = {term.language.id}
             ORDER BY TxReadDate desc, TxID desc
-            LIMIT 20
+            LIMIT {self.limit}
         """
         )
+        print(query)
 
         pattern = f"%{chr(0x200B)}{term_lc}{chr(0x200B)}%"
         params = {"pattern": pattern}

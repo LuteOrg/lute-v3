@@ -8,10 +8,9 @@ and retrieved from DB.
 from datetime import datetime
 import pytest
 
-from lute.models.term import Term as DBTerm, TermTag
 from lute.db import db
 from lute.term.model import Term, Repository, ReferencesRepository
-from tests.dbasserts import assert_sql_result, assert_record_count_equals
+from tests.dbasserts import assert_record_count_equals
 from tests.utils import add_terms, make_text
 
 
@@ -227,7 +226,7 @@ def test_get_references_only_includes_refs_in_same_language(
 
 
 @pytest.mark.sentences
-def test_get_references_new_term(spanish, repo, refsrepo):
+def test_get_references_new_term(spanish, refsrepo):
     "Check references with parents and children."
     text = make_text("hola", "Tengo un gato.", spanish)
     text.read_date = datetime.now()
@@ -246,12 +245,16 @@ def test_get_references_new_term(spanish, repo, refsrepo):
 
 
 @pytest.mark.sentences
-def test_can_get_references_by_term_id_including_unread(spanish, english):
+def test_can_get_references_by_term_id_including_unread(spanish):
     "Like it says above."
-    make_text("hola", "Tengo un gato.  No tengo un perro.", spanish)
-    make_text("hola", "Tengo in english.", english)
+    text = make_text("hola", "Tengo un gato.  No tengo un perro.", spanish)
+    text.load_sentences()
+    db.session.add(text)
+    db.session.commit()
     # pylint: disable=unbalanced-tuple-unpacking
     [tengo] = add_terms(spanish, ["tengo"])
+
+    assert_record_count_equals("select * from sentences", 2, "sanity check")
 
     refsrepo = ReferencesRepository(db.session, limit=1, include_unread=False)
     refs = refsrepo.find_references_by_id(tengo.id)
