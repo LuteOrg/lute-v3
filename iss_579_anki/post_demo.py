@@ -54,7 +54,7 @@ class AnkiExportConfigurationError(Exception):
     """
 
 
-def all_anki_models_exists(model_names):
+def verify_all_anki_models_exists(model_names):
     "Throws if some anki models don't exist."
     p = {"action": "modelNames", "version": 6}
     ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
@@ -66,7 +66,6 @@ def all_anki_models_exists(model_names):
         raise AnkiExportConfigurationError(
             f"Bad model names: {', '.join(bad_model_names)}"
         )
-    return True
 
 
 @dataclass
@@ -102,6 +101,20 @@ def mapping_as_array(field_mapping):
         fmd.value = val
         ret.append(fmd)
     return ret
+
+
+def verify_anki_model_fields_exist(model_name, fieldnames):
+    "Throws if some anki models don't exist."
+    p = {"action": "modelFieldNames", "version": 6, "params": {"modelName": model_name}}
+    ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
+    rj = ret.json()
+    # print(rj)
+    existing_field_names = rj["result"]
+    bad_field_names = [f for f in fieldnames if f not in existing_field_names]
+    if len(bad_field_names) != 0:
+        raise AnkiExportConfigurationError(
+            f"Bad field names: {', '.join(bad_field_names)}"
+        )
 
 
 def evaluate_selector(s, term):
@@ -459,9 +472,11 @@ def run_test():
     ]
 
     active_mappings = [m for m in all_mapping_data if m["active"]]
-    all_anki_models_exists(m["note_type"] for m in active_mappings)
+    verify_all_anki_models_exists(m["note_type"] for m in active_mappings)
     for m in active_mappings:
-        print(mapping_as_array(m["mapping"]))
+        mapping_array = mapping_as_array(m["mapping"])
+        fieldnames = [m.fieldname for m in mapping_array]
+        verify_anki_model_fields_exist(m["note_type"], fieldnames)
 
     return
 
