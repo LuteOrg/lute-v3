@@ -47,6 +47,27 @@ IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data/userimages"
 ANKI_CONNECT_URL = "http://localhost:8765"
 
 
+class AnkiExportConfigurationError(Exception):
+    """
+    Raised if the config for the export is bad.
+    """
+
+
+def all_anki_models_exists(model_names):
+    "Throws if some anki models don't exist."
+    p = {"action": "modelNames", "version": 6}
+    ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
+    rj = ret.json()
+    # print(rj)
+    existing_model_names = rj["result"]
+    bad_model_names = [m for m in model_names if m not in existing_model_names]
+    if len(bad_model_names) != 0:
+        raise AnkiExportConfigurationError(
+            f"Bad model names: {', '.join(bad_model_names)}"
+        )
+    return True
+
+
 def evaluate_selector(s, term):
     "Parse the selector, return True or False for the given term."
     # pylint: disable=too-many-locals
@@ -401,6 +422,8 @@ def run_test():
         },
     ]
 
+    all_anki_models_exists(m["note_type"] for m in all_mapping_data if m["active"])
+
     kinder = 143771
     kind = 143770
     termids = [kind, kinder]
@@ -413,6 +436,8 @@ def run_test():
     print(json.dumps(jsons, indent=2))
     print("=" * 25)
 
+    print("\n\nNOT POSTING")
+    return
     for p in jsons:
         ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
         rj = ret.json()
