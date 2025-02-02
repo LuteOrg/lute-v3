@@ -24,7 +24,7 @@ from lute.models.repositories import (
 )
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list
-from lute.term.model import Repository, Term
+from lute.term.model import Repository, Term, ReferencesRepository
 from lute.term.service import (
     Service as TermService,
     TermServiceException,
@@ -352,7 +352,8 @@ def sentences(langid, text):
     # in the term form, and the parent does not exist yet, then
     # we're creating a new term.
     t = repo.find_or_new(langid, text)
-    refs = repo.find_references(t)
+    refsrepo = ReferencesRepository(db.session)
+    refs = refsrepo.find_references(t)
 
     # Transform data for output, to
     # { "term": [refs], "children": [refs], "parent1": [refs], "parent2" ... }

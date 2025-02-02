@@ -71,19 +71,6 @@ class Term:  # pylint: disable=too-many-instance-attributes
         return f'<Term BO "{self.text}" lang_id={self.language_id}>'
 
 
-class TermReference:
-    "Where a Term has been used in books."
-
-    def __init__(
-        self, bookid, txid, pgnum, title, sentence=None
-    ):  # pylint: disable=too-many-arguments,too-many-positional-arguments
-        self.book_id = bookid
-        self.text_id = txid
-        self.page_number = pgnum
-        self.title = title
-        self.sentence = sentence
-
-
 class Repository:
     """
     Maps Term BO to and from lute.model.Term.
@@ -418,7 +405,43 @@ class Repository:
 
         return term
 
-    ## References.
+
+## References.
+
+
+class TermReference:
+    "Where a Term has been used in books."
+
+    def __init__(
+        self, bookid, txid, pgnum, title, sentence=None
+    ):  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self.book_id = bookid
+        self.text_id = txid
+        self.page_number = pgnum
+        self.title = title
+        self.sentence = sentence
+
+
+class ReferencesRepository:
+    """
+    Lookup terms.
+    """
+
+    def __init__(self, _session, limit=20, include_unread=False):
+        "Init."
+        self.session = _session
+        self.limit = limit
+        self.include_unread = include_unread
+
+    def _search_spec_term(self, langid, text):
+        """
+        Make a term to get the correct text_lc to search for.
+        This ensures that the spec term is properly parsed
+        and downcased.
+        """
+        lang_repo = LanguageRepository(self.session)
+        lang = lang_repo.find(langid)
+        return DBTerm(lang, text)
 
     def find_references(self, term):
         """
@@ -429,7 +452,16 @@ class Repository:
         searchterm = term_repo.find_by_spec(spec)
         if searchterm is None:
             searchterm = spec
+        return self._find_references(searchterm)
 
+    def find_references_by_id(self, term_id):
+        "Find references for the given term."
+        term_repo = TermRepository(self.session)
+        searchterm = term_repo.find(term_id)
+        return self._find_references(searchterm)
+
+    def _find_references(self, searchterm):
+        "Find refs."
         references = {
             "term": self._get_references(searchterm),
             "children": self._get_child_references(searchterm),
@@ -485,6 +517,7 @@ class Repository:
             AND SeText IS NOT NULL
             AND CASE WHEN SeTextLC == '*' THEN SeText ELSE SeTextLC END LIKE :pattern
             AND BkLgID = {term.language.id}
+            ORDER BY TxReadDate desc, TxID desc
             LIMIT 20
         """
         )
