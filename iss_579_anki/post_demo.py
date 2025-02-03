@@ -120,9 +120,9 @@ def apply_replacements(mapping_array, replacements):
 
 # pylint: disable=too-many-arguments,too-many-positional-arguments
 def build_ankiconnect_post_json(
-    term,
     mapping_array,
     media_mappings,
+    lute_and_term_tags,
     deck_name,
     model_name,
 ):
@@ -139,10 +139,6 @@ def build_ankiconnect_post_json(
         }
         post_actions.append(hsh)
 
-    postjson = {}
-    for m in mapping_array:
-        postjson[m.fieldname] = m.value.strip()
-
     post_actions.append(
         {
             "action": "addNote",
@@ -150,8 +146,8 @@ def build_ankiconnect_post_json(
                 "note": {
                     "deckName": deck_name,
                     "modelName": model_name,
-                    "fields": postjson,
-                    "tags": ["lute"] + all_tags(term),
+                    "fields": {m.fieldname: m.value.strip() for m in mapping_array},
+                    "tags": lute_and_term_tags,
                 }
             },
         }
@@ -177,7 +173,7 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
 
     ret = []
     for t in terms:
-        print(t)
+        # print(t)
         use_mappings = get_selected_mappings(all_mapping_data, t)
         for m in use_mappings:
             vals, mmap = get_values_and_media_mapping(t, refsrepo, m["mapping"])
@@ -185,11 +181,12 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
                 mmap[k] = os.path.join(IMAGE_ROOT_DIR, v)
             mapping_array = mapping_as_array(m["mapping"])
             mapping_array = apply_replacements(mapping_array, vals)
+            tags = ["lute"] + all_tags(t)
 
             p = build_ankiconnect_post_json(
-                t,
                 mapping_array,
                 mmap,
+                tags,
                 m["deck_name"],
                 m["note_type"],
             )
