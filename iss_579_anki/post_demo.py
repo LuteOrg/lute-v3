@@ -459,7 +459,7 @@ def run_test():
       Lute_term_id: {{ id }}
       Front: {{ tags:["der", "die", "das"] }} {{ parents }}, plural
       Picture: {{ image }}
-      Definition: {{ translxation }}
+      Definition: {{ translation }}
       Back: die {{ term }}
       Sentence: {{ sentence }}
     """
