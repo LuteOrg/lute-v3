@@ -21,11 +21,6 @@ import os
 import re
 import json
 import requests
-import pyparsing as pp
-from pyparsing import (
-    quotedString,
-    Suppress,
-)
 from pyparsing.exceptions import ParseException
 
 from lute.models.term import Term
@@ -112,12 +107,22 @@ def all_tags(term):
     return list(set(ret))
 
 
+def apply_replacements(mapping_array, replacements):
+    "Apply the replacement vals to the vals in the array."
+    for m in mapping_array:
+        value = m.value
+        for k, v in replacements.items():
+            pattern = rf"{{{{\s*{re.escape(k)}\s*}}}}"
+            value = re.sub(pattern, f"{v}", value)
+        m.value = value
+    return mapping_array
+
+
 # pylint: disable=too-many-arguments,too-many-positional-arguments
 def build_ankiconnect_post_json(
     term,
-    replacements,
+    mapping_array,
     media_mappings,
-    mapping_string,
     img_root_dir,
     deck_name,
     model_name,
@@ -136,17 +141,9 @@ def build_ankiconnect_post_json(
         }
         post_actions.append(hsh)
 
-    def get_field_mapping_json(map_string, replacements):
-        "Apply the replacements in the mapping string, return field: value json."
-        mapping = mapping_as_array(map_string)
-        postjson = {}
-        for m in mapping:
-            value = m.value
-            for k, v in replacements.items():
-                pattern = rf"{{{{\s*{re.escape(k)}\s*}}}}"
-                value = re.sub(pattern, f"{v}", value)
-            postjson[m.fieldname] = value.strip()
-        return postjson
+    postjson = {}
+    for m in mapping_array:
+        postjson[m.fieldname] = m.value.strip()
 
     post_actions.append(
         {
@@ -155,7 +152,7 @@ def build_ankiconnect_post_json(
                 "note": {
                     "deckName": deck_name,
                     "modelName": model_name,
-                    "fields": get_field_mapping_json(mapping_string, replacements),
+                    "fields": postjson,
                     "tags": ["lute"] + all_tags(term),
                 }
             },
@@ -186,11 +183,13 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
         use_mappings = get_selected_mappings(all_mapping_data, t)
         for m in use_mappings:
             vals, mmap = get_values_and_media_mapping(t, refsrepo, m["mapping"])
+            mapping_array = mapping_as_array(m["mapping"])
+            mapping_array = apply_replacements(mapping_array, vals)
+
             p = build_ankiconnect_post_json(
                 t,
-                vals,
+                mapping_array,
                 mmap,
-                m["mapping"],
                 IMAGE_ROOT_DIR,
                 m["deck_name"],
                 m["note_type"],
