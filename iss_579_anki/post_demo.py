@@ -123,7 +123,6 @@ def build_ankiconnect_post_json(
     term,
     mapping_array,
     media_mappings,
-    img_root_dir,
     deck_name,
     model_name,
 ):
@@ -131,12 +130,11 @@ def build_ankiconnect_post_json(
 
     post_actions = []
     for new_filename, original_file in media_mappings.items():
-        orig_full_path = os.path.join(img_root_dir, original_file)
         hsh = {
             "action": "storeMediaFile",
             "params": {
                 "filename": new_filename,
-                "path": orig_full_path,
+                "path": original_file,
             },
         }
         post_actions.append(hsh)
@@ -183,6 +181,8 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
         use_mappings = get_selected_mappings(all_mapping_data, t)
         for m in use_mappings:
             vals, mmap = get_values_and_media_mapping(t, refsrepo, m["mapping"])
+            for k, v in mmap.items():
+                mmap[k] = os.path.join(IMAGE_ROOT_DIR, v)
             mapping_array = mapping_as_array(m["mapping"])
             mapping_array = apply_replacements(mapping_array, vals)
 
@@ -190,7 +190,6 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
                 t,
                 mapping_array,
                 mmap,
-                IMAGE_ROOT_DIR,
                 m["deck_name"],
                 m["note_type"],
             )
