@@ -61,7 +61,7 @@ def validate_mapping(m):
     mapping_array = mapping_as_array(m["mapping"])
     fieldnames = [m.fieldname for m in mapping_array]
     verify_anki_model_fields_exist(m["note_type"], fieldnames)
-    verify_valid_mapping_parsing(m)
+    verify_valid_mapping_parsing(m["mapping"])
 
 
 def _verify_anki_item_exists(p, name, category_name):
@@ -196,19 +196,12 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
     return ret
 
 
-def verify_valid_mapping_parsing(m):
+def verify_valid_mapping_parsing(mapping_string):
     "Check mapping with a dummy Term."
     t = Term(Language(), "")
     refsrepo = None
     try:
-        build_ankiconnect_post_json(
-            t,
-            refsrepo,
-            m["mapping"],
-            IMAGE_ROOT_DIR,
-            m["deck_name"],
-            m["note_type"],
-        )
+        get_values_and_media_mapping(t, refsrepo, mapping_string)
     except ParseException as ex:
         msg = f'Invalid mapping value "{ex.line}". '
         raise AnkiExportConfigurationError(msg + str(ex)) from ex
