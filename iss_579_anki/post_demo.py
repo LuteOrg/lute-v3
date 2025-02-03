@@ -37,6 +37,7 @@ from pyparsing import (
     Suppress,
     Literal,
 )
+from pyparsing.exceptions import ParseException
 
 from lute.models.term import Term
 from lute.models.language import Language
@@ -426,6 +427,23 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
     return ret
 
 
+def verify_valid_mapping_parsing(m):
+    t = Term(Language(), "")
+    refsrepo = None
+    try:
+        p = build_ankiconnect_post_json(
+            t,
+            refsrepo,
+            m["mapping"],
+            IMAGE_ROOT_DIR,
+            m["deck_name"],
+            m["note_type"],
+        )
+    except ParseException as ex:
+        msg = f'invalid mapping value "{ex.line}". '
+        raise AnkiExportConfigurationError(msg + str(ex))
+
+
 def run_test():
     "Sample mapping and terms."
     gender_card_mapping = """\
@@ -483,24 +501,7 @@ def run_test():
         mapping_array = mapping_as_array(m["mapping"])
         fieldnames = [m.fieldname for m in mapping_array]
         verify_anki_model_fields_exist(m["note_type"], fieldnames)
-
-    app = lute.app_factory.create_app()
-    with app.app_context():
-        # test parse
-        print("-" * 25)
-        print("test parse")
-        t = Term(Language(), "")
-        refsrepo = None
-        for m in active_mappings:
-            p = build_ankiconnect_post_json(
-                t,
-                refsrepo,
-                m["mapping"],
-                IMAGE_ROOT_DIR,
-                m["deck_name"],
-                m["note_type"],
-            )
-        print("-" * 25)
+        verify_valid_mapping_parsing(m)
 
     kinder = 143771
     kind = 143770
