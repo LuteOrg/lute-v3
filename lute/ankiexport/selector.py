@@ -45,8 +45,8 @@ def evaluate_selector(s, term):
             return check_has_images()
         raise RuntimeError(f"Unhandled has check for {has_item}")
 
-    def check_parent_count(args):
-        "Check parents."
+    def get_binary_operator(opstring):
+        "Return lambda matching op."
         opMap = {
             "<": lambda a, b: a < b,
             "<=": lambda a, b: a <= b,
@@ -56,10 +56,20 @@ def evaluate_selector(s, term):
             "=": lambda a, b: a == b,
             "==": lambda a, b: a == b,
         }
+        return opMap[opstring]
+
+    def check_parent_count(args):
+        "Check parents."
         opstring, val = args
-        oplambda = opMap[opstring]
+        oplambda = get_binary_operator(opstring)
         pcount = len(term.parents)
         return oplambda(pcount, val)
+
+    def check_status_val(args):
+        "Check status."
+        opstring, val = args
+        oplambda = get_binary_operator(opstring)
+        return oplambda(term.status, val)
 
     ### class BoolNot:
     ###     "Not unary operator."
@@ -120,6 +130,8 @@ def evaluate_selector(s, term):
         + integer
     )
 
+    status_matcher = Suppress("status") + comparison_op + integer
+
     and_keyword = Keyword("and")
     or_keyword = Keyword("or")
 
@@ -127,7 +139,8 @@ def evaluate_selector(s, term):
         tag_matcher.set_parse_action(has_any_matching_tags)
         | lang_matcher.set_parse_action(matches_lang)
         | has_matcher.set_parse_action(check_has)
-        | parent_count_matcher.set_parse_action(check_parent_count),
+        | parent_count_matcher.set_parse_action(check_parent_count)
+        | status_matcher.set_parse_action(check_status_val),
         [
             (and_keyword, 2, opAssoc.LEFT, BoolAnd),
             (or_keyword, 2, opAssoc.LEFT, BoolOr),
