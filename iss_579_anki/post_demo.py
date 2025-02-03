@@ -305,6 +305,9 @@ def build_ankiconnect_post_json(
 
         def handle_sentences(_):
             "Get sample sentence for term."
+            if term.id is None:
+                # Dummy parse.
+                return ""
             refs = refsrepo.find_references_by_id(term.id)
             term_refs = refs["term"] or []
             if len(term_refs) == 0:
@@ -487,11 +490,11 @@ def run_test():
         print("-" * 25)
         print("test parse")
         t = Term(Language(), "")
-        fakerefsrepo = ReferencesRepository(db.session)
+        refsrepo = None
         for m in active_mappings:
             p = build_ankiconnect_post_json(
                 t,
-                fakerefsrepo,
+                refsrepo,
                 m["mapping"],
                 IMAGE_ROOT_DIR,
                 m["deck_name"],
