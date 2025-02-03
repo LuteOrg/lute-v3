@@ -57,30 +57,33 @@ class AnkiExportConfigurationError(Exception):
     """
 
 
-def verify_all_anki_models_exist(model_names):
+def validate_mapping(m):
+    verify_anki_model_exists(m["note_type"])
+    verify_anki_deck_exists(m["deck_name"])
+    mapping_array = mapping_as_array(m["mapping"])
+    fieldnames = [m.fieldname for m in mapping_array]
+    verify_anki_model_fields_exist(m["note_type"], fieldnames)
+    verify_valid_mapping_parsing(m)
+
+
+def _verify_anki_item_exists(p, name, category_name):
+    ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
+    rj = ret.json()
+    if name not in rj["result"]:
+        msg = f"Bad {category_name}: {name}"
+        raise AnkiExportConfigurationError(msg)
+
+
+def verify_anki_model_exists(model_name):
     "Throws if some anki models don't exist."
     p = {"action": "modelNames", "version": 6}
-    ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
-    rj = ret.json()
-    # print(rj)
-    existing_model_names = rj["result"]
-    bad_model_names = [m for m in model_names if m not in existing_model_names]
-    if len(bad_model_names) != 0:
-        raise AnkiExportConfigurationError(
-            f"Bad model names: {', '.join(bad_model_names)}"
-        )
+    _verify_anki_item_exists(p, model_name, "note type")
 
 
-def verify_all_anki_decks_exist(deck_names):
+def verify_anki_deck_exists(deck_name):
     "Throws if some anki decks don't exist."
     p = {"action": "deckNames", "version": 6}
-    ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
-    rj = ret.json()
-    # print(rj)
-    existing_names = rj["result"]
-    bad_names = [m for m in deck_names if m not in existing_names]
-    if len(bad_names) != 0:
-        raise AnkiExportConfigurationError(f"Bad model names: {', '.join(bad_names)}")
+    _verify_anki_item_exists(p, deck_name, "deck name")
 
 
 @dataclass
@@ -505,19 +508,14 @@ def run_test():
     ]
 
     active_mappings = [m for m in all_mapping_data if m["active"]]
-
-    verify_all_anki_models_exist([m["note_type"] for m in active_mappings])
-    verify_all_anki_decks_exist([m["deck_name"] for m in active_mappings])
+    valid_mappings = []
     errors = []
     for m in active_mappings:
         try:
-            mapping_array = mapping_as_array(m["mapping"])
-            fieldnames = [m.fieldname for m in mapping_array]
-            verify_anki_model_fields_exist(m["note_type"], fieldnames)
-            verify_valid_mapping_parsing(m)
+            validate_mapping(m)
+            valid_mappings.append(m)
         except AnkiExportConfigurationError as ex:
             errors.append([m["name"], ex])
-
     if len(errors) != 0:
         print(errors)
         return
@@ -528,7 +526,7 @@ def run_test():
 
     app = lute.app_factory.create_app()
     with app.app_context():
-        jsons = get_selected_post_data(db.session, termids, all_mapping_data)
+        jsons = get_selected_post_data(db.session, termids, valid_mappings)
 
     print("=" * 25)
     print(json.dumps(jsons, indent=2))
