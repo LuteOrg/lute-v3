@@ -19,7 +19,6 @@ python -m iss_579_anki.post_demo
 
 import os
 import re
-from dataclasses import dataclass
 import json
 import requests
 import pyparsing as pp
@@ -100,22 +99,25 @@ def verify_anki_model_fields_exist(model_name, fieldnames):
         )
 
 
+def all_terms(term):
+    "Term and any parents."
+    ret = [term]
+    ret.extend(term.parents)
+    return ret
+
+
+def all_tags(term):
+    "Tags for term and all parents."
+    ret = [tt.text for t in all_terms(term) for tt in t.term_tags]
+    return list(set(ret))
+
+
 # pylint: disable=too-many-arguments,too-many-positional-arguments
-def build_ankiconnect_post_json(
-    term, refsrepo, mapping_string, img_root_dir, deck_name, model_name
-):
-    "Build post json for term using the mappings."
-
-    def all_terms():
-        "Term and any parents."
-        all_terms = [term]
-        all_terms.extend(term.parents)
-        return all_terms
-
-    def all_tags():
-        "Tags for term and all parents."
-        ret = [tt.text for t in all_terms() for tt in t.term_tags]
-        return list(set(ret))
+def get_values_and_media_mapping(term, refsrepo, mapping_string):
+    """
+    Get the value replacements to be put in the mapping, and build
+    dict of new filenames to original filenames.
+    """
 
     def all_translations():
         ret = [term.translation or ""]
@@ -124,7 +126,7 @@ def build_ankiconnect_post_json(
                 ret.append(p.translation or "")
         return [r for r in ret if r.strip() != ""]
 
-    def parse_keys_needing_calculation(calculate_keys, post_actions):
+    def parse_keys_needing_calculation(calculate_keys, media_mappings):
         """
         Build a parser for some keys in the mapping string, return
         calculated value to use in the mapping.  SIDE EFFECT:
@@ -139,27 +141,20 @@ def build_ankiconnect_post_json(
         def get_filtered_tags(tagvals):
             "Get term tags matching the list."
             # tagvals is a pyparsing ParseResults, use list() to convert to strings.
-            ftags = [tt for tt in all_tags() if tt in list(tagvals)]
+            ftags = [tt for tt in all_tags(term) if tt in list(tagvals)]
             return ", ".join(ftags)
 
         def handle_image(_):
             id_images = [
                 (t, t.get_current_image())
-                for t in all_terms()
+                for t in all_terms(term)
                 if t.get_current_image() is not None
             ]
             image_srcs = []
             for t, imgfilename in id_images:
                 new_filename = f"LUTE_TERM_{t.id}.jpg"
-                image_path = os.path.join(img_root_dir, str(t.language.id), imgfilename)
-                hsh = {
-                    "action": "storeMediaFile",
-                    "params": {
-                        "filename": new_filename,
-                        "path": image_path,
-                    },
-                }
-                post_actions.append(hsh)
+                image_path = os.path.join(str(t.language.id), imgfilename)
+                media_mappings[new_filename] = image_path
                 image_srcs.append(f'<img src="{new_filename}">')
 
             return "".join(image_srcs)
@@ -209,7 +204,7 @@ def build_ankiconnect_post_json(
         "term": term.text,
         "language": term.language.name,
         "parents": ", ".join([p.text for p in term.parents]),
-        "tags": ", ".join(all_tags()),
+        "tags": ", ".join(all_tags(term)),
         "translation": "<br>".join(all_translations()),
     }
 
@@ -219,8 +214,33 @@ def build_ankiconnect_post_json(
         if k not in replacements
     ]
 
+    media_mappings = {}
+    calc_replacements = parse_keys_needing_calculation(calc_keys, media_mappings)
+
+    return ({**replacements, **calc_replacements}, media_mappings)
+
+
+# pylint: disable=too-many-arguments,too-many-positional-arguments
+def build_ankiconnect_post_json(
+    term, refsrepo, mapping_string, img_root_dir, deck_name, model_name
+):
+    "Build post json for term using the mappings."
+
+    replacements, media_mappings = get_values_and_media_mapping(
+        term, refsrepo, mapping_string
+    )
+
     post_actions = []
-    calc_replacements = parse_keys_needing_calculation(calc_keys, post_actions)
+    for new_filename, original_file in media_mappings.items():
+        orig_full_path = os.path.join(img_root_dir, original_file)
+        hsh = {
+            "action": "storeMediaFile",
+            "params": {
+                "filename": new_filename,
+                "path": orig_full_path,
+            },
+        }
+        post_actions.append(hsh)
 
     def get_field_mapping_json(map_string, replacements):
         "Apply the replacements in the mapping string, return field: value json."
@@ -241,10 +261,8 @@ def build_ankiconnect_post_json(
                 "note": {
                     "deckName": deck_name,
                     "modelName": model_name,
-                    "fields": get_field_mapping_json(
-                        mapping_string, {**replacements, **calc_replacements}
-                    ),
-                    "tags": ["lute"] + all_tags(),
+                    "fields": get_field_mapping_json(mapping_string, replacements),
+                    "tags": ["lute"] + all_tags(term),
                 }
             },
         }
