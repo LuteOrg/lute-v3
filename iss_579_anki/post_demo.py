@@ -364,15 +364,14 @@ def build_ankiconnect_post_json(
 
     def get_field_mapping_json(map_string, replacements):
         "Apply the replacements in the mapping string, return field: value json."
-        final = map_string
-        for k, v in replacements.items():
-            pattern = rf"{{{{\s*{re.escape(k)}\s*}}}}"
-            final = re.sub(pattern, f"{v}", final)
+        mapping = mapping_as_array(map_string)
         postjson = {}
-        mappings = [s.strip() for s in final.split("\n") if s.strip() != ""]
-        for s in mappings:
-            field, val = s.split(":", 1)
-            postjson[field.strip()] = val.strip()
+        for m in mapping:
+            value = m.value
+            for k, v in replacements.items():
+                pattern = rf"{{{{\s*{re.escape(k)}\s*}}}}"
+                value = re.sub(pattern, f"{v}", value)
+            postjson[m.fieldname] = value.strip()
         return postjson
 
     post_actions.append(
