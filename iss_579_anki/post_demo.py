@@ -112,7 +112,6 @@ def all_tags(term):
     return list(set(ret))
 
 
-# pylint: disable=too-many-arguments,too-many-positional-arguments
 def get_values_and_media_mapping(term, refsrepo, mapping_string):
     """
     Get the value replacements to be put in the mapping, and build
