@@ -38,6 +38,8 @@ from pyparsing import (
     Literal,
 )
 
+from lute.models.term import Term
+from lute.models.language import Language
 from lute.models.repositories import TermRepository
 from lute.term.model import ReferencesRepository
 import lute.app_factory
@@ -255,11 +257,11 @@ def build_ankiconnect_post_json(
         return list(set(ret))
 
     def all_translations():
-        ret = [term.translation]
+        ret = [term.translation or ""]
         for p in term.parents:
             if p.translation not in ret:
-                ret.append(p.translation)
-        return ret
+                ret.append(p.translation or "")
+        return [r for r in ret if r.strip() != ""]
 
     def parse_keys_needing_calculation(calculate_keys, post_actions):
         """
@@ -436,7 +438,7 @@ def run_test():
       Lute_term_id: {{ id }}
       Front: {{ tags:["der", "die", "das"] }} {{ parents }}, plural
       Picture: {{ image }}
-      Definition: {{ translation }}
+      Definition: {{ translxation }}
       Back: die {{ term }}
       Sentence: {{ sentence }}
     """
@@ -472,13 +474,30 @@ def run_test():
     ]
 
     active_mappings = [m for m in all_mapping_data if m["active"]]
+
     verify_all_anki_models_exists(m["note_type"] for m in active_mappings)
     for m in active_mappings:
         mapping_array = mapping_as_array(m["mapping"])
         fieldnames = [m.fieldname for m in mapping_array]
         verify_anki_model_fields_exist(m["note_type"], fieldnames)
 
-    return
+    app = lute.app_factory.create_app()
+    with app.app_context():
+        # test parse
+        print("-" * 25)
+        print("test parse")
+        t = Term(Language(), "")
+        fakerefsrepo = ReferencesRepository(db.session)
+        for m in active_mappings:
+            p = build_ankiconnect_post_json(
+                t,
+                fakerefsrepo,
+                m["mapping"],
+                IMAGE_ROOT_DIR,
+                m["deck_name"],
+                m["note_type"],
+            )
+        print("-" * 25)
 
     kinder = 143771
     kind = 143770
