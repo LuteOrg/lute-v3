@@ -24,7 +24,7 @@ def evaluate_selector(s, term):
     "Parse the selector, return True or False for the given term."
     # pylint: disable=too-many-locals
 
-    print(f"selector: {s}")
+    # print(f"selector: {s}")
 
     def has_any_matching_tags(tagvals):
         term_tags = [t.text for t in term.term_tags]
@@ -148,6 +148,6 @@ def evaluate_selector(s, term):
     )
 
     result = multi_check.parseString(s)
-    print(f"{result}, {result[0]}")
+    # print(f"{result}, {result[0]}")
     # print(bool(result[0]))
     return bool(result[0])
