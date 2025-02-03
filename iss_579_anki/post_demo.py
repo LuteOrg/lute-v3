@@ -440,7 +440,7 @@ def verify_valid_mapping_parsing(m):
             m["note_type"],
         )
     except ParseException as ex:
-        msg = f'invalid mapping value "{ex.line}". '
+        msg = f'Invalid mapping value "{ex.line}". '
         raise AnkiExportConfigurationError(msg + str(ex))
 
 
