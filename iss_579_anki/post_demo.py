@@ -37,16 +37,11 @@ import lute.app_factory
 from lute.db import db
 
 from lute.ankiexport.selector import evaluate_selector
+from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 
 IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data/userimages"
 ANKI_CONNECT_URL = "http://localhost:8765"
-
-
-class AnkiExportConfigurationError(Exception):
-    """
-    Raised if the config for the export is bad.
-    """
 
 
 def anki_is_running():
