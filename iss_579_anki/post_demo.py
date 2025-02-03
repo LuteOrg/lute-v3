@@ -57,6 +57,16 @@ class AnkiExportConfigurationError(Exception):
     """
 
 
+def anki_is_running():
+    try:
+        p = {"action": "version", "version": 6}
+        ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
+        rj = ret.json()
+        return True
+    except requests.exceptions.ConnectionError:
+        return False
+
+
 def validate_mapping(m):
     verify_anki_model_exists(m["note_type"])
     verify_anki_deck_exists(m["deck_name"])
@@ -541,4 +551,7 @@ def run_test():
 
 
 if __name__ == "__main__":
-    run_test()
+    if anki_is_running():
+        run_test()
+    else:
+        print("Anki not running")
