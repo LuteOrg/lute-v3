@@ -57,7 +57,7 @@ class AnkiExportConfigurationError(Exception):
     """
 
 
-def verify_all_anki_models_exists(model_names):
+def verify_all_anki_models_exist(model_names):
     "Throws if some anki models don't exist."
     p = {"action": "modelNames", "version": 6}
     ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
@@ -69,6 +69,18 @@ def verify_all_anki_models_exists(model_names):
         raise AnkiExportConfigurationError(
             f"Bad model names: {', '.join(bad_model_names)}"
         )
+
+
+def verify_all_anki_decks_exist(deck_names):
+    "Throws if some anki decks don't exist."
+    p = {"action": "deckNames", "version": 6}
+    ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
+    rj = ret.json()
+    # print(rj)
+    existing_names = rj["result"]
+    bad_names = [m for m in deck_names if m not in existing_names]
+    if len(bad_names) != 0:
+        raise AnkiExportConfigurationError(f"Bad model names: {', '.join(bad_names)}")
 
 
 @dataclass
@@ -494,12 +506,21 @@ def run_test():
 
     active_mappings = [m for m in all_mapping_data if m["active"]]
 
-    verify_all_anki_models_exists(m["note_type"] for m in active_mappings)
+    verify_all_anki_models_exist([m["note_type"] for m in active_mappings])
+    verify_all_anki_decks_exist([m["deck_name"] for m in active_mappings])
+    errors = []
     for m in active_mappings:
-        mapping_array = mapping_as_array(m["mapping"])
-        fieldnames = [m.fieldname for m in mapping_array]
-        verify_anki_model_fields_exist(m["note_type"], fieldnames)
-        verify_valid_mapping_parsing(m)
+        try:
+            mapping_array = mapping_as_array(m["mapping"])
+            fieldnames = [m.fieldname for m in mapping_array]
+            verify_anki_model_fields_exist(m["note_type"], fieldnames)
+            verify_valid_mapping_parsing(m)
+        except AnkiExportConfigurationError as ex:
+            errors.append([m["name"], ex])
+
+    if len(errors) != 0:
+        print(errors)
+        return
 
     kinder = 143771
     kind = 143770
