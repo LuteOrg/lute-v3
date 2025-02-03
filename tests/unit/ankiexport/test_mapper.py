@@ -2,10 +2,11 @@
 Field-to-value tests.
 """
 
+from unittest.mock import Mock
 import pytest
 
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
-from lute.ankiexport.mapper import mapping_as_array
+from lute.ankiexport.mapper import mapping_as_array, get_values_and_media_mapping
 
 # pylint: disable=missing-function-docstring
 
@@ -77,3 +78,103 @@ def test_mapping_as_array_raises_error_on_duplicate_fields():
     """
     with pytest.raises(AnkiExportConfigurationError, match="Dup field a in mapping"):
         mapping_as_array(mapping)
+
+
+@pytest.fixture(name="term")
+def fixture_term():
+    term = Mock()
+    term.id = 1
+    term.text = "test"
+    term.language.name = "English"
+    term.parents = []
+    term.term_tags = []
+    term.translation = "example translation"
+    return term
+
+
+def test_basic_replacements():
+    term = Mock()
+    term.id = 1
+    term.text = "test"
+    term.language.name = "English"
+    term.parents = []
+    term.term_tags = []
+    term.translation = "example translation"
+
+    refsrepo = Mock()
+    mapping_string = """
+        id: {{ id }}
+        term: {{ term }}
+        language: {{ language }}
+        translation: {{ translation }}
+    """
+    values, media = get_values_and_media_mapping(term, refsrepo, mapping_string)
+
+    expected = {
+        "id": 1,
+        "term": "test",
+        "parents": "",
+        "tags": "",
+        "language": "English",
+        "translation": "example translation",
+    }
+    assert values == expected, "mappings"
+    assert len(media) == 0
+
+
+def test_tag_replacements():
+    term = Mock()
+    term.id = 1
+    term.text = "test"
+    term.language.name = "English"
+    term.parents = []
+    term.term_tags = [Mock(text="noun"), Mock(text="verb")]
+    term.translation = ""
+
+    refsrepo = Mock()
+    mapping_string = "tags: {{ tags }}"
+
+    values, media = get_values_and_media_mapping(term, refsrepo, mapping_string)
+
+    assert set(values["tags"].split(", ")) == {"noun", "verb"}
+    assert len(media) == 0
+
+
+def test_image_handling():
+    term = Mock()
+    term.id = 1
+    term.text = "test"
+    term.language.id = 42
+    term.get_current_image.return_value = "image.jpg"
+    term.term_tags = [Mock(text="noun"), Mock(text="verb")]
+    term.translation = ""
+    term.parents = []
+
+    refsrepo = Mock()
+    mapping_string = "image: {{ image }}"
+
+    values, media = get_values_and_media_mapping(term, refsrepo, mapping_string)
+
+    assert media == {"LUTE_TERM_1.jpg": "42/image.jpg"}, "one image"
+    assert '<img src="LUTE_TERM_1.jpg">' in values["image"]
+
+
+def test_sentence_handling():
+    term = Mock()
+    term.id = 1
+    term.text = "test"
+    term.language.name = "English"
+    term.parents = []
+    term.term_tags = []
+    term.translation = ""
+
+    refsrepo = Mock()
+    refsrepo.find_references_by_id.return_value = {
+        "term": [Mock(sentence="Example sentence.")]
+    }
+    mapping_string = "sentence: {{ sentence }}"
+
+    values, media = get_values_and_media_mapping(term, refsrepo, mapping_string)
+
+    assert values["sentence"] == "Example sentence."
+    assert len(media) == 0
