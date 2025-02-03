@@ -86,21 +86,15 @@ def fixture_term():
     term.id = 1
     term.text = "test"
     term.language.name = "English"
+    term.language.id = 42
+    term.get_current_image.return_value = "image.jpg"
     term.parents = []
-    term.term_tags = []
+    term.term_tags = [Mock(text="noun"), Mock(text="verb")]
     term.translation = "example translation"
     return term
 
 
-def test_basic_replacements():
-    term = Mock()
-    term.id = 1
-    term.text = "test"
-    term.language.name = "English"
-    term.parents = []
-    term.term_tags = []
-    term.translation = "example translation"
-
+def test_basic_replacements(term):
     refsrepo = Mock()
     mapping_string = """
         id: {{ id }}
@@ -114,7 +108,7 @@ def test_basic_replacements():
         "id": 1,
         "term": "test",
         "parents": "",
-        "tags": "",
+        "tags": "noun, verb",
         "language": "English",
         "translation": "example translation",
     }
@@ -122,15 +116,7 @@ def test_basic_replacements():
     assert len(media) == 0
 
 
-def test_tag_replacements():
-    term = Mock()
-    term.id = 1
-    term.text = "test"
-    term.language.name = "English"
-    term.parents = []
-    term.term_tags = [Mock(text="noun"), Mock(text="verb")]
-    term.translation = ""
-
+def test_tag_replacements(term):
     refsrepo = Mock()
     mapping_string = "tags: {{ tags }}"
 
@@ -140,16 +126,7 @@ def test_tag_replacements():
     assert len(media) == 0
 
 
-def test_image_handling():
-    term = Mock()
-    term.id = 1
-    term.text = "test"
-    term.language.id = 42
-    term.get_current_image.return_value = "image.jpg"
-    term.term_tags = [Mock(text="noun"), Mock(text="verb")]
-    term.translation = ""
-    term.parents = []
-
+def test_image_handling(term):
     refsrepo = Mock()
     mapping_string = "image: {{ image }}"
 
@@ -159,15 +136,7 @@ def test_image_handling():
     assert '<img src="LUTE_TERM_1.jpg">' in values["image"]
 
 
-def test_sentence_handling():
-    term = Mock()
-    term.id = 1
-    term.text = "test"
-    term.language.name = "English"
-    term.parents = []
-    term.term_tags = []
-    term.translation = ""
-
+def test_sentence_handling(term):
     refsrepo = Mock()
     refsrepo.find_references_by_id.return_value = {
         "term": [Mock(sentence="Example sentence.")]

@@ -64,11 +64,9 @@ def _all_terms(term):
 
 def _all_tags(term):
     "Tags for term and all parents."
-    print(f"getting tags for term {term}")
     all_terms = _all_terms(term)
-    print(f"all terms = {all_terms}")
     ret = [tt.text for t in _all_terms(term) for tt in t.term_tags]
-    return list(set(ret))
+    return sorted(list(set(ret)))
 
 
 def get_values_and_media_mapping(term, refsrepo, mapping_string):
