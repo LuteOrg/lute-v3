@@ -76,7 +76,6 @@ class FieldMappingData:
     "Data class"
     fieldname: str = None
     value: str = None
-    processed_value: str = None
 
 
 def mapping_as_array(field_mapping):
