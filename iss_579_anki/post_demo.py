@@ -37,6 +37,7 @@ import lute.app_factory
 from lute.db import db
 
 from lute.ankiexport.selector import evaluate_selector
+from lute.ankiexport.mapper import mapping_as_array
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 
@@ -83,40 +84,6 @@ def verify_anki_deck_exists(deck_name):
     "Throws if some anki decks don't exist."
     p = {"action": "deckNames", "version": 6}
     _verify_anki_item_exists(p, deck_name, "deck name")
-
-
-@dataclass
-class FieldMappingData:
-    "Data class"
-    fieldname: str = None
-    value: str = None
-
-
-def mapping_as_array(field_mapping):
-    """
-    Given "a: {{ somefield }}", returns
-    [ ("a", "{{ somefield }}") ]
-
-    Raises config error if dup fields.
-    """
-    ret = []
-    lines = [
-        s.strip()
-        for s in field_mapping.split("\n")
-        if s.strip() != "" and not s.strip().startswith("#")
-    ]
-    for lin in lines:
-        parts = lin.split(":", 1)
-        if len(parts) != 2:
-            raise AnkiExportConfigurationError(f'Bad mapping line "{lin}" in mapping')
-        field, val = parts
-        if field in [fmd.fieldname for fmd in ret]:
-            raise AnkiExportConfigurationError(f"Dup field {field} in mapping")
-        fmd = FieldMappingData()
-        fmd.fieldname = field
-        fmd.value = val
-        ret.append(fmd)
-    return ret
 
 
 def verify_anki_model_fields_exist(model_name, fieldnames):
