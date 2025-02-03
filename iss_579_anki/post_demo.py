@@ -114,13 +114,15 @@ def all_tags(term):
 
 # pylint: disable=too-many-arguments,too-many-positional-arguments
 def build_ankiconnect_post_json(
-    term, refsrepo, mapping_string, img_root_dir, deck_name, model_name
+    term,
+    replacements,
+    media_mappings,
+    mapping_string,
+    img_root_dir,
+    deck_name,
+    model_name,
 ):
     "Build post json for term using the mappings."
-
-    replacements, media_mappings = get_values_and_media_mapping(
-        term, refsrepo, mapping_string
-    )
 
     post_actions = []
     for new_filename, original_file in media_mappings.items():
@@ -183,9 +185,11 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
         print(t)
         use_mappings = get_selected_mappings(all_mapping_data, t)
         for m in use_mappings:
+            vals, mmap = get_values_and_media_mapping(t, refsrepo, m["mapping"])
             p = build_ankiconnect_post_json(
                 t,
-                refsrepo,
+                vals,
+                mmap,
                 m["mapping"],
                 IMAGE_ROOT_DIR,
                 m["deck_name"],
