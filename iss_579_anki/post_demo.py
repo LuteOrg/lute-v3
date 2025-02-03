@@ -552,6 +552,12 @@ def run_test():
 
 if __name__ == "__main__":
     if anki_is_running():
-        run_test()
+        print("is running")
     else:
-        print("Anki not running")
+        print("not running")
+
+    try:
+        run_test()
+    except requests.exceptions.ConnectionError as ex:
+        print("Anki not running???")
+        print(ex)
