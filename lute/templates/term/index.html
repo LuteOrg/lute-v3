@@ -477,14 +477,14 @@
             return;
           }
 
+          $("<br>").insertAfter(el);
           $("<span>", {
             class: "tooltip",
             text: error ? `Error: ${error}` : message,
             css: {
-              marginLeft: "5px",
               color: error ? "red" : "green"
             }
-          }).insertAfter(el);
+          }).insertAfter(el.next());
         });
     })
     .fail(function (xhr, status, error) {
