@@ -380,7 +380,7 @@
 
 
   let render_text = function ( data, type, row, meta ) {
-    return `<a href="/term/edit/${row['WoID']}">${row['WoText']}</a>`;
+    return `<a id="term_${row['WoID']}" href="/term/edit/${row['WoID']}">${row['WoText']}</a>`;
   };
 
   let render_checkbox = function (data, type, row, meta) {
@@ -472,7 +472,7 @@
       .then(response => response.json())
       .then(results => {
         results.forEach(({ "word-id": wordId, message, error }) => {
-          const span = document.querySelector(`input[wordid="${wordId}"]`);
+          const span = document.querySelector(`a[id="term_${wordId}"]`);
           if (!span) return;
 
           const tooltip = document.createElement("span");
