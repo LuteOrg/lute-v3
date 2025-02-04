@@ -825,6 +825,18 @@ let show_translation_for_text = function(text) {
 };
 
 
+/**
+ * Get all selected words, post their IDs.
+ */
+function send_selected_terms_to_anki() {
+  let elements = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
+  if (elements.length == 0)
+    return;
+  const selected_ids = elements.map(el => $(el).data("wid"));
+  alert('sending ' + selected_ids);
+}
+
+
 // Get all the word ids on the current page, open new tab with just those terms.
 function open_term_list_for_current_page() {
   const ids = new Set();
