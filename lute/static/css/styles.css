@@ -905,6 +905,22 @@ img
     margin-left: 20pt;
 }
 
+/* Tooltip shown on copy or anki card creation. */
+.manual-tooltip {
+    position: absolute;
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 3px;
+    font-size: 12pt;
+    z-index: 500;  /* Initial z-index */
+}
+
+.manual-tooltip.hovered {
+    z-index: 10000;  /* Higher z-index when hovered */
+}
+
 /* Widening the tooltip. */
 div.ui-tooltip {
     max-width: 400px !important;
