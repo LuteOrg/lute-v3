@@ -479,11 +479,8 @@
 
           $("<br>").insertAfter(el);
           $("<span>", {
-            class: "tooltip",
-            text: error ? `Error: ${error}` : message,
-            css: {
-              color: error ? "red" : "green"
-            }
+            class: `ankicard post_${error ? 'error' : 'success'}`,
+            text: error ? error : message,
           }).insertAfter(el.next());
         });
     })
