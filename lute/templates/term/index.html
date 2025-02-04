@@ -462,29 +462,31 @@
       return;
     }
 
-    const postdata = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ term_ids: wordIds })
-    };
-
-    fetch("/ankiexport/create_cards_for_term_ids", postdata)
-      .then(response => response.json())
-      .then(results => {
+    $.ajax({
+        url: "/ankiexport/create_cards_for_term_ids",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ term_ids: wordIds }),
+        dataType: "json"
+    })
+    .done(function (results) {
         results.forEach(({ "word-id": wordId, message, error }) => {
-          const span = document.querySelector(`a[id="term_${wordId}"]`);
-          if (!span) return;
+            const $span = $(`a[id="term_${wordId}"]`);
+            if (!$span.length) return;
 
-          const tooltip = document.createElement("span");
-          tooltip.classList.add("tooltip");
-          tooltip.innerText = error ? `Error: ${error}` : message;
-          tooltip.style.marginLeft = "5px";
-          tooltip.style.color = error ? "red" : "green";
-
-          span.insertAdjacentElement("afterend", tooltip);
+            $("<span>", {
+                class: "tooltip",
+                text: error ? `Error: ${error}` : message,
+                css: {
+                    marginLeft: "5px",
+                    color: error ? "red" : "green"
+                }
+            }).insertAfter($span);
         });
-      }) // end then(results
-      .catch(error => console.error("Error:", error));
+    })
+    .fail(function (xhr, status, error) {
+        console.error("Error:", error);
+    });
   } // end post_anki
 
   function bulk_delete(event) {
