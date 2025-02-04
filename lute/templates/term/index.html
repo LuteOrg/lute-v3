@@ -74,6 +74,7 @@
   <div class="term-action-content">
     <a href="/term/new">Create new</a>
     <a id="term_action_bulk_edit" class="bulkActionLink" href="#" onclick="show_bulk_edit_form(event, this);">Bulk edit</a>
+    <a id="term_action_post_anki" href="#" onclick="post_anki(event);">Create Anki cards</a>
     <a id="term_action_bulk_delete" class="bulkActionLink" href="#" onclick="bulk_delete(event);">Delete selected</a>
     <a id="term_action_export_csv" href="#" onclick="export_csv(event);">Export CSV</a>
   </div>
@@ -451,6 +452,40 @@
   function set_bulk_wordids() {
     $("#txtWordIds").val(_get_checked_wordids().join(","));
   }
+
+  function post_anki(event) {
+    event.preventDefault();
+    const checked = $('.chkWord:checked');
+    const wordIds = checked.toArray().map(el => parseInt($(el).attr('wordid')));
+    if (wordIds.length === 0) {
+      console.log("No terms selected");
+      return;
+    }
+
+    const postdata = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ term_ids: wordIds })
+    };
+
+    fetch("/ankiexport/create_cards_for_term_ids", postdata)
+      .then(response => response.json())
+      .then(results => {
+        results.forEach(({ "word-id": wordId, message, error }) => {
+          const span = document.querySelector(`input[wordid="${wordId}"]`);
+          if (!span) return;
+
+          const tooltip = document.createElement("span");
+          tooltip.classList.add("tooltip");
+          tooltip.innerText = error ? `Error: ${error}` : message;
+          tooltip.style.marginLeft = "5px";
+          tooltip.style.color = error ? "red" : "green";
+
+          span.insertAdjacentElement("afterend", tooltip);
+        });
+      }) // end then(results
+      .catch(error => console.error("Error:", error));
+  } // end post_anki
 
   function bulk_delete(event) {
     event.preventDefault();
