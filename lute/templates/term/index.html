@@ -471,17 +471,20 @@
     })
     .done(function (results) {
         results.forEach(({ "word-id": wordId, message, error }) => {
-            const $span = $(`a[id="term_${wordId}"]`);
-            if (!$span.length) return;
+          const el = $(`#term_${wordId}`);
+          if (!el.length) {
+            console.log(`Not found id #term_${wordId}`);
+            return;
+          }
 
-            $("<span>", {
-                class: "tooltip",
-                text: error ? `Error: ${error}` : message,
-                css: {
-                    marginLeft: "5px",
-                    color: error ? "red" : "green"
-                }
-            }).insertAfter($span);
+          $("<span>", {
+            class: "tooltip",
+            text: error ? `Error: ${error}` : message,
+            css: {
+              marginLeft: "5px",
+              color: error ? "red" : "green"
+            }
+          }).insertAfter(el);
         });
     })
     .fail(function (xhr, status, error) {
