@@ -111,6 +111,7 @@
 </table>
 
 <script type="text/javascript" src="/static/js/never_cache/lute-tagify-utils.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/never_cache/lute-anki.js" charset="utf-8"></script>
 
 <script>
 
@@ -454,6 +455,8 @@
   }
 
   function post_anki(event) {
+    LuteAnki.get_anki_specs(null);
+
     event.preventDefault();
     const checked = $('.chkWord:checked');
     const wordIds = checked.toArray().map(el => parseInt($(el).attr('wordid')));
