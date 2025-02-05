@@ -49,7 +49,7 @@ const LuteAnki = (function() {
       }
     }
     result = await _invoke(p);
-    console.log(`got: ${JSON.stringify(result, null, 2)}`)
+    // console.log(`got: ${JSON.stringify(result, null, 2)}`)
 
     const deck_names = result[0];
     const note_types = result[1];
@@ -60,7 +60,7 @@ const LuteAnki = (function() {
         "modelName": nt
       }
     }));
-    console.log(JSON.stringify(getfieldnames_actions, null, 2));
+    // console.log(JSON.stringify(getfieldnames_actions, null, 2));
 
     p = {
       "action": "multi",
@@ -68,22 +68,23 @@ const LuteAnki = (function() {
       "params": { "actions": getfieldnames_actions }
     };
     result = await _invoke(p);
-    console.log(`got: ${JSON.stringify(result, null, 2)}`)
+    // console.log(`got: ${JSON.stringify(result, null, 2)}`)
     const note_type_fields = {};
     for (let i = 0; i < note_types.length; i++) {
       note_type_fields[note_types[i]] = result[i];
     }
-    console.log(`got: ${JSON.stringify(note_type_fields, null, 2)}`)
+    // console.log(`got: ${JSON.stringify(note_type_fields, null, 2)}`)
 
     const ret = {
       deck_names: deck_names,
       note_types: note_type_fields,
     };
-    console.log(`got: ${JSON.stringify(ret, null, 2)}`)
+    // console.log(`got: ${JSON.stringify(ret, null, 2)}`)
     return ret;
   }
 
 
+  // Exported functions.
   return {
     get_anki_specs: get_anki_specs,
   };
