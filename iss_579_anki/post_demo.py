@@ -21,17 +21,18 @@ import os
 import re
 import json
 import requests
-from pyparsing.exceptions import ParseException
 
-from lute.models.term import Term
-from lute.models.language import Language
 from lute.models.repositories import TermRepository
 from lute.term.model import ReferencesRepository
 import lute.app_factory
 from lute.db import db
 
 from lute.ankiexport.selector import evaluate_selector
-from lute.ankiexport.mapper import mapping_as_array, get_values_and_media_mapping
+from lute.ankiexport.mapper import (
+    mapping_as_array,
+    get_values_and_media_mapping,
+    validate_mapping,
+)
 from lute.ankiexport.ankiconnect import AnkiConnectWrapper
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
@@ -41,14 +42,14 @@ IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data/userimages"
 anki_connect = AnkiConnectWrapper(ANKI_CONNECT_URL)
 
 
-def validate_mapping(m):
+def validate_mapping_and_anki(m):
     "Check that the mapping is good."
+    validate_mapping(m["mapping"])
     verify_anki_model_exists(m["note_type"])
     verify_anki_deck_exists(m["deck_name"])
     mapping_array = mapping_as_array(m["mapping"])
     fieldnames = [m.fieldname for m in mapping_array]
     verify_anki_model_fields_exist(m["note_type"], fieldnames)
-    verify_valid_mapping_parsing(m["mapping"])
 
 
 def verify_anki_model_exists(model_name):
@@ -177,17 +178,6 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
     return ret
 
 
-def verify_valid_mapping_parsing(mapping_string):
-    "Check mapping with a dummy Term."
-    t = Term(Language(), "")
-    refsrepo = None
-    try:
-        get_values_and_media_mapping(t, refsrepo, mapping_string)
-    except ParseException as ex:
-        msg = f'Invalid mapping value "{ex.line}". '
-        raise AnkiExportConfigurationError(msg + str(ex)) from ex
-
-
 # pylint: disable=too-many-locals
 def run_test():
     "Sample mapping and terms."
@@ -244,7 +234,7 @@ def run_test():
     errors = []
     for m in active_mappings:
         try:
-            validate_mapping(m)
+            validate_mapping_and_anki(m)
             valid_mappings.append(m)
         except AnkiExportConfigurationError as ex:
             errors.append([m["name"], ex])

@@ -6,7 +6,11 @@ from unittest.mock import Mock
 import pytest
 
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
-from lute.ankiexport.mapper import mapping_as_array, get_values_and_media_mapping
+from lute.ankiexport.mapper import (
+    mapping_as_array,
+    get_values_and_media_mapping,
+    validate_mapping,
+)
 
 # pylint: disable=missing-function-docstring
 
@@ -76,8 +80,23 @@ def test_mapping_as_array_raises_error_on_duplicate_fields():
     b: {{ anotherfield }}
     a: {{ thirdfield }}
     """
-    with pytest.raises(AnkiExportConfigurationError, match="Dup field a in mapping"):
+    with pytest.raises(
+        AnkiExportConfigurationError, match="Duplicate field a in mapping"
+    ):
         mapping_as_array(mapping)
+
+
+@pytest.mark.parametrize(
+    "mapping,msg",
+    [
+        ("a: {{ x }}", 'Invalid mapping value "x"'),
+        ("a: {{ id }}\nb: {{ x }}", 'Invalid mapping value "x"'),
+        ("a: {{ id }}\na: {{ term }}", "Duplicate field a in mapping"),
+    ],
+)
+def test_validate_mapping_throws_if_bad_mapping_string(mapping, msg):
+    with pytest.raises(AnkiExportConfigurationError, match=msg):
+        validate_mapping(mapping)
 
 
 @pytest.fixture(name="term")

@@ -18,6 +18,9 @@ from pyparsing import (
     quotedString,
     Suppress,
 )
+from pyparsing.exceptions import ParseException
+from lute.models.term import Term
+from lute.models.language import Language
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 
@@ -47,7 +50,7 @@ def mapping_as_array(field_mapping):
             raise AnkiExportConfigurationError(f'Bad mapping line "{lin}" in mapping')
         field, val = parts
         if field in [fmd.fieldname for fmd in ret]:
-            raise AnkiExportConfigurationError(f"Dup field {field} in mapping")
+            raise AnkiExportConfigurationError(f"Duplicate field {field} in mapping")
         fmd = FieldMappingData()
         fmd.fieldname = field.strip()
         fmd.value = val.strip()
@@ -64,7 +67,6 @@ def _all_terms(term):
 
 def _all_tags(term):
     "Tags for term and all parents."
-    all_terms = _all_terms(term)
     ret = [tt.text for t in _all_terms(term) for tt in t.term_tags]
     return sorted(list(set(ret)))
 
@@ -174,3 +176,15 @@ def get_values_and_media_mapping(term, refsrepo, mapping_string):
     calc_replacements = parse_keys_needing_calculation(calc_keys, media_mappings)
 
     return ({**replacements, **calc_replacements}, media_mappings)
+
+
+def validate_mapping(mapping_string):
+    "Check mapping with a dummy Term."
+    t = Term(Language(), "")
+    refsrepo = None
+    try:
+        mapping_as_array(mapping_string)
+        get_values_and_media_mapping(t, refsrepo, mapping_string)
+    except ParseException as ex:
+        msg = f'Invalid mapping value "{ex.line}". '
+        raise AnkiExportConfigurationError(msg + str(ex)) from ex
