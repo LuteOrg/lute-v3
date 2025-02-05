@@ -34,55 +34,59 @@ const LuteAnki = (function() {
     });
   }
 
-  return {
-    /**
-     * Queries anki and gets data.
-     */
-    get_anki_specs: async function(anki_connect_url) {
-      let p = {
-        "action": "multi",
-        "version": 6,
-        "params": {
-          "actions": [
-            { "action": "deckNames" },
-            { "action": "modelNames" },
-          ]
-        }
+  /**
+   * Queries anki and gets data.
+   */
+  async function get_anki_specs(anki_connect_url) {
+    let p = {
+      "action": "multi",
+      "version": 6,
+      "params": {
+        "actions": [
+          { "action": "deckNames" },
+          { "action": "modelNames" },
+        ]
       }
-      result = await _invoke(p);
-      console.log(`got: ${JSON.stringify(result, null, 2)}`)
-
-      const deck_names = result[0];
-      const note_types = result[1];
-
-      const getfieldnames_actions = note_types.map(nt => ({
-        "action": "modelFieldNames",
-        "params": {
-          "modelName": nt
-        }
-      }));
-      console.log(JSON.stringify(getfieldnames_actions, null, 2));
-
-      p = {
-        "action": "multi",
-        "version": 6,
-        "params": { "actions": getfieldnames_actions }
-      };
-      result = await _invoke(p);
-      console.log(`got: ${JSON.stringify(result, null, 2)}`)
-      const note_type_fields = {};
-      for (let i = 0; i < note_types.length; i++) {
-        note_type_fields[note_types[i]] = result[i];
-      }
-      console.log(`got: ${JSON.stringify(note_type_fields, null, 2)}`)
-
-      const ret = {
-        deck_names: deck_names,
-        note_types: note_type_fields,
-      };
-      console.log(`got: ${JSON.stringify(ret, null, 2)}`)
-      return ret;
     }
+    result = await _invoke(p);
+    console.log(`got: ${JSON.stringify(result, null, 2)}`)
+
+    const deck_names = result[0];
+    const note_types = result[1];
+
+    const getfieldnames_actions = note_types.map(nt => ({
+      "action": "modelFieldNames",
+      "params": {
+        "modelName": nt
+      }
+    }));
+    console.log(JSON.stringify(getfieldnames_actions, null, 2));
+
+    p = {
+      "action": "multi",
+      "version": 6,
+      "params": { "actions": getfieldnames_actions }
+    };
+    result = await _invoke(p);
+    console.log(`got: ${JSON.stringify(result, null, 2)}`)
+    const note_type_fields = {};
+    for (let i = 0; i < note_types.length; i++) {
+      note_type_fields[note_types[i]] = result[i];
+    }
+    console.log(`got: ${JSON.stringify(note_type_fields, null, 2)}`)
+
+    const ret = {
+      deck_names: deck_names,
+      note_types: note_type_fields,
+    };
+    console.log(`got: ${JSON.stringify(ret, null, 2)}`)
+    return ret;
+  }
+
+
+  return {
+    get_anki_specs: get_anki_specs,
   };
+
 
 })();
