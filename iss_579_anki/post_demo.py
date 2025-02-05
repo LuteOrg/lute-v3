@@ -76,21 +76,21 @@ def _verify_anki_model_fields_exist(model_name, fieldnames):
         )
 
 
-def all_terms(term):
+def _all_terms(term):
     "Term and any parents."
     ret = [term]
     ret.extend(term.parents)
     return ret
 
 
-def all_tags(term):
+def _all_tags(term):
     "Tags for term and all parents."
-    ret = [tt.text for t in all_terms(term) for tt in t.term_tags]
+    ret = [tt.text for t in _all_terms(term) for tt in t.term_tags]
     return list(set(ret))
 
 
 # pylint: disable=too-many-arguments,too-many-positional-arguments
-def build_ankiconnect_post_json(
+def _build_ankiconnect_post_json(
     mapping_array,
     media_mappings,
     lute_and_term_tags,
@@ -147,9 +147,9 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
             for k, v in mmap.items():
                 mmap[k] = os.path.join(IMAGE_ROOT_DIR, v)
             mapping_array = get_fields_and_final_values(m["mapping"], replacements)
-            tags = ["lute"] + all_tags(t)
+            tags = ["lute"] + _all_tags(t)
 
-            p = build_ankiconnect_post_json(
+            p = _build_ankiconnect_post_json(
                 mapping_array,
                 mmap,
                 tags,
