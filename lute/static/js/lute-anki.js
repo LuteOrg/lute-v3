@@ -7,7 +7,9 @@ const LuteAnki = (function() {
   function _invoke(postdict) {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      xhr.addEventListener('error', () => reject('failed to issue request'));
+      xhr.addEventListener('error', (e) => {
+        reject(e);
+      });
       xhr.addEventListener('load', () => {
         try {
           const response = JSON.parse(xhr.responseText);
@@ -29,6 +31,8 @@ const LuteAnki = (function() {
         }
       });
 
+      // If AnkiConnect isn't running, Chrome error logs
+      // net::ERR_CONNECTION_REFUSED; this can't be suppressed.
       xhr.open('POST', 'http://127.0.0.1:8765');
       xhr.send(JSON.stringify(postdict));
     });
@@ -37,7 +41,7 @@ const LuteAnki = (function() {
   /**
    * Queries anki and gets data.
    */
-  async function get_anki_specs(anki_connect_url) {
+  async function _get_anki_specs(anki_connect_url) {
     let p = {
       "action": "multi",
       "version": 6,
@@ -84,11 +88,21 @@ const LuteAnki = (function() {
     return ret;
   }
 
+  function get_anki_specs() {
+    return _get_anki_specs()
+      .then(result => {
+        console.log("result:", result);
+        return result;
+      })
+      .catch(error => {
+        console.log("returning null");
+        return null;
+      });
+  }
 
   // Exported functions.
   return {
     get_anki_specs: get_anki_specs,
   };
-
 
 })();
