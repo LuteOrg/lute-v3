@@ -18,7 +18,6 @@ python -m iss_579_anki.post_demo
 """
 
 import os
-import re
 import json
 import requests
 
@@ -32,6 +31,7 @@ from lute.ankiexport.mapper import (
     mapping_as_array,
     get_values_and_media_mapping,
     validate_mapping,
+    get_fields_and_final_values,
 )
 from lute.ankiexport.ankiconnect import AnkiConnectWrapper
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
@@ -87,17 +87,6 @@ def all_tags(term):
     "Tags for term and all parents."
     ret = [tt.text for t in all_terms(term) for tt in t.term_tags]
     return list(set(ret))
-
-
-def apply_replacements(mapping_array, replacements):
-    "Apply the replacement vals to the vals in the array."
-    for m in mapping_array:
-        value = m.value
-        for k, v in replacements.items():
-            pattern = rf"{{{{\s*{re.escape(k)}\s*}}}}"
-            value = re.sub(pattern, f"{v}", value)
-        m.value = value
-    return mapping_array
 
 
 # pylint: disable=too-many-arguments,too-many-positional-arguments
@@ -159,11 +148,10 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
         # print(t)
         use_mappings = get_selected_mappings(all_mapping_data, t)
         for m in use_mappings:
-            vals, mmap = get_values_and_media_mapping(t, refsrepo, m["mapping"])
+            replacements, mmap = get_values_and_media_mapping(t, refsrepo, m["mapping"])
             for k, v in mmap.items():
                 mmap[k] = os.path.join(IMAGE_ROOT_DIR, v)
-            mapping_array = mapping_as_array(m["mapping"])
-            mapping_array = apply_replacements(mapping_array, vals)
+            mapping_array = get_fields_and_final_values(m["mapping"], replacements)
             tags = ["lute"] + all_tags(t)
 
             p = build_ankiconnect_post_json(

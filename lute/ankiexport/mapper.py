@@ -30,6 +30,9 @@ class FieldMappingData:
     fieldname: str = None
     value: str = None
 
+    def __str__(self):
+        return f"|{self.fieldname}|=>|{self.value}|"
+
 
 def mapping_as_array(field_mapping):
     """
@@ -188,3 +191,15 @@ def validate_mapping(mapping_string):
     except ParseException as ex:
         msg = f'Invalid mapping value "{ex.line}". '
         raise AnkiExportConfigurationError(msg + str(ex)) from ex
+
+
+def get_fields_and_final_values(mapping_string, replacements):
+    "Break mapping string into fields, apply replacements."
+    mapping_array = mapping_as_array(mapping_string)
+    for m in mapping_array:
+        value = m.value
+        for k, v in replacements.items():
+            pattern = rf"{{{{\s*{re.escape(k)}\s*}}}}"
+            value = re.sub(pattern, f"{v}", value)
+        m.value = value
+    return mapping_array

@@ -10,6 +10,7 @@ from lute.ankiexport.mapper import (
     mapping_as_array,
     get_values_and_media_mapping,
     validate_mapping,
+    get_fields_and_final_values,
 )
 
 # pylint: disable=missing-function-docstring
@@ -99,6 +100,19 @@ def test_validate_mapping_throws_if_bad_mapping_string(mapping, msg):
         validate_mapping(mapping)
 
 
+@pytest.mark.parametrize(
+    "mapping,msg",
+    [
+        ("a: {{ id }}", "ok"),
+        ("a: {{ id }}\nb: {{ id }}", "same value twice ok"),
+        ("a: {{ id }}\nb: {{ term }}", "different fields"),
+    ],
+)
+def test_validate_mapping_does_not_throw_if_ok(mapping, msg):
+    validate_mapping(mapping)
+    assert True, msg
+
+
 @pytest.fixture(name="term")
 def fixture_term():
     term = Mock()
@@ -166,3 +180,14 @@ def test_sentence_handling(term):
 
     assert values["sentence"] == "Example sentence."
     assert len(media) == 0
+
+
+def test_get_fields_and_final_values_smoke_test():
+    mapping_string = """
+    a: {{ id }}
+    b: {{ term }}
+    """
+    replacements = {"id": 42, "term": "rabbit"}
+    actual = get_fields_and_final_values(mapping_string, replacements)
+    actual = [str(a) for a in actual]
+    assert actual == ["|a|=>|42|", "|b|=>|rabbit|"]
