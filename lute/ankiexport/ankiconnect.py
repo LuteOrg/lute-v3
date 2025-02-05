@@ -47,6 +47,10 @@ class AnkiConnectWrapper:
         ret = self._do_post(p)
         return ret["result"]
 
+    def post(self, json):
+        "Post and return the result."
+        return self._do_post(json)
+
 
 if __name__ == "__main__":
     # Sanity check only, assumes ankiconnect running on default port.

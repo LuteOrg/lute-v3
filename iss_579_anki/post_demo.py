@@ -32,21 +32,13 @@ from lute.db import db
 
 from lute.ankiexport.selector import evaluate_selector
 from lute.ankiexport.mapper import mapping_as_array, get_values_and_media_mapping
+from lute.ankiexport.ankiconnect import AnkiConnectWrapper
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
-
-IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data/userimages"
 ANKI_CONNECT_URL = "http://localhost:8765"
+IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data/userimages"
 
-
-def anki_is_running():
-    "True if Anki version check returns data."
-    try:
-        p = {"action": "version", "version": 6}
-        requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
-        return True
-    except requests.exceptions.ConnectionError:
-        return False
+anki_connect = AnkiConnectWrapper(ANKI_CONNECT_URL)
 
 
 def validate_mapping(m):
@@ -59,34 +51,23 @@ def validate_mapping(m):
     verify_valid_mapping_parsing(m["mapping"])
 
 
-def _verify_anki_item_exists(p, name, category_name):
-    "Check collection contains the given name."
-    ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
-    rj = ret.json()
-    if name not in rj["result"]:
-        msg = f"Bad {category_name}: {name}"
-        raise AnkiExportConfigurationError(msg)
-
-
 def verify_anki_model_exists(model_name):
     "Throws if some anki models don't exist."
-    p = {"action": "modelNames", "version": 6}
-    _verify_anki_item_exists(p, model_name, "note type")
+    if model_name not in anki_connect.note_types():
+        msg = f"Bad note type: {model_name}"
+        raise AnkiExportConfigurationError(msg)
 
 
 def verify_anki_deck_exists(deck_name):
     "Throws if some anki decks don't exist."
-    p = {"action": "deckNames", "version": 6}
-    _verify_anki_item_exists(p, deck_name, "deck name")
+    if deck_name not in anki_connect.deck_names():
+        msg = f"Bad deck name: {deck_name}"
+        raise AnkiExportConfigurationError(msg)
 
 
 def verify_anki_model_fields_exist(model_name, fieldnames):
-    "Throws if some anki models don't exist."
-    p = {"action": "modelFieldNames", "version": 6, "params": {"modelName": model_name}}
-    ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
-    rj = ret.json()
-    # print(rj)
-    existing_field_names = rj["result"]
+    "Throws if the model doesn't contain all fields in fieldnames."
+    existing_field_names = anki_connect.note_fields(model_name)
     bad_field_names = [f for f in fieldnames if f not in existing_field_names]
     if len(bad_field_names) != 0:
         raise AnkiExportConfigurationError(
@@ -165,6 +146,7 @@ def get_selected_mappings(mappings, term):
     ]
 
 
+# pylint: disable=too-many-locals
 def get_selected_post_data(db_session, term_ids, all_mapping_data):
     "Run test."
     repo = TermRepository(db_session)
@@ -286,13 +268,12 @@ def run_test():
     print("\n\nNOT POSTING")
     return
     for p in jsons:
-        ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
-        rj = ret.json()
-        print(rj)
+        ret = anki_connect.post(p)
+        print(ret)
 
 
 if __name__ == "__main__":
-    if anki_is_running():
+    if anki_connect.is_running():
         print("is running")
     else:
         print("not running")
