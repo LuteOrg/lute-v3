@@ -6,31 +6,31 @@ const LuteAnki = (function() {
    * https://foosoft.net/projects/anki-connect/index.html#miscellaneous-actions */
   function _invoke(postdict) {
     return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.addEventListener('error', () => reject('failed to issue request'));
-        xhr.addEventListener('load', () => {
-            try {
-                const response = JSON.parse(xhr.responseText);
-                if (Object.getOwnPropertyNames(response).length != 2) {
-                    throw 'response has an unexpected number of fields';
-                }
-                if (!response.hasOwnProperty('error')) {
-                    throw 'response is missing required error field';
-                }
-                if (!response.hasOwnProperty('result')) {
-                    throw 'response is missing required result field';
-                }
-                if (response.error) {
-                    throw response.error;
-                }
-                resolve(response.result);
-            } catch (e) {
-                reject(e);
-            }
-        });
+      const xhr = new XMLHttpRequest();
+      xhr.addEventListener('error', () => reject('failed to issue request'));
+      xhr.addEventListener('load', () => {
+        try {
+          const response = JSON.parse(xhr.responseText);
+          if (Object.getOwnPropertyNames(response).length != 2) {
+            throw 'response has an unexpected number of fields';
+          }
+          if (!response.hasOwnProperty('error')) {
+            throw 'response is missing required error field';
+          }
+          if (!response.hasOwnProperty('result')) {
+            throw 'response is missing required result field';
+          }
+          if (response.error) {
+            throw response.error;
+          }
+          resolve(response.result);
+        } catch (e) {
+          reject(e);
+        }
+      });
 
-        xhr.open('POST', 'http://127.0.0.1:8765');
-        xhr.send(JSON.stringify(postdict));
+      xhr.open('POST', 'http://127.0.0.1:8765');
+      xhr.send(JSON.stringify(postdict));
     });
   }
 
@@ -68,6 +68,7 @@ const LuteAnki = (function() {
       "params": { "actions": getfieldnames_actions }
     };
     result = await _invoke(p);
+
     // console.log(`got: ${JSON.stringify(result, null, 2)}`)
     const note_type_fields = {};
     for (let i = 0; i < note_types.length; i++) {
