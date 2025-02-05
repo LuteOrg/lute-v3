@@ -45,28 +45,28 @@ anki_connect = AnkiConnectWrapper(ANKI_CONNECT_URL)
 def validate_mapping_and_anki(m):
     "Check that the mapping is good."
     validate_mapping(m["mapping"])
-    verify_anki_model_exists(m["note_type"])
-    verify_anki_deck_exists(m["deck_name"])
+    _verify_anki_model_exists(m["note_type"])
+    _verify_anki_deck_exists(m["deck_name"])
     mapping_array = mapping_as_array(m["mapping"])
     fieldnames = [m.fieldname for m in mapping_array]
-    verify_anki_model_fields_exist(m["note_type"], fieldnames)
+    _verify_anki_model_fields_exist(m["note_type"], fieldnames)
 
 
-def verify_anki_model_exists(model_name):
+def _verify_anki_model_exists(model_name):
     "Throws if some anki models don't exist."
     if model_name not in anki_connect.note_types():
         msg = f"Bad note type: {model_name}"
         raise AnkiExportConfigurationError(msg)
 
 
-def verify_anki_deck_exists(deck_name):
+def _verify_anki_deck_exists(deck_name):
     "Throws if some anki decks don't exist."
     if deck_name not in anki_connect.deck_names():
         msg = f"Bad deck name: {deck_name}"
         raise AnkiExportConfigurationError(msg)
 
 
-def verify_anki_model_fields_exist(model_name, fieldnames):
+def _verify_anki_model_fields_exist(model_name, fieldnames):
     "Throws if the model doesn't contain all fields in fieldnames."
     existing_field_names = anki_connect.note_fields(model_name)
     bad_field_names = [f for f in fieldnames if f not in existing_field_names]
@@ -127,15 +127,6 @@ def build_ankiconnect_post_json(
     return {"action": "multi", "params": {"actions": post_actions}}
 
 
-def get_selected_mappings(mappings, term):
-    """
-    Get all mappings where the selector is True.
-    """
-    return [
-        m for m in mappings if m["active"] and evaluate_selector(m["selector"], term)
-    ]
-
-
 # pylint: disable=too-many-locals
 def get_selected_post_data(db_session, term_ids, all_mapping_data):
     "Run test."
@@ -146,7 +137,11 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
     ret = []
     for t in terms:
         # print(t)
-        use_mappings = get_selected_mappings(all_mapping_data, t)
+        use_mappings = [
+            m
+            for m in all_mapping_data
+            if m["active"] and evaluate_selector(m["selector"], t)
+        ]
         for m in use_mappings:
             replacements, mmap = get_values_and_media_mapping(t, refsrepo, m["mapping"])
             for k, v in mmap.items():
