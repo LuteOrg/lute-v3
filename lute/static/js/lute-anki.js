@@ -116,9 +116,16 @@ const LuteAnki = (function() {
         data: JSON.stringify(postdata),
         dataType: "json"
       });
+
+      if (results.error) {
+        console.error("error:", results.error);
+        return null;
+      }
+
       return results;
-    } catch (error) {
-      console.error("Error:", error);
+    }
+    catch (jqXHR) {
+      console.error("AJAX request failed:", jqXHR.responseText || jqXHR.statusText);
       return null;
     }
   }

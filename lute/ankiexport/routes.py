@@ -6,6 +6,8 @@ import random
 
 # from flask import Blueprint, current_app, Response, request, jsonify, redirect, flash
 from flask import Blueprint, request, jsonify
+from lute.ankiexport.service import Service
+from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 # from lute.db import db
 
@@ -20,15 +22,6 @@ ERROR_MESSAGES = ["Duplicate", "Invalid ID", "Processing error"]
 fake_fail_counter = 0
 
 
-def _get_multiple_post_jsons(word_id):
-    """Get data from service."""
-    global fake_fail_counter
-    fake_fail_counter += 1
-    if fake_fail_counter % 2 == 0:  # Even IDs succeed
-        raise Exception(f"dummy failure {fake_fail_counter}")
-    return [{"some": f"value_{word_id}"}]
-
-
 @bp.route("/get_card_post_data", methods=["POST"])
 def get_ankiconnect_post_data():
     """Get data that the client javascript will post."""
@@ -36,20 +29,14 @@ def get_ankiconnect_post_data():
     word_ids = data.get("term_ids", [])
     anki_deck_names = data.get("deck_names", [])
     anki_note_types = data.get("note_types", {})
-    for t in [word_ids, anki_deck_names, anki_note_types]:
-        print(t, flush=True)
-
-    ret = {}
-    # get the post json.  If error, return that instead.
-    for word_id in word_ids:
-        entry = {"jsons": None, "error": None}
-        try:
-            entry["jsons"] = _get_multiple_post_jsons(word_id)
-        except Exception as ex:
-            entry["error"] = str(ex)
-        ret[word_id] = entry
-
-    return jsonify(ret)
+    svc = Service(anki_deck_names, anki_note_types)
+    try:
+        ret = svc.get_ankiconnect_post_data(word_ids)
+        return jsonify(ret)
+    except AnkiExportConfigurationError as ex:
+        response = jsonify({"error": str(ex)})
+        response.status_code = 400  # Bad Request
+        return response
 
 
 ### REMOVE
