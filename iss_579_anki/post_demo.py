@@ -29,50 +29,13 @@ from lute.db import db
 
 from lute.ankiexport.selector import evaluate_selector
 from lute.ankiexport.mapper import (
-    mapping_as_array,
     get_values_and_media_mapping,
-    validate_mapping,
     get_fields_and_final_values,
 )
 from lute.ankiexport.service import Service
-from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 ANKI_CONNECT_URL = "http://localhost:8765"
 IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data/userimages"
-
-
-def validate_mapping_and_anki(m):
-    "Check that the mapping is good."
-    validate_mapping(m["mapping"])
-    _verify_anki_model_exists(m["note_type"])
-    _verify_anki_deck_exists(m["deck_name"])
-    mapping_array = mapping_as_array(m["mapping"])
-    fieldnames = [m.fieldname for m in mapping_array]
-    _verify_anki_model_fields_exist(m["note_type"], fieldnames)
-
-
-def _verify_anki_model_exists(model_name):
-    "Throws if some anki models don't exist."
-    if model_name not in anki_connect.note_types():
-        msg = f"Bad note type: {model_name}"
-        raise AnkiExportConfigurationError(msg)
-
-
-def _verify_anki_deck_exists(deck_name):
-    "Throws if some anki decks don't exist."
-    if deck_name not in anki_connect.deck_names():
-        msg = f"Bad deck name: {deck_name}"
-        raise AnkiExportConfigurationError(msg)
-
-
-def _verify_anki_model_fields_exist(model_name, fieldnames):
-    "Throws if the model doesn't contain all fields in fieldnames."
-    existing_field_names = anki_connect.note_fields(model_name)
-    bad_field_names = [f for f in fieldnames if f not in existing_field_names]
-    if len(bad_field_names) != 0:
-        raise AnkiExportConfigurationError(
-            f"Bad field names: {', '.join(bad_field_names)}"
-        )
 
 
 def _all_terms(term):
@@ -226,27 +189,30 @@ def run_test():
     active_specs = [m for m in export_specs if m.active]
 
     # js would supply these ...
-    anki_deck_names = ["my_deck", "my_deck_2"]
-    anki_note_types = {"note 1": ["field a"], "note 2": ["a", "b", "c"]}
+    anki_deck_names = ["zzTestAnkiConnect", "some_other_deck"]
+    anki_note_types = {
+        "Lute_Basic_vocab": [
+            "Back",
+            "Definition",
+            "Front",
+            "Lute_term_id",
+            "Picture",
+            "Sentence",
+        ],
+        "note 2": ["a", "b", "c"],
+    }
 
     svc = Service(anki_deck_names, anki_note_types, active_specs)
     validation_results = svc.validate_specs()
-    print(validation_results)
+    if len(validation_results) != 0:
+        print("Errors:")
+        print(validation_results)
+        return
 
     print("\n\nSTOPPING FOR NOW")
     return
 
-    valid_specs = []
-    errors = []
-    for spec in active_specs:
-        try:
-            validate_mapping_and_anki(spec)
-            valid_specs.append(spec)
-        except AnkiExportConfigurationError as ex:
-            errors.append([spec.export_name, ex])
-    if len(errors) != 0:
-        print(errors)
-        return
+    valid_specs = active_specs
 
     kinder = 143771
     kind = 143770
@@ -264,7 +230,7 @@ def run_test():
     print("\n\nNOT POSTING")
     return
     for p in jsons:
-        ret = requests.post(ANKI_CONNECT_URL, json=json, timeout=5)
+        ret = requests.post(ANKI_CONNECT_URL, json=p, timeout=5)
         print(ret)
 
 
