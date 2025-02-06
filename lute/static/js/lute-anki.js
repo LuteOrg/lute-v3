@@ -81,20 +81,20 @@ const LuteAnki = (function() {
   async function get_anki_specs() {
     return _get_anki_specs()
       .then(result => {
-        console.log("result:", result);
+        // console.log("result:", result);
         return result;
       })
       .catch(error => {
-        console.log("returning null");
+        console.log("Error getting specs");
         return null;
       });
   }
 
   async function get_post_data(word_ids) {
-    console.log("getting post data");
+    // console.log("getting post data");
 
     const anki_specs = await get_anki_specs();
-    console.log("got specs?", anki_specs);
+    // console.log("got specs?", anki_specs);
 
     if (!anki_specs) {
       console.log("Anki not running, or can't connect?");
@@ -108,8 +108,6 @@ const LuteAnki = (function() {
       note_types: note_types,
     };
 
-    console.log("calling get post data");
-
     try {
       const results = await $.ajax({
         url: "/ankiexport/get_card_post_data",
@@ -118,8 +116,6 @@ const LuteAnki = (function() {
         data: JSON.stringify(postdata),
         dataType: "json"
       });
-
-      console.log("got results:", JSON.stringify(results, null, 2));
       return results;
     } catch (error) {
       console.error("Error:", error);
