@@ -100,9 +100,44 @@ const LuteAnki = (function() {
       });
   }
 
+  function get_post_data(word_ids) {
+    console.log("getting post data");
+    get_anki_specs().then(anki_specs => {
+      console.log("got specs?", anki_specs);
+    });
+    if (anki_specs == null) {
+      console.log("Anki not running, or can't connect?");
+      return null;
+    }
+    const { deck_names, note_types } = anki_specs;
+
+    const postdata = {
+      term_ids: word_ids,
+      deck_names: deck_names,
+      note_types: note_types,
+    };
+
+    console.log("calling get post data");
+    $.ajax({
+      url: "/ankiexport/get_card_post_data",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(postdata),
+      dataType: "json"
+    })
+      .done(function (results) {
+        console.log("got results");
+        console.log(JSON.stringify(results, null, 2));
+      })
+      .fail(function (xhr, status, error) {
+        console.error("Error:", error);
+      });
+  }
+
   // Exported functions.
   return {
     get_anki_specs: get_anki_specs,
+    get_post_data: get_post_data,
   };
 
 })();

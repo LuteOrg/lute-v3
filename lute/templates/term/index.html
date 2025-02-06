@@ -465,6 +465,15 @@
       return;
     }
 
+    const pd = LuteAnki.get_post_data(wordIds);
+    if (pd == null) {
+      console.log("no post data");
+      return;
+    }
+    console.log(JSON.stringify(pd, null, 2));
+    console.log("SKIPPING");
+    return;
+    
     $.ajax({
         url: "/ankiexport/create_cards_for_term_ids",
         method: "POST",
