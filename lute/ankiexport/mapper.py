@@ -189,8 +189,8 @@ def validate_mapping(mapping_string):
         mapping_as_array(mapping_string)
         get_values_and_media_mapping(t, refsrepo, mapping_string)
     except ParseException as ex:
-        msg = f'Invalid mapping value "{ex.line}". '
-        raise AnkiExportConfigurationError(msg + str(ex)) from ex
+        msg = f'Invalid field mapping "{ex.line}"'
+        raise AnkiExportConfigurationError(msg) from ex
 
 
 def get_fields_and_final_values(mapping_string, replacements):

@@ -12,6 +12,8 @@ from lute.ankiexport.mapper import (
 
 
 class Service:
+    "Srs export service."
+
     def __init__(
         self,
         anki_deck_names,
@@ -31,6 +33,7 @@ class Service:
         errors = []
         if spec.deck_name not in self.anki_deck_names:
             errors.append(f'No deck name: "{spec.deck_name}"')
+
         if spec.note_type not in self.anki_note_types_and_fields:
             errors.append(f'No note type: "{spec.note_type}"')
         else:
@@ -42,6 +45,12 @@ class Service:
                 bad_fields = ", ".join(bad_fields)
                 msg = f"Note type {spec.note_type} does not have field(s): {bad_fields}"
                 errors.append(msg)
+
+        try:
+            validate_mapping(spec.field_mapping)
+        except AnkiExportConfigurationError as ex:
+            errors.append(str(ex))
+
         return errors
 
     def validate_specs(self):

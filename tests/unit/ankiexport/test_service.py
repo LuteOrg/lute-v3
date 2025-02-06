@@ -28,7 +28,7 @@ def test_validate_returns_empty_hash_if_all_ok(export_spec):
     anki_notes = {"good_note": ["a", "b"]}
     svc = Service(anki_decks, anki_notes, [export_spec])
     result = svc.validate_specs()
-    assert result == {}, "No problems"
+    assert len(result) == 0, "No problems"
 
 
 @pytest.mark.parametrize(
@@ -42,7 +42,7 @@ def test_validate_returns_empty_hash_if_all_ok(export_spec):
             "xx: {{ language }}",
             "Note type good_note does not have field(s): xx",
         ),
-        ("field_mapping", "a: {{ bad_value }}", "blah"),
+        ("field_mapping", "a: {{ bad_value }}", 'Invalid field mapping "bad_value"'),
     ],
 )
 def test_validate_returns_dict_of_export_ids_and_errors(
