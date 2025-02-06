@@ -18,11 +18,27 @@ class Service:
         self.anki_note_types_and_fields = anki_note_types_and_fields
         self.export_specs = export_specs
 
+    def _validate_single_spec(self, spec):
+        """
+        Returns array of errors if any for the given spec.
+        """
+        errors = []
+        if spec.deck_name not in self.anki_deck_names:
+            errors.append(f'Bad deck name "{spec.deck_name}"')
+        if spec.note_type not in self.anki_note_types_and_fields:
+            errors.append(f'Bad note type "{spec.note_type}"')
+        return errors
+
     def validate_specs(self):
         """
         Return hash of spec ids and any config errors.
         """
-        return {}
+        failures = {}
+        for spec in self.export_specs:
+            v = self._validate_single_spec(spec)
+            if len(v) != 0:
+                failures[spec.id] = "; ".join(v)
+        return failures
 
     def _get_multiple_post_jsons(self, term_id):
         """Get data from service."""

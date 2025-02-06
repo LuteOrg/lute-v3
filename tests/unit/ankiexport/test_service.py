@@ -41,6 +41,7 @@ def test_validate_returns_dict_of_export_ids_and_errors(export_spec):
     svc = Service(anki_decks, anki_notes, [export_spec])
     result = svc.validate_specs()
     assert export_spec.id in result, "should have a problem"
+    assert result[export_spec.id] != ""
 
 
 def test_validate_reports_bad_mapping(export_spec):
@@ -50,6 +51,7 @@ def test_validate_reports_bad_mapping(export_spec):
     svc = Service(anki_decks, anki_notes, [export_spec])
     result = svc.validate_specs()
     assert export_spec.id in result, "should have a problem"
+    assert result[export_spec.id] != ""
 
 
 ### def assert_mapping_equals(mapping, expected):
