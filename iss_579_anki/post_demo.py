@@ -21,6 +21,7 @@ import os
 import json
 import requests
 
+from lute.models.srsexport import SrsExportSpec
 from lute.models.repositories import TermRepository
 from lute.term.model import ReferencesRepository
 import lute.app_factory
@@ -163,6 +164,10 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
 
 # pylint: disable=too-many-locals
 def run_test():
+    # js would supply these ...
+    anki_deck_names = ["my_deck", "my_deck_2"]
+    anki_note_types = {"note 1": ["field a"], "note 2": ["a", "b", "c"]}
+
     "Sample mapping and terms."
     gender_card_mapping = """\
       Lute_term_id: {{ id }}
@@ -212,15 +217,27 @@ def run_test():
         },
     ]
 
-    active_mappings = [m for m in all_mapping_data if m["active"]]
-    valid_mappings = []
+    export_specs = []
+    for md in all_mapping_data:
+        spec = SrsExportSpec()
+        spec.id = len(export_specs) + 1
+        spec.export_name = md["name"]
+        spec.criteria = md["selector"]
+        spec.deck_name = md["deck_name"]
+        spec.note_type = md["note_type"]
+        spec.field_mapping = md["mapping"]
+        spec.active = md["active"]
+        export_specs.append(spec)
+
+    active_specs = [m for m in export_specs if m.active]
+    valid_specs = []
     errors = []
-    for m in active_mappings:
+    for spec in active_specs:
         try:
-            validate_mapping_and_anki(m)
-            valid_mappings.append(m)
+            validate_mapping_and_anki(spec)
+            valid_specs.append(spec)
         except AnkiExportConfigurationError as ex:
-            errors.append([m["name"], ex])
+            errors.append([spec.export_name, ex])
     if len(errors) != 0:
         print(errors)
         return
@@ -231,7 +248,7 @@ def run_test():
 
     app = lute.app_factory.create_app()
     with app.app_context():
-        jsons = get_selected_post_data(db.session, termids, valid_mappings)
+        jsons = get_selected_post_data(db.session, termids, valid_specs)
 
     print("=" * 25)
     print(json.dumps(jsons, indent=2))
@@ -241,16 +258,11 @@ def run_test():
     print("\n\nNOT POSTING")
     return
     for p in jsons:
-        ret = anki_connect.post(p)
+        ret = requests.post(ANKI_CONNECT_URL, json=json, timeout=5)
         print(ret)
 
 
 if __name__ == "__main__":
-    if anki_connect.is_running():
-        print("is running")
-    else:
-        print("not running")
-
     try:
         run_test()
     except requests.exceptions.ConnectionError as ex:
