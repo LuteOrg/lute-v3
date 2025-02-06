@@ -39,9 +39,9 @@ class Service:
             fieldnames = [m.fieldname for m in mapping_array]
             bad_fields = [f for f in fieldnames if f not in note_fields]
             if len(bad_fields) > 0:
-                errors.append(
-                    f"Note type {spec.note_type} does not have field(s): {', '.join(bad_fields)}"
-                )
+                bad_fields = ", ".join(bad_fields)
+                msg = f"Note type {spec.note_type} does not have field(s): {bad_fields}"
+                errors.append(msg)
         return errors
 
     def validate_specs(self):
