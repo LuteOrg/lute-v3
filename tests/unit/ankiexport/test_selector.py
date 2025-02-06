@@ -6,6 +6,7 @@ import pytest
 from lute.models.term import Term, TermTag
 from lute.db import db
 from lute.ankiexport.selector import evaluate_selector
+from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 
 def _make_test_term(spanish):
@@ -37,10 +38,29 @@ def _make_test_term(spanish):
         ('tags:["fem", "masc"]', True),
         ("status<=3", True),
         ("status==1", False),
-        ('parents.count=1 and tags["fem", "masc"] and status<=3', True),
+        ('tags:["fem", "other"]', False),
+        ('parents.count=1 and tags:["fem", "other"] and status<=3', False),
     ],
 )
 def test_selector(selector, expected, empty_db, spanish):
     "Check selector vs test term."
     term = _make_test_term(spanish)
     assert evaluate_selector(selector, term) == expected, selector
+
+
+@pytest.mark.parametrize(
+    "selector",
+    [
+        ('lanxguage:"Spanish"'),
+        ('language="xxx"'),
+        ("parents=1"),
+        ('tags="masc"'),
+        ('tags["fem", "masc"]'),
+        ('parents.count=1 and tags["fem", "other"] and status<=3'),
+    ],
+)
+def test_bad_selector_throws(selector, empty_db, spanish):
+    "Check selector vs test term."
+    term = _make_test_term(spanish)
+    with pytest.raises(AnkiExportConfigurationError):
+        evaluate_selector(selector, term)

@@ -18,6 +18,7 @@ from pyparsing import (
     Suppress,
     Literal,
 )
+from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 
 def evaluate_selector(s, term):
@@ -112,7 +113,7 @@ def evaluate_selector(s, term):
     tagvallist = Suppress("[") + list_of_values + Suppress("]")
     tagcrit = tagvallist | quoteval
 
-    tag_matcher = Suppress("tags") + Suppress(":") + tagcrit
+    tag_matcher = Suppress(Literal("tags") + Literal(":")) + tagcrit
 
     lang_matcher = Suppress("language") + Suppress(":") + quoteval
 
@@ -147,7 +148,9 @@ def evaluate_selector(s, term):
         ],
     )
 
-    result = multi_check.parseString(s)
-    # print(f"{result}, {result[0]}")
-    # print(bool(result[0]))
-    return bool(result[0])
+    try:
+        result = multi_check.parseString(s, parseAll=True)
+        return bool(result[0])
+    except pp.ParseException as ex:
+        msg = f"Syntax error at position {ex.loc} or later: {ex.line}"
+        raise AnkiExportConfigurationError(msg) from ex
