@@ -3,6 +3,12 @@ Service, validates and posts.
 """
 
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
+from lute.ankiexport.mapper import (
+    mapping_as_array,
+    # get_values_and_media_mapping,
+    validate_mapping,
+    # get_fields_and_final_values,
+)
 
 
 class Service:
@@ -24,9 +30,18 @@ class Service:
         """
         errors = []
         if spec.deck_name not in self.anki_deck_names:
-            errors.append(f'Bad deck name "{spec.deck_name}"')
+            errors.append(f'No deck name: "{spec.deck_name}"')
         if spec.note_type not in self.anki_note_types_and_fields:
-            errors.append(f'Bad note type "{spec.note_type}"')
+            errors.append(f'No note type: "{spec.note_type}"')
+        else:
+            note_fields = self.anki_note_types_and_fields.get(spec.note_type, {})
+            mapping_array = mapping_as_array(spec.field_mapping)
+            fieldnames = [m.fieldname for m in mapping_array]
+            bad_fields = [f for f in fieldnames if f not in note_fields]
+            if len(bad_fields) > 0:
+                errors.append(
+                    f"Note type {spec.note_type} does not have field(s): {', '.join(bad_fields)}"
+                )
         return errors
 
     def validate_specs(self):

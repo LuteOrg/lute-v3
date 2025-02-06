@@ -35,9 +35,13 @@ def test_validate_returns_empty_hash_if_all_ok(export_spec):
     "prop_name,prop_value,expected_error",
     [
         ("criteria", 'lanxxguage:"German"', "lang"),
-        ("deck_name", "missing_deck", 'Bad deck name "missing_deck"'),
-        ("note_type", "missing_note", 'Bad note type "missing_note"'),
-        ("field_mapping", "bad_field: {{ language }}", "blah"),
+        ("deck_name", "missing_deck", 'No deck name: "missing_deck"'),
+        ("note_type", "missing_note", 'No note type: "missing_note"'),
+        (
+            "field_mapping",
+            "xx: {{ language }}",
+            "Note type good_note does not have field(s): xx",
+        ),
         ("field_mapping", "a: {{ bad_value }}", "blah"),
     ],
 )
