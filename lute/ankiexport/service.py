@@ -10,11 +10,19 @@ class Service:
         self,
         anki_deck_names,
         anki_note_types_and_fields,
+        export_specs,
     ):
         "init"
         self.fake_fail_counter = 0
         self.anki_deck_names = anki_deck_names
         self.anki_note_types_and_fields = anki_note_types_and_fields
+        self.export_specs = export_specs
+
+    def validate_specs(self):
+        """
+        Return hash of spec ids and any config errors.
+        """
+        return {}
 
     def _get_multiple_post_jsons(self, term_id):
         """Get data from service."""
