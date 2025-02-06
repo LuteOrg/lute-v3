@@ -2,40 +2,30 @@
 
 const LuteAnki = (function() {
 
-  /* copied verbatim from
-   * https://foosoft.net/projects/anki-connect/index.html#miscellaneous-actions */
-  function _invoke(postdict) {
-    return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.addEventListener('error', (e) => {
-        reject(e);
-      });
-      xhr.addEventListener('load', () => {
-        try {
-          const response = JSON.parse(xhr.responseText);
-          if (Object.getOwnPropertyNames(response).length != 2) {
-            throw 'response has an unexpected number of fields';
-          }
-          if (!response.hasOwnProperty('error')) {
-            throw 'response is missing required error field';
-          }
-          if (!response.hasOwnProperty('result')) {
-            throw 'response is missing required result field';
-          }
-          if (response.error) {
-            throw response.error;
-          }
-          resolve(response.result);
-        } catch (e) {
-          reject(e);
-        }
+  /* initial draft copied verbatim from
+   * https://foosoft.net/projects/anki-connect/index.html#miscellaneous-actions
+   *
+   * then converted to jquery, easier.
+   */
+  async function _invoke(postdict) {
+    try {
+      const response = await $.ajax({
+        url: 'http://127.0.0.1:8765',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(postdict),
+        dataType: 'json'
       });
 
-      // If AnkiConnect isn't running, Chrome error logs
-      // net::ERR_CONNECTION_REFUSED; this can't be suppressed.
-      xhr.open('POST', 'http://127.0.0.1:8765');
-      xhr.send(JSON.stringify(postdict));
-    });
+      if (response.error) {
+        throw new Error(response.error);
+      }
+    
+      return response.result;
+    } catch (error) {
+      console.error("AnkiConnect error:", error.message);
+      return null;
+    }
   }
 
   /**
@@ -88,7 +78,7 @@ const LuteAnki = (function() {
     return ret;
   }
 
-  function get_anki_specs() {
+  async function get_anki_specs() {
     return _get_anki_specs()
       .then(result => {
         console.log("result:", result);
@@ -100,17 +90,18 @@ const LuteAnki = (function() {
       });
   }
 
-  function get_post_data(word_ids) {
+  async function get_post_data(word_ids) {
     console.log("getting post data");
-    get_anki_specs().then(anki_specs => {
-      console.log("got specs?", anki_specs);
-    });
-    if (anki_specs == null) {
+
+    const anki_specs = await get_anki_specs();
+    console.log("got specs?", anki_specs);
+
+    if (!anki_specs) {
       console.log("Anki not running, or can't connect?");
       return null;
     }
-    const { deck_names, note_types } = anki_specs;
 
+    const { deck_names, note_types } = anki_specs;
     const postdata = {
       term_ids: word_ids,
       deck_names: deck_names,
@@ -118,20 +109,22 @@ const LuteAnki = (function() {
     };
 
     console.log("calling get post data");
-    $.ajax({
-      url: "/ankiexport/get_card_post_data",
-      method: "POST",
-      contentType: "application/json",
-      data: JSON.stringify(postdata),
-      dataType: "json"
-    })
-      .done(function (results) {
-        console.log("got results");
-        console.log(JSON.stringify(results, null, 2));
-      })
-      .fail(function (xhr, status, error) {
-        console.error("Error:", error);
+
+    try {
+      const results = await $.ajax({
+        url: "/ankiexport/get_card_post_data",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(postdata),
+        dataType: "json"
       });
+
+      console.log("got results:", JSON.stringify(results, null, 2));
+      return results;
+    } catch (error) {
+      console.error("Error:", error);
+      return null;
+    }
   }
 
   // Exported functions.
@@ -139,5 +132,4 @@ const LuteAnki = (function() {
     get_anki_specs: get_anki_specs,
     get_post_data: get_post_data,
   };
-
 })();

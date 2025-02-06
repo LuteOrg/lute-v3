@@ -455,25 +455,29 @@
   }
 
   function post_anki(event) {
-    LuteAnki.get_anki_specs(null);
+    // LuteAnki.get_anki_specs(null);
 
     event.preventDefault();
     const checked = $('.chkWord:checked');
-    const wordIds = checked.toArray().map(el => parseInt($(el).attr('wordid')));
-    if (wordIds.length === 0) {
+    const word_ids = checked.toArray().map(el => parseInt($(el).attr('wordid')));
+    if (word_ids.length === 0) {
       console.log("No terms selected");
       return;
     }
 
-    const pd = LuteAnki.get_post_data(wordIds);
-    if (pd == null) {
-      console.log("no post data");
-      return;
-    }
-    console.log(JSON.stringify(pd, null, 2));
-    console.log("SKIPPING");
-    return;
-    
+    LuteAnki.get_post_data(word_ids).then(results => {
+      if (results) {
+        console.log("Final results:", JSON.stringify(results, null, 2));
+      } else {
+        console.log("No results returned.");
+      }
+    }).catch(error => {
+      console.error("Error in get_post_data:", error);
+    });
+
+    console.log("TODO add posting");
+
+    /*
     $.ajax({
         url: "/ankiexport/create_cards_for_term_ids",
         method: "POST",
@@ -499,6 +503,7 @@
     .fail(function (xhr, status, error) {
         console.error("Error:", error);
     });
+    */
   } // end post_anki
 
   function bulk_delete(event) {

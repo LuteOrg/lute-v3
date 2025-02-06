@@ -46,7 +46,7 @@ def get_ankiconnect_post_data():
         try:
             entry["jsons"] = _get_multiple_post_jsons(word_id)
         except Exception as ex:
-            entry["error"] = ex
+            entry["error"] = str(ex)
         ret[word_id] = entry
 
     return jsonify(ret)
