@@ -34,13 +34,11 @@ from lute.ankiexport.mapper import (
     validate_mapping,
     get_fields_and_final_values,
 )
-from lute.ankiexport.ankiconnect import AnkiConnectWrapper
+from lute.ankiexport.service import Service
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 ANKI_CONNECT_URL = "http://localhost:8765"
 IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data/userimages"
-
-anki_connect = AnkiConnectWrapper(ANKI_CONNECT_URL)
 
 
 def validate_mapping_and_anki(m):
@@ -164,10 +162,6 @@ def get_selected_post_data(db_session, term_ids, all_mapping_data):
 
 # pylint: disable=too-many-locals
 def run_test():
-    # js would supply these ...
-    anki_deck_names = ["my_deck", "my_deck_2"]
-    anki_note_types = {"note 1": ["field a"], "note 2": ["a", "b", "c"]}
-
     "Sample mapping and terms."
     gender_card_mapping = """\
       Lute_term_id: {{ id }}
@@ -230,6 +224,18 @@ def run_test():
         export_specs.append(spec)
 
     active_specs = [m for m in export_specs if m.active]
+
+    # js would supply these ...
+    anki_deck_names = ["my_deck", "my_deck_2"]
+    anki_note_types = {"note 1": ["field a"], "note 2": ["a", "b", "c"]}
+
+    svc = Service(anki_deck_names, anki_note_types, active_specs)
+    validation_results = svc.validate_specs()
+    print(validation_results)
+
+    print("\n\nSTOPPING FOR NOW")
+    return
+
     valid_specs = []
     errors = []
     for spec in active_specs:
