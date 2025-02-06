@@ -5,7 +5,7 @@ Selector tests.
 import pytest
 from lute.models.term import Term, TermTag
 from lute.db import db
-from lute.ankiexport.selector import evaluate_selector
+from lute.ankiexport.selector import evaluate_selector, validate_selector
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 
@@ -64,3 +64,20 @@ def test_bad_selector_throws(selector, empty_db, spanish):
     term = _make_test_term(spanish)
     with pytest.raises(AnkiExportConfigurationError):
         evaluate_selector(selector, term)
+
+
+@pytest.mark.parametrize(
+    "selector",
+    [
+        ('lanxguage:"Spanish"'),
+        ('language="xxx"'),
+        ("parents=1"),
+        ('tags="masc"'),
+        ('tags["fem", "masc"]'),
+        ('parents.count=1 and tags["fem", "other"] and status<=3'),
+    ],
+)
+def test_validate_selector_throws_if_bad(selector):
+    "Check selector vs test term."
+    with pytest.raises(AnkiExportConfigurationError):
+        validate_selector(selector)

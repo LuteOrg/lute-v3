@@ -18,6 +18,9 @@ from pyparsing import (
     Suppress,
     Literal,
 )
+from pyparsing.exceptions import ParseException
+from lute.models.term import Term
+from lute.models.language import Language
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 
@@ -153,4 +156,15 @@ def evaluate_selector(s, term):
         return bool(result[0])
     except pp.ParseException as ex:
         msg = f"Syntax error at position {ex.loc} or later: {ex.line}"
+        raise AnkiExportConfigurationError(msg) from ex
+
+
+def validate_selector(selector):
+    "Check selector with a dummy Term."
+    term = Term(Language(), "")
+    refsrepo = None
+    try:
+        evaluate_selector(selector, term)
+    except ParseException as ex:
+        msg = f'Invalid criteria "{ex.line}"'
         raise AnkiExportConfigurationError(msg) from ex
