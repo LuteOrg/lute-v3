@@ -9,6 +9,10 @@ from lute.ankiexport.mapper import (
     validate_mapping,
     # get_fields_and_final_values,
 )
+from lute.ankiexport.selector import (
+    # evaluate_selector,
+    validate_selector,
+)
 
 
 class Service:
@@ -48,6 +52,11 @@ class Service:
 
         try:
             validate_mapping(spec.field_mapping)
+        except AnkiExportConfigurationError as ex:
+            errors.append(str(ex))
+
+        try:
+            validate_selector(spec.criteria)
         except AnkiExportConfigurationError as ex:
             errors.append(str(ex))
 

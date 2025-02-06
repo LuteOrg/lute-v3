@@ -90,8 +90,8 @@ def test_mapping_as_array_raises_error_on_duplicate_fields():
 @pytest.mark.parametrize(
     "mapping,msg",
     [
-        ("a: {{ x }}", 'Invalid mapping value "x"'),
-        ("a: {{ id }}\nb: {{ x }}", 'Invalid mapping value "x"'),
+        ("a: {{ x }}", 'Invalid field mapping "x"'),
+        ("a: {{ id }}\nb: {{ x }}", 'Invalid field mapping "x"'),
         ("a: {{ id }}\na: {{ term }}", "Duplicate field a in mapping"),
     ],
 )

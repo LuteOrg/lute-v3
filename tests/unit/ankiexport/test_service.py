@@ -34,7 +34,11 @@ def test_validate_returns_empty_hash_if_all_ok(export_spec):
 @pytest.mark.parametrize(
     "prop_name,prop_value,expected_error",
     [
-        ("criteria", 'lanxxguage:"German"', "lang"),
+        (
+            "criteria",
+            'lanxxguage:"German"',
+            'Syntax error at position 0 or later: lanxxguage:"German"',
+        ),
         ("deck_name", "missing_deck", 'No deck name: "missing_deck"'),
         ("note_type", "missing_note", 'No note type: "missing_note"'),
         (
