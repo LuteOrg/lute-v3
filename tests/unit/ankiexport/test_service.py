@@ -15,7 +15,7 @@ from lute.ankiexport.service import Service
 def fixture_spec():
     spec = SrsExportSpec()
     spec.id = 1
-    spec.export_name = "name"
+    spec.export_name = "export_name"
     spec.criteria = 'language:"German"'
     spec.deck_name = "good_deck"
     spec.note_type = "good_note"
@@ -97,8 +97,8 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
     pd = svc.get_ankiconnect_post_data_for_term(term, "http://x:42", refsrepo)
     assert len(pd) != 0, "Got some post data"
 
-    expected = [
-        {
+    expected = {
+        "export_name": {
             "action": "multi",
             "params": {
                 "actions": [
@@ -128,7 +128,7 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
                 ]
             },
         }
-    ]
+    }
 
     # print("actual")
     # print(pd)

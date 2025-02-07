@@ -138,7 +138,7 @@ class Service:
         ]
         # print(f"Using {len(use_exports)} exports")
 
-        ret = []
+        ret = {}
         for export in use_exports:
             replacements, mmap = get_values_and_media_mapping(
                 term, refsrepo, export.field_mapping
@@ -157,7 +157,7 @@ class Service:
                 export.deck_name,
                 export.note_type,
             )
-            ret.append(p)
+            ret[export.export_name] = p
 
         return ret
 
