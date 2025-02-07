@@ -17,110 +17,17 @@ python -m iss_579_anki.post_demo
 
 """
 
-import os
 import json
 import requests
 
 from lute.models.srsexport import SrsExportSpec
-from lute.models.repositories import TermRepository
-from lute.term.model import ReferencesRepository
 import lute.app_factory
 from lute.db import db
 
-from lute.ankiexport.selector import evaluate_selector
-from lute.ankiexport.mapper import (
-    get_values_and_media_mapping,
-    get_fields_and_final_values,
-)
 from lute.ankiexport.service import Service
 
 ANKI_CONNECT_URL = "http://localhost:8765"
 IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data/userimages"
-
-
-def _all_terms(term):
-    "Term and any parents."
-    ret = [term]
-    ret.extend(term.parents)
-    return ret
-
-
-def _all_tags(term):
-    "Tags for term and all parents."
-    ret = [tt.text for t in _all_terms(term) for tt in t.term_tags]
-    return list(set(ret))
-
-
-# pylint: disable=too-many-arguments,too-many-positional-arguments
-def _build_ankiconnect_post_json(
-    mapping_array,
-    media_mappings,
-    lute_and_term_tags,
-    deck_name,
-    model_name,
-):
-    "Build post json for term using the mappings."
-
-    post_actions = []
-    for new_filename, original_file in media_mappings.items():
-        hsh = {
-            "action": "storeMediaFile",
-            "params": {
-                "filename": new_filename,
-                "path": original_file,
-            },
-        }
-        post_actions.append(hsh)
-
-    post_actions.append(
-        {
-            "action": "addNote",
-            "params": {
-                "note": {
-                    "deckName": deck_name,
-                    "modelName": model_name,
-                    "fields": {m.fieldname: m.value.strip() for m in mapping_array},
-                    "tags": lute_and_term_tags,
-                }
-            },
-        }
-    )
-
-    return {"action": "multi", "params": {"actions": post_actions}}
-
-
-# pylint: disable=too-many-locals
-def get_selected_post_data(db_session, term_ids, all_mapping_data):
-    "Run test."
-    repo = TermRepository(db_session)
-    refsrepo = ReferencesRepository(db_session)
-    terms = [repo.find(termid) for termid in term_ids]
-
-    ret = []
-    for t in terms:
-        # print(t)
-        use_mappings = [
-            m
-            for m in all_mapping_data
-            if m["active"] and evaluate_selector(m["selector"], t)
-        ]
-        for m in use_mappings:
-            replacements, mmap = get_values_and_media_mapping(t, refsrepo, m["mapping"])
-            for k, v in mmap.items():
-                mmap[k] = os.path.join(IMAGE_ROOT_DIR, v)
-            mapping_array = get_fields_and_final_values(m["mapping"], replacements)
-            tags = ["lute"] + _all_tags(t)
-
-            p = _build_ankiconnect_post_json(
-                mapping_array,
-                mmap,
-                tags,
-                m["deck_name"],
-                m["note_type"],
-            )
-            ret.append(p)
-
-    return ret
 
 
 # pylint: disable=too-many-locals
