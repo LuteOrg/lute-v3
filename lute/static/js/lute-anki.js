@@ -106,14 +106,11 @@ const LuteAnki = (function() {
    * Each post_N_json is potentially a "multi" AnkiConnect
    * post, consisting of "storeMediaFile" and "addNote".
    */
-  async function get_post_data(anki_connect_url, word_ids) {
-    const anki_specs = await get_anki_specs(anki_connect_url);
-
-    if (!anki_specs) {
-      console.log("Anki not running, or can't connect?");
-      return null;
-    }
-
+  async function get_post_data(
+    anki_connect_url,
+    word_ids,
+    anki_specs,
+  ) {
     const { deck_names, note_types } = anki_specs;
     const postdata = {
       term_ids: word_ids,
@@ -224,9 +221,16 @@ const LuteAnki = (function() {
    * See comments in get_post_data() for notes on its return structure.
    */
   async function post_anki_cards(anki_connect_url, word_ids, callback) {
-    const post_data = await get_post_data(anki_connect_url, word_ids);
+    const anki_specs = await get_anki_specs(anki_connect_url);
+
+    if (!anki_specs) {
+      console.log("Anki not running, or can't connect?");
+      return null;
+    }
+
+    const post_data = await get_post_data(anki_connect_url, word_ids, anki_specs);
     if (post_data == null) {
-      console.log("anki not running? can't connect?")
+      console.log("some error?")
       return;
     }
 
