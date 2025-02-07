@@ -209,18 +209,13 @@ def run_test():
         print(validation_results)
         return
 
-    print("\n\nSTOPPING FOR NOW")
-    return
-
-    valid_specs = active_specs
-
     kinder = 143771
     kind = 143770
     termids = [kind, kinder]
 
     app = lute.app_factory.create_app()
     with app.app_context():
-        jsons = get_selected_post_data(db.session, termids, valid_specs)
+        jsons = svc.get_ankiconnect_post_data(termids, db.session)
 
     print("=" * 25)
     print(json.dumps(jsons, indent=2))

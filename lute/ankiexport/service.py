@@ -2,6 +2,8 @@
 Service, validates and posts.
 """
 
+from lute.models.repositories import TermRepository
+from lute.term.model import ReferencesRepository
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 from lute.ankiexport.mapper import (
     mapping_as_array,
@@ -72,15 +74,6 @@ class Service:
             if len(v) != 0:
                 failures[spec.id] = "; ".join(v)
         return failures
-
-    def _get_multiple_post_jsons(self, term_id):
-        """Get data from service."""
-        self.fake_fail_counter += 1
-        if self.fake_fail_counter % 3 == 0:
-            raise AnkiExportConfigurationError(
-                f"dummy failure {self.fake_fail_counter}"
-            )
-        return [{"some": f"value_{term_id}"}]
 
     def _all_terms(self, term):
         "Term and any parents."
@@ -166,7 +159,7 @@ class Service:
 
         return ret
 
-    def get_ankiconnect_post_data(self, term_ids):
+    def get_ankiconnect_post_data(self, term_ids, db_session):
         """
         Build data to be posted.
 
@@ -174,5 +167,13 @@ class Service:
         annoying to handle partial failures.
         """
 
-        ret = {tid: self._get_multiple_post_jsons(tid) for tid in term_ids}
+        repo = TermRepository(db_session)
+        refsrepo = ReferencesRepository(db_session)
+
+        ret = {}
+        for tid in term_ids:
+            term = repo.find(tid)
+            pd = self.get_ankiconnect_post_data_for_term(term, refsrepo)
+            ret[tid] = pd
+
         return ret
