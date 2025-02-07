@@ -82,6 +82,14 @@ class Service:
             )
         return [{"some": f"value_{term_id}"}]
 
+    def get_ankiconnect_post_data_for_term(self, term):
+        """
+        Get post data for a single term.
+        Separate method for unit testing.
+        """
+        print(term)
+        return {}
+
     def get_ankiconnect_post_data(self, term_ids):
         """
         Build data to be posted.
