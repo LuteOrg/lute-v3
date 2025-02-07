@@ -67,6 +67,21 @@ def test_validate_returns_dict_of_export_ids_and_errors(
     assert msg == [f"export_name: {expected_error}"], "failure msg"
 
 
+def test_validate_only_checks_active_specs(export_spec):
+    anki_decks = ["good_deck"]
+    anki_notes = {"good_note": ["a", "b"]}
+    export_spec.criteria = "xxx={{yyy}}"
+    svc = Service(anki_decks, anki_notes, [export_spec])
+    result = svc.validate_specs()
+    assert export_spec.id in result, "should have a problem, sanity check"
+
+    export_spec.active = False
+    result = svc.validate_specs()
+    assert len(result) == 0, "No problems"
+    msg = svc.validate_specs_failure_message()
+    assert msg == [], "failure msg"
+
+
 @pytest.fixture(name="term")
 def fixture_term():
     term = Mock()

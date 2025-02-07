@@ -69,7 +69,8 @@ class Service:
         Return hash of spec ids and any config errors.
         """
         failures = {}
-        for spec in self.export_specs:
+        active_specs = [s for s in self.export_specs if s.active is True]
+        for spec in active_specs:
             v = self._validate_single_spec(spec)
             if len(v) != 0:
                 failures[spec.id] = "; ".join(v)
