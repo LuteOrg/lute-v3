@@ -455,8 +455,6 @@
   }
 
   function post_anki(event) {
-    // LuteAnki.get_anki_specs(null);
-
     event.preventDefault();
     const checked = $('.chkWord:checked');
     const word_ids = checked.toArray().map(el => parseInt($(el).attr('wordid')));
@@ -465,7 +463,10 @@
       return;
     }
 
-    LuteAnki.get_post_data(word_ids).then(results => {
+    // TODO - need to get this from settings.
+    const ANKI_CONNECT_URL = "http://127.0.0.1:8765";
+    
+    LuteAnki.get_post_data(ANKI_CONNECT_URL, word_ids).then(results => {
       if (results) {
         console.log("Final results:", JSON.stringify(results, null, 2));
       } else {
@@ -476,34 +477,6 @@
     });
 
     console.log("TODO add posting");
-
-    /*
-    $.ajax({
-        url: "/ankiexport/create_cards_for_term_ids",
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({ term_ids: wordIds }),
-        dataType: "json"
-    })
-    .done(function (results) {
-        results.forEach(({ "word-id": wordId, message, error }) => {
-          const el = $(`#term_${wordId}`);
-          if (!el.length) {
-            console.log(`Not found id #term_${wordId}`);
-            return;
-          }
-
-          $("<br>").insertAfter(el);
-          $("<span>", {
-            class: `ankicard post_${error ? 'error' : 'success'}`,
-            text: error ? error : message,
-          }).insertAfter(el.next());
-        });
-    })
-    .fail(function (xhr, status, error) {
-        console.error("Error:", error);
-    });
-    */
   } // end post_anki
 
   function bulk_delete(event) {

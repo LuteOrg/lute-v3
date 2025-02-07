@@ -7,10 +7,10 @@ const LuteAnki = (function() {
    *
    * then converted to jquery, easier.
    */
-  async function _invoke(postdict) {
+  async function _invoke(anki_connect_url, postdict) {
     try {
       const response = await $.ajax({
-        url: 'http://127.0.0.1:8765',
+        url: anki_connect_url,
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(postdict),
@@ -42,7 +42,7 @@ const LuteAnki = (function() {
         ]
       }
     }
-    result = await _invoke(p);
+    result = await _invoke(anki_connect_url, p);
     // console.log(`got: ${JSON.stringify(result, null, 2)}`)
 
     const deck_names = result[0];
@@ -61,7 +61,7 @@ const LuteAnki = (function() {
       "version": 6,
       "params": { "actions": getfieldnames_actions }
     };
-    result = await _invoke(p);
+    result = await _invoke(anki_connect_url, p);
 
     // console.log(`got: ${JSON.stringify(result, null, 2)}`)
     const note_type_fields = {};
@@ -78,8 +78,8 @@ const LuteAnki = (function() {
     return ret;
   }
 
-  async function get_anki_specs() {
-    return _get_anki_specs()
+  async function get_anki_specs(anki_connect_url) {
+    return _get_anki_specs(anki_connect_url)
       .then(result => {
         // console.log("result:", result);
         return result;
@@ -90,10 +90,10 @@ const LuteAnki = (function() {
       });
   }
 
-  async function get_post_data(word_ids) {
+  async function get_post_data(anki_connect_url, word_ids) {
     // console.log("getting post data");
 
-    const anki_specs = await get_anki_specs();
+    const anki_specs = await get_anki_specs(anki_connect_url);
     // console.log("got specs?", anki_specs);
 
     if (!anki_specs) {

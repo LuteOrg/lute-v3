@@ -99,6 +99,9 @@ def get_active_export_specs():
     return _fake_export_specs()
 
 
+# TODO - search for get_card_post_data, hook it up
+# lute.js
+# term index.js?
 @bp.route("/get_card_post_data", methods=["POST"])
 def get_ankiconnect_post_data():
     """Get data that the client javascript will post."""
