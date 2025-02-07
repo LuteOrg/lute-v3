@@ -472,7 +472,7 @@
     function add_tooltip(term_id, results) {
       const el = $(`#term_${term_id}`);
       if (!el.length) {
-        console.log(`Not found id #term_${wordId}`);
+        console.log(`Not found id #term_${term_id}`);
         return;
       }
       const title = results.replaceAll("\n", "; ");
@@ -480,7 +480,14 @@
       el.tooltip("open");
     }
 
-    LuteAnki.post_anki_cards(ANKI_CONNECT_URL, word_ids, add_tooltip);
+    LuteAnki.post_anki_cards(
+      ANKI_CONNECT_URL, word_ids, add_tooltip
+    ).then(result => {
+      console.log(`got result: ${JSON.stringify(result, null, 2)}`);
+      if (result.error != null) {
+        alert(result.error);
+      }
+    });
   }
 
   function bulk_delete(event) {

@@ -23,8 +23,9 @@ const LuteAnki = (function() {
     
       return response.result;
     } catch (error) {
-      console.error("AnkiConnect error:", error.message);
-      return null;
+      const msg = `AnkiConnect post to ${anki_connect_url} failed.\n\n`
+      + `Ensure Anki is running and AnkiConnect is installed and configured.`;
+      throw new Error(msg);
     }
   }
 
@@ -78,15 +79,23 @@ const LuteAnki = (function() {
     return ret;
   }
 
+  /**
+   * Get info about deck names and note types.
+   * {
+   *   deck_names: [ a, ... ],
+   *   note_types: { n1: [ f1, f2 ], ...
+   * }
+   */
   async function get_anki_specs(anki_connect_url) {
     return _get_anki_specs(anki_connect_url)
       .then(result => {
         // console.log("result:", result);
-        return result;
+        return { result: result, error: null };
       })
       .catch(error => {
         console.log("Error getting specs");
-        return null;
+        console.log(`Error = ${JSON.stringify(error, null, 2)}`);
+        return { result: null, error: error };
       });
   }
 
@@ -130,14 +139,15 @@ const LuteAnki = (function() {
 
       if (results.error) {
         console.error("error:", results.error);
-        return null;
+        return { result: null, error: results.error };
       }
 
-      return results;
+      return { result: results, error: null };
     }
     catch (jqXHR) {
-      console.error("AJAX request failed:", jqXHR.responseText || jqXHR.statusText);
-      return null;
+      const emsg = jqXHR.responseText || jqXHR.statusText;
+      console.error("AJAX request failed:", emsg);
+      return { result: null, error: `AJAX request failed: ${emsg}` };
     }
   }
 
@@ -222,16 +232,20 @@ const LuteAnki = (function() {
    */
   async function post_anki_cards(anki_connect_url, word_ids, callback) {
     const anki_specs = await get_anki_specs(anki_connect_url);
-
-    if (!anki_specs) {
+    
+    if (anki_specs.error) {
       console.log("Anki not running, or can't connect?");
-      return null;
+      return { result: false, error: anki_specs.error };
     }
 
-    const post_data = await get_post_data(anki_connect_url, word_ids, anki_specs);
-    if (post_data == null) {
-      console.log("some error?")
-      return;
+    const post_data = await get_post_data(
+      anki_connect_url,
+      word_ids,
+      anki_specs.result
+    );
+    if (post_data.error) {
+      console.log(post_data.error)
+      return { result: false, error: post_data.error };
     }
 
     async function _post_single_card(data) {
@@ -244,7 +258,7 @@ const LuteAnki = (function() {
       });
     }
 
-    for (const [term_id, name_to_posts] of Object.entries(post_data)) {
+    for (const [term_id, name_to_posts] of Object.entries(post_data.result)) {
       // Continuing the example given in the comments for get_post_data(),
       // if "term_id" = 42,
       // name_to_posts = { "export_1": post_1_json, "export_2": post_2_json }
@@ -262,6 +276,8 @@ const LuteAnki = (function() {
         callback(term_id, "Unknown error ...");
       }
     }
+
+    return { result: true, error: null };
   }
 
   // Exported functions.
