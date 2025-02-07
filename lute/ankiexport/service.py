@@ -5,12 +5,12 @@ Service, validates and posts.
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 from lute.ankiexport.mapper import (
     mapping_as_array,
-    # get_values_and_media_mapping,
+    get_values_and_media_mapping,
     validate_mapping,
-    # get_fields_and_final_values,
+    get_fields_and_final_values,
 )
 from lute.ankiexport.selector import (
-    # evaluate_selector,
+    evaluate_selector,
     validate_selector,
 )
 
@@ -82,13 +82,90 @@ class Service:
             )
         return [{"some": f"value_{term_id}"}]
 
-    def get_ankiconnect_post_data_for_term(self, term):
+    def _all_terms(self, term):
+        "Term and any parents."
+        ret = [term]
+        ret.extend(term.parents)
+        return ret
+
+    def _all_tags(self, term):
+        "Tags for term and all parents."
+        ret = [tt.text for t in self._all_terms(term) for tt in t.term_tags]
+        return list(set(ret))
+
+    # pylint: disable=too-many-arguments,too-many-positional-arguments
+    def _build_ankiconnect_post_json(
+        self,
+        mapping_array,
+        media_mappings,
+        lute_and_term_tags,
+        deck_name,
+        model_name,
+    ):
+        "Build post json for term using the mappings."
+
+        post_actions = []
+        for new_filename, original_url in media_mappings.items():
+            hsh = {
+                "action": "storeMediaFile",
+                "params": {
+                    "filename": new_filename,
+                    "url": original_url,
+                },
+            }
+            post_actions.append(hsh)
+
+        post_actions.append(
+            {
+                "action": "addNote",
+                "params": {
+                    "note": {
+                        "deckName": deck_name,
+                        "modelName": model_name,
+                        "fields": {m.fieldname: m.value.strip() for m in mapping_array},
+                        "tags": lute_and_term_tags,
+                    }
+                },
+            }
+        )
+
+        return {"action": "multi", "params": {"actions": post_actions}}
+
+    def get_ankiconnect_post_data_for_term(self, term, refsrepo):
         """
         Get post data for a single term.
         Separate method for unit testing.
         """
+        self.validate_specs()
         print(term)
-        return {}
+
+        use_exports = [
+            spec
+            for spec in self.export_specs
+            if spec.active and evaluate_selector(spec.criteria, term)
+        ]
+        # print(f"Using {len(use_exports)} exports")
+
+        ret = []
+        for export in use_exports:
+            replacements, mmap = get_values_and_media_mapping(
+                term, refsrepo, export.field_mapping
+            )
+            mapping_array = get_fields_and_final_values(
+                export.field_mapping, replacements
+            )
+            tags = ["lute"] + self._all_tags(term)
+
+            p = self._build_ankiconnect_post_json(
+                mapping_array,
+                mmap,
+                tags,
+                export.deck_name,
+                export.note_type,
+            )
+            ret.append(p)
+
+        return ret
 
     def get_ankiconnect_post_data(self, term_ids):
         """

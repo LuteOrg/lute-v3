@@ -114,8 +114,8 @@ def get_values_and_media_mapping(term, refsrepo, mapping_string):
             image_srcs = []
             for t, imgfilename in id_images:
                 new_filename = f"LUTE_TERM_{t.id}.jpg"
-                image_path = os.path.join(str(t.language.id), imgfilename)
-                media_mappings[new_filename] = image_path
+                image_url = f"/userimages/{t.language.id}/{imgfilename}"
+                media_mappings[new_filename] = image_url
                 image_srcs.append(f'<img src="{new_filename}">')
 
             return "".join(image_srcs)

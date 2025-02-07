@@ -67,7 +67,7 @@ def fixture_term():
     term = Mock()
     term.id = 1
     term.text = "test"
-    term.language.name = "English"
+    term.language.name = "German"
     term.language.id = 42
     term.get_current_image.return_value = "image.jpg"
     term.parents = []
@@ -78,12 +78,53 @@ def fixture_term():
 
 def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
     anki_decks = ["good_deck"]
-    anki_notes = {"good_note": ["a", "b"]}
+    anki_notes = {"good_note": ["a", "b", "c"]}
+    export_spec.field_mapping = """
+    a: {{ language }}
+    b: {{ image }}
+    c: {{ term }}
+    """
     svc = Service(anki_decks, anki_notes, [export_spec])
     result = svc.validate_specs()
     assert len(result) == 0, "No problems, sanity check"
 
-    pd = svc.get_ankiconnect_post_data_for_term(term)
+    refsrepo = Mock()
+    refsrepo.find_references_by_id.return_value = {
+        "term": [Mock(sentence="Example sentence.")]
+    }
+
+    pd = svc.get_ankiconnect_post_data_for_term(term, refsrepo)
     assert len(pd) != 0, "Got some post data"
 
-    print(pd)
+    expected = [
+        {
+            "action": "multi",
+            "params": {
+                "actions": [
+                    {
+                        "action": "storeMediaFile",
+                        "params": {
+                            "filename": "LUTE_TERM_1.jpg",
+                            "url": "/userimages/42/image.jpg",
+                        },
+                    },
+                    {
+                        "action": "addNote",
+                        "params": {
+                            "note": {
+                                "deckName": "good_deck",
+                                "modelName": "good_note",
+                                "fields": {
+                                    "a": "German",
+                                    "b": '<img src="LUTE_TERM_1.jpg">',
+                                    "c": "test",
+                                },
+                                "tags": ["lute", "verb", "noun"],
+                            }
+                        },
+                    },
+                ]
+            },
+        }
+    ]
+    assert pd == expected, "PHEW!"

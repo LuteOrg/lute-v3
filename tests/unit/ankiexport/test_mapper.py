@@ -165,7 +165,7 @@ def test_image_handling(term):
 
     values, media = get_values_and_media_mapping(term, refsrepo, mapping_string)
 
-    assert media == {"LUTE_TERM_1.jpg": "42/image.jpg"}, "one image"
+    assert media == {"LUTE_TERM_1.jpg": "/userimages/42/image.jpg"}, "one image"
     assert '<img src="LUTE_TERM_1.jpg">' in values["image"]
 
 
