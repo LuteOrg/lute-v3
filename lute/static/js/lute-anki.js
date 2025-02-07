@@ -151,26 +151,22 @@ const LuteAnki = (function() {
     for (const [term_id, name_to_posts] of Object.entries(post_data)) {
       if (Object.keys(name_to_posts).length === 0) {
         // No posts, just call the callback
-        callback(id, 'no cards created');
+        callback(term_id, 'no cards created');
         continue;
       }
 
-      console.log("*******************");
-      console.log(JSON.stringify(name_to_posts, null, 2));
-      console.log("*******************");
+      const postPromises = Object.values(name_to_posts).
+            map(post => _post_single_card(post));
 
-      const name_and_action_array = Object.entries(name_to_posts).flatMap(
-        ([name, obj]) =>
-        obj.params.actions.map(action => ({ name, action: action.action }))
-      );
-
-      const export_posts = Object.values(name_to_posts);
-      const postPromises = export_posts.map(post => _post_single_card(post));
       try {
         const results = await Promise.all(postPromises);
-        const flat_results = results.flat();
-        const final_flat_results = flat_results.map(entry => 
-          entry && typeof entry === "object" && "error" in entry ? entry.error : "success"
+        const final_flat_results = results.flat().map(entry => 
+          entry && typeof entry === "object" && "error" in entry ?
+            entry.error : "success"
+        );
+        const name_and_action_array = Object.entries(name_to_posts).flatMap(
+          ([name, obj]) =>
+          obj.params.actions.map(action => ({ name, action: action.action }))
         );
         for (let i = 0; i < name_and_action_array.length; i++) {
           name_and_action_array[i]["result"] = final_flat_results[i];
@@ -179,12 +175,14 @@ const LuteAnki = (function() {
               .filter(entry => entry.action === "addNote")
               .map(entry => `${entry.name}: ${entry.result}`);
 
+        /*
         console.log('==================');
         console.log(JSON.stringify(name_and_action_array, null, 2));
-        console.log(JSON.stringify(flat_results, null, 2));
         console.log(JSON.stringify(final_flat_results, null, 2));
         console.log(JSON.stringify(addNote_results, null, 2));
         console.log('================');
+        */
+
         callback(term_id, addNote_results.join("\n"));
       } catch (error) {
         console.error(`Error processing ID ${term_id}:`, error);
