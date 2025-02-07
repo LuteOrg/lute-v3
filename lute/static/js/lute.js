@@ -673,6 +673,7 @@ let _get_textitems_text = function(textitemspans) {
 
 let _show_element_message_tooltip = function(element, message, remove_after_timeout = 2000) {
   const el = $(element);
+
   const tooltip = $('<span class="manual-tooltip"></span>').text(message);
   tooltip.insertAfter(el);
 
@@ -684,7 +685,7 @@ let _show_element_message_tooltip = function(element, message, remove_after_time
 
   tooltip.hover(
     function () { tooltip.addClass('hovered'); },
-    function () { tooltip.removeClass('hovered'); }
+    function () { tooltip.removeClass('hovered'); tooltip.remove(); }
   );
 
   if (remove_after_timeout > 0) {
