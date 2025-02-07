@@ -20,86 +20,20 @@ python -m iss_579_anki.post_demo
 import json
 import requests
 
-from lute.models.srsexport import SrsExportSpec
 import lute.app_factory
 from lute.db import db
 
 from lute.ankiexport.service import Service
+from lute.ankiexport.routes import _fake_export_specs
 
 ANKI_CONNECT_URL = "http://localhost:8765"
 IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data/userimages"
 
 
-def _fake_active_mapping_data():
-    "Sample mapping and terms."
-    gender_card_mapping = """\
-      Lute_term_id: {{ id }}
-      Front: {{ term }}: der, die, oder das?
-      Picture: {{ image }}
-      Definition: {{ translation }}
-      Back: {{ tags:["der", "die", "das"] }} {{ term }}
-      Sentence: {{ sentence }}
-    """
-
-    plural_card_mapping = """\
-      Lute_term_id: {{ id }}
-      Front: {{ tags:["der", "die", "das"] }} {{ parents }}, plural
-      Picture: {{ image }}
-      Definition: {{ translation }}
-      Back: die {{ term }}
-      Sentence: {{ sentence }}
-    """
-
-    all_mapping_data = [
-        {
-            "name": "Gender",
-            "selector": 'language:"German" and tags:["der", "die", "das"] and has:image',
-            "deck_name": "zzTestAnkiConnect",
-            "note_type": "Lute_Basic_vocab",
-            "mapping": gender_card_mapping,
-            "active": True,
-        },
-        {
-            "name": "Pluralization",
-            "selector": (
-                'language:"German" and parents.count = 1 '
-                + 'and has:image and tags:["plural", "plural and singular"]'
-            ),
-            "deck_name": "zzTestAnkiConnect",
-            "note_type": "Lute_Basic_vocab",
-            "mapping": plural_card_mapping,
-            "active": True,
-        },
-        {
-            "name": "m3",
-            "selector": "sel here",
-            "deck_name": "x",
-            "note_type": "y",
-            "mapping": "some mapping here",
-            "active": False,
-        },
-    ]
-
-    export_specs = []
-    for md in all_mapping_data:
-        spec = SrsExportSpec()
-        spec.id = len(export_specs) + 1
-        spec.export_name = md["name"]
-        spec.criteria = md["selector"]
-        spec.deck_name = md["deck_name"]
-        spec.note_type = md["note_type"]
-        spec.field_mapping = md["mapping"]
-        spec.active = md["active"]
-        export_specs.append(spec)
-
-    active_specs = [m for m in export_specs if m.active]
-    return active_specs
-
-
 # pylint: disable=too-many-locals
 def run_test():
     "Run it."
-    active_specs = _fake_active_mapping_data()
+    active_specs = _fake_export_specs()
 
     # js would supply these ...
     anki_deck_names = ["zzTestAnkiConnect", "some_other_deck"]

@@ -7,9 +7,9 @@ import random
 # from flask import Blueprint, current_app, Response, request, jsonify, redirect, flash
 from flask import Blueprint, request, jsonify
 from lute.ankiexport.service import Service
+from lute.models.srsexport import SrsExportSpec
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
-
-# from lute.db import db
+from lute.db import db
 
 
 bp = Blueprint("ankiexport", __name__, url_prefix="/ankiexport")
@@ -22,6 +22,83 @@ ERROR_MESSAGES = ["Duplicate", "Invalid ID", "Processing error"]
 fake_fail_counter = 0
 
 
+def _fake_export_specs():
+    "Sample mapping and terms."
+    gender_card_mapping = """\
+      Lute_term_id: {{ id }}
+      Front: {{ term }}: der, die, oder das?
+      Picture: {{ image }}
+      Definition: {{ translation }}
+      Back: {{ tags:["der", "die", "das"] }} {{ term }}
+      Sentence: {{ sentence }}
+    """
+
+    plural_card_mapping = """\
+      Lute_term_id: {{ id }}
+      Front: {{ tags:["der", "die", "das"] }} {{ parents }}, plural
+      Picture: {{ image }}
+      Definition: {{ translation }}
+      Back: die {{ term }}
+      Sentence: {{ sentence }}
+    """
+
+    all_mapping_data = [
+        {
+            "name": "Gender",
+            "selector": 'language:"German" and tags:["der", "die", "das"] and has:image',
+            "deck_name": "zzTestAnkiConnect",
+            "note_type": "Lute_Basic_vocab",
+            "mapping": gender_card_mapping,
+            "active": True,
+        },
+        {
+            "name": "Pluralization",
+            "selector": (
+                'language:"German" and parents.count = 1 '
+                + 'and has:image and tags:["plural", "plural and singular"]'
+            ),
+            "deck_name": "zzTestAnkiConnect",
+            "note_type": "Lute_Basic_vocab",
+            "mapping": plural_card_mapping,
+            "active": True,
+        },
+        {
+            "name": "m3",
+            "selector": "sel here",
+            "deck_name": "x",
+            "note_type": "y",
+            "mapping": "some mapping here",
+            "active": False,
+        },
+    ]
+
+    export_specs = []
+    for md in all_mapping_data:
+        spec = SrsExportSpec()
+        spec.id = len(export_specs) + 1
+        spec.export_name = md["name"]
+        spec.criteria = md["selector"]
+        spec.deck_name = md["deck_name"]
+        spec.note_type = md["note_type"]
+        spec.field_mapping = md["mapping"]
+        spec.active = md["active"]
+        export_specs.append(spec)
+
+    active_specs = [m for m in export_specs if m.active]
+    return active_specs
+
+
+def get_active_export_specs():
+    """
+    Get data.
+
+    Hardcoded fake data for now.
+
+    TODO - change to db fetch
+    """
+    return _fake_export_specs()
+
+
 @bp.route("/get_card_post_data", methods=["POST"])
 def get_ankiconnect_post_data():
     """Get data that the client javascript will post."""
@@ -29,9 +106,10 @@ def get_ankiconnect_post_data():
     word_ids = data.get("term_ids", [])
     anki_deck_names = data.get("deck_names", [])
     anki_note_types = data.get("note_types", {})
-    svc = Service(anki_deck_names, anki_note_types)
+    export_specs = get_active_export_specs()
+    svc = Service(anki_deck_names, anki_note_types, export_specs)
     try:
-        ret = svc.get_ankiconnect_post_data(word_ids)
+        ret = svc.get_ankiconnect_post_data(word_ids, db.session)
         return jsonify(ret)
     except AnkiExportConfigurationError as ex:
         response = jsonify({"error": str(ex)})
