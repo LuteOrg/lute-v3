@@ -2,25 +2,28 @@
 Selector tests.
 """
 
+from unittest.mock import Mock
 import pytest
-from lute.models.term import Term, TermTag
-from lute.db import db
 from lute.ankiexport.selector import evaluate_selector, validate_selector
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 
-def _make_test_term(spanish):
-    """Make term"""
-    term = Term(spanish, "HOLA")
-    parent = Term(spanish, "PARENT")
-    term.add_parent(parent)
+@pytest.fixture(name="term")
+def fixture_term():
+    "Fake term."
+    parent = Mock(text="PARENT")
+    parent.term_tags = []
 
-    term.add_term_tag(TermTag("masc"))
-    term.add_term_tag(TermTag("xxx"))
+    term = Mock()
+    term.id = 1
+    term.text = "HOLA"
     term.status = 3
-
-    db.session.add(term)
-    db.session.commit()
+    term.language.name = "Spanish"
+    term.language.id = 42
+    term.get_current_image.return_value = "image.jpg"
+    term.parents = [parent]
+    term.term_tags = [Mock(text="masc"), Mock(text="xxx")]
+    term.translation = "example translation"
     return term
 
 
@@ -42,9 +45,8 @@ def _make_test_term(spanish):
         ('parents.count=1 and tags:["fem", "other"] and status<=3', False),
     ],
 )
-def test_selector(selector, expected, empty_db, spanish):
+def test_selector(selector, expected, term):
     "Check selector vs test term."
-    term = _make_test_term(spanish)
     assert evaluate_selector(selector, term) == expected, selector
 
 
@@ -59,9 +61,8 @@ def test_selector(selector, expected, empty_db, spanish):
         ('parents.count=1 and tags["fem", "other"] and status<=3'),
     ],
 )
-def test_bad_selector_throws(selector, empty_db, spanish):
+def test_bad_selector_throws(selector, term):
     "Check selector vs test term."
-    term = _make_test_term(spanish)
     with pytest.raises(AnkiExportConfigurationError):
         evaluate_selector(selector, term)
 
