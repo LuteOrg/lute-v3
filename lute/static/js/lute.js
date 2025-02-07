@@ -673,7 +673,6 @@ let _get_textitems_text = function(textitemspans) {
 
 let _show_element_message_tooltip = function(element, message, remove_after_timeout = 2000) {
   const el = $(element);
-
   const tooltip = $('<span class="manual-tooltip"></span>').text(message);
   tooltip.insertAfter(el);
 
