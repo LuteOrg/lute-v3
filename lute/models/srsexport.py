@@ -13,7 +13,9 @@ class SrsExportSpec(db.Model):
     __tablename__ = "srsexportspecs"
 
     id = db.Column("SrsID", db.Integer, primary_key=True)
-    export_name = db.Column("SrsExportName", db.String(200), nullable=False)
+    export_name = db.Column(
+        "SrsExportName", db.String(200), nullable=False, unique=True
+    )
     criteria = db.Column("SrsCriteria", db.String(1000), nullable=False)
     deck_name = db.Column("SrsDeckName", db.String(200), nullable=False)
     note_type = db.Column("SrsNoteType", db.String(200), nullable=False)
