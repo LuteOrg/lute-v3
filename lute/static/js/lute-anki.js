@@ -130,9 +130,45 @@ const LuteAnki = (function() {
     }
   }
 
+  async function post_anki_cards(anki_connect_url, word_ids, callback) {
+    const post_data = await get_post_data(anki_connect_url, word_ids);
+    if (post_data == null) {
+      console.log("anki not running? can't connect?")
+      return;
+    }
+
+    async function _post_single_card(data) {
+      return $.ajax({
+        url: anki_connect_url,
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        dataType: "json"
+      });
+    }
+
+    for (const [term_id, posts] of Object.entries(post_data)) {
+      if (posts.length === 0) {
+        // No posts, just call the callback
+        callback(id, 'no cards created');
+        continue;
+      }
+
+      const postPromises = posts.map(post => _post_single_card(post));
+      try {
+        const results = await Promise.all(postPromises);
+        callback(term_id, results);
+      } catch (error) {
+        console.error(`Error processing ID ${term_id}:`, error);
+        callback(id, null); // Call callback with null to indicate failure
+      }
+    }
+  }
+
   // Exported functions.
   return {
     get_anki_specs: get_anki_specs,
     get_post_data: get_post_data,
+    post_anki_cards: post_anki_cards,
   };
 })();
