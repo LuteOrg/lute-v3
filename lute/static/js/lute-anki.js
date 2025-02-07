@@ -148,22 +148,44 @@ const LuteAnki = (function() {
       });
     }
 
-    for (const [term_id, posts] of Object.entries(post_data)) {
-      if (posts.length === 0) {
+    for (const [term_id, name_to_posts] of Object.entries(post_data)) {
+      if (Object.keys(name_to_posts).length === 0) {
         // No posts, just call the callback
         callback(id, 'no cards created');
         continue;
       }
 
-      const postPromises = posts.map(post => _post_single_card(post));
+      console.log("*******************");
+      console.log(JSON.stringify(name_to_posts, null, 2));
+      console.log("*******************");
+
+      const name_and_action_array = Object.entries(name_to_posts).flatMap(
+        ([name, obj]) =>
+        obj.params.actions.map(action => ({ name, action: action.action }))
+      );
+
+      const export_posts = Object.values(name_to_posts);
+      const postPromises = export_posts.map(post => _post_single_card(post));
       try {
         const results = await Promise.all(postPromises);
+        const flat_results = results.flat();
+        const final_flat_results = flat_results.map(entry => 
+          entry && typeof entry === "object" && "error" in entry ? entry.error : "success"
+        );
+        for (let i = 0; i < name_and_action_array.length; i++) {
+          name_and_action_array[i]["result"] = final_flat_results[i];
+        }
+        const addNote_results = name_and_action_array
+              .filter(entry => entry.action === "addNote")
+              .map(entry => `${entry.name}: ${entry.result}`);
+
         console.log('==================');
-        console.log(JSON.stringify(posts, null, 2));
-        console.log('-----------------');
-        console.log(JSON.stringify(results, null, 2));
+        console.log(JSON.stringify(name_and_action_array, null, 2));
+        console.log(JSON.stringify(flat_results, null, 2));
+        console.log(JSON.stringify(final_flat_results, null, 2));
+        console.log(JSON.stringify(addNote_results, null, 2));
         console.log('================');
-        callback(term_id, results);
+        callback(term_id, addNote_results.join("\n"));
       } catch (error) {
         console.error(`Error processing ID ${term_id}:`, error);
         callback(id, null); // Call callback with null to indicate failure
