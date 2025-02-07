@@ -844,31 +844,31 @@ let show_translation_for_text = function(text) {
  * Get all selected words, post their IDs.
  */
 function send_selected_terms_to_anki() {
+  console.log("SENDING STUFF");
   let elements = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
   if (elements.length == 0)
     return;
-  const selected_ids = elements.map(el => $(el).data("wid"));
+  const word_ids = elements.map(el => $(el).data("wid"));
 
-  $.ajax({
-    url: "/ankiexport/create_cards_for_term_ids",
-    method: "POST",
-    contentType: "application/json",
-    data: JSON.stringify({ term_ids: selected_ids }),
-    dataType: "json"
-  })
-    .done(function (results) {
-      results.forEach(({ "word-id": wordId, message, error }) => {
-        const popup_text = error ? `Error: ${error}` : message;
-        elements.forEach(function(el) {
-          if ($(el).data("wid") == wordId) {
-            _show_element_message_tooltip(el, popup_text, 0);
-          }
-        });
-      });
-    })
-    .fail(function (xhr, status, error) {
-      console.error("Error:", error);
+  // TODO_ANKI - need to get this from settings.
+  const ANKI_CONNECT_URL = "http://127.0.0.1:8765";
+
+  function add_tooltip(term_id, results) {
+    elements.forEach(function(el) {
+      if ($(el).data("wid") == term_id) {
+        _show_element_message_tooltip(el, results, 0);
+      }
     });
+  }
+
+  LuteAnki.post_anki_cards(
+    ANKI_CONNECT_URL, word_ids, add_tooltip
+  ).then(result => {
+    console.log("back from post");
+  }).catch(error => {
+    console.error("ERROR:", error);
+    alert(error.message);
+  });
 }
 
 
