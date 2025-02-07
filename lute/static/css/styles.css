@@ -914,6 +914,7 @@ img
     padding: 5px;
     border-radius: 3px;
     font-size: 12pt;
+    white-space: pre-line;  /* break if the text contains "\n" */
     z-index: 500;  /* Initial z-index */
 }
 
