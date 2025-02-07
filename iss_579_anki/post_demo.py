@@ -30,8 +30,7 @@ ANKI_CONNECT_URL = "http://localhost:8765"
 IMAGE_ROOT_DIR = "/Users/jeff/Documents/Projects/lute-v3/data/userimages"
 
 
-# pylint: disable=too-many-locals
-def run_test():
+def _fake_active_mapping_data():
     "Sample mapping and terms."
     gender_card_mapping = """\
       Lute_term_id: {{ id }}
@@ -94,6 +93,13 @@ def run_test():
         export_specs.append(spec)
 
     active_specs = [m for m in export_specs if m.active]
+    return active_specs
+
+
+# pylint: disable=too-many-locals
+def run_test():
+    "Run it."
+    active_specs = _fake_active_mapping_data()
 
     # js would supply these ...
     anki_deck_names = ["zzTestAnkiConnect", "some_other_deck"]
