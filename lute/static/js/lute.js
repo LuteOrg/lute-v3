@@ -673,7 +673,10 @@ let _get_textitems_text = function(textitemspans) {
 
 let _show_element_message_tooltip = function(element, message, remove_after_timeout = 2000) {
   const el = $(element);
-  const tooltip = $('<span class="manual-tooltip"></span>').text(message);
+
+  let show_results = "<b>Anki exports:</b><br />"
+  show_results += message.replaceAll("\n", "<br />");
+  const tooltip = $('<span class="manual-tooltip"></span>').html(show_results);
   tooltip.insertAfter(el);
 
   // Positioning.  Rest of css is handled in styles.css.
