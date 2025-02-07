@@ -91,7 +91,7 @@ class Service:
     def _all_tags(self, term):
         "Tags for term and all parents."
         ret = [tt.text for t in self._all_terms(term) for tt in t.term_tags]
-        return list(set(ret))
+        return sorted(list(set(ret)))
 
     # pylint: disable=too-many-arguments,too-many-positional-arguments
     def _build_ankiconnect_post_json(
@@ -137,7 +137,6 @@ class Service:
         Separate method for unit testing.
         """
         self.validate_specs()
-        print(term)
 
         use_exports = [
             spec
