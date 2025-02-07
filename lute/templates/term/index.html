@@ -474,8 +474,15 @@
         console.log(`Not found id #term_${term_id}`);
         return;
       }
-      const title = results.replaceAll("\n", "; ");
-      el.attr("title", title).tooltip();
+
+      let show_results = "<b>Anki exports:</b><br />"
+      show_results += results.replaceAll("\n", "<br />");
+      el.attr("title", show_results);
+      el.tooltip({
+        content: function (callback) {
+          callback($(this).prop('title'));
+        }
+      });
       el.tooltip("open");
     }
 
