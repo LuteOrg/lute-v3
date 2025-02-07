@@ -124,7 +124,7 @@ class Service:
 
         return {"action": "multi", "params": {"actions": post_actions}}
 
-    def get_ankiconnect_post_data_for_term(self, term, refsrepo):
+    def get_ankiconnect_post_data_for_term(self, term, base_url, refsrepo):
         """
         Get post data for a single term.
         Separate method for unit testing.
@@ -143,6 +143,8 @@ class Service:
             replacements, mmap = get_values_and_media_mapping(
                 term, refsrepo, export.field_mapping
             )
+            for k, v in mmap.items():
+                mmap[k] = base_url + v
             mapping_array = get_fields_and_final_values(
                 export.field_mapping, replacements
             )
@@ -159,7 +161,7 @@ class Service:
 
         return ret
 
-    def get_ankiconnect_post_data(self, term_ids, db_session):
+    def get_ankiconnect_post_data(self, term_ids, base_url, db_session):
         """
         Build data to be posted.
 
@@ -173,7 +175,7 @@ class Service:
         ret = {}
         for tid in term_ids:
             term = repo.find(tid)
-            pd = self.get_ankiconnect_post_data_for_term(term, refsrepo)
+            pd = self.get_ankiconnect_post_data_for_term(term, base_url, refsrepo)
             ret[tid] = pd
 
         return ret

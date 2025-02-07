@@ -106,13 +106,14 @@ def get_active_export_specs():
 def get_ankiconnect_post_data():
     """Get data that the client javascript will post."""
     data = request.get_json()
-    word_ids = data.get("term_ids", [])
-    anki_deck_names = data.get("deck_names", [])
-    anki_note_types = data.get("note_types", {})
+    word_ids = data["term_ids"]
+    base_url = data["base_url"]
+    anki_deck_names = data["deck_names"]
+    anki_note_types = data["note_types"]
     export_specs = get_active_export_specs()
     svc = Service(anki_deck_names, anki_note_types, export_specs)
     try:
-        ret = svc.get_ankiconnect_post_data(word_ids, db.session)
+        ret = svc.get_ankiconnect_post_data(word_ids, base_url, db.session)
         return jsonify(ret)
     except AnkiExportConfigurationError as ex:
         response = jsonify({"error": str(ex)})

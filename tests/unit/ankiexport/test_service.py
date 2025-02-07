@@ -94,7 +94,7 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
         "term": [Mock(sentence="Example sentence.")]
     }
 
-    pd = svc.get_ankiconnect_post_data_for_term(term, refsrepo)
+    pd = svc.get_ankiconnect_post_data_for_term(term, "http://x:42", refsrepo)
     assert len(pd) != 0, "Got some post data"
 
     expected = [
@@ -106,7 +106,7 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
                         "action": "storeMediaFile",
                         "params": {
                             "filename": "LUTE_TERM_1.jpg",
-                            "url": "/userimages/42/image.jpg",
+                            "url": "http://x:42/userimages/42/image.jpg",
                         },
                     },
                     {

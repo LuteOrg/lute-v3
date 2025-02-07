@@ -104,6 +104,7 @@ const LuteAnki = (function() {
     const { deck_names, note_types } = anki_specs;
     const postdata = {
       term_ids: word_ids,
+      base_url: window.location.origin,
       deck_names: deck_names,
       note_types: note_types,
     };
