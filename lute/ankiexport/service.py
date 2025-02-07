@@ -38,10 +38,10 @@ class Service:
         """
         errors = []
         if spec.deck_name not in self.anki_deck_names:
-            errors.append(f'No deck name: "{spec.deck_name}"')
+            errors.append(f'No deck name "{spec.deck_name}"')
 
         if spec.note_type not in self.anki_note_types_and_fields:
-            errors.append(f'No note type: "{spec.note_type}"')
+            errors.append(f'No note type "{spec.note_type}"')
         else:
             note_fields = self.anki_note_types_and_fields.get(spec.note_type, {})
             mapping_array = mapping_as_array(spec.field_mapping)
@@ -74,6 +74,15 @@ class Service:
             if len(v) != 0:
                 failures[spec.id] = "; ".join(v)
         return failures
+
+    def validate_specs_failure_message(self):
+        "Failure message for alerts."
+        failures = self.validate_specs()
+        msgs = []
+        for k, v in failures.items():
+            spec = next(s for s in self.export_specs if s.id == k)
+            msgs.append(f"{spec.export_name}: {v}")
+        return msgs
 
     def _all_terms(self, term):
         "Term and any parents."
@@ -129,8 +138,6 @@ class Service:
         Get post data for a single term.
         Separate method for unit testing.
         """
-        self.validate_specs()
-
         use_exports = [
             spec
             for spec in self.export_specs
@@ -168,6 +175,13 @@ class Service:
         Throws if any validation failure or mapping failure, as it's
         annoying to handle partial failures.
         """
+
+        msgs = self.validate_specs_failure_message()
+        if msgs != []:
+            show_msgs = [f"* {m}" for m in msgs]
+            show_msgs = "\n".join(show_msgs)
+            err_msg = "Anki export configuration errors:\n" + show_msgs
+            raise AnkiExportConfigurationError(err_msg)
 
         repo = TermRepository(db_session)
         refsrepo = ReferencesRepository(db_session)

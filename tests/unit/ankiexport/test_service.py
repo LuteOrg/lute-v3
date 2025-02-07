@@ -30,6 +30,8 @@ def test_validate_returns_empty_hash_if_all_ok(export_spec):
     svc = Service(anki_decks, anki_notes, [export_spec])
     result = svc.validate_specs()
     assert len(result) == 0, "No problems"
+    msg = svc.validate_specs_failure_message()
+    assert msg == [], "failure msg"
 
 
 @pytest.mark.parametrize(
@@ -38,10 +40,10 @@ def test_validate_returns_empty_hash_if_all_ok(export_spec):
         (
             "criteria",
             'lanxxguage:"German"',
-            'Syntax error at position 0 or later: lanxxguage:"German"',
+            'Criteria syntax error at position 0 or later: lanxxguage:"German"',
         ),
-        ("deck_name", "missing_deck", 'No deck name: "missing_deck"'),
-        ("note_type", "missing_note", 'No note type: "missing_note"'),
+        ("deck_name", "missing_deck", 'No deck name "missing_deck"'),
+        ("note_type", "missing_note", 'No note type "missing_note"'),
         (
             "field_mapping",
             "xx: {{ language }}",
@@ -60,6 +62,9 @@ def test_validate_returns_dict_of_export_ids_and_errors(
     result = svc.validate_specs()
     assert export_spec.id in result, "should have a problem"
     assert result[export_spec.id] == expected_error
+
+    msg = svc.validate_specs_failure_message()
+    assert msg == [f"export_name: {expected_error}"], "failure msg"
 
 
 @pytest.fixture(name="term")

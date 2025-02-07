@@ -155,7 +155,7 @@ def evaluate_selector(s, term):
         result = multi_check.parseString(s, parseAll=True)
         return bool(result[0])
     except pp.ParseException as ex:
-        msg = f"Syntax error at position {ex.loc} or later: {ex.line}"
+        msg = f"Criteria syntax error at position {ex.loc} or later: {ex.line}"
         raise AnkiExportConfigurationError(msg) from ex
 
 

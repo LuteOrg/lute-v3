@@ -30,9 +30,13 @@ const LuteAnki = (function() {
   }
 
   /**
-   * Queries anki and gets data.
+   * Get info about deck names and note types.
+   * {
+   *   deck_names: [ a, ... ],
+   *   note_types: { n1: [ f1, f2 ], ...
+   * }
    */
-  async function _get_anki_specs(anki_connect_url) {
+  async function get_anki_specs(anki_connect_url) {
     let p = {
       "action": "multi",
       "version": 6,
@@ -44,7 +48,6 @@ const LuteAnki = (function() {
       }
     }
     result = await _invoke(anki_connect_url, p);
-    // console.log(`got: ${JSON.stringify(result, null, 2)}`)
 
     const deck_names = result[0];
     const note_types = result[1];
@@ -55,7 +58,6 @@ const LuteAnki = (function() {
         "modelName": nt
       }
     }));
-    // console.log(JSON.stringify(getfieldnames_actions, null, 2));
 
     p = {
       "action": "multi",
@@ -64,39 +66,15 @@ const LuteAnki = (function() {
     };
     result = await _invoke(anki_connect_url, p);
 
-    // console.log(`got: ${JSON.stringify(result, null, 2)}`)
     const note_type_fields = {};
     for (let i = 0; i < note_types.length; i++) {
       note_type_fields[note_types[i]] = result[i];
     }
-    // console.log(`got: ${JSON.stringify(note_type_fields, null, 2)}`)
 
-    const ret = {
+    return {
       deck_names: deck_names,
       note_types: note_type_fields,
     };
-    // console.log(`got: ${JSON.stringify(ret, null, 2)}`)
-    return ret;
-  }
-
-  /**
-   * Get info about deck names and note types.
-   * {
-   *   deck_names: [ a, ... ],
-   *   note_types: { n1: [ f1, f2 ], ...
-   * }
-   */
-  async function get_anki_specs(anki_connect_url) {
-    return _get_anki_specs(anki_connect_url)
-      .then(result => {
-        // console.log("result:", result);
-        return { result: result, error: null };
-      })
-      .catch(error => {
-        console.log("Error getting specs");
-        console.log(`Error = ${JSON.stringify(error, null, 2)}`);
-        return { result: null, error: error };
-      });
   }
 
   /**
@@ -139,15 +117,20 @@ const LuteAnki = (function() {
 
       if (results.error) {
         console.error("error:", results.error);
-        return { result: null, error: results.error };
+        throw new Error(results.error);
       }
 
-      return { result: results, error: null };
+      return results;
     }
     catch (jqXHR) {
-      const emsg = jqXHR.responseText || jqXHR.statusText;
-      console.error("AJAX request failed:", emsg);
-      return { result: null, error: `AJAX request failed: ${emsg}` };
+      /*
+      console.log('jqXHR = ');
+      console.log(JSON.stringify(jqXHR, null, 2));
+      */
+      const errorMessage = jqXHR.responseJSON?.error ||
+            jqXHR.responseText ||
+            jqXHR.statusText;
+      throw new Error(`Failure: ${errorMessage}`);
     }
   }
 
@@ -232,21 +215,12 @@ const LuteAnki = (function() {
    */
   async function post_anki_cards(anki_connect_url, word_ids, callback) {
     const anki_specs = await get_anki_specs(anki_connect_url);
-    
-    if (anki_specs.error) {
-      console.log("Anki not running, or can't connect?");
-      return { result: false, error: anki_specs.error };
-    }
 
     const post_data = await get_post_data(
       anki_connect_url,
       word_ids,
-      anki_specs.result
+      anki_specs
     );
-    if (post_data.error) {
-      console.log(post_data.error)
-      return { result: false, error: post_data.error };
-    }
 
     async function _post_single_card(data) {
       return $.ajax({
@@ -258,7 +232,7 @@ const LuteAnki = (function() {
       });
     }
 
-    for (const [term_id, name_to_posts] of Object.entries(post_data.result)) {
+    for (const [term_id, name_to_posts] of Object.entries(post_data)) {
       // Continuing the example given in the comments for get_post_data(),
       // if "term_id" = 42,
       // name_to_posts = { "export_1": post_1_json, "export_2": post_2_json }
@@ -276,8 +250,6 @@ const LuteAnki = (function() {
         callback(term_id, "Unknown error ...");
       }
     }
-
-    return { result: true, error: null };
   }
 
   // Exported functions.
