@@ -158,6 +158,11 @@ const LuteAnki = (function() {
       const postPromises = posts.map(post => _post_single_card(post));
       try {
         const results = await Promise.all(postPromises);
+        console.log('==================');
+        console.log(JSON.stringify(posts, null, 2));
+        console.log('-----------------');
+        console.log(JSON.stringify(results, null, 2));
+        console.log('================');
         callback(term_id, results);
       } catch (error) {
         console.error(`Error processing ID ${term_id}:`, error);

@@ -33,6 +33,15 @@ def _fake_export_specs():
       Sentence: {{ sentence }}
     """
 
+    dummy_card_mapping = """\
+      Lute_term_id: {{ id }}
+      Front: ___ {{ term }}
+      Picture: {{ image }}
+      Definition: {{ translation }}
+      Back: {{ tags:["der", "die", "das"] }} {{ term }}
+      Sentence: {{ sentence }}
+    """
+
     plural_card_mapping = """\
       Lute_term_id: {{ id }}
       Front: {{ tags:["der", "die", "das"] }} {{ parents }}, plural
@@ -49,6 +58,14 @@ def _fake_export_specs():
             "deck_name": "zzTestAnkiConnect",
             "note_type": "Lute_Basic_vocab",
             "mapping": gender_card_mapping,
+            "active": True,
+        },
+        {
+            "name": "Dummy",
+            "selector": 'language:"German"',
+            "deck_name": "zzTestAnkiConnect",
+            "note_type": "Lute_Basic_vocab",
+            "mapping": dummy_card_mapping,
             "active": True,
         },
         {
