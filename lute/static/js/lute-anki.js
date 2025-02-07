@@ -90,11 +90,24 @@ const LuteAnki = (function() {
       });
   }
 
+  /**
+   * Returns a dict of ids to export name to AnkiConnect post data, eg:
+   *
+   * {
+   *   42: {
+   *     "export_1": post_1_json,
+   *     "export_2": post_2_json
+   *   },
+   *   43: {
+   *     "export_1": post_1_json
+   *   }...
+   * }
+   *
+   * Each post_N_json is potentially a "multi" AnkiConnect
+   * post, consisting of "storeMediaFile" and "addNote".
+   */
   async function get_post_data(anki_connect_url, word_ids) {
-    // console.log("getting post data");
-
     const anki_specs = await get_anki_specs(anki_connect_url);
-    // console.log("got specs?", anki_specs);
 
     if (!anki_specs) {
       console.log("Anki not running, or can't connect?");
@@ -131,6 +144,12 @@ const LuteAnki = (function() {
     }
   }
 
+  /**
+   * Posts anki cards for the given word_ids, and calls the callback
+   * for each.
+   *
+   * See comments in get_post_data() for notes on its return structure.
+   */
   async function post_anki_cards(anki_connect_url, word_ids, callback) {
     const post_data = await get_post_data(anki_connect_url, word_ids);
     if (post_data == null) {
@@ -148,45 +167,94 @@ const LuteAnki = (function() {
       });
     }
 
-    for (const [term_id, name_to_posts] of Object.entries(post_data)) {
-      if (Object.keys(name_to_posts).length === 0) {
-        // No posts, just call the callback
-        callback(term_id, 'no cards created');
-        continue;
+    /**
+     * Each term may have a series of exports to post, e.g.
+     * { "export_1": post_1_json, "export_2": post_2_json },
+     * and each post_N_json can be several actions, e.g.
+     *
+     *  {
+     *    "export_1": {
+     *      "action": "multi",
+     *      "params": {
+     *        "actions": [
+     *          { "action": "storeMediaFile", ... },
+     *          { "action": "addNote", ... }
+     *        ]
+     *      }
+     *    },
+     *    "export_2": {
+     *      "action": "multi",
+     *      "params": {
+     *        "actions": [
+     *          { "action": "storeMediaFile", ... },
+     *          { "action": "addNote", ... }
+     *        ]
+     *      }
+     *    },
+     *
+     * All posts are sent separately, but the results are
+     * await all, and so look like this:
+     * [
+     *   [ post_1_A_result, post_1_B_result ],
+     *   [ post_2_A_result, post_2_B_result ],
+     * ]
+     *
+     * e.g.
+     * [
+     *   // This is the result for "export_1"
+     *   ["LUTE_TERM_1.jpg", 1738896726062],
+     *   // This is the result for "export_2"
+     *   ["LUTE_TERM_2.jpg", { "result": null, "error": "... duplicate" }]
+     * ]
+     *
+     * This maps the export names to the addNote actions, e.g. for the above, returns
+     * [
+     *   "export_1: success",          // No error in export_1's results
+     *   "export_2: "... duplicate"    // error in export_2's results
+     * ]
+     */
+    function _get_addNote_results(name_to_posts, results) {
+      // Converts each export name and inner action to an array, e.g.
+      // [{ name: "export_1", action: "storeMediaFile" } ... etc
+      const name_and_action_array = Object.entries(name_to_posts).flatMap(
+        ([name, obj]) =>
+        obj.params.actions.map(action => ({ name, action: action.action }))
+      );
+
+      // Maps all results to the error message, or success.
+      // For the exmaple, this would return
+      // [ "success", "... duplicate" ]
+      const flat_results = results.flat().map(entry => 
+        entry && typeof entry === "object" && "error" in entry ?
+          entry.error : "success"
+      );
+
+      // Adds the final flat_result to its corresponding name_and_action_array.
+      for (let i = 0; i < name_and_action_array.length; i++) {
+        name_and_action_array[i]["result"] = flat_results[i];
       }
 
+      return name_and_action_array
+        .filter(entry => entry.action === "addNote")
+        .map(entry => `${entry.name}: ${entry.result}`);
+    }
+
+    for (const [term_id, name_to_posts] of Object.entries(post_data)) {
+      // Continuing the example given in the comments for get_post_data(),
+      // if "term_id" = 42,
+      // name_to_posts = { "export_1": post_1_json, "export_2": post_2_json }
       const postPromises = Object.values(name_to_posts).
             map(post => _post_single_card(post));
-
       try {
         const results = await Promise.all(postPromises);
-        const final_flat_results = results.flat().map(entry => 
-          entry && typeof entry === "object" && "error" in entry ?
-            entry.error : "success"
-        );
-        const name_and_action_array = Object.entries(name_to_posts).flatMap(
-          ([name, obj]) =>
-          obj.params.actions.map(action => ({ name, action: action.action }))
-        );
-        for (let i = 0; i < name_and_action_array.length; i++) {
-          name_and_action_array[i]["result"] = final_flat_results[i];
-        }
-        const addNote_results = name_and_action_array
-              .filter(entry => entry.action === "addNote")
-              .map(entry => `${entry.name}: ${entry.result}`);
-
-        /*
-        console.log('==================');
-        console.log(JSON.stringify(name_and_action_array, null, 2));
-        console.log(JSON.stringify(final_flat_results, null, 2));
-        console.log(JSON.stringify(addNote_results, null, 2));
-        console.log('================');
-        */
-
-        callback(term_id, addNote_results.join("\n"));
+        const addNote_results = _get_addNote_results(name_to_posts, results);
+        const msg = addNote_results.length === 0 ?
+              "no cards created" :
+              addNote_results.join("\n");
+        callback(term_id, msg);
       } catch (error) {
         console.error(`Error processing ID ${term_id}:`, error);
-        callback(id, null); // Call callback with null to indicate failure
+        callback(term_id, "Unknown error ...");
       }
     }
   }
