@@ -32,4 +32,59 @@
 <p>delete, edit actions</p>
 <p>add new link</p>
 
+<h1>HACKING FORM BUILDER</h1>
+<form id="dataMappingForm">
+  <label for="noteType">Note Type:</label>
+  <select id="noteType">
+    <option value="">-- Select Note Type --</option>
+    <option value="note_type_A">Note Type A</option>
+    <option value="note_type_B">Note Type B</option>
+  </select>
+
+  <div id="mappingContainer">
+    <!-- Fields will be dynamically inserted here -->
+  </div>
+</form>
+
+<script>
+
+  const noteTypeFields = {
+  note_type_A: ["a", "b"],
+  note_type_B: ["a", "c"]
+};
+
+// Predefined options for dropdowns next to input fields
+const predefinedOptions = ["option1", "option2", "option3"];
+
+$("#noteType").change(function () {
+  const selectedType = $(this).val();
+  const mappingContainer = $("#mappingContainer");
+
+  mappingContainer.empty(); // Clear previous fields
+
+  if (!selectedType) return; // Exit if no selection
+
+  noteTypeFields[selectedType].forEach(field => {
+    const fieldContainer = $("<div>").addClass("field-container");
+
+    const label = $("<label>").text(`${field}: `);
+    const textBox = $("<input>").attr({ type: "text", name: field });
+
+    const dropdown = $("<select>");
+    dropdown.append($("<option>").val("").text("-- Select --"));
+    predefinedOptions.forEach(option => {
+      dropdown.append($("<option>").val(option).text(option));
+    });
+
+    dropdown.change(function () {
+      textBox.val($(this).val()); // Set text box value when dropdown changes
+    });
+
+    fieldContainer.append(label, textBox, dropdown);
+    mappingContainer.append(fieldContainer);
+  });
+});
+  
+</script>
+
 {% endblock %}
