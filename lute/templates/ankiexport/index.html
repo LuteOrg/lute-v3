@@ -45,6 +45,11 @@
     <!-- Fields will be dynamically inserted here -->
   </div>
 
+  <datalist id="mapping-presets">
+  {% for x in ['term', 'tags', 'tags["val1", "val2", ...]'] %}
+  <option value="{% raw %}{{{% endraw %} {{ x }} {% raw %}}}{% endraw %}">
+  {% endfor %}
+  </datalist>
 </form>
 
 <button id="getjson" onclick="get_json(); return false;">Get json</button>
@@ -77,14 +82,6 @@
       fieldContainer.append(label, fieldBox, textBox);
       mappingContainer.append(fieldContainer);
     });
-
-    let mapping_presets = [ `<datalist id="mapping-presets">` ];
-    {% for x in ['term', 'tags', 'tags["val1", "val2", ...]'] %}
-    mapping_presets.push(`<option value="\{\{ {{ x }} \}\}">`);
-    {% endfor %}
-    mapping_presets.push("</datalist>");
-    mappingContainer.append(mapping_presets.join("\n"));
-
   });
 
 function get_json() {
