@@ -2,10 +2,17 @@
 Anki export.
 """
 
-import random
-
-# from flask import Blueprint, current_app, Response, request, jsonify, redirect, flash
-from flask import Blueprint, request, jsonify
+from flask import (
+    Blueprint,
+    request,
+    jsonify,
+    render_template,
+    # redirect,
+    flash,
+)
+from lute.models.repositories import UserSettingRepository
+from lute.settings.forms import AnkiConnectSettingsForm
+from lute.settings.current import refresh_global_settings
 from lute.ankiexport.service import Service
 from lute.models.srsexport import SrsExportSpec
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
@@ -14,12 +21,38 @@ from lute.db import db
 
 bp = Blueprint("ankiexport", __name__, url_prefix="/ankiexport")
 
-# Mock messages for success and failure
-SUCCESS_MESSAGES = ["Created X and Y", "Successfully processed", "Action completed"]
-ERROR_MESSAGES = ["Duplicate", "Invalid ID", "Processing error"]
 
-# pylint: disable=global-statement, broad-exception-caught, broad-exception-raised
-fake_fail_counter = 0
+@bp.route("/index", methods=["GET", "POST"])
+def anki_index():
+    "Edit settings."
+    repo = UserSettingRepository(db.session)
+    settings = [
+        "ankiconnect_web_bind_address",
+        "ankiconnect_web_bind_port",
+    ]
+    settings_dict = {s: repo.get_value(s) for s in settings}
+
+    form = AnkiConnectSettingsForm(
+        data={
+            "ankiconnect_web_bind_address": settings_dict[
+                "ankiconnect_web_bind_address"
+            ],
+            "ankiconnect_web_bind_port": int(
+                settings_dict["ankiconnect_web_bind_port"]
+            ),
+        }
+    )
+
+    if form.validate_on_submit():
+        for field in ["ankiconnect_web_bind_address", "ankiconnect_web_bind_port"]:
+            repo.set_value(field, str(getattr(form, field).data))
+        db.session.commit()
+        refresh_global_settings(db.session)
+
+        flash("AnkiConnect settings updated", "success")
+        return render_template("/ankiexport/index.html", form=form)
+
+    return render_template("/ankiexport/index.html", form=form)
 
 
 def _fake_export_specs():
@@ -136,24 +169,3 @@ def get_ankiconnect_post_data():
         response = jsonify({"error": str(ex)})
         response.status_code = 400  # Bad Request
         return response
-
-
-### REMOVE
-@bp.route("/create_cards_for_term_ids", methods=["POST"])
-def create_cards_for_term_ids():
-    """old."""
-    global fake_fail_counter
-    data = request.get_json()
-    word_ids = data.get("term_ids", [])
-
-    results = []
-    for word_id in word_ids:
-        fake_fail_counter += 1
-        if fake_fail_counter % 2 == 0:  # Even IDs succeed
-            message = random.choice(SUCCESS_MESSAGES)
-            results.append({"word-id": word_id, "message": message, "error": None})
-        else:  # Odd IDs fail
-            error = random.choice(ERROR_MESSAGES)
-            results.append({"word-id": word_id, "message": "", "error": error})
-
-    return jsonify(results)

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}AnkiConnect Settings{% endblock %}
+{% block header %}AnkiConnect Settings{% endblock %}
+
+{% block body %}
+
+<form method="post">
+  {{ form.hidden_tag() }}
+
+  <table class="settingstable">
+    {% for f in [
+    form.ankiconnect_web_bind_address,
+    form.ankiconnect_web_bind_port,
+    ]%}
+    <tr>
+      <td>{{ f.label }}</td>
+      <td>{{ f(class="form-control") }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <div style="margin-top:10px;">
+    <button class="btn" onclick="window.alert('TODO'); return false;">Test settings - TODO implement</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button class="btn" onclick="window.location = '/'; return false;">Cancel</button>
+  </div>
+
+</form>
+
+<p>TODO add datatables</p>
+<p>delete, edit actions</p>
+<p>add new link</p>
+
+{% endblock %}
