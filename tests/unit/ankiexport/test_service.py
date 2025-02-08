@@ -31,7 +31,7 @@ def test_validate_returns_empty_hash_if_all_ok(export_spec):
     result = svc.validate_specs()
     assert len(result) == 0, "No problems"
     msg = svc.validate_specs_failure_message()
-    assert msg == [], "failure msg"
+    assert len(msg) == 0, "failure msg"
 
 
 @pytest.mark.parametrize(
@@ -79,7 +79,7 @@ def test_validate_only_checks_active_specs(export_spec):
     result = svc.validate_specs()
     assert len(result) == 0, "No problems"
     msg = svc.validate_specs_failure_message()
-    assert msg == [], "failure msg"
+    assert len(msg) == 0, "failure msg"
 
 
 @pytest.fixture(name="term")

@@ -178,7 +178,7 @@ class Service:
         """
 
         msgs = self.validate_specs_failure_message()
-        if msgs != []:
+        if len(msgs) > 0:
             show_msgs = [f"* {m}" for m in msgs]
             show_msgs = "\n".join(show_msgs)
             err_msg = "Anki export configuration errors:\n" + show_msgs

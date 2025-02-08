@@ -162,7 +162,6 @@ def evaluate_criteria(s, term):
 def validate_criteria(criteria):
     "Check criteria with a dummy Term."
     term = Term(Language(), "")
-    refsrepo = None
     try:
         evaluate_criteria(criteria, term)
     except ParseException as ex:
