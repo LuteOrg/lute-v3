@@ -44,47 +44,59 @@
   <div id="mappingContainer">
     <!-- Fields will be dynamically inserted here -->
   </div>
+
 </form>
+
+<button id="getjson" onclick="get_json(); return false;">Get json</button>
 
 <script>
 
   const noteTypeFields = {
-  note_type_A: ["a", "b"],
-  note_type_B: ["a", "c"]
-};
+    note_type_A: ["a", "b"],
+    note_type_B: ["a", "c", "d"],
+  };
 
-// Predefined options for dropdowns next to input fields
-const predefinedOptions = ["option1", "option2", "option3"];
+  $("#noteType").change(function () {
+    const selectedType = $(this).val();
+    const mappingContainer = $("#mappingContainer");
 
-$("#noteType").change(function () {
-  const selectedType = $(this).val();
-  const mappingContainer = $("#mappingContainer");
+    mappingContainer.empty(); // Clear previous fields
 
-  mappingContainer.empty(); // Clear previous fields
+    if (!selectedType) return; // Exit if no selection
 
-  if (!selectedType) return; // Exit if no selection
+    const fields = noteTypeFields[selectedType];
+    if (fields.length == 0) return;
 
-  noteTypeFields[selectedType].forEach(field => {
-    const fieldContainer = $("<div>").addClass("field-container");
-
-    const label = $("<label>").text(`${field}: `);
-    const textBox = $("<input>").attr({ type: "text", name: field });
-
-    const dropdown = $("<select>");
-    dropdown.append($("<option>").val("").text("-- Select --"));
-    predefinedOptions.forEach(option => {
-      dropdown.append($("<option>").val(option).text(option));
+    fields.forEach(field => {
+      const fieldContainer = $("<div>").addClass("field-container");
+      const label = $("<label>").text(`${field}: `);
+      const fieldBox = $("<input>").
+            attr({ class: "fieldname", type: "hidden" }).val(field);
+      const textBox = $("<input>").
+            attr({ class: "fieldval", type: "text", list: `mapping-presets` });
+      fieldContainer.append(label, fieldBox, textBox);
+      mappingContainer.append(fieldContainer);
     });
 
-    dropdown.change(function () {
-      textBox.val($(this).val()); // Set text box value when dropdown changes
-    });
+    let mapping_presets = [ `<datalist id="mapping-presets">` ];
+    {% for x in ['term', 'tags', 'tags["val1", "val2", ...]'] %}
+    mapping_presets.push(`<option value="\{\{ {{ x }} \}\}">`);
+    {% endfor %}
+    mapping_presets.push("</datalist>");
+    mappingContainer.append(mapping_presets.join("\n"));
 
-    fieldContainer.append(label, textBox, dropdown);
-    mappingContainer.append(fieldContainer);
   });
-});
-  
+
+function get_json() {
+  // window.alert('hi');
+  let field_mapping = {};
+  $(".field-container").each(function() {
+    const fieldname = $(this).find(".fieldname").val();
+    const fieldval = $(this).find(".fieldval").val();
+    field_mapping[fieldname] = fieldval;
+  });
+  console.log(JSON.stringify(field_mapping, null, 2));
+}
 </script>
 
 {% endblock %}
