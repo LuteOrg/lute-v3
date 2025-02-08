@@ -5,15 +5,15 @@ Service, validates and posts.
 from lute.models.repositories import TermRepository
 from lute.term.model import ReferencesRepository
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
-from lute.ankiexport.mapper import (
+from lute.ankiexport.field_mapping import (
     mapping_as_array,
     get_values_and_media_mapping,
     validate_mapping,
     get_fields_and_final_values,
 )
-from lute.ankiexport.selector import (
-    evaluate_selector,
-    validate_selector,
+from lute.ankiexport.criteria import (
+    evaluate_criteria,
+    validate_criteria,
 )
 
 
@@ -58,7 +58,7 @@ class Service:
             errors.append(str(ex))
 
         try:
-            validate_selector(spec.criteria)
+            validate_criteria(spec.criteria)
         except AnkiExportConfigurationError as ex:
             errors.append(str(ex))
 
@@ -142,7 +142,7 @@ class Service:
         use_exports = [
             spec
             for spec in self.export_specs
-            if spec.active and evaluate_selector(spec.criteria, term)
+            if spec.active and evaluate_criteria(spec.criteria, term)
         ]
         # print(f"Using {len(use_exports)} exports")
 

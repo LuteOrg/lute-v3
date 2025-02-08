@@ -1,5 +1,5 @@
 """
-Selector.  Given a string with selection criteria, evaluates it
+Criteria.  Given a string with selection criteria, evaluates it
 with a term, returning True or False.
 """
 
@@ -24,11 +24,11 @@ from lute.models.language import Language
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 
-def evaluate_selector(s, term):
-    "Parse the selector, return True or False for the given term."
+def evaluate_criteria(s, term):
+    "Parse the criteria, return True or False for the given term."
     # pylint: disable=too-many-locals
 
-    # print(f"selector: {s}")
+    # print(f"criteria: {s}")
 
     def has_any_matching_tags(tagvals):
         term_tags = [t.text for t in term.term_tags]
@@ -159,12 +159,12 @@ def evaluate_selector(s, term):
         raise AnkiExportConfigurationError(msg) from ex
 
 
-def validate_selector(selector):
-    "Check selector with a dummy Term."
+def validate_criteria(criteria):
+    "Check criteria with a dummy Term."
     term = Term(Language(), "")
     refsrepo = None
     try:
-        evaluate_selector(selector, term)
+        evaluate_criteria(criteria, term)
     except ParseException as ex:
         msg = f'Invalid criteria "{ex.line}"'
         raise AnkiExportConfigurationError(msg) from ex

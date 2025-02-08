@@ -6,7 +6,7 @@ from unittest.mock import Mock
 import pytest
 
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
-from lute.ankiexport.mapper import (
+from lute.ankiexport.field_mapping import (
     mapping_as_array,
     get_values_and_media_mapping,
     validate_mapping,

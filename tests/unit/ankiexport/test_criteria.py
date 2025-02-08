@@ -4,7 +4,7 @@ Selector tests.
 
 from unittest.mock import Mock
 import pytest
-from lute.ankiexport.selector import evaluate_selector, validate_selector
+from lute.ankiexport.criteria import evaluate_criteria, validate_criteria
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 
@@ -28,7 +28,7 @@ def fixture_term():
 
 
 @pytest.mark.parametrize(
-    "selector,expected",
+    "criteria,expected",
     [
         ('language:"Spanish"', True),
         ('language:"xxx"', False),
@@ -45,13 +45,13 @@ def fixture_term():
         ('parents.count=1 and tags:["fem", "other"] and status<=3', False),
     ],
 )
-def test_selector(selector, expected, term):
-    "Check selector vs test term."
-    assert evaluate_selector(selector, term) == expected, selector
+def test_criteria(criteria, expected, term):
+    "Check criteria vs test term."
+    assert evaluate_criteria(criteria, term) == expected, criteria
 
 
 @pytest.mark.parametrize(
-    "selector",
+    "criteria",
     [
         ('lanxguage:"Spanish"'),
         ('language="xxx"'),
@@ -61,14 +61,14 @@ def test_selector(selector, expected, term):
         ('parents.count=1 and tags["fem", "other"] and status<=3'),
     ],
 )
-def test_bad_selector_throws(selector, term):
-    "Check selector vs test term."
+def test_bad_criteria_throws(criteria, term):
+    "Check criteria vs test term."
     with pytest.raises(AnkiExportConfigurationError):
-        evaluate_selector(selector, term)
+        evaluate_criteria(criteria, term)
 
 
 @pytest.mark.parametrize(
-    "selector",
+    "criteria",
     [
         ('lanxguage:"Spanish"'),
         ('language="xxx"'),
@@ -78,7 +78,7 @@ def test_bad_selector_throws(selector, term):
         ('parents.count=1 and tags["fem", "other"] and status<=3'),
     ],
 )
-def test_validate_selector_throws_if_bad(selector):
-    "Check selector vs test term."
+def test_validate_criteria_throws_if_bad(criteria):
+    "Check criteria vs test term."
     with pytest.raises(AnkiExportConfigurationError):
-        validate_selector(selector)
+        validate_criteria(criteria)
