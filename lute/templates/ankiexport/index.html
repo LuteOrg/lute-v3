@@ -101,13 +101,20 @@ function add_empty_mapping_row() {
     return;
   }
   const mappingContainer = $("#mappingContainer");
-  const fieldContainer = $("<div>").addClass("field-container");
+  const this_id = "fc_" + ($(".field-container").length + 1);
+  const fieldContainer = $(`<div id="${this_id}">`).addClass("field-container");
   const fieldBox = $("<input>").
         attr({ class: "fieldname", type: "text", list: "available_fields" });
   const textBox = $("<input>").
         attr({ class: "fieldval", type: "text", list: "mapping_presets" });
-  fieldContainer.append(fieldBox, textBox);
+  const del_button = $(`<button onclick="remove_mapping_row('${this_id}'); return false;">-</button>`);
+  fieldContainer.append(fieldBox, textBox, del_button);
   mappingContainer.append(fieldContainer);
+}
+
+function remove_mapping_row(row_id) {
+  console.log(`Removing ${row_id}`);
+  $(`#${row_id}`).remove();
 }
 
 function get_json() {
