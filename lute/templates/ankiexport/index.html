@@ -101,7 +101,7 @@
       fields.forEach(f => add_empty_mapping_row(f));
     }
     else {
-      $(".field_list_dropdown").each(function() {
+      $(".field_dropdown").each(function() {
         add_options($(this), fields);
       });
     }
@@ -142,21 +142,6 @@ function add_empty_mapping_row(field_name = null, mapping_val = null) {
   const fieldBox = $(`<input type="text" class="fieldname">`);
   if (field_name)
     fieldBox.val(field_name);
-
-  const fields = noteTypeFields[selectedType] ?? [];
-  const fieldOpts = $(`<select class="field_list_dropdown arrow_only_dropdown" />`);
-  add_options(fieldOpts, fields);
-
-  fieldOpts.on('change', function() {
-    const v = $(this).val() ?? "";
-    if (v == "")
-      return;
-    fieldBox.val(v);
-    field_box_changed(fieldBox);
-    $(this).val("").blur();
-  });
-
-  // Bind the change event to remove the red border color
   fieldBox.on('change', function() {
     field_box_changed($(this));
   });
@@ -165,18 +150,29 @@ function add_empty_mapping_row(field_name = null, mapping_val = null) {
   if (mapping_val)
     textBox.val(mapping_val);
 
-  const valOpts = $(`<select class="val_list_dropdown arrow_only_dropdown" />`);
-  const vos = [ 'text', 'tags' ].map(v => `{% raw %}{{{% endraw %} ${v} {% raw %}}}{% endraw %}`);
-  add_options(valOpts, vos);
+  function _create_dropdown(className, options, onChange) {
+    const select = $(`<select class="${className} arrow_only_dropdown" />`);
+    add_options(select, options);
+    select.on("change", function () {
+      const v = $(this).val() ?? "";
+      if (v !== "")
+        onChange(v);
+      $(this).val("").blur(); // Reset to down arrow
+    });
+    return select;
+  }
 
-  valOpts.on('change', function() {
-    const v = $(this).val() ?? "";
-    if (v == "")
-      return;
-    textBox.val(v);
-    $(this).val("").blur();
+  const fields = noteTypeFields[selectedType] ?? [];
+  const fieldOpts = _create_dropdown("field_dropdown", fields, (v) => {
+    fieldBox.val(v);
+    field_box_changed(fieldBox);
   });
 
+  const vos = ["text", "tags"].map((v) => `{% raw %}{{{% endraw %} ${v} {% raw %}}}{% endraw %}`);
+  const valOpts = _create_dropdown("mapping_dropdown", vos, (v) => {
+    textBox.val(v);
+  });
+  
   const del_button = $(`<button type="button">&nbsp;-&nbsp;</button>`).data("row-id", this_id);
   del_button.on("click", function () { remove_mapping_row($(this).data("row-id")); });
 
