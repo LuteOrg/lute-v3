@@ -138,9 +138,14 @@
 
     const mappingContainer = $("#mappingContainer");
 
-    $(".field_list_dropdown").each(function() {
-      add_fields($(this), fields);
-    });
+    if ($(".field-container").length == 0) {
+      fields.forEach(f => add_empty_mapping_row(f));
+    }
+    else {
+      $(".field_list_dropdown").each(function() {
+        add_fields($(this), fields);
+      });
+    }
     /*
     if (fields.length == 0) return;
 
@@ -166,17 +171,15 @@ function add_fields(field_select, field_list) {
 }
 
 function field_box_changed(field_box) {
-  console.log("Checking field_box_changed");
   const selectedType = $("#noteType").val();
   if (!selectedType) return;
   const available_fields = noteTypeFields[selectedType];
   const field_name = field_box.val();
-  console.log(`Checking field name ${field_name} vs available ${available_fields.join(',')}`);
   const color = available_fields.includes(field_name) ? "" : "red";
   field_box.css("border-color", color);
 }
 
-function add_empty_mapping_row() {
+function add_empty_mapping_row(field_name = null) {
   const selectedType = $("#noteType").val();
   if (!selectedType) {
     console.log("select note type");
@@ -189,6 +192,8 @@ function add_empty_mapping_row() {
   const fieldContainer = $(`<div id="${this_id}">`).addClass("field-container");
   const f_id = `f_${rowid}`;
   const fieldBox = $(`<input id="${f_id}" type="text" class="fieldname" list="available_fields">`);
+  if (field_name)
+    fieldBox.val(field_name);
 
   const fields = noteTypeFields[selectedType];
   const fieldOpts = $(`<select class="field_list_dropdown" />`);
@@ -229,7 +234,7 @@ function remove_mapping_row(row_id) {
 }
 
 function get_json() {
-  // window.alert('hi');
+  remove_empty_mapping_rows();
   let field_mapping = {};
   $(".field-container").each(function() {
     const fieldname = $(this).find(".fieldname").val();
