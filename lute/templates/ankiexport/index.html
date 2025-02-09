@@ -125,12 +125,14 @@ function field_box_changed(field_box) {
   field_box.css("border-color", color);
 }
 
-function add_empty_mapping_row(field_name = null) {
+function add_empty_mapping_row(field_name = null, mapping_val = null) {
   const selectedType = $("#noteType").val();
+  /*
   if (!selectedType) {
     console.log("select note type");
     return;
-  }
+    }
+  */
 
   const mappingContainer = $("#mappingContainer");
   const rowid = $(".field-container").length + 1;
@@ -141,7 +143,7 @@ function add_empty_mapping_row(field_name = null) {
   if (field_name)
     fieldBox.val(field_name);
 
-  const fields = noteTypeFields[selectedType];
+  const fields = noteTypeFields[selectedType] ?? [];
   const fieldOpts = $(`<select class="field_list_dropdown arrow_only_dropdown" />`);
   add_fields(fieldOpts, fields);
 
@@ -161,6 +163,9 @@ function add_empty_mapping_row(field_name = null) {
   });
 
   const textBox = $(`<input class="fieldval" type="text">`);
+  if (mapping_val)
+    textBox.val(mapping_val);
+
   const valOpts = $(`<select class="val_list_dropdown arrow_only_dropdown" />`);
   valOpts.append(new Option("\u25BE", ""));
   [ 'text', 'tags' ].forEach(v => {
@@ -204,6 +209,20 @@ function get_json() {
   });
   console.log(JSON.stringify(field_mapping, null, 2));
 }
+</script>
+
+<script>
+
+function load_stuff() {
+  $("#noteType").val("preload");
+  const fd = { "blah": "blah map", "b2": "{ b2map }" };
+  Object.entries(fd).forEach(([key, value]) => {
+    console.log(key, value);
+    add_empty_mapping_row(key, value);
+  });
+}
+
+load_stuff();
 </script>
 
 {% endblock %}
