@@ -45,7 +45,7 @@
     padding: 5px;
   }
 
-  .styled-select {
+  .field_list_dropdown {
     appearance: none; /* Hides default styling */
     width: 20px; /* Only show the dropdown arrow */
     overflow: hidden;
@@ -57,7 +57,7 @@
 
 <div class="dropdown-container">
   <input type="text" class="text-input" id="textBox">
-  <select class="styled-select" id="dropdown">
+  <select class="field_list_dropdown" id="dropdown">
     <option value="">▼</option>
     <option value="Option 1">Option 1</option>
     <option value="Option 2">Option 2</option>
@@ -138,6 +138,9 @@
 
     const mappingContainer = $("#mappingContainer");
 
+    $(".field_list_dropdown").each(function() {
+      add_fields($(this), fields);
+    });
     /*
     if (fields.length == 0) return;
 
@@ -154,11 +157,32 @@
 
   });
 
+function add_fields(field_select, field_list) {
+  field_select.empty();
+  field_select.append(new Option("▼", ""));
+  field_list.forEach(f => {
+    field_select.append(new Option(f, f));
+  });
+}
+
+function field_box_changed(field_box) {
+  console.log("Checking field_box_changed");
+  const selectedType = $("#noteType").val();
+  if (!selectedType) return;
+  const available_fields = noteTypeFields[selectedType];
+  const field_name = field_box.val();
+  console.log(`Checking field name ${field_name} vs available ${available_fields.join(',')}`);
+  const color = available_fields.includes(field_name) ? "" : "red";
+  field_box.css("border-color", color);
+}
+
 function add_empty_mapping_row() {
-  if ($("#noteType").val() == "") {
+  const selectedType = $("#noteType").val();
+  if (!selectedType) {
     console.log("select note type");
     return;
   }
+
   const mappingContainer = $("#mappingContainer");
   const rowid = $(".field-container").length + 1;
   const this_id = `fc_${rowid}`;
@@ -166,29 +190,23 @@ function add_empty_mapping_row() {
   const f_id = `f_${rowid}`;
   const fieldBox = $(`<input id="${f_id}" type="text" class="fieldname" list="available_fields">`);
 
-  const fieldOpts = $(`<select class="styled-select" id="dropdown">
-    <option value="">▼</option>
-    <option value="Option 1">Option 1</option>
-    <option value="Option 2">Option 2</option>
-    <option value="Option 3">Option 3</option>
-  </select>`);
+  const fields = noteTypeFields[selectedType];
+  const fieldOpts = $(`<select class="field_list_dropdown" />`);
+  add_fields(fieldOpts, fields);
 
   fieldOpts.on('change', function() {
     const v = $(this).val() ?? "";
     if (v == "")
       return;
     fieldBox.val(v);
+    field_box_changed(fieldBox);
     this.selectedIndex = 0; // Reset to down arrow
     this.blur();
   });
 
   // Bind the change event to remove the red border color
   fieldBox.on('change', function() {
-    const selectedType = $("#noteType").val();
-    const available_fields = noteTypeFields[selectedType];
-    const field_name = $(this).val();
-    const color = available_fields.includes(field_name) ? "" : "red";
-    $(this).css("border-color", color);
+    field_box_changed($(this));
   });
 
   const textBox = $("<input>").
