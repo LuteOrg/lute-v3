@@ -59,13 +59,13 @@
 
 </form>
 
-<button id="add_mapping_row" onclick="add_empty_mapping_row(); return false;">+</button>
+<button id="add_mapping_row" onclick="add_empty_mapping_row(); return false;">&nbsp;+&nbsp;</button>
 <button id="getjson" onclick="get_json(); return false;">Get json</button>
 
 <script>
 
   // Prevent Return from submitting the form.
-  $("dataMappingForm").bind("keypress", function (e) {
+  $("#dataMappingForm").bind("keypress", function (e) {
     if (e.keyCode == 13) {
       return false;
     }
@@ -102,16 +102,16 @@
     }
     else {
       $(".field_list_dropdown").each(function() {
-        add_fields($(this), fields);
+        add_options($(this), fields);
       });
     }
 
   });
 
-function add_fields(field_select, field_list) {
+function add_options(field_select, opts_list) {
   field_select.empty();
   field_select.append(new Option("\u25BE", ""));
-  field_list.forEach(f => {
+  opts_list.forEach(f => {
     field_select.append(new Option(f, f));
   });
 }
@@ -139,13 +139,14 @@ function add_empty_mapping_row(field_name = null, mapping_val = null) {
   const this_id = `fc_${rowid}`;
   const fieldContainer = $(`<div id="${this_id}">`).addClass("field-container");
   const f_id = `f_${rowid}`;
+
   const fieldBox = $(`<input id="${f_id}" type="text" class="fieldname">`);
   if (field_name)
     fieldBox.val(field_name);
 
   const fields = noteTypeFields[selectedType] ?? [];
   const fieldOpts = $(`<select class="field_list_dropdown arrow_only_dropdown" />`);
-  add_fields(fieldOpts, fields);
+  add_options(fieldOpts, fields);
 
   fieldOpts.on('change', function() {
     const v = $(this).val() ?? "";
@@ -153,8 +154,7 @@ function add_empty_mapping_row(field_name = null, mapping_val = null) {
       return;
     fieldBox.val(v);
     field_box_changed(fieldBox);
-    this.selectedIndex = 0; // Reset to down arrow
-    this.blur();
+    $(this).val("").blur();
   });
 
   // Bind the change event to remove the red border color
@@ -167,32 +167,28 @@ function add_empty_mapping_row(field_name = null, mapping_val = null) {
     textBox.val(mapping_val);
 
   const valOpts = $(`<select class="val_list_dropdown arrow_only_dropdown" />`);
-  valOpts.append(new Option("\u25BE", ""));
-  [ 'text', 'tags' ].forEach(v => {
-    const optval = `{% raw %}{{{% endraw %} ${v} {% raw %}}}{% endraw %}`;
-    valOpts.append(new Option(optval, optval));
-  });
+  const vos = [ 'text', 'tags' ].map(v => `{% raw %}{{{% endraw %} ${v} {% raw %}}}{% endraw %}`);
+  add_options(valOpts, vos);
 
   valOpts.on('change', function() {
     const v = $(this).val() ?? "";
     if (v == "")
       return;
     textBox.val(v);
-    this.selectedIndex = 0; // Reset to down arrow
-    this.blur();
+    $(this).val("").blur();
   });
 
-  const del_button = $(`<button type="button" onclick="remove_mapping_row('${this_id}'); return false;">-</button>`);
+  const del_button = $(`<button type="button">&nbsp;-&nbsp;</button>`).data("row-id", this_id);
+  del_button.on("click", function () { remove_mapping_row($(this).data("row-id")); });
+
   fieldContainer.append(fieldBox, fieldOpts, textBox, valOpts, del_button);
   mappingContainer.append(fieldContainer);
 }
 
 function remove_empty_mapping_rows() {
-  $(".field-container").each(function() {
-    if ($(this).find(".fieldval").val() === "") {
-      $(this).remove(); // Remove the container if the fieldval is empty
-    }
-  });
+  $(".field-container").filter(function () {
+    return !$(this).find(".fieldval").val().trim();
+  }).remove();
 }
 
 function remove_mapping_row(row_id) {
@@ -203,9 +199,11 @@ function get_json() {
   remove_empty_mapping_rows();
   let field_mapping = {};
   $(".field-container").each(function() {
-    const fieldname = $(this).find(".fieldname").val();
-    const fieldval = $(this).find(".fieldval").val();
-    field_mapping[fieldname] = fieldval;
+    const c = $(this);
+    const fieldname = c.find(".fieldname").val().trim();
+    const fieldval = c.find(".fieldval").val().trim();
+    if (fieldval != "")
+      field_mapping[fieldname] = fieldval;
   });
   console.log(JSON.stringify(field_mapping, null, 2));
 }
