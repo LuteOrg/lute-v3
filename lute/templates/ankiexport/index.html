@@ -168,7 +168,7 @@ function add_empty_mapping_row(field_name = null, mapping_val = null) {
     field_box_changed(fieldBox);
   });
 
-  const vos = ["text", "tags"].map((v) => `{% raw %}{{{% endraw %} ${v} {% raw %}}}{% endraw %}`);
+  const vos = ["text", "tags"].map((v) => `{ ${v} }`);
   const valOpts = _create_dropdown("mapping_dropdown", vos, (v) => {
     textBox.val(v);
   });
