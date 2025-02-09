@@ -58,7 +58,7 @@
 <div class="dropdown-container">
   <input type="text" class="text-input" id="textBox">
   <select class="styled-select" id="dropdown">
-    <option value="">▼</option>  <!-- Just a visual hint -->
+    <option value="">▼</option>
     <option value="Option 1">Option 1</option>
     <option value="Option 2">Option 2</option>
     <option value="Option 3">Option 3</option>
@@ -71,7 +71,8 @@
     if (this.value) {
       textBox.value = this.value;
     }
-    this.selectedIndex = 0; // Reset dropdown to "▼" after selection
+    this.selectedIndex = 0; // Reset to down arrow
+    this.blur();
   });
 </script>
 
