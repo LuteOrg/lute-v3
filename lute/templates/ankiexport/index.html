@@ -32,20 +32,8 @@
 <p>delete, edit actions</p>
 <p>add new link</p>
 
-<h1>combo box</h1>
-
 <style>
-  .dropdown-container {
-    display: flex;
-    align-items: center;
-  }
-
-  .text-input {
-    flex: 1;
-    padding: 5px;
-  }
-
-  .field_list_dropdown, .val_list_dropdown {
+  .arrow_only_dropdown {
     appearance: none; /* Hides default styling */
     width: 20px; /* Only show the dropdown arrow */
     overflow: hidden;
@@ -54,27 +42,6 @@
     cursor: pointer;
   }
 </style>
-
-<div class="dropdown-container">
-  <input type="text" class="text-input" id="textBox">
-  <select class="field_list_dropdown" id="dropdown">
-    <option value="">▼</option>
-    <option value="Option 1">Option 1</option>
-    <option value="Option 2">Option 2</option>
-    <option value="Option 3">Option 3</option>
-  </select>
-</div>
-
-<script>
-  document.getElementById("dropdown").addEventListener("change", function() {
-    const textBox = document.getElementById("textBox");
-    if (this.value) {
-      textBox.value = this.value;
-    }
-    this.selectedIndex = 0; // Reset to down arrow
-    this.blur();
-  });
-</script>
 
 <h1>HACKING FORM BUILDER</h1>
 
@@ -94,14 +61,6 @@
 
 <button id="add_mapping_row" onclick="add_empty_mapping_row(); return false;">+</button>
 <button id="getjson" onclick="get_json(); return false;">Get json</button>
-
-<datalist id="mapping_presets">
-  {% for x in ['term', 'tags', 'tags["val1", "val2", ...]'] %}
-  <option value="{% raw %}{{{% endraw %} {{ x }} {% raw %}}}{% endraw %}">
-  {% endfor %}
-</datalist>
-
-<datalist id="available_fields" />
 
 <script>
 
@@ -146,25 +105,12 @@
         add_fields($(this), fields);
       });
     }
-    /*
-    if (fields.length == 0) return;
-
-    fields.forEach(field => {
-      const fieldContainer = $("<div>").addClass("field-container");
-      const fieldBox = $("<input>").
-            attr({ class: "fieldname", type: "text", list: "available_fields" }).val(field);
-      const textBox = $("<input>").
-            attr({ class: "fieldval", type: "text", list: "mapping_presets" });
-      fieldContainer.append(fieldBox, textBox);
-      mappingContainer.append(fieldContainer);
-    });
-    */
 
   });
 
 function add_fields(field_select, field_list) {
   field_select.empty();
-  field_select.append(new Option("▼", ""));
+  field_select.append(new Option("\u25BE", ""));
   field_list.forEach(f => {
     field_select.append(new Option(f, f));
   });
@@ -191,12 +137,12 @@ function add_empty_mapping_row(field_name = null) {
   const this_id = `fc_${rowid}`;
   const fieldContainer = $(`<div id="${this_id}">`).addClass("field-container");
   const f_id = `f_${rowid}`;
-  const fieldBox = $(`<input id="${f_id}" type="text" class="fieldname" list="available_fields">`);
+  const fieldBox = $(`<input id="${f_id}" type="text" class="fieldname">`);
   if (field_name)
     fieldBox.val(field_name);
 
   const fields = noteTypeFields[selectedType];
-  const fieldOpts = $(`<select class="field_list_dropdown" />`);
+  const fieldOpts = $(`<select class="field_list_dropdown arrow_only_dropdown" />`);
   add_fields(fieldOpts, fields);
 
   fieldOpts.on('change', function() {
@@ -215,8 +161,8 @@ function add_empty_mapping_row(field_name = null) {
   });
 
   const textBox = $(`<input class="fieldval" type="text">`);
-  const valOpts = $(`<select class="val_list_dropdown" />`);
-  valOpts.append(new Option("▼", ""));
+  const valOpts = $(`<select class="val_list_dropdown arrow_only_dropdown" />`);
+  valOpts.append(new Option("\u25BE", ""));
   [ 'text', 'tags' ].forEach(v => {
     const optval = `{% raw %}{{{% endraw %} ${v} {% raw %}}}{% endraw %}`;
     valOpts.append(new Option(optval, optval));
@@ -231,7 +177,7 @@ function add_empty_mapping_row(field_name = null) {
     this.blur();
   });
 
-  const del_button = $(`<button onclick="remove_mapping_row('${this_id}'); return false;">-</button>`);
+  const del_button = $(`<button type="button" onclick="remove_mapping_row('${this_id}'); return false;">-</button>`);
   fieldContainer.append(fieldBox, fieldOpts, textBox, valOpts, del_button);
   mappingContainer.append(fieldContainer);
 }
