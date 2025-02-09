@@ -33,6 +33,7 @@
 <p>add new link</p>
 
 <h1>HACKING FORM BUILDER</h1>
+
 <form id="dataMappingForm">
   <label for="noteType">Note Type:</label>
   <select id="noteType">
@@ -60,6 +61,13 @@
 
 <script>
 
+  // Prevent Return from submitting the form.
+  $("dataMappingForm").bind("keypress", function (e) {
+    if (e.keyCode == 13) {
+      return false;
+    }
+  });
+
   const noteTypeFields = {
     note_type_A: ["a", "b"],
     note_type_B: ["a", "c", "d"],
@@ -67,17 +75,24 @@
 
   $("#noteType").change(function () {
     const selectedType = $(this).val();
-    const mappingContainer = $("#mappingContainer");
-
-    mappingContainer.empty(); // Clear previous fields
-
-    if (!selectedType) return; // Exit if no selection
+    if (!selectedType) return;
 
     const fields = noteTypeFields[selectedType];
-
     $("#available_fields").empty();
     for (let i = 0; i < fields.length; i++)
       $("#available_fields").append(`<option value="${fields[i]}">`);
+
+    $(".field-container").each(function() {
+      const fieldname_input = $(this).find(".fieldname")
+      const fieldname = fieldname_input.val();
+      if (!fields.includes(fieldname)) {
+        fieldname_input.css("border-color", "red");
+      }
+    });
+
+    remove_empty_mapping_rows();
+
+    const mappingContainer = $("#mappingContainer");
 
     /*
     if (fields.length == 0) return;
@@ -103,8 +118,17 @@ function add_empty_mapping_row() {
   const mappingContainer = $("#mappingContainer");
   const this_id = "fc_" + ($(".field-container").length + 1);
   const fieldContainer = $(`<div id="${this_id}">`).addClass("field-container");
-  const fieldBox = $("<input>").
-        attr({ class: "fieldname", type: "text", list: "available_fields" });
+  const fieldBox = $('<input type="text" class="fieldname" list="available_fields">');
+
+  // Bind the change event to remove the red border color
+  fieldBox.on('change', function() {
+    const selectedType = $("#noteType").val();
+    const available_fields = noteTypeFields[selectedType];
+    const field_name = $(this).val();
+    const color = available_fields.includes(field_name) ? "" : "red";
+    $(this).css("border-color", color);
+  });
+
   const textBox = $("<input>").
         attr({ class: "fieldval", type: "text", list: "mapping_presets" });
   const del_button = $(`<button onclick="remove_mapping_row('${this_id}'); return false;">-</button>`);
@@ -112,8 +136,15 @@ function add_empty_mapping_row() {
   mappingContainer.append(fieldContainer);
 }
 
+function remove_empty_mapping_rows() {
+  $(".field-container").each(function() {
+    if ($(this).find(".fieldval").val() === "") {
+      $(this).remove(); // Remove the container if the fieldval is empty
+    }
+  });
+}
+
 function remove_mapping_row(row_id) {
-  console.log(`Removing ${row_id}`);
   $(`#${row_id}`).remove();
 }
 
