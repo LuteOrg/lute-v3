@@ -160,9 +160,27 @@ function add_empty_mapping_row() {
     return;
   }
   const mappingContainer = $("#mappingContainer");
-  const this_id = "fc_" + ($(".field-container").length + 1);
+  const rowid = $(".field-container").length + 1;
+  const this_id = `fc_${rowid}`;
   const fieldContainer = $(`<div id="${this_id}">`).addClass("field-container");
-  const fieldBox = $('<input type="text" class="fieldname" list="available_fields">');
+  const f_id = `f_${rowid}`;
+  const fieldBox = $(`<input id="${f_id}" type="text" class="fieldname" list="available_fields">`);
+
+  const fieldOpts = $(`<select class="styled-select" id="dropdown">
+    <option value="">▼</option>
+    <option value="Option 1">Option 1</option>
+    <option value="Option 2">Option 2</option>
+    <option value="Option 3">Option 3</option>
+  </select>`);
+
+  fieldOpts.on('change', function() {
+    const v = $(this).val() ?? "";
+    if (v == "")
+      return;
+    fieldBox.val(v);
+    this.selectedIndex = 0; // Reset to down arrow
+    this.blur();
+  });
 
   // Bind the change event to remove the red border color
   fieldBox.on('change', function() {
@@ -176,7 +194,7 @@ function add_empty_mapping_row() {
   const textBox = $("<input>").
         attr({ class: "fieldval", type: "text", list: "mapping_presets" });
   const del_button = $(`<button onclick="remove_mapping_row('${this_id}'); return false;">-</button>`);
-  fieldContainer.append(fieldBox, textBox, del_button);
+  fieldContainer.append(fieldBox, fieldOpts, textBox, del_button);
   mappingContainer.append(fieldContainer);
 }
 
