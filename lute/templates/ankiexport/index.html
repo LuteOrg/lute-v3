@@ -45,12 +45,13 @@
     <!-- Fields will be dynamically inserted here -->
   </div>
 
-  <datalist id="mapping-presets">
+</form>
+
+<datalist id="mapping-presets">
   {% for x in ['term', 'tags', 'tags["val1", "val2", ...]'] %}
   <option value="{% raw %}{{{% endraw %} {{ x }} {% raw %}}}{% endraw %}">
   {% endfor %}
-  </datalist>
-</form>
+</datalist>
 
 <button id="getjson" onclick="get_json(); return false;">Get json</button>
 
