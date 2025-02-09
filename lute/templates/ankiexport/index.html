@@ -138,9 +138,8 @@ function add_empty_mapping_row(field_name = null, mapping_val = null) {
   const rowid = $(".field-container").length + 1;
   const this_id = `fc_${rowid}`;
   const fieldContainer = $(`<div id="${this_id}">`).addClass("field-container");
-  const f_id = `f_${rowid}`;
 
-  const fieldBox = $(`<input id="${f_id}" type="text" class="fieldname">`);
+  const fieldBox = $(`<input type="text" class="fieldname">`);
   if (field_name)
     fieldBox.val(field_name);
 
