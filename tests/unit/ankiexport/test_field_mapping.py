@@ -25,24 +25,24 @@ def assert_mapping_equals(mapping, expected):
 
 def test_mapping_as_array_valid():
     mapping = """
-    a: {{ somefield }}
-    b: {{ anotherfield }}
+    a: { somefield }
+    b: { anotherfield }
     """
     expected = [
-        "|a|=>|{{ somefield }}|",
-        "|b|=>|{{ anotherfield }}|",
+        "|a|=>|{ somefield }|",
+        "|b|=>|{ anotherfield }|",
     ]
     assert_mapping_equals(mapping, expected)
 
 
 def test_mapping_value_can_contain_colons_and_other_values():
     mapping = """
-    a: {{ somefield }}
-    b: {{ anotherfield }}: {{ still more }}
+    a: { somefield }
+    b: { anotherfield }: { still more }
     """
     expected = [
-        "|a|=>|{{ somefield }}|",
-        "|b|=>|{{ anotherfield }}: {{ still more }}|",
+        "|a|=>|{ somefield }|",
+        "|b|=>|{ anotherfield }: { still more }|",
     ]
     assert_mapping_equals(mapping, expected)
 
@@ -51,21 +51,21 @@ def test_mapping_as_array_ignores_comments_and_empty_lines():
     mapping = """
     
     # This is a comment
-    a: {{ somefield }}
+    a: { somefield }
     
-    b: {{ anotherfield }}
+    b: { anotherfield }
     # Another comment
     """
     expected = [
-        "|a|=>|{{ somefield }}|",
-        "|b|=>|{{ anotherfield }}|",
+        "|a|=>|{ somefield }|",
+        "|b|=>|{ anotherfield }|",
     ]
     assert_mapping_equals(mapping, expected)
 
 
 def test_mapping_as_array_raises_error_on_invalid_line():
     mapping = """
-    a: {{ somefield }}
+    a: { somefield }
     invalid_line_without_colon
     """
     with pytest.raises(
@@ -77,9 +77,9 @@ def test_mapping_as_array_raises_error_on_invalid_line():
 
 def test_mapping_as_array_raises_error_on_duplicate_fields():
     mapping = """
-    a: {{ somefield }}
-    b: {{ anotherfield }}
-    a: {{ thirdfield }}
+    a: { somefield }
+    b: { anotherfield }
+    a: { thirdfield }
     """
     with pytest.raises(
         AnkiExportConfigurationError, match="Duplicate field a in mapping"
@@ -90,9 +90,9 @@ def test_mapping_as_array_raises_error_on_duplicate_fields():
 @pytest.mark.parametrize(
     "mapping,msg",
     [
-        ("a: {{ x }}", 'Invalid field mapping "x"'),
-        ("a: {{ id }}\nb: {{ x }}", 'Invalid field mapping "x"'),
-        ("a: {{ id }}\na: {{ term }}", "Duplicate field a in mapping"),
+        ("a: { x }", 'Invalid field mapping "x"'),
+        ("a: { id }\nb: { x }", 'Invalid field mapping "x"'),
+        ("a: { id }\na: { term }", "Duplicate field a in mapping"),
     ],
 )
 def test_validate_mapping_throws_if_bad_mapping_string(mapping, msg):
@@ -103,9 +103,9 @@ def test_validate_mapping_throws_if_bad_mapping_string(mapping, msg):
 @pytest.mark.parametrize(
     "mapping,msg",
     [
-        ("a: {{ id }}", "ok"),
-        ("a: {{ id }}\nb: {{ id }}", "same value twice ok"),
-        ("a: {{ id }}\nb: {{ term }}", "different fields"),
+        ("a: { id }", "ok"),
+        ("a: { id }\nb: { id }", "same value twice ok"),
+        ("a: { id }\nb: { term }", "different fields"),
     ],
 )
 def test_validate_mapping_does_not_throw_if_ok(mapping, msg):
@@ -130,10 +130,10 @@ def fixture_term():
 def test_basic_replacements(term):
     refsrepo = Mock()
     mapping_string = """
-        id: {{ id }}
-        term: {{ term }}
-        language: {{ language }}
-        translation: {{ translation }}
+        id: { id }
+        term: { term }
+        language: { language }
+        translation: { translation }
     """
     values, media = get_values_and_media_mapping(term, refsrepo, mapping_string)
 
@@ -151,7 +151,7 @@ def test_basic_replacements(term):
 
 def test_tag_replacements(term):
     refsrepo = Mock()
-    mapping_string = "tags: {{ tags }}"
+    mapping_string = "tags: { tags }"
 
     values, media = get_values_and_media_mapping(term, refsrepo, mapping_string)
 
@@ -161,7 +161,7 @@ def test_tag_replacements(term):
 
 def test_image_handling(term):
     refsrepo = Mock()
-    mapping_string = "image: {{ image }}"
+    mapping_string = "image: { image }"
 
     values, media = get_values_and_media_mapping(term, refsrepo, mapping_string)
 
@@ -174,7 +174,7 @@ def test_sentence_handling(term):
     refsrepo.find_references_by_id.return_value = {
         "term": [Mock(sentence="Example sentence.")]
     }
-    mapping_string = "sentence: {{ sentence }}"
+    mapping_string = "sentence: { sentence }"
 
     values, media = get_values_and_media_mapping(term, refsrepo, mapping_string)
 
@@ -184,8 +184,8 @@ def test_sentence_handling(term):
 
 def test_get_fields_and_final_values_smoke_test():
     mapping_string = """
-    a: {{ id }}
-    b: {{ term }}
+    a: { id }
+    b: { term }
     """
     replacements = {"id": 42, "term": "rabbit"}
     actual = get_fields_and_final_values(mapping_string, replacements)

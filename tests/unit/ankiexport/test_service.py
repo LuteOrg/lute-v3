@@ -19,7 +19,7 @@ def fixture_spec():
     spec.criteria = 'language:"German"'
     spec.deck_name = "good_deck"
     spec.note_type = "good_note"
-    spec.field_mapping = "a: {{ language }}"
+    spec.field_mapping = "a: { language }"
     spec.active = True
     return spec
 
@@ -46,10 +46,10 @@ def test_validate_returns_empty_hash_if_all_ok(export_spec):
         ("note_type", "missing_note", 'No note type "missing_note"'),
         (
             "field_mapping",
-            "xx: {{ language }}",
+            "xx: { language }",
             "Note type good_note does not have field(s): xx",
         ),
-        ("field_mapping", "a: {{ bad_value }}", 'Invalid field mapping "bad_value"'),
+        ("field_mapping", "a: { bad_value }", 'Invalid field mapping "bad_value"'),
     ],
 )
 def test_validate_returns_dict_of_export_ids_and_errors(
@@ -70,7 +70,7 @@ def test_validate_returns_dict_of_export_ids_and_errors(
 def test_validate_only_checks_active_specs(export_spec):
     anki_decks = ["good_deck"]
     anki_notes = {"good_note": ["a", "b"]}
-    export_spec.criteria = "xxx={{yyy}}"
+    export_spec.criteria = "xxx={yyy}"
     svc = Service(anki_decks, anki_notes, [export_spec])
     result = svc.validate_specs()
     assert export_spec.id in result, "should have a problem, sanity check"
@@ -100,10 +100,10 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
     anki_decks = ["good_deck"]
     anki_notes = {"good_note": ["a", "b", "c", "d"]}
     export_spec.field_mapping = """
-    a: {{ language }}
-    b: {{ image }}
-    c: {{ term }}
-    d: {{ sentence }}
+    a: { language }
+    b: { image }
+    c: { term }
+    d: { sentence }
     """
     svc = Service(anki_decks, anki_notes, [export_spec])
     result = svc.validate_specs()

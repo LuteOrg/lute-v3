@@ -2,9 +2,9 @@
 
 e.g. given string like
 
-lute_term_id: {{ id }}
-term: {{ term }}
-tags: {{ tags:["masc", "fem"] }}
+lute_term_id: { id }
+term: { term }
+tags: { tags:["masc", "fem"] }
 
 extracts data from the given term and generates a mapping of field to
 actual values to send to AnkiConnect.
@@ -35,8 +35,8 @@ class FieldMappingData:
 
 def mapping_as_array(field_mapping):
     """
-    Given "a: {{ somefield }}", returns
-    [ ("a", "{{ somefield }}") ]
+    Given "a: { somefield }", returns
+    [ ("a", "{ somefield }") ]
 
     Raises config error if dup fields.
     """
@@ -93,7 +93,7 @@ def get_values_and_media_mapping(term, refsrepo, mapping_string):
         adds ankiconnect post actions to post_actions if needed
         (e.g. for image uploads).
 
-        e.g. the mapping "article: {{ tags["der", "die", "das"] }}"
+        e.g. the mapping "article: { tags["der", "die", "das"] }"
         needs to be parsed to extract certain tags from the current
         term.
         """
@@ -158,7 +158,7 @@ def get_values_and_media_mapping(term, refsrepo, mapping_string):
         return calc_replacements
 
     # One-for-one replacements in the mapping string.
-    # e.g. "{{ id }}" is replaced by term.termid.
+    # e.g. "{ id }" is replaced by term.termid.
     replacements = {
         "id": term.id,
         "term": term.text,
@@ -170,7 +170,7 @@ def get_values_and_media_mapping(term, refsrepo, mapping_string):
 
     calc_keys = [
         k
-        for k in set(re.findall(r"{{\s*(.*?)\s*}}", mapping_string))
+        for k in set(re.findall(r"{\s*(.*?)\s*}", mapping_string))
         if k not in replacements
     ]
 
@@ -198,7 +198,7 @@ def get_fields_and_final_values(mapping_string, replacements):
     for m in mapping_array:
         value = m.value
         for k, v in replacements.items():
-            pattern = rf"{{{{\s*{re.escape(k)}\s*}}}}"
+            pattern = rf"{{\s*{re.escape(k)}\s*}}"
             value = re.sub(pattern, f"{v}", value)
         m.value = value
     return mapping_array
