@@ -47,6 +47,9 @@
 
 </form>
 
+<button id="add_mapping_row" onclick="add_empty_mapping_row(); return false;">+</button>
+<button id="getjson" onclick="get_json(); return false;">Get json</button>
+
 <datalist id="mapping_presets">
   {% for x in ['term', 'tags', 'tags["val1", "val2", ...]'] %}
   <option value="{% raw %}{{{% endraw %} {{ x }} {% raw %}}}{% endraw %}">
@@ -54,8 +57,6 @@
 </datalist>
 
 <datalist id="available_fields" />
-  
-<button id="getjson" onclick="get_json(); return false;">Get json</button>
 
 <script>
 
@@ -78,6 +79,7 @@
     for (let i = 0; i < fields.length; i++)
       $("#available_fields").append(`<option value="${fields[i]}">`);
 
+    /*
     if (fields.length == 0) return;
 
     fields.forEach(field => {
@@ -89,7 +91,24 @@
       fieldContainer.append(fieldBox, textBox);
       mappingContainer.append(fieldContainer);
     });
+    */
+
   });
+
+function add_empty_mapping_row() {
+  if ($("#noteType").val() == "") {
+    console.log("select note type");
+    return;
+  }
+  const mappingContainer = $("#mappingContainer");
+  const fieldContainer = $("<div>").addClass("field-container");
+  const fieldBox = $("<input>").
+        attr({ class: "fieldname", type: "text", list: "available_fields" });
+  const textBox = $("<input>").
+        attr({ class: "fieldval", type: "text", list: "mapping_presets" });
+  fieldContainer.append(fieldBox, textBox);
+  mappingContainer.append(fieldContainer);
+}
 
 function get_json() {
   // window.alert('hi');
