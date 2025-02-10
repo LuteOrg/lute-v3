@@ -60,9 +60,10 @@
 
     new DataTable('#example', {
       columns: [
-        { title: 'export_name', data: 'export_name' },
-        { title: 'criteria', render: render_export_spec },
-        { title: 'active', data: 'active' }
+        { title: 'Export_id', data: 'id', visible: false },
+        { title: 'Export name', data: 'export_name' },
+        { title: 'Specification', render: render_export_spec },
+        { title: 'Active', data: 'active' }
       ],
       data: esj
     });
