@@ -27,7 +27,6 @@ class Service:
         export_specs,
     ):
         "init"
-        self.fake_fail_counter = 0
         self.anki_deck_names = anki_deck_names
         self.anki_note_types_and_fields = anki_note_types_and_fields
         self.export_specs = export_specs
@@ -146,6 +145,7 @@ class Service:
     def get_ankiconnect_post_data_for_term(self, term, base_url, refsrepo):
         """
         Get post data for a single term.
+        This assumes that all the specs are valid!
         Separate method for unit testing.
         """
         use_exports = [

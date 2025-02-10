@@ -166,8 +166,3 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
     # print("expected")
     # print(expected)
     assert pd == expected, "PHEW!"
-
-
-def test_todo_bad_spec_mapping_json():
-    a = 2
-    assert 1 == a, "TODO"
