@@ -177,3 +177,61 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
     # print("expected")
     # print(expected)
     assert pd == expected, "PHEW!"
+
+
+def test_smoke_ankiconnect_post_data_for_term_without_image(term, export_spec):
+    term.get_current_image.return_value = None
+
+    anki_decks = ["good_deck"]
+    anki_notes = {"good_note": ["a", "b", "c", "d"]}
+    export_spec.field_mapping = json.dumps(
+        {
+            "a": "{ language }",
+            "b": "{ image }",
+            "c": "{ term }",
+            "d": "{ sentence }",
+        }
+    )
+    svc = Service(anki_decks, anki_notes, [export_spec])
+    result = svc.validate_specs()
+    assert len(result) == 0, "No problems, sanity check"
+
+    refsrepo = Mock()
+    refsrepo.find_references_by_id.return_value = {
+        "term": [Mock(sentence="Example sentence.")]
+    }
+
+    pd = svc.get_ankiconnect_post_data_for_term(term, "http://x:42", refsrepo)
+    assert len(pd) != 0, "Got some post data"
+
+    expected = {
+        "export_name": {
+            "action": "multi",
+            "params": {
+                "actions": [
+                    {
+                        "action": "addNote",
+                        "params": {
+                            "note": {
+                                "deckName": "good_deck",
+                                "modelName": "good_note",
+                                "fields": {
+                                    "a": "German",
+                                    "b": "",
+                                    "c": "test",
+                                    "d": "Example sentence.",
+                                },
+                                "tags": ["lute", "noun", "verb"],
+                            }
+                        },
+                    },
+                ]
+            },
+        }
+    }
+
+    # print("actual")
+    # print(pd)
+    # print("expected")
+    # print(expected)
+    assert pd == expected, "PHEW!"
