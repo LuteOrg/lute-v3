@@ -2,6 +2,7 @@
 Anki export.
 """
 
+import json
 from flask import (
     Blueprint,
     request,
@@ -57,32 +58,38 @@ def anki_index():
 
 def _fake_export_specs():
     "Sample mapping and terms."
-    gender_card_mapping = """\
-      Lute_term_id: { id }
-      Front: { term }: der, die, oder das?
-      Picture: { image }
-      Definition: { translation }
-      Back: { tags:["der", "die", "das"] } { term }
-      Sentence: { sentence }
-    """
+    gender_card_mapping = json.dumps(
+        {
+            "Lute_term_id": "{ id }",
+            "Front": "{ term }: der, die, oder das?",
+            "Picture": "{ image }",
+            "Definition": "{ translation }",
+            "Back": '{ tags:["der", "die", "das"] } { term }',
+            "Sentence": "{ sentence }",
+        }
+    )
 
-    dummy_card_mapping = """\
-      Lute_term_id: { id }
-      Front: ___ { term }
-      Picture: { image }
-      Definition: { translation }
-      Back: { tags:["der", "die", "das"] } { term }
-      Sentence: { sentence }
-    """
+    dummy_card_mapping = json.dumps(
+        {
+            "Lute_term_id": "{ id }",
+            "Front": "___ { term }",
+            "Picture": "{ image }",
+            "Definition": "{ translation }",
+            "Back": '{ tags:["der", "die", "das"] } { term }',
+            "Sentence": "{ sentence }",
+        }
+    )
 
-    plural_card_mapping = """\
-      Lute_term_id: { id }
-      Front: { tags:["der", "die", "das"] } { parents }, plural
-      Picture: { image }
-      Definition: { translation }
-      Back: die { term }
-      Sentence: { sentence }
-    """
+    plural_card_mapping = json.dumps(
+        {
+            "Lute_term_id": "{ id }",
+            "Front": '{ tags:["der", "die", "das"] } { parents }, plural',
+            "Picture": "{ image }",
+            "Definition": "{ translation }",
+            "Back": "die { term }",
+            "Sentence": "{ sentence }",
+        }
+    )
 
     all_mapping_data = [
         {
