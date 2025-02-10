@@ -4,7 +4,7 @@ Service tests.
 
 from unittest.mock import Mock
 import pytest
-
+import json
 from lute.models.srsexport import SrsExportSpec
 from lute.ankiexport.service import Service
 
@@ -19,7 +19,7 @@ def fixture_spec():
     spec.criteria = 'language:"German"'
     spec.deck_name = "good_deck"
     spec.note_type = "good_note"
-    spec.field_mapping = "a: { language }"
+    spec.field_mapping = json.dumps({"a": "{ language }"})
     spec.active = True
     return spec
 
@@ -46,10 +46,14 @@ def test_validate_returns_empty_hash_if_all_ok(export_spec):
         ("note_type", "missing_note", 'No note type "missing_note"'),
         (
             "field_mapping",
-            "xx: { language }",
+            json.dumps({"xx": "{ language }"}),
             "Note type good_note does not have field(s): xx",
         ),
-        ("field_mapping", "a: { bad_value }", 'Invalid field mapping "bad_value"'),
+        (
+            "field_mapping",
+            json.dumps({"a": "{ bad_value }"}),
+            'Invalid field mapping "bad_value"',
+        ),
     ],
 )
 def test_validate_returns_dict_of_export_ids_and_errors(
@@ -99,12 +103,14 @@ def fixture_term():
 def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
     anki_decks = ["good_deck"]
     anki_notes = {"good_note": ["a", "b", "c", "d"]}
-    export_spec.field_mapping = """
-    a: { language }
-    b: { image }
-    c: { term }
-    d: { sentence }
-    """
+    export_spec.field_mapping = json.dumps(
+        {
+            "a": "{ language }",
+            "b": "{ image }",
+            "c": "{ term }",
+            "d": "{ sentence }",
+        }
+    )
     svc = Service(anki_decks, anki_notes, [export_spec])
     result = svc.validate_specs()
     assert len(result) == 0, "No problems, sanity check"
@@ -155,3 +161,8 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
     # print("expected")
     # print(expected)
     assert pd == expected, "PHEW!"
+
+
+def test_todo_bad_spec_mapping_json():
+    a = 2
+    assert 1 == a, "TODO"

@@ -2,11 +2,11 @@
 Service, validates and posts.
 """
 
+import json
 from lute.models.repositories import TermRepository
 from lute.term.model import ReferencesRepository
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 from lute.ankiexport.field_mapping import (
-    # mapping_as_array,
     get_values_and_media_mapping,
     validate_mapping,
     get_fields_and_final_values,
@@ -44,8 +44,8 @@ class Service:
             errors.append(f'No note type "{spec.note_type}"')
         else:
             note_fields = self.anki_note_types_and_fields.get(spec.note_type, {})
-            mapping_array = mapping_as_array(spec.field_mapping)
-            fieldnames = [m.fieldname for m in mapping_array]
+            mapping = json.loads(spec.field_mapping)
+            fieldnames = mapping.keys()
             bad_fields = [f for f in fieldnames if f not in note_fields]
             if len(bad_fields) > 0:
                 bad_fields = ", ".join(bad_fields)
@@ -53,7 +53,7 @@ class Service:
                 errors.append(msg)
 
         try:
-            validate_mapping(spec.field_mapping)
+            validate_mapping(json.loads(spec.field_mapping))
         except AnkiExportConfigurationError as ex:
             errors.append(str(ex))
 
@@ -99,7 +99,7 @@ class Service:
     # pylint: disable=too-many-arguments,too-many-positional-arguments
     def _build_ankiconnect_post_json(
         self,
-        mapping_array,
+        mapping,
         media_mappings,
         lute_and_term_tags,
         deck_name,
@@ -125,7 +125,7 @@ class Service:
                     "note": {
                         "deckName": deck_name,
                         "modelName": model_name,
-                        "fields": {m.fieldname: m.value.strip() for m in mapping_array},
+                        "fields": mapping,
                         "tags": lute_and_term_tags,
                     }
                 },
@@ -148,18 +148,15 @@ class Service:
 
         ret = {}
         for export in use_exports:
-            replacements, mmap = get_values_and_media_mapping(
-                term, refsrepo, export.field_mapping
-            )
+            mapping = json.loads(export.field_mapping)
+            replacements, mmap = get_values_and_media_mapping(term, refsrepo, mapping)
             for k, v in mmap.items():
                 mmap[k] = base_url + v
-            mapping_array = get_fields_and_final_values(
-                export.field_mapping, replacements
-            )
+            updated_mapping = get_fields_and_final_values(mapping, replacements)
             tags = ["lute"] + self._all_tags(term)
 
             p = self._build_ankiconnect_post_json(
-                mapping_array,
+                updated_mapping,
                 mmap,
                 tags,
                 export.deck_name,
