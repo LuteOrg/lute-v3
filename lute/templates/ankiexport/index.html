@@ -19,6 +19,33 @@
 
 </form>
 
+<table id="export_specs">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Export Name</th>
+      <th>Criteria</th>
+      <th>Deck Name</th>
+      <th>Note Type</th>
+      <th>Field Mapping</th>
+      <th>Active</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for spec in export_specs %}
+    <tr>
+      <td>{{ spec.id }}</td>
+      <td>{{ spec.export_name }}</td>
+      <td>{{ spec.criteria }}</td>
+      <td>{{ spec.deck_name }}</td>
+      <td>{{ spec.note_type }}</td>
+      <td>{{ spec.field_mapping }}</td>
+      <td>{{ "Yes" if spec.active else "No" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+  
 <p>TODO add datatables</p>
 <p>delete, edit actions</p>
 <p>add new link</p>
@@ -37,6 +64,10 @@
       .catch(error => alert(error));
   }
 
+  $( document ).ready(function() {
+    const dt = new DataTable('#export_specs');
+  });
+  
 </script>
 
 <style>

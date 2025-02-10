@@ -31,15 +31,18 @@ def anki_index():
     url = repo.get_value(fname)
     form = AnkiConnectSettingsForm(data={fname: url})
 
+    export_specs = db.session.query(SrsExportSpec).all()
+
     if form.validate_on_submit():
         repo.set_value(fname, form.ankiconnect_url.data)
         db.session.commit()
         refresh_global_settings(db.session)
 
         flash("AnkiConnect URL updated", "success")
-        return render_template("/ankiexport/index.html", form=form)
 
-    return render_template("/ankiexport/index.html", form=form)
+    return render_template(
+        "/ankiexport/index.html", form=form, export_specs=export_specs
+    )
 
 
 def _fake_export_specs():
