@@ -55,7 +55,6 @@ def anki_index():
     return render_template(
         "/ankiexport/index.html",
         form=form,
-        export_specs=export_specs,
         export_specs_json=export_specs_json,
     )
 

@@ -16,37 +16,10 @@
     <button type="submit" class="btn btn-primary">Save</button>
     <button class="btn" onclick="window.location = '/'; return false;">Cancel</button>
   </div>
-
 </form>
 
-<table id="export_specs">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Export Name</th>
-      <th>Criteria</th>
-      <th>Deck Name</th>
-      <th>Note Type</th>
-      <th>Field Mapping</th>
-      <th>Active</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for spec in export_specs %}
-    <tr>
-      <td>{{ spec.id }}</td>
-      <td>{{ spec.export_name }}</td>
-      <td>{{ spec.criteria }}</td>
-      <td>{{ spec.deck_name }}</td>
-      <td>{{ spec.note_type }}</td>
-      <td>{{ spec.field_mapping }}</td>
-      <td>{{ "Yes" if spec.active else "No" }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-<table id="example" class="display" width="100%"></table>
+<br />
+<table id="export_specs" class="display" width="100%"></table>
   
 <p>delete, edit actions</p>
 <p>add new link</p>
@@ -54,18 +27,14 @@
 <script>
 
   $( document ).ready(function() {
-    const dt = new DataTable('#export_specs');
-
-    const esj = {{ export_specs_json | tojson | safe }};
-
-    new DataTable('#example', {
+    new DataTable('#export_specs', {
       columns: [
         { title: 'Export_id', data: 'id', visible: false },
         { title: 'Export name', data: 'export_name' },
         { title: 'Specification', render: render_export_spec },
         { title: 'Active', data: 'active' }
       ],
-      data: esj
+      data: {{ export_specs_json | tojson | safe }}
     });
 
   });
