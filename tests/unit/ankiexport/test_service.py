@@ -61,19 +61,30 @@ def test_validate_returns_empty_hash_if_all_ok(export_spec):
         ),
     ],
 )
-def test_validate_returns_dict_of_export_ids_and_errors(
+def test_validate_spec_returns_array_of_errors(
     prop_name, prop_value, expected_error, export_spec
 ):
     anki_decks = ["good_deck"]
     anki_notes = {"good_note": ["a", "b"]}
     setattr(export_spec, prop_name, prop_value)
     svc = Service(anki_decks, anki_notes, [export_spec])
+    result = svc.validate_spec(export_spec)
+    assert result == [expected_error]
+
+    export_spec.active = False
+    assert svc.validate_spec(export_spec) == [], "no errors for inactive spec"
+
+
+def test_validate_specs_returns_dict_of_export_ids_and_errors(export_spec):
+    anki_decks = ["good_deck"]
+    anki_notes = {"good_note": ["a", "b"]}
+    export_spec.deck_name = "missing_deck"
+    svc = Service(anki_decks, anki_notes, [export_spec])
     result = svc.validate_specs()
-    assert export_spec.id in result, "should have a problem"
-    assert result[export_spec.id] == expected_error
+    assert result == {export_spec.id: 'No deck name "missing_deck"'}
 
     msg = svc.validate_specs_failure_message()
-    assert msg == [f"export_name: {expected_error}"], "failure msg"
+    assert msg == ['export_name: No deck name "missing_deck"'], "failure msg"
 
 
 def test_validate_only_checks_active_specs(export_spec):

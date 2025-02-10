@@ -31,10 +31,13 @@ class Service:
         self.anki_note_types_and_fields = anki_note_types_and_fields
         self.export_specs = export_specs
 
-    def _validate_single_spec(self, spec):
+    def validate_spec(self, spec):
         """
         Returns array of errors if any for the given spec.
         """
+        if not spec.active:
+            return []
+
         errors = []
 
         try:
@@ -77,9 +80,8 @@ class Service:
         Return hash of spec ids and any config errors.
         """
         failures = {}
-        active_specs = [s for s in self.export_specs if s.active is True]
-        for spec in active_specs:
-            v = self._validate_single_spec(spec)
+        for spec in self.export_specs:
+            v = self.validate_spec(spec)
             if len(v) != 0:
                 failures[spec.id] = "; ".join(v)
         return failures
