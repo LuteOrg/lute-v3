@@ -45,13 +45,29 @@
     {% endfor %}
   </tbody>
 </table>
+
+<table id="example" class="display" width="100%"></table>
   
-<p>TODO add datatables</p>
 <p>delete, edit actions</p>
 <p>add new link</p>
 
 <script>
 
+  $( document ).ready(function() {
+    const dt = new DataTable('#export_specs');
+
+    const esj = {{ export_specs_json | tojson | safe }};
+
+    new DataTable('#example', {
+      columns: [
+        { title: 'export_name', data: 'export_name' },
+        { title: 'criteria', data: 'criteria' },
+        { title: 'active', data: 'active' }
+      ],
+      data: esj
+    });
+  });
+  
   function test_ankiconnect_connection() {
     const ac_url = $("#ankiconnect_url").val().trim();
     if (ac_url == "") {
@@ -64,10 +80,6 @@
       .catch(error => alert(error));
   }
 
-  $( document ).ready(function() {
-    const dt = new DataTable('#export_specs');
-  });
-  
 </script>
 
 <style>

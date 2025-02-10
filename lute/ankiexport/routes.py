@@ -32,6 +32,18 @@ def anki_index():
     form = AnkiConnectSettingsForm(data={fname: url})
 
     export_specs = db.session.query(SrsExportSpec).all()
+    export_specs_json = [
+        {
+            "id": spec.id,
+            "export_name": spec.export_name,
+            "criteria": spec.criteria,
+            "deck_name": spec.deck_name,
+            "note_type": spec.note_type,
+            "field_mapping": spec.field_mapping,
+            "active": spec.active,
+        }
+        for spec in export_specs
+    ]
 
     if form.validate_on_submit():
         repo.set_value(fname, form.ankiconnect_url.data)
@@ -41,7 +53,10 @@ def anki_index():
         flash("AnkiConnect URL updated", "success")
 
     return render_template(
-        "/ankiexport/index.html", form=form, export_specs=export_specs
+        "/ankiexport/index.html",
+        form=form,
+        export_specs=export_specs,
+        export_specs_json=export_specs_json,
     )
 
 
