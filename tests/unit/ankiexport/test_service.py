@@ -54,6 +54,11 @@ def test_validate_returns_empty_hash_if_all_ok(export_spec):
             json.dumps({"a": "{ bad_value }"}),
             'Invalid field mapping "bad_value"',
         ),
+        (
+            "field_mapping",
+            "this_is_not_valid_json",
+            "Mapping is not valid json",
+        ),
     ],
 )
 def test_validate_returns_dict_of_export_ids_and_errors(

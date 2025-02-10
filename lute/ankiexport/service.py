@@ -37,30 +37,39 @@ class Service:
         Returns array of errors if any for the given spec.
         """
         errors = []
-        if spec.deck_name not in self.anki_deck_names:
-            errors.append(f'No deck name "{spec.deck_name}"')
-
-        if spec.note_type not in self.anki_note_types_and_fields:
-            errors.append(f'No note type "{spec.note_type}"')
-        else:
-            note_fields = self.anki_note_types_and_fields.get(spec.note_type, {})
-            mapping = json.loads(spec.field_mapping)
-            fieldnames = mapping.keys()
-            bad_fields = [f for f in fieldnames if f not in note_fields]
-            if len(bad_fields) > 0:
-                bad_fields = ", ".join(bad_fields)
-                msg = f"Note type {spec.note_type} does not have field(s): {bad_fields}"
-                errors.append(msg)
-
-        try:
-            validate_mapping(json.loads(spec.field_mapping))
-        except AnkiExportConfigurationError as ex:
-            errors.append(str(ex))
 
         try:
             validate_criteria(spec.criteria)
         except AnkiExportConfigurationError as ex:
             errors.append(str(ex))
+
+        if spec.deck_name not in self.anki_deck_names:
+            errors.append(f'No deck name "{spec.deck_name}"')
+
+        valid_note_type = spec.note_type in self.anki_note_types_and_fields
+        if not valid_note_type:
+            errors.append(f'No note type "{spec.note_type}"')
+
+        mapping = None
+        try:
+            mapping = json.loads(spec.field_mapping)
+        except json.decoder.JSONDecodeError as ex:
+            errors.append("Mapping is not valid json")
+
+        if valid_note_type and mapping:
+            note_fields = self.anki_note_types_and_fields.get(spec.note_type, {})
+            fieldnames = mapping.keys()
+            bad_fields = [f for f in mapping.keys() if f not in note_fields]
+            if len(bad_fields) > 0:
+                bad_fields = ", ".join(bad_fields)
+                msg = f"Note type {spec.note_type} does not have field(s): {bad_fields}"
+                errors.append(msg)
+
+        if mapping:
+            try:
+                validate_mapping(json.loads(spec.field_mapping))
+            except AnkiExportConfigurationError as ex:
+                errors.append(str(ex))
 
         return errors
 
