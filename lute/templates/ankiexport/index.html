@@ -31,7 +31,8 @@
       columns: [
         { title: 'Export_id', data: 'id', visible: false },
         { title: 'Export name', data: 'export_name' },
-        { title: 'Specification', render: render_export_spec },
+        { title: 'Specification', width: '40%', render: render_export_spec },
+        { title: 'Mapping', width: '40%', render: render_mapping },
         { title: 'Active', data: 'active' }
       ],
       data: {{ export_specs_json | tojson | safe }}
@@ -43,7 +44,11 @@
     const crit = `Criteria: <code>${row['criteria']}</code>`;
     const dn = `Deck: ${row['deck_name']}`;
     const nt = `Note type: ${row['note_type']}`;
+    const ret = [crit, dn, nt].map(el => `<p>${el}</p>`);
+    return ret.join("\n");
+  };
 
+  let render_mapping = function( data, type, row, meta ) {
     let fmjson = '';
     try {
       let tmp = JSON.parse(row['field_mapping']);
@@ -57,10 +62,7 @@
     catch {
       fmjson = '(error, unable to parse)'
     }
-    const fm = `Field mapping:<br />${fmjson}`;
-
-    const ret = [crit, dn, nt, fm].map(el => `<p>${el}</p>`);
-    return ret.join("\n");;
+    return fmjson;
   };
 
 

@@ -40,7 +40,7 @@ def anki_index():
             "deck_name": spec.deck_name,
             "note_type": spec.note_type,
             "field_mapping": spec.field_mapping,
-            "active": spec.active,
+            "active": "yes" if spec.active else "no",
         }
         for spec in export_specs
     ]
