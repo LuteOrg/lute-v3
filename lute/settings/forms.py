@@ -87,10 +87,4 @@ class UserShortcutsForm(FlaskForm):
 
 class AnkiConnectSettingsForm(FlaskForm):
     "AnkiConnect settings form."
-    ankiconnect_web_bind_address = StringField(
-        "AnkiConnect Web Bind Address", validators=[InputRequired()]
-    )
-    ankiconnect_web_bind_port = IntegerField(
-        "AnkiConnect Web Bind Port",
-        validators=[InputRequired(), NumberRange(min=1, max=65535)],
-    )
+    ankiconnect_url = StringField("AnkiConnect URL", validators=[InputRequired()])

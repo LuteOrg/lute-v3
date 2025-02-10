@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}AnkiConnect Settings{% endblock %}
-{% block header %}AnkiConnect Settings{% endblock %}
+{% block title %}AnkiConnect{% endblock %}
+{% block header %}AnkiConnect{% endblock %}
 
 {% block body %}
 
@@ -9,15 +9,10 @@
   {{ form.hidden_tag() }}
 
   <table class="settingstable">
-    {% for f in [
-    form.ankiconnect_web_bind_address,
-    form.ankiconnect_web_bind_port,
-    ]%}
     <tr>
-      <td>{{ f.label }}</td>
-      <td>{{ f(class="form-control") }}</td>
+      <td>{{ form.ankiconnect_url.label }}</td>
+      <td>{{ form.ankiconnect_url(class="form-control") }}</td>
     </tr>
-    {% endfor %}
   </table>
 
   <div style="margin-top:10px;">

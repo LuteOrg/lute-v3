@@ -27,26 +27,12 @@ bp = Blueprint("ankiexport", __name__, url_prefix="/ankiexport")
 def anki_index():
     "Edit settings."
     repo = UserSettingRepository(db.session)
-    settings = [
-        "ankiconnect_web_bind_address",
-        "ankiconnect_web_bind_port",
-    ]
-    settings_dict = {s: repo.get_value(s) for s in settings}
-
-    form = AnkiConnectSettingsForm(
-        data={
-            "ankiconnect_web_bind_address": settings_dict[
-                "ankiconnect_web_bind_address"
-            ],
-            "ankiconnect_web_bind_port": int(
-                settings_dict["ankiconnect_web_bind_port"]
-            ),
-        }
-    )
+    fname = "ankiconnect_url"
+    url = repo.get_value(fname)
+    form = AnkiConnectSettingsForm(data={fname: url})
 
     if form.validate_on_submit():
-        for field in ["ankiconnect_web_bind_address", "ankiconnect_web_bind_port"]:
-            repo.set_value(field, str(getattr(form, field).data))
+        repo.set_value(fname, form.ankiconnect_url.data)
         db.session.commit()
         refresh_global_settings(db.session)
 
