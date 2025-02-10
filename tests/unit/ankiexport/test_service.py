@@ -2,9 +2,9 @@
 Service tests.
 """
 
+import json
 from unittest.mock import Mock
 import pytest
-import json
 from lute.models.srsexport import SrsExportSpec
 from lute.ankiexport.service import Service
 
@@ -72,7 +72,7 @@ def test_validate_spec_returns_array_of_errors(
     assert result == [expected_error]
 
     export_spec.active = False
-    assert svc.validate_spec(export_spec) == [], "no errors for inactive spec"
+    assert len(svc.validate_spec(export_spec)) == 0, "no errors for inactive spec"
 
 
 def test_validate_specs_returns_dict_of_export_ids_and_errors(export_spec):

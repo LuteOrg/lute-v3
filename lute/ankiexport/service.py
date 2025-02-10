@@ -55,12 +55,11 @@ class Service:
         mapping = None
         try:
             mapping = json.loads(spec.field_mapping)
-        except json.decoder.JSONDecodeError as ex:
+        except json.decoder.JSONDecodeError:
             errors.append("Mapping is not valid json")
 
         if valid_note_type and mapping:
             note_fields = self.anki_note_types_and_fields.get(spec.note_type, {})
-            fieldnames = mapping.keys()
             bad_fields = [f for f in mapping.keys() if f not in note_fields]
             if len(bad_fields) > 0:
                 bad_fields = ", ".join(bad_fields)

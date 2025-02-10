@@ -13,7 +13,6 @@ actual values to send to AnkiConnect.
 """
 
 import re
-from dataclasses import dataclass
 import pyparsing as pp
 from pyparsing import (
     quotedString,
