@@ -7,21 +7,11 @@
 
 <form method="post">
   {{ form.hidden_tag() }}
-
-  <table class="settingstable">
-    <tr>
-      <td>
-        {{ form.ankiconnect_url.label }}
-      </td>
-      <td>
-        {{ form.ankiconnect_url(class="form-control") }}
-      </td>
-      <td>
-        <button class="btn" onclick="window.alert('TODO'); return false;">Test</button>
-      </td>
-    </tr>
-  </table>
-
+  <p>
+    {{ form.ankiconnect_url.label }}:
+    {{ form.ankiconnect_url(class="form-control") }}
+    <button class="btn" onclick="window.alert('TODO'); return false;">Test</button>
+  </p>
   <div style="margin-top:10px;">
     <button type="submit" class="btn btn-primary">Save</button>
     <button class="btn" onclick="window.location = '/'; return false;">Cancel</button>
