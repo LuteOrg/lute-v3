@@ -36,7 +36,7 @@ def anki_index():
         db.session.commit()
         refresh_global_settings(db.session)
 
-        flash("AnkiConnect settings updated", "success")
+        flash("AnkiConnect URL updated", "success")
         return render_template("/ankiexport/index.html", form=form)
 
     return render_template("/ankiexport/index.html", form=form)

@@ -10,7 +10,7 @@
   <p>
     {{ form.ankiconnect_url.label }}:
     {{ form.ankiconnect_url(class="form-control") }}
-    <button class="btn" onclick="window.alert('TODO'); return false;">Test</button>
+    <button class="btn" onclick="test_ankiconnect_connection(); return false;">Test</button>
   </p>
   <div style="margin-top:10px;">
     <button type="submit" class="btn btn-primary">Save</button>
@@ -22,6 +22,22 @@
 <p>TODO add datatables</p>
 <p>delete, edit actions</p>
 <p>add new link</p>
+
+<script>
+
+  function test_ankiconnect_connection() {
+    const ac_url = $("#ankiconnect_url").val().trim();
+    if (ac_url == "") {
+      alert("Please specify the AnkiConnect URL.");
+      $("#ankiconnect_url").focus();
+      return;
+    }
+    LuteAnki.get_anki_specs(ac_url)
+      .then(() => alert(`Connected successfully to AnkiConnect at ${ac_url}.`))
+      .catch(error => alert(error));
+  }
+
+</script>
 
 <style>
   .arrow_only_dropdown {
