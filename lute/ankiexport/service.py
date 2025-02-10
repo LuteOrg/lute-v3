@@ -6,7 +6,7 @@ from lute.models.repositories import TermRepository
 from lute.term.model import ReferencesRepository
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 from lute.ankiexport.field_mapping import (
-    mapping_as_array,
+    # mapping_as_array,
     get_values_and_media_mapping,
     validate_mapping,
     get_fields_and_final_values,

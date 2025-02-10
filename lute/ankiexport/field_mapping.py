@@ -1,10 +1,12 @@
 """Field to value mapper.
 
-e.g. given string like
+e.g. given dict like
 
-lute_term_id: { id }
-term: { term }
-tags: { tags:["masc", "fem"] }
+{
+  "lute_term_id": "{ id }",
+  "term": "{ term }",
+  "tags": "{ tags:["masc", "fem"] }"
+}
 
 extracts data from the given term and generates a mapping of field to
 actual values to send to AnkiConnect.
@@ -23,43 +25,6 @@ from lute.models.language import Language
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 
-@dataclass
-class FieldMappingData:
-    "Data class"
-    fieldname: str = None
-    value: str = None
-
-    def __str__(self):
-        return f"|{self.fieldname}|=>|{self.value}|"
-
-
-def mapping_as_array(field_mapping):
-    """
-    Given "a: { somefield }", returns
-    [ ("a", "{ somefield }") ]
-
-    Raises config error if dup fields.
-    """
-    ret = []
-    lines = [
-        s.strip()
-        for s in field_mapping.split("\n")
-        if s.strip() != "" and not s.strip().startswith("#")
-    ]
-    for lin in lines:
-        parts = lin.split(":", 1)
-        if len(parts) != 2:
-            raise AnkiExportConfigurationError(f'Bad mapping line "{lin}" in mapping')
-        field, val = parts
-        if field in [fmd.fieldname for fmd in ret]:
-            raise AnkiExportConfigurationError(f"Duplicate field {field} in mapping")
-        fmd = FieldMappingData()
-        fmd.fieldname = field.strip()
-        fmd.value = val.strip()
-        ret.append(fmd)
-    return ret
-
-
 def _all_terms(term):
     "Term and any parents."
     ret = [term]
@@ -73,7 +38,7 @@ def _all_tags(term):
     return sorted(list(set(ret)))
 
 
-def get_values_and_media_mapping(term, refsrepo, mapping_string):
+def get_values_and_media_mapping(term, refsrepo, mapping):
     """
     Get the value replacements to be put in the mapping, and build
     dict of new filenames to original filenames.
@@ -168,6 +133,7 @@ def get_values_and_media_mapping(term, refsrepo, mapping_string):
         "translation": "<br>".join(all_translations()),
     }
 
+    mapping_string = "; ".join(mapping.values())
     calc_keys = [
         k
         for k in set(re.findall(r"{\s*(.*?)\s*}", mapping_string))
@@ -180,25 +146,24 @@ def get_values_and_media_mapping(term, refsrepo, mapping_string):
     return ({**replacements, **calc_replacements}, media_mappings)
 
 
-def validate_mapping(mapping_string):
+def validate_mapping(mapping):
     "Check mapping with a dummy Term."
     t = Term(Language(), "")
     refsrepo = None
     try:
-        mapping_as_array(mapping_string)
-        get_values_and_media_mapping(t, refsrepo, mapping_string)
+        get_values_and_media_mapping(t, refsrepo, mapping)
     except ParseException as ex:
         msg = f'Invalid field mapping "{ex.line}"'
         raise AnkiExportConfigurationError(msg) from ex
 
 
-def get_fields_and_final_values(mapping_string, replacements):
+def get_fields_and_final_values(mapping, replacements):
     "Break mapping string into fields, apply replacements."
-    mapping_array = mapping_as_array(mapping_string)
-    for m in mapping_array:
-        value = m.value
+    ret = mapping
+    for fieldname, value in ret.items():
+        subbed_value = value
         for k, v in replacements.items():
             pattern = rf"{{\s*{re.escape(k)}\s*}}"
-            value = re.sub(pattern, f"{v}", value)
-        m.value = value
-    return mapping_array
+            subbed_value = re.sub(pattern, f"{v}", subbed_value)
+        ret[fieldname] = subbed_value
+    return ret
