@@ -217,7 +217,7 @@ def test_smoke_ankiconnect_post_data_for_term_without_image(term, export_spec):
                                 "modelName": "good_note",
                                 "fields": {
                                     "a": "German",
-                                    "b": "",
+                                    # "b": "", image not posted at all.
                                     "c": "test",
                                     "d": "Example sentence.",
                                 },

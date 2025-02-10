@@ -116,3 +116,13 @@ def test_get_fields_and_final_values_smoke_test():
     replacements = {"id": 42, "term": "rabbit"}
     actual = get_fields_and_final_values(mapping, replacements)
     assert actual == {"a": "42", "b": "rabbit"}
+
+
+def test_empty_fields_not_posted():
+    mapping = {
+        "a": "{ id }",
+        "b": "{ term }",
+    }
+    replacements = {"id": 42, "term": ""}
+    actual = get_fields_and_final_values(mapping, replacements)
+    assert actual == {"a": "42"}

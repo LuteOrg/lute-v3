@@ -159,11 +159,12 @@ def validate_mapping(mapping):
 
 def get_fields_and_final_values(mapping, replacements):
     "Break mapping string into fields, apply replacements."
-    ret = mapping
-    for fieldname, value in ret.items():
+    ret = {}
+    for fieldname, value in mapping.items():
         subbed_value = value
         for k, v in replacements.items():
             pattern = rf"{{\s*{re.escape(k)}\s*}}"
             subbed_value = re.sub(pattern, f"{v}", subbed_value)
-        ret[fieldname] = subbed_value
+        if subbed_value.strip() != "":
+            ret[fieldname.strip()] = subbed_value.strip()
     return ret
