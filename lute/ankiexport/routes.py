@@ -58,38 +58,32 @@ def anki_index():
 
 def _fake_export_specs():
     "Sample mapping and terms."
-    gender_card_mapping = json.dumps(
-        {
-            "Lute_term_id": "{ id }",
-            "Front": "{ term }: der, die, oder das?",
-            "Picture": "{ image }",
-            "Definition": "{ translation }",
-            "Back": '{ tags:["der", "die", "das"] } { term }',
-            "Sentence": "{ sentence }",
-        }
-    )
+    gender_card_mapping = {
+        "Lute_term_id": "{ id }",
+        "Front": "{ term }: der, die, oder das?",
+        "Picture": "{ image }",
+        "Definition": "{ translation }",
+        "Back": '{ tags:["der", "die", "das"] } { term }',
+        "Sentence": "{ sentence }",
+    }
 
-    dummy_card_mapping = json.dumps(
-        {
-            "Lute_term_id": "{ id }",
-            "Front": "___ { term }",
-            "Picture": "{ image }",
-            "Definition": "{ translation }",
-            "Back": '{ tags:["der", "die", "das"] } { term }',
-            "Sentence": "{ sentence }",
-        }
-    )
+    dummy_card_mapping = {
+        "Lute_term_id": "{ id }",
+        "Front": "___ { term }",
+        "Picture": "{ image }",
+        "Definition": "{ translation }",
+        "Back": '{ tags:["der", "die", "das"] } { term }',
+        "Sentence": "{ sentence }",
+    }
 
-    plural_card_mapping = json.dumps(
-        {
-            "Lute_term_id": "{ id }",
-            "Front": '{ tags:["der", "die", "das"] } { parents }, plural',
-            "Picture": "{ image }",
-            "Definition": "{ translation }",
-            "Back": "die { term }",
-            "Sentence": "{ sentence }",
-        }
-    )
+    plural_card_mapping = {
+        "Lute_term_id": "{ id }",
+        "Front": '{ tags:["der", "die", "das"] } { parents }, plural',
+        "Picture": "{ image }",
+        "Definition": "{ translation }",
+        "Back": "die { term }",
+        "Sentence": "{ sentence }",
+    }
 
     all_mapping_data = [
         {
@@ -97,7 +91,7 @@ def _fake_export_specs():
             "selector": 'language:"German" and tags:["der", "die", "das"] and has:image',
             "deck_name": "zzTestAnkiConnect",
             "note_type": "Lute_Basic_vocab",
-            "mapping": gender_card_mapping,
+            "mapping": json.dumps(gender_card_mapping),
             "active": True,
         },
         {
@@ -105,7 +99,7 @@ def _fake_export_specs():
             "selector": 'language:"German"',
             "deck_name": "zzTestAnkiConnect",
             "note_type": "Lute_Basic_vocab",
-            "mapping": dummy_card_mapping,
+            "mapping": json.dumps(dummy_card_mapping),
             "active": True,
         },
         {
@@ -116,7 +110,7 @@ def _fake_export_specs():
             ),
             "deck_name": "zzTestAnkiConnect",
             "note_type": "Lute_Basic_vocab",
-            "mapping": plural_card_mapping,
+            "mapping": json.dumps(plural_card_mapping),
             "active": True,
         },
         {
