@@ -61,13 +61,39 @@
     new DataTable('#example', {
       columns: [
         { title: 'export_name', data: 'export_name' },
-        { title: 'criteria', data: 'criteria' },
+        { title: 'criteria', render: render_export_spec },
         { title: 'active', data: 'active' }
       ],
       data: esj
     });
+
   });
-  
+
+  let render_export_spec = function( data, type, row, meta ) {
+    const crit = `Criteria: <code>${row['criteria']}</code>`;
+    const dn = `Deck: ${row['deck_name']}`;
+    const nt = `Note type: ${row['note_type']}`;
+
+    let fmjson = '';
+    try {
+      let tmp = JSON.parse(row['field_mapping']);
+      let fmjson_array = [];
+      for (const [fname, mapval] of Object.entries(tmp)) {
+        const p = `<code>${fname}</code> = <code>${mapval}</code>`
+        fmjson_array.push(p);
+      }
+      fmjson = `${fmjson_array.join('<br />')}`;
+    }
+    catch {
+      fmjson = '(error, unable to parse)'
+    }
+    const fm = `Field mapping:<br />${fmjson}`;
+
+    const ret = [crit, dn, nt, fm].map(el => `<p>${el}</p>`);
+    return ret.join("\n");;
+  };
+
+
   function test_ankiconnect_connection() {
     const ac_url = $("#ankiconnect_url").val().trim();
     if (ac_url == "") {
