@@ -30,7 +30,7 @@
     new DataTable('#export_specs', {
       columns: [
         { title: 'Export_id', data: 'id', visible: false },
-        { title: 'Export name', data: 'export_name' },
+        { title: 'Export name', render: render_export_name },
         { title: 'Specification', width: '40%', render: render_export_spec },
         { title: 'Mapping', width: '40%', render: render_mapping },
         { title: 'Active', data: 'active' }
@@ -39,6 +39,14 @@
     });
 
   });
+
+  let render_export_name = function( data, type, row, meta ) {
+    const eid = row['id'];
+    const ename = row['export_name'];
+    const url = `/ankiexport/spec/edit/${eid}`;
+    const a = `<a href="${url}">${ename}</a>`;
+    return a;
+  };
 
   let render_export_spec = function( data, type, row, meta ) {
     const crit = `Criteria: <code>${row['criteria']}</code>`;
