@@ -16,6 +16,7 @@ from lute.settings.forms import AnkiConnectSettingsForm
 from lute.settings.current import refresh_global_settings
 from lute.ankiexport.service import Service
 from lute.models.srsexport import SrsExportSpec
+from lute.ankiexport.forms import SrsExportSpecForm
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 from lute.db import db
 
@@ -57,6 +58,14 @@ def anki_index():
         form=form,
         export_specs_json=export_specs_json,
     )
+
+
+@bp.route("/spec/edit/<int:spec_id>", methods=["GET", "POST"])
+def edit_spec(spec_id):
+    "Edit a spec."
+    spec = db.session.query(SrsExportSpec).filter(SrsExportSpec.id == spec_id).first()
+    form = SrsExportSpecForm(obj=spec)
+    return render_template("/ankiexport/edit.html", form=form)
 
 
 def _fake_export_specs():

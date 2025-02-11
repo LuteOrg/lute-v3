@@ -1,0 +1,53 @@
+{% for field_name, field_errors in form.errors.items() %}
+<p>{{ field_name }}
+  <ul>
+    {% for error in field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+</p>
+{% endfor %}
+
+<form method="POST">
+  {{ form.hidden_tag() }}
+
+  <table id="ankiexport">
+  <tbody>
+
+    <tr>
+      <td>{{ form.export_name.label(class="form-control-label") }}</td>
+      <td>{{ form.export_name(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.criteria.label(class="form-control-label") }}</td>
+      <td>{{ form.criteria(class="form-largetextarea") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.deck_name.label(class="form-control-label") }}</td>
+      <td>{{ form.deck_name(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.note_type.label(class="form-control-label") }}</td>
+      <td>{{ form.note_type(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.field_mapping.label(class="form-control-label") }}</td>
+      <td>{{ form.field_mapping(class="form-largetextarea") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.active.label(class="form-control-label") }}</td>
+      <td>{{ form.active(class="form-control") }}</td>
+    </tr>
+
+  </tbody>
+  </table>
+
+  <button type="submit" class="btn btn-primary">Save</button>
+  <button class="btn" onclick="window.location = '{{ url_for('ankiexport.anki_index') }}'; return false;">Cancel</button>
+</form>
+
