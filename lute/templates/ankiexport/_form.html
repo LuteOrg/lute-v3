@@ -8,7 +8,7 @@
 </p>
 {% endfor %}
 
-<form method="POST">
+<form id="export_spec_form" method="POST">
   {{ form.hidden_tag() }}
 
   <table id="ankiexport">
@@ -48,6 +48,26 @@
   </table>
 
   <button type="submit" class="btn btn-primary">Save</button>
-  <button class="btn" onclick="window.location = '{{ url_for('ankiexport.anki_index') }}'; return false;">Cancel</button>
+  <button id="btnCancel" class="btn" onclick="window.location = '{{ url_for('ankiexport.anki_index') }}'; return false;">Cancel</button>
 </form>
 
+
+<script>
+
+  let anki_specs = null;
+
+  $( document ).ready(function() {
+    $("#export_spec_form :input").prop("disabled", true);
+    $("#btnCancel").prop("disabled", false);
+    const ac_url = LUTE_USER_SETTINGS["ankiconnect_url"];
+    LuteAnki.get_anki_specs(ac_url)
+      .then((specs) => {
+        $("#export_spec_form :input").prop("disabled", false);
+        anki_specs = specs;
+      })
+      .catch(error => {
+        window.alert(error);
+      });
+  });
+
+</script>

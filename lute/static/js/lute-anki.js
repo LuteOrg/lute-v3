@@ -24,10 +24,10 @@ const LuteAnki = (function() {
       return response.result;
     } catch (error) {
       const lute_origin = window.location.origin;
-      const msg = `AnkiConnect post to ${anki_connect_url} failed.\n\n`
+      const msg = `Unable to connect to AnkiConnect at\n${anki_connect_url}.\n\n`
             + `Ensure Anki is running and AnkiConnect is installed,\n`
             + `and "${lute_origin}" (your Lute url) is in AnkiConnect's webCorsOriginList in its config.\n`
-            + `(remember to restart Anki if you change the AnkiConnect config).`
+            + `(Remember to restart Anki if you change the AnkiConnect config.)`
       ;
       throw new Error(msg);
     }
