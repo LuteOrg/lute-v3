@@ -64,6 +64,7 @@
       .then((specs) => {
         $("#export_spec_form :input").prop("disabled", false);
         anki_specs = specs;
+        alert({{ form.field_mapping.data | tojson }});
       })
       .catch(error => {
         window.alert(error);
