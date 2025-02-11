@@ -49,6 +49,11 @@
 
   <button type="submit" class="btn btn-primary">Save</button>
   <button id="btnCancel" class="btn" onclick="window.location = '{{ url_for('ankiexport.anki_index') }}'; return false;">Cancel</button>
+
+  {% if spec.id %}
+  <button id="btnDelete" class="btn" onclick="confirm_delete({{ spec.id }}); return false;">Delete</button>
+  {% endif %}
+
 </form>
 
 
@@ -64,11 +69,21 @@
       .then((specs) => {
         $("#export_spec_form :input").prop("disabled", false);
         anki_specs = specs;
-        alert({{ form.field_mapping.data | tojson }});
+
+        // Is null for new.
+        const current_mapping = {{ form.field_mapping.data | tojson }};
       })
       .catch(error => {
         window.alert(error);
       });
   });
+
+  function confirm_delete(spec_id) {
+    if (spec_id == null)
+      return;
+    if (!window.confirm("Delete export?"))
+      return;
+    window.location = `/ankiexport/spec/delete/${spec_id}`;
+  }
 
 </script>

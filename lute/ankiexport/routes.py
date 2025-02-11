@@ -8,7 +8,7 @@ from flask import (
     request,
     jsonify,
     render_template,
-    # redirect,
+    redirect,
     flash,
 )
 from lute.models.repositories import UserSettingRepository
@@ -65,7 +65,25 @@ def edit_spec(spec_id):
     "Edit a spec."
     spec = db.session.query(SrsExportSpec).filter(SrsExportSpec.id == spec_id).first()
     form = SrsExportSpecForm(obj=spec)
-    return render_template("/ankiexport/edit.html", form=form)
+    return render_template("/ankiexport/edit.html", spec=spec, form=form)
+
+
+@bp.route("/spec/new", methods=["GET", "POST"])
+def new_spec():
+    "Make a new spec."
+    spec = SrsExportSpec()
+    form = SrsExportSpecForm(obj=spec)
+    return render_template("/ankiexport/new.html", spec=spec, form=form)
+
+
+@bp.route("/spec/delete/<int:spec_id>", methods=["GET", "POST"])
+def delete_spec(spec_id):
+    "Delete a spec."
+    spec = db.session.query(SrsExportSpec).filter(SrsExportSpec.id == spec_id).first()
+    db.session.delete(spec)
+    db.session.commit()
+    flash("Export mapping deleted.")
+    return redirect(f"/ankiexport/index", 302)
 
 
 def _fake_export_specs():
