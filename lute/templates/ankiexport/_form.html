@@ -44,6 +44,9 @@
       <td>{{ form.active(class="form-control") }}</td>
     </tr>
 
+    <!-- TODO hide this -->
+    <textarea name="ankisettings" id="txtAnkiSettings"></textarea>
+
   </tbody>
   </table>
 
@@ -69,6 +72,8 @@
       .then((specs) => {
         $("#export_spec_form :input").prop("disabled", false);
         anki_specs = specs;
+
+        $("#txtAnkiSettings").val(JSON.stringify(anki_specs, null, 2));
 
         // Is null for new.
         const current_mapping = {{ form.field_mapping.data | tojson }};
