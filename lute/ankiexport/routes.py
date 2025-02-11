@@ -60,20 +60,33 @@ def anki_index():
     )
 
 
+def _handle_form(spec, form_template_name):
+    """
+    Handle a form post.
+    """
+    form = SrsExportSpecForm(obj=spec)
+
+    if form.validate_on_submit():
+        form.populate_obj(spec)
+        db.session.add(spec)
+        db.session.commit()
+        return redirect("/ankiexport/index", 302)
+
+    return render_template(form_template_name, form=form, spec=spec)
+
+
 @bp.route("/spec/edit/<int:spec_id>", methods=["GET", "POST"])
 def edit_spec(spec_id):
     "Edit a spec."
     spec = db.session.query(SrsExportSpec).filter(SrsExportSpec.id == spec_id).first()
-    form = SrsExportSpecForm(obj=spec)
-    return render_template("/ankiexport/edit.html", spec=spec, form=form)
+    return _handle_form(spec, "/ankiexport/edit.html")
 
 
 @bp.route("/spec/new", methods=["GET", "POST"])
 def new_spec():
     "Make a new spec."
     spec = SrsExportSpec()
-    form = SrsExportSpecForm(obj=spec)
-    return render_template("/ankiexport/new.html", spec=spec, form=form)
+    return _handle_form(spec, "/ankiexport/new.html")
 
 
 @bp.route("/spec/delete/<int:spec_id>", methods=["GET", "POST"])
