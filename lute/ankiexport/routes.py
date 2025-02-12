@@ -70,7 +70,6 @@ def _handle_form(spec, form_template_name):
         anki_settings_json = request.form.get("ankisettings")
         anki_settings = json.loads(anki_settings_json)
 
-        dn = anki_settings.get("deck_names")
         form.anki_deck_names = anki_settings.get("deck_names")
         form.anki_note_types = anki_settings.get("note_types")
 
