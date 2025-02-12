@@ -3,7 +3,7 @@ SrsExportSpec form.
 """
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, BooleanField, TextAreaField
+from wtforms import StringField, SelectField, BooleanField, TextAreaField, HiddenField
 from wtforms.validators import DataRequired, Length
 from lute.ankiexport.service import Service
 from lute.models.srsexport import SrsExportSpec
@@ -30,7 +30,7 @@ class SrsExportSpecForm(FlaskForm):
     criteria = TextAreaField("Criteria", validators=[DataRequired(), Length(max=1000)])
     deck_name = SelectField("Deck Name", validators=[DataRequired(), Length(max=200)])
     note_type = SelectField("Note Type", validators=[DataRequired(), Length(max=200)])
-    field_mapping = TextAreaField(
+    field_mapping = HiddenField(
         "Field Mapping", validators=[DataRequired(), Length(max=1000)]
     )
     active = BooleanField("Active", default=True)
