@@ -85,6 +85,14 @@ def test_tag_replacements(term):
     assert len(media) == 0
 
 
+def test_filtered_tag_replacements(term):
+    refsrepo = Mock()
+    mapping = {"mytags": '{ tags:["noun"] }'}
+    values, media = get_values_and_media_mapping(term, refsrepo, mapping)
+    assert set(values['tags:["noun"]'].split(", ")) == {"noun"}
+    assert len(media) == 0
+
+
 def test_image_handling(term):
     refsrepo = Mock()
     mapping = {"image": "{ image }"}

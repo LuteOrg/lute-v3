@@ -57,7 +57,7 @@ def get_values_and_media_mapping(term, refsrepo, mapping):
         adds ankiconnect post actions to post_actions if needed
         (e.g. for image uploads).
 
-        e.g. the mapping "article: { tags["der", "die", "das"] }"
+        e.g. the mapping "article: { tags:["der", "die", "das"] }"
         needs to be parsed to extract certain tags from the current
         term.
         """
@@ -142,7 +142,11 @@ def get_values_and_media_mapping(term, refsrepo, mapping):
     media_mappings = {}
     calc_replacements = parse_keys_needing_calculation(calc_keys, media_mappings)
 
-    return ({**replacements, **calc_replacements}, media_mappings)
+    final_replacements = {**replacements, **calc_replacements}
+    # print(f"replacements = {replacements}", flush=True)
+    # print(f"calc replacements = {calc_replacements}", flush=True)
+    # print(f"fin replacements = {final_replacements}", flush=True)
+    return (final_replacements, media_mappings)
 
 
 def validate_mapping(mapping):

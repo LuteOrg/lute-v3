@@ -250,8 +250,18 @@ function add_empty_mapping_row(field_name = null, mapping_val = null) {
     field_box_changed(fieldBox);
   });
 
-  const vos = ["text", "tags"].map((v) => `{ ${v} }`);
-  const valOpts = _create_dropdown("mapping_dropdown", vos, (v) => {
+  const valOptions = [
+    `{ id }`,
+    `{ term }`,
+    `{ language }`,
+    `{ parents }`,
+    `{ tags }`,
+    `{ translation }`,
+    `{ tags:["val1", "val2"] }`,
+    `{ image }`,
+    `{ sentence }`,
+  ];
+  const valOpts = _create_dropdown("mapping_dropdown", valOptions, (v) => {
     textBox.val(v);
   });
 
