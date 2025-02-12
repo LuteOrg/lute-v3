@@ -198,6 +198,7 @@ class Service:
         for tid in term_ids:
             term = repo.find(tid)
             pd = self.get_ankiconnect_post_data_for_term(term, base_url, refsrepo)
-            ret[tid] = pd
+            if len(pd) > 0:
+                ret[tid] = pd
 
         return ret
