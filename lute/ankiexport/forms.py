@@ -27,7 +27,7 @@ class SrsExportSpecForm(FlaskForm):
     export_name = StringField(
         "Export Name", validators=[DataRequired(), Length(max=200)]
     )
-    criteria = TextAreaField("Criteria", validators=[DataRequired(), Length(max=1000)])
+    criteria = TextAreaField("Criteria")
     deck_name = SelectField("Deck Name", validators=[DataRequired(), Length(max=200)])
     note_type = SelectField("Note Type", validators=[DataRequired(), Length(max=200)])
     field_mapping = HiddenField(

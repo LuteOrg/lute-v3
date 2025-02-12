@@ -47,7 +47,12 @@
   };
 
   let render_export_spec = function( data, type, row, meta ) {
-    const crit = `Criteria: <code>${row['criteria']}</code>`;
+    let c = `${row['criteria']}`.trim();
+    if (c == "")
+      c = "(no criteria)";
+    else
+      c = `<code>${c}</code>`;
+    const crit = `Criteria: ${c}`;
     const dn = `Deck: ${row['deck_name']}`;
     const nt = `Note type: ${row['note_type']}`;
     const ret = [crit, dn, nt].map(el => `<p>${el}</p>`);
