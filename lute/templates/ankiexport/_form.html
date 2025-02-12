@@ -95,14 +95,24 @@
         $("#txtAnkiSettings").val(JSON.stringify(anki_specs, null, 2));
 
         noteTypeFields = anki_specs["note_types"];
-        ntsel = $("#noteType");
+        const ntsel = $("#note_type");
         ntsel.empty();
         ntsel.append(new Option("(select note type)", ""))
         Object.keys(noteTypeFields).forEach(f => {
           ntsel.append(new Option(f, f));
         });
-        const v = $("#note_type").val();
-        ntsel.val(v);
+        const ntv = "{{ form.note_type.data }}";
+        ntsel.val(ntv);
+
+        const deck_names = anki_specs["deck_names"];
+        const dnsel = $("#deck_name");
+        dnsel.empty();
+        dnsel.append(new Option("(select deck name)", ""))
+        deck_names.forEach(f => {
+          dnsel.append(new Option(f, f));
+        });
+        const dnv = "{{ form.deck_name.data }}";
+        dnsel.val(dnv);
 
         let current_mapping_string = {{ form.field_mapping.data | tojson }};
         load_fields_and_mappings(current_mapping_string);
@@ -123,14 +133,6 @@
 </script>
 
 
-
-<h1>HACKING FORM BUILDER</h1>
-
-<form id="dataMappingForm">
-  <label for="noteType">Note Type:</label>
-  <select id="noteType"></select>
-
-</form>
 
 <button id="getjson" onclick="get_json(); return false;">Get json</button>
 
@@ -175,7 +177,7 @@
     }
   }
 
-  $("#noteType").change(function () {
+  $("#note_type").change(function () {
     const selectedType = $(this).val();
     load_note_type_field_controls(selectedType);
   });
@@ -189,7 +191,7 @@ function add_options(field_select, opts_list) {
 }
 
 function field_box_changed(field_box) {
-  const selectedType = $("#noteType").val();
+  const selectedType = $("#note_type").val();
   if (!selectedType) return;
   const available_fields = noteTypeFields[selectedType];
   const field_name = field_box.val();
@@ -210,7 +212,7 @@ function load_fields_and_mappings(current_mapping_string) {
 
 
 function add_field_mapping_row(field_name = null, mapping_val = null) {
-  const selectedType = $("#noteType").val();
+  const selectedType = $("#note_type").val();
   /*
   if (!selectedType) {
     console.log("select note type");
