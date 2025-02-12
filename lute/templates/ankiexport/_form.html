@@ -191,7 +191,13 @@
     if (current_mapping_string == null)
       return;
 
-    const current_mapping = JSON.parse(current_mapping_string);
+    let current_mapping = {};
+    try {
+      current_mapping = JSON.parse(current_mapping_string);
+    }
+    catch (error) {
+      console.error(`Error parsing current mapping string ${current_mapping_string}`, error);
+    }
     Object.entries(current_mapping).forEach(([fld, mapping]) => {
       add_field_mapping_row(fld, mapping);
     });
