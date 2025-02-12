@@ -69,8 +69,15 @@ def _handle_form(spec, form_template_name):
     if request.method == "POST":
         anki_settings_json = request.form.get("ankisettings")
         anki_settings = json.loads(anki_settings_json)
+
+        dn = anki_settings.get("deck_names")
         form.anki_deck_names = anki_settings.get("deck_names")
         form.anki_note_types = anki_settings.get("note_types")
+
+        # Have to load the option choices or flask-wtf complains ...
+        # ouch.
+        form.deck_name.choices = [(f, f) for f in form.anki_deck_names]
+        form.note_type.choices = [(f, f) for f in form.anki_note_types.keys()]
 
     if form.validate_on_submit():
         form.populate_obj(spec)

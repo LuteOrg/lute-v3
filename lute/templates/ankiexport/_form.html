@@ -69,7 +69,7 @@
   </tbody>
   </table>
 
-  <button type="submit" class="btn btn-primary">Save</button>
+  <button type="submit" class="btn btn-primary" onclick="set_anksettings_field(); return true;">Save</button>
   <button id="btnCancel" class="btn" onclick="window.location = '{{ url_for('ankiexport.anki_index') }}'; return false;">Cancel</button>
 
   {% if spec.id %}
@@ -124,14 +124,6 @@
       return;
     window.location = `/ankiexport/spec/delete/${spec_id}`;
   }
-
-</script>
-
-
-
-<button id="getjson" onclick="get_json(); return false;">Get json</button>
-
-<script>
 
   // Prevent Return from submitting the form.
   $("#dataMappingForm").bind("keypress", function (e) {
@@ -281,7 +273,7 @@ function remove_mapping_row(row_id) {
   $(`#${row_id}`).remove();
 }
 
-function get_json() {
+function set_anksettings_field() {
   let field_mapping = {};
   $(".field-container").each(function() {
     const c = $(this);
@@ -290,6 +282,9 @@ function get_json() {
     if (fieldval != "")
       field_mapping[fieldname] = fieldval;
   });
-  console.log(JSON.stringify(field_mapping, null, 2));
+  const mapping_string = JSON.stringify(field_mapping, null, 2);
+  $("#field_mapping").val(mapping_string);
+  console.log(mapping_string);
 }
+
 </script>
