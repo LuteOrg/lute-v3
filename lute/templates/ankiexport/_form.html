@@ -123,17 +123,14 @@
 
 <form id="dataMappingForm">
   <label for="noteType">Note Type:</label>
-  <select id="noteType">
-    <option value="">-- Select Note Type --</option>
-    <option value="note_type_A">Note Type A</option>
-    <option value="note_type_B">Note Type B</option>
-  </select>
-
-  <div id="mappingContainer">
-    <!-- Fields will be dynamically inserted here -->
-  </div>
+  <select id="noteType"></select>
 
 </form>
+
+<div id="mappingContainer">
+  <!-- Fields will be dynamically inserted here -->
+</div>
+
 
 <button id="add_mapping_row" onclick="add_empty_mapping_row(); return false;">&nbsp;+&nbsp;</button>
 <button id="getjson" onclick="get_json(); return false;">Get json</button>
@@ -248,7 +245,7 @@ function add_empty_mapping_row(field_name = null, mapping_val = null) {
   const valOpts = _create_dropdown("mapping_dropdown", vos, (v) => {
     textBox.val(v);
   });
-  
+
   const del_button = $(`<button type="button">&nbsp;-&nbsp;</button>`).data("row-id", this_id);
   del_button.on("click", function () { remove_mapping_row($(this).data("row-id")); });
 
