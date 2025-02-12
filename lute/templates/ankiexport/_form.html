@@ -129,7 +129,7 @@
 </div>
 
 
-<button id="add_mapping_row" onclick="add_empty_mapping_row(); return false;">&nbsp;+&nbsp;</button>
+<button id="add_mapping_row" onclick="add_field_mapping_row(null, null); return false;">&nbsp;+&nbsp;</button>
 <button id="getjson" onclick="get_json(); return false;">Get json</button>
 
 <script>
@@ -164,7 +164,7 @@
     const mappingContainer = $("#mappingContainer");
 
     if ($(".field-container").length == 0) {
-      fields.forEach(f => add_empty_mapping_row(f));
+      fields.forEach(f => add_field_mapping_row(f));
     }
     else {
       $(".field_dropdown").each(function() {
@@ -202,12 +202,12 @@ function load_fields_and_mappings(current_mapping_string) {
   
   const current_mapping = JSON.parse(current_mapping_string);
   Object.entries(current_mapping).forEach(([fld, mapping]) => {
-    add_empty_mapping_row(fld, mapping);
+    add_field_mapping_row(fld, mapping);
   });
 }
 
 
-function add_empty_mapping_row(field_name = null, mapping_val = null) {
+function add_field_mapping_row(field_name = null, mapping_val = null) {
   const selectedType = $("#noteType").val();
   /*
   if (!selectedType) {
