@@ -28,7 +28,8 @@ def evaluate_criteria(s, term):
     "Parse the criteria, return True or False for the given term."
     # pylint: disable=too-many-locals
 
-    # print(f"criteria: {s}")
+    if (s or "").strip() == "":
+        return True
 
     def has_any_matching_tags(tagvals):
         term_tags = [t.text for t in term.term_tags]

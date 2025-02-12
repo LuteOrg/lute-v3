@@ -50,6 +50,11 @@ def test_criteria(criteria, expected, term):
     assert evaluate_criteria(criteria, term) == expected, criteria
 
 
+def test_blank_criteria_is_always_true(term):
+    assert evaluate_criteria("", term) == True, "blank"
+    assert evaluate_criteria(None, term) == True, "None"
+
+
 @pytest.mark.parametrize(
     "criteria",
     [
