@@ -1233,6 +1233,15 @@ textarea {
     font-family: inherit;
 }
 
+.arrow_only_dropdown {
+    appearance: none; /* Hides default styling */
+    width: 20px; /* Only show the dropdown arrow */
+    overflow: hidden;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
 textarea {
     width: 100%;
     resize: both;
