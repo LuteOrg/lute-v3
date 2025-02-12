@@ -81,26 +81,23 @@
 
 <script>
 
-  let anki_specs = null;
+  var noteTypeFields = {};
 
   $( document ).ready(function() {
     $("#export_spec_form :input").prop("disabled", true);
     $("#btnCancel").prop("disabled", false);
     const ac_url = LUTE_USER_SETTINGS["ankiconnect_url"];
     LuteAnki.get_anki_specs(ac_url)
-      .then((specs) => {
-        $("#export_spec_form :input").prop("disabled", false);
-        anki_specs = specs;
-
+      .then((anki_specs) => {
         $("#txtAnkiSettings").val(JSON.stringify(anki_specs, null, 2));
 
         noteTypeFields = anki_specs["note_types"];
         load_select("#note_type", Object.keys(noteTypeFields), "{{ form.note_type.data }}");
-
         load_select("#deck_name", anki_specs["deck_names"], "{{ form.deck_name.data }}");
-
         let current_mapping_string = {{ form.field_mapping.data | tojson }};
         load_fields_and_mappings(current_mapping_string);
+
+        $("#export_spec_form :input").prop("disabled", false);
       })
       .catch(error => {
         window.alert(error);
@@ -132,12 +129,10 @@
     }
   });
 
-  var noteTypeFields = {};
+  function load_note_type_field_controls(current_note_type) {
+    if (!current_note_type) return;
 
-  function load_note_type_field_controls(selectedType) {
-    if (!selectedType) return;
-
-    const fields = noteTypeFields[selectedType];
+    const fields = noteTypeFields[current_note_type];
     $("#available_fields").empty();
     for (let i = 0; i < fields.length; i++)
       $("#available_fields").append(`<option value="${fields[i]}">`);
@@ -165,8 +160,8 @@
   }
 
   $("#note_type").change(function () {
-    const selectedType = $(this).val();
-    load_note_type_field_controls(selectedType);
+    const current_note_type = $(this).val();
+    load_note_type_field_controls(current_note_type);
   });
 
   function add_options(field_select, opts_list) {
@@ -178,9 +173,9 @@
   }
 
   function field_box_changed(field_box) {
-    const selectedType = $("#note_type").val();
-    if (!selectedType) return;
-    const available_fields = noteTypeFields[selectedType];
+    const current_note_type = $("#note_type").val();
+    if (!current_note_type) return;
+    const available_fields = noteTypeFields[current_note_type];
     const field_name = field_box.val();
     const color = available_fields.includes(field_name) ? "" : "red";
     field_box.css("border-color", color);
@@ -205,15 +200,6 @@
 
 
   function add_field_mapping_row(field_name = null, mapping_val = null) {
-    const selectedType = $("#note_type").val();
-    /*
-    if (!selectedType) {
-      console.log("select note type");
-      return;
-      }
-    */
-
-    const mappingContainer = $("#mappingContainer");
     const rowid = $(".field-container").length + 1;
     const this_id = `fc_${rowid}`;
     const fieldContainer = $(`<div id="${this_id}">`).addClass("field-container");
@@ -241,7 +227,8 @@
       return select;
     }
 
-    const fields = noteTypeFields[selectedType] ?? [];
+    const current_note_type = $("#note_type").val();
+    const fields = noteTypeFields[current_note_type] ?? [];
     const fieldOpts = _create_dropdown("field_dropdown", fields, (v) => {
       fieldBox.val(v);
       field_box_changed(fieldBox);
@@ -266,7 +253,7 @@
     del_button.on("click", function () { remove_mapping_row($(this).data("row-id")); });
 
     fieldContainer.append(fieldBox, fieldOpts, textBox, valOpts, del_button);
-    mappingContainer.append(fieldContainer);
+    $("#mappingContainer").append(fieldContainer);
   }
 
   function remove_empty_mapping_rows() {
