@@ -1,11 +1,24 @@
+{{ form.errors.items() }}
+
+{% if form.general_errors | length > 0 %}
+<div class="flash-notice-narrow">
+  <p>Errors:</p>
+  {% for msg in form.general_errors %}
+  <p>{{ msg | safe }}</p>
+  {% endfor %}
+</div>
+{% endif %}
+
 {% for field_name, field_errors in form.errors.items() %}
-<p>{{ field_name }}
-  <ul>
-    {% for error in field_errors %}
-    <li>{{ error }}</li>
-    {% endfor %}
-  </ul>
-</p>
+<div class="flash-notice-narrow">
+  <p>{{ field_name }}
+    <ul>
+      {% for error in field_errors %}
+      <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  </p>
+</div>
 {% endfor %}
 
 <form id="export_spec_form" method="POST">

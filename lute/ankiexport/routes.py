@@ -65,6 +65,13 @@ def _handle_form(spec, form_template_name):
     Handle a form post.
     """
     form = SrsExportSpecForm(obj=spec)
+    form.original_spec = spec
+
+    if request.method == "POST":
+        anki_settings_json = request.form.get("ankisettings")
+        anki_settings = json.loads(anki_settings_json)
+        form.anki_deck_names = anki_settings.get("deck_names")
+        form.anki_note_types = anki_settings.get("note_types")
 
     if form.validate_on_submit():
         form.populate_obj(spec)
@@ -96,7 +103,7 @@ def delete_spec(spec_id):
     db.session.delete(spec)
     db.session.commit()
     flash("Export mapping deleted.")
-    return redirect(f"/ankiexport/index", 302)
+    return redirect("/ankiexport/index", 302)
 
 
 def _fake_export_specs():

@@ -5,10 +5,25 @@ SrsExportSpec form.
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Length
+from lute.ankiexport.service import Service
 
 
 class SrsExportSpecForm(FlaskForm):
     "Srs export spec."
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Flask doesn't allow for "general" errors, so handle those
+        # specially.
+        self.general_errors = []
+
+        # Extra data added to the form during POST
+        # to simplify validation.
+        self.anki_deck_names = None
+        self.anki_note_types = None
+        self.original_spec = None
+
     export_name = StringField(
         "Export Name", validators=[DataRequired(), Length(max=200)]
     )
@@ -19,3 +34,15 @@ class SrsExportSpecForm(FlaskForm):
         "Field Mapping", validators=[DataRequired(), Length(max=1000)]
     )
     active = BooleanField("Active", default=True)
+
+    def validate(self, extra_validators=None):
+        """Custom validation logic."""
+        if not super().validate(extra_validators):
+            return False  # Return early if standard validation fails
+
+        svc = Service(self.anki_deck_names, self.anki_note_types, [self.original_spec])
+        self.general_errors = svc.validate_spec(self.original_spec)
+        if len(self.general_errors) > 0:
+            return False
+
+        return True
