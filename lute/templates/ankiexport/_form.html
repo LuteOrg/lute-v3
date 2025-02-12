@@ -89,6 +89,7 @@
         noteTypeFields = anki_specs["note_types"];
         ntsel = $("#noteType");
         ntsel.empty();
+        ntsel.append(new Option("(select note type)", ""))
         Object.keys(noteTypeFields).forEach(f => {
           ntsel.append(new Option(f, f));
         });
