@@ -94,13 +94,10 @@
           ntsel.append(new Option(f, f));
         });
         const v = $("#note_type").val();
-        if (v) {
-          ntsel.val(v);
-          load_note_type_field_controls(v);
-        }
+        ntsel.val(v);
 
-        // Is null for new.
-        const current_mapping = {{ form.field_mapping.data | tojson }};
+        let current_mapping_string = {{ form.field_mapping.data | tojson }};
+        load_fields_and_mappings(current_mapping_string);
       })
       .catch(error => {
         window.alert(error);
@@ -198,6 +195,18 @@ function field_box_changed(field_box) {
   field_box.css("border-color", color);
 }
 
+/** Pre-load the mapping fields and their strings. */
+function load_fields_and_mappings(current_mapping_string) {
+  if (current_mapping_string == null)
+    return;
+  
+  const current_mapping = JSON.parse(current_mapping_string);
+  Object.entries(current_mapping).forEach(([fld, mapping]) => {
+    add_empty_mapping_row(fld, mapping);
+  });
+}
+
+
 function add_empty_mapping_row(field_name = null, mapping_val = null) {
   const selectedType = $("#noteType").val();
   /*
@@ -274,18 +283,4 @@ function get_json() {
   });
   console.log(JSON.stringify(field_mapping, null, 2));
 }
-</script>
-
-<script>
-
-function load_stuff() {
-  $("#noteType").val("preload");
-  const fd = { "blah": "blah map", "b2": "{ b2map }" };
-  Object.entries(fd).forEach(([key, value]) => {
-    console.log(key, value);
-    add_empty_mapping_row(key, value);
-  });
-}
-
-load_stuff();
 </script>
