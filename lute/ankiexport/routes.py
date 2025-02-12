@@ -65,7 +65,6 @@ def _handle_form(spec, form_template_name):
     Handle a form post.
     """
     form = SrsExportSpecForm(obj=spec)
-    form.original_spec = spec
 
     if request.method == "POST":
         anki_settings_json = request.form.get("ankisettings")
@@ -93,6 +92,10 @@ def edit_spec(spec_id):
 def new_spec():
     "Make a new spec."
     spec = SrsExportSpec()
+    # Hack ... not sure why this was necessary, given that the model
+    # and form both have the default as True.
+    if spec.active is None:
+        spec.active = True
     return _handle_form(spec, "/ankiexport/new.html")
 
 
