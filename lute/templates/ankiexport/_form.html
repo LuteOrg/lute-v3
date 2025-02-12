@@ -86,6 +86,18 @@
 
         $("#txtAnkiSettings").val(JSON.stringify(anki_specs, null, 2));
 
+        noteTypeFields = anki_specs["note_types"];
+        ntsel = $("#noteType");
+        ntsel.empty();
+        Object.keys(noteTypeFields).forEach(f => {
+          ntsel.append(new Option(f, f));
+        });
+        const v = $("#note_type").val();
+        if (v) {
+          ntsel.val(v);
+          load_note_type_field_controls(v);
+        }
+
         // Is null for new.
         const current_mapping = {{ form.field_mapping.data | tojson }};
       })
@@ -134,13 +146,9 @@
     }
   });
 
-  const noteTypeFields = {
-    note_type_A: ["a", "b"],
-    note_type_B: ["a", "c", "d"],
-  };
+  var noteTypeFields = {};
 
-  $("#noteType").change(function () {
-    const selectedType = $(this).val();
+  function load_note_type_field_controls(selectedType) {
     if (!selectedType) return;
 
     const fields = noteTypeFields[selectedType];
@@ -168,7 +176,11 @@
         add_options($(this), fields);
       });
     }
+  }
 
+  $("#noteType").change(function () {
+    const selectedType = $(this).val();
+    load_note_type_field_controls(selectedType);
   });
 
 function add_options(field_select, opts_list) {
