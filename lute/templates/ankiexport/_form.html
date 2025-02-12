@@ -95,24 +95,9 @@
         $("#txtAnkiSettings").val(JSON.stringify(anki_specs, null, 2));
 
         noteTypeFields = anki_specs["note_types"];
-        const ntsel = $("#note_type");
-        ntsel.empty();
-        ntsel.append(new Option("(select note type)", ""))
-        Object.keys(noteTypeFields).forEach(f => {
-          ntsel.append(new Option(f, f));
-        });
-        const ntv = "{{ form.note_type.data }}";
-        ntsel.val(ntv);
+        load_select("#note_type", Object.keys(noteTypeFields), "{{ form.note_type.data }}");
 
-        const deck_names = anki_specs["deck_names"];
-        const dnsel = $("#deck_name");
-        dnsel.empty();
-        dnsel.append(new Option("(select deck name)", ""))
-        deck_names.forEach(f => {
-          dnsel.append(new Option(f, f));
-        });
-        const dnv = "{{ form.deck_name.data }}";
-        dnsel.val(dnv);
+        load_select("#deck_name", anki_specs["deck_names"], "{{ form.deck_name.data }}");
 
         let current_mapping_string = {{ form.field_mapping.data | tojson }};
         load_fields_and_mappings(current_mapping_string);
@@ -121,6 +106,16 @@
         window.alert(error);
       });
   });
+
+  function load_select(sel_id, sel_options, current_value) {
+    const ntsel = $(sel_id);
+    ntsel.empty();
+    ntsel.append(new Option("(select)", ""))
+    sel_options.forEach(f => {
+      ntsel.append(new Option(f, f));
+    });
+    ntsel.val(current_value);
+  }
 
   function confirm_delete(spec_id) {
     if (spec_id == null)
