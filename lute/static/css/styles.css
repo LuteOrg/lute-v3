@@ -1295,6 +1295,10 @@ table input:not([type="checkbox"]) {
     width: 100%;
 }
 
+div#mappingContainer input:not([type="checkbox"]) {
+    width: 40%;
+}
+
 .statsWordsRead th, 
 .statsWordsRead td { 
     padding: 5px; 

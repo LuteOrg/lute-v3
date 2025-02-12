@@ -47,7 +47,15 @@
 
     <tr>
       <td>{{ form.field_mapping.label(class="form-control-label") }}</td>
-      <td>{{ form.field_mapping(class="form-largetextarea") }}</td>
+      <td>
+        {{ form.field_mapping(class="form-largetextarea") }}
+
+        <div id="mappingContainer">
+          <!-- Fields will be dynamically inserted here -->
+        </div>
+        <button id="add_mapping_row" onclick="add_field_mapping_row(null, null); return false;">&nbsp;+&nbsp;</button>
+
+      </td>
     </tr>
 
     <tr>
@@ -124,12 +132,6 @@
 
 </form>
 
-<div id="mappingContainer">
-  <!-- Fields will be dynamically inserted here -->
-</div>
-
-
-<button id="add_mapping_row" onclick="add_field_mapping_row(null, null); return false;">&nbsp;+&nbsp;</button>
 <button id="getjson" onclick="get_json(); return false;">Get json</button>
 
 <script>
