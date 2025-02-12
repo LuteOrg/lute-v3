@@ -139,10 +139,7 @@
 
     $(".field-container").each(function() {
       const fieldname_input = $(this).find(".fieldname")
-      const fieldname = fieldname_input.val();
-      if (!fields.includes(fieldname)) {
-        fieldname_input.css("border-color", "red");
-      }
+      field_box_changed(fieldname_input);
     });
 
     remove_empty_mapping_rows();
