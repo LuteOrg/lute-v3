@@ -12,7 +12,6 @@ from flask import (
     flash,
 )
 from lute.models.repositories import UserSettingRepository
-from lute.settings.forms import AnkiConnectSettingsForm
 from lute.settings.current import refresh_global_settings
 from lute.ankiexport.service import Service
 from lute.models.srsexport import SrsExportSpec
@@ -26,12 +25,6 @@ bp = Blueprint("ankiexport", __name__, url_prefix="/ankiexport")
 
 @bp.route("/index", methods=["GET", "POST"])
 def anki_index():
-    "Edit settings."
-    repo = UserSettingRepository(db.session)
-    fname = "ankiconnect_url"
-    url = repo.get_value(fname)
-    form = AnkiConnectSettingsForm(data={fname: url})
-
     export_specs = db.session.query(SrsExportSpec).all()
     export_specs_json = [
         {
@@ -46,16 +39,8 @@ def anki_index():
         for spec in export_specs
     ]
 
-    if form.validate_on_submit():
-        repo.set_value(fname, form.ankiconnect_url.data)
-        db.session.commit()
-        refresh_global_settings(db.session)
-
-        flash("AnkiConnect URL updated", "success")
-
     return render_template(
         "/ankiexport/index.html",
-        form=form,
         export_specs_json=export_specs_json,
     )
 

@@ -53,6 +53,9 @@ class UserSettingsForm(FlaskForm):
     ]
     japanese_reading = SelectField("Pronunciation characters", choices=reading_choices)
 
+    use_ankiconnect = BooleanField("Enable export using AnkiConnect")
+    ankiconnect_url = StringField("AnkiConnect URL", validators=[InputRequired()])
+
     def validate_backup_dir(self, field):
         "Field must be set if enabled."
         if self.backup_enabled.data is False:
@@ -83,8 +86,3 @@ class UserShortcutsForm(FlaskForm):
     I'm only using this form to get the validate_on_submit()!
     There's likely a better way to do this.
     """
-
-
-class AnkiConnectSettingsForm(FlaskForm):
-    "AnkiConnect settings form."
-    ankiconnect_url = StringField("AnkiConnect URL", validators=[InputRequired()])

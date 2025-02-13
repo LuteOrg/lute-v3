@@ -5,20 +5,6 @@
 
 {% block body %}
 
-<form method="post">
-  {{ form.hidden_tag() }}
-  <p>
-    {{ form.ankiconnect_url.label }}:
-    {{ form.ankiconnect_url(class="form-control") }}
-    <button class="btn" onclick="test_ankiconnect_connection(); return false;">Test</button>
-  </p>
-  <div style="margin-top:10px;">
-    <button type="submit" class="btn btn-primary">Save</button>
-    <button class="btn" onclick="window.location = '/'; return false;">Cancel</button>
-  </div>
-</form>
-
-<br />
 <button class="btn" onclick="validate_exports();">Validate exports</button>
 <table id="export_specs" class="display" width="100%"></table>
 <p><a href="/ankiexport/spec/new">Create new export specification</a></p>
@@ -77,20 +63,6 @@
     }
     return fmjson;
   };
-
-
-  function test_ankiconnect_connection() {
-    const ac_url = $("#ankiconnect_url").val().trim();
-    if (ac_url == "") {
-      alert("Please specify the AnkiConnect URL.");
-      $("#ankiconnect_url").focus();
-      return;
-    }
-    LuteAnki.get_anki_specs(ac_url)
-      .then(() => alert(`Connected successfully to AnkiConnect at ${ac_url}.`))
-      .catch(error => alert(error));
-  }
-
 
   function _call_svc_validate_exports(anki_specs) {
     $.ajax({
