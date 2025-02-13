@@ -132,3 +132,20 @@ def get_ankiconnect_post_data():
         response = jsonify({"error": str(ex)})
         response.status_code = 400  # Bad Request
         return response
+
+
+@bp.route("/validate_export_specs", methods=["POST"])
+def validate_export_specs():
+    """Get data that the client javascript will post."""
+    data = request.get_json()
+    anki_deck_names = data["deck_names"]
+    anki_note_types = data["note_types"]
+    export_specs = db.session.query(SrsExportSpec).all()
+    svc = Service(anki_deck_names, anki_note_types, export_specs)
+    try:
+        ret = svc.validate_specs()
+        return jsonify(ret)
+    except AnkiExportConfigurationError as ex:
+        response = jsonify({"error": str(ex)})
+        response.status_code = 400  # Bad Request
+        return response

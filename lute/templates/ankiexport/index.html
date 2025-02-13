@@ -19,6 +19,7 @@
 </form>
 
 <br />
+<button class="btn" onclick="validate_exports();">Validate exports</button>
 <table id="export_specs" class="display" width="100%"></table>
 <p><a href="/ankiexport/spec/new">Create new export specification</a></p>
 
@@ -41,8 +42,9 @@
   let render_export_name = function( data, type, row, meta ) {
     const eid = row['id'];
     const ename = row['export_name'];
+    const el_id = `export_${eid}`;
     const url = `/ankiexport/spec/edit/${eid}`;
-    const a = `<a href="${url}">${ename}</a>`;
+    const a = `<a id="${el_id}" href="${url}">${ename}</a>`;
     return a;
   };
 
@@ -89,6 +91,34 @@
       .catch(error => alert(error));
   }
 
+
+  function _call_svc_validate_exports(anki_specs) {
+    $.ajax({
+      url: "/ankiexport/validate_export_specs",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(anki_specs),
+      dataType: "json"
+    }).done(results => {
+      $(".export_validation_failed").remove();
+      for (const [eid, msg] of Object.entries(results)) {
+        const el_id = `export_${eid}`;
+        const fail_icon = $('<img class="export_validation_failed">')
+              .attr("src", "{{ url_for('static', filename='icn/cross.png') }}")
+              .attr("title", msg)
+              .css({ width: "20px", height: "20px", cursor: "pointer", marginLeft: "5px"});
+        $(`#${el_id}`).after(fail_icon);
+      }
+    }).fail(error => alert(error))
+  }
+
+  function validate_exports() {
+    const ac_url = LUTE_USER_SETTINGS["ankiconnect_url"];
+    LuteAnki.get_anki_specs(ac_url)
+      .then(specs => { _call_svc_validate_exports(specs); })
+      .catch(error => { alert(error); });
+  
+  }
 </script>
 
 {% endblock %}
