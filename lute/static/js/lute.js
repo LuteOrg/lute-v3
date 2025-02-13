@@ -847,14 +847,10 @@ let show_translation_for_text = function(text) {
  * Get all selected words, post their IDs.
  */
 function send_selected_terms_to_anki() {
-  console.log("SENDING STUFF");
   let elements = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
   if (elements.length == 0)
     return;
   const word_ids = elements.map(el => $(el).data("wid"));
-
-  // TODO_ANKI - need to get this from settings.
-  const ANKI_CONNECT_URL = "http://127.0.0.1:8765";
 
   function add_tooltip(term_id, results) {
     elements.forEach(function(el) {
@@ -864,11 +860,10 @@ function send_selected_terms_to_anki() {
     });
   }
 
+  const ANKI_CONNECT_URL = LUTE_USER_SETTINGS["ankiconnect_url"];
   LuteAnki.post_anki_cards(
     ANKI_CONNECT_URL, word_ids, add_tooltip
-  ).then(result => {
-    console.log("back from post");
-  }).catch(error => {
+  ).catch(error => {
     console.error("ERROR:", error);
     alert(error.message);
   });
