@@ -11,8 +11,6 @@ from flask import (
     redirect,
     flash,
 )
-from lute.models.repositories import UserSettingRepository
-from lute.settings.current import refresh_global_settings
 from lute.ankiexport.service import Service
 from lute.models.srsexport import SrsExportSpec
 from lute.ankiexport.forms import SrsExportSpecForm
@@ -25,6 +23,7 @@ bp = Blueprint("ankiexport", __name__, url_prefix="/ankiexport")
 
 @bp.route("/index", methods=["GET", "POST"])
 def anki_index():
+    "List the exports."
     export_specs = db.session.query(SrsExportSpec).all()
     export_specs_json = [
         {
