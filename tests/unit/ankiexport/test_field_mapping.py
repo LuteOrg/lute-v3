@@ -42,15 +42,16 @@ def test_validate_mapping_does_not_throw_if_ok(mapping, msg):
 
 @pytest.fixture(name="term")
 def fixture_term():
+    zws = "\u200B"
     term = Mock()
     term.id = 1
-    term.text = "test"
+    term.text = f"test{zws} {zws}term"
     term.language.name = "English"
     term.language.id = 42
     term.get_current_image.return_value = "image.jpg"
     term.parents = []
     term.term_tags = [Mock(text="noun"), Mock(text="verb")]
-    term.translation = "example translation"
+    term.translation = f"example{zws} {zws}translation"
     return term
 
 
@@ -66,7 +67,7 @@ def test_basic_replacements(term):
 
     expected = {
         "id": 1,
-        "term": "test",
+        "term": "test term",
         "parents": "",
         "tags": "noun, verb",
         "language": "English",
@@ -105,8 +106,9 @@ def test_image_handling(term):
 
 def test_sentence_handling(term):
     refsrepo = Mock()
+    zws = "\u200B"
     refsrepo.find_references_by_id.return_value = {
-        "term": [Mock(sentence="Example sentence.")]
+        "term": [Mock(sentence=f"Example{zws} {zws}sentence.")]
     }
     mapping = {"sentence": "{ sentence }"}
 

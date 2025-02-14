@@ -104,15 +104,16 @@ def test_validate_only_checks_active_specs(export_spec):
 
 @pytest.fixture(name="term")
 def fixture_term():
+    zws = "\u200B"
     term = Mock()
     term.id = 1
-    term.text = "test"
+    term.text = f"test{zws} {zws}term"
     term.language.name = "German"
     term.language.id = 42
     term.get_current_image.return_value = "image.jpg"
     term.parents = []
     term.term_tags = [Mock(text="noun"), Mock(text="verb")]
-    term.translation = "example translation"
+    term.translation = f"example{zws} {zws}translation"
     return term
 
 
@@ -160,7 +161,7 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
                                 "fields": {
                                     "a": "German",
                                     "b": '<img src="LUTE_TERM_1.jpg">',
-                                    "c": "test",
+                                    "c": "test term",
                                     "d": "Example sentence.",
                                 },
                                 "tags": ["lute", "noun", "verb"],
@@ -218,7 +219,7 @@ def test_smoke_ankiconnect_post_data_for_term_without_image(term, export_spec):
                                 "fields": {
                                     "a": "German",
                                     # "b": "", image not posted at all.
-                                    "c": "test",
+                                    "c": "test term",
                                     "d": "Example sentence.",
                                 },
                                 "tags": ["lute", "noun", "verb"],

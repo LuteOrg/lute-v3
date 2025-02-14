@@ -121,6 +121,15 @@ def get_values_and_media_mapping(term, refsrepo, mapping):
 
         return calc_replacements
 
+    def remove_zws(replacements_dict):
+        cleaned = {}
+        for key, value in replacements_dict.items():
+            if isinstance(value, str):
+                cleaned[key] = value.replace("\u200B", "")
+            else:
+                cleaned[key] = value
+        return cleaned
+
     # One-for-one replacements in the mapping string.
     # e.g. "{ id }" is replaced by term.termid.
     replacements = {
@@ -143,10 +152,8 @@ def get_values_and_media_mapping(term, refsrepo, mapping):
     calc_replacements = parse_keys_needing_calculation(calc_keys, media_mappings)
 
     final_replacements = {**replacements, **calc_replacements}
-    # print(f"replacements = {replacements}", flush=True)
-    # print(f"calc replacements = {calc_replacements}", flush=True)
-    # print(f"fin replacements = {final_replacements}", flush=True)
-    return (final_replacements, media_mappings)
+    cleaned = remove_zws(final_replacements)
+    return (cleaned, media_mappings)
 
 
 def validate_mapping(mapping):
