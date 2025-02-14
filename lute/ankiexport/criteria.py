@@ -35,6 +35,18 @@ def evaluate_criteria(s, term):
         term_tags = [t.text for t in term.term_tags]
         return any(e in term_tags for e in tagvals)
 
+    def has_any_matching_parent_tags(tagvals):
+        ptags = []
+        for p in term.parents:
+            ptags.extend([t.text for t in p.term_tags])
+        return any(e in ptags for e in tagvals)
+
+    def has_any_matching_all_tags(tagvals):
+        alltags = [t.text for t in term.term_tags]
+        for p in term.parents:
+            alltags.extend([t.text for t in p.term_tags])
+        return any(e in alltags for e in tagvals)
+
     def matches_lang(lang):
         return term.language.name == lang[0]
 
@@ -118,6 +130,8 @@ def evaluate_criteria(s, term):
     tagcrit = tagvallist | quoteval
 
     tag_matcher = Suppress(Literal("tags") + Literal(":")) + tagcrit
+    parents_tag_matcher = Suppress(Literal("parents.tags") + Literal(":")) + tagcrit
+    all_tag_matcher = Suppress(Literal("all.tags") + Literal(":")) + tagcrit
 
     lang_matcher = Suppress("language") + Suppress(":") + quoteval
 
@@ -142,6 +156,8 @@ def evaluate_criteria(s, term):
 
     multi_check = infixNotation(
         tag_matcher.set_parse_action(has_any_matching_tags)
+        | parents_tag_matcher.set_parse_action(has_any_matching_parent_tags)
+        | all_tag_matcher.set_parse_action(has_any_matching_all_tags)
         | lang_matcher.set_parse_action(matches_lang)
         | has_matcher.set_parse_action(check_has)
         | parent_count_matcher.set_parse_action(check_parent_count)
