@@ -12,7 +12,7 @@ from lute.ankiexport.exceptions import AnkiExportConfigurationError
 def fixture_term():
     "Fake term."
     parent = Mock(text="PARENT")
-    parent.term_tags = []
+    parent.term_tags = [Mock(text="parenttag")]
 
     term = Mock()
     term.id = 1
@@ -42,6 +42,9 @@ def fixture_term():
         ("status<=3", True),
         ("status==1", False),
         ('tags:["fem", "other"]', False),
+        ('tags:["parenttag"]', False),
+        ('parents.tags:["parenttag"]', True),
+        ('all.tags:["parenttag"]', True),
         ('parents.count=1 and tags:["fem", "other"] and status<=3', False),
     ],
 )
