@@ -84,22 +84,21 @@
 
   $( document ).ready(function() {
     $("#export_spec_form :input").prop("disabled", true);
-    const ac_url = LUTE_USER_SETTINGS["ankiconnect_url"];
 
+    // The deck_names and note_types dropdowns contain at minimum the
+    // current field values.  If the anki specs are retrieved with
+    // current decks and note types, those are used.
     let deck_names = ["{{ form.deck_name.data }}"];
     let note_types = ["{{ form.note_type.data }}"];
     let disable_form = false;
+
+    const ac_url = LUTE_USER_SETTINGS["ankiconnect_url"];
     LuteAnki.get_anki_specs(ac_url)
       .then((anki_specs) => {
         $("#txtAnkiSettings").val(JSON.stringify(anki_specs, null, 2));
-
         noteTypeFields = anki_specs["note_types"];
         deck_names = anki_specs["deck_names"];
         note_types = Object.keys(noteTypeFields);
-        let current_mapping_string = {{ form.field_mapping.data | tojson }};
-        load_fields_and_mappings(current_mapping_string);
-
-        $("#export_spec_form :input").prop("disabled", false);
       })
       .catch(error => {
         window.alert(error);
