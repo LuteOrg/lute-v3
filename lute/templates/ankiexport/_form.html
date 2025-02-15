@@ -31,11 +31,6 @@
     </tr>
 
     <tr>
-      <td>{{ form.criteria.label(class="form-control-label") }}</td>
-      <td>{{ form.criteria(class="form-largetextarea") }}</td>
-    </tr>
-
-    <tr>
       <td>{{ form.deck_name.label(class="form-control-label") }}</td>
       <td>{{ form.deck_name(class="form-control") }}</td>
     </tr>
@@ -56,6 +51,11 @@
         <img id="add_mapping_row" src="{{ url_for('static', filename='icn/plus-button.png') }}" onclick="add_field_mapping_row(null, null); return false;">
 
       </td>
+    </tr>
+
+    <tr>
+      <td>{{ form.criteria.label(class="form-control-label") }}</td>
+      <td>{{ form.criteria(class="form-largetextarea") }}</td>
     </tr>
 
     <tr>
