@@ -86,13 +86,16 @@
     $("#export_spec_form :input").prop("disabled", true);
     $("#btnCancel").prop("disabled", false);
     const ac_url = LUTE_USER_SETTINGS["ankiconnect_url"];
+
+    let deck_names = ["{{ form.deck_name.data }}"];
+    let note_types = ["{{ form.note_type.data }}"];
     LuteAnki.get_anki_specs(ac_url)
       .then((anki_specs) => {
         $("#txtAnkiSettings").val(JSON.stringify(anki_specs, null, 2));
 
         noteTypeFields = anki_specs["note_types"];
-        load_select("#note_type", Object.keys(noteTypeFields), "{{ form.note_type.data }}");
-        load_select("#deck_name", anki_specs["deck_names"], "{{ form.deck_name.data }}");
+        deck_names = anki_specs["deck_names"];
+        note_types = Object.keys(noteTypeFields);
         let current_mapping_string = {{ form.field_mapping.data | tojson }};
         load_fields_and_mappings(current_mapping_string);
 
@@ -100,6 +103,10 @@
       })
       .catch(error => {
         window.alert(error);
+      })
+      .finally(() => {
+        load_select("#note_type", note_types, "{{ form.note_type.data }}");
+        load_select("#deck_name", deck_names, "{{ form.deck_name.data }}");
       });
   });
 
