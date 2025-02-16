@@ -1,4 +1,13 @@
 
+# 3.9.5 (2025-02-15)
+
+Tweaks:
+
+* #563: don't block image search page load if Bing is slow (asynchronous search).  By @parradam in #570.
+* Fix how term image data is stored.
+* Allow reference lookup by Term ID.
+
+
 # 3.9.4 (2025-01-26)
 
 * #573: make term listing editable, with "term list" menu entry to show the terms on the current page.  Brief usage notes are in [the manual](https://luteorg.github.io/lute-manual/usage/terms/edit-using-term-listing.html).
