@@ -41,6 +41,9 @@ def lint(c):
 def lint_changed(c):
     "Run pylint on changed files only.  (*nix machines only)"
     c.run("for p in `git diff --name-only | grep py`; do echo $p; pylint $p; done")
+    c.run(
+        "for p in `git diff --cached --name-only | grep py`; do echo $p; pylint $p; done"
+    )
 
 
 @task

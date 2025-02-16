@@ -74,6 +74,7 @@
   <div class="term-action-content">
     <a href="/term/new">Create new</a>
     <a id="term_action_bulk_edit" class="bulkActionLink" href="#" onclick="show_bulk_edit_form(event, this);">Bulk edit</a>
+    <a id="term_action_post_anki" href="#" onclick="post_anki(event);">Create Anki cards</a>
     <a id="term_action_bulk_delete" class="bulkActionLink" href="#" onclick="bulk_delete(event);">Delete selected</a>
     <a id="term_action_export_csv" href="#" onclick="export_csv(event);">Export CSV</a>
   </div>
@@ -379,7 +380,7 @@
 
 
   let render_text = function ( data, type, row, meta ) {
-    return `<a href="/term/edit/${row['WoID']}">${row['WoText']}</a>`;
+    return `<a id="term_${row['WoID']}" href="/term/edit/${row['WoID']}">${row['WoText']}</a>`;
   };
 
   let render_checkbox = function (data, type, row, meta) {
@@ -450,6 +451,45 @@
 
   function set_bulk_wordids() {
     $("#txtWordIds").val(_get_checked_wordids().join(","));
+  }
+
+  /**
+   * Post the checked words to Anki service, add tooltip.
+   */
+  function post_anki(event) {
+    event.preventDefault();
+    const checked = $('.chkWord:checked');
+    const word_ids = checked.toArray().map(el => parseInt($(el).attr('wordid')));
+    if (word_ids.length === 0) {
+      console.log("No terms selected");
+      return;
+    }
+
+    function add_tooltip(term_id, results) {
+      const el = $(`#term_${term_id}`);
+      if (!el.length) {
+        console.log(`Not found id #term_${term_id}`);
+        return;
+      }
+
+      let show_results = "<b>Anki exports:</b><br />"
+      show_results += results.replaceAll("\n", "<br />");
+      el.attr("title", show_results);
+      el.tooltip({
+        content: function (callback) {
+          callback($(this).prop('title'));
+        }
+      });
+      el.tooltip("open");
+    }
+
+    const ANKI_CONNECT_URL = LUTE_USER_SETTINGS["ankiconnect_url"];
+    LuteAnki.post_anki_cards(
+      ANKI_CONNECT_URL, word_ids, add_tooltip
+    ).catch(error => {
+      console.error("ERROR:", error);
+      alert(error.message);
+    });
   }
 
   function bulk_delete(event) {
@@ -638,6 +678,10 @@
     // Setting up the datatable now, so the filters are
     // taken into account.
     setup_term_datatable(dt_saved_state_key, "{{ initial_search or '' }}");
+
+    if (LUTE_USER_SETTINGS["use_ankiconnect"] == false) {
+      $("#term_action_post_anki").css('display', 'none');
+    }
   });
 
 

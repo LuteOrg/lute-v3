@@ -104,6 +104,9 @@ def add_default_user_settings(session, default_user_backup_path):
         # Term popups:
         "term_popup_promote_parent_translation": True,
         "term_popup_show_components": True,
+        # Anki:
+        "use_ankiconnect": False,
+        "ankiconnect_url": "http://127.0.0.1:8765",
     }
     add_initial_vals_if_needed(keys_and_defaults)
 
