@@ -53,6 +53,7 @@ INSERT INTO _migrations VALUES('20241221_add_wordsread_table.sql');
 INSERT INTO _migrations VALUES('20241221_clean_up_missing_relationships.sql');
 INSERT INTO _migrations VALUES('20250102_add_TxStartDate.sql');
 INSERT INTO _migrations VALUES('20241220_fix_for_wordsread_table_load.sql');
+INSERT INTO _migrations VALUES('20250206_create_srsexportspecs.sql');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
@@ -211,6 +212,16 @@ CREATE TABLE IF NOT EXISTS "wordsread" (
 	PRIMARY KEY ("WrID"),
         FOREIGN KEY("WrTxID") REFERENCES "texts" ("TxID") ON DELETE SET NULL,
         FOREIGN KEY("WrLgID") REFERENCES "languages" ("LgID") ON UPDATE NO ACTION ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "srsexportspecs" (
+       "SrsID" INTEGER NOT NULL,
+       "SrsExportName" VARCHAR(200) NOT NULL UNIQUE,
+       "SrsCriteria" VARCHAR(1000) NOT NULL,
+       "SrsDeckName" VARCHAR(200) NOT NULL,
+       "SrsNoteType" VARCHAR(200) NOT NULL,       
+       "SrsFieldMapping" VARCHAR(1000) NOT NULL,
+       "SrsActive" TINYINT NOT NULL DEFAULT '1',
+       PRIMARY KEY ("SrsID")
 );
 CREATE UNIQUE INDEX "TgText" ON "tags" ("TgText");
 CREATE UNIQUE INDEX "T2Text" ON "tags2" ("T2Text");
