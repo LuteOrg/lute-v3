@@ -678,6 +678,10 @@
     // Setting up the datatable now, so the filters are
     // taken into account.
     setup_term_datatable(dt_saved_state_key, "{{ initial_search or '' }}");
+
+    if (LUTE_USER_SETTINGS["use_ankiconnect"] == false) {
+      $("#term_action_post_anki").css('display', 'none');
+    }
   });
 
 
