@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}AnkiConnect{% endblock %}
+{% block header %}AnkiConnect{% endblock %}
+
+{% block body %}
+
+<button class="btn" onclick="validate_exports();">Validate exports</button>&nbsp;<span id="validation_message"></span>
+<table id="export_specs" class="display" width="100%"></table>
+<p><a href="/ankiexport/spec/new">Create new export specification</a></p>
+
+<script>
+
+  $( document ).ready(function() {
+    new DataTable('#export_specs', {
+      columns: [
+        { title: 'Export_id', data: 'id', visible: false },
+        { title: 'Export name', render: render_export_name },
+        { title: 'Specification', width: '40%', render: render_export_spec },
+        { title: 'Mapping', width: '40%', render: render_mapping },
+        { title: 'Active', data: 'active' }
+      ],
+      data: {{ export_specs_json | tojson | safe }}
+    });
+
+  });
+
+  let render_export_name = function( data, type, row, meta ) {
+    const eid = row['id'];
+    const ename = row['export_name'];
+    const el_id = `export_${eid}`;
+    const url = `/ankiexport/spec/edit/${eid}`;
+    const a = `<a id="${el_id}" href="${url}">${ename}</a>`;
+    return a;
+  };
+
+  let render_export_spec = function( data, type, row, meta ) {
+    let c = `${row['criteria']}`.trim();
+    if (c == "")
+      c = "(no criteria)";
+    else
+      c = `<code>${c}</code>`;
+    const crit = `Criteria: ${c}`;
+    const dn = `Deck: ${row['deck_name']}`;
+    const nt = `Note type: ${row['note_type']}`;
+    const ret = [crit, dn, nt].map(el => `<p>${el}</p>`);
+    return ret.join("\n");
+  };
+
+  let render_mapping = function( data, type, row, meta ) {
+    let fmjson = '';
+    try {
+      let tmp = JSON.parse(row['field_mapping']);
+      let fmjson_array = [];
+      for (const [fname, mapval] of Object.entries(tmp)) {
+        const p = `<code>${fname}</code> = <code>${mapval}</code>`
+        fmjson_array.push(p);
+      }
+      fmjson = `${fmjson_array.join('<br />')}`;
+    }
+    catch {
+      fmjson = '(error, unable to parse)'
+    }
+    return fmjson;
+  };
+
+  function _show_validation_message(results) {
+    const el = $("#validation_message");
+    const failcount = Object.keys(results).length;
+    let msg = "All active exports ok.";
+    let color = "green";
+    if (failcount > 0) {
+      msg = `${failcount} active export(s) are invalid.`;
+      color = "red";
+    }
+    el.text(msg);
+    el.css({ border: `2px solid ${color}` });
+  }
+
+  function _make_validation_failed_icon(msg) {
+    const fail_icon = $('<img class="export_validation_failed">')
+          .attr("src", "{{ url_for('static', filename='icn/cross.png') }}")
+          .attr("title", msg)
+          .css({ width: "20px", height: "20px", cursor: "pointer", marginLeft: "5px"});
+    return fail_icon;
+  }
+
+  function _call_svc_validate_exports(anki_specs) {
+    $.ajax({
+      url: "/ankiexport/validate_export_specs",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(anki_specs),
+      dataType: "json"
+    }).done(results => {
+      _show_validation_message(results);
+      $(".export_validation_failed").remove();
+      for (const [eid, msg] of Object.entries(results)) {
+        const el_id = `export_${eid}`;
+        const fail_icon = _make_validation_failed_icon(msg);
+        $(`#${el_id}`).after(fail_icon);
+      }
+    }).fail(error => alert(error))
+  }
+
+  function validate_exports() {
+    const ac_url = LUTE_USER_SETTINGS["ankiconnect_url"];
+    LuteAnki.get_anki_specs(ac_url)
+      .then(specs => { _call_svc_validate_exports(specs); })
+      .catch(error => { alert(error); });
+  
+  }
+</script>
+
+{% endblock %}

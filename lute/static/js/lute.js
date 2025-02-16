@@ -48,6 +48,7 @@ function reset_cursor_marker() {
  */
 function start_hover_mode() {
   reset_cursor_marker();
+  _hide_element_message_tooltips();
   _hide_term_edit_form();
   _hide_dictionaries();
   clear_newmultiterm_elements();
@@ -334,6 +335,7 @@ function hover_out(e) {
 /** Clicking */
 
 let word_clicked = function(el, e) {
+  _hide_element_message_tooltips();
   el.removeClass('wordhover');
   save_curr_data_order(el);
   el.toggleClass('kwordmarked');
@@ -383,6 +385,7 @@ function handle_select_started(e) {
 }
 
 function select_started(el, e) {
+  _hide_element_message_tooltips();
   clear_newmultiterm_elements();
   el.addClass('newmultiterm');
   selection_start_el = el;
@@ -668,18 +671,32 @@ let _get_textitems_text = function(textitemspans) {
 }
 
 
-let _show_element_message_tooltip = function(element, message) {
+let _show_element_message_tooltip = function(element, message, remove_after_timeout = 2000) {
   const el = $(element);
-  el.attr('title', message);
-  el.tooltip({
-    show: { effect: "fadeIn", duration: 200 },
-    hide: { effect: "fadeOut", duration: 200 }
+
+  let show_results = "<b>Anki exports:</b><br />"
+  show_results += message.replaceAll("\n", "<br />");
+  const tooltip = $('<span class="manual-tooltip"></span>').html(show_results);
+  tooltip.insertAfter(el);
+
+  // Positioning.  Rest of css is handled in styles.css.
+  tooltip.css({
+    top: el.offset().top + el.outerHeight() + 5, // below the target
+    left: el.offset().left,
   });
-  el.tooltip("open");
-  setTimeout(function() {
-    el.tooltip("close");
-    el.removeAttr('title');
-  }, 1000);
+
+  tooltip.hover(
+    function () { tooltip.addClass('hovered'); },
+    function () { tooltip.removeClass('hovered'); tooltip.remove(); }
+  );
+
+  if (remove_after_timeout > 0) {
+    setTimeout(() => { tooltip.remove(); }, remove_after_timeout);
+  }
+};
+
+let _hide_element_message_tooltips = function() {
+  $('.manual-tooltip').remove();
 };
 
 
@@ -706,7 +723,7 @@ let copy_text_to_clipboard = function(textitemspans) {
   });
   setTimeout(() => removeFlash(), 1000);
 
-  _show_element_message_tooltip(textitemspans[textitemspans.length - 1], "Copied to clipboard.");
+  _show_element_message_tooltip(textitemspans[textitemspans.length - 1], "Copied to clipboard.", 1000);
 }
 
 
@@ -736,6 +753,7 @@ let _update_screen_cursor = function(target) {
  * direction is 1 if moving "right", -1 if moving "left" -
  * note that these switch depending on if the language is right-to-left! */
 let _move_cursor = function(selector, direction = 1) {
+  _hide_element_message_tooltips();
   const fe = _first_selected_element();
   const fe_order = (fe != null) ? _get_order($(fe)) : 0;
   let candidates = $(selector).toArray();
@@ -823,6 +841,33 @@ let show_translation_for_text = function(text) {
   }
 
 };
+
+
+/**
+ * Get all selected words, post their IDs.
+ */
+function send_selected_terms_to_anki() {
+  let elements = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
+  if (elements.length == 0)
+    return;
+  const word_ids = elements.map(el => $(el).data("wid"));
+
+  function add_tooltip(term_id, results) {
+    elements.forEach(function(el) {
+      if ($(el).data("wid") == term_id) {
+        _show_element_message_tooltip(el, results, 0);
+      }
+    });
+  }
+
+  const ANKI_CONNECT_URL = LUTE_USER_SETTINGS["ankiconnect_url"];
+  LuteAnki.post_anki_cards(
+    ANKI_CONNECT_URL, word_ids, add_tooltip
+  ).catch(error => {
+    console.error("ERROR:", error);
+    alert(error.message);
+  });
+}
 
 
 // Get all the word ids on the current page, open new tab with just those terms.
@@ -969,6 +1014,7 @@ function handle_keydown (e) {
     "hotkey_StatusUp": () => increment_status_for_selected_elements(+1),
     "hotkey_StatusDown": () => increment_status_for_selected_elements(-1),
     "hotkey_PageTermList": () => open_term_list_for_current_page(),
+    "hotkey_PostTermsToAnki": () => send_selected_terms_to_anki(),
     "hotkey_Bookmark": () => handle_bookmark(),
     "hotkey_CopySentence": () => handle_copy('sentence-id'),
     "hotkey_CopyPara": () => handle_copy('paragraph-id'),

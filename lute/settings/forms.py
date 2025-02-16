@@ -53,6 +53,9 @@ class UserSettingsForm(FlaskForm):
     ]
     japanese_reading = SelectField("Pronunciation characters", choices=reading_choices)
 
+    use_ankiconnect = BooleanField("Enable export using AnkiConnect")
+    ankiconnect_url = StringField("AnkiConnect URL", validators=[InputRequired()])
+
     def validate_backup_dir(self, field):
         "Field must be set if enabled."
         if self.backup_enabled.data is False:

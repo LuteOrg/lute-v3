@@ -1,0 +1,299 @@
+{% if form.general_errors | length > 0 %}
+<div class="flash-notice-narrow">
+  <p>Errors:</p>
+  {% for msg in form.general_errors %}
+  <p>{{ msg | safe }}</p>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% for field_name, field_errors in form.errors.items() %}
+<div class="flash-notice-narrow">
+  <p>{{ field_name }}
+    <ul>
+      {% for error in field_errors %}
+      <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  </p>
+</div>
+{% endfor %}
+
+<p>For notes on form usage, see
+  <a href="https://luteorg.github.io/lute-manual/usage/ankiexport/defining-exports.html">the user manual</a>.
+</p>
+  
+<form id="export_spec_form" method="POST">
+  {{ form.hidden_tag() }}
+
+  <table id="ankiexport">
+  <tbody>
+
+    <tr>
+      <td>{{ form.export_name.label(class="form-control-label") }}</td>
+      <td>{{ form.export_name(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.deck_name.label(class="form-control-label") }}</td>
+      <td>{{ form.deck_name(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.note_type.label(class="form-control-label") }}</td>
+      <td>{{ form.note_type(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.field_mapping.label(class="form-control-label") }}</td>
+      <td>
+        {{ form.field_mapping(class="form-control") }}
+
+        <div id="mappingContainer">
+          <!-- Fields will be dynamically inserted here -->
+        </div>
+        <img id="add_mapping_row" class="row_control" src="{{ url_for('static', filename='icn/plus-button.png') }}" onclick="add_field_mapping_row(null, null); return false;">
+
+      </td>
+    </tr>
+
+    <tr>
+      <td>{{ form.criteria.label(class="form-control-label") }}</td>
+      <td>{{ form.criteria(class="form-largetextarea") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.active.label(class="form-control-label") }}</td>
+      <td>{{ form.active(class="form-control") }}</td>
+    </tr>
+
+    <input type="hidden" name="ankisettings" id="txtAnkiSettings"></textarea>
+
+  </tbody>
+  </table>
+
+  <button type="submit" class="btn btn-primary" onclick="set_anksettings_field(); return true;">Save</button>
+  <button id="btnCancel" class="btn" onclick="window.location = '{{ url_for('ankiexport.anki_index') }}'; return false;">Cancel</button>
+
+  {% if spec.id %}
+  <button id="btnDelete" class="btn" onclick="confirm_delete({{ spec.id }}); return false;">Delete</button>
+  {% endif %}
+
+</form>
+
+
+<script>
+
+  var noteTypeFields = {};
+
+  $( document ).ready(function() {
+    $("#export_spec_form :input").prop("disabled", true);
+
+    // The deck_names and note_types dropdowns contain at minimum the
+    // current field values.  If the anki specs are retrieved with
+    // current decks and note types, those are used.
+    let deck_names = ["{{ form.deck_name.data }}"];
+    let note_types = ["{{ form.note_type.data }}"];
+    let disable_form = false;
+
+    const ac_url = LUTE_USER_SETTINGS["ankiconnect_url"];
+    LuteAnki.get_anki_specs(ac_url)
+      .then((anki_specs) => {
+        $("#txtAnkiSettings").val(JSON.stringify(anki_specs, null, 2));
+        noteTypeFields = anki_specs["note_types"];
+        deck_names = anki_specs["deck_names"];
+        note_types = Object.keys(noteTypeFields);
+      })
+      .catch(error => {
+        window.alert(error);
+        disable_form = true;
+      })
+      .finally(() => {
+        load_select("#note_type", note_types, "{{ form.note_type.data }}");
+        load_select("#deck_name", deck_names, "{{ form.deck_name.data }}");
+        let current_mapping_string = {{ form.field_mapping.data | tojson }};
+        load_fields_and_mappings(current_mapping_string);
+        $("#export_spec_form :input").prop("disabled", disable_form);
+        $("#btnCancel").prop("disabled", false);
+        if (disable_form) {
+          $(".row_control").hide();
+        }
+      });
+  });
+
+  function load_select(sel_id, sel_options, current_value) {
+    const ntsel = $(sel_id);
+    ntsel.empty();
+    ntsel.append(new Option("(select)", ""))
+    sel_options.forEach(f => {
+      ntsel.append(new Option(f, f));
+    });
+    ntsel.val(current_value);
+  }
+
+  function confirm_delete(spec_id) {
+    if (spec_id == null)
+      return;
+    if (!window.confirm("Delete export?"))
+      return;
+    window.location = `/ankiexport/spec/delete/${spec_id}`;
+  }
+
+  // Prevent Return from submitting the form.
+  $("#dataMappingForm").bind("keypress", function (e) {
+    if (e.keyCode == 13) {
+      return false;
+    }
+  });
+
+  function load_note_type_field_controls(current_note_type) {
+    if (!current_note_type) return;
+
+    const fields = noteTypeFields[current_note_type];
+    $("#available_fields").empty();
+    for (let i = 0; i < fields.length; i++)
+      $("#available_fields").append(`<option value="${fields[i]}">`);
+
+    $(".field-container").each(function() {
+      const fieldname_input = $(this).find(".fieldname")
+      field_box_changed(fieldname_input);
+    });
+
+    remove_empty_mapping_rows();
+
+    const mappingContainer = $("#mappingContainer");
+
+    if ($(".field-container").length == 0) {
+      fields.forEach(f => add_field_mapping_row(f));
+    }
+    else {
+      $(".field_dropdown").each(function() {
+        add_options($(this), fields);
+      });
+    }
+  }
+
+  $("#note_type").change(function () {
+    const current_note_type = $(this).val();
+    load_note_type_field_controls(current_note_type);
+  });
+
+  function add_options(field_select, opts_list) {
+    field_select.empty();
+    field_select.append(new Option("\u25BE", ""));
+    opts_list.forEach(f => {
+      field_select.append(new Option(f, f));
+    });
+  }
+
+  function field_box_changed(field_box) {
+    const current_note_type = $("#note_type").val();
+    if (!current_note_type) return;
+    const available_fields = noteTypeFields[current_note_type];
+    const field_name = field_box.val();
+    const color = available_fields.includes(field_name) ? "" : "red";
+    field_box.css("border-color", color);
+  }
+
+  /** Pre-load the mapping fields and their strings. */
+  function load_fields_and_mappings(current_mapping_string) {
+    if (current_mapping_string == null)
+      return;
+
+    let current_mapping = {};
+    try {
+      current_mapping = JSON.parse(current_mapping_string);
+    }
+    catch (error) {
+      console.error(`Error parsing current mapping string ${current_mapping_string}`, error);
+    }
+    Object.entries(current_mapping).forEach(([fld, mapping]) => {
+      add_field_mapping_row(fld, mapping);
+    });
+  }
+
+
+  function add_field_mapping_row(field_name = null, mapping_val = null) {
+    const rowid = $(".field-container").length + 1;
+    const this_id = `fc_${rowid}`;
+    const fieldContainer = $(`<div id="${this_id}">`).addClass("field-container");
+
+    const fieldBox = $(`<input type="text" class="fieldname">`);
+    if (field_name)
+      fieldBox.val(field_name);
+    fieldBox.on('change', function() {
+      field_box_changed($(this));
+    });
+
+    const textBox = $(`<input class="fieldval" type="text">`);
+    if (mapping_val)
+      textBox.val(mapping_val);
+
+    function _create_dropdown(className, options, onChange) {
+      const select = $(`<select class="${className} arrow_only_dropdown" />`);
+      add_options(select, options);
+      select.on("change", function () {
+        const v = $(this).val() ?? "";
+        if (v !== "")
+          onChange(v);
+        $(this).val("").blur(); // Reset to down arrow
+      });
+      return select;
+    }
+
+    const current_note_type = $("#note_type").val();
+    const fields = noteTypeFields[current_note_type] ?? [];
+    const fieldOpts = _create_dropdown("field_dropdown", fields, (v) => {
+      fieldBox.val(v);
+      field_box_changed(fieldBox);
+    });
+
+    const valOptions = [
+      `{ id }`,
+      `{ term }`,
+      `{ language }`,
+      `{ parents }`,
+      `{ tags }`,
+      `{ translation }`,
+      `{ tags:["val1", "val2"] }`,
+      `{ image }`,
+      `{ sentence }`,
+    ];
+    const valOpts = _create_dropdown("mapping_dropdown", valOptions, (v) => {
+      textBox.val(v);
+    });
+
+    const del_button = $(`<img class="row_control" src="{{ url_for('static', filename='icn/minus-button.png') }}">`).data("row-id", this_id);
+    del_button.on("click", function () { remove_mapping_row($(this).data("row-id")); });
+
+    fieldContainer.append(fieldBox, fieldOpts, textBox, valOpts, del_button);
+    $("#mappingContainer").append(fieldContainer);
+  }
+
+  function remove_empty_mapping_rows() {
+    $(".field-container").filter(function () {
+      return !$(this).find(".fieldval").val().trim();
+    }).remove();
+  }
+
+  function remove_mapping_row(row_id) {
+    $(`#${row_id}`).remove();
+  }
+
+  function set_anksettings_field() {
+    let field_mapping = {};
+    $(".field-container").each(function() {
+      const c = $(this);
+      const fieldname = c.find(".fieldname").val().trim();
+      const fieldval = c.find(".fieldval").val().trim();
+      if (fieldval != "")
+        field_mapping[fieldname] = fieldval;
+    });
+    let mapping_string = JSON.stringify(field_mapping, null, 2);
+    if (mapping_string == "{}")
+      mapping_string = null;
+    $("#field_mapping").val(mapping_string);
+    console.log(mapping_string);
+  }
+
+</script>

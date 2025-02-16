@@ -114,6 +114,31 @@
 
     <tr>
       <td>
+        <h2>Anki</h2>
+      </td>
+    </tr>
+    {% for f in [
+    form.use_ankiconnect,
+    form.ankiconnect_url,
+    ]%}
+    <tr>
+      <td>{{ f.label }}</td>
+      <td>{{ f(class="form-control") }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td>
+      </td>
+      <td>
+        <button id="test_ankiconnect_btn" onclick="test_ankiconnect_setup(); return false;">
+          Test AnkiConnect connection
+        </button>
+        <div style="margin-top: 5px" id="ankiconnect_result"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
         <h2>Japanese</h2>
       </td>
     </tr>
@@ -197,6 +222,26 @@
         alert('Error occured');
       }
     });
+  }
+
+  function test_ankiconnect_setup() {
+    const ac_url = $('#ankiconnect_url').val().trim();
+    const el = $('#ankiconnect_result');
+    if (ac_url == "") {
+      alert("Please specify the AnkiConnect URL.");
+      $("#ankiconnect_url").focus();
+      return;
+    }
+    LuteAnki.get_anki_specs(ac_url)
+      .then(() => {
+        el.text(`Connected successfully to AnkiConnect at ${ac_url}.`);
+        el.css('border', `2px solid green`);
+      })
+      .catch(error => {
+        el.text(error);
+        el.css('border', `2px solid red`);
+        $("#use_ankiconnect").prop("checked", false);
+      });
   }
 
 </script>

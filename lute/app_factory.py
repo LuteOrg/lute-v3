@@ -43,6 +43,7 @@ from lute.settings.current import (
 from lute.models.repositories import UserSettingRepository
 from lute.book.stats import Service as StatsService
 
+from lute.ankiexport.routes import bp as anki_bp
 from lute.book.routes import bp as book_bp
 from lute.bookmarks.routes import bp as bookmarks_bp
 from lute.language.routes import bp as language_bp
@@ -329,6 +330,7 @@ def _create_app(app_config, extra_config):
 
     _add_base_routes(app, app_config)
     app.register_blueprint(language_bp)
+    app.register_blueprint(anki_bp)
     app.register_blueprint(book_bp)
     app.register_blueprint(bookmarks_bp)
     app.register_blueprint(term_bp)

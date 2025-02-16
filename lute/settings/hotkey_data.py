@@ -31,6 +31,8 @@ Misc:
   desc: Toggle focus mode
 - hotkey: hotkey_SaveTerm
   desc: Save term in term form
+- hotkey: hotkey_PostTermsToAnki
+  desc: Post selected terms to Anki
 
 Navigation:
 - hotkey: hotkey_StartHover

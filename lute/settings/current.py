@@ -40,6 +40,7 @@ def refresh_global_settings(session):
         "show_highlights",
         "term_popup_promote_parent_translation",
         "term_popup_show_components",
+        "use_ankiconnect",
     ]
     for k in boolkeys:
         current_settings[k] = current_settings[k] == "1"
