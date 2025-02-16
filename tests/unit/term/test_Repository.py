@@ -5,14 +5,13 @@ Tests lute.term.model.Term *domain* objects being saved
 and retrieved from DB.
 """
 
-from datetime import datetime
 import pytest
 
 from lute.models.term import Term as DBTerm, TermTag
 from lute.db import db
 from lute.term.model import Term, Repository
 from tests.dbasserts import assert_sql_result, assert_record_count_equals
-from tests.utils import add_terms, make_text
+from tests.utils import add_terms
 
 
 @pytest.fixture(name="repo")
