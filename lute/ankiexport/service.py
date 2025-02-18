@@ -10,6 +10,7 @@ from lute.ankiexport.field_mapping import (
     get_values_and_media_mapping,
     validate_mapping,
     get_fields_and_final_values,
+    SentenceLookup,
 )
 from lute.ankiexport.criteria import (
     evaluate_criteria,
@@ -143,7 +144,7 @@ class Service:
 
         return {"action": "multi", "params": {"actions": post_actions}}
 
-    def get_ankiconnect_post_data_for_term(self, term, base_url, refsrepo):
+    def get_ankiconnect_post_data_for_term(self, term, base_url, sentence_lookup):
         """
         Get post data for a single term.
         This assumes that all the specs are valid!
@@ -159,7 +160,9 @@ class Service:
         ret = {}
         for export in use_exports:
             mapping = json.loads(export.field_mapping)
-            replacements, mmap = get_values_and_media_mapping(term, refsrepo, mapping)
+            replacements, mmap = get_values_and_media_mapping(
+                term, sentence_lookup, mapping
+            )
             for k, v in mmap.items():
                 mmap[k] = base_url + v
             updated_mapping = get_fields_and_final_values(mapping, replacements)
@@ -192,12 +195,17 @@ class Service:
             raise AnkiExportConfigurationError(err_msg)
 
         repo = TermRepository(db_session)
+
+        fixed_sentences = {}
         refsrepo = ReferencesRepository(db_session)
+        sentence_lookup = SentenceLookup(fixed_sentences, refsrepo)
 
         ret = {}
         for tid in term_ids:
             term = repo.find(tid)
-            pd = self.get_ankiconnect_post_data_for_term(term, base_url, refsrepo)
+            pd = self.get_ankiconnect_post_data_for_term(
+                term, base_url, sentence_lookup
+            )
             if len(pd) > 0:
                 ret[tid] = pd
 
