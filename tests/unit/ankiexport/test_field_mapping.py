@@ -10,6 +10,7 @@ from lute.ankiexport.field_mapping import (
     get_values_and_media_mapping,
     validate_mapping,
     get_fields_and_final_values,
+    SentenceLookup,
 )
 
 # pylint: disable=missing-function-docstring
@@ -136,3 +137,14 @@ def test_empty_fields_not_posted():
     replacements = {"id": 42, "term": ""}
     actual = get_fields_and_final_values(mapping, replacements)
     assert actual == {"a": "42"}
+
+
+def test_sentence_lookup_finds_sentence_in_supplied_dict_or_does_db_call():
+    refsrepo = Mock()
+    refsrepo.find_references_by_id.return_value = {"term": [Mock(sentence="Db lookup")]}
+    fixed_sentences = {"42": "Hello"}
+    lookup = SentenceLookup(fixed_sentences, refsrepo)
+    assert lookup.get_sentence_for_term("42") == "Hello", "looks up"
+    assert lookup.get_sentence_for_term(42) == "Hello", "int ok, still finds"
+    assert lookup.get_sentence_for_term(99) == "Db lookup", "falls back to db lookup"
+    assert lookup.get_sentence_for_term("99") == "Db lookup", "falls back to db lookup"
