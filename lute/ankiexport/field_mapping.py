@@ -61,7 +61,7 @@ def _all_tags(term):
     return sorted(list(set(ret)))
 
 
-def get_values_and_media_mapping(term, refsrepo, mapping):
+def get_values_and_media_mapping(term, sentence_lookup, mapping):
     """
     Get the value replacements to be put in the mapping, and build
     dict of new filenames to original filenames.
@@ -112,11 +112,7 @@ def get_values_and_media_mapping(term, refsrepo, mapping):
             if term.id is None:
                 # Dummy parse.
                 return ""
-            refs = refsrepo.find_references_by_id(term.id)
-            term_refs = refs["term"] or []
-            if len(term_refs) == 0:
-                return ""
-            return term_refs[0].sentence
+            return sentence_lookup.get_sentence_for_term(term.id)
 
         quotedString.setParseAction(pp.removeQuotes)
         tag_matcher = (
