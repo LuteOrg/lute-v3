@@ -24,6 +24,30 @@ from lute.models.language import Language
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
 
+class SentenceLookup:
+    "Sentence lookup, finds in a supplied dictionary or from db."
+
+    def __init__(self, default_sentences_by_term_id, references_repo):
+        "init"
+        sdict = {}
+        for k, v in default_sentences_by_term_id.items():
+            sdict[int(k)] = v
+        self.default_sentences_by_term_id = sdict
+        self.references_repo = references_repo
+
+    def get_sentence_for_term(self, term_id):
+        "Get sentence from the dict, or do a lookup."
+        tid = int(term_id)
+        if tid in self.default_sentences_by_term_id:
+            return self.default_sentences_by_term_id[tid]
+
+        refs = self.references_repo.find_references_by_id(term_id)
+        term_refs = refs["term"] or []
+        if len(term_refs) == 0:
+            return ""
+        return term_refs[0].sentence
+
+
 def _all_terms(term):
     "Term and any parents."
     ret = [term]
