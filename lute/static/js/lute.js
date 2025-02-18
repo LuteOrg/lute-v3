@@ -852,6 +852,25 @@ function send_selected_terms_to_anki() {
     return;
   const word_ids = elements.map(el => $(el).data("wid"));
 
+  function _get_sentence(el) {
+    const el_sentence_id = $(el).data('sentence-id');
+    const selector = `span.textitem[data-sentence-id="${el_sentence_id}"]`;
+    const tis = $(selector).toArray();
+    return _get_textitems_text(tis);
+  }
+
+  function _get_sentences_dict(elements) {
+    ret = {};
+    elements.forEach(function(el) {
+      const wid = $(el).data("wid");
+      ret[wid] = _get_sentence(el);
+    });
+    return ret;
+  }
+  // TODO-ANKI
+  const word_sentences = _get_sentences_dict(elements);
+  console.log(JSON.stringify(word_sentences, null, 2));
+
   function add_tooltip(term_id, results) {
     $('.ui-tooltip').remove();
     elements.forEach(function(el) {
