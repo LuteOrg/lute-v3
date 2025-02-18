@@ -132,12 +132,10 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
     result = svc.validate_specs()
     assert len(result) == 0, "No problems, sanity check"
 
-    refsrepo = Mock()
-    refsrepo.find_references_by_id.return_value = {
-        "term": [Mock(sentence="Example sentence.")]
-    }
+    sentence_lookup = Mock()
+    sentence_lookup.get_sentence_for_term.return_value = "Example sentence."
 
-    pd = svc.get_ankiconnect_post_data_for_term(term, "http://x:42", refsrepo)
+    pd = svc.get_ankiconnect_post_data_for_term(term, "http://x:42", sentence_lookup)
     assert len(pd) != 0, "Got some post data"
 
     expected = {
@@ -197,12 +195,10 @@ def test_smoke_ankiconnect_post_data_for_term_without_image(term, export_spec):
     result = svc.validate_specs()
     assert len(result) == 0, "No problems, sanity check"
 
-    refsrepo = Mock()
-    refsrepo.find_references_by_id.return_value = {
-        "term": [Mock(sentence="Example sentence.")]
-    }
+    sentence_lookup = Mock()
+    sentence_lookup.get_sentence_for_term.return_value = "Example sentence."
 
-    pd = svc.get_ankiconnect_post_data_for_term(term, "http://x:42", refsrepo)
+    pd = svc.get_ankiconnect_post_data_for_term(term, "http://x:42", sentence_lookup)
     assert len(pd) != 0, "Got some post data"
 
     expected = {
