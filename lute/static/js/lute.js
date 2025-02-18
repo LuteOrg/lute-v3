@@ -867,9 +867,7 @@ function send_selected_terms_to_anki() {
     });
     return ret;
   }
-  // TODO-ANKI
-  const word_sentences = _get_sentences_dict(elements);
-  console.log(JSON.stringify(word_sentences, null, 2));
+  const termid_sentences = _get_sentences_dict(elements);
 
   function add_tooltip(term_id, results) {
     $('.ui-tooltip').remove();
@@ -882,7 +880,7 @@ function send_selected_terms_to_anki() {
 
   const ANKI_CONNECT_URL = LUTE_USER_SETTINGS["ankiconnect_url"];
   LuteAnki.post_anki_cards(
-    ANKI_CONNECT_URL, word_ids, add_tooltip
+    ANKI_CONNECT_URL, word_ids, termid_sentences, add_tooltip
   ).catch(error => {
     console.error("ERROR:", error);
     alert(error.message);

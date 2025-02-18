@@ -100,11 +100,13 @@ const LuteAnki = (function() {
   async function get_post_data(
     anki_connect_url,
     word_ids,
+    termid_sentences,
     anki_specs,
   ) {
     const { deck_names, note_types } = anki_specs;
     const postdata = {
       term_ids: word_ids,
+      termid_sentences: termid_sentences,
       base_url: window.location.origin,
       deck_names: deck_names,
       note_types: note_types,
@@ -217,12 +219,13 @@ const LuteAnki = (function() {
    *
    * See comments in get_post_data() for notes on its return structure.
    */
-  async function post_anki_cards(anki_connect_url, word_ids, callback) {
+  async function post_anki_cards(anki_connect_url, word_ids, termid_sentences, callback) {
     const anki_specs = await get_anki_specs(anki_connect_url);
 
     const post_data = await get_post_data(
       anki_connect_url,
       word_ids,
+      termid_sentences,
       anki_specs
     );
 
