@@ -483,9 +483,13 @@
       el.tooltip("open");
     }
 
+    // The term listing doesn't have a "current sentence" for terms,
+    // so rely on lookups.
+    termid_sentences = {};
+
     const ANKI_CONNECT_URL = LUTE_USER_SETTINGS["ankiconnect_url"];
     LuteAnki.post_anki_cards(
-      ANKI_CONNECT_URL, word_ids, add_tooltip
+      ANKI_CONNECT_URL, word_ids, termid_sentences, add_tooltip
     ).catch(error => {
       console.error("ERROR:", error);
       alert(error.message);

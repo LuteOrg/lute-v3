@@ -10,6 +10,7 @@ from lute.ankiexport.field_mapping import (
     get_values_and_media_mapping,
     validate_mapping,
     get_fields_and_final_values,
+    SentenceLookup,
 )
 
 # pylint: disable=missing-function-docstring
@@ -56,14 +57,14 @@ def fixture_term():
 
 
 def test_basic_replacements(term):
-    refsrepo = Mock()
+    sentence_lookup = Mock()
     mapping = {
         "id": "{ id }",
         "term": "{ term }",
         "language": "{ language }",
         "translation": "{ translation }",
     }
-    values, media = get_values_and_media_mapping(term, refsrepo, mapping)
+    values, media = get_values_and_media_mapping(term, sentence_lookup, mapping)
 
     expected = {
         "id": 1,
@@ -78,41 +79,39 @@ def test_basic_replacements(term):
 
 
 def test_tag_replacements(term):
-    refsrepo = Mock()
+    sentence_lookup = Mock()
     mapping = {"tags": "{ tags }"}
-    values, media = get_values_and_media_mapping(term, refsrepo, mapping)
+    values, media = get_values_and_media_mapping(term, sentence_lookup, mapping)
 
     assert set(values["tags"].split(", ")) == {"noun", "verb"}
     assert len(media) == 0
 
 
 def test_filtered_tag_replacements(term):
-    refsrepo = Mock()
+    sentence_lookup = Mock()
     mapping = {"mytags": '{ tags:["noun"] }'}
-    values, media = get_values_and_media_mapping(term, refsrepo, mapping)
+    values, media = get_values_and_media_mapping(term, sentence_lookup, mapping)
     assert set(values['tags:["noun"]'].split(", ")) == {"noun"}
     assert len(media) == 0
 
 
 def test_image_handling(term):
-    refsrepo = Mock()
+    sentence_lookup = Mock()
     mapping = {"image": "{ image }"}
 
-    values, media = get_values_and_media_mapping(term, refsrepo, mapping)
+    values, media = get_values_and_media_mapping(term, sentence_lookup, mapping)
 
     assert media == {"LUTE_TERM_1.jpg": "/userimages/42/image.jpg"}, "one image"
     assert '<img src="LUTE_TERM_1.jpg">' in values["image"]
 
 
 def test_sentence_handling(term):
-    refsrepo = Mock()
     zws = "\u200B"
-    refsrepo.find_references_by_id.return_value = {
-        "term": [Mock(sentence=f"Example{zws} {zws}sentence.")]
-    }
+    sentence_lookup = Mock()
+    sentence_lookup.get_sentence_for_term.return_value = f"Example{zws} {zws}sentence."
     mapping = {"sentence": "{ sentence }"}
 
-    values, media = get_values_and_media_mapping(term, refsrepo, mapping)
+    values, media = get_values_and_media_mapping(term, sentence_lookup, mapping)
 
     assert values["sentence"] == "Example sentence."
     assert len(media) == 0
@@ -136,3 +135,14 @@ def test_empty_fields_not_posted():
     replacements = {"id": 42, "term": ""}
     actual = get_fields_and_final_values(mapping, replacements)
     assert actual == {"a": "42"}
+
+
+def test_sentence_lookup_finds_sentence_in_supplied_dict_or_does_db_call():
+    refsrepo = Mock()
+    refsrepo.find_references_by_id.return_value = {"term": [Mock(sentence="Db lookup")]}
+    fixed_sentences = {"42": "Hello"}
+    lookup = SentenceLookup(fixed_sentences, refsrepo)
+    assert lookup.get_sentence_for_term("42") == "Hello", "looks up"
+    assert lookup.get_sentence_for_term(42) == "Hello", "int ok, still finds"
+    assert lookup.get_sentence_for_term(99) == "Db lookup", "falls back to db lookup"
+    assert lookup.get_sentence_for_term("99") == "Db lookup", "falls back to db lookup"
