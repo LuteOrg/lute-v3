@@ -853,6 +853,7 @@ function send_selected_terms_to_anki() {
   const word_ids = elements.map(el => $(el).data("wid"));
 
   function add_tooltip(term_id, results) {
+    $('.ui-tooltip').remove();
     elements.forEach(function(el) {
       if ($(el).data("wid") == term_id) {
         _show_element_message_tooltip(el, results, 0);
