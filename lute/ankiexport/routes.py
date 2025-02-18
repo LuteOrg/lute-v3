@@ -104,13 +104,16 @@ def get_ankiconnect_post_data():
     """Get data that the client javascript will post."""
     data = request.get_json()
     word_ids = data["term_ids"]
+    termid_sentences = data["termid_sentences"]
     base_url = data["base_url"]
     anki_deck_names = data["deck_names"]
     anki_note_types = data["note_types"]
     export_specs = db.session.query(SrsExportSpec).all()
     svc = Service(anki_deck_names, anki_note_types, export_specs)
     try:
-        ret = svc.get_ankiconnect_post_data(word_ids, base_url, db.session)
+        ret = svc.get_ankiconnect_post_data(
+            word_ids, termid_sentences, base_url, db.session
+        )
         return jsonify(ret)
     except AnkiExportConfigurationError as ex:
         response = jsonify({"error": str(ex)})

@@ -179,7 +179,9 @@ class Service:
 
         return ret
 
-    def get_ankiconnect_post_data(self, term_ids, base_url, db_session):
+    def get_ankiconnect_post_data(
+        self, term_ids, termid_sentences, base_url, db_session
+    ):
         """
         Build data to be posted.
 
@@ -196,9 +198,8 @@ class Service:
 
         repo = TermRepository(db_session)
 
-        fixed_sentences = {}
         refsrepo = ReferencesRepository(db_session)
-        sentence_lookup = SentenceLookup(fixed_sentences, refsrepo)
+        sentence_lookup = SentenceLookup(termid_sentences, refsrepo)
 
         ret = {}
         for tid in term_ids:
