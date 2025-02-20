@@ -108,6 +108,7 @@ def fixture_term():
     term = Mock()
     term.id = 1
     term.text = f"test{zws} {zws}term"
+    term.romanization = "blah-blah"
     term.language.name = "German"
     term.language.id = 42
     term.get_current_image.return_value = "image.jpg"
@@ -119,13 +120,14 @@ def fixture_term():
 
 def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
     anki_decks = ["good_deck"]
-    anki_notes = {"good_note": ["a", "b", "c", "d"]}
+    anki_notes = {"good_note": ["a", "b", "c", "d", "e"]}
     export_spec.field_mapping = json.dumps(
         {
             "a": "{ language }",
             "b": "{ image }",
             "c": "{ term }",
             "d": "{ sentence }",
+            "e": "{ pronunciation }",
         }
     )
     svc = Service(anki_decks, anki_notes, [export_spec])
@@ -161,6 +163,7 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
                                     "b": '<img src="LUTE_TERM_1.jpg">',
                                     "c": "test term",
                                     "d": "Example sentence.",
+                                    "e": "blah-blah",
                                 },
                                 "tags": ["lute", "noun", "verb"],
                             }

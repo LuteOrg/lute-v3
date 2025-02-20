@@ -47,6 +47,7 @@ def fixture_term():
     term = Mock()
     term.id = 1
     term.text = f"test{zws} {zws}term"
+    term.romanization = "blah-blah"
     term.language.name = "English"
     term.language.id = 42
     term.get_current_image.return_value = "image.jpg"
@@ -63,6 +64,7 @@ def test_basic_replacements(term):
         "term": "{ term }",
         "language": "{ language }",
         "translation": "{ translation }",
+        "pron": "{ pronunciation }",
     }
     values, media = get_values_and_media_mapping(term, sentence_lookup, mapping)
 
@@ -73,6 +75,7 @@ def test_basic_replacements(term):
         "tags": "noun, verb",
         "language": "English",
         "translation": "example translation",
+        "pronunciation": "blah-blah",
     }
     assert values == expected, "mappings"
     assert len(media) == 0
