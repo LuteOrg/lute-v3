@@ -159,6 +159,7 @@ def get_values_and_media_mapping(term, sentence_lookup, mapping):
         "parents": ", ".join([p.text for p in term.parents]),
         "tags": ", ".join(_all_tags(term)),
         "translation": "<br>".join(all_translations()),
+        "pronunciation": term.romanization,
     }
 
     mapping_string = "; ".join(mapping.values())
