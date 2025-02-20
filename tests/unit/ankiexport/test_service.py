@@ -112,15 +112,22 @@ def fixture_term():
     term.language.name = "German"
     term.language.id = 42
     term.get_current_image.return_value = "image.jpg"
-    term.parents = []
     term.term_tags = [Mock(text="noun"), Mock(text="verb")]
     term.translation = f"example{zws} {zws}translation"
+
+    parent = Mock()
+    parent.text = "parent-text"
+    parent.translation = "parent-transl"
+    parent.get_current_image.return_value = None
+    parent.term_tags = [Mock(text="parenttag"), Mock(text="xyz")]
+    term.parents = [parent]
+
     return term
 
 
 def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
     anki_decks = ["good_deck"]
-    anki_notes = {"good_note": ["a", "b", "c", "d", "e"]}
+    anki_notes = {"good_note": ["a", "b", "c", "d", "e", "f"]}
     export_spec.field_mapping = json.dumps(
         {
             "a": "{ language }",
@@ -128,6 +135,7 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
             "c": "{ term }",
             "d": "{ sentence }",
             "e": "{ pronunciation }",
+            "f": '{ tags:["parenttag"] }',
         }
     )
     svc = Service(anki_decks, anki_notes, [export_spec])
@@ -164,8 +172,9 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
                                     "c": "test term",
                                     "d": "Example sentence.",
                                     "e": "blah-blah",
+                                    "f": "parenttag",
                                 },
-                                "tags": ["lute", "noun", "verb"],
+                                "tags": ["lute", "noun", "parenttag", "verb", "xyz"],
                             }
                         },
                     },
@@ -221,7 +230,7 @@ def test_smoke_ankiconnect_post_data_for_term_without_image(term, export_spec):
                                     "c": "test term",
                                     "d": "Example sentence.",
                                 },
-                                "tags": ["lute", "noun", "verb"],
+                                "tags": ["lute", "noun", "parenttag", "verb", "xyz"],
                             }
                         },
                     },
