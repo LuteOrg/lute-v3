@@ -671,10 +671,13 @@ let _get_textitems_text = function(textitemspans) {
 }
 
 
-let _show_element_message_tooltip = function(element, message, remove_after_timeout = 2000) {
+let _show_element_message_tooltip = function(element, title, message, remove_after_timeout = 2000) {
   const el = $(element);
 
-  let show_results = "<b>Anki exports:</b><br />"
+  let show_results = "";
+  if (title != null) {
+    show_results = `<b>${title}</b><br />`;
+  }
   show_results += message.replaceAll("\n", "<br />");
   const tooltip = $('<span class="manual-tooltip"></span>').html(show_results);
   tooltip.insertAfter(el);
@@ -723,7 +726,8 @@ let copy_text_to_clipboard = function(textitemspans) {
   });
   setTimeout(() => removeFlash(), 1000);
 
-  _show_element_message_tooltip(textitemspans[textitemspans.length - 1], "Copied to clipboard.", 1000);
+  const last_el = textitemspans[textitemspans.length - 1];
+  _show_element_message_tooltip(last_el, null, "Copied to clipboard.", 1000);
 }
 
 
@@ -873,7 +877,7 @@ function send_selected_terms_to_anki() {
     $('.ui-tooltip').remove();
     elements.forEach(function(el) {
       if ($(el).data("wid") == term_id) {
-        _show_element_message_tooltip(el, results, 0);
+        _show_element_message_tooltip(el, "Anki exports", results, 0);
       }
     });
   }
