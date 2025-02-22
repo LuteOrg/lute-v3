@@ -16,7 +16,9 @@ import re
 import pyparsing as pp
 from pyparsing import (
     quotedString,
+    QuotedString,
     Suppress,
+    Literal,
 )
 from pyparsing.exceptions import ParseException
 from lute.models.term import Term
@@ -86,11 +88,21 @@ def get_values_and_media_mapping(term, sentence_lookup, mapping):
         term.
         """
 
+        def _filtered_tags_in_term_list(term_list, tagvals):
+            "Get all unique tags."
+            # tagvals is a pyparsing ParseResults, use list() to convert to strings.
+            ttext = [tt.text for t in term_list for tt in t.term_tags]
+            ttext = sorted(list(set(ttext)))
+            ftags = [tt for tt in ttext if tt in list(tagvals)]
+            return ", ".join(ftags)
+
         def get_filtered_tags(tagvals):
             "Get term tags matching the list."
-            # tagvals is a pyparsing ParseResults, use list() to convert to strings.
-            ftags = [tt for tt in _all_tags(term) if tt in list(tagvals)]
-            return ", ".join(ftags)
+            return _filtered_tags_in_term_list([term], tagvals)
+
+        def get_filtered_parents_tags(tagvals):
+            "Get term tags matching the list."
+            return _filtered_tags_in_term_list(term.parents, tagvals)
 
         def handle_image(_):
             id_images = [
@@ -115,18 +127,17 @@ def get_values_and_media_mapping(term, sentence_lookup, mapping):
             return sentence_lookup.get_sentence_for_term(term.id)
 
         quotedString.setParseAction(pp.removeQuotes)
-        tag_matcher = (
-            Suppress("tags")
-            + Suppress(":")
-            + Suppress("[")
-            + pp.delimitedList(quotedString)
-            + Suppress("]")
-        )
+        tagvallist = Suppress("[") + pp.delimitedList(quotedString) + Suppress("]")
+        tagcrit = tagvallist | QuotedString(quoteChar='"')
+        tag_matcher = Suppress(Literal("tags") + Literal(":")) + tagcrit
+        parents_tag_matcher = Suppress(Literal("parents.tags") + Literal(":")) + tagcrit
+
         image = Suppress("image")
         sentence = Suppress("sentence")
 
         matcher = (
             tag_matcher.set_parse_action(get_filtered_tags)
+            | parents_tag_matcher.set_parse_action(get_filtered_parents_tags)
             | image.set_parse_action(handle_image)
             | sentence.set_parse_action(handle_sentences)
         )
@@ -157,7 +168,7 @@ def get_values_and_media_mapping(term, sentence_lookup, mapping):
         "term": term.text,
         "language": term.language.name,
         "parents": ", ".join([p.text for p in term.parents]),
-        "tags": ", ".join(_all_tags(term)),
+        "tags": ", ".join(sorted({tt.text for tt in term.term_tags})),
         "translation": "<br>".join(all_translations()),
         "pronunciation": term.romanization,
     }
