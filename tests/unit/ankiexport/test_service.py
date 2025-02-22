@@ -127,7 +127,7 @@ def fixture_term():
 
 def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
     anki_decks = ["good_deck"]
-    anki_notes = {"good_note": ["a", "b", "c", "d", "e", "f"]}
+    anki_notes = {"good_note": ["a", "b", "c", "d", "e", "f", "g"]}
     export_spec.field_mapping = json.dumps(
         {
             "a": "{ language }",
@@ -135,7 +135,8 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
             "c": "{ term }",
             "d": "{ sentence }",
             "e": "{ pronunciation }",
-            "f": '{ tags:["parenttag"] }',
+            "f": '{ tags:["noun"] }',
+            "g": '{ parents.tags:["parenttag"] }',
         }
     )
     svc = Service(anki_decks, anki_notes, [export_spec])
@@ -172,7 +173,8 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
                                     "c": "test term",
                                     "d": "Example sentence.",
                                     "e": "blah-blah",
-                                    "f": "parenttag",
+                                    "f": "noun",
+                                    "g": "parenttag",
                                 },
                                 "tags": ["lute", "noun", "parenttag", "verb", "xyz"],
                             }

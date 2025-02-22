@@ -51,9 +51,16 @@ def fixture_term():
     term.language.name = "English"
     term.language.id = 42
     term.get_current_image.return_value = "image.jpg"
-    term.parents = []
     term.term_tags = [Mock(text="noun"), Mock(text="verb")]
     term.translation = f"example{zws} {zws}translation"
+
+    parent = Mock()
+    parent.text = "parent-text"
+    parent.translation = "parent-transl"
+    parent.get_current_image.return_value = None
+    parent.term_tags = [Mock(text="parenttag"), Mock(text="xyz")]
+    term.parents = [parent]
+
     return term
 
 
@@ -71,10 +78,10 @@ def test_basic_replacements(term):
     expected = {
         "id": 1,
         "term": "test term",
-        "parents": "",
+        "parents": "parent-text",
         "tags": "noun, verb",
         "language": "English",
-        "translation": "example translation",
+        "translation": "example translation<br>parent-transl",
         "pronunciation": "blah-blah",
     }
     assert values == expected, "mappings"
@@ -95,6 +102,14 @@ def test_filtered_tag_replacements(term):
     mapping = {"mytags": '{ tags:["noun"] }'}
     values, media = get_values_and_media_mapping(term, sentence_lookup, mapping)
     assert set(values['tags:["noun"]'].split(", ")) == {"noun"}
+    assert len(media) == 0
+
+
+def test_filtered_parents_tag_replacements(term):
+    sentence_lookup = Mock()
+    mapping = {"mytags": '{ parents.tags:["parenttag"] }'}
+    values, media = get_values_and_media_mapping(term, sentence_lookup, mapping)
+    assert set(values['parents.tags:["parenttag"]'].split(", ")) == {"parenttag"}
     assert len(media) == 0
 
 
