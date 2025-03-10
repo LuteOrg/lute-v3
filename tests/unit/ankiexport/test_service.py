@@ -118,6 +118,7 @@ def fixture_term():
     parent = Mock()
     parent.text = "parent-text"
     parent.translation = "parent-transl"
+    parent.romanization = "parent-blah"
     parent.get_current_image.return_value = None
     parent.term_tags = [Mock(text="parenttag"), Mock(text="xyz")]
     term.parents = [parent]
@@ -127,7 +128,7 @@ def fixture_term():
 
 def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
     anki_decks = ["good_deck"]
-    anki_notes = {"good_note": ["a", "b", "c", "d", "e", "f", "g"]}
+    anki_notes = {"good_note": ["a", "b", "c", "d", "e", "f", "g", "h"]}
     export_spec.field_mapping = json.dumps(
         {
             "a": "{ language }",
@@ -137,6 +138,7 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
             "e": "{ pronunciation }",
             "f": '{ tags:["noun"] }',
             "g": '{ parents.tags:["parenttag"] }',
+            "h": "{ parents.pronunciation }",
         }
     )
     svc = Service(anki_decks, anki_notes, [export_spec])
@@ -175,6 +177,7 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
                                     "e": "blah-blah",
                                     "f": "noun",
                                     "g": "parenttag",
+                                    "h": "parent-blah",
                                 },
                                 "tags": ["lute", "noun", "parenttag", "verb", "xyz"],
                             }
