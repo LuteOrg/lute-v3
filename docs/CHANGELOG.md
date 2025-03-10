@@ -1,4 +1,11 @@
 
+# 3.10.1 (2025-03-10)
+
+* #594: add parents.pronunciation to anki mapping.
+* Update built-in language definitions (Turkish, wordreference dictionary as popup)
+* Add AAC, FLAC, and WebM support: by @imamcr in #589
+
+
 # 3.10.0 (2025-02-23)
 
 * #579: Add flexible Anki export.
