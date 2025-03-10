@@ -57,6 +57,7 @@ def fixture_term():
     parent = Mock()
     parent.text = "parent-text"
     parent.translation = "parent-transl"
+    parent.romanization = "parent-blah"
     parent.get_current_image.return_value = None
     parent.term_tags = [Mock(text="parenttag"), Mock(text="xyz")]
     term.parents = [parent]
@@ -83,6 +84,38 @@ def test_basic_replacements(term):
         "language": "English",
         "translation": "example translation<br>parent-transl",
         "pronunciation": "blah-blah",
+        "parents.pronunciation": "parent-blah",
+    }
+    assert values == expected, "mappings"
+    assert len(media) == 0
+
+    term.parents[0].romanization = None
+    values, media = get_values_and_media_mapping(term, sentence_lookup, mapping)
+    expected["parents.pronunciation"] = ""
+    assert values == expected, "new mappings with no parent pron"
+
+
+def test_basic_replacements_no_parents(term):
+    sentence_lookup = Mock()
+    mapping = {
+        "id": "{ id }",
+        "term": "{ term }",
+        "language": "{ language }",
+        "translation": "{ translation }",
+        "pron": "{ pronunciation }",
+    }
+    term.parents = []
+    values, media = get_values_and_media_mapping(term, sentence_lookup, mapping)
+
+    expected = {
+        "id": 1,
+        "term": "test term",
+        "parents": "",
+        "tags": "noun, verb",
+        "language": "English",
+        "translation": "example translation",
+        "pronunciation": "blah-blah",
+        "parents.pronunciation": "",
     }
     assert values == expected, "mappings"
     assert len(media) == 0
