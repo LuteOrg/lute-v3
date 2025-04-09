@@ -23,6 +23,7 @@ readme = "README_PyPi.md"
 dependencies = [
   "Flask-SQLAlchemy>=3.1.1,<4",
   "Flask-WTF>=1.2.1,<2",
+  "flask_login>=0.6.3",
   "natto-py>=1.0.1,<2",
   "jaconv>=0.3.4,<1",
   "platformdirs>=3.10.0,<4",

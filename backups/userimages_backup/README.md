@@ -1,0 +1,1 @@
+User images.  Each subfolder is a language's ID.

@@ -1,0 +1,86 @@
+document.addEventListener('DOMContentLoaded', function () {
+  console.log('DOMContentLoaded: Starting stats-summary.js');
+
+  // === Summary Table ===
+  fetch('/api/usage/summary')
+    .then(response => response.json())
+    .then(data => {
+      console.log('Summary data loaded:', data);
+
+      const table = document.getElementById('summary-table');
+      if (!table) {
+        console.error('Could not find #summary-table');
+        return;
+      }
+
+      table.innerHTML = `
+        <tr><td style="padding: 0.5em; border-bottom: 1px solid #ddd;">📚 Total Words in Texts</td>
+            <td style="padding: 0.5em; border-bottom: 1px solid #ddd;">${(data.total_text_words || 0).toLocaleString()}</td></tr>
+        <tr><td style="padding: 0.5em; border-bottom: 1px solid #ddd;">🔢 Unique Words Tracked</td>
+            <td style="padding: 0.5em; border-bottom: 1px solid #ddd;">${(data.total_words || 0).toLocaleString()}</td></tr>
+        <tr><td style="padding: 0.5em; border-bottom: 1px solid #ddd;">🧠 Known Words</td>
+            <td style="padding: 0.5em; border-bottom: 1px solid #ddd;">${(data.known_words || 0).toLocaleString()}</td></tr>
+        <tr><td style="padding: 0.5em; border-bottom: 1px solid #ddd;">🧠 Learning Words</td>
+            <td style="padding: 0.5em; border-bottom: 1px solid #ddd;">${(data.learning_words || 0).toLocaleString()}</td></tr>
+        <tr><td style="padding: 0.5em; border-bottom: 1px solid #ddd;">🧠 Unknown Words</td>
+            <td style="padding: 0.5em; border-bottom: 1px solid #ddd;">${(data.unknown_words || 0).toLocaleString()}</td></tr>
+        <tr><td style="padding: 0.5em; border-bottom: 1px solid #ddd;">🕒 Words Added (Last 30 Days)</td>
+            <td style="padding: 0.5em; border-bottom: 1px solid #ddd;">${(data.words_added_30d || 0).toLocaleString()}</td></tr>
+        <tr><td style="padding: 0.5em;">🔁 Status Changes (Last 30 Days)</td>
+            <td style="padding: 0.5em;">${(data.status_changed_30d || 0).toLocaleString()}</td></tr>
+      `;
+    })
+    .catch(err => {
+      console.error('Failed to load summary data:', err);
+    });
+
+  // === Words Per Book Pie Chart ===
+  fetch('/api/usage/words_by_book')
+    .then(response => response.json())
+    .then(data => {
+      console.log('Pie chart data loaded:', data);
+
+      const canvas = document.getElementById('wordsPerBookChart');
+      if (!canvas) {
+        console.error('Could not find #wordsPerBookChart');
+        return;
+      }
+
+      const ctx = canvas.getContext('2d');
+
+      const labels = data.map(entry => entry.title);
+      const wordCounts = data.map(entry => entry.words);
+
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Words per Book',
+            data: wordCounts,
+            backgroundColor: [
+              '#36A2EB', '#FFCE56', '#FF6384', '#4BC0C0', '#9966FF',
+              '#FF9F40', '#C9CBCF', '#66BB6A', '#F06292', '#BA68C8',
+              '#FFB74D', '#81C784', '#90CAF9', '#CE93D8', '#FF8A65'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right'
+            },
+            title: {
+              display: true,
+              text: 'Words per Book'
+            }
+          }
+        }
+      });
+    })
+    .catch(err => {
+      console.error('Failed to load pie chart data:', err);
+    });
+});

@@ -9,72 +9,26 @@
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/chartjs/chart.umd.js') }}" charset="utf-8"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/chartjs/chartjs-adapter-date-fns.js') }}" charset="utf-8"></script>
 
-<!-- 🧱 Row 1: Summary + New Words -->
-<div style="display: flex; gap: 1em; margin-bottom: 1.5em; flex-wrap: wrap;">
-  <!-- 📊 Summary -->
-  <div style="flex: 1 1 400px; background: #fdfdfd; padding: 1em; border-radius: 8px;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #ddd;">
-    <h2 style="margin-top: 0;">Summary</h2>
-    <table class="statsSummary"
-           style="font-size: 0.9em; border-collapse: collapse; width: 100%;">
-      <tbody id="summary-table"></tbody>
-    </table>
+<h2 id="calendar-title">Activity Calendar</h2>
+<div style="display: flex">
+  <div style="display: flex; flex-direction: column; margin-right: 5px; font-size: 0.75em;">
+    <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
   </div>
-
-  <!-- 📈 New Words -->
-  <div style="flex: 1 1 400px; background: #fdfdfd; padding: 1em; border-radius: 8px;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #ddd;
-              overflow-x: auto;">
-    <h2 style="margin-top: 0;">New Words Added Per Day</h2>
-    <div style="min-width: 800px; height: 300px; position: relative;">
-      <canvas id="newWordsChart" style="width: 100%; height: 100%;"></canvas>
-    </div>
-  </div>
+  <div id="heatmap" style="
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    grid-auto-rows: 14px;
+    gap: 2px;
+    margin-bottom: 0.5em;
+  "></div>
 </div>
 
-<!-- 🧱 Row 2: Heatmap + Pie Chart -->
-<div style="display: flex; gap: 1em; margin-bottom: 1.5em; flex-wrap: wrap;">
-  <!-- 📅 Activity Calendar -->
-  <div style="flex: 1 1 400px; background: #fdfdfd; padding: 1em; border-radius: 8px;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #ddd;">
-    <h2 id="calendar-title">Activity Calendar</h2>
-    <div style="display: flex">
-      <div style="display: flex; flex-direction: column; margin-right: 5px; font-size: 0.75em;">
-        <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-      </div>
-      <div id="heatmap" style="
-        display: grid;
-        grid-template-columns: repeat(13, 1fr);
-        grid-auto-rows: 14px;
-        gap: 2px;
-        margin-bottom: 0.5em;
-      "></div>
-    </div>
-    <div style="margin-top: 0.5em; font-size: 0.8em">
-      <span style="display: inline-block; width: 16px; height: 12px; background-color: rgb(255,255,255); border: 1px solid #ccc; margin-right: 4px;"></span> no activity
-      <span style="display: inline-block; width: 16px; height: 12px; background-color: rgb(200,200,255); border: 1px solid #ccc; margin-left: 8px; margin-right: 4px;"></span> low
-      <span style="display: inline-block; width: 16px; height: 12px; background-color: rgb(0,0,255); border: 1px solid #ccc; margin-left: 8px; margin-right: 4px;"></span> high
-    </div>
-  </div>
-
-  <!-- 🥧 Words per Book -->
-  <div style="flex: 1 1 400px; background: #fdfdfd; padding: 1em; border-radius: 8px;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #ddd;">
-    <h2 style="margin-top: 0;">Words per Book</h2>
-    <div style="width: 100%; height: 300px;">
-      <canvas id="wordsPerBookChart"></canvas>
-    </div>
-  </div>
+<div style="margin-top: 0.5em; font-size: 0.8em">
+  <span style="display: inline-block; width: 16px; height: 12px; background-color: rgb(255,255,255); border: 1px solid #ccc; margin-right: 4px;"></span> no activity
+  <span style="display: inline-block; width: 16px; height: 12px; background-color: rgb(200,200,255); border: 1px solid #ccc; margin-left: 8px; margin-right: 4px;"></span> low
+  <span style="display: inline-block; width: 16px; height: 12px; background-color: rgb(0,0,255); border: 1px solid #ccc; margin-left: 8px; margin-right: 4px;"></span> high
 </div>
 
-
-
-  <div style="margin-top: 0.5em; font-size: 0.8em">
-    <span style="display: inline-block; width: 16px; height: 12px; background-color: rgb(255,255,255); border: 1px solid #ccc; margin-right: 4px;"></span> no activity
-    <span style="display: inline-block; width: 16px; height: 12px; background-color: rgb(200,200,255); border: 1px solid #ccc; margin-left: 8px; margin-right: 4px;"></span> low
-    <span style="display: inline-block; width: 16px; height: 12px; background-color: rgb(0,0,255); border: 1px solid #ccc; margin-left: 8px; margin-right: 4px;"></span> high
-  </div>
-</div>
 
 
 <h2>Words read</h2>
@@ -122,38 +76,39 @@
   });
 
 
-  /* ============================== */  
-
   function renderHeatmap(data) {
   const container = document.getElementById('heatmap');
   container.innerHTML = '';
 
   const now = new Date();
-  const year = now.getUTCFullYear();
-  const startDate = new Date(Date.UTC(year, 0, 1)); // Jan 1 UTC
-  const endDate = new Date(); // today local
-  const today = new Date(Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate()));
+  const year = now.getFullYear();
+  const startDate = new Date(year, 0, 1);
+  const endDate = now;
 
-  // Build list of dates from Jan 1 to today (inclusive)
+  // Build date list from Jan 1 to today
   const dates = [];
-  for (let d = new Date(startDate); d <= today; d.setUTCDate(d.getUTCDate() + 1)) {
-    dates.push(new Date(d));
+  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    dates.push(new Date(d.getTime())); // Important fix: clone the date properly
   }
 
+  // Determine max count for colour scale
   const max = Math.max(...dates.map(d => data[d.toISOString().split('T')[0]] || 0), 1);
 
-  // Get weekday of Jan 1 in UTC (0 = Sun, 1 = Mon, ...)
-  const startDay = startDate.getUTCDay();
+  // Fix: align Jan 1 to correct weekday row (column-down layout)
+  const startDay = (startDate.getDay() + 6) % 7;
+
   let weeks = [];
 
-  // First week: fill blanks up to weekday
+  // Fill in blanks up to the first weekday
   let firstWeek = new Array(startDay).fill(null);
+
+  // Fill rest of first week
   for (let i = startDay; i < 7 && dates.length; i++) {
     firstWeek.push(dates.shift());
   }
   weeks.push(firstWeek);
 
-  // Remaining weeks
+  // Build remaining weeks
   while (dates.length) {
     const week = [];
     for (let i = 0; i < 7; i++) {
@@ -162,13 +117,13 @@
     weeks.push(week);
   }
 
-  // Configure grid
+  // Set grid
   container.style.display = 'grid';
   container.style.gridTemplateColumns = `repeat(${weeks.length}, 1fr)`;
   container.style.gridTemplateRows = 'repeat(7, 1fr)';
   container.style.gap = '2px';
 
-  // Render vertically (column = week, row = weekday)
+  // Transpose weeks to columns for S-M-T-W-T-F-S display
   for (let row = 0; row < 7; row++) {
     for (let col = 0; col < weeks.length; col++) {
       const dateObj = weeks[col][row];
@@ -198,9 +153,6 @@
   if (title) title.textContent = `Activity Calendar (${year})`;
 }
 
-
-
-/* ============================== */  
   
   function renderChart(data) {
     var ctx = document.getElementById('wordCountChart').getContext('2d');
@@ -309,7 +261,5 @@
     });
   }
 </script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/stats-summary.js') }}" charset="utf-8"></script>
-
 
 {% endblock %}
