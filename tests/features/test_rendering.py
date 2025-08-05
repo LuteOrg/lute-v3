@@ -24,13 +24,6 @@ text = None
 
 scenarios("rendering.feature")
 
-
-@given("demo data")
-def given_demo_data(app_context):
-    "Calling app_context loads the demo data."
-    # TODO remove this
-
-
 @given(parsers.parse("language {langname}"))
 def given_lang(langname):
     svc = LanguageService(db.session)
