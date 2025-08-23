@@ -30,6 +30,7 @@ from lute.db.data_cleanup import clean_data
 from lute.backup.service import Service as BackupService
 from lute.db.demo import Service as DemoService
 import lute.utils.formutils
+from lute.i18n import init_babel
 
 from lute.parse.registry import init_parser_plugins, supported_parsers
 
@@ -60,6 +61,7 @@ from lute.settings.routes import bp as settings_bp
 from lute.themes.routes import bp as themes_bp
 from lute.stats.routes import bp as stats_bp
 from lute.cli.commands import bp as cli_bp
+from lute.language_selection.routes import bp as language_selection_bp
 
 
 def _setup_app_dir(dirname, readme_content):
@@ -283,6 +285,11 @@ def _add_base_routes(app, app_config):
             ),
             404,
         )
+    
+    @app.route("/test_i18n")
+    def test_i18n():
+        """Test route to demonstrate i18n functionality."""
+        return render_template("test_i18n.html")
 
 
 def _create_app(app_config, extra_config):
@@ -316,6 +323,7 @@ def _create_app(app_config, extra_config):
     app.env_config = app_config
 
     db.init_app(app)
+    init_babel(app)
 
     @listens_for(Pool, "connect")
     def _pragmas_on_connect(dbapi_con, con_record):  # pylint: disable=unused-argument
@@ -345,6 +353,7 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(themes_bp)
     app.register_blueprint(stats_bp)
     app.register_blueprint(cli_bp)
+    app.register_blueprint(language_selection_bp)
     if app_config.is_test_db:
         app.register_blueprint(dev_api_bp)
 
