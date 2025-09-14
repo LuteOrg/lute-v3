@@ -32,7 +32,7 @@ from lute.term.service import (
 )
 from lute.db import db
 from lute.term.forms import TermForm
-import lute.utils.formutils
+from lute.utils.formutils import language_choices, valid_current_language_id
 
 bp = Blueprint("term", __name__, url_prefix="/term")
 
@@ -43,9 +43,8 @@ def index(search):
     "Index page."
     repo = TermRepository(db.session)
     repo.delete_empty_images()
-    languages = db.session.query(Language).order_by(Language.name).all()
-    langopts = [(lang.id, lang.name) for lang in languages]
-    langopts = [(0, "(all)")] + langopts
+    langopts = language_choices(db.session, "(all)")
+    current_language_id = valid_current_language_id(db.session)
     all_statuses = db.session.query(Status).all()
     filter_statuses = [s for s in all_statuses if s.id != Status.IGNORED]
     # Add ignored to the end of the list ... annoying that the numbers
@@ -58,6 +57,7 @@ def index(search):
         "term/index.html",
         initial_search=search,
         language_options=langopts,
+        current_language_id=current_language_id,
         filter_statuses=filter_statuses,
         update_statuses=update_statuses,
         tags=r.get_term_tags(),
@@ -238,7 +238,7 @@ def handle_term_form(
     # The user opening the form is treated as an acknowledgement.
     term.flash_message = None
 
-    form.language_id.choices = lute.utils.formutils.language_choices(session)
+    form.language_id.choices = language_choices(session)
 
     if form.validate_on_submit():
         form.populate_obj(term)
