@@ -157,23 +157,21 @@ class ImageLookupButton extends GeneralLookupButton {
  */
 class DictButton extends LookupButton {
 
-  constructor(dictURL, frameName) {
+  constructor(dict, frameName) {
     super(frameName);
 
-    this.dictID = LookupButton.TERM_DICTS.indexOf(dictURL);
+    this.dictID = LookupButton.TERM_DICTS.indexOf(dict);
     if (this.dictID == -1) {
-      console.log(`Error: Dict url ${dictURL} not found (??)`);
+      console.log(`Error: Dict url ${dict.url} not found (??)`);
       return;
     }
 
-    const url = dictURL.split("*").splice(-1)[0];
-
-    this.label = (url.length <= 10) ? url : (url.slice(0, 10) + '...');
+    this.label = (dict.url.length <= 10) ? dict.url : (dict.url.slice(0, 10) + '...');
 
     // If the URL is a real url, get icon and label.
     let fimg = null;
     try {
-      const urlObj = new URL(url);  // Throws if invalid.
+      const urlObj = new URL(dict.url);  // Throws if invalid.
       const domain = urlObj.hostname;
       this.label = domain.split("www.").splice(-1)[0];
 
@@ -192,7 +190,7 @@ class DictButton extends LookupButton {
 
     this.btn.setAttribute("title", this.label);
 
-    this.isExternal = (dictURL.charAt(0) == '*');
+    this.isExternal = (dict.dicttype == "popuphtml");
     if (this.isExternal) {
       const ext_img = document.createElement("img");
       ext_img.classList.add("dict-btn-external-img");
@@ -204,15 +202,15 @@ class DictButton extends LookupButton {
   /** LOOKUPS *************************/
 
   do_lookup() {
-    const dicturl = LookupButton.TERM_DICTS[this.dictID];
-    if (LookupButton.TERM_FORM_CONTAINER == null || dicturl == null)
+    const dict = LookupButton.TERM_DICTS[this.dictID];
+    if (LookupButton.TERM_FORM_CONTAINER == null || dict == null)
       return;
     const term = LookupButton.TERM_FORM_CONTAINER.querySelector("#text").value;
     if (this.isExternal) {
-      this._load_popup(dicturl, term);
+      this._load_popup(dict.url, term);
     }
     else {
-      this._load_frame(dicturl, term);
+      this._load_frame(dict.url, term);
     }
     this.activate();
   }
@@ -236,8 +234,6 @@ class DictButton extends LookupButton {
   _load_popup(url, term) {
     if ((url ?? "") == "")
       return;
-    if (url[0] == "*")  // Should be true!
-      url = url.slice(1);
     const lookup_url = this._get_lookup_url(url, term);
     let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no'
     if (LUTE_USER_SETTINGS.open_popup_in_new_tab)
