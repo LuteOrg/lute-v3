@@ -5,7 +5,7 @@ Book create/edit forms.
 import json
 from flask import request
 from wtforms import StringField, SelectField, TextAreaField, IntegerField, HiddenField
-from wtforms import ValidationError
+from wtforms import BooleanField
 from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
@@ -60,6 +60,7 @@ class NewBookForm(FlaskForm):
             )
         ],
     )
+    generate_tts = BooleanField("Generate TTS audio automatically", default=True)
     book_tags = StringField("Tags")
 
     def __init__(self, *args, **kwargs):

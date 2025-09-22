@@ -75,6 +75,7 @@ class Service:
 
         return errors
 
+    
     def validate_specs(self):
         """
         Return hash of spec ids and any config errors.

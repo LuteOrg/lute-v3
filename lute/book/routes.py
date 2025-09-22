@@ -10,6 +10,7 @@ from flask import (
     render_template,
     redirect,
     flash,
+    current_app,
 )
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.book.service import (
@@ -17,6 +18,7 @@ from lute.book.service import (
     BookImportException,
     BookDataFromUrl,
 )
+from lute.tts.service import TTSService  # Add this import
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm
 from lute.book.stats import Service as StatsService
@@ -126,11 +128,21 @@ def new():
     if form.validate_on_submit():
         try:
             form.populate_obj(b)
+            # Add the TTS option from the form
+            b.generate_tts = form.generate_tts.data
             svc = BookService()
             book = svc.import_book(b, db.session)
             return redirect(f"/read/{book.id}/page/1", 302)
         except BookImportException as e:
             flash(e.message, "notice")
+        except Exception as e:
+            # Handle any other exceptions that might occur
+            error_msg = f"An error occurred while creating the book: {str(e)}"
+            flash(error_msg, "notice")
+            # Log the full traceback for debugging
+            import traceback
+            print(f"Book creation error: {error_msg}")
+            print(traceback.format_exc())
 
     # Don't set the current language before submit.
     usrepo = UserSettingRepository(db.session)
@@ -231,3 +243,67 @@ def table_stats(bookid):
         "status_distribution": stats.status_distribution,
     }
     return jsonify(ret)
+
+
+# Add a global variable to store progress (in a real application, you'd use a proper storage mechanism)
+tts_progress = {}
+
+# Add a route to get TTS progress
+@bp.route("/tts_progress/<task_id>")
+def tts_progress_status(task_id):
+    """Get the progress of a TTS generation task."""
+    progress_data = tts_progress.get(task_id, {"percent": 0, "message": "Not started"})
+    return jsonify(progress_data)
+
+# Add a route for async book creation with TTS
+@bp.route("/new_async", methods=["POST"])
+def new_async():
+    """Create a new book asynchronously with TTS progress tracking."""
+    import uuid
+    import threading
+    from flask import current_app
+    
+    task_id = str(uuid.uuid4())
+    tts_progress[task_id] = {"percent": 0, "message": "Starting..."}
+    
+    # Store form data for processing in the background thread
+    form_data = request.form.to_dict()
+    files_data = {}
+    if 'textfile' in request.files and request.files['textfile'].filename != '':
+        file = request.files['textfile']
+        files_data['textfile'] = {
+            'filename': file.filename,
+            'content': file.read()
+        }
+    if 'audiofile' in request.files and request.files['audiofile'].filename != '':
+        file = request.files['audiofile']
+        files_data['audiofile'] = {
+            'filename': file.filename,
+            'content': file.read()
+        }
+    
+    # Define progress callback that updates our global progress tracker
+    def progress_callback(percent, message):
+        tts_progress[task_id] = {"percent": percent, "message": message}
+        print(f"TTS Progress [{task_id}]: {percent}% - {message}")
+    
+    # Process in background thread
+    def process_book(app, form_data, files_data, progress_callback):
+        try:
+            # Create the new book using the actual BookService
+            # We need to use the application context in the thread
+            with app.app_context():
+                book_service = BookService()
+                new_book = book_service.create_book(form_data, files_data, db.session, progress_callback)
+                progress_callback(100, "Book creation complete!")
+        except Exception as e:
+            progress_callback(-1, f"Error: {str(e)}")
+    
+    thread = threading.Thread(
+        target=process_book, 
+        args=(current_app._get_current_object(), form_data, files_data, progress_callback)
+    )
+    thread.start()
+
+    
+    return jsonify({"task_id": task_id})
