@@ -92,6 +92,12 @@
     </div>
   </li>
   <li>
+    <a href="/quiz/start_quiz/{{ book.texts[page_num-1].id }}" title="Iniciar Quiz">
+      <img src="{{ url_for('static', filename='icn/quiz.png') }}" alt="Start Quiz" />
+      <span>Start Quiz</span>
+    </a>
+  </li>
+  <li>
     <a id="sendTermsToAnki" class="reading-menu-item" href="" onclick="send_selected_terms_to_anki(); return false;">
       Create Anki cards
     </a>

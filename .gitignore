@@ -148,3 +148,5 @@ dmypy.json
 cython_debug/
 
 .DS_Store
+
+.env

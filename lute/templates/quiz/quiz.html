@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}Reading Quiz - {{ question.question_text }}{% endblock %}
+
+{% block content %}
+<div class="quiz-container">
+    <div class="quiz-header">
+        <h2>Reading Comprehension Quiz</h2>
+        <div class="quiz-progress">
+            Question {{ question_number }} of {{ total_questions }}
+        </div>
+    </div>
+
+    <div class="quiz-content">
+        <div class="question-card">
+            <h3 class="question-text">{{ question.question_text }}</h3>
+            
+            <form id="quiz-form" method="POST">
+                <div class="answer-options">
+                    <div class="answer-option">
+                        <input type="radio" id="option-a" name="answer" value="{{ question.option_a }}" required>
+                        <label for="option-a" class="option-label">
+                            <span class="option-letter">A</span>
+                            <span class="option-text">{{ question.option_a }}</span>
+                        </label>
+                    </div>
+                    
+                    <div class="answer-option">
+                        <input type="radio" id="option-b" name="answer" value="{{ question.option_b }}">
+                        <label for="option-b" class="option-label">
+                            <span class="option-letter">B</span>
+                            <span class="option-text">{{ question.option_b }}</span>
+                        </label>
+                    </div>
+                    
+                    <div class="answer-option">
+                        <input type="radio" id="option-c" name="answer" value="{{ question.option_c }}">
+                        <label for="option-c" class="option-label">
+                            <span class="option-letter">C</span>
+                            <span class="option-text">{{ question.option_c }}</span>
+                        </label>
+                    </div>
+                    
+                    <div class="answer-option">
+                        <input type="radio" id="option-d" name="answer" value="{{ question.option_d }}">
+                        <label for="option-d" class="option-label">
+                            <span class="option-letter">D</span>
+                            <span class="option-text">{{ question.option_d }}</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="quiz-actions">
+                    <button type="button" class="btn btn-secondary" onclick="skipQuiz()">
+                        Skip Quiz
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">
+                        Submit Answer
+                    </button>
+                </div>
+            </form>
+            
+            <div id="result-feedback" class="result-feedback" style="display: none;">
+                <div class="feedback-content">
+                    <div id="feedback-message" class="feedback-message"></div>
+                    <div id="correct-answer" class="correct-answer"></div>
+                    <div id="explanation" class="explanation" style="display: none;"></div>
+                </div>
+                <div class="feedback-actions">
+                    <button type="button" class="btn btn-primary" onclick="nextQuestion()">
+                        Next Question
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.quiz-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.quiz-header h2 {
+    margin: 0;
+    color: #333;
+}
+
+.quiz-progress {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.question-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 2rem;
+}
+
+.question-text {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    color: #333;
+    line-height: 1.5;
+}
+
+.answer-options {
+    margin-bottom: 2rem;
+}
+
+.answer-option {
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.answer-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #f8f9fa;
+}
+
+.option-label:hover {
+    border-color: #007bff;
+    background: #e3f2fd;
+}
+
+.answer-option input[type="radio"]:checked + .option-label {
+    border-color: #007bff;
+    background: #e3f2fd;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+.option-letter {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    margin-right: 1rem;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.option-text {
+    flex: 1;
+    font-size: 1.1rem;
+}
+
+.quiz-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+}
+
+.result-feedback {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border-radius: 6px;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+}
+
+.feedback-message {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.feedback-message.correct {
+    color: #28a745;
+}
+
+.feedback-message.incorrect {
+    color: #dc3545;
+}
+
+.correct-answer {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.feedback-actions {
+    text-align: right;
+}
+
+@media (max-width: 768px) {
+    .quiz-container {
+        margin: 1rem auto;
+    }
+    
+    .quiz-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .question-card {
+        padding: 1.5rem;
+    }
+    
+    .quiz-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .quiz-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.getElementById('quiz-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+    if (!selectedAnswer) {
+        alert('Please select an answer');
+        return;
+    }
+    
+    submitAnswer(selectedAnswer.value);
+});
+
+function submitAnswer(answer) {
+    fetch('{{ url_for("quiz.submit_answer") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            question_id: {{ question.id }},
+            selected_answer: answer
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        showResult(data);
+    })
+    .catch(error => {
+        console.error('Error submitting answer:', error);
+        alert('Error submitting answer. Please try again.');
+    });
+}
+
+function showResult(result) {
+    const form = document.getElementById('quiz-form');
+    const resultFeedback = document.getElementById('result-feedback');
+    const feedbackMessage = document.getElementById('feedback-message');
+    const correctAnswer = document.getElementById('correct-answer');
+    const explanationEl = document.getElementById('explanation');
+    
+    form.style.display = 'none';
+    resultFeedback.style.display = 'block';
+    
+    if (result.is_correct) {
+        feedbackMessage.className = 'feedback-message correct';
+        feedbackMessage.textContent = '✓ Correct! Well done! (+' + (result.points_awarded || 1) + ' point)';
+        correctAnswer.style.display = 'none';
+    } else {
+        feedbackMessage.className = 'feedback-message incorrect';
+        feedbackMessage.textContent = '✗ Incorrect (+' + (result.points_awarded || 0) + ' points)';
+        correctAnswer.textContent = 'The correct answer is: ' + result.correct_answer;
+        correctAnswer.style.display = 'block';
+    }
+
+    if (result.explanation) {
+        explanationEl.textContent = result.explanation;
+        explanationEl.style.display = 'block';
+    } else {
+        explanationEl.style.display = 'none';
+    }
+}
+
+function nextQuestion() {
+    window.location.href = '{{ url_for("quiz.next_question", text_id=text_id, current_question_id=question.id) }}';
+}
+
+function skipQuiz() {
+    if (confirm('Are you sure you want to skip this quiz?')) {
+        window.location.href = '{{ url_for("quiz.skip_quiz", text_id=text_id) }}';
+    }
+}
+</script>
+{% endblock %}
