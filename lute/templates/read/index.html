@@ -8,7 +8,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
-
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" type="text/css">
 <div id="rendering_controls" style="display: none">
   <pre>
     lang_is_rtl: <input id="lang_is_rtl" value="{{ is_rtl }}">
@@ -84,10 +84,22 @@
           </div>
         </div>
     </div>
+    <div id="reading-timer" class="reading-timer">
+      <span id="reading-timer-text">00:00:00</span>
+      <span id="reading-timer-sep"> | </span>
+      <span id="reading-timer-controls">
+        <input type="checkbox" id="focus"> Focus mode
+        &nbsp; &nbsp; &nbsp;
+        <input type="checkbox" id="tap_sets_status"> Tap sets status
+      </span>
+    </div>
+
 
     <!-- <div class="definition-container"></div> -->
 
   </div>
+
+ 
 
   {% include "read/audio_player.html" %}
 
@@ -573,6 +585,54 @@
     })
   }
 
+</script>
+
+<script>
+  let startTime;
+  let timerInterval;
+
+  function startTimer() {
+    startTime = new Date();
+    timerInterval = setInterval(updateTimer, 1000);
+  }
+
+  function stopTimer() {
+    clearInterval(timerInterval);
+    const endTime = new Date();
+    const seconds = Math.round((endTime - startTime) / 1000);
+    const bookid = $('#book_id').val();
+    const data = {
+      bookid: bookid,
+      seconds: seconds
+    };
+    $.ajax({
+      type: 'post',
+      url: '/read/update_read_time',
+      data: JSON.stringify(data),
+      contentType: "application/json; charset=utf-8"
+    });
+  }
+
+  function updateTimer() {
+    const now = new Date();
+    const elapsed = now - startTime;
+    const hours = Math.floor(elapsed / 3600000);
+    const minutes = Math.floor((elapsed % 3600000) / 60000);
+    const seconds = Math.floor((elapsed % 60000) / 1000);
+    const timerText = 
+      (hours < 10 ? '0' : '') + hours + ':' +
+      (minutes < 10 ? '0' : '') + minutes + ':' +
+      (seconds < 10 ? '0' : '') + seconds;
+    $('#reading-timer-text').text(timerText);
+  }
+
+  $(document).ready(function () {
+    startTimer();
+  });
+
+  window.addEventListener('beforeunload', function (e) {
+    stopTimer();
+  });
 </script>
 
 {% endblock %}

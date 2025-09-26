@@ -48,7 +48,7 @@ class AppConfig:  # pylint: disable=too-many-instance-attributes
         self.is_test_db = self.dbname.startswith("test_")
 
         # Path to user data.
-        self.datapath = config.get("DATAPATH", self._get_appdata_dir())
+        self.datapath = os.path.abspath(config.get("DATAPATH", self._get_appdata_dir()))
         self.plugin_datapath = os.path.join(self.datapath, "plugins")
         self.userimagespath = os.path.join(self.datapath, "userimages")
         self.useraudiopath = os.path.join(self.datapath, "useraudio")

@@ -252,3 +252,11 @@ class Service:
         t.parents = [p for p in parent_data if p.show]
         t.components = [c for c in component_data if c.show]
         return t
+
+    def update_read_time(self, bookid, seconds):
+        "Update the read time for a book."
+        br = BookRepository(self.session)
+        book = br.find(bookid)
+        book.read_time_in_seconds += seconds
+        self.session.add(book)
+        self.session.commit()

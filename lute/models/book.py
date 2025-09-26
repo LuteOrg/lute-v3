@@ -48,6 +48,7 @@ class Book(
     source_uri = db.Column("BkSourceURI", db.String(length=1000))
     current_tx_id = db.Column("BkCurrentTxID", db.Integer, default=0)
     archived = db.Column("BkArchived", db.Boolean, default=False)
+    read_time_in_seconds = db.Column("BkReadTime", db.Integer, default=0)
 
     audio_filename = db.Column("BkAudioFilename", db.String)
     audio_current_pos = db.Column("BkAudioCurrentPos", db.Float)

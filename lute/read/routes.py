@@ -172,6 +172,18 @@ def save_player_data():
     return jsonify("ok")
 
 
+@bp.route("/update_read_time", methods=["POST"])
+def update_read_time():
+    "Update the read time for a book."
+    data = request.json
+    bookid = int(data.get("bookid"))
+    seconds = int(data.get("seconds"))
+    service = Service(db.session)
+    service.update_read_time(bookid, seconds)
+    return jsonify("ok")
+
+
+
 @bp.route("/start_reading/<int:bookid>/<int:pagenum>", methods=["GET"])
 def start_reading(bookid, pagenum):
     "Called by ajax.  Update the text.start_date, and render page."

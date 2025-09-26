@@ -33,6 +33,21 @@
 </ul>
 </table>
 
+<h2>Time spent reading (minutes)</h2>
+
+<table class="statsWordsRead">
+  <tr>
+    <th>Book</th>
+    <th>Minutes</th>
+  </tr>
+  {% for item in time_tracking_data %}
+  <tr>
+    <td>{{ item.book }}</td>
+    <td>{{ item.minutes | round(2) }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
 <div style="position: relative; aspect-ratio: 3">
   <canvas id="wordCountChart"></canvas>
 </div>

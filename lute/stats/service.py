@@ -94,3 +94,17 @@ def get_table_data(session):
     for langname, readbydate in raw_data.items():
         ret.append({"name": langname, "counts": _readcount_by_date(readbydate)})
     return ret
+
+def get_time_tracking_data(session):
+    "Get time tracking data for each book."
+    sql = """
+    select BkTitle, BkReadTime
+    from books
+    where BkReadTime > 0
+    order by BkTitle
+    """
+    result = session.execute(text(sql)).all()
+    ret = []
+    for row in result:
+        ret.append({"book": row[0], "minutes": row[1] / 60})
+    return ret
