@@ -128,6 +128,7 @@
     </p>
 
     <div id="final_page_controls" class="hide">
+      <button id="go-to-quiz" class="btn btn-primary">Go to Quiz</button>
       <p>
         <span
           id="footerMarkRestAsKnown"
@@ -162,6 +163,8 @@
         method="post"
         action="/book/archive/{{ book.id }}"
         ></form>
+      
+      
     </div>
 
   </div>
@@ -193,6 +196,19 @@
 </div>
 
 </div>
+
+<script>
+  var text_id = {{ text.id if text else 0 }};
+</script>
+<script>
+  document.getElementById('go-to-quiz').addEventListener('click', function() {
+    if (text_id) {
+      window.location.href = '/quiz/start/' + text_id;
+    } else {
+      alert('Text ID not available. Please complete the page first.');
+    }
+  });
+</script>
 
 <script>
   LookupButton.LANG_ID = {{ lang_id | safe }};
@@ -551,8 +567,15 @@
       url: '/read/page_done',
       data: JSON.stringify(data),
       contentType: "application/json; charset=utf-8"
-    }).done(function(d) {
-      goto_relative_page(next_relative_page);
+    }).done(function(response) {
+      // Check if we should redirect to quiz
+      if (response.text_id) {
+        // Redirect to quiz for this text
+        window.location.href = '/quiz/start/' + response.text_id;
+      } else {
+        // Continue with normal page navigation
+        goto_relative_page(next_relative_page);
+      }
     });
   }
 
