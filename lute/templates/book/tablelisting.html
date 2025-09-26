@@ -1,3 +1,20 @@
+<style>
+  .timer-pill {
+    background-color: #f0f0f0;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.9em;
+    color: #333;
+    display: inline-flex;
+    align-items: center;
+  }
+  .timer-pill img {
+    margin-right: 4px;
+    width: 0.9rem;
+    height: 0.9rem;
+    vertical-align: middle;
+  }
+</style>
 <!-- The default language selector.  This is moved into the datatables toolbar during setup. -->
 <select id="defaultLanguageSelect" class="dataTables_filter" title="Default language">
   {% for lang_choice in language_choices %}
@@ -199,13 +216,6 @@
     do_action_post('unarchive', bookid);
   }
 
-  //  function confirm_reparse(bookid) {
-  //    if (!confirm(`Reparse the book using parsing rules defined for its language.  This will also reset you to the first page of the book.  Click OK to proceed, or Cancel.`)) {
-  //      return;
-  //    }
-  //    do_action_post('reparse', bookid);
-  //  }
-
   function edit_book(el) {
     const bookid = $(el).data('bkid');
     document.location = `/book/edit/${bookid}`;
@@ -315,7 +325,8 @@
     }
     const djs = dayjs(dt);
     const txt = djs.fromNow();
-    return `<span title="${dt}">${txt}</span>`;
+    const clock_img = `<img src="{{ url_for('static', filename='icn/clock.png') }}" title="Last read">`;
+    return `<span title="${dt}" class="timer-pill">${clock_img}${txt}</span>`;
   };
 
   let render_book_actions = function ( data, type, row, meta ) {

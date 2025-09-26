@@ -1,7 +1,0 @@
-CREATE TABLE daily_reading (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    book_id INTEGER NOT NULL,
-    date TEXT NOT NULL,
-    time_spent INTEGER NOT NULL DEFAULT 0,
-    FOREIGN KEY (book_id) REFERENCES books(BkID)
-);

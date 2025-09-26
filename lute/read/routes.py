@@ -106,16 +106,7 @@ def page_done():
 
     service = Service(db.session)
     service.mark_page_read(bookid, pagenum, restknown)
-    
-    # Get the text ID for this page to check if quiz should be started
-    book = _find_book(bookid)
-    text = book.text_at_page(pagenum)
-    
-    # Return the text ID so the frontend can redirect to quiz
-    return jsonify({
-        "status": "ok",
-        "text_id": text.id if text else None
-    })
+    return jsonify({"status": "ok"})
 
 
 @bp.route("/delete_page/<int:bookid>/<int:pagenum>", methods=["GET"])

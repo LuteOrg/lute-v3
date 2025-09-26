@@ -150,3 +150,5 @@ cython_debug/
 .DS_Store
 
 .env
+# Ommit user audio
+useraudio/*
