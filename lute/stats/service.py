@@ -4,6 +4,44 @@ Calculating stats.
 
 from datetime import datetime, timedelta
 from sqlalchemy import text
+from lute.models.repositories import UserSettingRepository
+
+
+def get_streaks_data(session):
+    "Get daily goal and streaks data."
+    us_repo = UserSettingRepository(session)
+    goal_minutes = int(us_repo.get_value("daily_reading_goal") or 15)
+    goal_seconds = goal_minutes * 60
+
+    sql = """
+    SELECT date(read_date, 'localtime') as d, SUM(duration_seconds) as total_seconds
+    FROM reading_tracking
+    GROUP BY d
+    ORDER BY d DESC
+    """
+    result = session.execute(text(sql)).all()
+    
+    read_days = {datetime.strptime(row[0], '%Y-%m-%d').date(): row[1] for row in result}
+
+    today = datetime.now().date()
+    
+    todays_seconds = read_days.get(today, 0)
+
+    streak = 0
+    check_day = today
+    if read_days.get(check_day, 0) < goal_seconds:
+        check_day = today - timedelta(days=1)
+
+    while read_days.get(check_day, 0) >= goal_seconds:
+        streak += 1
+        check_day -= timedelta(days=1)
+
+    return {
+        "goal": goal_minutes,
+        "todays_progress_percent": min(100, (todays_seconds / goal_seconds) * 100) if goal_seconds > 0 else 0,
+        "current_streak": streak,
+        "goal_met_today": todays_seconds >= goal_seconds
+    }
 
 
 def _get_data_per_lang(session):
@@ -98,13 +136,38 @@ def get_table_data(session):
 def get_time_tracking_data(session):
     "Get time tracking data for each book."
     sql = """
-    select BkTitle, BkReadTime
-    from books
-    where BkReadTime > 0
-    order by BkTitle
+    SELECT b.BkID, b.BkTitle, rt.id, rt.read_date, rt.duration_seconds
+    FROM reading_tracking rt
+    JOIN books b ON b.BkID = rt.book_id
+    ORDER BY b.BkTitle, rt.read_date DESC
     """
     result = session.execute(text(sql)).all()
-    ret = []
+    
+    from collections import defaultdict
+    import pandas as pd
+    books_data = defaultdict(lambda: {'total_seconds': 0, 'entries': []})
+    
     for row in result:
-        ret.append({"book": row[0], "minutes": row[1] / 60})
+        book_id = row[0]
+        book_title = row[1]
+        entry_id = row[2]
+        read_date = row[3]
+        duration_seconds = row[4]
+        
+        books_data[book_title]['total_seconds'] += duration_seconds
+        books_data[book_title]['entries'].append({
+            'id': entry_id,
+            'date': pd.to_datetime(read_date, format='mixed'),
+            'duration': f"{duration_seconds // 60} min, {duration_seconds % 60} sec"
+        })
+        
+    ret = []
+    for title, data in books_data.items():
+        total_minutes = data['total_seconds'] / 60
+        ret.append({
+            'book': title,
+            'total_minutes': total_minutes,
+            'entries': data['entries']
+        })
+        
     return ret

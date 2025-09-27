@@ -174,8 +174,9 @@ def save_player_data():
 
 @bp.route("/update_read_time", methods=["POST"])
 def update_read_time():
+    import json
     "Update the read time for a book."
-    data = request.json
+    data = json.loads(request.data)
     bookid = int(data.get("bookid"))
     seconds = int(data.get("seconds"))
     service = Service(db.session)

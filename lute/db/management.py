@@ -101,6 +101,7 @@ def add_default_user_settings(session, default_user_backup_path):
         "open_popup_in_new_tab": False,
         "stop_audio_on_term_form_open": True,
         "stats_calc_sample_size": 5,
+        "daily_reading_goal": 15,
         # Term popups:
         "term_popup_promote_parent_translation": True,
         "term_popup_show_components": True,

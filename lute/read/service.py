@@ -257,6 +257,9 @@ class Service:
         "Update the read time for a book."
         br = BookRepository(self.session)
         book = br.find(bookid)
-        book.read_time_in_seconds += seconds
-        self.session.add(book)
+        from lute.models.reading_tracker import ReadingTracker
+        tracker = ReadingTracker(book, seconds)
+        self.session.add(tracker)
         self.session.commit()
+
+

@@ -621,12 +621,7 @@
       bookid: bookid,
       seconds: seconds
     };
-    $.ajax({
-      type: 'post',
-      url: '/read/update_read_time',
-      data: JSON.stringify(data),
-      contentType: "application/json; charset=utf-8"
-    });
+    navigator.sendBeacon('/read/update_read_time', JSON.stringify(data));
   }
 
   function updateTimer() {

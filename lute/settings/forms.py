@@ -39,6 +39,10 @@ class UserSettingsForm(FlaskForm):
         validators=[InputRequired(), NumberRange(min=1, max=500)],
         render_kw={"title": "Number of pages to use for book stats calculation."},
     )
+    daily_reading_goal = IntegerField(
+        "Daily reading goal (minutes)",
+        validators=[InputRequired(), NumberRange(min=1)],
+    )
 
     term_popup_promote_parent_translation = BooleanField(
         "Promote parent translation to term translation if possible"
