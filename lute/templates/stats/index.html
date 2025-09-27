@@ -9,58 +9,32 @@
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/chartjs/chart.umd.js') }}" charset="utf-8"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/chartjs/chartjs-adapter-date-fns.js') }}" charset="utf-8"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/charts.js') }}" charset="utf-8"></script>
+<link href="{{ url_for('static', filename='css/stats.css') }}" rel="stylesheet">
 
 <style>
-.stats-section {
-    display: flex;
-    justify-content: space-around;
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-radius: 5px;
-    margin-bottom: 2rem;
-}
-.stat-item {
-    text-align: center;
-}
-.stat-label {
-    font-size: 0.9rem;
-    color: #6c757d;
-}
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-.progress {
-    height: 2rem;
-    width: 150px;
-    margin-top: 5px;
-}
-.progress-bar {
-    font-size: 1rem;
-    line-height: 2rem;
-}
+  
 </style>
 
 <h2>Daily Goal and Streak</h2>
 <div class="stats-section">
-    <div class="stat-item">
+    <div class="stat-card">
+        <div class="stat-icon">🎯</div>
         <div class="stat-label">Daily Goal</div>
-        <div class="stat-value">{{ streaks_data.goal }} minutes</div>
+        <div class="stat-value">{{ streaks_data.goal }} min</div>
     </div>
-    <div class="stat-item">
+    <div class="stat-card {% if streaks_data.goal_met_today %}goal-met{% endif %}">
+        <div class="stat-icon">📈</div>
         <div class="stat-label">Today's Progress</div>
-        <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: {{ streaks_data.todays_progress_percent }}%;" aria-valuenow="{{ streaks_data.todays_progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-container">
+            <div class="progress-bar-custom {% if streaks_data.goal_met_today %}goal-met{% endif %}" style="width: {{ streaks_data.todays_progress_percent }}%;">
                 {{ streaks_data.todays_progress_percent | round }}%
             </div>
         </div>
     </div>
-    <div class="stat-item">
+    <div class="stat-card">
+        <div class="stat-icon">🔥</div>
         <div class="stat-label">Current Streak</div>
-        <div class="stat-value">
-            {{ streaks_data.current_streak }} days
-            {% if streaks_data.current_streak > 0 %}🔥{% endif %}
-        </div>
+        <div class="stat-value">{{ streaks_data.current_streak }} days</div>
     </div>
 </div>
 
@@ -139,6 +113,8 @@
 <div class="chart-container" style="position: relative; aspect-ratio: 2; max-width: 500px; margin: auto;">
   <canvas id="languageDistributionChart"></canvas>
 </div>
+
+
 
   
 {% endblock %}

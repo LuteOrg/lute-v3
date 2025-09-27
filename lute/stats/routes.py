@@ -3,7 +3,7 @@
 """
 
 from flask import Blueprint, render_template, jsonify, flash, redirect
-from lute.stats.service import get_chart_data, get_table_data, get_time_tracking_data, get_streaks_data
+from lute.stats.service import get_chart_data, get_table_data, get_time_tracking_data, get_streaks_data, get_time_chart_data
 from lute.db import db
 
 bp = Blueprint("stats", __name__, url_prefix="/stats")
@@ -28,7 +28,11 @@ def index():
 def get_data():
     "Ajax call."
     chartdata = get_chart_data(db.session)
-    return jsonify(chartdata)
+    timechartdata = get_time_chart_data(db.session)
+    return jsonify({
+        'wordcount': chartdata,
+        'timetracking': timechartdata
+    })
 
 @bp.route("/delete_reading_entry/<int:entry_id>", methods=["POST"])
 def delete_reading_entry(entry_id):

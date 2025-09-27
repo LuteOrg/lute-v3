@@ -2,12 +2,12 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch('/stats/data')
       .then(response => response.json())
       .then(data => {
-        renderLineChart(data);
-        renderDoughnutChart(data);
+        renderLineChart(data.wordcount, data.timetracking);
+        renderDoughnutChart(data.wordcount);
       });
-  });
+});
 
-  function renderDoughnutChart(data) {
+function renderDoughnutChart(data) {
     var ctx = document.getElementById('languageDistributionChart').getContext('2d');
 
     const palette = [
@@ -30,33 +30,9 @@ document.addEventListener('DOMContentLoaded', function() {
         colorIndex++;
       }
     });
-
-    new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: chartData,
-          backgroundColor: backgroundColors,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: 'Word Distribution by Language'
-          }
-        }
-      }
-    });
   }
 
-  function renderLineChart(data) {
+function renderLineChart(wordCountData, timeData) {
     var ctx = document.getElementById('wordCountChart').getContext('2d');
 
     const palette = [
@@ -64,16 +40,16 @@ document.addEventListener('DOMContentLoaded', function() {
       '#937860', '#da8bc3', '#8c8c8c', '#ccb974', '#64b5cd'
     ];
 
-    datasets = [];
+    let datasets = [];
     let colorIndex = 0;
 
-    Object.entries(data).forEach(entry => {
+    Object.entries(wordCountData).forEach(entry => {
       const [langname, langdata] = entry;
       const color = palette[colorIndex % palette.length];
       colorIndex++;
 
       var daily = {
-        label: `${langname} (daily)`,
+        label: `${langname} (daily words)`,
         yAxisID: 'daily',
         data: [],
         borderWidth: 1,
@@ -83,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
       };
 
       var total = {
-        label: `${langname} (total)`,
+        label: `${langname} (total words)`,
         yAxisID: 'total',
         data: [],
         borderWidth: 2,
@@ -102,6 +78,17 @@ document.addEventListener('DOMContentLoaded', function() {
       datasets.push(total);
     });
 
+    const timeDataset = {
+        label: 'Minutes Read',
+        yAxisID: 'time',
+        data: timeData.map(item => ({ x: item.date, y: item.minutes })),
+        type: 'bar',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1
+    };
+    datasets.push(timeDataset);
+
     new Chart(ctx, {
       type: 'bar',
       data: {
@@ -112,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
         plugins: {
           title: {
             display: true,
-            text: 'Word Count Over Time'
+            text: 'Reading History'
           },
           legend: {
             position: 'top',
@@ -140,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
             position: 'left',
             title: {
               display: true,
-              text: 'Daily Count',
+              text: 'Daily Word Count',
             },
             grid: {
               display: false
@@ -156,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
             position: 'right',
             title: {
               display: true,
-              text: 'Running Total',
+              text: 'Running Total Words',
             },
             grid: {
               display: false
@@ -168,7 +155,20 @@ document.addEventListener('DOMContentLoaded', function() {
               }
             }
           },
+          time: {
+            position: 'right',
+            title: {
+              display: true,
+              text: 'Minutes Read'
+            },
+            grid: {
+              drawOnChartArea: false,
+            },
+            ticks: {
+              beginAtZero: true
+            }
+          }
         }
       }
     });
-  }
+}

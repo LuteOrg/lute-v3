@@ -1,0 +1,56 @@
+.stats-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+  }
+  .stat-card {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+  }
+  .stat-card:hover {
+      transform: translateY(-5px);
+  }
+  .stat-card.goal-met {
+      background-color: #e8f5e9; /* A light green */
+  }
+  .stat-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+  }
+  .stat-label {
+      font-size: 1rem;
+      color: #6c757d;
+      margin-bottom: 0.5rem;
+  }
+  .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #343a40;
+  }
+  .progress-container {
+      width: 100%;
+      background-color: #e9ecef;
+      border-radius: .25rem;
+      height: 2.5rem;
+      margin-top: 1rem;
+  }
+  .progress-bar-custom {
+      background-color: #007bff;
+      height: 100%;
+      border-radius: .25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: width 0.6s ease;
+  }
+  .progress-bar-custom.goal-met {
+      background-color: #28a745; /* Green when goal is met */
+  }

@@ -144,11 +144,9 @@ def get_time_tracking_data(session):
     result = session.execute(text(sql)).all()
     
     from collections import defaultdict
-    import pandas as pd
     books_data = defaultdict(lambda: {'total_seconds': 0, 'entries': []})
     
     for row in result:
-        book_id = row[0]
         book_title = row[1]
         entry_id = row[2]
         read_date = row[3]
@@ -157,7 +155,7 @@ def get_time_tracking_data(session):
         books_data[book_title]['total_seconds'] += duration_seconds
         books_data[book_title]['entries'].append({
             'id': entry_id,
-            'date': pd.to_datetime(read_date, format='mixed'),
+            'date': read_date,
             'duration': f"{duration_seconds // 60} min, {duration_seconds % 60} sec"
         })
         
@@ -171,3 +169,21 @@ def get_time_tracking_data(session):
         })
         
     return ret
+
+def get_time_chart_data(session):
+    "Get data for time chart."
+    sql = """
+    SELECT date(read_date, 'localtime') as d, SUM(duration_seconds) as total_seconds
+    FROM reading_tracking
+    GROUP BY d
+    ORDER BY d
+    """
+    result = session.execute(text(sql)).all()
+    
+    data = []
+    for row in result:
+        data.append({
+            "date": row[0],
+            "minutes": row[1] / 60
+        })
+    return data
