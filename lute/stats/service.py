@@ -5,7 +5,30 @@ Calculating stats.
 from datetime import datetime, timedelta
 from sqlalchemy import text
 from lute.models.repositories import UserSettingRepository
+from lute.db import db
 
+def get_reading_progress():
+    """
+    Get the user's reading progress for the day.
+    """
+    us_repo = UserSettingRepository(db.session)
+    goal_minutes = int(us_repo.get_value("daily_reading_goal") or 15)
+    goal_seconds = goal_minutes * 60
+
+    sql = """
+    SELECT SUM(duration_seconds)
+    FROM reading_tracking
+    WHERE date(read_date, 'localtime') = date('now', 'localtime')
+    """
+    result = db.session.execute(text(sql)).scalar()
+    todays_seconds = result or 0
+
+    return {
+        "goal": goal_minutes,
+        "todays_progress_percent": min(100, (todays_seconds / goal_seconds) * 100) if goal_seconds > 0 else 0,
+        "goal_met_today": todays_seconds >= goal_seconds,
+        "todays_seconds": todays_seconds,
+    }
 
 def get_streaks_data(session):
     "Get daily goal and streaks data."

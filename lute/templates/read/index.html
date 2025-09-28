@@ -22,6 +22,17 @@
   .timer-control label {
     cursor: pointer;
   }
+
+  .reading-progress-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 9999;
+  }
 </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" type="text/css">
 <div id="rendering_controls" style="display: none">
@@ -102,6 +113,7 @@
       <div>Timer </div>
       <div class="vr mx-2"></div>
       <span id="reading-timer-text" class="me-3">00:00:00</span>
+      <button id="pause-timer-btn" class="btn btn-sm btn-outline-secondary">Pause</button>
       <div class="vr me-3"></div>
     </div>
     <a id="yg-widget-0" class="youglish-widget" data-query="great%20power" data-lang="english" data-zones="all,us,uk,aus" data-components="8415" data-bkg-color="theme_light"  rel="nofollow" href="https://youglish.com">Visit YouGlish.com</a>
@@ -606,27 +618,72 @@
 <script>
   let startTime;
   let timerInterval;
+  let totalElapsed = 0;
+  let isPaused = false;
 
   function startTimer() {
     startTime = new Date();
     timerInterval = setInterval(updateTimer, 1000);
+    isPaused = false;
+  }
+
+  function pauseTimer() {
+    clearInterval(timerInterval);
+    const now = new Date();
+    totalElapsed += now - startTime;
+    isPaused = true;
+  }
+
+  function resumeTimer() {
+    startTime = new Date();
+    timerInterval = setInterval(updateTimer, 1000);
+    isPaused = false;
+  }
+
+  function show_progress_notification() {
+    fetch('/stats/reading_progress')
+      .then(response => response.json())
+      .then(data => {
+        const percent = Math.round(data.todays_progress_percent);
+        const goal_met = data.goal_met_today;
+        const mins_read = Math.round(data.todays_seconds / 60);
+        const goal_mins = data.goal;
+
+        let message = `You've read for ${mins_read} minutes today. `;
+        if (goal_met) {
+          message += `Congratulations, you've met your daily goal of ${goal_mins} minutes!`;
+        } else {
+          message += `You are ${percent}% of the way to your daily goal of ${goal_mins} minutes.`;
+        }
+
+        const notification = document.createElement('div');
+        notification.classList.add('reading-progress-notification');
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 5000);
+      });
   }
 
   function stopTimer() {
-    clearInterval(timerInterval);
-    const endTime = new Date();
-    const seconds = Math.round((endTime - startTime) / 1000);
+    if (!isPaused) {
+      pauseTimer();
+    }
+    const seconds = Math.round(totalElapsed / 1000);
     const bookid = $('#book_id').val();
     const data = {
       bookid: bookid,
       seconds: seconds
     };
     navigator.sendBeacon('/read/update_read_time', JSON.stringify(data));
+    show_progress_notification();
   }
 
   function updateTimer() {
     const now = new Date();
-    const elapsed = now - startTime;
+    const elapsed = totalElapsed + (now - startTime);
     const hours = Math.floor(elapsed / 3600000);
     const minutes = Math.floor((elapsed % 3600000) / 60000);
     const seconds = Math.floor((elapsed % 60000) / 1000);
@@ -639,6 +696,16 @@
 
   $(document).ready(function () {
     startTimer();
+
+    $('#pause-timer-btn').click(function() {
+      if (isPaused) {
+        resumeTimer();
+        $(this).text('Pause');
+      } else {
+        pauseTimer();
+        $(this).text('Resume');
+      }
+    });
   });
 
   window.addEventListener('beforeunload', function (e) {

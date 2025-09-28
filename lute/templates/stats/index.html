@@ -6,14 +6,7 @@
 
 {% block body %}
 
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/chartjs/chart.umd.js') }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/chartjs/chartjs-adapter-date-fns.js') }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/charts.js') }}" charset="utf-8"></script>
 <link href="{{ url_for('static', filename='css/stats.css') }}" rel="stylesheet">
-
-<style>
-  
-</style>
 
 <h2>Daily Goal and Streak</h2>
 <div class="stats-section">
@@ -114,8 +107,8 @@
   <canvas id="languageDistributionChart"></canvas>
 </div>
 
-
-
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/chartjs/chart.umd.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/chartjs/chartjs-adapter-date-fns.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/charts.js') }}" charset="utf-8"></script>
   
 {% endblock %}
-
