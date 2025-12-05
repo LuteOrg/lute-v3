@@ -12,6 +12,8 @@ body {
   --font-color: #F3F4F4;
   --light-grey: #c4c8ce;
 
+  --lute-theme-font-stack: "Lucida Grande", Arial, sans-serif, STHeiti, "Arial Unicode MS", MingLiu;
+
   background-color: var(--background-color);
   color: var(--font-color); /* grey font */
 }
