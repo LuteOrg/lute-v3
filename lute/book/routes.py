@@ -222,6 +222,11 @@ def table_stats(bookid):
         # is showing books and IDs that no longer exist after cache reset.
         # TODO fix_hack: get rid of this hack.
         return jsonify({})
+
+     # Check for full_book query parameter
+    full_book_param = request.args.get("full_book", "false")
+    use_full_book = full_book_param.lower() == "true"   
+    
     svc = StatsService(db.session)
     stats = svc.get_stats(b)
     ret = {
