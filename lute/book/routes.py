@@ -228,7 +228,8 @@ def table_stats(bookid):
     use_full_book = full_book_param.lower() == "true"   
     
     svc = StatsService(db.session)
-    stats = svc.get_stats(b)
+    stats = svc._calculate_stats(b, full_book=use_full_book)
+    
     ret = {
         "distinctterms": stats.distinctterms,
         "distinctunknowns": stats.distinctunknowns,
