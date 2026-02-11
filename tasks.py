@@ -92,7 +92,7 @@ def test(c):
     """
     Unit tests only.
     """
-    c.run("pytest --ignore=./tests/acceptance")
+    c.run(f"{sys.executable} -m pytest --ignore=./tests/acceptance")
 
 
 def _site_is_running(useport=None):
@@ -137,7 +137,7 @@ def _run_browser_tests(port, run_test):
             print(f"[{label}] {line.decode().strip()}", flush=True)
         pipe.close()
 
-    cmd = ["python", "-m", "tests.acceptance.start_acceptance_app", f"{port}"]
+    cmd = [sys.executable, "-m", "tests.acceptance.start_acceptance_app", f"{port}"]
     with subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     ) as app_process:
@@ -183,6 +183,8 @@ def _run_acceptance(  # pylint: disable=too-many-arguments,too-many-positional-a
     If Lute's not running on specified port, start a server.
     """
     run_test = [
+        sys.executable,
+        "-m",
         "pytest",
         "tests/acceptance",
         "--splinter-screenshot-dir=tests/acceptance/failure_screenshots",

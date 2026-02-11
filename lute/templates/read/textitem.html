@@ -9,4 +9,9 @@
       data-order="{{ item.index }}"
       {% if item.wo_id is not none -%}
       data-wid="{{ item.wo_id }}"
+      {% endif %}
+      {% if item.overlapping_term_ids|length > 0 -%}
+      data-overlap-ids="{{ item.overlapping_term_ids|join(',') }}"
+      data-overlap-count="{{ item.overlapping_term_count }}"
       {% endif %}>{{ item.html_display_text | safe }}</span>
+

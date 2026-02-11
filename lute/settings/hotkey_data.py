@@ -49,6 +49,10 @@ Navigation:
   desc: Move to previous sentence
 - hotkey: hotkey_NextSentence
   desc: Move to next sentence
+- hotkey: hotkey_CycleOverlapForward
+  desc: Cycle forward to next overlapping term
+- hotkey: hotkey_CycleOverlapBackward
+  desc: Cycle backward to previous overlapping term
 
 Paging:
 - hotkey: hotkey_PreviousPage
@@ -124,6 +128,8 @@ _initial_values = {
     "hotkey_ToggleHighlight": "KeyH",
     "hotkey_ToggleFocus": "KeyF",
     "hotkey_SaveTerm": "ctrl+Enter",
+    "hotkey_CycleOverlapForward": "KeyS",
+    "hotkey_CycleOverlapBackward": "KeyD",
 }
 
 

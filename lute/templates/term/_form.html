@@ -1,7 +1,8 @@
 {# This form is "included" into other .html files. #}
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/lute-hotkey-utils.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/lute-hotkey-utils.js') }}"
+  charset="utf-8"></script>
 <script type="text/javascript">
   /**
    * Sometimes this file is included within the context of base.html
@@ -23,55 +24,68 @@
 
 {% if duplicated_term %}
 {#
-  Duplicated term, only show a link to that term.
-  See DUPLICATE_TERM_CHECK comments in other files.
+Duplicated term, only show a link to that term.
+See DUPLICATE_TERM_CHECK comments in other files.
 #}
 <div class="flash-notice-narrow">
   Term <a href="/term/edit/{{ duplicated_term.id }}">{{ duplicated_term.text }}</a> already exists.
 </div>
 {% else %}
-  {% for field_name, field_errors in form.errors.items() %}
-  {% for error in field_errors %}
-  <div class="flash-notice-narrow">{{ error }}</div>
-  {% endfor %}
-  {% endfor %}
+{% for field_name, field_errors in form.errors.items() %}
+{% for error in field_errors %}
+<div class="flash-notice-narrow">{{ error }}</div>
+{% endfor %}
+{% endfor %}
 {% endif %}
 
 
 <div id="term-form-container">
-  <form id="term-form" name="term_form" method="POST"
-        onsubmit="return convert_pending_parent_tags(event);">
+  <form id="term-form" name="term_form" method="POST" onsubmit="return convert_pending_parent_tags(event);">
     {{ form.hidden_tag() }}
     <div id="term">
-      <div id="languageSel"
-        {% if term.language_id is none %}
-        {# show the language select box. #}
-        {% else %}
-        style="display:none;"
-        {% endif %}>
+      <div id="languageSel" {% if term.language_id is none %} {# show the language select box. #} {% else %}
+        style="display:none;" {% endif %}>
         {{ form.language_id(class="form-control") }}
         <button id="load-dicts-btn" title="Load dictionaries for the new term" type="button"></button>
       </div>
-  
+
       {{ form.original_text }}
 
       <div>{{ form.text(class="form-control", value=(form.original_text.data or '')) }}</div>
 
+      {# Overlapping terms cycling widget #}
+      <div id="overlap-cycling-widget"
+        style="display: none; padding: 8px; background-color: #f0f0f0; border-radius: 4px; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span id="overlap-info" style="font-size: 0.9em; color: #555;">
+            📚 <span id="overlap-count">0</span> overlapping terms
+          </span>
+          <div style="display: flex; gap: 5px;">
+            <button type="button" id="cycle-backward-btn" onclick="parent.cycle_overlap_backward();"
+              title="Cycle backward (hotkey: d)" style="padding: 4px 8px; font-size: 0.9em;">
+              ← d
+            </button>
+            <span id="overlap-position" style="font-size: 0.9em; padding: 4px 8px;">1 of 1</span>
+            <button type="button" id="cycle-forward-btn" onclick="parent.cycle_overlap_forward();"
+              title="Cycle forward (hotkey: s)" style="padding: 4px 8px; font-size: 0.9em;">
+              s →
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div>{{ form.parentslist(class="form-control") }}</div>
-  
-      <div {% if hide_pronunciation %}style="display:none;"{% endif %}>
+
+      <div {% if hide_pronunciation %}style="display:none;" {% endif %}>
         {{ form.romanization(class="form-control") }}
       </div>
 
       <div id="translation-container">
         <div>{{ form.translation }}</div>
-        <img {% if term.current_image %}style="grid-column: -1; display: block"{% endif %} 
-             class="zoomableTermImage"
-             id="term_image"
-             tabindex="0"
-             src="/userimages/{{ term.language_id or 0 }}/{{ form.current_image.object_data or '-' }}"
-             onclick="clicked_zoomable_image(this);"
-             />
+        <img {% if term.current_image %}style="grid-column: -1; display: block" {% endif %} class="zoomableTermImage"
+          id="term_image" tabindex="0"
+          src="/userimages/{{ term.language_id or 0 }}/{{ form.current_image.object_data or '-' }}"
+          onclick="clicked_zoomable_image(this);" />
       </div>
 
       <div id="status-container">
@@ -87,10 +101,10 @@
       <div>{{ form.termtagslist(class="form-control") }}</div>
 
       <div id="term-button-container">
-          {% if term.id %}
-          <button id="delete" type="button" class="btn" onclick="deleteTerm()">Delete</button>
-          {% endif %}
-          <button id="btnsubmit" type="submit" title="Shortcut: Control+Enter" class="btn btn-primary">Save</button>
+        {% if term.id %}
+        <button id="delete" type="button" class="btn" onclick="deleteTerm()">Delete</button>
+        {% endif %}
+        <button id="btnsubmit" type="submit" title="Shortcut: Control+Enter" class="btn btn-primary">Save</button>
       </div>
     </div>
   </form>
@@ -120,12 +134,12 @@
   // Monitor state of form change.
   let form_changed = false;
 
-  $("form :input").change(function() {
-      form_changed = true;
+  $("form :input").change(function () {
+    form_changed = true;
   });
 
   // Parents are in the tagify-managed #parentslist input box.
-  let get_parents = function() {
+  let get_parents = function () {
     // During form load, and in "steady state" (i.e., after the tags
     // have been added or removed, and the focus has switched to
     // another control) the #sync_status text box is loaded with the
@@ -139,7 +153,7 @@
     return parents;
   };
 
-  let enable_disable_sync_status_checkbox = function() {
+  let enable_disable_sync_status_checkbox = function () {
     const cb = $("#sync_status");
     if (get_parents().length == 1)
       cb.removeAttr("disabled");
@@ -152,7 +166,7 @@
   $(document).ready(function () {
 
     // "Save" shortcut
-    $(document).keydown(function(event) {
+    $(document).keydown(function (event) {
       if (get_hotkey_name(event) == "hotkey_SaveTerm") {
         $("#btnsubmit").click();
       }
@@ -162,11 +176,11 @@
     var term_image = $("#term_image");
 
     term_image.hover(
-      function(){ $(this).attr("title", "Click and hit Delete to remove, then Save."); },
-      function(){ $(this).removeClass('clickedZoomableImage') }
+      function () { $(this).attr("title", "Click and hit Delete to remove, then Save."); },
+      function () { $(this).removeClass('clickedZoomableImage') }
     );
 
-    term_image.on("keydown", function(event) {
+    term_image.on("keydown", function (event) {
       if (term_image.hasClass("clickedZoomableImage")) {
         const k = event.key;
         if (k === "Delete" || k === "Backspace") {
@@ -212,7 +226,7 @@
       // Manually post, tell the reading screen to update, then go to the url.
       const frm = $('#term-form');
       const formData = frm.serialize();
-      $.post(frm.attr('action'), formData, function(response) {
+      $.post(frm.attr('action'), formData, function (response) {
         window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
         window.location.href = url;
       });
@@ -255,7 +269,7 @@
     var termtags_tagify = lute_tagify_utils_setup_term_tag_tagify(
       termtagslist, TAGS, overrides
     );
-    
+
     // Post message re form opened.
     // Note have to use this rather than the better
     // this.dispatchEvent(new Event("termFormOpened"));
@@ -263,8 +277,55 @@
     window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
 
     enable_disable_sync_status_checkbox();
+
+    // Update overlapping terms cycling widget
+    updateOverlapCyclingWidget();
   });  // end $(document).ready
 
+
+  // =============================
+  // Overlapping Terms Widget
+
+  function updateOverlapCyclingWidget() {
+    // Get overlap data from the parent window's currently selected element
+    try {
+      const parentWindow = window.parent;
+      if (!parentWindow || !parentWindow.$) {
+        return;  // Not in reading frame
+      }
+
+      const selectedEl = parentWindow.$('span.wordhover, span.kwordmarked').first();
+      if (selectedEl.length === 0) {
+        return;
+      }
+
+      const overlapCount = selectedEl.data('overlap-count');
+      const overlapIds = selectedEl.data('overlap-ids');
+
+      if (!overlapCount || overlapCount <= 1) {
+        // No overlapping terms, hide widget
+        $('#overlap-cycling-widget').hide();
+        return;
+      }
+
+      // Show widget and update count
+      $('#overlap-count').text(overlapCount);
+      $('#overlap-cycling-widget').show();
+
+      // Update position indicator
+      const overlapIdsArray = overlapIds.split(',').map(id => parseInt(id.trim()));
+      const currentTermId = {{ term.id or 0 }};
+    const currentIndex = overlapIdsArray.indexOf(currentTermId);
+
+    if (currentIndex !== -1) {
+      const position = currentIndex + 1;  // 1-indexed for display
+      $('#overlap-position').text(`${position} of ${overlapCount}`);
+    }
+  } catch (e) {
+    // Silently fail if we can't access parent window (e.g., not in iframe)
+    console.log('Could not update overlap widget:', e);
+  }
+  }
 
   // =============================
   // Submit.
@@ -299,7 +360,7 @@
 
     // We still have to wait for data to be fully processed :-(
     const DELAY = 150;  // ms
-    setTimeout(function() {
+    setTimeout(function () {
       const form = $('#term-form');
       form[0].submit();
     }, DELAY);
@@ -313,11 +374,11 @@
 
   function deleteTerm() {
     const msg = "Are you sure you want to delete this term?\n\n" +
-          "This action cannot be undone, and if this term has children, they will be orphaned.";
+      "This action cannot be undone, and if this term has children, they will be orphaned.";
     if (!confirm(msg))
       return;
 
-    $.post("/term/delete/{{ term.id }}", function( data ) {
+    $.post("/term/delete/{{ term.id }}", function (data) {
       if ("{{ embedded_in_reading_frame }}" == "True") {
         window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
         window.parent.document.getElementById('wordframeid').src = 'about:blank';
