@@ -166,3 +166,94 @@ def test_crazy_case(english):
     expected = "[A-1][ -1][B C-3][C D E-5][E F G H I-9]"
     expected_displayed = "[A-1][ -1][B C-3][ D E-5][ F G H I-9]"
     assert_renderable_equals(english, data, words, expected, expected_displayed)
+
+
+def test_overlapping_term_ids_two_terms(english):
+    """
+    Test that overlapping_term_ids are correctly populated
+    when two terms start at the same position.
+    """
+    data = ["A", " ", "B", " ", "C"]
+    tokens = make_tokens(data)
+
+    term1 = Term(english, "A B")
+    term1.id = 100
+    term2 = Term(english, "A B C")
+    term2.id = 200
+
+    tis = get_textitems(tokens, [term1, term2], english)
+
+    # Find the textitem that's displayed (should be "A B C", the longer one)
+    displayed_ti = [ti for ti in tis if ti.wo_id == 200][0]
+
+    # Should have both term IDs, sorted by length (longest first)
+    assert displayed_ti.overlapping_term_ids == [200, 100]
+    assert displayed_ti.has_overlapping_terms() is True
+    assert displayed_ti.overlapping_term_count == 2
+
+
+def test_overlapping_term_ids_three_nested(english):
+    """
+    Test three nested overlapping terms: "a", "a cat", "a cat sat".
+    """
+    data = ["a", " ", "cat", " ", "sat"]
+    tokens = make_tokens(data)
+
+    term1 = Term(english, "a")
+    term1.id = 10
+    term2 = Term(english, "a cat")
+    term2.id = 20
+    term3 = Term(english, "a cat sat")
+    term3.id = 30
+
+    tis = get_textitems(tokens, [term1, term2, term3], english)
+
+    # Find the displayed term (longest: "a cat sat")
+    displayed_ti = [ti for ti in tis if ti.wo_id == 30][0]
+
+    # Should have all three term IDs, sorted by length descending
+    assert displayed_ti.overlapping_term_ids == [30, 20, 10]
+    assert displayed_ti.has_overlapping_terms() is True
+    assert displayed_ti.overlapping_term_count == 3
+
+
+def test_no_overlapping_terms(english):
+    """
+    Test that single terms have no overlapping_term_ids.
+    """
+    data = ["hello", " ", "world"]
+    tokens = make_tokens(data)
+
+    term1 = Term(english, "hello")
+    term1.id = 100
+
+    tis = get_textitems(tokens, [term1], english)
+
+    hello_ti = [ti for ti in tis if ti.wo_id == 100][0]
+
+    # Single term should have no overlaps
+    assert hello_ti.overlapping_term_ids == []
+    assert hello_ti.has_overlapping_terms() is False
+    assert hello_ti.overlapping_term_count == 0
+
+
+def test_overlapping_ids_ordering(english):
+    """
+    Test that overlapping term IDs are correctly ordered by token count.
+    """
+    data = ["look", " ", "forward", " ", "to"]
+    tokens = make_tokens(data)
+
+    term1 = Term(english, "forward")
+    term1.id = 50
+    term2 = Term(english, "look forward to")
+    term2.id = 150
+
+    tis = get_textitems(tokens, [term1, term2], english)
+
+    # Find displayed term (should be "look forward to")
+    displayed_ti = [ti for ti in tis if ti.wo_id == 150][0]
+
+    # Longest term should come first in overlapping_term_ids
+    assert displayed_ti.overlapping_term_ids[0] == 150
+    assert displayed_ti.overlapping_term_ids[1] == 50

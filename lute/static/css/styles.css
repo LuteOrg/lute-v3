@@ -3,6 +3,10 @@
  * \brief Main stylesheet for the default theme.
  */
 
+:root {
+    --lute-theme-font-stack: "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -28,7 +32,9 @@ body {
     background-color: var(--background-color);
     color: var(--font-color);
 
-    font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
+    font-size: 100%;
+    line-height: 1.25;
+    font-family: var(--lute-theme-font-stack, "Lucida Grande", Arial, sans-serif, STHeiti, "Arial Unicode MS", MingLiu);
 }
 
 /* Main container div for Lute site content. */

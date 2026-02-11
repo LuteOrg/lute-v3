@@ -16,7 +16,7 @@ let LUTE_CURR_TERM_DATA_ORDER = -1;  // initially not set.
 function reset_cursor_marker() {
   $('span.kwordmarked').removeClass('kwordmarked');
 
-  const curr_word = $('span.word').filter(function() {
+  const curr_word = $('span.word').filter(function () {
     return _get_order($(this)) == LUTE_CURR_TERM_DATA_ORDER;
   });
   if (curr_word.length == 1) {
@@ -163,10 +163,10 @@ function _add_desktop_interactions() {
 /* ========================================= */
 /** Tooltip (term detail hover). */
 
-let _get_tooltip_pos = function() {
-  let ret = {my: 'left top+10', at: 'left bottom', collision: 'flipfit flip'};
+let _get_tooltip_pos = function () {
+  let ret = { my: 'left top+10', at: 'left bottom', collision: 'flipfit flip' };
   if (window.matchMedia("(max-width: 980px)").matches) {
-    ret = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
+    ret = { my: 'center bottom', at: 'center top-10', collision: 'flipfit flip' };
   }
   return ret;
 }
@@ -179,7 +179,7 @@ let tooltip_textitem_hover_content = function (el, setContent) {
   $.ajax({
     url: `/read/termpopup/${elid}`,
     type: 'get',
-    success: function(response) {
+    success: function (response) {
       setContent(response);
     }
   });
@@ -251,6 +251,91 @@ function show_multiword_term_edit_form(selected) {
 
 
 /* ========================================= */
+/** Overlapping terms cycling. */
+
+/**
+ * Current index in the overlapping terms array for the selected term.
+ * -1 means no cycling active or no overlapping terms.
+ */
+let LUTE_CURR_OVERLAP_INDEX = -1;
+
+/**
+ * Array of overlapping term IDs for the current selection.
+ * Empty if no overlapping terms.
+ */
+let LUTE_CURR_OVERLAP_IDS = [];
+
+/**
+ * Get overlapping term IDs from the currently marked/hovered element.
+ */
+function _get_overlapping_term_ids() {
+  const el = $('span.wordhover, span.kwordmarked').first();
+  if (el.length === 0) {
+    return [];
+  }
+
+  const overlapData = el.data('overlap-ids');
+  if (!overlapData) {
+    return [];
+  }
+
+  // overlap-ids is a comma-separated string of term IDs
+  return overlapData.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+}
+
+/**
+ * Cycle to the next or previous overlapping term.
+ * @param {number} direction - 1 for forward, -1 for backward
+ */
+function cycle_overlapping_term(direction) {
+  const overlapIds = _get_overlapping_term_ids();
+
+  if (overlapIds.length <= 1) {
+    // No overlapping terms to cycle through
+    return;
+  }
+
+  // Initialize if not already cycling
+  if (LUTE_CURR_OVERLAP_INDEX === -1 || !arraysEqual(LUTE_CURR_OVERLAP_IDS, overlapIds)) {
+    LUTE_CURR_OVERLAP_IDS = overlapIds;
+    LUTE_CURR_OVERLAP_INDEX = 0; // Start at first term
+  }
+
+  // Move to next/previous term
+  LUTE_CURR_OVERLAP_INDEX = (LUTE_CURR_OVERLAP_INDEX + direction + overlapIds.length) % overlapIds.length;
+
+  // Load the term form for the selected overlapping term
+  const selectedTermId = overlapIds[LUTE_CURR_OVERLAP_INDEX];
+  _show_wordframe_url(`/read/edit_term/${selectedTermId}`);
+}
+
+/**
+ * Helper function to compare two arrays.
+ */
+function arraysEqual(a, b) {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+/**
+ * Cycle forward to the next overlapping term.
+ */
+function cycle_overlap_forward() {
+  cycle_overlapping_term(1);
+}
+
+/**
+ * Cycle backward to the previous overlapping term.
+ */
+function cycle_overlap_backward() {
+  cycle_overlapping_term(-1);
+}
+
+
+/* ========================================= */
 /** Cursor management. */
 
 /** Called on page load (read/index.html). */
@@ -258,9 +343,9 @@ function reset_cursor() {
   LUTE_CURR_TERM_DATA_ORDER = -1;
 }
 
-let _get_order = function(el) { return parseInt(el.data('order')); };
+let _get_order = function (el) { return parseInt(el.data('order')); };
 
-let save_curr_data_order = function(el) {
+let save_curr_data_order = function (el) {
   LUTE_CURR_TERM_DATA_ORDER = _get_order(el);
 }
 
@@ -275,7 +360,7 @@ let save_curr_data_order = function(el) {
  * User setting "show_highlights" is rendered in read/index.html. */
 
 /** True if show_highlights setting is True. */
-let _show_highlights = function() {
+let _show_highlights = function () {
   return ($("#show_highlights").text().toLowerCase() == "true");
 }
 
@@ -291,12 +376,12 @@ function add_status_classes() {
 }
 
 /** Add the data-status-class to the term's classes. */
-let apply_status_class = function(el) {
+let apply_status_class = function (el) {
   el.addClass(el.data("status-class"));
 }
 
 /** Remove the status from elements, if not showing highlights. */
-let remove_status_highlights = function() {
+let remove_status_highlights = function () {
   if (_show_highlights()) {
     /* Not removing anything, always showing highlights. */
     return;
@@ -334,14 +419,14 @@ function hover_out(e) {
 /* ========================================= */
 /** Clicking */
 
-let word_clicked = function(el, e) {
+let word_clicked = function (el, e) {
   _hide_element_message_tooltips();
   el.removeClass('wordhover');
   save_curr_data_order(el);
   el.toggleClass('kwordmarked');
 
   // If Shift isn't held, this is a regular click.
-  if (! e.shiftKey) {
+  if (!e.shiftKey) {
     // No other elements should be marked clicked.
     $('span.kwordmarked').not(el).removeClass('kwordmarked');
     if (el.hasClass('kwordmarked')) {
@@ -374,7 +459,7 @@ let word_clicked = function(el, e) {
 let selection_start_el = null;
 let selection_start_shift_held = false;
 
-let clear_newmultiterm_elements = function() {
+let clear_newmultiterm_elements = function () {
   $('.newmultiterm').removeClass('newmultiterm');
   selection_start_el = null;
   selection_start_shift_held = false;
@@ -393,12 +478,12 @@ function select_started(el, e) {
   save_curr_data_order(el);
 }
 
-let get_selected_in_range = function(start_el, end_el) {
+let get_selected_in_range = function (start_el, end_el) {
   let tmp_start = _get_order(start_el);
   let tmp_end = _get_order(end_el);
   // Javascript sorts numbers as strings.  wtf.
   const [startord, endord] = [tmp_start, tmp_end].sort((a, b) => a - b);
-  const selected = $('span.textitem').filter(function() {
+  const selected = $('span.textitem').filter(function () {
     const ord = _get_order($(this));
     return ord >= startord && ord <= endord;
   });
@@ -408,7 +493,7 @@ let get_selected_in_range = function(start_el, end_el) {
 function handle_select_over(e) {
   select_over($(this), e);
 }
-  
+
 function select_over(el, e) {
   if (selection_start_el == null)
     return;  // Not selecting
@@ -496,7 +581,7 @@ function _get_coords(touch) {
   var touchX = touch.clientX;
   var touchY = touch.clientY;
   // console.log('X: ' + touchX + ', Y: ' + touchY);
-  return [ touchX, touchY ];
+  return [touchX, touchY];
 }
 
 function _swipe_distance(e) {
@@ -602,7 +687,7 @@ function _single_tap(el, e) {
 /** Get the textitems whose span_attribute value matches that of the
  * current active/hovered word.  If span_attribute is null, return
  * all. */
-let get_textitems_spans = function(span_attribute) {
+let get_textitems_spans = function (span_attribute) {
   if (span_attribute == null)
     return $('span.textitem').toArray();
 
@@ -616,25 +701,25 @@ let get_textitems_spans = function(span_attribute) {
   return $(selector).toArray();
 };
 
-let handle_bookmark = function() {
+let handle_bookmark = function () {
   // Function defined in read/index.html ... yuck, need to reorganize this js code.
   // TODO javascript: reorganize, or make modules.
   add_bookmark();
 }
 
-let handle_edit_page = function() {
+let handle_edit_page = function () {
   // Function defined in read/index.html ... yuck, need to reorganize this js code.
   // TODO javascript: reorganize, or make modules.
   edit_current_page();
 }
 
-let handle_mark_read_hotkey = function() {
+let handle_mark_read_hotkey = function () {
   // Function defined in read/index.html ... yuck, need to reorganize this js code.
   // TODO javascript: reorganize
   handle_page_done(false, 1);
 }
 
-let handle_mark_read_well_known_hotkey = function() {
+let handle_mark_read_well_known_hotkey = function () {
   // Function defined in read/index.html ... yuck, need to reorganize this js code.
   // TODO javascript: reorganize
   handle_page_done(true, 1);
@@ -642,19 +727,19 @@ let handle_mark_read_well_known_hotkey = function() {
 
 /** Copy the text of the textitemspans to the clipboard, and add a
  * color flash. */
-let handle_copy = function(span_attribute) {
+let handle_copy = function (span_attribute) {
   tis = get_textitems_spans(span_attribute);
   copy_text_to_clipboard(tis);
 }
 
 /** Get the text from the text items, adding "\n" between paragraphs. */
-let _get_textitems_text = function(textitemspans) {
+let _get_textitems_text = function (textitemspans) {
   if (textitemspans.length == 0)
     return '';
 
-  let _partition_by_paragraph_id = function(textitemspans) {
+  let _partition_by_paragraph_id = function (textitemspans) {
     const partitioned = {};
-    $(textitemspans).each(function() {
+    $(textitemspans).each(function () {
       const pid = $(this).attr('data-paragraph-id');
       if (!partitioned[pid])
         partitioned[pid] = [];
@@ -671,7 +756,7 @@ let _get_textitems_text = function(textitemspans) {
 }
 
 
-let _show_element_message_tooltip = function(element, title, message, remove_after_timeout = 2000) {
+let _show_element_message_tooltip = function (element, title, message, remove_after_timeout = 2000) {
   const el = $(element);
 
   let show_results = "";
@@ -698,12 +783,12 @@ let _show_element_message_tooltip = function(element, title, message, remove_aft
   }
 };
 
-let _hide_element_message_tooltips = function() {
+let _hide_element_message_tooltips = function () {
   $('.manual-tooltip').remove();
 };
 
 
-let copy_text_to_clipboard = function(textitemspans) {
+let copy_text_to_clipboard = function (textitemspans) {
   const copytext = _get_textitems_text(textitemspans);
   if (copytext == '')
     return;
@@ -715,7 +800,7 @@ let copy_text_to_clipboard = function(textitemspans) {
   document.execCommand("Copy");
   textArea.remove();
 
-  const removeFlash = function() {
+  const removeFlash = function () {
     $('span.flashtextcopy').addClass('wascopied'); // for acceptance testing.
     $('span.flashtextcopy').removeClass('flashtextcopy');
   };
@@ -732,7 +817,7 @@ let copy_text_to_clipboard = function(textitemspans) {
 
 
 /** First selected/hovered element, or null if nothing. */
-let _first_selected_element = function() {
+let _first_selected_element = function () {
   let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
   if (elements.length == 0)
     return null;
@@ -742,7 +827,7 @@ let _first_selected_element = function() {
 
 
 /** Update cursor, clear prior cursors. */
-let _update_screen_cursor = function(target) {
+let _update_screen_cursor = function (target) {
   $('span.newmultiterm, span.kwordmarked, span.wordhover').removeClass('newmultiterm kwordmarked wordhover');
   remove_status_highlights();
   target.addClass('kwordmarked');
@@ -756,15 +841,15 @@ let _update_screen_cursor = function(target) {
 /** Move to the next/prev candidate determined by the selector.
  * direction is 1 if moving "right", -1 if moving "left" -
  * note that these switch depending on if the language is right-to-left! */
-let _move_cursor = function(selector, direction = 1) {
+let _move_cursor = function (selector, direction = 1) {
   _hide_element_message_tooltips();
   const fe = _first_selected_element();
   const fe_order = (fe != null) ? _get_order($(fe)) : 0;
   let candidates = $(selector).toArray();
-  let comparator = function(a, b) { return a > b };
+  let comparator = function (a, b) { return a > b };
   if (direction < 0) {
     candidates = candidates.reverse();
-    comparator = function(a, b) { return a < b };
+    comparator = function (a, b) { return a < b };
   }
 
   const match = candidates.find(el => comparator(_get_order($(el)), fe_order));
@@ -796,7 +881,7 @@ var LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX = 0;
  * move to the next sentence dictionary; otherwise start the cycle
  * again (from index 0).
  */
-let _get_translation_dict_index = function(sentence) {
+let _get_translation_dict_index = function (sentence) {
   const dict_count = LUTE_SENTENCE_LOOKUP_URIS.length;
   if (dict_count == 0)
     return 0;
@@ -817,7 +902,7 @@ let _get_translation_dict_index = function(sentence) {
 }
 
 
-let show_translation_for_text = function(text) {
+let show_translation_for_text = function (text) {
   if (text == '')
     return;
 
@@ -865,7 +950,7 @@ function send_selected_terms_to_anki() {
 
   function _get_sentences_dict(elements) {
     ret = {};
-    elements.forEach(function(el) {
+    elements.forEach(function (el) {
       const wid = $(el).data("wid");
       ret[wid] = _get_sentence(el);
     });
@@ -875,7 +960,7 @@ function send_selected_terms_to_anki() {
 
   function add_tooltip(term_id, results) {
     $('.ui-tooltip').remove();
-    elements.forEach(function(el) {
+    elements.forEach(function (el) {
       if ($(el).data("wid") == term_id) {
         _show_element_message_tooltip(el, "Anki exports", results, 0);
       }
@@ -929,10 +1014,10 @@ function next_theme() {
     type: 'post',
     dataType: 'JSON',
     contentType: 'application/json',
-    success: function(response) {
+    success: function (response) {
       location.reload();
     },
-    error: function(response, status, err) {
+    error: function (response, status, err) {
       const msg = {
         response: response,
         status: status,
@@ -958,10 +1043,10 @@ function toggle_highlight() {
     type: 'post',
     dataType: 'JSON',
     contentType: 'application/json',
-    success: function(response) {
+    success: function (response) {
       location.reload();
     },
-    error: function(response, status, err) {
+    error: function (response, status, err) {
       const msg = {
         response: response,
         status: status,
@@ -1012,7 +1097,7 @@ function _lang_is_left_to_right() {
 }
 
 
-function handle_keydown (e) {
+function handle_keydown(e) {
   if ($('span.word').length == 0) {
     return; // Nothing to do.
   }
@@ -1056,6 +1141,8 @@ function handle_keydown (e) {
     "hotkey_StatusIgnore": () => update_status_for_marked_elements(98),
     "hotkey_StatusWellKnown": () => update_status_for_marked_elements(99),
     "hotkey_DeleteTerm": () => update_status_for_marked_elements(0),
+    "hotkey_CycleOverlapForward": () => cycle_overlap_forward(),
+    "hotkey_CycleOverlapBackward": () => cycle_overlap_backward(),
 
     // Functions defined in read/index.html, or refer to them
     // TODO javascript_hotkeys: fix javascript sprawl
@@ -1097,7 +1184,7 @@ function update_term_form(el, new_status) {
 
 function update_status_for_marked_elements(new_status) {
   let elements = $('span.kwordmarked').toArray().concat($('span.wordhover').toArray());
-  let updates = [ make_status_update_hash(new_status, elements) ]
+  let updates = [make_status_update_hash(new_status, elements)]
   post_bulk_update(updates);
 }
 
@@ -1124,7 +1211,7 @@ function post_bulk_update(updates) {
 
   data = JSON.stringify({ updates: updates });
 
-  let re_mark_selected_ids = function() {
+  let re_mark_selected_ids = function () {
     for (let i = 0; i < selected_ids.length; i++) {
       let el = $(`#${selected_ids[i]}`);
       el.addClass('kwordmarked');
@@ -1133,7 +1220,7 @@ function post_bulk_update(updates) {
       $('span.wordhover').removeClass('wordhover');
   };
 
-  let reload_text_div = function() {
+  let reload_text_div = function () {
     const bookid = $('#book_id').val();
     const pagenum = $('#page_num').val();
     const url = `/read/refresh_page/${bookid}/${pagenum}`;
@@ -1147,13 +1234,13 @@ function post_bulk_update(updates) {
     data: data,
     dataType: 'JSON',
     contentType: 'application/json',
-    success: function(response) {
+    success: function (response) {
       reload_text_div();
       if (elements.length == 1) {
         update_term_form(firstel, first_status);
       }
     },
-    error: function(response, status, err) {
+    error: function (response, status, err) {
       const msg = {
         response: response,
         status: status,
@@ -1197,7 +1284,7 @@ function increment_status_for_selected_elements(shiftBy) {
 
     let status_index = statuses.indexOf(status);
     let new_index = status_index + shiftBy;
-    new_index = Math.max(0, Math.min((statuses.length-1), new_index));
+    new_index = Math.max(0, Math.min((statuses.length - 1), new_index));
     let new_status = Number(statuses[new_index].replace(/\D/g, ''));
 
     // Can't set status to 0 (that is for deleted/non-existent terms only).

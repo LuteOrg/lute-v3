@@ -248,6 +248,33 @@ def get_textitems(tokens, terms, language, multiword_term_indexer=None):
         ti.display_count = id_counts.get(id(ti), 0)
     # dt.step("display_count")
 
+    # Detect overlapping terms BEFORE filtering by display_count
+    # This ensures we detect overlaps even when shorter terms are hidden
+    # Two terms overlap if their token ranges intersect
+    term_items = [ti for ti in textitems if ti.wo_id is not None]
+
+    for i, ti in enumerate(term_items):
+        ti_start = ti.index
+        ti_end = ti.index + ti.token_count - 1
+        overlapping = []
+
+        # Check all other term items for overlaps
+        for j, other_ti in enumerate(term_items):
+            other_start = other_ti.index
+            other_end = other_ti.index + other_ti.token_count - 1
+
+            # Check if ranges overlap
+            if ti_start <= other_end and other_start <= ti_end:
+                overlapping.append(other_ti)
+
+        # If there are 2+ overlapping terms (including itself), populate overlapping_term_ids
+        if len(overlapping) > 1:
+            # Sort by token count descending (longest first)
+            sorted_overlapping = sorted(overlapping, key=lambda x: -x.token_count)
+            overlap_ids = [t.wo_id for t in sorted_overlapping]
+            ti.overlapping_term_ids = overlap_ids
+
+    # Now filter to only displayed items
     textitems = [ti for ti in textitems if ti.display_count > 0]
 
     current_paragraph = 0

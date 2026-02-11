@@ -512,6 +512,8 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             # Manually added.
             "8": "Digit8",
             "9": "Digit9",
+            "s": "KeyS",
+            "d": "KeyD",
         }
         if hotkey.lower() not in key_to_code_map:
             raise RuntimeError(f"Missing {hotkey} in acceptance test map")

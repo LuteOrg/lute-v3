@@ -603,3 +603,37 @@ Feature: User can actually read and stuff.
         When I set the book table filter to "Hola"
         Then the book table contains:
             Hola; Spanish; ; 2;
+
+
+    Scenario: User can cycle through overlapping terms
+        Given a Spanish book "Hola" with content:
+            Tengo un gato.
+        When I click "un" and edit the form:
+            translation: a
+        When I click "gato" and edit the form:
+            translation: cat
+        And I shift click:
+            un
+            gato
+        And I edit the bulk edit form:
+            translation: a cat
+        
+        # Click the multi-word term
+        When I click "un gato"
+        Then the reading page term form shows term "un gato"
+        
+        # Cycle forward 's' -> un
+        When I press hotkey "s"
+        Then the reading page term form shows term "un"
+        
+        # Cycle forward 's' -> gato
+        When I press hotkey "s"
+        Then the reading page term form shows term "gato"
+        
+        # Cycle forward 's' -> un gato
+        When I press hotkey "s"
+        Then the reading page term form shows term "un gato"
+        
+        # Cycle backward 'd' -> gato
+        When I press hotkey "d"
+        Then the reading page term form shows term "gato"

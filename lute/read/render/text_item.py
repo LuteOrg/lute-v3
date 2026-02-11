@@ -33,6 +33,10 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         # Calls setter
         self.term = term
 
+        # Track overlapping terms (list of term IDs that overlap at this position)
+        # Sorted by token count descending (longest first)
+        self.overlapping_term_ids: list = []
+
         self.extra_html_classes = []
 
         # TODO code
@@ -112,6 +116,15 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         "Add extra class to term."
         self.extra_html_classes.append(c)
 
+    def has_overlapping_terms(self):
+        """Return True if this TextItem has overlapping terms."""
+        return len(self.overlapping_term_ids) > 1
+
+    @property
+    def overlapping_term_count(self):
+        """Return count of overlapping terms (including the current term)."""
+        return len(self.overlapping_term_ids)
+
     @property
     def html_class_string(self):
         """
@@ -129,6 +142,10 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
 
         if self.display_text != self.text:
             classes.append("overlapped")
+
+        if self.has_overlapping_terms():
+            classes.append("has-overlaps")
+
         classes.extend(self.extra_html_classes)
 
         return " ".join(classes)

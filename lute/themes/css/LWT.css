@@ -9,6 +9,8 @@ body {
   --status-98-color: #F8F8F8;
   --status-99-color: #F8F8F8;
 
+  --lute-theme-font-stack: "Lucida Grande", Arial, sans-serif, STHeiti, "Arial Unicode MS", MingLiu;
+
   font: 100%/1.25 "Lucida Grande", Arial, sans-serif, STHeiti, "Arial Unicode MS", MingLiu;
 }
 
