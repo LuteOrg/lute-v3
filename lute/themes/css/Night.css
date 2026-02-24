@@ -117,3 +117,44 @@ span.hamburger {
 #reading_menu .reading-menu-item:hover {
   color: var(--background-color);
 }
+
+/* Fix: audio player night theme */
+.audio-player-container {
+  --audio-color-3: #1e1e1e;
+  --audio-color-4: #2a2a2a;
+  --audio-color-5: #2a2a2a;
+  border-color: #444;
+}
+
+.audio-player-central-container,
+.audio-player-timeline-container,
+.rewind-container,
+.bookmark-buttons-container {
+  background-color: #2a2a2a;
+}
+
+.duration-container span,
+.current-time,
+#playback-rate-indicator,
+#rewind-option {
+  color: #F3F4F4;
+}
+
+#rewind-option {
+  background-color: #333;
+  color: #F3F4F4;
+}
+
+.audio-button {
+  background-color: #444;
+  filter: invert(1);
+}
+
+.rate-btn {
+  background-color: #444;
+}
+
+.timeline,
+.volume {
+  background-color: #444;
+}
