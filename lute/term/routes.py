@@ -257,6 +257,10 @@ def handle_term_form(
     if term_language is not None:
         hide_pronunciation = not term_language.show_romanization
 
+    is_monolingual = False
+    if term_language is not None:
+        is_monolingual = bool(term_language.is_monolingual)
+
     # Set the language dropdown to the user's current_language_id IF APPLICABLE.
     if embedded_in_reading_frame or term_language is not None:
         # Do nothing.  The language dropdown is not shown, or the term already
@@ -276,6 +280,7 @@ def handle_term_form(
         duplicated_term=form.duplicated_term,
         language_dicts=language_repo.all_dictionaries(),
         hide_pronunciation=hide_pronunciation,
+        is_monolingual=is_monolingual,
         tags=repo.get_term_tags(),
         embedded_in_reading_frame=embedded_in_reading_frame,
     )

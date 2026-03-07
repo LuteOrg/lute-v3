@@ -48,6 +48,7 @@ class LanguageForm(FlaskForm):
         FormField(LanguageDictionaryForm, default=LanguageDictionary)
     )
     show_romanization = BooleanField("Show Pronunciation field")
+    is_monolingual = BooleanField("Monolingual mode")
     right_to_left = BooleanField("Right-to-left")
 
     # Note!  The choices have to be set in the routes!

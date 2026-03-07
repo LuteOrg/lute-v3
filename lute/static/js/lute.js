@@ -346,7 +346,11 @@ let word_clicked = function(el, e) {
     $('span.kwordmarked').not(el).removeClass('kwordmarked');
     if (el.hasClass('kwordmarked')) {
       el.removeClass('hasflash');
-      show_term_edit_form(el);
+      if (window.LUTE_IS_MONOLINGUAL && el.data('status-class') === 'status99') {
+        _show_wordframe_url(`/read/term_definition_frame/${parseInt(el.data('wid'))}`);
+      } else {
+        show_term_edit_form(el);
+      }
     }
     else {
       _hide_dictionaries();

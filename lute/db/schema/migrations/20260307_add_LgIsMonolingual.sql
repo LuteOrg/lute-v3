@@ -1,0 +1,1 @@
+ALTER TABLE languages ADD COLUMN "LgIsMonolingual" TINYINT NOT NULL DEFAULT 0;
