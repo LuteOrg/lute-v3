@@ -580,6 +580,11 @@ function _double_tap(el, e) {
 function _single_tap(el, e) {
   clear_newmultiterm_elements();
 
+  if (window.LUTE_IS_MONOLINGUAL && el.data('status-class') === 'status99') {
+    _show_wordframe_url(`/read/term_definition_frame/${parseInt(el.data('wid'))}`);
+    return;
+  }
+
   const term_is_status_0 = (el.data("status-class") == "status0");
   if (!term_is_status_0) {
     return;
