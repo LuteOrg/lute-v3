@@ -287,6 +287,13 @@ def term_definition_frame(term_id):
     text = dbterm.translation or ""
     render_svc = RenderService(db.session)
     paragraphs = render_svc.get_paragraphs(text, lang)
+    # Save new status-0 terms so they get IDs for data-wid attributes.
+    for para in paragraphs:
+        for sentence in para:
+            for ti in sentence:
+                if ti.is_word and ti.term is not None and ti.term.id is None and ti.term.status == 0:
+                    db.session.add(ti.term)
+    db.session.commit()
     return render_template(
         "read/term_definition_frame.html",
         term=dbterm,

@@ -187,8 +187,13 @@
         items: '.word',
         show: { easing: 'easeOutCirc' },
         content: function (setContent) {
+          var wordText = $(this).text();
           var wid = parseInt($(this).data('wid'));
-          if (isNaN(wid)) return;
+          console.log('[def-frame tooltip] word="' + wordText + '" data-wid=' + $(this).data('wid') + ' parsed=' + wid);
+          if (isNaN(wid)) {
+            console.log('[def-frame tooltip] skipping "' + wordText + '" — wid is NaN (missing)');
+            return;
+          }
           $.ajax({
             url: '/read/termpopup/' + wid,
             type: 'get',
