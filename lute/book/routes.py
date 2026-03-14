@@ -226,15 +226,19 @@ def table_stats(bookid):
         # TODO fix_hack: get rid of this hack.
         return jsonify({})
 
-    # Check for full_book query parameter
+    # Optional query params:
+    # - full_book=true: calculate over the full book
+    # - force_recalc=true: bypass cache for the normal sampled calculation
     full_book_param = request.args.get("full_book", "false")
+    force_recalc_param = request.args.get("force_recalc", "false")
     use_full_book = full_book_param.lower() == "true"
+    use_force_recalc = force_recalc_param.lower() == "true"
 
     svc = StatsService(db.session)
     stats = svc.get_stats(
         b,
         full_book=use_full_book,
-        force_recalc=use_full_book,
+        force_recalc=(use_force_recalc or use_full_book),
     )
 
     ret = {
