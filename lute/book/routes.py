@@ -3,33 +3,36 @@
 """
 
 import json
+
 from flask import (
     Blueprint,
-    request,
-    jsonify,
-    render_template,
-    redirect,
     flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
 )
-from lute.utils.data_tables import DataTablesFlaskParamParser
+
+import lute.utils.formutils
+from lute.book.datatables import get_data_tables_list
+from lute.book.forms import EditBookForm, NewBookForm
+from lute.book.model import Book, Repository
+from lute.book.service import (
+    BookDataFromUrl,
+    BookImportException,
+)
 from lute.book.service import (
     Service as BookService,
-    BookImportException,
-    BookDataFromUrl,
 )
-from lute.book.datatables import get_data_tables_list
-from lute.book.forms import NewBookForm, EditBookForm
 from lute.book.stats import Service as StatsService
-import lute.utils.formutils
 from lute.db import db
 from lute.models.language import Language
 from lute.models.repositories import (
     BookRepository,
-    UserSettingRepository,
     LanguageRepository,
+    UserSettingRepository,
 )
-from lute.book.model import Book, Repository
-
+from lute.utils.data_tables import DataTablesFlaskParamParser
 
 bp = Blueprint("book", __name__, url_prefix="/book")
 
@@ -223,13 +226,17 @@ def table_stats(bookid):
         # TODO fix_hack: get rid of this hack.
         return jsonify({})
 
-     # Check for full_book query parameter
+    # Check for full_book query parameter
     full_book_param = request.args.get("full_book", "false")
-    use_full_book = full_book_param.lower() == "true"   
-    
+    use_full_book = full_book_param.lower() == "true"
+
     svc = StatsService(db.session)
-    stats = svc._calculate_stats(b, full_book=use_full_book)
-    
+    stats = svc.get_stats(
+        b,
+        full_book=use_full_book,
+        force_recalc=use_full_book,
+    )
+
     ret = {
         "distinctterms": stats.distinctterms,
         "distinctunknowns": stats.distinctunknowns,

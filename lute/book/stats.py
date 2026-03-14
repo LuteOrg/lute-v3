@@ -3,10 +3,12 @@ Book statistics.
 """
 
 import json
+
 from sqlalchemy import select, text
-from lute.read.render.service import Service as RenderService
+
 from lute.models.book import Book, BookStats
 from lute.models.repositories import UserSettingRepository
+from lute.read.render.service import Service as RenderService
 
 # from lute.utils.debug_helpers import DebugTimer
 
@@ -98,12 +100,14 @@ class Service:
         self.session.query(BookStats).filter_by(BkID=bk_id).delete()
         self.session.commit()
 
-    def get_stats(self, book):
+    def get_stats(self, book, full_book=False, force_recalc=False):
         "Gets stats from the cache if available, or calculates."
         bk_id = book.id
-        stats = self.session.query(BookStats).filter_by(BkID=bk_id).first()
+        stats = None
+        if not force_recalc:
+            stats = self.session.query(BookStats).filter_by(BkID=bk_id).first()
         if stats is None or stats.status_distribution is None:
-            newstats = self._calculate_stats(book)
+            newstats = self._calculate_stats(book, full_book=full_book)
             self._update_stats(book, newstats)
             stats = self.session.query(BookStats).filter_by(BkID=bk_id).first()
         return stats
