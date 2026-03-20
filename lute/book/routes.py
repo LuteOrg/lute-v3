@@ -3,36 +3,32 @@
 """
 
 import json
-
 from flask import (
     Blueprint,
-    flash,
-    jsonify,
-    redirect,
-    render_template,
     request,
+    jsonify,
+    render_template,
+    redirect,
+    flash,
 )
-
-import lute.utils.formutils
-from lute.book.datatables import get_data_tables_list
-from lute.book.forms import EditBookForm, NewBookForm
-from lute.book.model import Book, Repository
-from lute.book.service import (
-    BookDataFromUrl,
-    BookImportException,
-)
+from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.book.service import (
     Service as BookService,
+    BookImportException,
+    BookDataFromUrl,
 )
+from lute.book.datatables import get_data_tables_list
+from lute.book.forms import NewBookForm, EditBookForm
 from lute.book.stats import Service as StatsService
+import lute.utils.formutils
 from lute.db import db
 from lute.models.language import Language
 from lute.models.repositories import (
     BookRepository,
-    LanguageRepository,
     UserSettingRepository,
+    LanguageRepository,
 )
-from lute.utils.data_tables import DataTablesFlaskParamParser
+from lute.book.model import Book, Repository
 
 bp = Blueprint("book", __name__, url_prefix="/book")
 

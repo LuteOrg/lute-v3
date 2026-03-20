@@ -3,12 +3,10 @@ Book statistics.
 """
 
 import json
-
 from sqlalchemy import select, text
-
+from lute.read.render.service import Service as RenderService
 from lute.models.book import Book, BookStats
 from lute.models.repositories import UserSettingRepository
-from lute.read.render.service import Service as RenderService
 
 # from lute.utils.debug_helpers import DebugTimer
 
