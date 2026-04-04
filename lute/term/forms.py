@@ -29,7 +29,7 @@ class TermForm(FlaskForm):
 
     original_text = HiddenField("OriginalText")
     text = StringField(
-        "Text", validators=[DataRequired()], render_kw={"placeholder": "Term"}
+        "Text", validators=[DataRequired()], render_kw={"placeholder": "Term", "autofocus": True }
     )
     parentslist = StringField("Parents")
 
