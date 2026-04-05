@@ -63,6 +63,72 @@ def add_bookmark():
     return jsonify(success=True, status=200)
 
 
+@bp.route("/<int:bookid>/chapter_progress/<int:pagenum>", methods=["GET"])
+def chapter_progress(bookid, pagenum):
+    """
+    Return chapter progress info for the given page.
+
+    Bookmarks are used as chapter markers — the bookmark whose page is <= the
+    current page is the chapter start; the next bookmark's page - 1 is the
+    chapter end (or the last page of the book if there is no next bookmark).
+
+    Returns JSON:
+      { found: false }                          — no bookmarks before this page
+      { found: true, title, pages_in,
+        chapter_length, pages_left, pct }       — chapter info
+    """
+    br = BookRepository(db.session)
+    book = br.find(bookid)
+    if book is None:
+        return jsonify(found=False)
+
+    # Collect all bookmarks for this book sorted by page order
+    bookmarks = sorted(
+        [
+            {"title": bm.title, "page": text.order}
+            for text in book.texts
+            for bm in text.bookmarks
+        ],
+        key=lambda b: b["page"],
+    )
+
+    if not bookmarks:
+        return jsonify(found=False)
+
+    # Find the last bookmark whose page <= current page
+    chapter_start = None
+    chapter_start_idx = None
+    for i, bm in enumerate(bookmarks):
+        if bm["page"] <= pagenum:
+            chapter_start = bm
+            chapter_start_idx = i
+        else:
+            break
+
+    if chapter_start is None:
+        return jsonify(found=False)
+
+    next_bookmark = (
+        bookmarks[chapter_start_idx + 1]
+        if chapter_start_idx + 1 < len(bookmarks)
+        else None
+    )
+    chapter_end = next_bookmark["page"] - 1 if next_bookmark else book.page_count
+    chapter_length = chapter_end - chapter_start["page"] + 1
+    pages_in = pagenum - chapter_start["page"] + 1
+    pages_left = chapter_end - pagenum
+    pct = round((pages_in / chapter_length) * 100)
+
+    return jsonify(
+        found=True,
+        title=chapter_start["title"],
+        pages_in=pages_in,
+        chapter_length=chapter_length,
+        pages_left=pages_left,
+        pct=pct,
+    )
+
+
 @bp.route("/delete", methods=["POST"])
 def delete_bookmark():
     "Delete bookmark"
