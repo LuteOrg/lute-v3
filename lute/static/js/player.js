@@ -387,7 +387,7 @@ window.addEventListener("keydown", function (e) {
   if (e.code == "Space") {
     // prevent scrolling when space is pressed
     // and it seems this fixes the issue where there's flashing
-    // where one keydown event continiously makes the button play and pause
+    // where one keydown event continuously makes the button play and pause
     e.preventDefault();
     togglePlayPause();
     // if (e.target == document.body) {

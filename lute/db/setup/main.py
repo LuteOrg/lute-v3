@@ -96,7 +96,7 @@ class Setup:  # pylint: disable=too-few-public-methods
 
         if not os.path.exists(self._db_filename):
             new_db = True
-            # Note openin a connection creates a db file,
+            # Note opening a connection creates a db file,
             # so this has to be done after the existence
             # check.
             with closing(self._open_connection()) as conn:

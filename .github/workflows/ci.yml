@@ -68,9 +68,17 @@ jobs:
         export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
         pytest
 
-    # Skipping acceptance tests for 3.8, just to save some time.
+    - name: Playwright install
+      run: playwright install
+
+    - name: Playwright smoke test
+      run: |
+        set -x
+        set -e
+        inv playwright
+
     - name: Acceptance testing
-      if: matrix.python_version != '3.8'
+      if: matrix.python_version == '3.11' || matrix.python_version == '3.12' || matrix.python_version == '3.13'
       uses: nick-fields/retry@v3
       with:
         max_attempts: 3
@@ -88,7 +96,7 @@ jobs:
 
     # Skipping acceptance tests for 3.8, just to save some time.
     - name: Mobile acceptance testing
-      if: matrix.python_version != '3.8'
+      if: matrix.python_version == '3.11' || matrix.python_version == '3.12' || matrix.python_version == '3.13'
       uses: nick-fields/retry@v3
       with:
         max_attempts: 3
@@ -103,15 +111,6 @@ jobs:
               echo "Command failed with exit code $exit_code, retrying..."
           fi
           exit $exit_code
-
-    - name: Playwright install
-      run: playwright install
-
-    - name: Playwright smoke test
-      run: |
-        set -x
-        set -e
-        inv playwright
 
     - name: Check flit package
       run: |
@@ -165,6 +164,9 @@ jobs:
         echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/lute/config/config.yml
         ls ${{ github.workspace }}
         cat ${{ github.workspace }}/lute/config/config.yml
+
+    - name: Playwright install
+      run: playwright install
 
     # Run one particular sanity check.
     #

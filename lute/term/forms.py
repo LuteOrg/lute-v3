@@ -33,7 +33,9 @@ class TermForm(FlaskForm):
     )
     parentslist = StringField("Parents")
 
-    translation = TextAreaField("Translation", render_kw={"placeholder": "Translation"})
+    translation = TextAreaField(
+        "Translation", render_kw={"placeholder": "Translation", "autofocus": True}
+    )
     romanization = StringField(
         "Romanization", render_kw={"placeholder": "Pronunciation"}
     )

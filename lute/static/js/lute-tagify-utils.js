@@ -141,7 +141,7 @@ function lute_tagify_utils_setup_parent_tagify(
       },
 
       // Use a hook to force build_autocomplete_dropdown.
-      // Pasting from the clipboard doesnt fire the
+      // Pasting from the clipboard doesn't fire the
       // tagify.on('input') event, so intercept it and handle
       // it manually.
       hooks: {

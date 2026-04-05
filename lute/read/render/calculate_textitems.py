@@ -105,7 +105,7 @@ def get_textitems(tokens, terms, language, multiword_term_indexer=None):
       starting index in the tokens.
 
     - "Write" the TextItems to an array in correctly sorted
-      order, so that the correct TextItems take precendence
+      order, so that the correct TextItems take precedence
       in the final rendering.
 
     - Calculate any term overlaps.

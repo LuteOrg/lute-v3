@@ -185,8 +185,6 @@ def _run_acceptance(  # pylint: disable=too-many-arguments,too-many-positional-a
     run_test = [
         "pytest",
         "tests/acceptance",
-        "--splinter-screenshot-dir=tests/acceptance/failure_screenshots",
-        "--splinter-webdriver=chrome",
         f"--port={port}",
     ]
 

@@ -76,7 +76,7 @@ if (mediaTablet.matches) {
   readPaneRight.addEventListener("pointerdown", function(e){
     if (e.offsetY < borderWidth) {
       // if there's transition animation dragging is not smooth.
-      // get's reverted back on document.mouseup below
+      // gets reverted back on document.mouseup below
       readPaneRight.style.transition = "unset";
       setIFrameStatus("none");
       mouse_pos = e.y;

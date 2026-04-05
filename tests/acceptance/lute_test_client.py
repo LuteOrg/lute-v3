@@ -17,8 +17,7 @@ to get nicer assertion details.
 import time
 import json
 import requests
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
+from playwright.sync_api import Keyboard, Mouse, expect
 
 
 class LuteTestClient:  # pylint: disable=too-many-public-methods
@@ -29,8 +28,9 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     ################################3
     # Setup
 
-    def __init__(self, b, home):
-        self.browser = b
+    def __init__(self, p, home, has_touch=False):
+        self.has_touch = has_touch
+        self.page = p
         self.home = home
         self.visit("dev_api/wipe_db")
         self.visit("dev_api/load_demo_languages")
@@ -62,21 +62,24 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         "Visit a sub url under the base."
         if suburl.startswith("/"):
             suburl = suburl[1:]
-        url = f"{self.home}/{suburl}"
+        if suburl.startswith(self.home):
+            url = suburl
+        else:
+            url = f"{self.home}/{suburl}"
         # print(f'visiting: {url}')
-        self.browser.visit(url)
+        self.page.goto(url)
 
     def index(self):
         "Go to home page."
-        self.browser.visit("")
+        self.visit("")
 
     def clear_book_filter(self):
         "Clear all state.  Normally state is saved."
-        self.browser.execute_script("clear_datatable_state()")
+        self.page.evaluate("clear_datatable_state()")
         time.sleep(0.1)
 
     def click_link(self, linktext):
-        self.browser.links.find_by_text(linktext).click()
+        self.page.locator(f'text="{linktext}"').click()
 
     ################################3
     # Languages
@@ -86,18 +89,22 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         Edit a language.
         """
         self.visit("/")
-        self.browser.find_by_css("#menu_settings").mouse_over()
-        self.browser.find_by_id("lang_index").first.click()
-        # WEIRD: find_by_text(langname) doesn't work ...
-        self.browser.links.find_by_partial_text(langname).click()
-        assert f"Edit {langname}" in self.browser.html
+        self.page.hover("#menu_settings")
+        self.page.locator("#lang_index").first.click()
+
+        # Partial text match for link
+        self.page.get_by_role("link", name=langname, exact=False).click()
+        time.sleep(0.1)  # hack
+        assert f"Edit {langname}" in self.page.content()
+
         updates = updates or {}
         for k, v in updates.items():
             if k == "exceptions_split_sentences":
-                self.browser.find_by_css(f"#{k}").fill(v)
+                self.page.locator(f"#{k}").fill(v)
             else:
                 raise RuntimeError(f"unhandled key {k}")
-        self.browser.find_by_css("#submit").first.click()
+
+        self.page.click("#submit")
 
     ################################3
     # Books
@@ -105,44 +112,58 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     def make_book(self, title, text, langname):
         "Create a book with title, text, and languagename."
         self.visit("book/new")
-        self.browser.fill("text", text)
-        self.browser.find_by_css("#title").fill(title)
-        self.browser.select("language_id", int(self.language_ids[langname]))
-        self.browser.find_by_css("#save").first.click()
+        self.page.fill('textarea[name="text"]', text)  # assuming <textarea name="text">
+        self.page.fill("#title", title)
+        self.page.select_option(
+            'select[name="language_id"]', str(self.language_ids[langname])
+        )
+        # Without force=True, was getting an error:
+        # "<td>…</td> from <table id="book">…</table> subtree intercepts pointer events".
+        # TODO fix_test: "force=True" is hacky as it can obscure layout problems.
+        self.page.locator("#save").click(force=True)
 
     def make_book_from_file(self, title, filename, langname):
         "Create a book with title, content from filename, and languagename."
         self.visit("book/new")
-        self.browser.attach_file("textfile", filename)
-        self.browser.find_by_css("#title").fill(title)
-        self.browser.select("language_id", int(self.language_ids[langname]))
-        self.browser.find_by_css("#save").first.click()
+        file_input = self.page.locator('input[type="file"][name="textfile"]')
+        file_input.set_input_files(filename)
+        self.page.fill("#title", title)
+        self.page.select_option(
+            'select[name="language_id"]', str(self.language_ids[langname])
+        )
+        self.page.locator("#save").click(force=True)
 
     def make_book_from_url(self, url, langname):
         "Create a book with title, content from url, and languagename."
         self.visit("book/import_webpage")
-        self.browser.find_by_css("#importurl").fill(url)
-        self.browser.find_by_css("#import").first.click()
+        self.page.fill("#importurl", url)
+        self.page.locator("#import").click()
         time.sleep(0.1)  # hack
-        self.browser.select("language_id", int(self.language_ids[langname]))
-        self.browser.find_by_css("#save").first.click()
+        self.page.select_option(
+            'select[name="language_id"]', str(self.language_ids[langname])
+        )
+        self.page.locator("#save").click(force=True)
 
     def get_book_table_content(self):
         "Get book table content."
-        css = "#booktable tbody tr"
+        rows = self.page.locator("#booktable tbody tr")
+        rowcount = rows.count()
+        content = []
 
-        # Skip the last two columns:
-        # - "last opened" date is a hassle to check
-        # - "actions" is just "..."
-        def _to_string(row):
-            tds = row.find_by_css("td")
-            rowtext = [td.text.strip() for td in tds]
+        for i in range(rowcount):
+            row = rows.nth(i)
+            tds = row.locator("td")
+            tdcount = tds.count()
+            rowtext = [tds.nth(j).inner_text().strip() for j in range(tdcount)]
+            # Skip the last two columns:
+            # - "last opened" date is a hassle to check
+            # - "actions" is just "..."
             ret = "; ".join(rowtext[:-2]).strip()
-            # print(ret, flush=True)
-            return ret
+            # Hacky cleanup ok for tests.
+            ret = ret.replace("\u200B", "").replace("\n", "").replace("\\n", "")
+            content.append(ret)
 
-        rows = list(self.browser.find_by_css(css))
-        return "\n".join([_to_string(row) for row in rows])
+        return "\n".join([c for c in content if c.strip() != ""]).strip()
 
     def get_book_page_start_dates(self):
         "get content from sql check"
@@ -179,190 +200,201 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     ################################
     # Terms
 
-    def _fill_tagify_field(self, b, fieldid, text):
-        "Fill in field in browser b with text."
-        xpath = [
-            # input w/ id
-            f'//input[@id="{fieldid}"]',
-            # <tags> before it.
-            "/preceding-sibling::tags",
-            # <span> within the <tags> with class.
-            '/span[@class="tagify__input"]',
-        ]
-        xpath = "".join(xpath)
+    def _fill_tagify_field(self, frame, fieldid, text):
+        "Fill a Tagify field inside `frame` with `text`."
 
-        # Sometimes test runs couldn't find the parent
-        # tagify input, so hacky loop to get it and retry.
+        xpath = (
+            f'//input[@id="{fieldid}"]'
+            "/preceding-sibling::tags"
+            '/span[contains(@class, "tagify__input")]'
+        )
+
         span = None
         attempts = 0
         while span is None and attempts < 10:
-            time.sleep(0.2)  # seconds
+            time.sleep(0.2)
             attempts += 1
-            span = b.find_by_xpath(xpath)
+            elements = frame.locator(f"xpath={xpath}")
+            if elements.count() > 0:
+                span = elements.nth(0)
+
         if span is None:
             raise RuntimeError(f"unable to find {fieldid}")
 
-        span.type(text, slowly=False)
-        span.type(Keys.RETURN)
-        time.sleep(0.3)  # seconds
+        # Focus the span and type text.  Various timing hacks added to
+        # ensure that tagify wires things up correctly in response to
+        # clicks ...  hacky, but fixed errors during ci runs.
+        expect(span).to_be_visible()
+        expect(span).to_be_enabled()
+        span.click()
+        time.sleep(0.1)
+        expect(span).to_be_focused()
+        time.sleep(0.1)
+        span.fill(text)
+        time.sleep(0.1)
+        span.press("Enter")
+        time.sleep(0.3)
 
-    def _fill_term_form(self, b, updates):
+    def _fill_term_form(self, page, updates):
         "Fill in the term form."
         for k, v in updates.items():
             if k == "language_id":
-                b.select("language_id", v)
+                page.select_option("select[name='language_id']", str(v))
+
             elif k == "status":
-                # This line didn't work:
-                # iframe.choose('status', updates['status'])
                 s = updates["status"]
-                xp = "".join(
-                    [
-                        "//input[@type='radio'][@name='status']",
-                        f"[@value='{s}']",
-                        "/following-sibling::label",
-                    ]
-                )
-                labels = b.find_by_xpath(xp)
-                assert len(labels) == 1, "have matching radio button"
-                label = labels[0]
-                label.click()
+                x = f"//input[@type='radio'][@name='status'][@value='{s}']/following-sibling::label"
+                labels = page.locator(f"xpath={x}")
+                count = labels.count()
+                assert count == 1, "have matching radio button"
+                labels.nth(0).click()
+
             elif k in ("translation", "text", "romanization"):
-                b.find_by_css(f"#{k}").fill(v)
-            elif k in ("pronunciation"):
-                b.find_by_css("#romanization").fill(v)
+                page.fill(f"#{k}", v)
+
+            elif k == "pronunciation":
+                page.fill("#romanization", v)
+
             elif k == "parents":
                 for p in updates["parents"]:
-                    self._fill_tagify_field(b, "parentslist", p)
+                    self._fill_tagify_field(page, "parentslist", p)
+
             elif k == "sync_status":
-                if v:
-                    b.check("sync_status")
-                else:
-                    b.uncheck("sync_status")
+                checkbox = page.locator("input[name='sync_status']")
+                checked = checkbox.is_checked()
+                if v and not checked:
+                    checkbox.check()
+                elif not v and checked:
+                    checkbox.uncheck()
+
             else:
                 raise RuntimeError(f"unhandled key {k}")
 
-    def _fill_bulk_term_edit_form(self, b, updates):
-        "Fill in the term bulk edit form."
+    def _fill_bulk_term_edit_form(self, frame, updates):
+        "Fill in the term bulk edit form using Playwright."
         for k, v in updates.items():
+            # print(f"Bulk form, updating {k} to {v}", flush=True)
             if k == "remove parents":
+                cb = frame.locator("#chkRemoveParents")
                 if v:
-                    b.check("remove_parents")
+                    cb.check()
                 else:
-                    b.uncheck("remove_parents")
+                    cb.uncheck()
             elif k == "parent":
-                self._fill_tagify_field(b, "txtSetParent", v)
+                self._fill_tagify_field(frame, "txtSetParent", v)
             elif k == "change status":
+                cb = frame.locator("#chkChangeStatus")
                 if v:
-                    b.check("change_status")
+                    cb.check()
                 else:
-                    b.uncheck("change_status")
+                    cb.uncheck()
             elif k == "status":
-                # This line didn't work:
-                # iframe.choose('status', updates['status'])
                 s = updates["status"]
-                xp = "".join(
-                    [
-                        "//input[@type='radio'][@name='status']",
-                        f"[@value='{s}']",
-                        "/following-sibling::label",
-                    ]
+                xp = (
+                    f"//input[@type='radio'][@name='status'][@value='{s}']"
+                    "/following-sibling::label"
                 )
-                labels = b.find_by_xpath(xp)
-                assert len(labels) == 1, "have matching radio button"
-                label = labels[0]
-                label.click()
+                labels = frame.locator(f"xpath={xp}")
+                assert labels.count() == 1, "have matching radio button"
+                labels.first.click()
             elif k in ("add tags", "remove tags"):
                 fields = {"add tags": "txtAddTags", "remove tags": "txtRemoveTags"}
                 for tag in updates[k].split(", "):
-                    self._fill_tagify_field(b, fields[k], tag)
+                    self._fill_tagify_field(frame, fields[k], tag)
             else:
                 raise RuntimeError(f"unhandled key {k}")
 
     def make_term(self, lang, updates):
         "Create a new term."
-        # Sometimes this failed during the unsupported_parser.feature, not sure why.
-        # Likely something silly, don't care, so will bypass the screen controls.
-        # I am sure this will bite me later.
-        # TODO fix_nav: figure out why occasionally got ElementNotInteractableException
-        # self.visit("/")
-        # self.browser.find_by_css("#menu_terms").mouse_over()
-        # self.browser.find_by_id("term_index").first.click()
-        # self.browser.find_by_css("#term_actions").mouse_over()
-        # self.click_link("Create new")
         self.visit("/term/new")
-        assert "New Term" in self.browser.html
+        assert "New Term" in self.page.content()
 
         updates["language_id"] = self.language_ids[lang]
-        b = self.browser
-        self._fill_term_form(b, updates)
-        b.find_by_css("#btnsubmit").first.click()
+        self._fill_term_form(self.page, updates)
+        self.page.click("#btnsubmit")
 
     def get_term_table_content(self):
         "Get term table content."
         self.visit("/")
-        self.browser.find_by_css("#menu_terms").mouse_over()
-        self.browser.find_by_id("term_index").first.click()
 
-        # clear any filters!
-        self.browser.find_by_id("showHideFilters").first.click()
+        self.page.hover("#menu_terms")
+        self.page.click("#term_index")
 
-        # The last column of the table is the "date added", but that's
-        # a hassle to check, so ignore it.
-        def _to_string(row):
-            tds = row.find_by_css("td")
-            rowtext = [td.text.strip() for td in tds]
+        # Clear any filters
+        self.page.click("#showHideFilters")
+
+        # The last column ("date added") is skipped, as in Splinter version
+        rows = self.page.query_selector_all("#termtable tbody tr")
+
+        rowstring = []
+
+        def _delimited_tags(td):
+            """Get the cleaned tags."""
+            # print(f"GOT RAW TAGS = {td.inner_text()}", flush=True)
+            tags = [t.strip() for t in td.inner_text().split("\n")]
+            tags = [t for t in tags if t not in ["", "\u200B"]]
+            return ", ".join(tags)
+
+        for row in rows:
+            tds = row.query_selector_all("td")
+            rowtext = [td.inner_text().strip() for td in tds]
             check = "; ".join(rowtext).strip()
+
             if check == "No data available in table":
-                return check
+                rowstring.append(check)
+                continue
 
-            rowtext = [""]  # first field is empty checkbox
-            rowtext.append(tds[1].text.strip())  # term
+            rowtext = [""]  # first column is an empty checkbox
+            rowtext.append(tds[1].inner_text().strip())  # term
 
-            parenttags = tds[2].text.strip()
-            parenttags = ", ".join(parenttags.split("\n"))
-            rowtext.append(parenttags)
+            rowtext.append(_delimited_tags(tds[2]))  # parent terms
 
-            rowtext.append(tds[3].text.strip())  # translation
-            rowtext.append(tds[6].text.strip())  # language
+            rowtext.append(tds[3].inner_text().strip())  # translation
+            rowtext.append(tds[6].inner_text().strip())  # language
 
-            termtags = tds[4].text.strip()
-            termtags = ", ".join(termtags.split("\n"))
-            rowtext.append(termtags)
+            rowtext.append(_delimited_tags(tds[4]))  # term tags
 
-            select_element = row.find_by_css("select")
-            selected_value = select_element.value
-            selected_option = select_element.find_by_css(
+            select_element = row.query_selector("select")
+            selected_value = select_element.input_value()
+            selected_option = select_element.query_selector(
                 f'option[value="{selected_value}"]'
             )
-            rowtext.append(selected_option.text)  # status select
-            return "; ".join(rowtext).strip()
+            selected_text = (
+                selected_option.inner_text().strip() if selected_option else ""
+            )
+            rowtext.append(selected_text)
 
-        css = "#termtable tbody tr"
-        rows = list(self.browser.find_by_css(css))
-        rowstring = [_to_string(row) for row in rows]
-        return "\n".join(rowstring)
+            # Hacky cleanup, ok for tests.
+            # print(f"RAW ROWTEXT = {rowtext}", flush=True)
+            rowtext = [
+                r.replace("\u200B", "").replace("\n", "").replace("\\n", "")
+                for r in rowtext
+            ]
+            rowval = "; ".join(rowtext).strip()
+            rowstring.append(rowval)
+
+        # print(f"RAW ROWSTRINGs = {rowstring}", flush=True)
+        return "\n".join([r for r in rowstring if r.strip() != ""]).strip()
 
     ################################3
     # Reading/rendering
 
     def displayed_text(self):
         "Return the TextItems, with '/' at token boundaries."
-        elements = self.browser.find_by_xpath('//span[contains(@class, "textitem")]')
+        self.page.wait_for_selector('span[class*="textitem"]')
+        elements = self.page.query_selector_all('span[class*="textitem"]')
+        # print("check elements on page", flush=True)
+        # print(elements, flush=True)
 
         def _to_string(t):
             "Create string for token, eg 'cat (2)'."
-
-            # Note that selenium's t.text accessor strips leading/trailing whitespace,
-            # so if a span contains " ", t.text returns "".  We need the actual
-            # inner html.
-            # pylint: disable=protected-access
-            inner_html = t._element.get_attribute("innerHTML")
             zws = "\u200B"
-            inner_html = inner_html.replace(zws, "")
+            inner_html = t.inner_html().replace(zws, "")
 
+            class_attr = t.get_attribute("class") or ""
             status = [
                 c.replace("status", "")
-                for c in t["class"].split(" ")
+                for c in class_attr.split(" ")
                 if c.startswith("status") and c != "status0"
             ]
             if len(status) == 0:
@@ -382,71 +414,91 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     def _get_element_for_word(self, word):
         "Helper, get the element."
         # print('getting ' + word)
-        elements = self.browser.find_by_xpath('//span[contains(@class, "textitem")]')
-        es = [e for e in elements if e.text == word]
+        self.page.wait_for_selector('span[class*="textitem"]')
+        elements = self.page.query_selector_all('span[class*="textitem"]')
+        es = [e for e in elements if e.text_content() == word]
         assert len(es) > 0, f"match for {word}"
+        # print(f"got match for {word}", flush=True)
         return es[0]
 
     def click_word(self, word):
         "Click a word in the reading frame."
-        self._get_element_for_word(word).click()
+        el = self._get_element_for_word(word)
+        # print(f"got element {el}", flush=True)
+        if self.has_touch:
+            el.tap()
+        else:
+            el.click()
 
     def shift_click_words(self, words):
         "Shift-click words."
-        # https://stackoverflow.com/questions/27775759/
-        #   send-keys-control-click-in-selenium-with-python-bindings
-        # pylint: disable=protected-access
-        els = [self._get_element_for_word(w)._element for w in words]
-        ac = ActionChains(self.browser.driver).key_down(Keys.SHIFT)
+        els = [self._get_element_for_word(w) for w in words]
+        self.page.keyboard.down("Shift")
         for e in els:
-            ac = ac.click(e)
-        ac = ac.key_up(Keys.SHIFT)
-        ac.perform()
+            e.click()
+        self.page.keyboard.up("Shift")
 
     def shift_drag(self, fromword, toword):
         "Shift-drag over words."
-        # https://stackoverflow.com/questions/27775759/
-        #   send-keys-control-click-in-selenium-with-python-bindings
-        # pylint: disable=protected-access
-        [fromel, toel] = [
-            self._get_element_for_word(w)._element for w in [fromword, toword]
-        ]
-        actions = ActionChains(self.browser.driver)
-        actions.key_down(Keys.SHIFT)
-        actions.click_and_hold(fromel)
-        actions.move_to_element(toel)
-        actions.key_up(Keys.SHIFT)
-        actions.release()
-        actions.perform()
+        from_el = self._get_element_for_word(fromword)
+        to_el = self._get_element_for_word(toword)
+
+        # Get bounding boxes for precise mouse control
+        from_box = from_el.bounding_box()
+        to_box = to_el.bounding_box()
+
+        assert from_box and to_box, "Element bounding boxes must exist"
+
+        # Press Shift, click and drag
+        kb: Keyboard = self.page.keyboard
+        mouse: Mouse = self.page.mouse
+
+        kb.down("Shift")
+        mouse.move(
+            from_box["x"] + from_box["width"] / 2,
+            from_box["y"] + from_box["height"] / 2,
+        )
+        mouse.down()
+        mouse.move(
+            to_box["x"] + to_box["width"] / 2, to_box["y"] + to_box["height"] / 2
+        )
+        mouse.up()
+        kb.up("Shift")
 
     def drag(self, fromword, toword):
         "drag over words."
-        # https://stackoverflow.com/questions/27775759/
-        #   send-keys-control-click-in-selenium-with-python-bindings
-        # pylint: disable=protected-access
-        [fromel, toel] = [
-            self._get_element_for_word(w)._element for w in [fromword, toword]
-        ]
-        actions = ActionChains(self.browser.driver)
-        actions.click_and_hold(fromel)
-        actions.move_to_element(toel)
-        actions.release()
-        actions.perform()
+        from_el = self._get_element_for_word(fromword)
+        to_el = self._get_element_for_word(toword)
+
+        # Get bounding boxes for precise mouse control
+        from_box = from_el.bounding_box()
+        to_box = to_el.bounding_box()
+        assert from_box and to_box, "Element bounding boxes must exist"
+        mouse: Mouse = self.page.mouse
+        mouse.move(
+            from_box["x"] + from_box["width"] / 2,
+            from_box["y"] + from_box["height"] / 2,
+        )
+        mouse.down()
+        mouse.move(
+            to_box["x"] + to_box["width"] / 2, to_box["y"] + to_box["height"] / 2
+        )
+        mouse.up()
 
     def _refresh_browser(self):
         """
         Term actions (edits, hotkeys) cause updated content to be ajaxed in.
-        For the splinter browser to be aware of it, the browser has to be
-        reloaded, but calling a self.browser.reload() has other side effects
+        For the page to be aware of it, the page has to be
+        reloaded, but calling a self.page.reload() has other side effects
         (sets the page start date, etc).
 
-        The below weird js hack causes the browser to be updated,
+        The below weird js hack causes the page to be updated,
         and then the js events have to be reattached too.
         """
         # self.browser.reload()
         # ??? ChatGPT suggested:
-        time.sleep(0.5)  # Hack for ci.
-        self.browser.execute_script(
+        time.sleep(0.2)  # Hack for ci.
+        self.page.evaluate(
             """
             // Trigger re-render of the entire body
             var body = document.querySelector('body');
@@ -458,7 +510,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             window.prepareTextInteractions();
             """
         )
-        time.sleep(0.5)  # Hack for ci.
+        time.sleep(0.2)  # Hack for ci.
 
     def fill_reading_bulk_edit_form(self, updates=None):
         """
@@ -466,18 +518,18 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         """
         updates = updates or {}
         should_refresh = False
-        with self.browser.get_iframe("wordframe") as iframe:
-            time.sleep(0.4)  # Hack, test failing.
-            self._fill_bulk_term_edit_form(iframe, updates)
-            time.sleep(0.4)  # Hack, test failing.
-            iframe.find_by_css("#btnsubmit").first.click()
-            time.sleep(0.4)  # Hack, test failing.
+        iframe = self.page.frame(name="wordframe")
+        time.sleep(0.2)  # Hack, test failing.
+        self._fill_bulk_term_edit_form(iframe, updates)
+        time.sleep(0.2)  # Hack, test failing.
+        iframe.locator("#btnsubmit").first.click()
+        time.sleep(0.2)  # Hack, test failing.
 
-            # Only refresh the reading frame if everything was ok.
-            # Some submits will fail due to validation errors,
-            # and we want to look at them.
-            if "updated" in iframe.html:
-                should_refresh = True
+        # Only refresh the reading frame if everything was ok.
+        # Some submits will fail due to validation errors,
+        # and we want to look at them.
+        if "updated" in iframe.content():
+            should_refresh = True
 
         # Have to refresh the content to query the dom.
         if should_refresh:
@@ -492,7 +544,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         # Have to visit and save settings to re-set the JS values that will be rendered.
         # Big time waste finding this out.
         self.visit("settings/shortcuts")
-        self.browser.find_by_css("#btnSubmit").first.click()
+        self.page.click("#btnSubmit")
 
     def press_hotkey(self, hotkey):
         "Send a hotkey."
@@ -526,8 +578,8 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         }});"""
         # print(script, flush=True)
         # pylint: disable=protected-access
-        el = self.browser.find_by_id("thetext")
-        self.browser.execute_script(script, el._element)
+        el = self.page.locator("#thetext")
+        self.page.evaluate(script, el)
         time.sleep(0.2)  # Or it's too fast.
         # print(script)
         # Have to refresh the content to query the dom.
@@ -541,18 +593,18 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         updates = updates or {}
 
         should_refresh = False
-        with self.browser.get_iframe("wordframe") as iframe:
-            time.sleep(0.4)  # Hack, test failing.
-            self._fill_term_form(iframe, updates)
-            time.sleep(0.4)  # Hack, test failing.
-            iframe.find_by_css("#btnsubmit").first.click()
-            time.sleep(0.4)  # Hack, test failing.
+        iframe = self.page.frame(name="wordframe")
+        time.sleep(0.2)  # Hack, test failing.
+        self._fill_term_form(iframe, updates)
+        time.sleep(0.2)  # Hack, test failing.
+        iframe.locator("#btnsubmit").first.click()
+        time.sleep(0.2)  # Hack, test failing.
 
-            # Only refresh the reading frame if everything was ok.
-            # Some submits will fail due to validation errors,
-            # and we want to look at them.
-            if "updated" in iframe.html:
-                should_refresh = True
+        # Only refresh the reading frame if everything was ok.
+        # Some submits will fail due to validation errors,
+        # and we want to look at them.
+        if "updated" in iframe.content():
+            should_refresh = True
 
         # Have to refresh the content to query the dom.
         if should_refresh:

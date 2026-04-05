@@ -1,6 +1,6 @@
-# Web tests with pytest-splinter
+# Web tests with playwright
 
-Ref https://pytest-splinter.readthedocs.io/en/3.3.2/#example
+Ref https://playwright.dev/python/docs/intro
 
 ## How to run the tests
 

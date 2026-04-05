@@ -78,7 +78,7 @@ def test_multiword_items_cover_other_items(english):
 
 
 def test_case_not_considered_for_matches(english):
-    "Case doesnt matter."
+    "Case doesn't matter."
     data = ["some", " ", "data", " ", "here", "."]
     expected = "[some-1][ -1][data here-3][.-1]"
     assert_renderable_equals(english, data, ["DATA HERE"], expected)
