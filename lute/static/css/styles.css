@@ -1145,6 +1145,49 @@ div.code pre {
 }
 
 
+/* CHAPTER PROGRESS BAR */
+#chapter-progress-wrap {
+    width: 100%;
+}
+
+#chapter-progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 3px 14px 2px;
+    font-size: 0.78rem;
+    color: var(--font-color);
+    opacity: 0.6;
+    gap: 1rem;
+    white-space: nowrap;
+}
+
+#chapter-progress-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex-shrink: 1;
+    font-style: italic;
+}
+
+#chapter-progress-stats {
+    flex-shrink: 0;
+}
+
+#chapter-progress-track {
+    width: 100%;
+    height: 3px;
+    background-color: rgba(128, 128, 128, 0.2);
+}
+
+#chapter-progress-fill {
+    height: 100%;
+    width: 0%;
+    background-color: #4CBB17;
+    transition: width 0.35s ease;
+    border-radius: 0 2px 2px 0;
+}
+
 /* STYLES FOR PAGE BOOKMARKS */
 .read-bkm-btn {
     font-size: 1.6rem;
