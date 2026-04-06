@@ -67,6 +67,8 @@ def upload_backup():
     if not filename.endswith(".db.gz"):
         flash("Invalid backup filename.", "error")
         return redirect("/backup/index", 302)
+    if not filename.startswith("manual_"):
+        filename = f"manual_{filename}"
 
     settings = _get_settings()
     os.makedirs(settings.backup_dir, exist_ok=True)
