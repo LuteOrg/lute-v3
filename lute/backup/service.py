@@ -6,6 +6,7 @@ import os
 import re
 import shutil
 import gzip
+import sqlite3
 from datetime import datetime
 import time
 import tempfile
@@ -118,6 +119,7 @@ class Service:
         Restore the database from the given backup file.
         """
         backupfile = self._get_backup_file(settings.backup_dir, filename)
+        backup_dir = settings.backup_dir
 
         fd, tempname = tempfile.mkstemp(
             suffix=".restore", dir=os.path.dirname(app_config.dbfilename)
@@ -135,6 +137,7 @@ class Service:
             self.session.remove()
             bind.dispose()
             os.replace(tempname, app_config.dbfilename)
+            self._set_backup_dir(app_config.dbfilename, backup_dir)
         finally:
             if os.path.exists(tempname):
                 os.remove(tempname)
@@ -223,3 +226,15 @@ class Service:
         "Return a validated backup file."
         fullpath = os.path.join(outdir, os.path.basename(filename))
         return DatabaseBackupFile(fullpath)
+
+    def _set_backup_dir(self, dbfilename, backup_dir):
+        "Preserve the local backup_dir after restore."
+        with sqlite3.connect(dbfilename) as conn:
+            cur = conn.cursor()
+            sql = """
+            update settings
+            set StValue = ?
+            where StKey = 'backup_dir' and StKeyType = 'user'
+            """
+            cur.execute(sql, (backup_dir,))
+            conn.commit()
