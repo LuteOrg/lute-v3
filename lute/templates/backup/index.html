@@ -26,6 +26,7 @@
       <th>Last Modified</th>
       <th></th>
       <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -36,6 +37,7 @@
       <td>{{ backup.last_modified.strftime('%Y-%m-%d %H:%M:%S') }}</td>
       <td><a href="/backup/download/{{ backup.name }}">Download</a></td>
       <td><a href="#" class="restore-backup-link" data-filename="{{ backup.name }}">Restore</a></td>
+      <td><a href="#" class="delete-backup-link" data-filename="{{ backup.name }}">Delete</a></td>
     </tr>
     {% endfor %}
   </tbody>
@@ -62,6 +64,23 @@
         .fail(function(xhr) {
           const p = JSON.parse(xhr.responseText);
           alert("RESTORE ERROR: " + p.errmsg);
+        });
+    });
+
+    $('.delete-backup-link').click(function(e) {
+      e.preventDefault();
+
+      const filename = $(this).data('filename');
+      const msg = `Delete "${filename}"?`;
+      if (!confirm(msg)) {
+        return;
+      }
+
+      $.post('/backup/do_delete', { filename: filename })
+        .done(function() { window.location = "/backup/index"; })
+        .fail(function(xhr) {
+          const p = JSON.parse(xhr.responseText);
+          alert("DELETE ERROR: " + p.errmsg);
         });
     });
   });
