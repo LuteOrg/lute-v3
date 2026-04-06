@@ -8,6 +8,7 @@ import shutil
 import gzip
 from datetime import datetime
 import time
+import tempfile
 from typing import List, Union
 
 from lute.models.repositories import UserSettingRepository
@@ -112,6 +113,32 @@ class Service:
         self._remove_excess_backups(settings.backup_count, settings.backup_dir)
         return f
 
+    def restore_backup(self, app_config, settings, filename):
+        """
+        Restore the database from the given backup file.
+        """
+        backupfile = self._get_backup_file(settings.backup_dir, filename)
+
+        fd, tempname = tempfile.mkstemp(
+            suffix=".restore", dir=os.path.dirname(app_config.dbfilename)
+        )
+        os.close(fd)
+
+        try:
+            with gzip.open(backupfile.filepath, "rb") as in_file, open(
+                tempname, "wb"
+            ) as out_file:
+                shutil.copyfileobj(in_file, out_file)
+
+            bind = self.session.get_bind()
+            self.session.close()
+            self.session.remove()
+            bind.dispose()
+            os.replace(tempname, app_config.dbfilename)
+        finally:
+            if os.path.exists(tempname):
+                os.remove(tempname)
+
     def should_run_auto_backup(self, backup_settings):
         """
         True (if applicable) if last backup was old.
@@ -191,3 +218,8 @@ class Service:
             for f in os.listdir(outdir)
             if re.match(r"(manual_)?lute_backup_", f)
         ]
+
+    def _get_backup_file(self, outdir, filename) -> DatabaseBackupFile:
+        "Return a validated backup file."
+        fullpath = os.path.join(outdir, os.path.basename(filename))
+        return DatabaseBackupFile(fullpath)

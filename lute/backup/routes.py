@@ -93,6 +93,26 @@ def do_backup():
         return jsonify({"errmsg": str(e) + " -- " + tb}), 500
 
 
+@bp.route("/do_restore", methods=["POST"])
+def do_restore():
+    """
+    Ajax endpoint to restore a backup file.
+    """
+    prms = request.form.to_dict()
+    filename = prms.get("filename", "")
+
+    c = current_app.env_config
+    settings = _get_settings()
+    service = Service(db.session)
+    try:
+        service.restore_backup(c, settings, filename)
+        flash(f"Backup restored: {filename}", "notice")
+        return jsonify(filename)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        tb = traceback.format_exc()
+        return jsonify({"errmsg": str(e) + " -- " + tb}), 500
+
+
 @bp.route("/skip_this_backup", methods=["GET"])
 def handle_skip_this_backup():
     "Update last backup date so backup not attempted again."
