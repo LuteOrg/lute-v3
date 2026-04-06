@@ -6,10 +6,6 @@
 
 {% block body %}
 
-{% if backups|length == 0 %}
-  <p>No backups have been made yet.</p>
-{% else %}
-
 <p>Stored in: {{ backup_dir }}</p>
 <br />
 
@@ -17,6 +13,10 @@
   <input type="file" name="backup_file" accept=".gz" />
   <button type="submit">Upload backup</button>
 </form>
+
+{% if backups|length == 0 %}
+  <p>No backups have been made yet.</p>
+{% else %}
 
 <table class="table dataTable no-footer" style="width: 80%; margin: 0;">
   <thead>
