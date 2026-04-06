@@ -13,12 +13,18 @@
 <p>Stored in: {{ backup_dir }}</p>
 <br />
 
+<form action="/backup/upload" method="post" enctype="multipart/form-data" style="margin-bottom: 1em;">
+  <input type="file" name="backup_file" accept=".gz" />
+  <button type="submit">Upload backup</button>
+</form>
+
 <table class="table dataTable no-footer" style="width: 80%; margin: 0;">
   <thead>
     <tr>
       <th>Backup File</th>
       <th>Size</th>
       <th>Last Modified</th>
+      <th></th>
       <th></th>
     </tr>
   </thead>
@@ -29,6 +35,7 @@
       <td>{{ backup.size }}</td>
       <td>{{ backup.last_modified.strftime('%Y-%m-%d %H:%M:%S') }}</td>
       <td><a href="/backup/download/{{ backup.name }}">Download</a></td>
+      <td><a href="#" class="restore-backup-link" data-filename="{{ backup.name }}">Restore</a></td>
     </tr>
     {% endfor %}
   </tbody>
@@ -38,5 +45,26 @@
 
 <br />
 <a href="{{ url_for('backup.backup', type='manual') }}">Create new</a>
+
+<script>
+  $(document).ready(function() {
+    $('.restore-backup-link').click(function(e) {
+      e.preventDefault();
+
+      const filename = $(this).data('filename');
+      const msg = `Restore "${filename}"?  This will replace the current database.`;
+      if (!confirm(msg)) {
+        return;
+      }
+
+      $.post('/backup/do_restore', { filename: filename })
+        .done(function() { window.location = "/"; })
+        .fail(function(xhr) {
+          const p = JSON.parse(xhr.responseText);
+          alert("RESTORE ERROR: " + p.errmsg);
+        });
+    });
+  });
+</script>
 
 {% endblock %}

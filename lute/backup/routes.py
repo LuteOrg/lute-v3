@@ -5,6 +5,7 @@ Backup settings form management, and running backups.
 """
 
 import os
+import re
 import traceback
 from flask import (
     Blueprint,
@@ -51,6 +52,29 @@ def download_backup(filename):
     settings = _get_settings()
     fullpath = os.path.join(settings.backup_dir, filename)
     return send_file(fullpath, as_attachment=True)
+
+
+@bp.route("/upload", methods=["POST"])
+def upload_backup():
+    """
+    Upload a backup file into the backup directory.
+    """
+    upload = request.files.get("backup_file")
+    if upload is None or upload.filename == "":
+        flash("No backup file selected.", "error")
+        return redirect("/backup/index", 302)
+
+    filename = os.path.basename(upload.filename)
+    if not re.match(r"(manual_)?lute_backup_.*\.db\.gz$", filename):
+        flash("Invalid backup filename.", "error")
+        return redirect("/backup/index", 302)
+
+    settings = _get_settings()
+    os.makedirs(settings.backup_dir, exist_ok=True)
+    dest = os.path.join(settings.backup_dir, filename)
+    upload.save(dest)
+    flash(f"Backup uploaded: {filename}", "notice")
+    return redirect("/backup/index", 302)
 
 
 @bp.route("/backup", methods=["GET"])
