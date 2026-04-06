@@ -33,7 +33,7 @@ class DatabaseBackupFile:
             raise BackupException(f"No backup file at {filepath}.")
 
         name = os.path.basename(filepath)
-        if not re.match(r"(manual_)?lute_backup_", name):
+        if not name.endswith(".db.gz"):
             raise BackupException(f"Not a valid lute database backup at {filepath}.")
 
         self.filepath = filepath
@@ -219,7 +219,7 @@ class Service:
         return [
             DatabaseBackupFile(os.path.join(outdir, f))
             for f in os.listdir(outdir)
-            if re.match(r"(manual_)?lute_backup_", f)
+            if f.endswith(".db.gz")
         ]
 
     def _get_backup_file(self, outdir, filename) -> DatabaseBackupFile:
