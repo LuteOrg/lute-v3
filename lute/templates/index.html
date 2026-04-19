@@ -41,4 +41,10 @@
   {% include "book/tablelisting.html" %}
 {% endif %}
 
+{% if reading_streak > 0 and show_streak_on_home %}
+<div style="text-align: center; margin-top: 20px; font-size: 1.2em;">
+  <strong>Reading Streak: {{ reading_streak }} day{{ reading_streak != 1 and 's' or '' }}</strong>
+</div>
+{% endif %}
+
 {% endblock %}
