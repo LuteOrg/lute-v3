@@ -1,3 +1,3 @@
 [submodule "lute/db/language_defs"]
 	path = lute/db/language_defs
-	url = git@github.com:LuteOrg/lute-language-defs.git
+	url = https://github.com/LuteOrg/lute-language-defs.git
