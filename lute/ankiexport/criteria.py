@@ -114,6 +114,20 @@ def evaluate_criteria(s, term):
         def __bool__(self) -> bool:
             return self.eval_fn(bool(a) for a in self.args)
 
+    class BoolNot:
+        "Not unary operator."
+
+        def __init__(self, t):
+            self.arg = t[0][1]
+
+        def __bool__(self) -> bool:
+            return not bool(self.arg)
+
+        def __str__(self) -> str:
+            return f"(not {self.arg})"
+
+        __repr__ = __str__
+
     class BoolAnd(BoolBinOp):
         repr_symbol = "&"
         eval_fn = all
@@ -153,6 +167,7 @@ def evaluate_criteria(s, term):
 
     and_keyword = Keyword("and")
     or_keyword = Keyword("or")
+    not_keyword = Keyword("not")
 
     multi_check = infixNotation(
         tag_matcher.set_parse_action(has_any_matching_tags)
@@ -163,6 +178,7 @@ def evaluate_criteria(s, term):
         | parent_count_matcher.set_parse_action(check_parent_count)
         | status_matcher.set_parse_action(check_status_val),
         [
+            (not_keyword, 1, opAssoc.RIGHT, BoolNot),
             (and_keyword, 2, opAssoc.LEFT, BoolAnd),
             (or_keyword, 2, opAssoc.LEFT, BoolOr),
         ],

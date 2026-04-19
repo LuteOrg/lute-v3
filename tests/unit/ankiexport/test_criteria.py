@@ -46,6 +46,11 @@ def fixture_term():
         ('parents.tags:["parenttag"]', True),
         ('all.tags:["parenttag"]', True),
         ('parents.count=1 and tags:["fem", "other"] and status<=3', False),
+        ('not tags:"masc"', False),
+        ('not tags:"fem"', True),
+        ('not parents.count==0', True),
+        ('not status<=3', False),
+        ('not (parents.count==0 and status<=3)', True),
     ],
 )
 def test_criteria(criteria, expected, term):
