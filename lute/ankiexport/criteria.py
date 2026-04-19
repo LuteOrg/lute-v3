@@ -101,6 +101,7 @@ def evaluate_criteria(s, term):
 
     class BoolBinOp:
         "Binary operation."
+
         repr_symbol: str = ""
         eval_fn: Callable[[Iterable[bool]], bool] = lambda _: False
 
