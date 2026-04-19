@@ -42,6 +42,7 @@ from lute.settings.current import (
 )
 from lute.models.repositories import UserSettingRepository
 from lute.book.stats import Service as StatsService
+from lute.stats.service import get_reading_streak
 
 from lute.ankiexport.routes import bp as anki_bp
 from lute.book.routes import bp as book_bp
@@ -175,6 +176,7 @@ def _add_base_routes(app, app_config):
                 is_production_data=is_production,
                 backup_show_warning=backup_show_warning,
                 backup_warning_msg=warning_msg,
+                reading_streak=get_reading_streak(db.session),
             )
         )
         return response

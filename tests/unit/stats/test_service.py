@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 from lute.models.book import WordsRead
 from lute.db import db
-from lute.stats.service import get_chart_data, get_table_data
+from lute.stats.service import get_chart_data, get_table_data, get_reading_streak
 from tests.utils import make_text
 
 
@@ -87,3 +87,27 @@ def test_get_data_works_when_nothing_read(app_context):
     "Nothing read should still be ok, empty chart."
     assert not get_chart_data(db.session), "nothing present"
     assert not get_table_data(db.session), "nothing"
+
+
+def test_get_reading_streak(spanish, app_context):
+    "Test reading streak calculation."
+    today = datetime.now().date()
+    yesterday = today - timedelta(days=1)
+    day_before_yesterday = today - timedelta(days=2)
+    three_days_ago = today - timedelta(days=3)
+
+    assert get_reading_streak(db.session) == 0
+
+    make_read_text(spanish, "Yo tengo un gato.", yesterday)
+    assert get_reading_streak(db.session) == 0
+
+    make_read_text(spanish, "Ella esta aqui.", today)
+    assert get_reading_streak(db.session) == 1
+
+    assert get_reading_streak(db.session) == 2
+
+    make_read_text(spanish, "Nuevo text.", day_before_yesterday)
+    assert get_reading_streak(db.session) == 2
+
+    make_read_text(spanish, "Otro text.", three_days_ago)
+    assert get_reading_streak(db.session) == 2
