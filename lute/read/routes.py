@@ -12,7 +12,6 @@ from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
 from lute.db import db
 
-
 bp = Blueprint("read", __name__, url_prefix="/read")
 
 
@@ -106,7 +105,18 @@ def page_done():
 
     service = Service(db.session)
     service.mark_page_read(bookid, pagenum, restknown)
-    return jsonify("ok")
+
+    # Check if book is finished
+    book = _find_book(bookid)
+    is_finished = pagenum == book.page_count
+
+    result = {"ok": True}
+    if is_finished:
+        total_words = service.get_total_words_read_in_book(bookid)
+        result["book_finished"] = True
+        result["total_words"] = total_words
+
+    return jsonify(result)
 
 
 @bp.route("/delete_page/<int:bookid>/<int:pagenum>", methods=["GET"])

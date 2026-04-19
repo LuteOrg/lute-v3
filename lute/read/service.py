@@ -37,7 +37,7 @@ class TermPopup:
 
     def _clean(self, t):
         "Clean text for popup usage."
-        zws = "\u200B"
+        zws = "\u200b"
         ret = (t or "").strip()
         ret = ret.replace(zws, "")
         ret = ret.replace("\n", "<br />")
@@ -94,6 +94,22 @@ class Service:
         self.session.commit()
         if mark_rest_as_known:
             self.set_unknowns_to_known(text)
+
+    def get_total_words_read_in_book(self, bookid):
+        """
+        Gets the total number of words read in a book
+        by calculating the sum of all read pages
+        """
+        br = BookRepository(self.session)
+        book = br.find(bookid)
+        if book is None:
+            return 0
+
+        total = 0
+        for text in book.texts:
+            if text.read_date is not None:
+                total += text.word_count or 0
+        return total
 
     def set_unknowns_to_known(self, text: Text):
         """
