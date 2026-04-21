@@ -177,6 +177,7 @@ def _add_base_routes(app, app_config):
                 backup_show_warning=backup_show_warning,
                 backup_warning_msg=warning_msg,
                 reading_streak=get_reading_streak(db.session),
+                show_streak_on_home=current_settings.get("show_streak_on_home", False),
             )
         )
         return response

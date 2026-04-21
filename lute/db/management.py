@@ -100,6 +100,7 @@ def add_default_user_settings(session, default_user_backup_path):
         # Behaviour:
         "open_popup_in_new_tab": False,
         "stop_audio_on_term_form_open": True,
+        "show_streak_on_home": False,
         "stats_calc_sample_size": 5,
         # Term popups:
         "term_popup_promote_parent_translation": True,
