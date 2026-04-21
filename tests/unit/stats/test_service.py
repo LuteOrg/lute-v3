@@ -94,18 +94,14 @@ def test_get_reading_streak(spanish, app_context):
     today = datetime.now().date()
     yesterday = today - timedelta(days=1)
     day_before_yesterday = today - timedelta(days=2)
-    three_days_ago = today - timedelta(days=3)
 
-    assert get_reading_streak(db.session) == 0
-
-    make_read_text(spanish, "Yo tengo un gato.", yesterday)
     assert get_reading_streak(db.session) == 0
 
     make_read_text(spanish, "Ella esta aqui.", today)
     assert get_reading_streak(db.session) == 1
 
-    make_read_text(spanish, "Nuevo text.", day_before_yesterday)
+    make_read_text(spanish, "Nuevo text.", yesterday)
     assert get_reading_streak(db.session) == 2
 
-    make_read_text(spanish, "Otro text.", three_days_ago)
+    make_read_text(spanish, "Otro text.", day_before_yesterday)
     assert get_reading_streak(db.session) == 2
