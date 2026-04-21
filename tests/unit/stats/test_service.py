@@ -104,4 +104,4 @@ def test_get_reading_streak(spanish, app_context):
     assert get_reading_streak(db.session) == 2
 
     make_read_text(spanish, "Otro text.", day_before_yesterday)
-    assert get_reading_streak(db.session) == 2
+    assert get_reading_streak(db.session) == 3
