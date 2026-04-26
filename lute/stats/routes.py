@@ -14,7 +14,11 @@ def index():
     "Main page."
     read_table_data = get_table_data(db.session)
     reading_streak = get_reading_streak(db.session)
-    return render_template("stats/index.html", read_table_data=read_table_data, reading_streak=reading_streak)
+    return render_template(
+        "stats/index.html",
+        read_table_data=read_table_data,
+        reading_streak=reading_streak
+    )
 
 
 @bp.route("/data")
