@@ -17,7 +17,7 @@ def index():
     return render_template(
         "stats/index.html",
         read_table_data=read_table_data,
-        reading_streak=reading_streak
+        reading_streak=reading_streak,
     )
 
 
