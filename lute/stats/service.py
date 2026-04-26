@@ -112,7 +112,10 @@ def get_reading_streak(session):
     today = datetime.now().date()
     yesterday = today - timedelta(days=1)
 
-    has_recent_reading = today.strftime('%Y-%m-%d') in dates or yesterday.strftime('%Y-%m-%d') in dates
+    has_recent_reading = (
+        today.strftime('%Y-%m-%d') in dates or
+        yesterday.strftime('%Y-%m-%d') in dates
+    )
 
     if not has_recent_reading:
         return 0
