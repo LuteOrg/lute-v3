@@ -240,6 +240,7 @@ Feature: User can actually read and stuff.
         When I shift click:
             una
             bebida
+        And sleep for 1
         Then the bulk edit term form is shown
         When I press hotkey "1"
         Then the term form is hidden

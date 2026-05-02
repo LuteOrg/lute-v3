@@ -330,10 +330,13 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
         def _delimited_tags(td):
             """Get the cleaned tags."""
-            # print(f"GOT RAW TAGS = {td.inner_text()}", flush=True)
-            tags = [t.strip() for t in td.inner_text().split("\n")]
-            tags = [t for t in tags if t not in ["", "\u200B"]]
-            return ", ".join(tags)
+            # The below line used to work in python 3.12, but breaks as at 3.13.
+            # The more explicit query_selector_all is clearer and works in all versions.
+            # tags = [t.strip() for t in td.inner_text().split("\n")]
+            tags = td.query_selector_all(".tagify__tag")
+            values = [t.inner_text().strip() for t in tags]
+            values = [v for v in values if v not in ["", "\u200B"]]
+            return ", ".join(values)
 
         for row in rows:
             tds = row.query_selector_all("td")
