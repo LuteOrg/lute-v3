@@ -44,6 +44,7 @@ def index(search):
     repo = TermRepository(db.session)
     repo.delete_empty_images()
     langopts = language_choices(db.session, "(all)")
+    langopts = [(0, "(all)")] + langopts
     current_language_id = valid_current_language_id(db.session)
     all_statuses = db.session.query(Status).all()
     filter_statuses = [s for s in all_statuses if s.id != Status.IGNORED]
