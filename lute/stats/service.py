@@ -94,3 +94,31 @@ def get_table_data(session):
     for langname, readbydate in raw_data.items():
         ret.append({"name": langname, "counts": _readcount_by_date(readbydate)})
     return ret
+
+
+def get_reading_streak(session):
+    "Calculates the current reading streak in days."
+    sql = """
+    SELECT DISTINCT strftime('%Y-%m-%d', WrReadDate) as dt
+    FROM wordsread
+    ORDER BY dt DESC
+    """
+    result = session.execute(text(sql)).all()
+    if not result:
+        return 0
+
+    dates = {datetime.strptime(row[0], "%Y-%m-%d").date() for row in result}
+
+    today = datetime.now().date()
+    yesterday = today - timedelta(days=1)
+
+    if today not in dates and yesterday not in dates:
+        return 0
+
+    streak = 0
+    current_date = today if today in dates else yesterday
+    while current_date in dates:
+        streak += 1
+        current_date -= timedelta(days=1)
+
+    return streak
