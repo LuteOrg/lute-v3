@@ -207,7 +207,7 @@ class Service:
             timeout = 20  # seconds
             response = requests.get(url, timeout=timeout)
             response.raise_for_status()
-            s = response.text
+            s = response.content
         except requests.exceptions.RequestException as e:
             msg = f"Could not parse {url} (error: {str(e)})"
             raise BookImportException(message=msg, cause=e) from e
