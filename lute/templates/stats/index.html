@@ -33,16 +33,13 @@
 </ul>
 </table>
 
-{% if reading_streak > 0 %}
-<div style="text-align: center; margin-top: 20px; font-size: 1.2em;">
-  <strong>Reading Streak: {{ reading_streak }} day{{ reading_streak != 1 and 's' or '' }}</strong>
-</div>
-<br>
-{% endif %}
-
 <div style="position: relative; aspect-ratio: 3">
   <canvas id="wordCountChart"></canvas>
 </div>
+
+{% if reading_streak > 0 %}
+  <h2>Reading Streak: {{ reading_streak }} day{{ reading_streak != 1 and 's' or '' }}</h2>
+{% endif %}
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
