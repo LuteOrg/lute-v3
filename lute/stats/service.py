@@ -104,25 +104,20 @@ def get_reading_streak(session):
     ORDER BY dt DESC
     """
     result = session.execute(text(sql)).all()
-    dates = [row[0] for row in result]
-
-    if not dates:
+    if not result:
         return 0
+
+    dates = {datetime.strptime(row[0], "%Y-%m-%d").date() for row in result}
 
     today = datetime.now().date()
     yesterday = today - timedelta(days=1)
 
-    has_recent_reading = (
-        today.strftime("%Y-%m-%d") in dates or yesterday.strftime("%Y-%m-%d") in dates
-    )
-
-    if not has_recent_reading:
+    if today not in dates and yesterday not in dates:
         return 0
 
     streak = 0
-    current_date = today if today.strftime("%Y-%m-%d") in dates else yesterday
-
-    while current_date.strftime("%Y-%m-%d") in dates:
+    current_date = today if today in dates else yesterday
+    while current_date in dates:
         streak += 1
         current_date -= timedelta(days=1)
 
