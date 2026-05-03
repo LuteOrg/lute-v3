@@ -15,7 +15,6 @@ from flask import (
     send_file,
     flash,
 )
-from lute.models.language import Language
 from lute.models.term import Status
 from lute.models.repositories import (
     LanguageRepository,
