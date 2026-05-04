@@ -784,20 +784,20 @@ let _move_cursor = function(selector, direction = 1) {
 
 /** SENTENCE TRANSLATIONS *************************/
 
-// LUTE_SENTENCE_LOOKUP_URIS is rendered in templates/read/index.html.
+// LUTE_SENTENCE_LOOKUP_DICTS is rendered in templates/read/index.html.
 // Hitting "t" repeatedly cycles through the uris.  Moving to a new
 // sentence resets the order.
 
 var LUTE_LAST_SENTENCE_TRANSLATION_TEXT = '';
 var LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX = 0;
 
-/** Cycle through the LUTE_SENTENCE_LOOKUP_URIS.
+/** Cycle through the LUTE_SENTENCE_LOOKUP_DICTS.
  * If the current sentence is the same as the last translation,
  * move to the next sentence dictionary; otherwise start the cycle
  * again (from index 0).
  */
 let _get_translation_dict_index = function(sentence) {
-  const dict_count = LUTE_SENTENCE_LOOKUP_URIS.length;
+  const dict_count = LUTE_SENTENCE_LOOKUP_DICTS.length;
   if (dict_count == 0)
     return 0;
   let new_index = LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX;
@@ -821,19 +821,18 @@ let show_translation_for_text = function(text) {
   if (text == '')
     return;
 
-  if (LUTE_SENTENCE_LOOKUP_URIS.length == 0) {
-    console.log('No sentence translation uris configured.');
+  if (LUTE_SENTENCE_LOOKUP_DICTS.length == 0) {
+    console.log('No sentence translation dictionaries configured.');
     return;
   }
 
   const dict_index = _get_translation_dict_index(text);
-  const userdict = LUTE_SENTENCE_LOOKUP_URIS[dict_index];
+  const dict = LUTE_SENTENCE_LOOKUP_DICTS[dict_index];
 
   const lookup = encodeURIComponent(text);
-  let url = userdict.replace('[LUTE]', lookup);
+  let url = dict.url.replace('[LUTE]', lookup);
   url = url.replace('###', lookup);  // TODO remove_old_###_placeholder: remove
-  if (url[0] == '*') {
-    const finalurl = url.substring(1);  // drop first char.
+  if (dict.dicttype == "popuphtml") {
     let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no';
     if (LUTE_USER_SETTINGS.open_popup_in_new_tab)
       settings = null;

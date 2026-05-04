@@ -25,14 +25,6 @@ class LanguageDictionary(db.Model):
     is_active = db.Column("LdIsActive", db.Boolean, default=True)
     sort_order = db.Column("LdSortOrder", db.SmallInteger, nullable=False)
 
-    # HACK: pre-pend '*' to URLs that need to open a new window.
-    # This is a relic of the original code, and should be changed.
-    # TODO remove-asterisk-hack: remove * from URL start.
-    def make_uri(self):
-        "Hack add asterisk."
-        prepend = "*" if self.dicttype == "popuphtml" else ""
-        return f"{prepend}{self.dicturi}"
-
 
 class Language(
     db.Model
@@ -107,7 +99,7 @@ class Language(
         "Get sorted uris for active dicts of correct type."
         actives = [d for d in self.dictionaries if d.is_active and d.usefor == use_for]
         sorted_actives = sorted(actives, key=lambda x: x.sort_order)
-        return [d.make_uri() for d in sorted_actives]
+        return [{"url": d.dicturi, "dicttype": d.dicttype} for d in sorted_actives]
 
     @property
     def sentence_dict_uris(self):

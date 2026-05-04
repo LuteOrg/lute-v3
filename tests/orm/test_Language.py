@@ -87,10 +87,18 @@ def test_language_dictionaries_smoke_test(empty_db):
     assert ld.dicttype == "embeddedhtml", "type"
     assert ld.dicturi == "1?[LUTE]", "uri"
 
-    exp = """{"1": {"term": ["1?[LUTE]", "*2?[LUTE]"], "sentence": ["*3?[LUTE]"]}}"""
+    exp = {
+        1: {
+            "term": [
+                {"url": "1?[LUTE]", "dicttype": "embeddedhtml"},
+                {"url": "2?[LUTE]", "dicttype": "popuphtml"},
+            ],
+            "sentence": [{"url": "3?[LUTE]", "dicttype": "popuphtml"}],
+        }
+    }
     repo = LanguageRepository(db.session)
     dicts = repo.all_dictionaries()
-    assert json.dumps(dicts) == exp
+    assert dicts == exp
 
 
 def test_delete_language_removes_book_and_terms(app_context, spanish):
