@@ -2,7 +2,6 @@
 Language mapping tests.
 """
 
-import json
 from lute.models.language import Language, LanguageDictionary
 from lute.models.repositories import LanguageRepository
 from lute.read.service import Service as ReadService
