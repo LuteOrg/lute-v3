@@ -132,6 +132,14 @@ class Service:
             ) as out_file:
                 shutil.copyfileobj(in_file, out_file)
 
+            suffix = f"pre_restore_{datetime.now().strftime('%Y-%m-%d_%H%M%S')}"
+            self.create_backup(
+                app_config,
+                settings,
+                is_manual=True,
+                suffix=suffix,
+            )
+
             bind = self.session.get_bind()
             self.session.close()
             self.session.remove()
