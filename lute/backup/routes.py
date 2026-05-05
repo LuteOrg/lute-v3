@@ -18,7 +18,7 @@ from flask import (
 )
 from lute.db import db
 from lute.models.repositories import UserSettingRepository
-from lute.backup.service import Service
+from lute.backup.service import Service, BackupException
 
 
 bp = Blueprint("backup", __name__, url_prefix="/backup")
@@ -58,26 +58,15 @@ def upload_backup():
     """
     Upload a backup file into the backup directory.
     """
-    upload = request.files.get("backup_file")
-    if upload is None or upload.filename == "":
-        flash("No backup file selected.", "error")
-        return redirect("/backup/index", 302)
-
-    filename = os.path.basename(upload.filename)
-    if not filename.endswith(".db.gz"):
-        flash("Invalid backup filename.", "error")
-        return redirect("/backup/index", 302)
-    if not filename.startswith("manual_"):
-        filename = f"manual_{filename}"
-
     settings = _get_settings()
-    os.makedirs(settings.backup_dir, exist_ok=True)
-    dest = os.path.join(settings.backup_dir, filename)
-    if os.path.exists(dest):
-        flash(f"Backup already exists: {filename}", "error")
-        return redirect("/backup/index", 302)
-    upload.save(dest)
-    flash(f"Backup uploaded: {filename}", "notice")
+    service = Service(db.session)
+    try:
+        filename = service.save_uploaded_backup(
+            settings, request.files.get("backup_file")
+        )
+        flash(f"Backup uploaded: {filename}", "notice")
+    except BackupException as e:
+        flash(str(e), "error")
     return redirect("/backup/index", 302)
 
 
@@ -152,10 +141,9 @@ def do_delete():
     settings = _get_settings()
     service = Service(db.session)
     try:
-        backupfile = service._get_backup_file(settings.backup_dir, filename)
-        os.remove(backupfile.filepath)
-        flash(f"Backup deleted: {filename}", "notice")
-        return jsonify(filename)
+        deleted_filename = service.delete_backup(settings, filename)
+        flash(f"Backup deleted: {deleted_filename}", "notice")
+        return jsonify(deleted_filename)
     except Exception as e:  # pylint: disable=broad-exception-caught
         tb = traceback.format_exc()
         return jsonify({"errmsg": str(e) + " -- " + tb}), 500

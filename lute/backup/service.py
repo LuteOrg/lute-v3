@@ -150,6 +150,31 @@ class Service:
             if os.path.exists(tempname):
                 os.remove(tempname)
 
+    def save_uploaded_backup(self, settings, upload):
+        "Save an uploaded database backup file."
+        if upload is None or upload.filename == "":
+            raise BackupException("No backup file selected.")
+
+        filename = os.path.basename(upload.filename)
+        if not filename.endswith(".db.gz"):
+            raise BackupException("Invalid backup filename.")
+        if not filename.startswith("manual_"):
+            filename = f"manual_{filename}"
+
+        os.makedirs(settings.backup_dir, exist_ok=True)
+        dest = os.path.join(settings.backup_dir, filename)
+        if os.path.exists(dest):
+            raise BackupException(f"Backup already exists: {filename}")
+
+        upload.save(dest)
+        return filename
+
+    def delete_backup(self, settings, filename):
+        "Delete a backup file."
+        backupfile = self._get_backup_file(settings.backup_dir, filename)
+        os.remove(backupfile.filepath)
+        return backupfile.name
+
     def should_run_auto_backup(self, backup_settings):
         """
         True (if applicable) if last backup was old.
