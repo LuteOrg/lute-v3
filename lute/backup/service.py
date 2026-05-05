@@ -132,6 +132,8 @@ class Service:
             ) as out_file:
                 shutil.copyfileobj(in_file, out_file)
 
+            self._validate_lute_database(tempname)
+
             suffix = f"pre_restore_{datetime.now().strftime('%Y-%m-%d_%H%M%S')}"
             self.create_backup(
                 app_config,
@@ -259,6 +261,30 @@ class Service:
         "Return a validated backup file."
         fullpath = os.path.join(outdir, os.path.basename(filename))
         return DatabaseBackupFile(fullpath)
+
+    def _validate_lute_database(self, dbfilename):
+        "Raise if dbfilename is not a valid Lute database."
+        required_tables = {
+            "_migrations": ["filename"],
+            "settings": ["StKey", "StKeyType", "StValue"],
+            "books": ["BkID", "BkLgID", "BkTitle"],
+            "languages": ["LgID", "LgName"],
+            "words": ["WoID", "WoLgID", "WoText"],
+        }
+        try:
+            with sqlite3.connect(dbfilename) as conn:
+                integrity = conn.execute("pragma integrity_check").fetchone()
+                if integrity is None or integrity[0] != "ok":
+                    raise BackupException("Backup database failed integrity check.")
+
+                for table, columns in required_tables.items():
+                    rows = conn.execute(f'pragma table_info("{table}")').fetchall()
+                    found_columns = {row[1] for row in rows}
+                    missing_columns = set(columns) - found_columns
+                    if missing_columns:
+                        raise BackupException("Backup is not a valid Lute database.")
+        except sqlite3.Error as e:
+            raise BackupException("Backup is not a valid SQLite database.") from e
 
     def _set_backup_dir(self, dbfilename, backup_dir):
         "Preserve the local backup_dir after restore."
