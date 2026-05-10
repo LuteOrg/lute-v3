@@ -481,28 +481,15 @@
       function(data, status) {
         $('#thetext').html(data);
 
+		var html = $('#thetext').html();
 
-// Replace headings inside a target DIV (e.g., #content)
-// $('#thetext').each(function() {
-  var html = $('#thetext').html();
+		html = html.replace(/\n\s*<span(?:[^>]*)>\s*(#+)\s*<\/span>(<span(?:[^>]*)>\s*.*\s*<\/span>)+(\s*\n)+/gmiu, function(_, hashes, text) {
+					console.log(_, hashes, text);
+			var level = Math.min(hashes.length, 4);
+			return '<h' + level + '>' + text.trim() + '</h' + level + '>';
+		}).replace(/(<h\d>(\s*\n)+)*<span class="textitem">.?<\/span>(\s*\n)*/gmiu, "$1");
 
-  // Work on plain text lines: convert <br> to newline first if needed
-  // and strip existing wrapping tags that would interfere (optional).
-//   html = html.replace(/<br\s*\/?>/gi, '\n');
-		console.log(html);
-
-  // Replace lines starting with 1+ # followed by a space (common Markdown style)
-  html = html.replace(/\n\s*<span(?:[^>]*)>\s*(#+)\s*<\/span>(<span(?:[^>]*)>\s*.*\s*<\/span>(\s*\n)*)+(\s*\n)+/gmiu, function(_, hashes, text) {
-			console.log(_, hashes, text);
-    var level = Math.min(hashes.length, 4);
-    return '<h' + level + '>' + text.trim() + '</h' + level + '>';
-  });
-
-  // Convert remaining newlines back to <br> if you want to preserve line breaks
-//   html = html.replace(/\n/g, '<br>');
-
-  $('#thetext').html(html);
-// });
+		$('#thetext').html(html);
 
         add_status_classes();
         reset_cursor();
