@@ -16,6 +16,7 @@ from openepub import Epub, EpubError
 from pypdf import PdfReader
 from subtitle_parser import SrtParser, WebVttParser
 from lute.book.model import Repository
+# import re
 
 
 class BookImportException(Exception):
@@ -173,7 +174,6 @@ class FileTextExtraction:
             msg = f"Could not parse {filename} (error: {str(e)})"
             raise BookImportException(message=msg, cause=e) from e
 
-
 class Service:
     "Service."
 
@@ -217,8 +217,14 @@ class Service:
 
         # Add elements in order found.
         for element in soup.descendants:
-            if element.name in ("h1", "h2", "h3", "h4", "p"):
-                extracted_text.append(element.text)
+            if element.text not in ("", None):
+                element_text = element.text # remove refs: re.sub(r"\[\d+\]", "", element.text)
+                if element.name == "p":
+                    extracted_text.append(element_text)
+                elif element.name in ("h1", "h2", "h3", "h4"):
+                    extracted_text.append(''.rjust(int(element.name[1]), '#') + ' ' + element_text)
+        
+        print(extracted_text)
 
         title_node = soup.find("title")
         orig_title = title_node.string if title_node else url

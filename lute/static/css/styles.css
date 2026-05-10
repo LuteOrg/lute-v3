@@ -813,7 +813,7 @@ span.textsentence {
 
 /* A word shown in the reading pane. */
 span.textitem {
-    font-size: 16px;
+    /* font-size: 16px; */
     color: var(--font-color);
 
     /* disallow select, only allow mouse-down-drag-up to define multiword
@@ -825,11 +825,10 @@ span.textitem {
     border-bottom: 1px solid transparent;
 }
 
-/* .click */
-/* { */
-    /* cursor: pointer; */
+span.click {
+    cursor: pointer;
     /* color: #C00000; */
-/* } */
+}
 
 .hide
 {
