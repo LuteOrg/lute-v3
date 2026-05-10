@@ -205,7 +205,7 @@ class Service:
         s = None
         try:
             timeout = 20  # seconds
-            response = requests.get(url, timeout=timeout)
+            response = requests.get(url, headers={"User-Agent":	"Lute/3.0 (X11; Ubuntu; Linux x86_64)"}, timeout=timeout)
             response.raise_for_status()
             s = response.text
         except requests.exceptions.RequestException as e:
