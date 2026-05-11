@@ -176,6 +176,10 @@ class FileTextExtraction:
 
 class Service:
     "Service."
+    
+    HEADERS = {
+        "User-Agent": "Lute/3.0 (X11; Ubuntu; Linux x86_64)"
+    }
 
     def _unique_fname(self, filename):
         """
@@ -205,7 +209,7 @@ class Service:
         s = None
         try:
             timeout = 20  # seconds
-            response = requests.get(url, headers={"User-Agent":	"Lute/3.0 (X11; Ubuntu; Linux x86_64)"}, timeout=timeout)
+            response = requests.get(url, headers=self.HEADERS, timeout=timeout)
             response.raise_for_status()
             s = response.text
         except requests.exceptions.RequestException as e:
