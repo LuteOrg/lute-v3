@@ -29,7 +29,8 @@ from lute.models.repositories import (
     LanguageRepository,
 )
 from lute.book.model import Book, Repository
-
+from langdetect import detect
+import pycountry
 
 bp = Blueprint("book", __name__, url_prefix="/book")
 
@@ -122,6 +123,12 @@ def new():
     form = NewBookForm(obj=b)
     form.language_id.choices = lute.utils.formutils.language_choices(db.session)
     repo = Repository(db.session)
+    if isinstance(form.text.data, str):
+        language_name = pycountry.languages.get(alpha_2=detect(form.text.data)).name
+        language_id = LanguageRepository(db.session).find_by_name(language_name).id
+        form.language_id.data = language_id
+    else:
+        form.language_id.data = 0
 
     if form.validate_on_submit():
         try:
@@ -131,11 +138,6 @@ def new():
             return redirect(f"/read/{book.id}/page/1", 302)
         except BookImportException as e:
             flash(e.message, "notice")
-
-    # Don't set the current language before submit.
-    usrepo = UserSettingRepository(db.session)
-    current_language_id = int(usrepo.get_value("current_language_id"))
-    form.language_id.data = current_language_id
 
     return render_template(
         "book/create_new.html",
