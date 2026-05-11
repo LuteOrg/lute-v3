@@ -55,8 +55,8 @@ class NewBookForm(FlaskForm):
         "Audio file",
         validators=[
             FileAllowed(
-                ["mp3", "m4a", "wav", "ogg", "opus", "aac", "flac", "webm"],
-                "Please upload a valid audio file (mp3, m4a, wav, ogg, opus, aac, flac, webm)",
+                ["mp3", "m4a", "m4b", "wav", "ogg", "opus", "aac", "flac", "webm"],
+                "Please upload a valid audio file (mp3, m4a/m4b, wav, ogg, opus, aac, flac, webm)",
             )
         ],
     )
@@ -117,8 +117,8 @@ class EditBookForm(FlaskForm):
         "Audio file",
         validators=[
             FileAllowed(
-                ["mp3", "wav", "ogg", "opus", "aac", "flac", "webm"],
-                "Please upload a valid audio file (mp3, wav, ogg, opus, aac, flac, webm)",
+                ["mp3", "m4a", "m4b", "wav", "ogg", "opus", "aac", "flac", "webm"],
+                "Please upload a valid audio file (mp3, m4a/m4b, wav, ogg, opus, aac, flac, webm)",
             )
         ],
     )
