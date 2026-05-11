@@ -129,7 +129,7 @@ def new():
     if isinstance(form.text.data, str):
         language_name = pycountry.languages.get(alpha_2=detect(form.text.data)).name
         language_id = LanguageRepository(db.session).find_by_name(language_name)
-        form.language_id.data = language_id.id if form.language_id.data is not None else 0
+        form.language_id.data = language_id.id if language_id is not None else 0
     
     if form.language_id.data == 0:
         # Don't set the current language before submit.
