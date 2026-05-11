@@ -123,12 +123,19 @@ def new():
     form = NewBookForm(obj=b)
     form.language_id.choices = lute.utils.formutils.language_choices(db.session)
     repo = Repository(db.session)
+    form.language_id.data = 0
+    
+    # Attempt autodetect
     if isinstance(form.text.data, str):
         language_name = pycountry.languages.get(alpha_2=detect(form.text.data)).name
-        language_id = LanguageRepository(db.session).find_by_name(language_name).id
-        form.language_id.data = language_id
-    else:
-        form.language_id.data = 0
+        language_id = LanguageRepository(db.session).find_by_name(language_name)
+        form.language_id.data = language_id.id if form.language_id.data is not None else 0
+    
+    if form.language_id.data == 0:
+        # Don't set the current language before submit.
+        usrepo = UserSettingRepository(db.session)
+        current_language_id = int(usrepo.get_value("current_language_id"))
+        form.language_id.data = current_language_id
 
     if form.validate_on_submit():
         try:
