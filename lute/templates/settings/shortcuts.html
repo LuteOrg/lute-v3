@@ -92,6 +92,7 @@
   function toggle_shortcut(el, text_input_id) {
     let newval = el.checked ? "TBD" : "";
     $(`#${text_input_id}`).val(newval);
+    _check_dups();
   }
 
 </script>
