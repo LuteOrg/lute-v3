@@ -1,7 +1,10 @@
+"""
+Test bing image search parsing.
+"""
+
 from unittest.mock import patch, MagicMock
 import urllib.error
 import urllib.request
-import json
 
 
 def test_bing_search_success_json_parsing(client):

@@ -49,6 +49,7 @@ def bing_search_page(langid, text, searchstring):
 def bing_search(langid, text, searchstring):
     "Do an image search."
 
+    # pylint: disable=too-many-locals
     # Searching for images slows acceptance tests.  If NO_BING_IMAGES
     # environment setting, don't do a search.
     if "NO_BING_IMAGES" in os.environ:
