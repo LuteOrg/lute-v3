@@ -29,6 +29,7 @@ Menu sub-items are only visible after hovering over the menu, e.g.:
 
 import os
 import time
+import re
 from playwright.sync_api import Playwright, sync_playwright, expect
 
 
@@ -315,6 +316,57 @@ def test_hotkey_conflict():
 
         # Verify the Save button is now enabled
         expect(save_btn).to_be_enabled()
+
+        context.close()
+        browser.close()
+
+
+def test_page_change_first_word():
+    "Test that going to the next page resets the cursor, so the first word is selected next."
+
+    showbrowser = os.environ.get("SHOW", "") == "true"
+    with sync_playwright() as sp:
+        browser = sp.chromium.launch(headless=not showbrowser)
+        context = browser.new_context()
+        page = context.new_page()
+
+        # Load demo database
+        page.goto("http://localhost:5001/dev_api/load_demo")
+
+        # Open Tutorial
+        page.goto("http://localhost:5001")
+        page.get_by_role("link", name="Tutorial", exact=True).click()
+
+        # Wait until page text is loaded
+        page.locator("span.word").first.wait_for()
+
+        # Press right arrow 3 times to move the cursor to some word in the middle
+        page.keyboard.press("ArrowRight")
+        page.keyboard.press("ArrowRight")
+        page.keyboard.press("ArrowRight")
+
+        # Verify a word is highlighted/active
+        expect(
+            page.locator("span.word.wordhover, span.word.kwordmarked").first
+        ).to_be_visible()
+
+        # Go to the next page using the right arrow navigation button
+        page.get_by_text("▶").click()
+
+        # Wait for the new page content to load
+        page.locator("span.word").first.wait_for()
+
+        # Verify that NO word on the new page is highlighted automatically
+        expect(
+            page.locator("span.word.wordhover, span.word.kwordmarked")
+        ).to_have_count(0)
+
+        # Press the right arrow key
+        page.keyboard.press("ArrowRight")
+
+        # Verify that the VERY FIRST word on the new page is now highlighted
+        first_word = page.locator("span.word").first
+        expect(first_word).to_have_class(re.compile(r"kwordmarked"))
 
         context.close()
         browser.close()
