@@ -2334,3 +2334,24 @@ div#termimagesearch span.imageAction:hover {
     color: #C00000;
     cursor: pointer;
 }
+
+div#termimagesearch {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px;
+}
+div#termimagesearch span {
+    width: 120px;
+    height: 90px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+}
+div#termimagesearch span img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
