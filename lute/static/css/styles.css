@@ -2309,6 +2309,7 @@ div#termimagesearch p.termimagesearchtitle {
 
 div#termimagesearch .initial {
     border: solid 2px transparent;
+    cursor: pointer;
 }
 
 div#termimagesearch .highlight {
@@ -2321,6 +2322,8 @@ div#termimagesearch .saved {
 
 div#termimagesearch span > img {
     display:inline;
+    max-height: 200px;
+    width: auto;
 }
 
 div#termimagesearch span.imageAction {

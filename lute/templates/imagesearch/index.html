@@ -7,6 +7,30 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
     <link rel="stylesheet" type="text/css" href="/theme/current">
     <link rel="stylesheet" type="text/css" href="/theme/custom_styles">
+    <style>
+      #termimagesearch {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 4px;
+      }
+      #termimagesearch span {
+        width: 120px;
+        height: 90px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid transparent;
+        box-sizing: border-box;
+      }
+      #termimagesearch span img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      #termimagesearch span.highlight { border-color: #4a90e2; }
+      #termimagesearch span.saved    { border-color: #27ae60; }
+    </style>
   </head>
 
   <body>

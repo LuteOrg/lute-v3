@@ -7,6 +7,7 @@ import datetime
 import hashlib
 import re
 import urllib.request
+import json
 from flask import (
     Blueprint,
     request,
@@ -55,15 +56,23 @@ def bing_search(langid, text, searchstring):
             "imagesearch/index.html", langid=langid, text=text, images=[]
         )
 
-    # dump("searching for " + text + " in " + language.getLgName())
     search = urllib.parse.quote(text)
     params = searchstring.replace("[LUTE]", search)
     params = params.replace("###", search)  # TODO remove_old_###_placeholder: remove
-    url = "https://www.bing.com/images/search?" + params
+
+    url = "https://www.bing.com/images/async?" + params + "&first=1&count=35&mmasync=1"
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/120.0.0.0 Safari/537.36"
+        )
+    }
     content = ""
     error_msg = ""
     try:
-        with urllib.request.urlopen(url) as s:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req) as s:
             content = s.read().decode("utf-8")
     except urllib.error.URLError as e:
         content = ""
@@ -76,21 +85,34 @@ def bing_search(langid, text, searchstring):
     # <img class="mimg vimgld" ... data-src="https:// ...">
     # or
     # <img class="mimg rms_img" ... src="https://tse4.mm.bing ..." >
+    images = []
+    for m_data in re.findall(r' m="({.*?})"', content):
+        try:
+            data = json.loads(m_data.replace("&quot;", '"'))
+            murl = data.get("murl", "")
+            if murl and murl.startswith("http"):
+                images.append({"html": '<img src="' + murl + '">', "src": murl})
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
 
-    def is_search_img(img):
-        return not ('src="/' in img) and ("rms_img" in img or "vimgld" in img)
+    if not images:
 
-    def build_struct(image):
-        src = "missing"
-        normalized_source = image.replace("data-src=", "src=")
-        m = re.search(r'src="(.*?)"', normalized_source)
-        if m:
-            src = m.group(1)
-        return {"html": image, "src": src}
+        def is_search_img(img):
+            if 'src="/' in img:
+                return False
+            normalized = img.replace("data-src=", "src=")
+            return bool(re.search(r'src="https?://', normalized))
 
-    raw_images = list(re.findall(r"(<img .*?>)", content, re.I))
+        def build_struct(image):
+            src = "missing"
+            normalized_source = image.replace("data-src=", "src=")
+            m = re.search(r'src="(.*?)"', normalized_source)
+            if m:
+                src = m.group(1)
+            return {"html": image, "src": src}
 
-    images = [build_struct(i) for i in raw_images if is_search_img(i)]
+        raw_images = list(re.findall(r"(<img .*?>)", content, re.I))
+        images = [build_struct(i) for i in raw_images if is_search_img(i)]
 
     # Reduce image load count so we don't kill subpage loading.
     # Also bing seems to throttle images if the count is higher (??).
