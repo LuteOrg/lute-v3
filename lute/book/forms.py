@@ -11,8 +11,20 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 
 # Global configuration for allowed audio files
-ALLOWED_AUDIO_EXTENSIONS = ["mp3", "m4a", "m4b", "wav", "ogg", "opus", "aac", "flac", "webm"]
-AUDIO_VALIDATION_MSG = f"Please upload a valid audio file ({', '.join(ALLOWED_AUDIO_EXTENSIONS)})"
+ALLOWED_AUDIO_EXTENSIONS = [
+    "mp3",
+    "m4a",
+    "m4b",
+    "wav",
+    "ogg",
+    "opus",
+    "aac",
+    "flac",
+    "webm",
+]
+AUDIO_VALIDATION_MSG = (
+    f"Please upload a valid audio file ({', '.join(ALLOWED_AUDIO_EXTENSIONS)})"
+)
 
 
 def _tag_values(field_data):
