@@ -154,8 +154,25 @@ def bing_save():
 
     imgdir, filename = _get_dir_and_filename(langid, text)
     destfile = os.path.join(imgdir, filename)
-    with urllib.request.urlopen(src) as response, open(destfile, "wb") as out_file:
-        out_file.write(response.read())
+
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/120.0.0.0 Safari/537.36"
+        ),
+        "Referer": "https://www.bing.com/",
+        "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+    }
+
+    try:
+        req = urllib.request.Request(src, headers=headers)
+        with urllib.request.urlopen(req) as response, open(destfile, "wb") as out_file:
+            out_file.write(response.read())
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        # Some sites won't allow direct calls :-( not sure what to do.
+        # Return a failure.
+        return jsonify({"reason": str(e)}), 500
 
     ret = {
         "url": f"/userimages/{langid}/{filename}",
