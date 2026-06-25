@@ -464,6 +464,7 @@
    * to the ajax "success" function worked.  ???
    */
   function goto_relative_page(p, initial_page_load = false) {
+    reset_cursor();
     const bookid = $('#book_id').val();
     const actualPage = getActualPage(p);
 
@@ -480,7 +481,6 @@
       function(data, status) {
         $('#thetext').html(data);
         add_status_classes();
-        reset_cursor();
         start_hover_mode();
         $('#page_num').val(actualPage);
         enable_page_nav_links();
