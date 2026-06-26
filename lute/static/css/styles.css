@@ -2342,8 +2342,8 @@ div#termimagesearch {
     padding: 4px;
 }
 div#termimagesearch span {
-    width: 120px;
-    height: 90px;
+    width: 160px;
+    height: 120px;
     overflow: hidden;
     cursor: pointer;
     border: 2px solid transparent;
