@@ -2309,6 +2309,7 @@ div#termimagesearch p.termimagesearchtitle {
 
 div#termimagesearch .initial {
     border: solid 2px transparent;
+    cursor: pointer;
 }
 
 div#termimagesearch .highlight {
@@ -2321,6 +2322,8 @@ div#termimagesearch .saved {
 
 div#termimagesearch span > img {
     display:inline;
+    max-height: 200px;
+    width: auto;
 }
 
 div#termimagesearch span.imageAction {
@@ -2330,4 +2333,25 @@ div#termimagesearch span.imageAction {
 div#termimagesearch span.imageAction:hover {
     color: #C00000;
     cursor: pointer;
+}
+
+div#termimagesearch {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px;
+}
+div#termimagesearch span {
+    width: 160px;
+    height: 120px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+}
+div#termimagesearch span img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
