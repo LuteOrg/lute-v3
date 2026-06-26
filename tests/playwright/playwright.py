@@ -289,7 +289,7 @@ def test_hotkey_conflict():
         # Focus first shortcut and press a key to assign it
         shortcuts.nth(0).click()
         page.keyboard.press("KeyA")
-        
+
         # Focus second shortcut and press the same key to create a conflict
         shortcuts.nth(1).click()
         page.keyboard.press("KeyA")
@@ -297,7 +297,7 @@ def test_hotkey_conflict():
         # Verify that both are highlighted as duplicates (dupShortcut class)
         expect(shortcuts.nth(0)).to_have_class(r"shortcutdefinition dupShortcut")
         expect(shortcuts.nth(1)).to_have_class(r"shortcutdefinition dupShortcut")
-        
+
         # Verify the Save button is disabled
         save_btn = page.locator("#btnSubmit")
         expect(save_btn).to_be_disabled()
