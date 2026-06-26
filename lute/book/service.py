@@ -12,6 +12,7 @@ from tempfile import TemporaryFile
 import requests
 from bs4 import BeautifulSoup
 from flask import current_app, flash
+from sqlalchemy import text
 from openepub import Epub, EpubError
 from pypdf import PdfReader
 from subtitle_parser import SrtParser, WebVttParser
@@ -282,3 +283,81 @@ class Service:
         dbbook = repo.add(book)
         repo.commit()
         return dbbook
+
+    # pylint: disable=too-many-locals
+    def search_books_for_term(self, term, session):
+        """
+        Locate term in any book using full text search.
+        Returns a list of dictionaries with book info and phrases
+        (snippets of 200 characters) containing the term.
+        """
+        sql = """
+            SELECT b.BkID, b.BkTitle, t.TxText
+            FROM texts_fts f
+            JOIN texts t ON t.TxID = f.rowid
+            JOIN books b ON b.BkID = t.TxBkID
+            WHERE f.texts_fts MATCH :search_term
+            ORDER BY b.BkTitle, t.TxOrder
+        """
+
+        # Simple sanitization and prefix matching for FTS5 syntax
+        sanitized_term = term.replace('"', '""')
+
+        result = session.execute(
+            text(sql),
+            {
+                "search_term": f'"{sanitized_term}"*',
+            },
+        ).all()
+
+        books_map = {}
+        target_len = 200
+        term_len = len(term)
+        term_lower = term.lower()
+
+        for row in result:
+            bk_id, title, page_text = row
+
+            # Find all occurrences of the term in the page_text
+            text_lower = page_text.lower()
+            start = 0
+
+            page_snippets = []
+            while True:
+                pos = text_lower.find(term_lower, start)
+                if pos == -1:
+                    break
+
+                # Determine centered window
+                padding = (target_len - term_len) // 2
+                snippet_start = max(0, pos - padding)
+                snippet_end = min(len(page_text), pos + term_len + padding)
+
+                # Adjust window to get target_len characters if possible
+                actual_len = snippet_end - snippet_start
+                if actual_len < target_len:
+                    if snippet_start == 0:
+                        snippet_end = min(len(page_text), target_len)
+                    elif snippet_end == len(page_text):
+                        snippet_start = max(0, len(page_text) - target_len)
+
+                snippet = page_text[snippet_start:snippet_end]
+
+                # Add ellipses if truncated
+                prefix = "..." if snippet_start > 0 else ""
+                suffix = "..." if snippet_end < len(page_text) else ""
+
+                snippet_text = f"{prefix}{snippet}{suffix}"
+                term_position = pos
+
+                page_snippets.append({"text": snippet_text, "position": term_position})
+                start = pos + max(1, term_len)
+
+            if page_snippets:
+                if bk_id not in books_map:
+                    books_map[bk_id] = {"book_id": bk_id, "title": title, "phrases": []}
+                for s in page_snippets:
+                    if s not in books_map[bk_id]["phrases"]:
+                        books_map[bk_id]["phrases"].append(s)
+
+        return list(books_map.values())

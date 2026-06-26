@@ -233,3 +233,14 @@ def table_stats(bookid):
         "status_distribution": stats.status_distribution,
     }
     return jsonify(ret)
+
+
+@bp.route("/search_term", methods=["GET"])
+def search_term():
+    "Search books for a term."
+    term = request.args.get("term", "").strip()
+    if not term:
+        return jsonify([])
+    svc = BookService()
+    results = svc.search_books_for_term(term, db.session)
+    return jsonify(results)
