@@ -29,6 +29,7 @@ Menu sub-items are only visible after hovering over the menu, e.g.:
 
 import os
 import time
+import re
 from playwright.sync_api import Playwright, sync_playwright, expect
 
 
@@ -273,7 +274,7 @@ def test_playwright():
 
 def test_page_change_first_word():
     "Test that going to the next page resets the cursor, so the first word is selected next."
-    import re
+
     showbrowser = os.environ.get("SHOW", "") == "true"
     with sync_playwright() as sp:
         browser = sp.chromium.launch(headless=not showbrowser)
@@ -296,16 +297,20 @@ def test_page_change_first_word():
         page.keyboard.press("ArrowRight")
 
         # Verify a word is highlighted/active
-        expect(page.locator("span.word.wordhover, span.word.kwordmarked").first).to_be_visible()
+        expect(
+            page.locator("span.word.wordhover, span.word.kwordmarked").first
+        ).to_be_visible()
 
         # Go to the next page using the right arrow navigation button
         page.get_by_text("▶").click()
-        
+
         # Wait for the new page content to load
         page.locator("span.word").first.wait_for()
 
         # Verify that NO word on the new page is highlighted automatically
-        expect(page.locator("span.word.wordhover, span.word.kwordmarked")).to_have_count(0)
+        expect(
+            page.locator("span.word.wordhover, span.word.kwordmarked")
+        ).to_have_count(0)
 
         # Press the right arrow key
         page.keyboard.press("ArrowRight")
