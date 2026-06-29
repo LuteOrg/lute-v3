@@ -2359,9 +2359,9 @@ div#termimagesearch span img {
 
 /* Search FTS Card & Highlight Styles */
 
-.dt-search {
+/*.dt-search {
     display: none !important;
-}
+}*/
 
 .premium-search-container {
     margin-bottom: 1.5rem;
