@@ -244,3 +244,54 @@ def search_term():
     svc = BookService()
     results = svc.search_books_for_term(term, db.session)
     return jsonify(results)
+
+
+@bp.route("/search", methods=["GET"])
+def search():
+    "Render the content search page."
+    return render_template("book/search.html")
+
+
+@bp.route("/search_datatables", methods=["GET"])
+def search_datatables():
+    "Search books for a term, returning paginated data for DataTables."
+    term = request.args.get("term", "").strip()
+    draw = int(request.args.get("draw", 1))
+    start = int(request.args.get("start", 0))
+    length = int(request.args.get("length", 25))
+
+    if not term:
+        return jsonify(
+            {"draw": draw, "recordsTotal": 0, "recordsFiltered": 0, "data": []}
+        )
+
+    svc = BookService()
+    results = svc.search_books_for_term(term, db.session)
+
+    # Flatten the book-phrase nested dict into a list
+    flat_results = []
+    for book in results:
+        for phrase in book["phrases"]:
+            flat_results.append(
+                {
+                    "book_id": book["book_id"],
+                    "title": book["title"],
+                    "page": phrase["page"],
+                    "text": phrase["text"],
+                }
+            )
+
+    # Sort flat results by title, page
+    flat_results.sort(key=lambda x: (x["title"], x["page"]))
+
+    total_records = len(flat_results)
+    paginated_data = flat_results[start : start + length]
+
+    return jsonify(
+        {
+            "draw": draw,
+            "recordsTotal": total_records,
+            "recordsFiltered": total_records,
+            "data": paginated_data,
+        }
+    )

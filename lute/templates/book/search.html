@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Search Book Content{% endblock %}
+
+{% block header %}Search Content{% endblock %}
+
+{% block body %}
+<div class="premium-search-container">
+  <div class="premium-search-input-wrapper">
+    <input type="text" id="customSearchInput" class="premium-search-input" placeholder="Search (in content)" autofocus />
+  </div>
+</div>
+
+<div id="ftsContainer">
+  <table id="searchtable" class="table dataTable stripe" style="width:100%">
+    <thead>
+      <tr>
+        <th style="text-align: left; width: 30%;">Title</th>
+        <th style="text-align: left; width: 10%;">Page</th>
+        <th style="text-align: left; width: 50%;">Phrase</th>
+        <th style="text-align: center; width: 10%;">Actions</th>
+      </tr>
+    </thead>
+  </table>
+</div>
+
+<script>
+  $(document).ready(function () {
+    // Clear search state if not navigated back from reading/peek pages
+    const referrer = document.referrer;
+    const isFromReading = referrer && (referrer.includes('/peek/') || referrer.includes('/read/'));
+    if (!isFromReading) {
+      sessionStorage.removeItem('lastSearchQuery');
+    }
+
+    // Restore search query from sessionStorage
+    const savedQuery = sessionStorage.getItem('lastSearchQuery');
+    if (savedQuery !== null) {
+      $('#customSearchInput').val(savedQuery);
+    }
+
+    let searchTimeout = null;
+
+    const searchTable = $('#searchtable').DataTable({
+      layout: {
+        topStart: 'pageLength',
+        topEnd: [],
+        bottomStart: [],
+        bottomEnd: 'paging'
+      },
+      responsive: true,
+      lengthMenu: [ 10, 25, 50, 100 ],
+      pageLength: 25,
+      paging: true,
+      info: true,
+      ordering: false,
+      searching: false,
+      processing: true,
+      serverSide: true,
+      ajax: {
+        url: "/book/search_datatables",
+        data: function (d) {
+          d.term = $('#customSearchInput').val().trim();
+        },
+        type: "GET",
+        dataType: "json"
+      },
+      columns: [
+        { name: "BkTitle", data: "title" },
+        { name: "PageNum", data: "page", render: function(data, type, row) {
+            return `Page ${data}`;
+          }
+        },
+        { name: "PhraseText", data: "text", render: function(data, type, row) {
+            const term = $('#customSearchInput').val().trim();
+            if (!term) return data;
+
+            let textHtml = data.replace(/\u200B/g, '');
+            const termLower = term.toLowerCase();
+            const snippetLower = textHtml.toLowerCase();
+
+            const idx = snippetLower.indexOf(termLower);
+            if (idx !== -1) {
+              const left = textHtml.substring(0, idx);
+              const match = textHtml.substring(idx, idx + term.length);
+              const right = textHtml.substring(idx + term.length);
+              textHtml = `${left}<span class="fts-phrase-match">${match}</span>${right}`;
+            }
+            return textHtml;
+          }
+        },
+        { 
+          sortable: true,
+          data: null,
+          className: "text-center",
+          render: function(data, type, row) {
+            const term = $('#customSearchInput').val().trim();
+            return `<span class="fts-goto-arrow" title="go-to" onclick="window.location='/read/${row.book_id}/peek/${row.page}?highlight=${encodeURIComponent(term)}'">▶</span>`;
+          }
+        }
+      ]
+    });
+
+    $('#customSearchInput').on('input', function() {
+      // Clear query state in sessionStorage immediately
+      sessionStorage.setItem('lastSearchQuery', $(this).val().trim());
+
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(function() {
+        searchTable.draw();
+      }, 300);
+    });
+  });
+</script>
+{% endblock %}

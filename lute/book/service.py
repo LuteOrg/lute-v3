@@ -292,7 +292,7 @@ class Service:
         (snippets of 200 characters) containing the term.
         """
         sql = """
-            SELECT b.BkID, b.BkTitle, t.TxText
+            SELECT b.BkID, b.BkTitle, t.TxText, t.TxOrder
             FROM texts_fts f
             JOIN texts t ON t.TxID = f.rowid
             JOIN books b ON b.BkID = t.TxBkID
@@ -316,7 +316,7 @@ class Service:
         term_lower = term.lower()
 
         for row in result:
-            bk_id, title, page_text = row
+            bk_id, title, page_text, page_num = row
 
             # Find all occurrences of the term in the page_text
             text_lower = page_text.lower()
@@ -348,9 +348,8 @@ class Service:
                 suffix = "..." if snippet_end < len(page_text) else ""
 
                 snippet_text = f"{prefix}{snippet}{suffix}"
-                term_position = pos
 
-                page_snippets.append({"text": snippet_text, "position": term_position})
+                page_snippets.append({"text": snippet_text, "page": page_num})
                 start = pos + max(1, term_len)
 
             if page_snippets:

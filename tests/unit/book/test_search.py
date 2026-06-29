@@ -10,11 +10,11 @@ from tests.utils import make_book
 def test_search_books_for_term(app_context, spanish):
     """
     Verify search_books_for_term locates the correct book and extracts
-    containing phrases with positions in full text.
+    containing phrases with page numbers.
     """
     svc = Service()
 
-    # Create book 1
+    # Create book 1 (page 1 and page 2)
     b1 = make_book(
         "Spanish Adventure",
         ["Me gusta comer manzanas.", "Tengo un perro grande."],
@@ -24,7 +24,7 @@ def test_search_books_for_term(app_context, spanish):
         text_obj.load_sentences()
     db.session.add(b1)
 
-    # Create book 2
+    # Create book 2 (page 1 and page 2)
     b2 = make_book(
         "Spanish Cooking",
         ["Las manzanas son deliciosas.", "No me gusta el pescado."],
@@ -46,28 +46,28 @@ def test_search_books_for_term(app_context, spanish):
 
     assert "Spanish Adventure" in res_map
     assert res_map["Spanish Adventure"]["phrases"] == [
-        {"text": "Me gusta comer manzanas.", "position": 15}
+        {"text": "Me gusta comer manzanas.", "page": 1}
     ]
 
     assert "Spanish Cooking" in res_map
     assert res_map["Spanish Cooking"]["phrases"] == [
-        {"text": "Las manzanas son deliciosas.", "position": 4}
+        {"text": "Las manzanas son deliciosas.", "page": 1}
     ]
 
     # Search for term "perro"
     results2 = svc.search_books_for_term("perro", db.session)
     assert len(results2) == 1
     assert results2[0]["title"] == "Spanish Adventure"
-    assert results2[0]["phrases"] == [{"text": "Tengo un perro grande.", "position": 9}]
+    assert results2[0]["phrases"] == [{"text": "Tengo un perro grande.", "page": 2}]
 
     # Search for term "gusta" (should match both books)
     results3 = svc.search_books_for_term("gusta", db.session)
     assert len(results3) == 2
     res_map3 = {r["title"]: r for r in results3}
-    assert {"text": "Me gusta comer manzanas.", "position": 3} in res_map3[
+    assert {"text": "Me gusta comer manzanas.", "page": 1} in res_map3[
         "Spanish Adventure"
     ]["phrases"]
-    assert {"text": "No me gusta el pescado.", "position": 6} in res_map3[
+    assert {"text": "No me gusta el pescado.", "page": 2} in res_map3[
         "Spanish Cooking"
     ]["phrases"]
 
@@ -75,10 +75,13 @@ def test_search_books_for_term(app_context, spanish):
     results4 = svc.search_books_for_term("manzan", db.session)
     assert len(results4) == 2
     res_map4 = {r["title"]: r for r in results4}
-    assert {"text": "Me gusta comer manzanas.", "position": 15} in res_map4[
+    assert {"text": "Me gusta comer manzanas.", "page": 1} in res_map4[
         "Spanish Adventure"
     ]["phrases"]
-    assert {"text": "Las manzanas son deliciosas.", "position": 4} in res_map4[
+    assert {
+        "text": "Las manzanas son deliciosas.",
+        "page": 1,
+    } in res_map4[
         "Spanish Cooking"
     ]["phrases"]
 
@@ -104,7 +107,7 @@ def test_search_books_for_term_long_content(app_context, spanish):
     assert len(results) == 1
     phrase_obj = results[0]["phrases"][0]
     phrase = phrase_obj["text"]
-    position = phrase_obj["position"]
+    page = phrase_obj["page"]
 
     # The snippet must have ellipses on both sides because it is truncated
     assert phrase.startswith("...")
@@ -119,7 +122,4 @@ def test_search_books_for_term_long_content(app_context, spanish):
     # Centered means 96 characters from left_padding, and 96 characters from right_padding.
     expected_snippet = left_padding[54:] + "manzanas" + right_padding[:96]
     assert clean_snippet == expected_snippet
-
-    # The position must point exactly to "manzanas" inside the original full page text.
-    # Since left_padding is exactly 150 characters, "manzanas" starts at index 150.
-    assert position == 150
+    assert page == 1

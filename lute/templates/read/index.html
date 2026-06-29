@@ -47,14 +47,14 @@
             <span class="hamburger"></span>
             <span class="hamburger"></span>
           </div>
-	  <a href="/">
-		<img
-		  src="{{ url_for('static', filename='img/lute.png') }}"
-		  class="lutelogo_small"
-		  style="cursor: pointer"
-		  title="Home"
-		/>
-	  </a>
+          <a href="/" class="home-link">
+            <img
+              src="{{ url_for('static', filename='img/lute.png') }}"
+              class="lutelogo_small"
+              style="cursor: pointer; margin: 0;"
+              title="Home"
+            />
+          </a>
         </div>
         <div class="reading_header_mid">
         <div class="reading_header_mid_top">
@@ -84,6 +84,11 @@
           </div>
         </div>
     </div>
+  <div>
+      <a href="/book/search" id="backToSearchLink" title="Go back to search">
+          ◀ Back to Search
+      </a>
+  </div>
 
     <!-- <div class="definition-container"></div> -->
 
@@ -317,6 +322,17 @@
 
     createLookupButtons();
     $(document).click(_close_slide_in_menu_on_click_away);
+
+    // Show Back to Search link if there is a saved search query
+    if (sessionStorage.getItem('lastSearchQuery')) {
+      $('#backToSearchLink').show();
+    }
+
+    // Clear search state when clicking any home link
+    $('.home-link').on('click', function() {
+      sessionStorage.removeItem('lastSearchQuery');
+      sessionStorage.removeItem('lastSearchInContent');
+    });
 
     window.addEventListener("message", _lute_form_event_handler);
 

@@ -2355,3 +2355,127 @@ div#termimagesearch span img {
     object-fit: cover;
     display: block;
 }
+
+
+/* Search FTS Card & Highlight Styles */
+
+.dt-search {
+    display: none !important;
+}
+
+.premium-search-container {
+    margin-bottom: 1.5rem;
+}
+
+.premium-search-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.premium-search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.premium-search-options {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.premium-search-options label {
+    cursor: pointer;
+    user-select: none;
+}
+
+.fts-results-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.fts-book-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.fts-book-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0.75rem;
+    color: #1e293b;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 6px;
+}
+
+.fts-phrases-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fts-phrase-card {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.fts-phrase-card:hover {
+    background: #f1f5f9;
+}
+
+.fts-phrase-match {
+    background-color: #fef08a !important; /* Yellow highlight */
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-weight: 600;
+}
+
+.fts-goto-arrow {
+    color: #22c55e;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 8px;
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+}
+
+.fts-goto-arrow:hover {
+    transform: scale(1.15);
+}
+
+
+/* Back to Search Link in Reading Page Header */
+#backToSearchLink {
+    display: none;
+    align-self: center;
+    font-size: 12px;
+    text-decoration: none;
+    color: #22c55e;
+    font-weight: bold;
+    white-space: nowrap;
+    margin-left: 12px;
+    margin-right: 12px;
+}
+
