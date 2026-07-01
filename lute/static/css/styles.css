@@ -2479,3 +2479,150 @@ div#termimagesearch span img {
     margin-right: 12px;
 }
 
+/* In-Book Search Header Button */
+.reading-search-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.reading-search-btn svg {
+    stroke: #64748b;
+    transition: stroke 0.15s ease;
+}
+
+.reading-search-btn:hover svg {
+    stroke: #3b82f6;
+}
+
+/* Return to Reading Banner & Button */
+.return-to-reading-banner {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: center;
+}
+
+.return-to-reading-btn {
+    background-color: #22c55e;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.15s ease;
+}
+
+.return-to-reading-btn:hover {
+    background-color: #16a34a;
+}
+
+/* Floating Book Search Modal */
+.book-search-modal {
+    position: fixed;
+    z-index: 2000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 650px;
+    background-color: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-sizing: border-box;
+}
+
+.book-search-modal-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.book-search-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.book-search-modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #1e293b;
+}
+
+.book-search-modal-close {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #64748b;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.15s ease;
+}
+
+.book-search-modal-close:hover {
+    color: #0f172a;
+}
+
+.book-search-modal-body {
+    padding: 16px;
+}
+
+/* Floating Book Search Backdrop */
+.book-search-modal-backdrop {
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Dimmed backdrop */
+}
+
+/* Clear Search Button inside Input Wrapper */
+.clear-search-btn {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #64748b;
+    font-size: 1.2rem;
+    font-weight: bold;
+    user-select: none;
+    transition: color 0.15s ease;
+}
+
+.clear-search-btn:hover {
+    color: #0f172a;
+}
+
+/* Return to Search Button in Peek Banner */
+.return-to-search-btn {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.15s ease;
+}
+
+.return-to-search-btn:hover {
+    background-color: #2563eb;
+}
+
+#bookSearchTable td, #bookSearchTable th {
+    vertical-align: middle !important;
+}
+

@@ -256,6 +256,7 @@ def search():
 def search_datatables():
     "Search books for a term, returning paginated data for DataTables."
     term = request.args.get("term", "").strip()
+    book_id = request.args.get("book_id", "").strip()
     draw = int(request.args.get("draw", 1))
     start = int(request.args.get("start", 0))
     length = int(request.args.get("length", 25))
@@ -271,6 +272,9 @@ def search_datatables():
     # Flatten the book-phrase nested dict into a list
     flat_results = []
     for book in results:
+        # Filter by book_id if provided
+        if book_id and str(book["book_id"]) != book_id:
+            continue
         for phrase in book["phrases"]:
             flat_results.append(
                 {

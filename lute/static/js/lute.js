@@ -1012,6 +1012,12 @@ function _lang_is_left_to_right() {
 
 
 function handle_keydown (e) {
+  if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+    return;
+  }
+  if ($('#bookSearchModalBackdrop').is(':visible')) {
+    return;
+  }
   if ($('span.word').length == 0) {
     return; // Nothing to do.
   }
