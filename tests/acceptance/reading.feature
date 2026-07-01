@@ -228,6 +228,29 @@ Feature: User can actually read and stuff.
             Tengo (1)/ /otro/ /amigo (1)/.
 
 
+    Scenario: Hotkey copies the selected word
+        Given I set hotkey "hotkey_CopySelected" to "Digit8"
+        And a Spanish book "Hola" with content:
+            Tengo otro amigo.
+        When I click "otro"
+        And I press hotkey "8"
+        Then the copied words are:
+            otro
+
+
+    Scenario: Hotkey copies multiple selected words
+        Given I set hotkey "hotkey_CopySelected" to "Digit8"
+        And a Spanish book "Hola" with content:
+            Tengo otro amigo.
+        When I shift click:
+            Tengo
+            amigo
+        And I press hotkey "8"
+        Then the copied words are:
+            Tengo
+            amigo
+
+
     Scenario: Edit forms are shown at appropriate times
         Given a Spanish book "Hola" with content:
             Tengo un amigo y una bebida.
