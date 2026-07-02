@@ -1,13 +1,48 @@
 {% extends "base.html" %}
 
-{% block title %}Search Book Content{% endblock %}
+{% block title %}Content search{% endblock %}
 
-{% block header %}Search Content{% endblock %}
+{% block header %}Content search{% endblock %}
 
 {% block body %}
-<div class="premium-search-container">
+<div class="premium-search-container" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; background: #f8fafc; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px;">
   <div class="premium-search-input-wrapper">
     <input type="text" id="customSearchInput" class="premium-search-input" placeholder="Search (in content)" autofocus />
+  </div>
+
+  <div class="search-filters-row" style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+    <div class="filter-group" style="display: flex; flex-direction: column; gap: 4px;">
+      <label for="searchLanguageSelect" style="font-weight: 600; color: #475569; font-size: 0.9rem;">Language</label>
+      <select id="searchLanguageSelect" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #cbd5e1; background-color: #fff; min-width: 180px;">
+        <option value="">(all languages)</option>
+        {% for lang in languages %}
+          <option value="{{ lang.id }}">{{ lang.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filter-group" style="display: flex; flex-direction: column; gap: 4px;">
+      <label for="searchBookSelect" style="font-weight: 600; color: #475569; font-size: 0.9rem;">Books</label>
+      <div style="display: flex; gap: 8px; align-items: flex-start;">
+        <select id="searchBookSelect" name="book_ids" multiple style="padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1; background-color: #fff; min-width: 250px; height: 100px;">
+          {% for book in books %}
+            <option value="{{ book.id }}" data-lang-id="{{ book.language_id }}" data-archived="{{ 'true' if book.archived else 'false' }}">
+              {{ book.title }}{% if book.archived %} [Archived]{% endif %}
+            </option>
+          {% endfor %}
+        </select>
+        <button type="button" id="clearBookSelection" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #cbd5e1; background-color: #f1f5f9; color: #475569; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: background-color 0.15s ease;">
+          Clean Selection
+        </button>
+      </div>
+      <span style="font-size: 0.75rem; color: #64748b;">Hold Ctrl/Cmd to select multiple books.</span>
+    </div>
+
+    <div class="filter-group" style="display: flex; align-items: center; gap: 8px; margin-top: 28px;">
+      <input type="checkbox" id="showArchivedBooks" style="width: 16px; height: 16px; cursor: pointer;" />
+      <label for="showArchivedBooks" style="font-weight: 600; color: #475569; font-size: 0.9rem; cursor: pointer; user-select: none;">Show archived books</label>
+      <span id="filterWaiting" style="display: none; margin-left: 4px;"><img src="/static/icn/waiting2.gif" style="height: 16px; vertical-align: middle;" /></span>
+    </div>
   </div>
 </div>
 
@@ -39,6 +74,45 @@
       $('#customSearchInput').val(savedQuery);
     }
 
+    // Keep memory of book options for dynamic rebuilding
+    const allBookOptions = [];
+    $('#searchBookSelect option').each(function() {
+      allBookOptions.push({
+        value: $(this).val(),
+        text: $(this).text(),
+        langId: $(this).data('lang-id'),
+        archived: $(this).data('archived') === true || $(this).data('archived') === "true"
+      });
+    });
+
+    function updateBookSelect() {
+      const selectedLang = $('#searchLanguageSelect').val();
+      const showArchived = $('#showArchivedBooks').is(':checked');
+      const currentSelectedValues = $('#searchBookSelect').val() || [];
+
+      const selectEl = $('#searchBookSelect');
+      selectEl.empty();
+
+      allBookOptions.forEach(opt => {
+        if (selectedLang && String(opt.langId) !== String(selectedLang)) {
+          return;
+        }
+        if (opt.archived && !showArchived) {
+          return;
+        }
+        
+        const isSelected = currentSelectedValues.includes(String(opt.value));
+        const newOpt = $('<option>')
+          .val(opt.value)
+          .text(opt.text)
+          .prop('selected', isSelected);
+        selectEl.append(newOpt);
+      });
+    }
+
+    // Initialize book list
+    updateBookSelect();
+
     let searchTimeout = null;
 
     const searchTable = $('#searchtable').DataTable({
@@ -61,6 +135,9 @@
         url: "/book/search_datatables",
         data: function (d) {
           d.term = $('#customSearchInput').val().trim();
+          d.lang_id = $('#searchLanguageSelect').val();
+          d.book_ids = $('#searchBookSelect').val() || [];
+          d.show_archived = $('#showArchivedBooks').is(':checked') ? 'true' : 'false';
         },
         type: "GET",
         dataType: "json"
@@ -101,14 +178,40 @@
       ]
     });
 
-    $('#customSearchInput').on('input', function() {
-      // Clear query state in sessionStorage immediately
-      sessionStorage.setItem('lastSearchQuery', $(this).val().trim());
+    // Bind loading spinner visibility to DataTable Ajax events
+    $('#searchtable').on('preXhr.dt', function() {
+      $('#filterWaiting').show();
+    });
 
+    $('#searchtable').on('xhr.dt', function() {
+      $('#filterWaiting').hide();
+    });
+
+    $('#customSearchInput').on('input', function() {
+      sessionStorage.setItem('lastSearchQuery', $(this).val().trim());
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(function() {
         searchTable.draw();
       }, 300);
+    });
+
+    $('#searchLanguageSelect').on('change', function() {
+      updateBookSelect();
+      searchTable.draw();
+    });
+
+    $('#searchBookSelect').on('change', function() {
+      searchTable.draw();
+    });
+
+    $('#clearBookSelection').on('click', function() {
+      $('#searchBookSelect').val([]);
+      searchTable.draw();
+    });
+
+    $('#showArchivedBooks').on('change', function() {
+      updateBookSelect();
+      searchTable.draw();
     });
   });
 </script>

@@ -123,3 +123,39 @@ def test_search_books_for_term_long_content(app_context, spanish):
     expected_snippet = left_padding[54:] + "manzanas" + right_padding[:96]
     assert clean_snippet == expected_snippet
     assert page == 1
+
+
+def test_search_books_for_term_overlapping_matches(app_context, spanish):
+    """
+    Verify search_books_for_term returns multiple snippets if a term occurs multiple times.
+    """
+    svc = Service()
+    # Separate occurrences by more than 200 chars to avoid identical snippets
+    left = "gusta " + ("a " * 150)
+    middle = (" b" * 150) + " gusta"
+    b = make_book("Overlapping", left + middle, spanish)
+    for text_obj in b.texts:
+        text_obj.load_sentences()
+    db.session.add(b)
+    db.session.commit()
+
+    results = svc.search_books_for_term("gusta", db.session)
+    assert len(results) == 1
+    phrases = results[0]["phrases"]
+    assert len(phrases) == 2
+
+
+def test_search_books_for_term_zero_width_spaces(app_context, spanish):
+    """
+    Verify search_books_for_term handles zero-width space boundaries properly.
+    """
+    svc = Service()
+    b = make_book("ZWS Book", "gusta\u200Bcomer\u200Bmanzanas", spanish)
+    for text_obj in b.texts:
+        text_obj.load_sentences()
+    db.session.add(b)
+    db.session.commit()
+
+    results = svc.search_books_for_term("comer", db.session)
+    assert len(results) == 1
+    assert results[0]["phrases"][0]["text"] == "gusta\u200Bcomer\u200Bmanzanas"

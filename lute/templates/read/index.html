@@ -97,6 +97,10 @@
 
   {% include "read/audio_player.html" %}
 
+  <div id="returnToReadingBanner" class="return-to-reading-banner" style="display: none;">
+    <button id="returnToSearchBtn" class="return-to-search-btn">Return to search</button>
+    <button id="returnToReadingBtn" class="return-to-reading-btn" style="margin-left: 10px;">Reading mode</button>
+  </div>
   <h1 id="thetexttitle" {% if is_rtl %}dir="rtl" {% endif %} class="hide">{{ book.title }}</h1>
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
     ...
@@ -186,6 +190,40 @@
   </div>
 </div>
 
+<!-- Floating Book Search Modal Backdrop -->
+<div id="bookSearchModalBackdrop" class="book-search-modal-backdrop" style="display: none;">
+  <!-- Floating Book Search Modal -->
+  <div id="bookSearchModal" class="book-search-modal">
+    <div class="book-search-modal-content">
+      <div class="book-search-modal-header">
+        <h3>Search Book</h3>
+        <span class="book-search-modal-close" onclick="closeBookSearchModal()">&times;</span>
+      </div>
+      <div class="book-search-modal-body">
+        <div class="premium-search-input-wrapper" style="margin-bottom: 12px; position: relative; display: flex; align-items: center; width: 100%;">
+          <input type="text" id="bookSearchInput" class="premium-search-input" placeholder="Search in this book..." style="padding-right: 30px;" />
+          <span id="clearBookSearch" class="clear-search-btn" style="display: none;">&times;</span>
+        </div>
+        <div id="bookSearchResultsContainer" style="max-height: 400px; overflow-y: auto;">
+          <table id="bookSearchTable" class="table stripe" style="width: 100%; margin-top: 10px; font-size: 0.9rem; display: none;">
+            <thead>
+              <tr>
+                <th style="width: 20%; text-align: left;">Page</th>
+                <th style="width: 70%; text-align: left;">Phrase</th>
+                <th style="width: 10%; text-align: center;">Go</th>
+              </tr>
+            </thead>
+            <tbody id="bookSearchResultsBody">
+            </tbody>
+          </table>
+          <div id="bookSearchNoResults" style="display: none; text-align: center; padding: 20px; color: #64748b;">No results found.</div>
+          <div id="bookSearchWaiting" style="display: none; text-align: center; padding: 20px;"><img src="/static/icn/waiting2.gif" /> Searching...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 
 <script>
@@ -247,6 +285,7 @@
 
   let _lute_form_event_handler = function(event) {
     if (event.data.event === "LuteTermFormOpened") {
+      switchRightPaneTab('dict');
       LookupButton.TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
       loadDictionaries();
     }
@@ -578,6 +617,223 @@
       }
     })
   }
+
+  // Modal open/close actions
+  window.showBookSearchModal = function() {
+    // Clear old search term and results when opening fresh
+    $('#bookSearchInput').val('');
+    $('#clearBookSearch').hide();
+    
+    // Clear and redraw DataTable
+    if (window.bookSearchTableInstance) {
+      window.bookSearchTableInstance.draw();
+    }
+
+    $('#bookSearchModalBackdrop').show();
+    $('#bookSearchInput').focus();
+  }
+
+  window.closeBookSearchModal = function() {
+    $('#bookSearchModalBackdrop').hide();
+  }
+
+  // Open search modal and restore last search query
+  window.returnToSearchWindow = function() {
+    const bookId = $('#book_id').val();
+    const savedQuery = sessionStorage.getItem(`lastBookSearchQuery-${bookId}`);
+    
+    $('#bookSearchModalBackdrop').show();
+    $('#bookSearchInput').focus();
+
+    if (savedQuery) {
+      $('#bookSearchInput').val(savedQuery);
+    } else {
+      $('#bookSearchInput').val('');
+    }
+
+    if (window.bookSearchTableInstance) {
+      window.bookSearchTableInstance.draw();
+    }
+  }
+
+  // In-Book Full-Text Search (Tabular layout)
+  let bookSearchTimeout = null;
+  function performBookSearch() {
+    const term = $('#bookSearchInput').val().trim();
+    const bookId = $('#book_id').val();
+    
+    // Scoped storage persistence
+    sessionStorage.setItem(`lastBookSearchQuery-${bookId}`, term);
+
+    if (term) {
+      $('#clearBookSearch').show();
+    } else {
+      $('#clearBookSearch').hide();
+    }
+
+    if (window.bookSearchTableInstance) {
+      window.bookSearchTableInstance.draw();
+    }
+  }
+
+  // Page peeking & return logic
+  window.originalReadingPage = null;
+
+  window.peekBookPage = function(targetPage) {
+    const currentPage = parseInt($('#page_num').val());
+    if (window.originalReadingPage === null) {
+      window.originalReadingPage = currentPage;
+    }
+
+    $('#returnToReadingBanner').show();
+    $('#track_page_open').val('false');
+
+    const delta = targetPage - currentPage;
+    closeBookSearchModal();
+    goto_relative_page(delta);
+  }
+
+  window.returnToReadingPage = function() {
+    if (window.originalReadingPage !== null) {
+      const currentPage = parseInt($('#page_num').val());
+      const delta = window.originalReadingPage - currentPage;
+      
+      $('#track_page_open').val('true');
+      goto_relative_page(delta);
+
+      $('#returnToReadingBanner').hide();
+      window.originalReadingPage = null;
+    }
+  }
+
+  // Bind FTS search events on ready
+  $(document).ready(function() {
+    // Initialize DataTable on the modal search table
+    window.bookSearchTableInstance = $('#bookSearchTable').DataTable({
+      layout: {
+        topStart: 'pageLength',
+        topEnd: [],
+        bottomStart: [],
+        bottomEnd: 'paging'
+      },
+      responsive: true,
+      lengthMenu: [ 5, 10, 25 ],
+      pageLength: 5,
+      paging: true,
+      info: true,
+      ordering: false,
+      searching: false,
+      processing: true,
+      serverSide: true,
+      ajax: {
+        url: "/book/search_datatables",
+        data: function (d) {
+          d.term = $('#bookSearchInput').val().trim();
+          d.book_id = $('#book_id').val();
+        },
+        type: "GET",
+        dataType: "json"
+      },
+      columns: [
+        { 
+          name: "PageNum", 
+          data: "page",
+          className: "text-center vertical-middle",
+          render: function(data, type, row) {
+            return `<strong>${data}</strong>`;
+          }
+        },
+        { 
+          name: "PhraseText", 
+          data: "text",
+          className: "vertical-middle",
+          render: function(data, type, row) {
+            const term = $('#bookSearchInput').val().trim();
+            if (!term) return data;
+
+            let textHtml = data.replace(/\u200B/g, '');
+            const termLower = term.toLowerCase();
+            const snippetLower = textHtml.toLowerCase();
+
+            const idx = snippetLower.indexOf(termLower);
+            if (idx !== -1) {
+              const left = textHtml.substring(0, idx);
+              const match = textHtml.substring(idx, idx + term.length);
+              const right = textHtml.substring(idx + term.length);
+              textHtml = `${left}<span class="fts-phrase-match">${match}</span>${right}`;
+            }
+            return textHtml;
+          }
+        },
+        { 
+          sortable: false,
+          data: null,
+          className: "text-center vertical-middle",
+          render: function(data, type, row) {
+            return `<span class="fts-goto-arrow" title="go-to" onclick="peekBookPage(${row.page})">▶</span>`;
+          }
+        }
+      ],
+      drawCallback: function(settings) {
+        // Toggle table / no results display based on records
+        const api = this.api();
+        const records = api.rows().count();
+        const term = $('#bookSearchInput').val().trim();
+        
+        $('#bookSearchWaiting').hide();
+
+        if (!term) {
+          $('#bookSearchTable_wrapper').hide();
+          $('#bookSearchNoResults').hide();
+        } else if (records === 0) {
+          $('#bookSearchTable_wrapper').hide();
+          $('#bookSearchNoResults').show();
+        } else {
+          $('#bookSearchTable_wrapper').show();
+          $('#bookSearchNoResults').hide();
+        }
+      }
+    });
+
+    // Make sure search starts clean on ready, do not restore on load
+
+    $('#readingSearchBtn').on('click', function(e) {
+      e.stopPropagation();
+      showBookSearchModal();
+    });
+
+    $('#bookSearchInput').on('input', function() {
+      if ($(this).val().trim()) {
+        $('#clearBookSearch').show();
+      } else {
+        $('#clearBookSearch').hide();
+      }
+      clearTimeout(bookSearchTimeout);
+      $('#bookSearchWaiting').show();
+      bookSearchTimeout = setTimeout(performBookSearch, 300);
+    });
+
+    $('#clearBookSearch').on('click', function() {
+      $('#bookSearchInput').val('').focus();
+      $(this).hide();
+      performBookSearch();
+    });
+
+    $('#returnToReadingBtn').on('click', function() {
+      returnToReadingPage();
+    });
+
+    $('#returnToSearchBtn').on('click', function() {
+      returnToSearchWindow();
+    });
+
+    // Close modal on click outside modal content (on the backdrop)
+    $('#bookSearchModalBackdrop').on('click', function(event) {
+      if (event.target === this) {
+        closeBookSearchModal();
+      }
+    });
+  });
 
 </script>
 
