@@ -623,7 +623,7 @@
     // Clear old search term and results when opening fresh
     $('#bookSearchInput').val('');
     $('#clearBookSearch').hide();
-    
+
     // Clear and redraw DataTable
     if (window.bookSearchTableInstance) {
       window.bookSearchTableInstance.draw();
@@ -641,7 +641,7 @@
   window.returnToSearchWindow = function() {
     const bookId = $('#book_id').val();
     const savedQuery = sessionStorage.getItem(`lastBookSearchQuery-${bookId}`);
-    
+
     $('#bookSearchModalBackdrop').show();
     $('#bookSearchInput').focus();
 
@@ -661,7 +661,7 @@
   function performBookSearch() {
     const term = $('#bookSearchInput').val().trim();
     const bookId = $('#book_id').val();
-    
+
     // Scoped storage persistence
     sessionStorage.setItem(`lastBookSearchQuery-${bookId}`, term);
 
@@ -697,7 +697,7 @@
     if (window.originalReadingPage !== null) {
       const currentPage = parseInt($('#page_num').val());
       const delta = window.originalReadingPage - currentPage;
-      
+
       $('#track_page_open').val('true');
       goto_relative_page(delta);
 
@@ -735,16 +735,16 @@
         dataType: "json"
       },
       columns: [
-        { 
-          name: "PageNum", 
+        {
+          name: "PageNum",
           data: "page",
           className: "text-center vertical-middle",
           render: function(data, type, row) {
             return `<strong>${data}</strong>`;
           }
         },
-        { 
-          name: "PhraseText", 
+        {
+          name: "PhraseText",
           data: "text",
           className: "vertical-middle",
           render: function(data, type, row) {
@@ -765,7 +765,7 @@
             return textHtml;
           }
         },
-        { 
+        {
           sortable: false,
           data: null,
           className: "text-center vertical-middle",
@@ -779,7 +779,7 @@
         const api = this.api();
         const records = api.rows().count();
         const term = $('#bookSearchInput').val().trim();
-        
+
         $('#bookSearchWaiting').hide();
 
         if (!term) {
