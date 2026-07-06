@@ -836,7 +836,7 @@ let show_translation_for_text = function(text) {
     let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no';
     if (LUTE_USER_SETTINGS.open_popup_in_new_tab)
       settings = null;
-    window.open(finalurl, 'dictwin', settings);
+    window.open(url, 'dictwin', settings);
   }
   else {
     top.frames.wordframe.location.href = url;
