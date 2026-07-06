@@ -672,6 +672,50 @@ def test_find_or_new_ambiguous_japanese_terms(japanese, repo):
     assert t.text == f"集め{zws}れ", "returns a new term"
 
 
+def test_find_or_new_with_pretokenized_text_finds_in_context_term(japanese, repo):
+    """
+    Fix for the reading-pane multiword term bug.
+
+    The reading pane sends pre-tokenized text (zws-joined, built from
+    the tokens already rendered on screen) when creating a multiword
+    term by selecting a span of text. find_or_new must trust those
+    token boundaries -- both when looking up an existing term and
+    when building a new one -- instead of re-parsing the flat string
+    in isolation, where a context-sensitive parser like MeCab can
+    land on a different (and wrong) segmentation.
+
+    e.g. "それはそれで" parsed in isolation comes back as 3 tokens
+    (それ/は/それで, fusing で into that/それ), but parsed as part of
+    its original sentence it's correctly split into 4 tokens
+    (それ/は/それ/で).
+    """
+    zws = "\u200B"
+    in_context_text = zws.join(["それ", "は", "それ", "で"])
+
+    # Simulates a term that already exists with the correct,
+    # in-context tokenization (e.g. auto-created while the page with
+    # that sentence was being read).
+    existing = DBTerm.create_term_no_parsing(japanese, in_context_text)
+    db.session.add(existing)
+    db.session.commit()
+
+    # Simulates a /termform request built from a drag-selection over
+    # the same 4 on-screen tokens.
+    t = repo.find_or_new(japanese.id, in_context_text)
+    assert t.id == existing.id, "found the existing in-context term"
+    assert t.text == in_context_text
+
+
+def test_find_or_new_with_pretokenized_text_creates_correct_new_term(japanese, repo):
+    "As above, but for a term that doesn't exist yet: still not re-parsed."
+    zws = "\u200B"
+    in_context_text = zws.join(["それ", "は", "それ", "で"])
+
+    t = repo.find_or_new(japanese.id, in_context_text)
+    assert t.id is None
+    assert t.text == in_context_text
+
+
 ## Matches tests.
 
 
