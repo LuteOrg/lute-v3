@@ -1,4 +1,11 @@
 
+# 3.10.3 (2026-07-06)
+
+Bugfix:
+
+* #692: rename js variable, fix sentence translation.  By @marcomachado in #694
+
+
 # 3.10.2 (2026-06-27)
 
 Fixes:
