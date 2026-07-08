@@ -239,8 +239,20 @@ function _hide_term_edit_form() {
 function show_multiword_term_edit_form(selected) {
   if (selected.length == 0)
     return;
+  // Zero-width space: matches the separator Lute uses internally
+  // (see lute.models.term.Term) to mark token boundaries in
+  // multiword terms.
+  const ZWS = '\u200B';
   const textparts = selected.toArray().map((el) => $(el).text());
-  const text = textparts.join('').trim();
+  // Join with ZWS, not '', so the exact tokens the parser already
+  // produced for this sentence (i.e., the ones currently rendered
+  // on screen) are preserved and sent to the backend as-is, instead
+  // of being collapsed into a flat string that then has to be
+  // re-parsed out of context. Context-sensitive parsers (e.g. MeCab
+  // for Japanese) can tokenize an isolated substring differently
+  // than they tokenize it within its original sentence, which was
+  // causing newly-created multiword terms to not match when reading.
+  const text = textparts.join(ZWS).trim();
   if (text == "")
     return;
   const lid = parseInt(selected.eq(0).data('lang-id'));
@@ -784,20 +796,20 @@ let _move_cursor = function(selector, direction = 1) {
 
 /** SENTENCE TRANSLATIONS *************************/
 
-// LUTE_SENTENCE_LOOKUP_DICTS is rendered in templates/read/index.html.
+// LUTE_SENTENCE_LOOKUP_URIS is rendered in templates/read/index.html.
 // Hitting "t" repeatedly cycles through the uris.  Moving to a new
 // sentence resets the order.
 
 var LUTE_LAST_SENTENCE_TRANSLATION_TEXT = '';
 var LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX = 0;
 
-/** Cycle through the LUTE_SENTENCE_LOOKUP_DICTS.
+/** Cycle through the LUTE_SENTENCE_LOOKUP_URIS.
  * If the current sentence is the same as the last translation,
  * move to the next sentence dictionary; otherwise start the cycle
  * again (from index 0).
  */
 let _get_translation_dict_index = function(sentence) {
-  const dict_count = LUTE_SENTENCE_LOOKUP_DICTS.length;
+  const dict_count = LUTE_SENTENCE_LOOKUP_URIS.length;
   if (dict_count == 0)
     return 0;
   let new_index = LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX;
@@ -821,22 +833,23 @@ let show_translation_for_text = function(text) {
   if (text == '')
     return;
 
-  if (LUTE_SENTENCE_LOOKUP_DICTS.length == 0) {
-    console.log('No sentence translation dictionaries configured.');
+  if (LUTE_SENTENCE_LOOKUP_URIS.length == 0) {
+    console.log('No sentence translation uris configured.');
     return;
   }
 
   const dict_index = _get_translation_dict_index(text);
-  const dict = LUTE_SENTENCE_LOOKUP_DICTS[dict_index];
+  const userdict = LUTE_SENTENCE_LOOKUP_URIS[dict_index];
 
   const lookup = encodeURIComponent(text);
-  let url = dict.url.replace('[LUTE]', lookup);
+  let url = userdict.replace('[LUTE]', lookup);
   url = url.replace('###', lookup);  // TODO remove_old_###_placeholder: remove
-  if (dict.dicttype == "popuphtml") {
+  if (url[0] == '*') {
+    const finalurl = url.substring(1);  // drop first char.
     let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no';
     if (LUTE_USER_SETTINGS.open_popup_in_new_tab)
       settings = null;
-    window.open(url, 'dictwin', settings);
+    window.open(finalurl, 'dictwin', settings);
   }
   else {
     top.frames.wordframe.location.href = url;

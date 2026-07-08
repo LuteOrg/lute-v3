@@ -187,13 +187,40 @@ class Term(
         return self._text
 
     def _parse_string_add_zws(self, lang, textstring):
-        "Parse the string using the language."
-        # Clean up encoding cruft.
-        t = textstring.strip()
+        """
+        Parse the string using the language, returning the text
+        with zero-width spaces (zws) inserted between each token.
+
+        If textstring already contains zws, it is treated as
+        pre-tokenized and is *not* re-parsed: the existing token
+        boundaries are trusted as-is (after stripping any empty
+        "paragraph marker" tokens).
+
+        This matters for context-sensitive parsers such as MeCab
+        (Japanese).  The reading pane sends pre-tokenized text
+        (built from the already-parsed, on-screen tokens) when the
+        user selects a span to create a multiword term.  Re-parsing
+        that text in isolation, without the rest of the sentence,
+        can produce a different tokenization than the one used when
+        the sentence was originally parsed for display -- e.g., a
+        trailing particle can get fused into the preceding word when
+        there's no following context to disambiguate it.  That
+        mismatch is what causes newly-created multiword terms to
+        silently fail to highlight when reading.
+
+        Callers without pre-tokenization info (CSV import, manually
+        typed text in the term/search forms) don't have zws in their
+        input, so they fall through to the original parse-from-scratch
+        behaviour, which is unchanged.
+        """
         zws = "\u200B"  # zero-width space
-        t = t.replace(zws, "")
         nbsp = "\u00A0"  # non-breaking space
-        t = t.replace(nbsp, " ")
+
+        t = textstring.strip().replace(nbsp, " ")
+
+        if zws in t:
+            tok_strings = [tok for tok in t.split(zws) if tok != "¶"]
+            return zws.join(tok_strings)
 
         tokens = lang.get_parsed_tokens(t)
 
@@ -201,8 +228,7 @@ class Term(
         tokens = [tok for tok in tokens if tok.token != "¶"]
         tok_strings = [tok.token for tok in tokens]
 
-        t = zws.join(tok_strings)
-        return t
+        return zws.join(tok_strings)
 
     @text.setter
     def text(self, textstring):

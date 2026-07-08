@@ -272,6 +272,51 @@ def test_changing_text_to_same_thing_does_not_throw(japanese):
 
 
 @pytest.mark.term_case
+def test_new_term_with_pretokenized_zws_text_is_not_reparsed(japanese):
+    """
+    Reproduces the "reading pane multiword term" bug (issue: multiword
+    terms created by selecting text in the reading pane can silently
+    fail to highlight afterwards).
+
+    MeCab is context-sensitive.  Parsed in isolation, "それはそれで"
+    comes back as 3 tokens (それ / は / それで), fusing the final で
+    into a single word with それ.  Parsed as part of its original
+    sentence ("...それはそれで問題になる..."), MeCab correctly splits
+    it into 4 tokens (それ / は / それ / で), since で is a particle
+    attaching to the following 問題になる.
+
+    The reading pane already knows the correct, in-context tokens
+    (they're the ones rendered on screen), and now sends them
+    pre-joined with zero-width spaces.  That pre-tokenized text must
+    be trusted as-is, NOT re-parsed from scratch, or it silently
+    reverts to the ambiguous/incorrect 3-token split and the term
+    never matches when reading.
+    """
+    zws = "\u200B"
+    in_context_tokens = ["それ", "は", "それ", "で"]
+    pretokenized = zws.join(in_context_tokens)
+
+    term = Term(japanese, pretokenized)
+    assert term.token_count == 4, "kept the 4 in-context tokens, not re-parsed"
+    assert term.text == pretokenized, "text preserved exactly as given"
+
+
+@pytest.mark.term_case
+def test_new_term_without_zws_is_parsed_from_scratch_as_before(japanese):
+    """
+    Sanity/regression check: text with NO pre-existing zws (e.g., typed
+    directly into a form, or from a CSV import) has no in-context
+    token information available, so it keeps the original behaviour of
+    being parsed fresh -- which, for this ambiguous phrase, produces
+    the (documented, pre-existing) 3-token result.
+    """
+    zws = "\u200B"
+    term = Term(japanese, "それはそれで")
+    assert term.token_count == 3
+    assert term.text == f"それ{zws}は{zws}それで"
+
+
+@pytest.mark.term_case
 def test_changing_multiword_text_case_does_not_throw(english):
     """
     Sanity check.
