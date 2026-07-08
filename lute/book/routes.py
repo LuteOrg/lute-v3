@@ -30,7 +30,6 @@ from lute.models.repositories import (
 )
 from lute.book.model import Book, Repository
 
-
 bp = Blueprint("book", __name__, url_prefix="/book")
 
 
@@ -224,8 +223,22 @@ def table_stats(bookid):
         # is showing books and IDs that no longer exist after cache reset.
         # TODO fix_hack: get rid of this hack.
         return jsonify({})
+
+    # Optional query params:
+    # - full_book=true: calculate over the full book
+    # - force_recalc=true: bypass cache for the normal sampled calculation
+    full_book_param = request.args.get("full_book", "false")
+    force_recalc_param = request.args.get("force_recalc", "false")
+    use_full_book = full_book_param.lower() == "true"
+    use_force_recalc = force_recalc_param.lower() == "true"
+
     svc = StatsService(db.session)
-    stats = svc.get_stats(b)
+    stats = svc.get_stats(
+        b,
+        full_book=use_full_book,
+        force_recalc=(use_force_recalc or use_full_book),
+    )
+
     ret = {
         "distinctterms": stats.distinctterms,
         "distinctunknowns": stats.distinctunknowns,
