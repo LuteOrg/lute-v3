@@ -206,6 +206,24 @@ def then_page_contains(luteclient, text):
     assert text in luteclient.page.content()
 
 
+@then(parsers.parse("the copied words are:\n{words}"))
+def then_copied_words_are(luteclient, words):
+    "Check words marked as copied by copy_text_to_clipboard."
+    expected = [w.strip() for w in words.split("\n") if w.strip()]
+    timeout = 3
+    poll_frequency = 0.25
+    start_time = time.time()
+    actual = []
+    while time.time() - start_time < timeout:
+        els = luteclient.page.locator("span.wascopied.word")
+        actual = [els.nth(i).inner_text() for i in range(els.count())]
+        if actual == expected:
+            break
+        time.sleep(poll_frequency)
+    else:
+        assert actual == expected
+
+
 # Language
 
 
