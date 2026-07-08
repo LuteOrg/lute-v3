@@ -176,7 +176,7 @@ class FileTextExtraction:
 
 class Service:
     "Service."
-
+    
     def _unique_fname(self, filename):
         """
         Return secure name pre-pended with datetime string.
@@ -205,7 +205,10 @@ class Service:
         s = None
         try:
             timeout = 20  # seconds
-            response = requests.get(url, timeout=timeout)
+            HEADERS = {
+                "User-Agent": "Lute/3.0 (X11; Ubuntu; Linux x86_64)"
+            }
+            response = requests.get(url, headers=HEADERS, timeout=timeout)
             response.raise_for_status()
             s = response.content
         except requests.exceptions.RequestException as e:
