@@ -92,6 +92,18 @@
   {% include "read/audio_player.html" %}
 
   <h1 id="thetexttitle" {% if is_rtl %}dir="rtl" {% endif %} class="hide">{{ book.title }}</h1>
+
+  <!-- Chapter progress bar (uses bookmarks as chapter markers) -->
+  <div id="chapter-progress-wrap">
+    <div id="chapter-progress-info">
+      <span id="chapter-progress-title"></span>
+      <span id="chapter-progress-stats"></span>
+    </div>
+    <div id="chapter-progress-track">
+      <div id="chapter-progress-fill"></div>
+    </div>
+  </div>
+
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
     ...
   </div>
@@ -365,6 +377,67 @@
     const pagenum = parseInt($('#page_num').val());
     const maxpage = parseInt($('#page_count').val());
     $('#page_indicator').text(`${pagenum}/${maxpage}`);
+    update_chapter_progress(pagenum);
+  };
+
+  // Update the chapter progress bar using bookmarks as chapter markers.
+  let _chapter_progress_cache = {};
+  let update_chapter_progress = function(pagenum) {
+    const bookid = $('#book_id').val();
+    if (!bookid || !pagenum) return;
+
+    const cacheKey = `${bookid}:${pagenum}`;
+    if (_chapter_progress_cache[cacheKey] !== undefined) {
+      _render_chapter_progress(_chapter_progress_cache[cacheKey]);
+      return;
+    }
+
+    fetch(`/bookmarks/${bookid}/chapter_progress/${pagenum}`)
+      .then(r => r.json())
+      .then(data => {
+        _chapter_progress_cache[cacheKey] = data;
+        _render_chapter_progress(data);
+      })
+      .catch(() => { /* silently ignore network errors */ });
+  };
+
+  let _render_chapter_progress = function(data) {
+    const wrap  = document.getElementById('chapter-progress-wrap');
+    const title = document.getElementById('chapter-progress-title');
+    const stats = document.getElementById('chapter-progress-stats');
+    const fill  = document.getElementById('chapter-progress-fill');
+    if (!wrap || !title || !stats || !fill) return;
+
+    if (!data || !data.found) {
+      wrap.style.display = 'none';
+      return;
+    }
+
+    wrap.style.display = '';
+    title.textContent = data.title;
+
+    const remText = data.pages_left === 0
+      ? 'last page'
+      : data.pages_left === 1
+        ? '1 page left'
+        : `${data.pages_left} pages left`;
+    stats.textContent = `Page ${data.pages_in} of ${data.chapter_length}  ·  ${remText}  ·  ${data.pct}%`;
+    fill.style.width = `${data.pct}%`;
+  };
+
+  // Invalidate the chapter progress cache when a bookmark is added, edited,
+  // or deleted so the bar reflects the change immediately.
+  let _orig_fetch = window.fetch.bind(window);
+  window.fetch = function(...args) {
+    return _orig_fetch(...args).then(function(response) {
+      const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+      if (/\/bookmarks\/(add|delete|edit)/.test(url)) {
+        _chapter_progress_cache = {};
+        const pagenum = parseInt($('#page_num').val());
+        setTimeout(() => update_chapter_progress(pagenum), 300);
+      }
+      return response;
+    });
   };
 
   // Enable page nav links, depending on page num.
