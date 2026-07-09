@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Lute index{% endblock %}
+{% block title %}{{ _('Lute index') }}{% endblock %}
 
 {% block preloadassets %}
   {# The book status load blocks the waiting2.gif from being served, so preload it. #}
@@ -14,28 +14,20 @@
 
 {% if tutorial_book_id %}
 <div class="flash-notice">
-  <p>The Lute database has been loaded with a
-    <a href="/read/{{ tutorial_book_id }}/page/1" style="text-decoration: underline;">brief tutorial</a>,
-    and some languages and short texts for you to try out.
-  </p>
-  <p>When you're done trying out the demo, <a href="/wipe_database"
-  style="text-decoration: underline;">click here</a> to clear out the
-  database.  <i>Note: this removes everything in the db.</i></p>
-  <p>Or instead,
-    <a href="/remove_demo_flag" style="text-decoration: underline;">dismiss</a>
-    this message.
-  </p>
+  <p>{{ _('The Lute database has been loaded with a <a href="/read/%(tutorial_id)s/page/1" style="text-decoration: underline;">brief tutorial</a>, and some languages and short texts for you to try out.', tutorial_id=tutorial_book_id) | safe }}</p>
+  <p>{{ _('When you\'re done trying out the demo, <a href="/wipe_database" style="text-decoration: underline;">click here</a> to clear out the database. <i>Note: this removes everything in the db.</i>') | safe }}</p>
+  <p>{{ _('Or instead, <a href="/remove_demo_flag" style="text-decoration: underline;">dismiss</a> this message.') | safe }}</p>
 </div>
 {% endif %}
 
 {% if is_production_data and backup_show_warning %}
 <div class="flash-notice">
-  <p>Warning: {{ backup_warning_msg }} <a href="/backup/backup">Create a backup.</a></p>
+  <p>{{ _('Warning: %(msg)s', msg=backup_warning_msg) }} <a href="/backup/backup">{{ _('Create a backup.') }}</a></p>
 </div>
 {% endif %}
 
 {% if not have_languages %}
-  <p>To get started using Lute, first <a href="/language/list_predefined">load a predefined language and sample text</a>, or <a href="/language/new">create your language.</a>
+  <p>{{ _('To get started using Lute, first <a href="/language/list_predefined">load a predefined language and sample text</a>, or <a href="/language/new">create your language.</a>') | safe }}
 </p>
 {% else %}
   {% include "book/tablelisting.html" %}
