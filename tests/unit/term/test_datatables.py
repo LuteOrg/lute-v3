@@ -5,6 +5,7 @@ Book tests.
 import pytest
 from lute.term.datatables import get_data_tables_list
 from lute.db import db
+from lute.models.book import Book, Text
 from tests.utils import add_terms
 
 
@@ -75,3 +76,43 @@ def test_parents_included_in_termids_query(app_context, _dt_params, spanish):
     terms = [t["WoText"] for t in d["data"]]
     terms = sorted(terms)
     assert terms == ["P", "T"]
+
+
+def test_book_and_page_filtering(app_context, _dt_params, spanish):
+    "Filtering terms in datatables by book and page scope."
+    # Create a book with two pages
+    book = Book("Test Book", spanish)
+    Text(book, "Hola tengo un gato.", 1)
+    Text(book, "Adiós tengo un perro.", 2)
+    db.session.add(book)
+    db.session.commit()
+
+    # Add terms
+    add_terms(spanish, ["gato", "perro", "amigo"])
+    db.session.commit()
+
+    # Test entire book filter
+    _dt_params["filtBook"] = f"{book.id}"
+    _dt_params["filtBookScope"] = "all"
+    d = get_data_tables_list(_dt_params, db.session)
+    terms = [t["WoText"] for t in d["data"]]
+    assert "gato" in terms
+    assert "perro" in terms
+    assert "amigo" not in terms
+
+    # Test page 1 filter
+    _dt_params["filtBookScope"] = "page"
+    _dt_params["filtPageNum"] = "1"
+    d = get_data_tables_list(_dt_params, db.session)
+    terms = [t["WoText"] for t in d["data"]]
+    assert "gato" in terms
+    assert "perro" not in terms
+    assert "amigo" not in terms
+
+    # Test page 2 filter
+    _dt_params["filtPageNum"] = "2"
+    d = get_data_tables_list(_dt_params, db.session)
+    terms = [t["WoText"] for t in d["data"]]
+    assert "gato" not in terms
+    assert "perro" in terms
+    assert "amigo" not in terms
