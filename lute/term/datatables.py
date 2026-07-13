@@ -3,6 +3,9 @@ Show terms in datatables.
 """
 
 from lute.utils.data_tables import DataTablesSqliteQuery, supported_parser_type_criteria
+from lute.models.book import Book
+from lute.models.term import Term
+from lute.read.render.service import Service as RenderService
 
 
 def get_data_tables_list(parameters, session):
@@ -89,6 +92,60 @@ def get_data_tables_list(parameters, session):
     if parameters["filtIncludeIgnored"] == "true":
         st_where = f"({st_where} OR StID = 98)"
     wheres.append(st_where)
+
+    book_id = parameters.get("filtBook")
+    if book_id and book_id != "0" and book_id != "null":
+        book = session.query(Book).filter(Book.id == int(book_id)).first()
+        if book:
+            scope = parameters.get("filtBookScope", "all")
+            page_num = parameters.get("filtPageNum")
+            if scope == "page" and page_num and page_num != "0":
+                texts = [book.text_at_page(int(page_num))]
+            else:
+                texts = book.texts
+
+            words_lc = set()
+            service = RenderService(session)
+            combined_text = "\n".join([t.text for t in texts])
+            tokens = book.language.get_parsed_tokens(combined_text)
+            text_lcs = [book.language.parser.get_lowercase(t.token) for t in tokens]
+            mword_terms = service.find_all_multi_word_term_text_lcs_in_content(
+                text_lcs, book.language
+            )
+            words_lc.update(text_lcs)
+            words_lc.update(mword_terms)
+
+            if not words_lc:
+                wheres.append("1 = 0")
+            else:
+                term_ids = [
+                    r[0]
+                    for r in session.query(Term.id)
+                    .filter(
+                        Term.language_id == book.language_id,
+                        Term.text_lc.in_(list(words_lc)),
+                    )
+                    .all()
+                ]
+
+                if not term_ids:
+                    wheres.append("1 = 0")
+                else:
+                    chunks = [
+                        term_ids[i : i + 900] for i in range(0, len(term_ids), 900)
+                    ]
+                    chunk_wheres = []
+                    for chunk in chunks:
+                        chunk_str = ",".join(str(tid) for tid in chunk)
+                        parentsql = (
+                            f"select WpParentWoID from wordparents "
+                            f"where WpWoID in ({chunk_str})"
+                        )
+                        chunk_wheres.append(
+                            f"((w.WoID in ({chunk_str})) OR "
+                            f"(w.WoID in ({parentsql})))"
+                        )
+                    wheres.append("(" + " OR ".join(chunk_wheres) + ")")
 
     termids = parameters["filtTermIDs"].strip()
     if termids != "":

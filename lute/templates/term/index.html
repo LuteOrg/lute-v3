@@ -56,6 +56,37 @@
         <input id="filtIncludeIgnored" type="checkbox" />
       </td>
     </tr>
+    <tr>
+      <td>Book</td>
+      <td>
+        <select id="filtBook">
+          <!-- populated via JS -->
+        </select>
+        <span style="margin-left: 10px;">
+          <input id="filtIncludeArchivedBooks" type="checkbox" />
+          <label for="filtIncludeArchivedBooks">Include archived books</label>
+        </span>
+      </td>
+    </tr>
+    <tr id="filtBookScope_row" style="display: none;">
+      <td>Show terms from</td>
+      <td>
+        <select id="filtBookScope">
+          <option value="all">Entire book</option>
+          <option value="page">Current page</option>
+        </select>
+        <span id="page_selector_span" style="display: none; margin-left: 10px;">
+          Page:
+          <select id="filtPageNum">
+            <!-- populated via JS -->
+          </select>
+          <button id="btnMarkCurrentPage" type="button" style="margin-left: 10px;">Mark as current page</button>
+        </span>
+        <span style="margin-left: 15px;">
+          <a id="lnkReturnToPage" href="#" style="font-weight: bold; display: none;">Return to reading page</a>
+        </span>
+      </td>
+    </tr>
     <tr id="filtTermIDs_row" style="display: none">
       <td>Term IDs</td>
       <td>
@@ -370,6 +401,9 @@
           filtStatusMax: () => $('#filtStatusMax').val(),
           filtIncludeIgnored: () => $('#filtIncludeIgnored').prop('checked'),
           filtTermIDs: () => $('#filtTermIDs').val(),
+          filtBook: () => $('#filtBook').val(),
+          filtBookScope: () => $('#filtBookScope').val(),
+          filtPageNum: () => $('#filtPageNum').val(),
         },
 
         dataType: "json"
@@ -542,8 +576,90 @@
   };
 
 
+  var all_books = {{ books_json | safe }};
+
+  function update_book_dropdown() {
+    var selected_lang = parseInt($('#filtLanguage').val() ?? '0');
+    var include_archived = $('#filtIncludeArchivedBooks').is(':checked');
+    var book_select = $('#filtBook');
+    var current_val = book_select.val() ?? '0';
+
+    book_select.empty();
+    book_select.append('<option value="0">(all)</option>');
+
+    var filtered = all_books.filter(function(b) {
+      if (selected_lang !== 0 && b.language_id !== selected_lang) {
+        return false;
+      }
+      if (!include_archived && b.archived === 1) {
+        return false;
+      }
+      return true;
+    });
+
+    filtered.forEach(function(b) {
+      var archived_suffix = b.archived === 1 ? ' (archived)' : '';
+      book_select.append('<option value="' + b.id + '">' + b.title + archived_suffix + '</option>');
+    });
+
+    if (book_select.find('option[value="' + current_val + '"]').length > 0) {
+      book_select.val(current_val);
+    } else {
+      book_select.val('0');
+    }
+
+    update_book_ui_state();
+  }
+
+  function update_book_ui_state() {
+    var book_id = parseInt($('#filtBook').val() ?? '0');
+    if (book_id === 0) {
+      $('#filtBookScope_row').hide();
+      $('#page_selector_span').hide();
+      $('#lnkReturnToPage').hide();
+      return;
+    }
+
+    $('#filtBookScope_row').show();
+    var book = all_books.find(function(b) { return b.id === book_id; });
+    if (!book) return;
+
+    var page_select = $('#filtPageNum');
+    var current_page_val = parseInt(page_select.val() ?? '0');
+    page_select.empty();
+    for (var i = 1; i <= book.page_count; i++) {
+      page_select.append('<option value="' + i + '">' + i + '</option>');
+    }
+
+    if (current_page_val > 0 && current_page_val <= book.page_count) {
+      page_select.val(current_page_val);
+    } else {
+      page_select.val(book.current_page);
+    }
+
+    var scope = $('#filtBookScope').val();
+    if (scope === 'page') {
+      $('#page_selector_span').show();
+    } else {
+      $('#page_selector_span').hide();
+    }
+
+    var active_page = page_select.val() ?? book.current_page;
+    $('#lnkReturnToPage')
+      .attr('href', '/read/' + book_id + '/page/' + active_page)
+      .text('Return to reading page (Page ' + active_page + ')')
+      .show();
+  }
+
+  function clear_termids_filter() {
+    if ($('#filtTermIDs').val() !== '') {
+      $('#filtTermIDs').val('');
+      $('#filtTermIDs_row').css('display', 'none');
+    }
+  }
+
   let update_filter_storage = function() {
-    const store = {
+    let store = {
       filtDisplay: $('#filterControls').css('display'),
       filtLanguage: $('#filtLanguage').val(),
       filtParentsOnly: $('#filtParentsOnly').prop('checked'),
@@ -553,8 +669,11 @@
       filtStatusMax: $('#filtStatusMax').val(),
       filtIncludeIgnored: $('#filtIncludeIgnored').prop('checked'),
       filtTermIDs: $('#filtTermIDs').val(),
+      filtBook: $('#filtBook').val(),
+      filtIncludeArchivedBooks: $('#filtIncludeArchivedBooks').prop('checked'),
+      filtBookScope: $('#filtBookScope').val(),
+      filtPageNum: $('#filtPageNum').val(),
     };
-    // console.log('saving: ' + JSON.stringify(store));
     sessionStorage.setItem('termtable_filters', JSON.stringify(store));
   };
 
@@ -568,6 +687,11 @@
     $('#filtIncludeIgnored').prop('checked', false);
     $('#filtTermIDs').val('');
     $('#filtTermIDs_row').css('display', 'none');
+    $('#filtBook').val(0);
+    $('#filtIncludeArchivedBooks').prop('checked', false);
+    $('#filtBookScope').val('all');
+    $('#filtPageNum').val(0);
+    update_book_dropdown();
     update_filter_storage();
   };
 
@@ -576,9 +700,7 @@
     $('#termtable').DataTable().draw();
   };
 
-
   let update_filter_button_src = function(is_hidden) {
-    // console.log(`is_hidden = ${is_hidden}`);
     const new_src = is_hidden ?
           "{{ url_for('static', filename='icn/plus-button.png') }}" :
           "{{ url_for('static', filename='icn/minus-button.png') }}";
@@ -587,7 +709,6 @@
 
   let load_filters_from_storage = function() {
     fs = sessionStorage.getItem('termtable_filters');
-    // console.log(fs);
     if (fs == null)
       return;
     store = JSON.parse(fs);
@@ -608,6 +729,15 @@
       $('#filtTermIDs_row').css('display', 'table-row');
       $('#filtTermIDs_message').text('(Filtered from reading pane)');
     }
+
+    $('#filtIncludeArchivedBooks').prop('checked', store.filtIncludeArchivedBooks ?? false);
+    update_book_dropdown();
+    $('#filtBook').val(store.filtBook ?? '0');
+    update_book_ui_state();
+    $('#filtBookScope').val(store.filtBookScope ?? 'all');
+    update_book_ui_state();
+    $('#filtPageNum').val(store.filtPageNum ?? '1');
+    update_book_ui_state();
   };
 
   let handle_show_hide_filter_click = function() {
@@ -616,7 +746,7 @@
     const new_display = (fc.css('display') == 'none' ? 'block' : 'none');
     fc.css('display', new_display);
     update_filter_button_src(new_display == 'none');
-    update_filter_storage();  // to store new display setting.
+    update_filter_storage();
     $('#termtable').DataTable().draw();
   };
 
@@ -625,7 +755,6 @@
     $('#termtable').DataTable().draw();
   };
 
-  // Return the termids and params if those were passed, else null.
   let get_termids_list_params_from_query_string = function() {
     const queryString = window.location.search;
     const params = new URLSearchParams(queryString);
@@ -633,9 +762,6 @@
       return null;
 
     let termids = params.get('termids');
-    // The termids are passed as "+" separated values,
-    // but the browser might replace them with spaces.
-    // Restore '+' for standard handling.
     termids = termids.replaceAll(' ', '+');
 
     return {
@@ -645,42 +771,124 @@
     };
   };
 
+  let get_book_params_from_query_string = function() {
+    const queryString = window.location.search;
+    const params = new URLSearchParams(queryString);
+    if (!params.has('bookid'))
+      return null;
+    return {
+      bookid: params.get('bookid'),
+      pagenum: params.get('pagenum'),
+    };
+  };
+
   $(document).ready(function () {
     // Handlers.
     $('#showHideFilters').click(handle_show_hide_filter_click);
-    $('#filtLanguage').change(handle_filter_update);
+    $('#filtLanguage').change(function() {
+      update_book_dropdown();
+      handle_filter_update();
+    });
     $('#filtParentsOnly').change(handle_filter_update);
     $('#filtAgeMin').keyup(handle_filter_update);
     $('#filtAgeMax').keyup(handle_filter_update);
     $('#filtStatusMin').change(handle_filter_update);
     $('#filtStatusMax').change(handle_filter_update);
     $('#filtIncludeIgnored').change(handle_filter_update);
-    // filtTermIDs are not interactive, no handler needed.
     $('#clearFilters').click(handle_clear_filters);
 
-    // Datatables state needs to be different for regular vs term
-    // list.  If they were the same, then setting the page number
-    // on the filtered term id list would also affect the default
-    // term listing.
+    $('#filtBook').change(function() {
+      clear_termids_filter();
+      update_book_ui_state();
+      handle_filter_update();
+    });
+    $('#filtIncludeArchivedBooks').change(function() {
+      update_book_dropdown();
+      handle_filter_update();
+    });
+    $('#filtBookScope').change(function() {
+      clear_termids_filter();
+      update_book_ui_state();
+      handle_filter_update();
+    });
+    $('#filtPageNum').change(function() {
+      clear_termids_filter();
+      update_book_ui_state();
+      handle_filter_update();
+    });
+
+    $('#btnMarkCurrentPage').click(function() {
+      var book_id = $('#filtBook').val();
+      var page_num = $('#filtPageNum').val();
+      if (!book_id || book_id === '0' || !page_num || page_num === '0') return;
+
+      var btn = $(this);
+      btn.prop('disabled', true).text('Saving...');
+      $.ajax({
+        url: '/term/mark_current_page/' + book_id + '/' + page_num,
+        type: 'POST',
+        success: function(response) {
+          btn.text('Saved!');
+          var book = all_books.find(function(b) { return b.id == book_id; });
+          if (book) {
+            book.current_page = parseInt(page_num);
+          }
+          setTimeout(function() {
+            btn.prop('disabled', false).text('Mark as current page');
+          }, 1000);
+        },
+        error: function() {
+          btn.text('Error');
+          setTimeout(function() {
+            btn.prop('disabled', false).text('Mark as current page');
+          }, 1000);
+        }
+      });
+    });
+
     let dt_saved_state_key = "saved_state_default";
 
-    // If term ids were passed in, override any storage values.
-    // Filters are fast to apply, not concerned about this.
-    const hsh = get_termids_list_params_from_query_string();
-    if (hsh != null) {
+    update_book_dropdown();
+
+    const book_params = get_book_params_from_query_string();
+    if (book_params != null) {
       wipe_filter_storage();
-      $('#filterControls').css('display', 'block');
-      $('#filtStatusMin').val(0);
-      $('#filtTermIDs').val(hsh.termids_string);
+      var book_obj = all_books.find(function(b) { return b.id == book_params.bookid; });
+      if (book_obj) {
+        if (book_obj.archived === 1) {
+          $('#filtIncludeArchivedBooks').prop('checked', true);
+        }
+        $('#filtLanguage').val(book_obj.language_id);
+        update_book_dropdown();
+      }
+
+      $('#filtBook').val(book_params.bookid);
+      update_book_ui_state();
+
+      if (book_params.pagenum) {
+        $('#filtBookScope').val('page');
+        $('#filtPageNum').val(book_params.pagenum);
+        update_book_ui_state();
+      } else {
+        $('#filtBookScope').val('all');
+        update_book_ui_state();
+      }
+
+      const hsh = get_termids_list_params_from_query_string();
+      if (hsh != null) {
+        $('#filterControls').css('display', 'block');
+        $('#filtStatusMin').val(0);
+        $('#filtTermIDs').val(hsh.termids_string);
+        // Each book and page gets its own state.
+        dt_saved_state_key = `saved_state_${hsh.bookid}_${hsh.pagenum}`;
+      } else {
+        dt_saved_state_key = `saved_state_${book_params.bookid}_all`;
+      }
       update_filter_storage();
-      // Each book and page gets its own state.
-      dt_saved_state_key = `saved_state_${hsh.bookid}_${hsh.pagenum}`;
+    } else {
+      load_filters_from_storage();
     }
 
-    load_filters_from_storage();
-
-    // Setting up the datatable now, so the filters are
-    // taken into account.
     setup_term_datatable(dt_saved_state_key, "{{ initial_search or '' }}");
 
     if (LUTE_USER_SETTINGS["use_ankiconnect"] == false) {
