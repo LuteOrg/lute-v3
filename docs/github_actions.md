@@ -58,8 +58,34 @@ gh run list --branch github-ci -L 5
 ```
 
 ### Watch Progress
-To watch the build process in real-time as it executes:
-```bash
-gh run watch <run-id>
-```
-*(Replace `<run-id>` with the run ID returned by the `gh run list` command.)*
+To watch the build process in real-time as it executes, you can either:
+
+* **Choose interactively (Recommended)**:
+  ```bash
+  gh run watch
+  ```
+  This will present an interactive menu allowing you to choose from the most recent runs.
+
+* **Specify a run ID**:
+  ```bash
+  gh run watch <run-id>
+  ```
+  *(Replace `<run-id>` with the run ID returned by the `gh run list` command.)*
+
+---
+
+## 4. Required GitHub Repository Settings
+
+To successfully run workflows in your own personal repository or fork, ensure the following configuration options are set in your GitHub repository settings:
+
+### Enable GitHub Actions Permissions
+1. Navigate to your repository page on GitHub.
+2. Click on **Settings** -> **Actions** -> **General**.
+3. Under **Actions permissions**, select **Allow all actions and reusable workflows**.
+
+### Workflow Permissions
+By default, some steps in the CI workflows (such as checking out code, uploading test coverage report tokens, or running analysis checks) require read/write access to the repository:
+1. Scroll down to **Workflow permissions**.
+2. Select **Read and write permissions**.
+3. Check the box **Allow GitHub Actions to create and approve pull requests**.
+4. Click **Save**.

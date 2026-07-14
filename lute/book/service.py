@@ -284,73 +284,32 @@ class Service:
         repo.commit()
         return dbbook
 
-    # pylint: disable=too-many-locals
     def search_books_for_term(self, term, session):
         """
         Locate term in any book using full text search.
         Returns a list of dictionaries with book info and phrases
         (snippets of 200 characters) containing the term.
         """
-        sql = """
-            SELECT b.BkID, b.BkTitle, t.TxText, t.TxOrder
-            FROM texts_fts f
-            JOIN texts t ON t.TxID = f.rowid
-            JOIN books b ON b.BkID = t.TxBkID
-            WHERE f.texts_fts MATCH :search_term
-            ORDER BY b.BkTitle, t.TxOrder
-        """
-
-        # Simple sanitization and prefix matching for FTS5 syntax
-        sanitized_term = term.replace('"', '""')
-
         result = session.execute(
-            text(sql),
+            text(
+                """
+                SELECT b.BkID, b.BkTitle, t.TxText, t.TxOrder
+                FROM texts_fts f
+                JOIN texts t ON t.TxID = f.rowid
+                JOIN books b ON b.BkID = t.TxBkID
+                WHERE f.texts_fts MATCH :search_term
+                ORDER BY b.BkTitle, t.TxOrder
+                """
+            ),
             {
-                "search_term": f'"{sanitized_term}"*',
+                "search_term": f'"{term.replace(chr(34), chr(34) * 2)}"*',
             },
         ).all()
 
         books_map = {}
-        target_len = 200
-        term_len = len(term)
-        term_lower = term.lower()
 
-        for row in result:
-            bk_id, title, page_text, page_num = row
-
-            # Find all occurrences of the term in the page_text
-            text_lower = page_text.lower()
-            start = 0
-
-            page_snippets = []
-            while True:
-                pos = text_lower.find(term_lower, start)
-                if pos == -1:
-                    break
-
-                # Determine centered window
-                padding = (target_len - term_len) // 2
-                snippet_start = max(0, pos - padding)
-                snippet_end = min(len(page_text), pos + term_len + padding)
-
-                # Adjust window to get target_len characters if possible
-                actual_len = snippet_end - snippet_start
-                if actual_len < target_len:
-                    if snippet_start == 0:
-                        snippet_end = min(len(page_text), target_len)
-                    elif snippet_end == len(page_text):
-                        snippet_start = max(0, len(page_text) - target_len)
-
-                snippet = page_text[snippet_start:snippet_end]
-
-                # Add ellipses if truncated
-                prefix = "..." if snippet_start > 0 else ""
-                suffix = "..." if snippet_end < len(page_text) else ""
-
-                snippet_text = f"{prefix}{snippet}{suffix}"
-
-                page_snippets.append({"text": snippet_text, "page": page_num})
-                start = pos + max(1, term_len)
+        for bk_id, title, page_text, page_num in result:
+            page_snippets = _extract_page_snippets(page_text, page_num, term)
 
             if page_snippets:
                 if bk_id not in books_map:
@@ -360,3 +319,40 @@ class Service:
                         books_map[bk_id]["phrases"].append(s)
 
         return list(books_map.values())
+
+
+def _extract_page_snippets(page_text, page_num, term):
+    """
+    Extract snippets containing the search term from page text.
+    """
+    text_lower = page_text.lower()
+    start = 0
+
+    page_snippets = []
+    while True:
+        pos = text_lower.find(term.lower(), start)
+        if pos == -1:
+            break
+
+        # Determine centered window
+        padding = (200 - len(term)) // 2
+        snippet_start = max(0, pos - padding)
+        snippet_end = min(len(page_text), pos + len(term) + padding)
+
+        # Adjust window to get 200 characters if possible
+        if (snippet_end - snippet_start) < 200:
+            if snippet_start == 0:
+                snippet_end = min(len(page_text), 200)
+            elif snippet_end == len(page_text):
+                snippet_start = max(0, len(page_text) - 200)
+
+        snippet = page_text[snippet_start:snippet_end]
+
+        # Add ellipses if truncated
+        prefix = "..." if snippet_start > 0 else ""
+        suffix = "..." if snippet_end < len(page_text) else ""
+
+        page_snippets.append({"text": f"{prefix}{snippet}{suffix}", "page": page_num})
+        start = pos + max(1, len(term))
+
+    return page_snippets

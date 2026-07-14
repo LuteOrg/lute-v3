@@ -515,6 +515,7 @@ def drag(luteclient, wstart, wend):
 def when_click_word_press_hotkey(luteclient, word, hotkey):
     "Click word and press hotkey."
     luteclient.click_word(word)
+    time.sleep(0.5)
     luteclient.press_hotkey(hotkey)
 
 
