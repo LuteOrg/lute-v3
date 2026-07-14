@@ -205,7 +205,7 @@
           <span id="clearBookSearch" class="clear-search-btn" style="display: none;">&times;</span>
         </div>
         <div id="bookSearchResultsContainer" style="max-height: 400px; overflow-y: auto;">
-          <table id="bookSearchTable" class="table stripe" style="width: 100%; margin-top: 10px; font-size: 0.9rem; display: none;">
+          <table id="bookSearchTable" class="table stripe" style="width: 100%; margin-top: 10px; font-size: 0.9rem;">
             <thead>
               <tr>
                 <th style="width: 20%; text-align: left;">Page</th>
@@ -229,6 +229,7 @@
 <script>
   LookupButton.LANG_ID = {{ lang_id | safe }};
   LookupButton.TERM_DICTS = {{ term_dicts | safe }};
+  window.tempHighlightTerm = "{{ highlight }}";
 
   let mouseY = 0;
   let scrollY = 0;
@@ -543,8 +544,32 @@
         if (initial_page_load && have_audio_file()) {
           load_player_source();
         }
+
+        applyFtsHighlight();
       }
     );
+  }
+
+  function applyFtsHighlight() {
+    if (window.tempHighlightTerm) {
+      const cleanTerm = window.tempHighlightTerm.replace(/\u200B/g, '').trim().toLowerCase();
+      if (cleanTerm) {
+        $('.textsentence').each(function() {
+          const sentText = $(this).text().replace(/\u200B/g, '').trim().toLowerCase();
+          if (sentText === cleanTerm || sentText.indexOf(cleanTerm) !== -1) {
+            const sentEl = $(this);
+            sentEl.css({
+              'background-color': '#fde047',
+              'transition': 'background-color 1s ease'
+            });
+            setTimeout(function() {
+              sentEl.css('background-color', '');
+            }, 3000);
+          }
+        });
+      }
+      window.tempHighlightTerm = null;
+    }
   }
 
   function closeMenu() {
@@ -679,7 +704,7 @@
   // Page peeking & return logic
   window.originalReadingPage = null;
 
-  window.peekBookPage = function(targetPage) {
+  window.peekBookPage = function(targetPage, phraseText) {
     const currentPage = parseInt($('#page_num').val());
     if (window.originalReadingPage === null) {
       window.originalReadingPage = currentPage;
@@ -690,6 +715,7 @@
 
     const delta = targetPage - currentPage;
     closeBookSearchModal();
+    window.tempHighlightTerm = phraseText || $('#bookSearchInput').val().trim();
     goto_relative_page(delta);
   }
 
@@ -752,17 +778,11 @@
             if (!term) return data;
 
             let textHtml = data.replace(/\u200B/g, '');
-            const termLower = term.toLowerCase();
-            const snippetLower = textHtml.toLowerCase();
-
-            const idx = snippetLower.indexOf(termLower);
-            if (idx !== -1) {
-              const left = textHtml.substring(0, idx);
-              const match = textHtml.substring(idx, idx + term.length);
-              const right = textHtml.substring(idx + term.length);
-              textHtml = `${left}<span class="fts-phrase-match">${match}</span>${right}`;
-            }
-            return textHtml;
+            const escapedTerm = term.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            const regex = new RegExp(escapedTerm, 'gi');
+            return textHtml.replace(regex, function(match) {
+              return `<span class="fts-phrase-match">${match}</span>`;
+            });
           }
         },
         {
@@ -770,7 +790,8 @@
           data: null,
           className: "text-center vertical-middle",
           render: function(data, type, row) {
-            return `<span class="fts-goto-arrow" title="go-to" onclick="peekBookPage(${row.page})">▶</span>`;
+            const cleanText = row.text.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+            return `<span class="fts-goto-arrow" title="go-to" onclick="peekBookPage(${row.page}, \`${cleanText}\`)">▶</span>`;
           }
         }
       ],
@@ -783,12 +804,15 @@
         $('#bookSearchWaiting').hide();
 
         if (!term) {
+          $('#bookSearchTable').hide();
           $('#bookSearchTable_wrapper').hide();
           $('#bookSearchNoResults').hide();
         } else if (records === 0) {
+          $('#bookSearchTable').hide();
           $('#bookSearchTable_wrapper').hide();
           $('#bookSearchNoResults').show();
         } else {
+          $('#bookSearchTable').show();
           $('#bookSearchTable_wrapper').show();
           $('#bookSearchNoResults').hide();
         }

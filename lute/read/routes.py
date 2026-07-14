@@ -24,6 +24,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
     show_highlights = current_settings["show_highlights"]
     lang_repo = LanguageRepository(db.session)
     term_dicts = lang_repo.all_dictionaries()[lang.id]["term"]
+    highlight = request.args.get("highlight", "")
 
     return render_template(
         "read/index.html",
@@ -38,6 +39,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         lang_id=lang.id,
         track_page_open=track_page_open,
         term_dicts=term_dicts,
+        highlight=highlight,
     )
 
 

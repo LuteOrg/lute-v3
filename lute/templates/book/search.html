@@ -153,17 +153,11 @@
             if (!term) return data;
 
             let textHtml = data.replace(/\u200B/g, '');
-            const termLower = term.toLowerCase();
-            const snippetLower = textHtml.toLowerCase();
-
-            const idx = snippetLower.indexOf(termLower);
-            if (idx !== -1) {
-              const left = textHtml.substring(0, idx);
-              const match = textHtml.substring(idx, idx + term.length);
-              const right = textHtml.substring(idx + term.length);
-              textHtml = `${left}<span class="fts-phrase-match">${match}</span>${right}`;
-            }
-            return textHtml;
+            const escapedTerm = term.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            const regex = new RegExp(escapedTerm, 'gi');
+            return textHtml.replace(regex, function(match) {
+              return `<span class="fts-phrase-match">${match}</span>`;
+            });
           }
         },
         { 
@@ -171,8 +165,7 @@
           data: null,
           className: "text-center",
           render: function(data, type, row) {
-            const term = $('#customSearchInput').val().trim();
-            return `<span class="fts-goto-arrow" title="go-to" onclick="window.location='/read/${row.book_id}/peek/${row.page}?highlight=${encodeURIComponent(term)}'">▶</span>`;
+            return `<span class="fts-goto-arrow" title="go-to" onclick="window.location='/read/${row.book_id}/peek/${row.page}?highlight=${encodeURIComponent(row.text)}'">▶</span>`;
           }
         }
       ]

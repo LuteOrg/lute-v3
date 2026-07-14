@@ -98,3 +98,93 @@ def test_fts_search_archived_books(app, app_context, spanish):
     data_shown = res_shown.get_json()
     assert data_shown["recordsTotal"] == 1
     assert data_shown["data"][0]["title"] == "Archived Book"
+
+
+def test_fts_search_ui_elements(app, app_context):
+    """
+    Assert that the Content search page contains the Clean Selection button
+    and the filter loading spinner indicator.
+    """
+    client = app.test_client()
+    response = client.get("/book/search")
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+
+    # Assert Clean Selection button exists
+    clear_btn = soup.find(id="clearBookSelection")
+    assert (
+        clear_btn is not None
+    ), "Clean Selection button #clearBookSelection should be present"
+
+    # Assert loading spinner exists
+    waiting_spinner = soup.find(id="filterWaiting")
+    assert (
+        waiting_spinner is not None
+    ), "Loading spinner #filterWaiting should be present"
+
+
+def test_fts_peek_page_highlight(app, app_context, spanish):
+    """
+    Ensure that peeking a page with ?highlight=term passes the highlight term
+    to the client-side JavaScript.
+    """
+    b1 = make_book(
+        "Test Highlight Book", ["Este es un libro con la palabra prueba."], spanish
+    )
+    for text_obj in b1.texts:
+        text_obj.load_sentences()
+    db.session.add(b1)
+    db.session.commit()
+
+    client = app.test_client()
+    url = f"/read/{b1.id}/peek/1?highlight=prueba"
+    response = client.get(url)
+    assert response.status_code == 200
+    assert b'window.tempHighlightTerm = "prueba";' in response.data
+
+
+def test_fts_peek_page_phrase_highlight(app, app_context, spanish):
+    """
+    Verify that peeking a page with a full sentence highlight passes the entire
+    phrase to client-side JavaScript.
+    """
+    b1 = make_book(
+        "Test Highlight Book", ["Este es un libro con la palabra prueba."], spanish
+    )
+    for text_obj in b1.texts:
+        text_obj.load_sentences()
+    db.session.add(b1)
+    db.session.commit()
+
+    client = app.test_client()
+    phrase = "Este es un libro con la palabra prueba."
+    url = f"/read/{b1.id}/peek/1?highlight={phrase}"
+    response = client.get(url)
+    assert response.status_code == 200
+    expected_js = f'window.tempHighlightTerm = "{phrase}";'.encode("utf-8")
+    assert expected_js in response.data
+
+
+def test_fts_search_table_phrase_link(app, app_context):
+    """
+    Ensure search.html template DataTable renders click navigation action passing
+    the full row.text rather than just the search term keyword.
+    """
+    client = app.test_client()
+    response = client.get("/book/search")
+    assert response.status_code == 200
+    expected_js = b"highlight=${encodeURIComponent(row.text)}"
+    assert expected_js in response.data
+
+
+def test_fts_search_multiple_highlights_js(app, app_context):
+    """
+    Verify that search.html contains regex logic to replace multiple occurrences of a term.
+    """
+    client = app.test_client()
+    response = client.get("/book/search")
+    assert response.status_code == 200
+    # Before the fix, the template contains indexOf logic;
+    # after the fix, it should use RegExp global matching.
+    assert b"new RegExp" in response.data
