@@ -165,7 +165,7 @@
           data: null,
           className: "text-center",
           render: function(data, type, row) {
-            return `<span class="fts-goto-arrow" title="go-to" onclick="window.location='/read/${row.book_id}/peek/${row.page}?highlight=${encodeURIComponent(row.text)}'">▶</span>`;
+            return `<span class="fts-goto-arrow" title="go to page" onclick="window.location='/read/${row.book_id}/peek/${row.page}?highlight=${encodeURIComponent(row.text)}'">▶</span>`;
           }
         }
       ]

@@ -188,3 +188,41 @@ def test_fts_search_multiple_highlights_js(app, app_context):
     # Before the fix, the template contains indexOf logic;
     # after the fix, it should use RegExp global matching.
     assert b"new RegExp" in response.data
+
+
+def test_fts_delegated_click_handler(app, app_context, spanish):
+    """
+    Ensure index.html has a delegated click handler for fts-goto-arrow.
+    """
+    b1 = make_book("Test Click Handler Book", ["Book text."], spanish)
+    for text_obj in b1.texts:
+        text_obj.load_sentences()
+    db.session.add(b1)
+    db.session.commit()
+
+    client = app.test_client()
+    response = client.get(f"/read/{b1.id}")
+    assert response.status_code == 200
+    # The template should contain delegated event registration
+    assert b"$('#bookSearchTable').on('click', '.fts-goto-arrow'" in response.data
+
+
+def test_fts_magnifier_conditional_search_behavior(app, app_context, spanish):
+    """
+    Verify that index.html implements conditional search restore on magnifier click
+    and cleans up sessionStorage when returning to reading mode.
+    """
+    b1 = make_book("Test Search Restore Book", ["Book text."], spanish)
+    for text_obj in b1.texts:
+        text_obj.load_sentences()
+    db.session.add(b1)
+    db.session.commit()
+
+    client = app.test_client()
+    response = client.get(f"/read/{b1.id}")
+    assert response.status_code == 200
+
+    # The template should check returnToReadingBanner visibility on magnifier click
+    assert b"$('#returnToReadingBanner').is(':visible')" in response.data
+    # The returnToReadingPage function should clear lastBookSearchQuery from sessionStorage
+    assert b"sessionStorage.removeItem(`lastBookSearchQuery-" in response.data

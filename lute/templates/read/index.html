@@ -729,6 +729,9 @@
 
       $('#returnToReadingBanner').hide();
       window.originalReadingPage = null;
+
+      const bookId = $('#book_id').val();
+      sessionStorage.removeItem(`lastBookSearchQuery-${bookId}`);
     }
   }
 
@@ -790,8 +793,7 @@
           data: null,
           className: "text-center vertical-middle",
           render: function(data, type, row) {
-            const cleanText = row.text.replace(/`/g, '\\`').replace(/\$/g, '\\$');
-            return `<span class="fts-goto-arrow" title="go-to" onclick="peekBookPage(${row.page}, \`${cleanText}\`)">▶</span>`;
+            return `<span class="fts-goto-arrow" title="go to page" data-page="${row.page}" data-text="${encodeURIComponent(row.text)}">▶</span>`;
           }
         }
       ],
@@ -821,9 +823,20 @@
 
     // Make sure search starts clean on ready, do not restore on load
 
+    // Delegated click event handler for FTS play go-to button
+    $('#bookSearchTable').on('click', '.fts-goto-arrow', function() {
+      const page = $(this).data('page');
+      const text = decodeURIComponent($(this).data('text'));
+      peekBookPage(page, text);
+    });
+
     $('#readingSearchBtn').on('click', function(e) {
       e.stopPropagation();
-      showBookSearchModal();
+      if ($('#returnToReadingBanner').is(':visible')) {
+        returnToSearchWindow();
+      } else {
+        showBookSearchModal();
+      }
     });
 
     $('#bookSearchInput').on('input', function() {
