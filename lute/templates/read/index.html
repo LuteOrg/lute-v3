@@ -540,8 +540,33 @@
       data: JSON.stringify(data),
       contentType: "application/json; charset=utf-8"
     }).done(function(d) {
-      goto_relative_page(next_relative_page);
+      if (d.book_finished) {
+        showFinishedScreen(d.total_words);
+      } else {
+        goto_relative_page(next_relative_page);
+      }
     });
+  }
+
+  function showFinishedScreen(total_words) {
+    const html = `
+      <div id="book-finished-modal" class="book-finished-overlay">
+        <div class="book-finished-content">
+          <h2>Book Finished!</h2>
+          <p>Great job!</p>
+          <p class="words-read">You've read <strong>${total_words}</strong> words.</p>
+          <div class="book-finished-actions">
+            <a href="/" class="btn btn-primary">Home</a>
+            <button class="btn btn-secondary" onclick="closeFinishedScreen()">Close</button>
+          </div>
+        </div>
+      </div>
+    `;
+    $('body').append(html);
+  }
+
+  function closeFinishedScreen() {
+    $('#book-finished-modal').remove();
   }
 
   function add_bookmark() {

@@ -998,6 +998,99 @@ div.code pre {
     background-image: url("/static/icn/font-decrease.svg");
 }
 
+.book-finished-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.book-finished-content {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    animation: slideUp 0.3s ease-in-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.book-finished-content h1 {
+    font-size: 72px;
+    margin-bottom: 20px;
+}
+
+.book-finished-content h2 {
+    font-size: 36px;
+    margin: 20px 0;
+    color: #333;
+}
+
+.book-finished-content p {
+    font-size: 18px;
+    color: #666;
+    margin: 10px 0;
+}
+
+.book-finished-content .words-read {
+    font-size: 24px;
+    color: #4CBB17;
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+.book-finished-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: #4CBB17;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #3a9911;
+}
+
+.btn-secondary {
+    background-color: #ddd;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background-color: #ccc;
+}
+
 .lh-plus {
     background-image: url("/static/icn/line-spacing-increase.svg");
 }
