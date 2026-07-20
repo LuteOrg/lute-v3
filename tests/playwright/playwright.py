@@ -269,3 +269,52 @@ def test_playwright():
     "Run playwright with tests."
     with sync_playwright() as sp:
         run(sp)
+
+
+def test_hotkey_conflict():
+    "Test that disabling a conflicting hotkey clears conflict warning."
+    showbrowser = os.environ.get("SHOW", "") == "true"
+    with sync_playwright() as sp:
+        browser = sp.chromium.launch(headless=not showbrowser)
+        context = browser.new_context()
+        page = context.new_page()
+
+        # Load the shortcuts settings page
+        page.goto("http://localhost:5001/settings/shortcuts")
+
+        # Select the first two shortcut inputs by class name "shortcutdefinition"
+        shortcuts = page.locator(".shortcutdefinition")
+        expect(shortcuts.first).to_be_visible()
+
+        # Focus first shortcut and press a key to assign it
+        shortcuts.nth(0).click()
+        page.keyboard.press("KeyA")
+
+        # Focus second shortcut and press the same key to create a conflict
+        shortcuts.nth(1).click()
+        page.keyboard.press("KeyA")
+
+        # Verify that both are highlighted as duplicates (dupShortcut class)
+        expect(shortcuts.nth(0)).to_have_class(r"shortcutdefinition dupShortcut")
+        expect(shortcuts.nth(1)).to_have_class(r"shortcutdefinition dupShortcut")
+
+        # Verify the Save button is disabled
+        save_btn = page.locator("#btnSubmit")
+        expect(save_btn).to_be_disabled()
+
+        # Uncheck the checkbox next to the first shortcut to disable it
+        first_row = shortcuts.nth(0).locator("xpath=../..")
+        checkbox = first_row.locator('input[type="checkbox"]')
+        checkbox.uncheck()
+
+        # Verify the first input is now empty
+        expect(shortcuts.nth(0)).to_have_value("")
+
+        # Verify that the second input is no longer marked as a duplicate
+        expect(shortcuts.nth(1)).not_to_have_class(r"dupShortcut")
+
+        # Verify the Save button is now enabled
+        expect(save_btn).to_be_enabled()
+
+        context.close()
+        browser.close()
