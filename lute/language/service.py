@@ -60,14 +60,8 @@ class LangDef:
                 content = f.read()
             title_match = re.search(r"title:\s*(.*)\n", content)
             title = title_match.group(1).strip()
-            # Optional `# source_url: ...` header. When present and non-blank
-            # the parsed value is stored on Book.source_uri so it lands in
-            # the book's "Source URI" field on import. Matched before the
-            # `#`-line stripper below removes the header from the body.
-            # `[ \t]*` (not `\s*`) so a blank `source_url:` line does not
-            # let the capture group spill onto the next line.
             source_url = None
-            source_url_match = re.search(r"source_url:[ \t]*([^\n]*)", content)
+            source_url_match = re.search(r"source_url:(.*)\n", content)
             if source_url_match:
                 candidate = source_url_match.group(1).strip()
                 if candidate:
