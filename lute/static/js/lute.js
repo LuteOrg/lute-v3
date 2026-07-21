@@ -759,7 +759,7 @@ let _update_screen_cursor = function(target) {
 let _move_cursor = function(selector, direction = 1) {
   _hide_element_message_tooltips();
   const fe = _first_selected_element();
-  const fe_order = (fe != null) ? _get_order($(fe)) : 0;
+  const fe_order = (fe != null) ? _get_order($(fe)) : (direction > 0 ? -1 : Infinity);
   let candidates = $(selector).toArray();
   let comparator = function(a, b) { return a > b };
   if (direction < 0) {
