@@ -60,11 +60,19 @@ class LangDef:
                 content = f.read()
             title_match = re.search(r"title:\s*(.*)\n", content)
             title = title_match.group(1).strip()
+            source_url = None
+            source_url_match = re.search(r"source_url:(.*)\n", content)
+            if source_url_match:
+                candidate = source_url_match.group(1).strip()
+                if candidate:
+                    source_url = candidate
             content = re.sub(r"#.*\n", "", content)
             b = Book()
             b.language_name = language_name
             b.title = title
             b.text = content
+            if source_url is not None:
+                b.source_uri = source_url
             books.append(b)
         return books
 
