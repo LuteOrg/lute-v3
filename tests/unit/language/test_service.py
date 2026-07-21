@@ -94,31 +94,25 @@ def test_load_all_defs_loads_lang_and_stories(app_context):
         assert lang_id > 0, "Loaded"
 
 
-def _write_story(directory, filename, content):
-    "Write a story file under directory; return the LangDef wrapping the dir."
-    path = os.path.join(directory, filename)
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
-
-
 def test_get_books_parses_optional_source_url(tmp_path):
-    """A `# source_url:` header lands on Book.source_uri; story body keeps
-    only the prose. Stories without the header keep source_uri at the
-    Book default (None)."""
+    """Sets the Book.source_uri if present, otherwise it's left blank."""
+
+    def _write_story(filename, content):
+        path = os.path.join(tmp_path, filename)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(content)
+
     # LangDef._get_name reads definition.yaml; provide a minimal one.
     (tmp_path / "definition.yaml").write_text("name: TestLang\n", encoding="utf-8")
     _write_story(
-        str(tmp_path),
         "with_source.txt",
         "# title: With Source\n# source_url: https://example.com/story\nHello.\n",
     )
     _write_story(
-        str(tmp_path),
         "without_source.txt",
         "# title: Without Source\nWorld.\n",
     )
     _write_story(
-        str(tmp_path),
         "blank_source.txt",
         "# title: Blank Source\n# source_url:    \nGoodbye.\n",
     )
@@ -132,6 +126,7 @@ def test_get_books_parses_optional_source_url(tmp_path):
     assert books["Without Source"].source_uri is None
     assert books["Without Source"].text.strip() == "World."
 
-    # Blank value is treated as "no url" (not the empty string).
-    assert books["Blank Source"].source_uri is None
+    assert (
+        books["Blank Source"].source_uri is None
+    ), "a blank line isn't recorded as an empty string"
     assert books["Blank Source"].text.strip() == "Goodbye."
