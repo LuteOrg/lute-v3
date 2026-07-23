@@ -108,8 +108,8 @@
 
   function getSetting(key, defaultValue) {
     try {
-      if (window.LUTE_USER_SETTINGS && window.LUTE_USER_SETTINGS[key] !== undefined) {
-        var val = window.LUTE_USER_SETTINGS[key];
+      if (typeof LUTE_USER_SETTINGS !== "undefined" && LUTE_USER_SETTINGS[key] !== undefined) {
+        var val = LUTE_USER_SETTINGS[key];
         if (val === "1" || val === 1 || val === true) return true;
         if (val === "0" || val === 0 || val === false) return false;
         return val;
@@ -119,17 +119,11 @@
   }
 
   var SETTINGS = {
-    enabled: getSetting("tts_enabled", true),
     hoverPronunciation: getSetting("tts_hover_pronunciation", true),
     clickPronunciation: getSetting("tts_click_pronunciation", true),
     showControlPanel: getSetting("tts_show_control_panel", true),
     showSentenceButtons: getSetting("tts_show_sentence_buttons", true),
   };
-
-  // If TTS is completely disabled, stop here
-  if (!SETTINGS.enabled) {
-    return;
-  }
 
   // ------------------------------------------------------------------
   // 1. Speech synthesis (primary: browser SpeechSynthesis,
@@ -137,8 +131,10 @@
   // ------------------------------------------------------------------
 
   let currentUtterance = null;
+  let currentAudio = null;
   let globalSpeed = 1.0;
   let hoverTimer = null;
+  let isPaused = false;
 
   function selectBestVoiceForLang(voices, targetLang) {
     if (!voices || voices.length === 0) return null;
@@ -216,14 +212,20 @@
       utterance.rate = globalSpeed;
       if (isFullText) {
         currentUtterance = utterance;
+        isPaused = false;
         utterance.onend = function () {
           currentUtterance = null;
-          updatePlayButtonState(false);
+          isPaused = false;
+          updatePlayPauseButton();
         };
       }
 
       setTimeout(function () {
         window.speechSynthesis.speak(utterance);
+        if (isFullText) {
+          isPaused = false;
+          updatePlayPauseButton();
+        }
       }, 20);
       return;
     }
@@ -234,6 +236,8 @@
     const audio = new Audio(url);
     audio.playbackRate = globalSpeed;
     if (isFullText) {
+      currentAudio = audio;
+      isPaused = false;
       audio.play().catch(function () {});
       currentUtterance = {
         stop: function () {
@@ -243,12 +247,25 @@
         },
       };
       audio.addEventListener("ended", function () {
+        currentAudio = null;
         currentUtterance = null;
-        updatePlayButtonState(false);
+        isPaused = false;
+        updatePlayPauseButton();
       });
+      updatePlayPauseButton();
     } else {
       audio.play().catch(function () {});
     }
+  }
+
+  function getPlaybackState() {
+    if (isPaused) return "stopped";
+    if ("speechSynthesis" in window) {
+      if (window.speechSynthesis.speaking) return "playing";
+    }
+    if (currentAudio && !currentAudio.paused) return "playing";
+    if (currentUtterance || currentAudio) return "playing";
+    return "stopped";
   }
 
   function stopFullText() {
@@ -257,23 +274,33 @@
         window.speechSynthesis.cancel();
       } catch (_) {}
     }
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.removeAttribute("src");
+      currentAudio.load();
+      currentAudio = null;
+    }
     if (currentUtterance && currentUtterance.stop) currentUtterance.stop();
     currentUtterance = null;
-    updatePlayButtonState(false);
+    isPaused = false;
+    updatePlayPauseButton();
   }
 
-  function pauseFullText() {
-    if ("speechSynthesis" in window && window.speechSynthesis.speaking)
-      window.speechSynthesis.pause();
-  }
-
-  function updatePlayButtonState(isPlaying) {
-    const playBtn =
+  function updatePlayPauseButton() {
+    const btn =
+      document.getElementById("btn-lute-playpause") ||
       document.getElementById("btn-lute-play") ||
       document.getElementById("tts-play");
-    if (playBtn) {
-      playBtn.innerHTML = isPlaying ? "🔊" : "▶";
-      playBtn.style.background = isPlaying ? "#40c057" : "";
+    if (!btn) return;
+    const state = getPlaybackState();
+    if (state === "playing") {
+      btn.innerHTML = "⏹";
+      btn.title = "Stop";
+      btn.style.background = "#fa5252";
+    } else {
+      btn.innerHTML = "▶";
+      btn.title = "Play";
+      btn.style.background = "#228be6";
     }
   }
 
@@ -644,15 +671,9 @@
         "border:1px solid #dee2e6;gap:10px;font-family:sans-serif;" +
         "flex-wrap:wrap;z-index:9999;";
       panel.innerHTML =
-        '<button id="btn-lute-play" title="Play" ' +
-        'style="padding:5px 10px;background:#228be6;color:#fff;border:none;' +
-        'border-radius:4px;cursor:pointer;font-size:14px;line-height:1;">▶</button>' +
-        '<button id="btn-lute-pause" title="Pause" ' +
-        'style="padding:5px 10px;background:#fab005;color:#fff;border:none;' +
-        'border-radius:4px;cursor:pointer;font-size:14px;line-height:1;">⏸</button>' +
-        '<button id="btn-lute-stop" title="Stop" ' +
-        'style="padding:5px 10px;background:#fa5252;color:#fff;border:none;' +
-        'border-radius:4px;cursor:pointer;font-size:14px;line-height:1;">⏹</button>' +
+        '<button id="btn-lute-playpause" title="Play" ' +
+        'style="padding:5px 14px;background:#228be6;color:#fff;border:none;' +
+        'border-radius:4px;cursor:pointer;font-size:14px;line-height:1;min-width:42px;">▶</button>' +
         '<div style="display:flex;align-items:center;gap:4px;' +
         'border-left:1px solid #ccc;padding-left:8px;">' +
         '<span title="Voice" style="font-size:14px;">🗣️</span>' +
@@ -676,30 +697,21 @@
   }
 
   function wirePanelEvents(panel) {
-    const playBtn = panel.querySelector("#btn-lute-play") || panel.querySelector("#tts-play");
-    const pauseBtn = panel.querySelector("#btn-lute-pause") || panel.querySelector("#tts-pause");
+    const playPauseBtn = panel.querySelector("#btn-lute-playpause") || panel.querySelector("#btn-lute-play") || panel.querySelector("#tts-play");
     const stopBtn = panel.querySelector("#btn-lute-stop") || panel.querySelector("#tts-stop");
     const speedSlider = panel.querySelector("#lute-speed-slider") || panel.querySelector("#tts-rate");
     const speedVal = panel.querySelector("#lute-speed-val") || panel.querySelector("#tts-rate-val");
 
-    if (playBtn && !playBtn.dataset.wired) {
-      playBtn.dataset.wired = "true";
-      playBtn.addEventListener("click", function () {
-        if (window.speechSynthesis && window.speechSynthesis.paused && window.speechSynthesis.speaking) {
-          window.speechSynthesis.resume();
+    if (playPauseBtn && !playPauseBtn.dataset.wired) {
+      playPauseBtn.dataset.wired = "true";
+      playPauseBtn.addEventListener("click", function () {
+        const state = getPlaybackState();
+        if (state === "playing") {
+          stopFullText();
         } else {
           playFullText();
         }
-      });
-    }
-    if (pauseBtn && !pauseBtn.dataset.wired) {
-      pauseBtn.dataset.wired = "true";
-      pauseBtn.addEventListener("click", function () {
-        if (window.speechSynthesis && window.speechSynthesis.paused) {
-          window.speechSynthesis.resume();
-        } else {
-          pauseFullText();
-        }
+        setTimeout(updatePlayPauseButton, 60);
       });
     }
     if (stopBtn && !stopBtn.dataset.wired) {
@@ -805,10 +817,160 @@
   }
 
   // ------------------------------------------------------------------
-  // 9. Boot
+  // 9. TTS toggles (sidebar quick controls)
+  // ------------------------------------------------------------------
+
+  let ttsPlayerVisible = true;
+  let ttsSentenceButtonsVisible = true;
+
+  function setTtsPlayerVisible(visible) {
+    ttsPlayerVisible = visible;
+    const panel = document.getElementById("lute-tts-panel");
+    const toggle = document.getElementById("tts-player-toggle");
+    const container = document.body;
+
+    if (panel) {
+      panel.style.display = visible ? "" : "none";
+    }
+    if (toggle) {
+      toggle.checked = visible;
+    }
+    if (container) {
+      if (visible) {
+        container.classList.add("tts-player-active");
+      } else {
+        container.classList.remove("tts-player-active");
+      }
+    }
+
+    try {
+      localStorage.setItem("ttsPlayerVisible", visible ? "1" : "0");
+    } catch (_) {}
+
+    var val = visible ? "1" : "0";
+    try {
+      fetch("/settings/set/tts_show_control_panel/" + val, { method: "POST" });
+    } catch (_) {}
+  }
+
+  function setTtsSentenceButtonsVisible(visible) {
+    ttsSentenceButtonsVisible = visible;
+    const btns = document.querySelectorAll(".lute-sentence-play-btn");
+    const toggle = document.getElementById("tts-sentence-buttons-toggle");
+    const container = document.body;
+
+    btns.forEach(function (btn) {
+      btn.style.display = visible ? "" : "none";
+    });
+    if (toggle) {
+      toggle.checked = visible;
+    }
+    if (container) {
+      if (visible) {
+        container.classList.add("tts-sentence-buttons-active");
+      } else {
+        container.classList.remove("tts-sentence-buttons-active");
+      }
+    }
+
+    try {
+      localStorage.setItem("ttsSentenceButtonsVisible", visible ? "1" : "0");
+    } catch (_) {}
+
+    var val = visible ? "1" : "0";
+    try {
+      fetch("/settings/set/tts_show_sentence_buttons/" + val, { method: "POST" });
+    } catch (_) {}
+  }
+
+  function setupTtsPlayerToggle() {
+    const toggle = document.getElementById("tts-player-toggle");
+    if (!toggle) return;
+
+    let saved = null;
+    try {
+      saved = localStorage.getItem("ttsPlayerVisible");
+    } catch (_) {}
+
+    var initialVisible;
+    if (saved !== null) {
+      initialVisible = saved !== "0";
+    } else {
+      initialVisible = SETTINGS.showControlPanel;
+    }
+    ttsPlayerVisible = initialVisible;
+
+    toggle.checked = initialVisible;
+    if (initialVisible) {
+      document.body.classList.add("tts-player-active");
+    } else {
+      document.body.classList.remove("tts-player-active");
+    }
+
+    toggle.addEventListener("change", function () {
+      setTtsPlayerVisible(toggle.checked);
+    });
+  }
+
+  function setupTtsSentenceButtonsToggle() {
+    const toggle = document.getElementById("tts-sentence-buttons-toggle");
+    if (!toggle) return;
+
+    let saved = null;
+    try {
+      saved = localStorage.getItem("ttsSentenceButtonsVisible");
+    } catch (_) {}
+
+    var initialVisible;
+    if (saved !== null) {
+      initialVisible = saved !== "0";
+    } else {
+      initialVisible = SETTINGS.showSentenceButtons;
+    }
+    ttsSentenceButtonsVisible = initialVisible;
+
+    toggle.checked = initialVisible;
+    if (initialVisible) {
+      document.body.classList.add("tts-sentence-buttons-active");
+    } else {
+      document.body.classList.remove("tts-sentence-buttons-active");
+    }
+
+    toggle.addEventListener("change", function () {
+      setTtsSentenceButtonsVisible(toggle.checked);
+    });
+  }
+
+  // Override inject functions to respect toggle states
+  const _origInjectControlPanel = injectControlPanel;
+  injectControlPanel = function () {
+    if (!SETTINGS.showControlPanel) return;
+    _origInjectControlPanel();
+    const panel = document.getElementById("lute-tts-panel");
+    if (panel && !ttsPlayerVisible) {
+      panel.style.display = "none";
+    }
+  };
+
+  const _origInjectSentenceButtons = injectSentencePlayButtons;
+  injectSentencePlayButtons = function () {
+    if (!SETTINGS.showSentenceButtons) return;
+    _origInjectSentenceButtons();
+    if (!ttsSentenceButtonsVisible) {
+      document.querySelectorAll(".lute-sentence-play-btn").forEach(function (btn) {
+        btn.style.display = "none";
+      });
+    }
+  };
+
+  // ------------------------------------------------------------------
+  // 10. Boot
   // ------------------------------------------------------------------
 
   function boot() {
+    setupTtsPlayerToggle();
+    setupTtsSentenceButtonsToggle();
+
     // Initial setup — only on the main reading page.
     if (document.getElementById("thetext")) {
       if (SETTINGS.showControlPanel) injectControlPanel();
