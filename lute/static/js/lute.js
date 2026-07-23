@@ -836,19 +836,7 @@ let show_translation_for_text = function(text) {
     let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no';
     if (LUTE_USER_SETTINGS.open_popup_in_new_tab)
       settings = null;
-    
-    const topWin = window.top;
-    if (topWin.lute_popup_window && !topWin.lute_popup_window.closed) {
-      topWin.lute_popup_window.location = url;
-      topWin.lute_popup_window.focus();
-    } else {
-      const pop = topWin.open(url, 'dictwin', settings);
-      topWin.lute_popup_window = pop;
-      if (!topWin.lute_popup_windows) {
-        topWin.lute_popup_windows = [];
-      }
-      topWin.lute_popup_windows.push(pop);
-    }
+    LutePopups.open_popup(url, settings);
   }
   else {
     top.frames.wordframe.location.href = url;
