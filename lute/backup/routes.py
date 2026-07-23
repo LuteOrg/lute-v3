@@ -5,7 +5,10 @@ Backup settings form management, and running backups.
 """
 
 import os
+import shutil
+import tempfile
 import traceback
+from werkzeug.utils import secure_filename
 from flask import (
     Blueprint,
     current_app,
@@ -106,8 +109,6 @@ def restore_backup():
     """
     Restore from an uploaded backup file.
     """
-    from werkzeug.utils import secure_filename
-    import tempfile
 
     if "backup_file" not in request.files:
         flash("No file selected", "error")
@@ -147,5 +148,4 @@ def restore_backup():
     finally:
         # Clean up temp file
         if os.path.exists(temp_dir):
-            import shutil
             shutil.rmtree(temp_dir)

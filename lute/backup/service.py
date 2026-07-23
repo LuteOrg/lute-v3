@@ -6,6 +6,8 @@ import os
 import re
 import shutil
 import gzip
+import sqlite3
+import tempfile
 from datetime import datetime
 import time
 from typing import List, Union
@@ -198,7 +200,10 @@ class Service:
             os.mkdir(target_dir)
         shutil.copytree(userimagespath, target_dir, dirs_exist_ok=True)
 
-    def _add_missing_default_settings(self, dbfilename, app_config, current_backup_dir=None, current_mecab_path=None):
+    def _add_missing_default_settings(
+        self, dbfilename, _app_config,
+        current_backup_dir=None, current_mecab_path=None
+    ):
         """
         Add any missing default user settings to the database at dbfilename.
 
@@ -209,7 +214,6 @@ class Service:
         restored database (so the user's backup directory preference
         isn't overwritten by the backup's setting).
         """
-        import sqlite3
 
         default_tts_settings = [
             ("tts_enabled", "1"),
@@ -238,17 +242,23 @@ class Service:
             # Preserve the current backup_dir from before restore
             if current_backup_dir:
                 cursor.execute(
-                    "SELECT StValue FROM settings WHERE StKey = 'backup_dir' AND StKeyType = 'user'"
+                    "SELECT StValue FROM settings "
+                    "WHERE StKey = 'backup_dir' "
+                    "AND StKeyType = 'user'"
                 )
                 row = cursor.fetchone()
                 if row is None:
                     cursor.execute(
-                        "INSERT INTO settings (StKey, StValue, StKeyType) VALUES ('backup_dir', ?, 'user')",
+                        "INSERT INTO settings "
+                        "(StKey, StValue, StKeyType) "
+                        "VALUES ('backup_dir', ?, 'user')",
                         (current_backup_dir,),
                     )
                 else:
                     cursor.execute(
-                        "UPDATE settings SET StValue = ? WHERE StKey = 'backup_dir' AND StKeyType = 'user'",
+                        "UPDATE settings SET StValue = ? "
+                        "WHERE StKey = 'backup_dir' "
+                        "AND StKeyType = 'user'",
                         (current_backup_dir,),
                     )
 
@@ -256,17 +266,22 @@ class Service:
             # (system-specific path, shouldn't be overwritten by backup)
             if current_mecab_path:
                 cursor.execute(
-                    "SELECT StValue FROM settings WHERE StKey = 'mecab_path' AND StKeyType = 'user'"
+                    "SELECT StValue FROM settings "
+                    "WHERE StKey = 'mecab_path' "
+                    "AND StKeyType = 'user'"
                 )
                 row = cursor.fetchone()
                 if row is None:
                     cursor.execute(
-                        "INSERT INTO settings (StKey, StValue, StKeyType) VALUES ('mecab_path', ?, 'user')",
+                        "INSERT INTO settings "
+                        "(StKey, StValue, StKeyType) "
+                        "VALUES ('mecab_path', ?, 'user')",
                         (current_mecab_path,),
                     )
                 else:
                     cursor.execute(
-                        "UPDATE settings SET StValue = ? WHERE StKey = 'mecab_path' AND StKeyType = 'user'",
+                        "UPDATE settings SET StValue = ? "
+                        "WHERE StKey = 'mecab_path' AND StKeyType = 'user'",
                         (current_mecab_path,),
                     )
 
@@ -288,15 +303,13 @@ class Service:
     # Set by restore_backup(), checked in before_request handler.
     _engine_needs_reset = False
 
-    def restore_backup(self, app_config, backup_file_path):
+    def restore_backup(self, app_config, backup_file_path):  # pylint: disable=too-many-locals
         """
         Restore from a backup file.
 
         backup_file_path can be either a .db.gz file or a .db file.
         DANGEROUS: this replaces the current database.
         """
-        import sqlite3
-        import tempfile
 
         if not os.path.exists(backup_file_path):
             raise BackupException(f"Backup file not found: {backup_file_path}")
