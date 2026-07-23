@@ -947,6 +947,43 @@ ul.sentencelist {
     border: 1px solid darkgrey;
 }
 
+.book-tag {
+    display: inline;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    cursor: pointer;
+    border-bottom: 1px dotted #999;
+    padding-bottom: 1px;
+    margin-right: 4px;
+}
+
+.book-tag:hover {
+    border-bottom: 1px solid #333;
+    color: #333;
+}
+
+#activeTagFilter {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    color: inherit;
+    vertical-align: baseline;
+}
+
+#activeTagFilter #clearTagFilter {
+    margin-left: 6px;
+    color: #212529;
+    text-decoration: none;
+}
+
+#activeTagFilter #clearTagFilter:hover {
+    color: #e03131;
+}
+
 /* error handler */
 
 div.bug_report {
