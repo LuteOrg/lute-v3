@@ -15,6 +15,12 @@ import urllib.parse
 import requests
 from flask import Blueprint, current_app, send_file, jsonify
 
+try:
+    import edge_tts
+    _EDGE_TTS_AVAILABLE = True
+except ImportError:
+    _EDGE_TTS_AVAILABLE = False
+
 bp = Blueprint("tts", __name__)
 
 
@@ -147,14 +153,18 @@ def _generate_audio(text, voice, filepath):
 
     edge-tts is async, so it is run via asyncio.run() within this sync
     Flask route.
+
+    Returns None on success, or an error tuple on failure.
     """
-    import edge_tts  # imported lazily so the app still starts if missing
+    if not _EDGE_TTS_AVAILABLE:
+        return jsonify({"error": "edge-tts not installed"}), 500
 
     async def _run():
         communicate = edge_tts.Communicate(text, voice)
         await communicate.save(filepath)
 
     asyncio.run(_run())
+    return None
 
 
 @bp.route("/api/translate/<sl>/<tl>/<path:text>", methods=["GET"])
