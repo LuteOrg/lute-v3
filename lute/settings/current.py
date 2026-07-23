@@ -42,6 +42,12 @@ def refresh_global_settings(session):
         "term_popup_show_components",
         "use_ankiconnect",
         "show_streak_on_home",
+        "tts_enabled",
+        "tts_hover_pronunciation",
+        "tts_click_pronunciation",
+        "tts_show_control_panel",
+        "tts_show_sentence_buttons",
     ]
     for k in boolkeys:
-        current_settings[k] = current_settings[k] == "1"
+        if k in current_settings:
+            current_settings[k] = current_settings[k] == "1"

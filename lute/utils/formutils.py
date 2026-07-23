@@ -28,7 +28,22 @@ def valid_current_language_id(session):
     it's still valid.  If not, change it.
     """
     repo = UserSettingRepository(session)
-    current_language_id = repo.get_value("current_language_id")
+    try:
+        current_language_id = repo.get_value("current_language_id")
+    except Exception:  # pylint: disable=broad-exception-caught
+        # Setting doesn't exist (e.g. restored from older version)
+        current_language_id = None
+
+    if current_language_id is None:
+        valid_language_ids = [int(p[0]) for p in language_choices(session)]
+        current_language_id = valid_language_ids[0] if valid_language_ids else 0
+        try:
+            repo.set_value("current_language_id", current_language_id)
+            session.commit()
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+        return current_language_id
+
     current_language_id = int(current_language_id)
 
     valid_language_ids = [int(p[0]) for p in language_choices(session)]
@@ -36,6 +51,9 @@ def valid_current_language_id(session):
         return current_language_id
 
     current_language_id = valid_language_ids[0]
-    repo.set_value("current_language_id", current_language_id)
-    session.commit()
+    try:
+        repo.set_value("current_language_id", current_language_id)
+        session.commit()
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass
     return current_language_id

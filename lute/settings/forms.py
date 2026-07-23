@@ -57,6 +57,12 @@ class UserSettingsForm(FlaskForm):
     use_ankiconnect = BooleanField("Enable export using AnkiConnect")
     ankiconnect_url = StringField("AnkiConnect URL", validators=[InputRequired()])
 
+    tts_enabled = BooleanField("Enable TTS (text-to-speech)")
+    tts_hover_pronunciation = BooleanField("Pronounce word on hover (200ms delay)")
+    tts_click_pronunciation = BooleanField("Pronounce word when clicked (term form opens)")
+    tts_show_control_panel = BooleanField("Show TTS control panel (play/pause/stop)")
+    tts_show_sentence_buttons = BooleanField("Show 🔊 button on each sentence")
+
     def validate_backup_dir(self, field):
         "Field must be set if enabled."
         if self.backup_enabled.data is False:
