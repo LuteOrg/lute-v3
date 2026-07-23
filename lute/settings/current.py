@@ -44,4 +44,5 @@ def refresh_global_settings(session):
         "show_streak_on_home",
     ]
     for k in boolkeys:
-        current_settings[k] = current_settings[k] == "1"
+        if k in current_settings:
+            current_settings[k] = current_settings[k] == "1"

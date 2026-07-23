@@ -99,3 +99,53 @@ def handle_skip_this_backup():
     service = Service(db.session)
     service.skip_this_backup()
     return redirect("/", 302)
+
+
+@bp.route("/restore", methods=["POST"])
+def restore_backup():
+    """
+    Restore from an uploaded backup file.
+    """
+    from werkzeug.utils import secure_filename
+    import tempfile
+
+    if "backup_file" not in request.files:
+        flash("No file selected", "error")
+        return redirect("/backup/index")
+
+    f = request.files["backup_file"]
+    if f.filename == "":
+        flash("No file selected", "error")
+        return redirect("/backup/index")
+
+    # Save uploaded file to temp location
+    temp_dir = tempfile.mkdtemp()
+    filename = secure_filename(f.filename)
+    filepath = os.path.join(temp_dir, filename)
+    f.save(filepath)
+
+    c = current_app.env_config
+    service = Service(db.session)
+    try:
+        safety_copy = service.restore_backup(c, filepath)
+
+        # Database connections were already closed and engine disposed
+        # inside restore_backup(). We do NOT use db.session after this
+        # point. The next request will automatically create new connections.
+
+        flash(
+            f"Backup restored successfully! A safety copy of your previous "
+            f"database was saved as: {safety_copy}. "
+            f"Note: The restored database has its own backup settings. "
+            f"Please check Settings → Backup directory to make sure it's correct.",
+            "notice",
+        )
+        return redirect("/")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        flash(f"Restore failed: {str(e)}", "error")
+        return redirect("/backup/index")
+    finally:
+        # Clean up temp file
+        if os.path.exists(temp_dir):
+            import shutil
+            shutil.rmtree(temp_dir)
