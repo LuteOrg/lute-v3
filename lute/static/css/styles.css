@@ -947,6 +947,15 @@ ul.sentencelist {
     border: 1px solid darkgrey;
 }
 
+/* Book listing tag pills */
+.book-tag-list {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+    max-width: 100%;
+}
+
 .book-tag {
     display: inline;
     color: inherit;
@@ -956,12 +965,20 @@ ul.sentencelist {
     cursor: pointer;
     border-bottom: 1px dotted #999;
     padding-bottom: 1px;
-    margin-right: 4px;
+    white-space: nowrap;
 }
 
 .book-tag:hover {
     border-bottom: 1px solid #333;
     color: #333;
+}
+
+.tag-sep {
+    display: inline;
+    margin: 0 6px;
+    color: #999;
+    font-size: 0.9em;
+    user-select: none;
 }
 
 #activeTagFilter {
@@ -2239,6 +2256,27 @@ input[name='status']:disabled + label {
 
 #booktable td {
     vertical-align: middle;
+}
+
+#booktable th {
+    border-right: 1px solid #dee2e6;
+}
+
+#booktable th:last-child {
+    border-right: none;
+}
+
+#booktable td:nth-child(3),
+#booktable td:nth-child(3) .book-tag-list {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#booktable td:nth-child(3) .book-tag {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 

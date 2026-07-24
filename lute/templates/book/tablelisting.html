@@ -109,13 +109,16 @@
     if (!data) return '';
     const tags = data.split(', ');
     const filtered = currentTagFilter ? currentTagFilter.toLowerCase() : '';
-    return tags.filter(function(t) {
+    const visibleTags = tags.filter(function(t) {
       return !filtered || t.toLowerCase() !== filtered;
-    }).map(function(t) {
-      return '<span class="book-tag" data-tag="' + t + '" ' +
+    });
+    if (visibleTags.length === 0) return '';
+    return '<span class="book-tag-list">' + visibleTags.map(function(t, i) {
+      const sep = i > 0 ? '<span class="tag-sep" aria-hidden="true">·</span>' : '';
+      return sep + '<span class="book-tag" data-tag="' + t + '" ' +
         'title="Click to filter by this tag">' +
         t + '</span>';
-    }).join('');
+    }).join('') + '</span>';
   };
 
   let setup_book_datatable = function(initial_search) {
@@ -166,12 +169,12 @@
       stateDuration: 0,  /* never expire saved state. */
       search: { search: initial_search },
       columns: [
-        { name: "BkTitle", width: "40%", render: render_book_title },
+        { name: "BkTitle", width: "32%", render: render_book_title },
         { name: "LgName", width: "10%", data: "LgName" },
-        { name: "TagList", width: "10%", data: "TagList", render: render_tag_list },
-        { name: "WordCount", width: "10%", data: "WordCount" },
-        { name: "UnknownPercent", "searchable": false, render: render_book_stats_graph_placeholder },
-        { name: "LastOpenedDate", "searchable": false, render: render_last_opened_date },
+        { name: "TagList", width: "18%", data: "TagList", render: render_tag_list },
+        { name: "WordCount", width: "8%", data: "WordCount" },
+        { name: "UnknownPercent", width: "14%", "searchable": false, render: render_book_stats_graph_placeholder },
+        { name: "LastOpenedDate", width: "10%", "searchable": false, render: render_last_opened_date },
         { width: "8%", "searchable": false, "orderable": false, render: render_book_actions },
       ],
       createdRow: function(row, data, dataIndex) { ajax_in_book_stats(row, data, dataIndex); },
