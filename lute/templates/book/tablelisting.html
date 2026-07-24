@@ -164,6 +164,12 @@
     }
   }
 
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted && book_listing_table) {
+      book_listing_table.ajax.reload(null, false);
+    }
+  });
+
   $(document).ready(function () {
     const current_language_id = {{ current_language_id }};
     // Language filter is set up first, because its value

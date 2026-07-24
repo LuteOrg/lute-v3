@@ -10,6 +10,7 @@ from lute.term.routes import handle_term_form
 from lute.settings.current import current_settings
 from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
+from lute.tts.routes import get_lang_code
 from lute.db import db
 
 
@@ -36,6 +37,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         page_count=book.page_count,
         show_highlights=show_highlights,
         lang_id=lang.id,
+        lang_code=get_lang_code(lang.name),
         track_page_open=track_page_open,
         term_dicts=term_dicts,
     )
@@ -182,6 +184,17 @@ def start_reading(bookid, pagenum):
     service = Service(db.session)
     paragraphs = service.start_reading(book, pagenum)
     return render_template("read/page_content.html", paragraphs=paragraphs)
+
+
+@bp.route("/update_start_date/<int:bookid>/<int:pagenum>", methods=["GET"])
+def update_start_date(bookid, pagenum):
+    "Lightweight update of text.start_date, called beforeunload."
+    book = _find_book(bookid)
+    if book is None:
+        return ""
+    service = Service(db.session)
+    service.update_start_date(book, pagenum)
+    return ""
 
 
 @bp.route("/refresh_page/<int:bookid>/<int:pagenum>", methods=["GET"])

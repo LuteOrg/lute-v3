@@ -8,6 +8,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/dict-tabs.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=12" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
   <pre>
@@ -20,6 +21,7 @@
     page_count: <input id="page_count" value="{{ page_count }}">
     highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
     track_page_open: <input id="track_page_open" value="{{ track_page_open|lower }}">
+    tts_lang: <input id="tts_lang" value="{{ lang_code }}">
   </pre>
 </div>
 
@@ -291,6 +293,8 @@
     };
   };
 
+  var luteStartReadingDone = false;
+
   $(document).ready(function () {
     const theTextReloadObs = new MutationObserver((mutationList, observer) => {
       if (scrollYBeforeReload) window.scrollTo(0, scrollYBeforeReload);
@@ -328,9 +332,18 @@
       $('div.audio-player-container').show();
     }
 
-    window.addEventListener("beforeunload", function() {
-      LutePopups.close_all_popups();
-    });
+  window.addEventListener("beforeunload", function() {
+    if (!luteStartReadingDone) {
+      var bookid = $('#book_id').val();
+      var pageNum = $('#page_num').val();
+      if (bookid && pageNum) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/read/update_start_date/' + bookid + '/' + pageNum, false);
+        try { xhr.send(); } catch(e) {}
+      }
+    }
+    LutePopups.close_all_popups();
+  });
 
     goto_relative_page(0, true);
   });
@@ -468,6 +481,7 @@
    * to the ajax "success" function worked.  ???
    */
   function goto_relative_page(p, initial_page_load = false) {
+    luteStartReadingDone = false;
     reset_cursor();
     const bookid = $('#book_id').val();
     const actualPage = getActualPage(p);
@@ -483,6 +497,7 @@
     $.get(
       url,
       function(data, status) {
+        luteStartReadingDone = true;
         $('#thetext').html(data);
         add_status_classes();
         start_hover_mode();
