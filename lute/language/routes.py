@@ -23,7 +23,7 @@ def index():
 
     # Using plain sql, easier to get bulk quantities.
     sql = """
-    select LgID, LgName, book_count, term_count from languages
+    select LgID, LgName, LgIsActive, book_count, term_count from languages
     left outer join (
       select BkLgID, count(BkLgID) as book_count from books
       group by BkLgID
@@ -37,7 +37,13 @@ def index():
     """
     result = db.session.execute(text(sql)).all()
     languages = [
-        {"LgID": row[0], "LgName": row[1], "book_count": row[2], "term_count": row[3]}
+        {
+            "LgID": row[0],
+            "LgName": row[1],
+            "LgIsActive": bool(row[2]),
+            "book_count": row[3],
+            "term_count": row[4],
+        }
         for row in result
     ]
     return render_template("language/index.html", language_data=languages)
@@ -148,6 +154,24 @@ def new(langname):
     )
 
 
+@bp.route("/toggle_active/<int:langid>", methods=["POST"])
+def toggle_active(langid):
+    """
+    Toggle a language's active (frozen/thawed) state.
+    """
+    language = db.session.get(Language, langid)
+    if not language:
+        flash(f"Language {langid} not found", "error")
+        return redirect(url_for("language.index"))
+    language.is_active = not language.is_active
+    db.session.commit()
+    if language.is_active:
+        flash(f"Language '{language.name}' activated.", "success")
+    else:
+        flash(f"Language '{language.name}' frozen.", "info")
+    return redirect(url_for("language.index"))
+
+
 @bp.route("/delete/<int:langid>", methods=["POST"])
 def delete(langid):
     """
@@ -156,8 +180,18 @@ def delete(langid):
     language = db.session.get(Language, langid)
     if not language:
         flash(f"Language {langid} not found")
-    db.session.delete(language)
-    db.session.commit()
+        return redirect(url_for("language.index"))
+    try:
+        db.session.delete(language)
+        db.session.commit()
+        flash(f"Language '{language.name}' deleted.", "success")
+    except IntegrityError:
+        db.session.rollback()
+        flash(
+            f"Cannot delete '{language.name}': it has associated books or terms. "
+            "Remove them first, or freeze the language instead.",
+            "error",
+        )
     return redirect(url_for("language.index"))
 
 

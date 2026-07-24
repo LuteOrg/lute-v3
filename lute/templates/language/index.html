@@ -17,11 +17,13 @@
       <th>Language</th>
       <th>Books</th>
       <th>Terms</th>
+      <th>Status</th>
+      <th style="width: 130px;">Actions</th>
     </tr>
   </thead>
   <tbody>
     {% for lang in language_data %}
-    <tr>
+    <tr style="{% if not lang.LgIsActive %}opacity: 0.5;{% endif %}">
       <td>
         <a href="/language/edit/{{ lang.LgID }}">
           {{ lang.LgName }}
@@ -29,6 +31,23 @@
       </td>
       <td>{{ lang.book_count or '-' }}</td>
       <td>{{ lang.term_count or '-' }}</td>
+      <td>
+        {% if lang.LgIsActive %}
+        <span style="color: #37b24d; font-size: 12px;">● Active</span>
+        {% else %}
+        <span style="color: #868e96; font-size: 12px;">● Frozen</span>
+        {% endif %}
+      </td>
+      <td>
+        <form method="POST" action="/language/toggle_active/{{ lang.LgID }}"
+              style="display:inline;">
+          <button type="submit" title="{% if lang.LgIsActive %}Freeze language{% else %}Activate language{% endif %}"
+                  style="padding:2px 8px;background:{% if lang.LgIsActive %}#fab005{% else %}#37b24d{% endif %};color:#fff;border:none;
+                         border-radius:4px;cursor:pointer;font-size:12px;">
+            {% if lang.LgIsActive %}Freeze{% else %}Activate{% endif %}
+          </button>
+        </form>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
@@ -42,8 +61,6 @@
 <p><a href="{{ url_for('language.new') }}">Create new</a></p>
 
 <script>
-  var language_listing_table;
-
   let setup_lang_datatable = function() {
     lang_listing_table = $('#languagetable').DataTable({
       responsive: true,
