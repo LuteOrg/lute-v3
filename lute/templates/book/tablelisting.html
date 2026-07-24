@@ -10,9 +10,19 @@
     <tr>
       <th style="text-align: left">Title</th>
       <th style="text-align: left">Language</th>
-      <th style="text-align: left">Tags</th>
+      <th style="text-align: left">
+        <span id="tagsHeaderLabel">Tags</span>
+        <span id="activeTagFilter" style="display:none;vertical-align:middle;">
+          <span id="activeTagName"></span><a href="#" id="clearTagFilter" style="margin-left:6px;text-decoration:none;vertical-align:middle;display:inline-flex;align-items:center;" title="Clear tag filter">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </a>
+        </span>
+      </th>
       <th style="text-align: left">Word count</th>
-      <th style="text-align: left">Statuses
+      <th style="text-align: left">Status
         <a href="/refresh_all_stats" class="refresh" title="Refresh stats for all books"></a>
       </th>
       <th style="text-align: left">Last read</th>
@@ -36,6 +46,18 @@
 {# Hidden form for archive, unarchive, delete. #}
 <form id="actionposter" method="post" action="">
 </form>
+
+{# Status detail modal #}
+<div id="statusModalOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:9999;justify-content:center;align-items:center;">
+  <div id="statusModal" style="background:#fff;border-radius:8px;padding:20px;min-width:320px;max-width:420px;box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div id="statusModalTitle" style="font-weight:bold;font-size:15px;"></div>
+      <button onclick="document.getElementById('statusModalOverlay').style.display='none'"
+              style="background:none;border:none;font-size:18px;cursor:pointer;color:#adb5bd;padding:0 4px;">&times;</button>
+    </div>
+    <div id="statusModalBody"></div>
+  </div>
+</div>
 
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/dayjs/dayjs.min.js') }}" charset="utf-8"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/dayjs/relativeTime.js') }}" charset="utf-8"></script>
@@ -63,6 +85,41 @@
 
   /* The book listing. */
   var book_listing_table;
+  var currentTagFilter = "";
+
+  function setTagFilter(tag) {
+    currentTagFilter = tag || "";
+    const pill = document.getElementById('activeTagFilter');
+    const nameSpan = document.getElementById('activeTagName');
+    const headerLabel = document.getElementById('tagsHeaderLabel');
+    if (currentTagFilter) {
+      nameSpan.textContent = currentTagFilter;
+      pill.style.display = 'inline-block';
+      if (headerLabel) headerLabel.style.display = 'none';
+    } else {
+      pill.style.display = 'none';
+      if (headerLabel) headerLabel.style.display = '';
+    }
+    if (book_listing_table) {
+      book_listing_table.draw();
+    }
+  }
+
+  let render_tag_list = function(data, type, row, meta) {
+    if (!data) return '';
+    const tags = data.split(', ');
+    const filtered = currentTagFilter ? currentTagFilter.toLowerCase() : '';
+    const visibleTags = tags.filter(function(t) {
+      return !filtered || t.toLowerCase() !== filtered;
+    });
+    if (visibleTags.length === 0) return '';
+    return '<span class="book-tag-list">' + visibleTags.map(function(t, i) {
+      const sep = i > 0 ? '<span class="tag-sep" aria-hidden="true">·</span>' : '';
+      return sep + '<span class="book-tag" data-tag="' + t + '" ' +
+        'title="Click to filter by this tag">' +
+        t + '</span>';
+    }).join('') + '</span>';
+  };
 
   let setup_book_datatable = function(initial_search) {
     book_listing_table = $('#booktable').DataTable({
@@ -112,12 +169,12 @@
       stateDuration: 0,  /* never expire saved state. */
       search: { search: initial_search },
       columns: [
-        { name: "BkTitle", width: "40%", render: render_book_title },
+        { name: "BkTitle", width: "32%", render: render_book_title },
         { name: "LgName", width: "10%", data: "LgName" },
-        { name: "TagList", width: "10%", data: "TagList" },
-        { name: "WordCount", width: "10%", data: "WordCount" },
-        { name: "UnknownPercent", "searchable": false, render: render_book_stats_graph_placeholder },
-        { name: "LastOpenedDate", "searchable": false, render: render_last_opened_date },
+        { name: "TagList", width: "18%", data: "TagList", render: render_tag_list },
+        { name: "WordCount", width: "8%", data: "WordCount" },
+        { name: "UnknownPercent", width: "14%", "searchable": false, render: render_book_stats_graph_placeholder },
+        { name: "LastOpenedDate", width: "10%", "searchable": false, render: render_last_opened_date },
         { width: "8%", "searchable": false, "orderable": false, render: render_book_actions },
       ],
       createdRow: function(row, data, dataIndex) { ajax_in_book_stats(row, data, dataIndex); },
@@ -128,6 +185,7 @@
         // data sent to the controller.
         data: {
           filtLanguage: () => $("#defaultLanguageSelect").val(),
+          filtTag: () => currentTagFilter,
         },
 
         type: "POST",
@@ -175,6 +233,83 @@
 
     $("#datatables_config_toggle").click(function() {
       $("#datatables_config_items").toggle();
+    });
+
+    // Click tag pill to filter by that tag
+    $(document).on('click', '.book-tag', function(e) {
+      e.stopPropagation();
+      const tag = $(this).data('tag');
+      setTagFilter(tag);
+    });
+
+    // Click clear link in header to clear tag filter
+    $(document).on('click', '#clearTagFilter', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      setTagFilter('');
+    });
+
+    // Status bar click -> show detail modal
+    $(document).on('click', '.status-bar-container', function(e) {
+      e.stopPropagation();
+      const $container = $(this);
+      const $cell = $container.closest('td');
+      const row = book_listing_table.row($cell.closest('tr'));
+      const data = row.data();
+      const title = data['BkTitle'];
+      const totalCount = data['WordCount'] || 0;
+
+      // Parse status distribution from the dataset if available
+      const statusCounts = $container.data('status-counts');
+      if (!statusCounts) return;
+
+      let html = '<div style="padding:10px 0;">';
+      html += '<h4 style="margin:0 0 12px 0;font-size:15px;">' + title + '</h4>';
+      html += '<table style="width:100%;font-size:13px;border-collapse:collapse;">';
+      html += '<tr><th style="text-align:left;padding:4px 8px;border-bottom:1px solid #e9ecef;">Status</th>';
+      html += '<th style="text-align:right;padding:4px 8px;border-bottom:1px solid #e9ecef;">Words</th>';
+      html += '<th style="text-align:right;padding:4px 8px;border-bottom:1px solid #e9ecef;">%</th></tr>';
+
+      const statusLabels = {
+        '0': 'Unknown', '1': 'Level 1', '2': 'Level 2',
+        '3': 'Level 3', '4': 'Level 4', '5': 'Level 5',
+        '98': 'Ignored', '99': 'Well-known'
+      };
+      const statusColors = {
+        '0': '#ced4da', '1': '#ff6b6b', '2': '#ffa94d',
+        '3': '#ffd43b', '4': '#69db7c', '5': '#339af0',
+        '98': '#adb5bd', '99': '#845ef7'
+      };
+      let total = 0;
+      for (const k in statusCounts) { total += statusCounts[k]; }
+      if (total === 0) total = 1;
+
+      for (const key of ['0','1','2','3','4','5','98','99']) {
+        const count = statusCounts[key] || 0;
+        const pct = ((count / total) * 100).toFixed(1);
+        html += '<tr>';
+        html += '<td style="padding:4px 8px;">';
+        html += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + (statusColors[key] || '#ccc') + ';margin-right:6px;"></span>';
+        html += (statusLabels[key] || key) + '</td>';
+        html += '<td style="text-align:right;padding:4px 8px;">' + count + '</td>';
+        html += '<td style="text-align:right;padding:4px 8px;">' + pct + '%</td>';
+        html += '</tr>';
+      }
+      html += '<tr style="font-weight:bold;border-top:2px solid #e9ecef;">';
+      html += '<td style="padding:6px 8px;">Total</td>';
+      html += '<td style="text-align:right;padding:6px 8px;">' + total + '</td>';
+      html += '<td style="text-align:right;padding:6px 8px;">100%</td>';
+      html += '</tr>';
+      html += '</table></div>';
+
+      showStatusModal(html);
+    });
+
+    // Close modal on overlay click
+    $('#statusModalOverlay').on('click', function(e) {
+      if (e.target.id === 'statusModalOverlay') {
+        $(this).hide();
+      }
     });
   });
 
@@ -268,22 +403,22 @@
 
   /* Generate stats graph <div> from statuscounts JSON. */
   let render_stats_graph = function(statuscounts) {
-    statuscounts["99"] = statuscounts["98"] + statuscounts["99"];
-    delete statuscounts['98'];
-    const totalcount = Object.values(statuscounts).reduce((acc, val) => acc + val, 0);
+    const countsCopy = Object.assign({}, statuscounts);
+    countsCopy["99"] = (countsCopy["98"] || 0) + (countsCopy["99"] || 0);
+    delete countsCopy['98'];
+    const totalcount = Object.values(countsCopy).reduce((acc, val) => acc + val, 0);
     if (totalcount == 0) {
       return empty_stats;
     }
     const statuspct = {};
-    Object.entries(statuscounts).forEach(([key, value]) => {
+    Object.entries(countsCopy).forEach(([key, value]) => {
       let pct = (value * 100.0) / totalcount;
       statuspct[key] = pct.toFixed(0);
     });
-    // return JSON.stringify(statuspct);
 
     let make_bar = function(stid, title) {
       const p = statuspct[stid];
-      const msg = `${p}% (${statuscounts[stid]} words)`;
+      const msg = `${p}% (${countsCopy[stid]} words)`;
       const smallestP = window.matchMedia("(max-width: 980px)").matches ? 2 : 1;
       let display = "inline-flex"
       if (p < smallestP)
@@ -300,7 +435,8 @@
       "1": 1, "2": 2, "3": 3, "4": 4, "5": 5,
       "99": "Well Known or Ignored"
     };
-    ret = `<div class="status-bar-container">`;
+    const countsJson = JSON.stringify(statuscounts).replace(/"/g, '&quot;');
+    ret = `<div class="status-bar-container" data-status-counts="${countsJson}" style="cursor:pointer;">`;
     Object.entries(bar_titles).forEach(([key, title]) => {
       ret += make_bar(key, title);
     });
@@ -361,5 +497,11 @@
    */
   function clear_datatable_state() {
     book_listing_table.state.clear();
+  }
+
+  function showStatusModal(content) {
+    document.getElementById('statusModalBody').innerHTML = content;
+    const overlay = document.getElementById('statusModalOverlay');
+    overlay.style.display = 'flex';
   }
 </script>

@@ -73,5 +73,16 @@ def get_data_tables_list(parameters, is_archived, session):
     if language_id != 0:
         base_sql += f" and LgID = {language_id}"
 
+    tag_filter = parameters.get("filtTag")
+    if tag_filter and tag_filter.strip():
+        tag = tag_filter.strip().replace("'", "''")
+        base_sql += (
+            f" and b.BkID in ("
+            f"select BtBkID from booktags bt "
+            f"inner join tags2 t2 on t2.T2ID = bt.BtT2ID "
+            f"where t2.T2Text = '{tag}'"
+            f")"
+        )
+
     connection = session.connection()
     return DataTablesSqliteQuery.get_data(base_sql, parameters, connection)

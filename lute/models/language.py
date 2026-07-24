@@ -53,6 +53,7 @@ class Language(
     right_to_left = db.Column("LgRightToLeft", db.Boolean)
     show_romanization = db.Column("LgShowRomanization", db.Boolean)
     parser_type = db.Column("LgParserType", db.String(20))
+    is_active = db.Column("LgIsActive", db.Boolean, default=True)
 
     def __init__(self):
         self.character_substitutions = "´='|`='|’='|‘='|...=…|..=‥"
@@ -63,6 +64,7 @@ class Language(
         self.show_romanization = False
         self.parser_type = "spacedel"
         self.dictionaries = []
+        self.is_active = True
 
     def __repr__(self):
         return f"<Language {self.id} '{self.name}'>"

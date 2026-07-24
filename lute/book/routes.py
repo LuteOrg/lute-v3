@@ -38,6 +38,7 @@ def _load_term_custom_filters(request_form, parameters):
     "Manually add filters that the DataTablesFlaskParamParser doesn't know about."
     filter_param_names = [
         "filtLanguage",
+        "filtTag",
     ]
     request_params = request_form.to_dict(flat=True)
     for p in filter_param_names:
