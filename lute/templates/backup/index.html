@@ -37,6 +37,20 @@
 {% endif %}
 
 <br />
+
+<h3>Restore from backup</h3>
+<p style="color: #dc3545;"><strong>Warning:</strong> Restoring a backup will replace your current database.
+A safety copy of your current database will be created before restoring.</p>
+
+<form method="POST" action="{{ url_for('backup.restore_backup') }}"
+      enctype="multipart/form-data"
+      onsubmit="return confirm('Are you sure you want to restore from this backup?\nYour current database will be replaced (a safety copy will be kept).');">
+  <input type="file" name="backup_file" required />
+  <br /><br />
+  <button type="submit" class="btn btn-primary">Restore Backup</button>
+</form>
+
+<br />
 <a href="{{ url_for('backup.backup', type='manual') }}">Create new</a>
 
 {% endblock %}

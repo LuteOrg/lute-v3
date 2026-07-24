@@ -333,6 +333,40 @@ def _create_app(app_config, extra_config):
     app.db = db
 
     _add_base_routes(app, app_config)
+
+    # The before_request hook checks a single boolean flag.
+    # The import is at module level so it only happens once.
+    from lute.backup.service import Service as _BackupServiceClass
+
+    @app.before_request
+    def _before_request():
+        """
+        Reset engine and refresh settings after a backup restore.
+        Only runs once (after restore_backup sets the flag).
+        """
+        if not _BackupServiceClass._engine_needs_reset:
+            return
+        _BackupServiceClass._engine_needs_reset = False
+        try:
+            db.session.remove()
+            db.engine.dispose()
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+        try:
+            db.engine.connect().close()
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+        try:
+            refresh_global_settings(db.session)
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+        try:
+            from lute.parse.mecab_parser import JapaneseParser
+            JapaneseParser._is_supported = None
+            JapaneseParser._old_mecab_path = None
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+
     app.register_blueprint(language_bp)
     app.register_blueprint(anki_bp)
     app.register_blueprint(book_bp)
