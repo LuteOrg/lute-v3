@@ -83,7 +83,7 @@ class Service:
     def update_start_date(self, book, pagenum):
         "Lightweight update of text.start_date."
         text = book.text_at_page(pagenum)
-        text.start_date = datetime.now()
+        text.start_date = datetime.utcnow()
         book.current_tx_id = text.id
         self.session.add(text)
         self.session.add(book)
@@ -94,7 +94,7 @@ class Service:
         br = BookRepository(self.session)
         book = br.find(bookid)
         text = book.text_at_page(pagenum)
-        d = datetime.now()
+        d = datetime.utcnow()
         text.read_date = d
 
         w = WordsRead(text, d, text.word_count)
@@ -170,7 +170,7 @@ class Service:
         svc.mark_stale(dbbook)
 
         if track_page_open:
-            text.start_date = datetime.now()
+            text.start_date = datetime.utcnow()
             dbbook.current_tx_id = text.id
 
         self.session.add(dbbook)
