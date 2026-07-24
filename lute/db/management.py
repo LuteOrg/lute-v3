@@ -108,6 +108,12 @@ def add_default_user_settings(session, default_user_backup_path):
         # Anki:
         "use_ankiconnect": False,
         "ankiconnect_url": "http://127.0.0.1:8765",
+        # TTS:
+        "tts_enabled": True,
+        "tts_hover_pronunciation": True,
+        "tts_click_pronunciation": True,
+        "tts_show_control_panel": True,
+        "tts_show_sentence_buttons": True,
     }
     add_initial_vals_if_needed(keys_and_defaults)
 

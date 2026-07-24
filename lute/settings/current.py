@@ -33,7 +33,7 @@ def refresh_global_settings(session):
     for h in hotkeys:
         current_hotkeys[h.value] = h.key
 
-    # Convert some ints into bools.
+    # Convert some string values into bools.
     boolkeys = [
         "open_popup_in_new_tab",
         "stop_audio_on_term_form_open",
@@ -42,6 +42,12 @@ def refresh_global_settings(session):
         "term_popup_show_components",
         "use_ankiconnect",
         "show_streak_on_home",
+        "tts_hover_pronunciation",
+        "tts_click_pronunciation",
+        "tts_show_control_panel",
+        "tts_show_sentence_buttons",
     ]
+    true_vals = {"1", "true", "True", "yes", "Yes", "on"}
     for k in boolkeys:
-        current_settings[k] = current_settings[k] == "1"
+        if k in current_settings:
+            current_settings[k] = str(current_settings[k]) in true_vals

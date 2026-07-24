@@ -186,6 +186,23 @@
       <td>{{ form.japanese_reading }}</td>
     </tr>
 
+    <tr>
+      <td>
+        <h2>TTS (Text-to-Speech)</h2>
+      </td>
+    </tr>
+    {% for f in [
+    form.tts_hover_pronunciation,
+    form.tts_click_pronunciation,
+    form.tts_show_control_panel,
+    form.tts_show_sentence_buttons,
+    ]%}
+    <tr>
+      <td>{{ f.label }}</td>
+      <td>{{ f(class="form-control") }}</td>
+    </tr>
+    {% endfor %}
+
   </table>
 
   <div style="margin-top:40px;">
