@@ -159,7 +159,7 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
                     {
                         "action": "storeMediaFile",
                         "params": {
-                            "filename": "LUTE_TERM_1.jpg",
+                            "filename": "lute_term_1.jpg",
                             "url": "http://x:42/userimages/42/image.jpg",
                         },
                     },
@@ -171,7 +171,7 @@ def test_smoke_ankiconnect_post_data_for_term(term, export_spec):
                                 "modelName": "good_note",
                                 "fields": {
                                     "a": "German",
-                                    "b": '<img src="LUTE_TERM_1.jpg">',
+                                    "b": '<img src="lute_term_1.jpg">',
                                     "c": "test term",
                                     "d": "Example sentence.",
                                     "e": "blah-blah",
