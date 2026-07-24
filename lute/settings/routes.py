@@ -47,7 +47,10 @@ def edit_settings():
         # Update the settings in the database
         for field in form:
             if field.id not in ("csrf_token", "submit"):
-                repo.set_value(field.id, field.data)
+                val = field.data
+                if isinstance(field, BooleanField):
+                    val = "1" if val else "0"
+                repo.set_value(field.id, val)
         db.session.commit()
         refresh_global_settings(db.session)
 
@@ -55,12 +58,20 @@ def edit_settings():
         return redirect("/")
 
     # Load current settings from the database
+    repo = UserSettingRepository(db.session)
     for field in form:
         if field.id != "csrf_token":
-            field.data = repo.get_value(field.id)
+            try:
+                field.data = repo.get_value(field.id)
+            except Exception:  # pylint: disable=broad-exception-caught
+                # Setting doesn't exist yet (e.g. restored from older version),
+                # leave the default from the form.
+                pass
         if isinstance(field, BooleanField):
             # Hack: set boolean settings to ints, otherwise they're always checked.
-            field.data = int(field.data or 0)
+            true_vals = {"1", "true", "True", "yes", "Yes", "on"}
+            str_val = str(field.data or "")
+            field.data = 1 if str_val in true_vals else 0
 
     return render_template("settings/form.html", form=form)
 

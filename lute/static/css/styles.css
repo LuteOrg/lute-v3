@@ -486,7 +486,9 @@ span.hamburger {
 }
 
 #focus-container,
-#tap_sets_status-container {
+#tap_sets_status-container,
+#tts-player-container,
+#tts-sentence-buttons-container {
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -499,7 +501,9 @@ span.hamburger {
 }
 
 #focus,
-#tap_sets_status {
+#tap_sets_status,
+#tts-player-toggle,
+#tts-sentence-buttons-toggle {
     appearance: none;
     display: block;
     background-color: #ffffff;
@@ -513,12 +517,18 @@ span.hamburger {
 }
 
 #focus-container label,
-#tap_sets_status-container label {
+#tap_sets_status-container label,
+#tts-player-container label,
+#tts-sentence-buttons-container label {
     font-weight: bold;
+    min-width: 110px;
+    text-align: right;
 }
 
 #focus::after,
-#tap_sets_status::after {
+#tap_sets_status::after,
+#tts-player-toggle::after,
+#tts-sentence-buttons-toggle::after {
     content: "";
     display: block;
     background-color: #616161;
@@ -539,6 +549,18 @@ span.hamburger {
 .tap_sets_status-active #tap_sets_status {
     background-color: #b197fc;
     border-color: #b197fc;
+}
+
+.tts-player-active #tts-player-toggle::after,
+.tts-sentence-buttons-active #tts-sentence-buttons-toggle::after {
+    transform: translate(100%, 0);
+    background-color: #ffffff;
+}
+
+.tts-player-active #tts-player-toggle,
+.tts-sentence-buttons-active #tts-sentence-buttons-toggle {
+    background-color: #40916c;
+    border-color: #40916c;
 }
 
 #tap_sets_status-container label,
