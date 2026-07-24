@@ -204,8 +204,10 @@ class Service:
         """
         s = None
         try:
+            # Add User Agent header to avoid forbidden HTTP issue 403.
+            headers = {"User-Agent": "Lute/3.0 (X11; Ubuntu; Linux x86_64)"}
             timeout = 20  # seconds
-            response = requests.get(url, timeout=timeout)
+            response = requests.get(url, headers=headers, timeout=timeout)
             response.raise_for_status()
             s = response.content
         except requests.exceptions.RequestException as e:
