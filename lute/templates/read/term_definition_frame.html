@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html {% if is_rtl %}dir="rtl" {% endif %}>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Definition</title>
+
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/jquery/jquery-ui.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <link rel="stylesheet" type="text/css" href="/theme/current">
+  <link rel="stylesheet" type="text/css" href="/theme/custom_styles">
+
+  <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.js') }}"
+    charset="utf-8"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery-ui.min.js') }}"
+    charset="utf-8"></script>
+
+  <style>
+    #term-definition-container {
+      padding: 1.5rem;
+      padding-bottom: 1.5rem;
+      position: relative;
+    }
+
+    /* Top bar: back link on left, edit button on right */
+    #term-definition-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 1.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    #term-definition-back-btn {
+      display: none;
+      cursor: pointer;
+      font-size: 0.8rem;
+      user-select: none;
+    }
+
+    #term-definition-edit-btn {
+      /* no absolute positioning — sits in the flex row */
+    }
+
+    /* Headword */
+    #term-definition-headword {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid currentColor;
+      opacity: 0.85;
+    }
+
+    /* Section labels */
+    #term-definition-container h4 {
+      margin: 0 0 0.35rem 0;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.45;
+    }
+
+    #parents-section {
+      padding-left: 0;
+      list-style-position: inside;
+      margin: 0 0 1.25rem 0;
+      font-size: 0.9rem;
+    }
+
+    #parents-section li {
+      margin-bottom: 0.15rem;
+    }
+
+    #definition-label {
+      margin-top: 0.1rem;
+    }
+
+    #thetext {
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    #thetext p {
+      margin: 0 0 0.5rem 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="term-definition-container">
+    <div id="term-definition-topbar">
+      <a id="term-definition-back-btn" style="display:none">&#8592;back</a>
+      <span></span>
+      <button id="term-definition-edit-btn" class="btn">Edit</button>
+    </div>
+    <div id="term-definition-headword">{{ term.text }}</div>
+
+    {% if term.parents %}
+    <h4>Parents</h4>
+    <ul id="parents-section">
+      {% for parent in term.parents %}
+      <li>
+        <span class="word" data-wid="{{ parent.id }}" data-status-class="status{{ parent.status }}">{{ parent.text
+          }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <h4 id="definition-label">Definition</h4>
+    <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
+      {% set sentence_id = 1 %}
+      {% for para in paragraphs %}
+      <p>
+        {% for sentence in para %}
+        <span class="textsentence" id="sent_{{ sentence_id }}">
+          {% for item in sentence %}{% include 'read/textitem.html' %}{% endfor %}
+        </span>
+        {% set sentence_id = sentence_id + 1 %}
+        {% endfor %}
+        <span class="textitem">&ZeroWidthSpace;</span>
+      </p>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# Hidden container so the parent frame's dict system can read term text and parents. #}
+  <div id="term-form-container" style="display:none">
+    <input id="text" value="{{ term.text }}" />
+    <input id="parentslist" value="" />
+  </div>
+
+  <script type="text/javascript">
+    var IS_MONOLINGUAL = {{ is_monolingual | lower }};
+    var LANG_ID = {{ term.language.id }};
+
+    // Build parentslist in tagify format: [{"value": "parent1"}, ...]
+    var parentsTagifyJson = JSON.stringify(
+      {{ term.parents | map(attribute = 'text') | list | tojson }}.map(function (t) { return { value: t }; })
+      );
+    document.getElementById('parentslist').value = parentsTagifyJson;
+
+    // Stack is a comma-separated list of term IDs representing where we came from.
+    var stack = new URLSearchParams(window.location.search).get('stack') || '';
+    var currentTermId = {{ term.id }};
+
+    function stackWith(id) {
+      var ids = stack ? stack.split(',') : [];
+      if (ids.length > 0 && ids[ids.length - 1] === '' + id) return stack;
+      return ids.concat(id).join(',');
+    }
+
+    function goBack() {
+      var ids = stack.split(',');
+      var prevId = ids.pop();
+      var remaining = ids.join(',');
+      var url = '/read/term_definition_frame/' + prevId;
+      if (remaining) url += '?stack=' + remaining;
+      window.location.href = url;
+    }
+
+    $(document).ready(function () {
+      // Show Back button if there's a stack to go back through.
+      if (stack) {
+        document.getElementById('term-definition-back-btn').style.display = 'inline-block';
+      }
+      document.getElementById('term-definition-back-btn').onclick = goBack;
+
+      // Edit button pushes current term onto stack so Back from edit returns here.
+      document.getElementById('term-definition-edit-btn').onclick = function () {
+        window.location.href = '/read/edit_term/' + currentTermId + '?stack=' + stackWith(currentTermId);
+      };
+
+      // Apply status CSS classes to word spans.
+      $('span.word').each(function () {
+        $(this).addClass($(this).data('status-class'));
+      });
+
+      // Signal parent frame to show dictionaries.
+      window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
+
+      // Hover tooltips fetching termpopup.
+      $('#thetext, #parents-section').tooltip({
+        position: { my: 'left top+10', at: 'left bottom', collision: 'flipfit flip' },
+        items: '.word',
+        show: { easing: 'easeOutCirc' },
+        content: function (setContent) {
+          var wid = parseInt($(this).data('wid'));
+          if (isNaN(wid)) return;
+          $.ajax({
+            url: '/read/termpopup/' + wid,
+            type: 'get',
+            success: function (response) {
+              setContent(response);
+            }
+          });
+        }
+      });
+
+      // Click handler: push current term onto stack when navigating to another term.
+      $('#thetext, #parents-section').on('click', '.word', function () {
+        var el = $(this);
+        var wid = parseInt(el.data('wid'));
+        var statusClass = el.data('status-class');
+        if (isNaN(wid)) {
+          var text = (el.data('text') || '').replace('/', 'LUTESLASH');
+          window.location.href = '/read/termform/' + LANG_ID + '/' + text + '?stack=' + stackWith(currentTermId);
+          return;
+        }
+        var newStack = wid !== currentTermId ? stackWith(currentTermId) : stack;
+        if (IS_MONOLINGUAL && statusClass === 'status99') {
+          window.location.href = '/read/term_definition_frame/' + wid + '?stack=' + newStack;
+        } else {
+          window.location.href = '/read/edit_term/' + wid + '?stack=' + newStack;
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

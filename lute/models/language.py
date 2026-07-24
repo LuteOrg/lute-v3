@@ -52,6 +52,7 @@ class Language(
     _word_characters = db.Column("LgRegexpWordCharacters", db.String(500))
     right_to_left = db.Column("LgRightToLeft", db.Boolean)
     show_romanization = db.Column("LgShowRomanization", db.Boolean)
+    is_monolingual = db.Column("LgIsMonolingual", db.Boolean)
     parser_type = db.Column("LgParserType", db.String(20))
 
     def __init__(self):
@@ -61,6 +62,7 @@ class Language(
         self.word_characters = "a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ"
         self.right_to_left = False
         self.show_romanization = False
+        self.is_monolingual = False
         self.parser_type = "spacedel"
         self.dictionaries = []
 
@@ -134,6 +136,7 @@ class Language(
             dd["active"] = d.is_active
             ret["dictionaries"].append(dd)
         ret["show_romanization"] = self.show_romanization
+        ret["is_monolingual"] = self.is_monolingual
         ret["right_to_left"] = self.right_to_left
         ret["parser_type"] = self.parser_type
         ret["character_substitutions"] = self.character_substitutions
@@ -164,6 +167,7 @@ class Language(
         mappings = {
             "name": "name",
             "show_romanization": "show_romanization",
+            "is_monolingual": "is_monolingual",
             "right_to_left": "right_to_left",
             "parser_type": "parser_type",
             "character_substitutions": "character_substitutions",

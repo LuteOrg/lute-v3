@@ -65,7 +65,7 @@
       </div>
 
       <div id="translation-container">
-        <div>{{ form.translation }}</div>
+        <div>{{ form.translation(placeholder=("Definition" if is_monolingual else "Translation")) }}</div>
         <img {% if term.current_image %}style="grid-column: -1; display: block"{% endif %} 
              class="zoomableTermImage"
              id="term_image"

@@ -10,6 +10,8 @@ from lute.term.routes import handle_term_form
 from lute.settings.current import current_settings
 from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
+from lute.models.term import Term as DBTerm
+from lute.read.render.service import Service as RenderService
 from lute.db import db
 
 
@@ -29,6 +31,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         "read/index.html",
         hide_top_menu=True,
         is_rtl=lang.right_to_left,
+        is_monolingual=bool(lang.is_monolingual),
         html_title=book.title,
         book=book,
         sentence_dict_uris=lang.sentence_dict_uris,
@@ -272,6 +275,32 @@ def term_popup(termid):
 @bp.route("/flashcopied", methods=["GET"])
 def flashcopied():
     return render_template("read/flashcopied.html")
+
+
+@bp.route("/term_definition_frame/<int:term_id>")
+def term_definition_frame(term_id):
+    """Show a term's translation as parsed reading text in the right-pane iframe."""
+    dbterm = db.session.get(DBTerm, term_id)
+    if dbterm is None:
+        return ""
+    lang = dbterm.language
+    text = dbterm.translation or ""
+    render_svc = RenderService(db.session)
+    paragraphs = render_svc.get_paragraphs(text, lang)
+    # Save new status-0 terms so they get IDs for data-wid attributes.
+    for para in paragraphs:
+        for sentence in para:
+            for ti in sentence:
+                if ti.is_word and ti.term is not None and ti.term.id is None and ti.term.status == 0:
+                    db.session.add(ti.term)
+    db.session.commit()
+    return render_template(
+        "read/term_definition_frame.html",
+        term=dbterm,
+        paragraphs=paragraphs,
+        is_monolingual=bool(lang.is_monolingual),
+        is_rtl=lang.right_to_left,
+    )
 
 
 @bp.route("/editpage/<int:bookid>/<int:pagenum>", methods=["GET", "POST"])
