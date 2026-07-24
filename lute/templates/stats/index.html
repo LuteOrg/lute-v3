@@ -102,46 +102,88 @@
   }
 
   /* Heatmap */
-  .heatmap-container { display: flex; align-items: flex-start; flex: 1; }
+  .heatmap-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    gap: 12px;
+  }
+  .heatmap-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
   .heatmap-day-labels {
     display: grid;
-    grid-template-rows: repeat(7, 12px);
-    gap: 3px;
-    font-size: 9px;
-    color: #586069;
-    margin-right: 4px;
+    grid-template-rows: repeat(7, 15px);
+    gap: 4px;
+    font-size: 10px;
+    color: #6a737d;
+    margin-right: 8px;
     align-items: center;
+    line-height: 1;
+    padding-top: 1px;
+  }
+  .heatmap-day-labels span {
+    height: 15px;
+    line-height: 15px;
   }
   .heatmap-month-labels {
     display: flex;
-    gap: 3px;
     font-size: 10px;
-    color: #586069;
-    margin-left: 28px;
-    margin-bottom: 3px;
+    color: #6a737d;
+    margin-left: 0;
+    margin-bottom: 4px;
+    height: 15px;
+    line-height: 15px;
+  }
+  .heatmap-month-labels span {
+    display: inline-block;
+    text-align: left;
+    white-space: nowrap;
   }
   .heatmap-grid {
     display: inline-grid;
     grid-auto-flow: column;
-    grid-template-rows: repeat(7, 12px);
-    gap: 3px;
+    grid-template-rows: repeat(7, 15px);
+    gap: 4px;
   }
   .heatmap-cell {
-    width: 12px;
-    height: 12px;
+    width: 15px;
+    height: 15px;
     border-radius: 2px;
     background: #ebedf0;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  .heatmap-cell:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    z-index: 1;
+    position: relative;
   }
   .heatmap-scroll { overflow-x: auto; padding-bottom: 6px; }
+  .heatmap-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #6a737d;
+    padding-top: 4px;
+    border-top: 1px solid #f1f3f5;
+  }
+  .heatmap-total {
+    font-weight: 600;
+    color: #343a40;
+  }
   .heatmap-legend {
     display: flex;
     align-items: center;
     gap: 4px;
-    margin-top: 8px;
     font-size: 11px;
-    color: #586069;
+    color: #6a737d;
   }
-  .heatmap-legend .heatmap-cell { width: 10px; height: 10px; }
+  .heatmap-legend .heatmap-cell { width: 12px; height: 12px; }
 
   .chart-wrap { position: relative; height: 240px; flex: 1; }
   .empty-msg { color: #adb5bd; font-style: italic; font-size: 13px; padding: 20px 0; text-align: center; }
@@ -182,14 +224,19 @@
   <div class="chart-card">
     <h3>Term activity</h3>
     <div class="heatmap-container">
-      <div class="heatmap-day-labels">
-        <span></span><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span>
-      </div>
-      <div style="flex:1;min-width:0;">
-        <div class="heatmap-month-labels" id="heatmap-month-labels"></div>
-        <div class="heatmap-scroll">
-          <div class="heatmap-grid" id="heatmap-grid"></div>
+      <div class="heatmap-main">
+        <div class="heatmap-day-labels">
+          <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
         </div>
+        <div style="flex:1;min-width:0;max-width:100%;">
+          <div class="heatmap-month-labels" id="heatmap-month-labels"></div>
+          <div class="heatmap-scroll">
+            <div class="heatmap-grid" id="heatmap-grid"></div>
+          </div>
+        </div>
+      </div>
+      <div class="heatmap-footer">
+        <span id="heatmap-total-label">Total activities: <span class="heatmap-total" id="heatmap-total">0</span></span>
         <div class="heatmap-legend">
           <span>Less</span>
           <span class="heatmap-cell"></span>
@@ -350,36 +397,55 @@
 
   function levelForCount(count, max) {
     if (count === 0 || max === 0) return 0;
-    const ratio = count / max;
-    if (ratio <= 0.25) return 1;
-    if (ratio <= 0.5) return 2;
-    if (ratio <= 0.75) return 3;
+    if (max <= 4) {
+      if (count <= 1) return 1;
+      if (count <= 2) return 2;
+      if (count <= 3) return 3;
+      return 4;
+    }
+    const t1 = Math.max(1, Math.ceil(max * 0.15));
+    const t2 = Math.max(t1 + 1, Math.ceil(max * 0.35));
+    const t3 = Math.max(t2 + 1, Math.ceil(max * 0.65));
+    if (count < t1) return 1;
+    if (count < t2) return 2;
+    if (count < t3) return 3;
     return 4;
   }
 
   function renderHeatmap(dataArr) {
     const grid = document.getElementById('heatmap-grid');
     const monthLabels = document.getElementById('heatmap-month-labels');
+    const totalEl = document.getElementById('heatmap-total');
     grid.innerHTML = '';
     monthLabels.innerHTML = '';
 
     const countMap = {};
     let maxCount = 0;
+    let totalCount = 0;
     dataArr.forEach(function(d) {
       countMap[d.date] = d.count;
       if (d.count > maxCount) maxCount = d.count;
+      totalCount += d.count;
     });
+
+    if (totalEl) totalEl.textContent = totalCount.toLocaleString();
 
     if (dataArr.length === 0) {
       grid.innerHTML = '<span class="empty-msg">No activity yet.</span>';
       return;
     }
 
+    const CELL_SIZE = 15;
+    const CELL_GAP = 4;
+    const COL_WIDTH = CELL_SIZE + CELL_GAP;
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const dayMs = 86400000;
-    // Reduce to ~180 days (about 6 months)
-    const start = new Date(today - 179 * dayMs);
+
+    const TOTAL_WEEKS = 26;
+    const daysBack = TOTAL_WEEKS * 7 - 1;
+    const start = new Date(today.getTime() - daysBack * dayMs);
     start.setDate(start.getDate() - start.getDay());
 
     const totalDays = Math.ceil((today - start) / dayMs) + 1;
@@ -421,8 +487,8 @@
     let prevWeek = -1;
     monthSpans.forEach(function(m) {
       const gap = m.weekIndex - prevWeek - 1;
-      if (gap > 0) labelHtml += '<span style="width:' + (gap * 15) + 'px;display:inline-block"></span>';
-      labelHtml += '<span style="width:15px;display:inline-block">' + m.label + '</span>';
+      if (gap > 0) labelHtml += '<span style="width:' + (gap * COL_WIDTH) + 'px"></span>';
+      labelHtml += '<span style="width:' + COL_WIDTH + 'px">' + m.label + '</span>';
       prevWeek = m.weekIndex;
     });
     monthLabels.innerHTML = labelHtml;
