@@ -294,9 +294,12 @@
   };
 
   var luteStartReadingDone = false;
+  var _lastStartDateUpdate = 0;
 
   function _updateStartDateIfNeeded() {
-    if (luteStartReadingDone) return;
+    var now = Date.now();
+    if (now - _lastStartDateUpdate < 5000) return;
+    _lastStartDateUpdate = now;
     var bookid = $('#book_id').val();
     var pageNum = $('#page_num').val();
     if (!bookid || !pageNum) return;
