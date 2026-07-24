@@ -28,6 +28,7 @@ def index():
     default_lang_id = get_last_read_language_id(db.session)
     return render_template(
         "stats/index.html",
+        hide_homelink=True,
         read_table_data=read_table_data,
         reading_streak=reading_streak,
         term_languages=term_languages,
