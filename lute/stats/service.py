@@ -14,7 +14,7 @@ def _get_data_per_lang(session):
     from (
       select LgName as lang, strftime('%Y-%m-%d', WrReadDate) as dt, WrWordCount
       from wordsread
-      inner join languages on LgID = WrLgID
+      inner join languages on LgID = WrLgID and LgIsActive = 1
     ) raw
     group by lang, dt
     """
@@ -101,6 +101,7 @@ def get_reading_streak(session):
     sql = """
     SELECT DISTINCT strftime('%Y-%m-%d', WrReadDate) as dt
     FROM wordsread
+    WHERE WrLgID IN (SELECT LgID FROM languages WHERE LgIsActive = 1)
     ORDER BY dt DESC
     """
     result = session.execute(text(sql)).all()
@@ -122,3 +123,181 @@ def get_reading_streak(session):
         current_date -= timedelta(days=1)
 
     return streak
+
+
+# ---------------------------------------------------------------------------
+# Term statistics (for overview charts)
+# ---------------------------------------------------------------------------
+
+STATUS_LABELS = {
+    0: "Unknown",
+    1: "Level 1",
+    2: "Level 2",
+    3: "Level 3",
+    4: "Level 4",
+    5: "Level 5",
+    98: "Ignored",
+    99: "Well-known",
+}
+
+
+def _month_start(d):
+    "Return the first day of the month containing date string d."
+    dt = datetime.strptime(d, "%Y-%m-%d").date()
+    return dt.replace(day=1)
+
+
+def _daily_counts(session, date_col, lang_id, status_filter=None):
+    """
+    Return list of {date, count} (daily granularity) for the given date
+    column.  status_filter restricts to a specific WoStatus value.
+    Only counts terms from active (non-frozen) languages.
+    """
+    params = {}
+    where = []
+    where.append(
+        "WoLgID in (select LgID from languages where LgIsActive = 1)"
+    )
+    if lang_id is not None:
+        where.append("WoLgID = :lid")
+        params["lid"] = lang_id
+    if status_filter is not None:
+        where.append("WoStatus = :st")
+        params["st"] = status_filter
+    where_clause = "where " + " and ".join(where)
+
+    sql = (
+        f"select strftime('%Y-%m-%d', {date_col}) as dt, count(*) as cnt "
+        f"from words {where_clause} "
+        "group by dt order by dt"
+    )
+    rows = session.execute(text(sql), params).all()
+    return [{"date": r[0], "count": int(r[1])} for r in rows if r[0]]
+
+
+def _filter_days(daily_data, days):
+    "Return only the last N days of daily data (including today)."
+    today = datetime.now().date()
+    cutoff = today - timedelta(days=days - 1)
+    cutoff_str = cutoff.isoformat()
+    today_str = today.isoformat()
+    return [d for d in daily_data if cutoff_str <= d["date"] <= today_str]
+
+
+def _monthly_aggregate(daily_data, months=12):
+    "Aggregate daily data into monthly buckets, keeping last N months."
+    if not daily_data:
+        return []
+    buckets = {}
+    for item in daily_data:
+        key = _month_start(item["date"])
+        buckets[key] = buckets.get(key, 0) + item["count"]
+    sorted_months = sorted(buckets.items())
+    if len(sorted_months) > months:
+        sorted_months = sorted_months[-months:]
+    return [{"date": k.isoformat(), "count": v} for k, v in sorted_months]
+
+
+def get_new_terms(session, period, lang_id):
+    "New terms trend grouped by creation date."
+    daily = _daily_counts(session, "WoCreated", lang_id)
+    if period == "7days":
+        return _filter_days(daily, 7)
+    if period == "monthly":
+        return _monthly_aggregate(daily, 12)
+    return daily
+
+
+def get_mastered_terms(session, period, lang_id):
+    "Fully-mastered (status 99) terms grouped by status-changed date."
+    daily = _daily_counts(session, "WoStatusChanged", lang_id, status_filter=99)
+    if period == "7days":
+        return _filter_days(daily, 7)
+    if period == "monthly":
+        return _monthly_aggregate(daily, 12)
+    return daily
+
+
+def get_heatmap_data(session, lang_id):
+    "Daily term-adjustment volume for the GitHub-style heatmap."
+    return _daily_counts(session, "WoStatusChanged", lang_id)
+
+
+def get_term_languages(session):
+    "Active languages that have at least one term, for the selector."
+    sql = (
+        "select l.LgID, l.LgName, count(w.WoID) as cnt "
+        "from languages l "
+        "inner join words w on w.WoLgID = l.LgID "
+        "where l.LgIsActive = 1 "
+        "group by l.LgID, l.LgName "
+        "order by l.LgName"
+    )
+    rows = session.execute(text(sql)).all()
+    return [{"id": r[0], "name": r[1], "count": int(r[2])} for r in rows]
+
+
+def get_last_read_language_id(session):
+    "Language ID of the most recently read book, or None."
+    sql = (
+        "select b.BkLgID "
+        "from books b "
+        "inner join languages l on l.LgID = b.BkLgID and l.LgIsActive = 1 "
+        "where b.BkArchived = 0 "
+        "order by b.BkCurrentTxID desc "
+        "limit 1"
+    )
+    row = session.execute(text(sql)).first()
+    if row is None:
+        # Fallback: language of most recently added term
+        sql2 = (
+            "select w.WoLgID from words w "
+            "inner join languages l on l.LgID = w.WoLgID and l.LgIsActive = 1 "
+            "order by w.WoID desc limit 1"
+        )
+        row = session.execute(text(sql2)).first()
+    return int(row[0]) if row else None
+
+
+def get_term_summary(session, lang_id):
+    """
+    Summary data for the summary panel:
+      - total_terms: total number of terms
+      - today_by_status: {status_code: count} of terms created today
+      - cumulative_by_status: {status_code: count} of all terms by status
+    Only counts terms from active (non-frozen) languages.
+    """
+    params = {}
+    where_parts = [
+        "WoLgID in (select LgID from languages where LgIsActive = 1)"
+    ]
+    if lang_id is not None:
+        where_parts.append("WoLgID = :lid")
+        params["lid"] = lang_id
+
+    where_clause = "where " + " and ".join(where_parts)
+
+    total_sql = f"select count(*) from words {where_clause}"
+    total = session.execute(text(total_sql), params).scalar() or 0
+
+    today_where = where_clause
+    if today_where:
+        today_where += " and date(WoCreated) = date('now', 'localtime')"
+    else:
+        today_where = "where date(WoCreated) = date('now', 'localtime')"
+    today_sql = (
+        f"select WoStatus, count(*) from words {today_where} "
+        "group by WoStatus"
+    )
+    today_rows = session.execute(text(today_sql), params).all()
+    today_by_status = {int(r[0]): int(r[1]) for r in today_rows}
+
+    cum_sql = f"select WoStatus, count(*) from words {where_clause} group by WoStatus"
+    cum_rows = session.execute(text(cum_sql), params).all()
+    cumulative_by_status = {int(r[0]): int(r[1]) for r in cum_rows}
+
+    return {
+        "total_terms": int(total),
+        "today_by_status": today_by_status,
+        "cumulative_by_status": cumulative_by_status,
+    }
