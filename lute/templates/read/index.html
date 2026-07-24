@@ -295,6 +295,27 @@
 
   var luteStartReadingDone = false;
 
+  function _updateStartDateIfNeeded() {
+    if (luteStartReadingDone) return;
+    var bookid = $('#book_id').val();
+    var pageNum = $('#page_num').val();
+    if (!bookid || !pageNum) return;
+    var url = '/read/update_start_date/' + bookid + '/' + pageNum;
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url);
+    } else {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', url, false);
+      try { xhr.send(); } catch(e) {}
+    }
+  }
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      _updateStartDateIfNeeded();
+    }
+  });
+
   $(document).ready(function () {
     const theTextReloadObs = new MutationObserver((mutationList, observer) => {
       if (scrollYBeforeReload) window.scrollTo(0, scrollYBeforeReload);
@@ -333,15 +354,7 @@
     }
 
   window.addEventListener("beforeunload", function() {
-    if (!luteStartReadingDone) {
-      var bookid = $('#book_id').val();
-      var pageNum = $('#page_num').val();
-      if (bookid && pageNum) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/read/update_start_date/' + bookid + '/' + pageNum, false);
-        try { xhr.send(); } catch(e) {}
-      }
-    }
+    _updateStartDateIfNeeded();
     LutePopups.close_all_popups();
   });
 

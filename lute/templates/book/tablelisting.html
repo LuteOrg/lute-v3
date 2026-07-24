@@ -164,8 +164,13 @@
     }
   }
 
+  var _pageshow_first_load = true;
   window.addEventListener('pageshow', function(e) {
-    if (e.persisted && book_listing_table) {
+    if (_pageshow_first_load) {
+      _pageshow_first_load = false;
+      return;
+    }
+    if (book_listing_table) {
       book_listing_table.ajax.reload(null, false);
     }
   });

@@ -186,9 +186,9 @@ def start_reading(bookid, pagenum):
     return render_template("read/page_content.html", paragraphs=paragraphs)
 
 
-@bp.route("/update_start_date/<int:bookid>/<int:pagenum>", methods=["GET"])
+@bp.route("/update_start_date/<int:bookid>/<int:pagenum>", methods=["GET", "POST"])
 def update_start_date(bookid, pagenum):
-    "Lightweight update of text.start_date, called beforeunload."
+    "Lightweight update of text.start_date, called by sendBeacon/beforeunload."
     book = _find_book(bookid)
     if book is None:
         return ""
