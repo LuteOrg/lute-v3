@@ -486,7 +486,9 @@ span.hamburger {
 }
 
 #focus-container,
-#tap_sets_status-container {
+#tap_sets_status-container,
+#tts-player-container,
+#tts-sentence-buttons-container {
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -494,12 +496,13 @@ span.hamburger {
 }
 
 #tap_sets_status-container {
-    /* Toggled later in mobile media check. */
     display:none;
 }
 
 #focus,
-#tap_sets_status {
+#tap_sets_status,
+#tts-player-toggle,
+#tts-sentence-buttons-toggle {
     appearance: none;
     display: block;
     background-color: #ffffff;
@@ -513,12 +516,18 @@ span.hamburger {
 }
 
 #focus-container label,
-#tap_sets_status-container label {
+#tap_sets_status-container label,
+#tts-player-container label,
+#tts-sentence-buttons-container label {
     font-weight: bold;
+    min-width: 110px;
+    text-align: right;
 }
 
 #focus::after,
-#tap_sets_status::after {
+#tap_sets_status::after,
+#tts-player-toggle::after,
+#tts-sentence-buttons-toggle::after {
     content: "";
     display: block;
     background-color: #616161;
@@ -530,15 +539,19 @@ span.hamburger {
 }
 
 .focus-mode-active #focus::after,
-.tap_sets_status-active #tap_sets_status::after {
+.tap_sets_status-active #tap_sets_status::after,
+.tts-player-active #tts-player-toggle::after,
+.tts-sentence-buttons-active #tts-sentence-buttons-toggle::after {
     transform: translate(100%, 0);
-    background-color: #7950f2;
+    background-color: #ffffff;
 }
 
 .focus-mode-active #focus,
-.tap_sets_status-active #tap_sets_status {
-    background-color: #b197fc;
-    border-color: #b197fc;
+.tap_sets_status-active #tap_sets_status,
+.tts-player-active #tts-player-toggle,
+.tts-sentence-buttons-active #tts-sentence-buttons-toggle {
+    background-color: #40916c;
+    border-color: #40916c;
 }
 
 #tap_sets_status-container label,
@@ -945,6 +958,60 @@ ul.sentencelist {
     color: black;
     padding: 0 1px 0 1px;
     border: 1px solid darkgrey;
+}
+
+/* Book listing tag pills */
+.book-tag-list {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+    max-width: 100%;
+}
+
+.book-tag {
+    display: inline;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    cursor: pointer;
+    border-bottom: 1px dotted #999;
+    padding-bottom: 1px;
+    white-space: nowrap;
+}
+
+.book-tag:hover {
+    border-bottom: 1px solid #333;
+    color: #333;
+}
+
+.tag-sep {
+    display: inline;
+    margin: 0 6px;
+    color: #999;
+    font-size: 0.9em;
+    user-select: none;
+}
+
+#activeTagFilter {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    color: inherit;
+    vertical-align: baseline;
+}
+
+#activeTagFilter #clearTagFilter {
+    margin-left: 6px;
+    color: #212529;
+    text-decoration: none;
+}
+
+#activeTagFilter #clearTagFilter:hover {
+    color: #e03131;
 }
 
 /* error handler */
@@ -2121,12 +2188,7 @@ input[name='status']:disabled + label {
         width: 50px;
     }
 
-    #booktable td:nth-child(2),
-    #booktable th:nth-child(2),
-    #booktable td:nth-child(3),
-    #booktable th:nth-child(3) {
-        display: none;
-    }
+    
 
     table#term {
         width: 100% !important;
@@ -2200,8 +2262,71 @@ input[name='status']:disabled + label {
     filter: saturate(1.4);
 }
 
+#booktable,
+  .dt-container table {
+    table-layout: fixed;
+    width: 100%;
+  }
+
+#booktable thead th,
+  .dt-scroll-headInner thead th {
+    position: relative;
+  }
+
+  #booktable .resize-handle,
+  .dt-scroll-headInner .resize-handle {
+    position: absolute;
+    right: -3px;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 10;
+    user-select: none;
+    background-color: transparent;
+    border-right: 1px solid #dee2e6;
+    transition: background-color 0.15s ease;
+  }
+
+  #booktable .resize-handle:hover,
+  #booktable .resize-handle:active,
+  .dt-scroll-headInner .resize-handle:hover,
+  .dt-scroll-headInner .resize-handle:active {
+    background-color: rgba(0, 120, 255, 0.3);
+    border-right: 1px solid rgba(0, 120, 255, 0.6);
+  }
+
+#booktable col {
+    width: auto;
+}
+
 #booktable td {
     vertical-align: middle;
+}
+
+#booktable thead th {
+    border-right: 1px solid #dee2e6 !important;
+}
+
+#booktable thead th:last-child {
+    border-right: none !important;
+}
+
+#booktable thead {
+    border-bottom: 2px solid #dee2e6;
+}
+
+#booktable td:nth-child(3),
+#booktable td:nth-child(3) .book-tag-list {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#booktable td:nth-child(3) .book-tag {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 
