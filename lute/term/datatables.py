@@ -3,6 +3,9 @@ Show terms in datatables.
 """
 
 from lute.utils.data_tables import DataTablesSqliteQuery, supported_parser_type_criteria
+from lute.models.book import Book
+from lute.models.term import Term
+from lute.read.render.service import Service as RenderService
 
 
 def get_data_tables_list(parameters, session):
@@ -49,6 +52,15 @@ def get_data_tables_list(parameters, session):
     LEFT OUTER JOIN wordimages wi on wi.WiWoID = w.WoID
     """
 
+    wheres = _build_where_criteria(parameters, session)
+
+    return DataTablesSqliteQuery.get_data(
+        base_sql + " WHERE " + " AND ".join(wheres), parameters, session.connection()
+    )
+
+
+def _build_where_criteria(parameters, session):
+    "Build SQL where clause criteria from filters."
     typecrit = supported_parser_type_criteria()
     wheres = [f"L.LgParserType in ({typecrit})"]
 
@@ -69,9 +81,11 @@ def get_data_tables_list(parameters, session):
     if language_id != 0:
         wheres.append(f"L.LgID == {language_id}")
 
+    # Parents only
     if parameters["filtParentsOnly"] == "true":
         wheres.append("parents.parentlist IS NULL")
 
+    # Age filters
     sql_age_calc = "cast(julianday('now') - julianday(w.wocreated) as int)"
     age_min = parameters["filtAgeMin"].strip()
     if age_min:
@@ -80,6 +94,7 @@ def get_data_tables_list(parameters, session):
     if age_max:
         wheres.append(f"{sql_age_calc} <= {int(age_max)}")
 
+    # Status filters
     st_range = ["StID != 98"]
     status_min = int(parameters.get("filtStatusMin", "0"))
     status_max = int(parameters.get("filtStatusMax", "99"))
@@ -90,12 +105,71 @@ def get_data_tables_list(parameters, session):
         st_where = f"({st_where} OR StID = 98)"
     wheres.append(st_where)
 
+    # Book and page filters
+    _add_book_filter(wheres, parameters, session)
+
+    # Term IDs filter
     termids = parameters["filtTermIDs"].strip()
     if termids != "":
         parentsql = f"select WpParentWoID from wordparents where WpWoID in ({termids})"
         wheres.append(f"((w.WoID in ({termids})) OR (w.WoID in ({parentsql})))")
 
-    # Phew.
-    return DataTablesSqliteQuery.get_data(
-        base_sql + " WHERE " + " AND ".join(wheres), parameters, session.connection()
+    return wheres
+
+
+def _add_book_filter(wheres, parameters, session):
+    "Add book and page level filters to SQL where clauses."
+    if not parameters.get("filtBook") or parameters.get("filtBook") in ("0", "null"):
+        return
+
+    book = (
+        session.query(Book).filter(Book.id == int(parameters.get("filtBook"))).first()
     )
+    if not book:
+        return
+
+    if parameters.get("filtBookScope", "all") == "page" and parameters.get(
+        "filtPageNum"
+    ) not in (None, "0", ""):
+        texts = [book.text_at_page(int(parameters.get("filtPageNum")))]
+    else:
+        texts = book.texts
+
+    words_lc = set()
+    service = RenderService(session)
+    text_lcs = [
+        book.language.parser.get_lowercase(t.token)
+        for t in book.language.get_parsed_tokens("\n".join([t.text for t in texts]))
+    ]
+    words_lc.update(text_lcs)
+    words_lc.update(
+        service.find_all_multi_word_term_text_lcs_in_content(text_lcs, book.language)
+    )
+
+    if not words_lc:
+        wheres.append("1 = 0")
+        return
+
+    term_ids = [
+        r[0]
+        for r in session.query(Term.id)
+        .filter(
+            Term.language_id == book.language_id,
+            Term.text_lc.in_(list(words_lc)),
+        )
+        .all()
+    ]
+
+    if not term_ids:
+        wheres.append("1 = 0")
+        return
+
+    chunks = [term_ids[i : i + 900] for i in range(0, len(term_ids), 900)]
+    chunk_wheres = []
+    for chunk in chunks:
+        chunk_str = ",".join(str(tid) for tid in chunk)
+        chunk_wheres.append(
+            f"((w.WoID in ({chunk_str})) OR "
+            f"(w.WoID in (select WpParentWoID from wordparents where WpWoID in ({chunk_str}))))"
+        )
+    wheres.append("(" + " OR ".join(chunk_wheres) + ")")

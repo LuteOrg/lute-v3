@@ -338,6 +338,7 @@
       make_link('Unarchive', "confirm_unarchive");
     }
     make_link('Delete', "confirm_delete");
+    links.push(`<a href="/term/index?bookid=${bkid}">Terms</a>`);
 
     return `<div class="book-action-dropdown"><span>&hellip;</span>
       <div class="book-action-dropdown-content">${links.join('')}</div>

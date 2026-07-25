@@ -5,6 +5,7 @@
 import os
 import csv
 import json
+from sqlalchemy import text as sql_text
 from flask import (
     Blueprint,
     request,
@@ -15,6 +16,8 @@ from flask import (
     send_file,
     flash,
 )
+from lute.db import db
+from lute.models.book import Book
 from lute.models.language import Language
 from lute.models.term import Status
 from lute.models.repositories import (
@@ -30,7 +33,6 @@ from lute.term.service import (
     TermServiceException,
     BulkTermUpdateData,
 )
-from lute.db import db
 from lute.term.forms import TermForm
 import lute.utils.formutils
 
@@ -54,6 +56,34 @@ def index(search):
         s for s in all_statuses if s.id == Status.IGNORED
     ]
     r = Repository(db.session)
+
+    sql = sql_text(
+        """
+        SELECT 
+            b.BkID, 
+            b.BkTitle, 
+            b.BkArchived, 
+            b.BkLgID,
+            (SELECT COUNT(*) FROM texts WHERE TxBkID = b.BkID) as page_count,
+            (SELECT TxOrder FROM texts WHERE TxID = b.BkCurrentTxID) as current_page
+        FROM books b
+        ORDER BY b.BkTitle
+    """
+    )
+    results = db.session.execute(sql).all()
+    book_options = []
+    for row in results:
+        book_options.append(
+            {
+                "id": row[0],
+                "title": row[1],
+                "archived": 1 if row[2] else 0,
+                "language_id": row[3],
+                "page_count": row[4] or 0,
+                "current_page": row[5] or 1,
+            }
+        )
+
     return render_template(
         "term/index.html",
         initial_search=search,
@@ -62,7 +92,22 @@ def index(search):
         update_statuses=update_statuses,
         tags=r.get_term_tags(),
         in_term_index_listing=True,
+        books_json=json.dumps(book_options),
     )
+
+
+@bp.route("/mark_current_page/<int:bookid>/<int:pagenum>", methods=["POST"])
+def mark_current_page(bookid, pagenum):
+    "Mark a page as the current page of a book."
+    book = db.session.query(Book).filter(Book.id == bookid).first()
+    if not book:
+        return jsonify({"status": "error", "message": "Book not found"}), 404
+    text = next((t for t in book.texts if t.order == pagenum), None)
+    if not text:
+        return jsonify({"status": "error", "message": "Page not found"}), 404
+    book.current_tx_id = text.id
+    db.session.commit()
+    return jsonify({"status": "ok", "pagenum": pagenum})
 
 
 def _load_term_custom_filters(request_form, parameters):
@@ -76,6 +121,9 @@ def _load_term_custom_filters(request_form, parameters):
         "filtStatusMax",
         "filtIncludeIgnored",
         "filtTermIDs",
+        "filtBook",
+        "filtBookScope",
+        "filtPageNum",
     ]
     request_params = request_form.to_dict(flat=True)
     for p in filter_param_names:
