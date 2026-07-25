@@ -72,7 +72,7 @@ def test_smoke_get_post_data(empty_db, spanish):
                         {
                             "action": "storeMediaFile",
                             "params": {
-                                "filename": "LUTE_TERM_1.jpg",
+                                "filename": "lute_term_1.jpg",
                                 "url": "dummyurl/userimages/1/blah.jpg",
                             },
                         },
@@ -84,7 +84,7 @@ def test_smoke_get_post_data(empty_db, spanish):
                                     "modelName": "good_note",
                                     "fields": {
                                         "a": "Spanish",
-                                        "b": '<img src="LUTE_TERM_1.jpg">',
+                                        "b": '<img src="lute_term_1.jpg">',
                                         "c": "un gatito",
                                     },
                                     "tags": ["lute", "p_tag", "t_tag"],
