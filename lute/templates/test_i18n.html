@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('i18n Test Page') }}{% endblock %}
+
+{% block header %}{{ _('Internationalization Test') }}{% endblock %}
+
+{% block body %}
+<h2>{{ _('Welcome to Lute') }}</h2>
+<p>{{ _('This is a test page to demonstrate internationalization.') }}</p>
+
+<div class="menu-demo">
+  <h3>{{ _('Menu Translation Demo') }}</h3>
+  <ul>
+    <li>{{ _('Home') }}</li>
+    <li>{{ _('Books') }}</li>
+    <li>{{ _('Terms') }}</li>
+    <li>{{ _('Settings') }}</li>
+    <li>{{ _('Languages') }}</li>
+    <li>{{ _('Backup') }}</li>
+    <li>{{ _('About') }}</li>
+  </ul>
+</div>
+
+<div class="actions-demo">
+  <h3>{{ _('Actions Translation Demo') }}</h3>
+  <ul>
+    <li>{{ _('Create new Book') }}</li>
+    <li>{{ _('Import web page') }}</li>
+    <li>{{ _('Import Terms') }}</li>
+    <li>{{ _('Create backup') }}</li>
+  </ul>
+</div>
+
+<div class="language-switcher">
+  <h3>{{ _('Change Language') }}</h3>
+  <p>{{ _('Current language') }}: {{ session.get('language', 'en') }}</p>
+  <a href="/language/set/en">English</a> | 
+  <a href="/language/set/es">Español</a> | 
+  <a href="/language/set/fr">Français</a>
+</div>
+
+{% endblock %}
