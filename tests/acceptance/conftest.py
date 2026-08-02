@@ -182,6 +182,18 @@ def set_txstartdate_to_null(luteclient):
     luteclient.set_txstartdate_to_null()
 
 
+@then(parsers.parse("the backup settings are:\n{content}"))
+def check_backup_settings(luteclient, content):
+    "Check the current backup settings values from the settings form."
+    expected = yaml.safe_load(content)
+    actual = luteclient.get_backup_settings()
+
+    if expected.get("backup_dir") == "default":
+        expected["backup_dir"] = actual["backup_dir"]
+
+    assert expected == actual
+
+
 # Browsing
 
 
@@ -241,6 +253,23 @@ def given_update_language(luteclient, lang, content):
     luteclient.edit_language(lang, updates)
 
 
+@when("I open the language index")
+def when_open_language_index(luteclient):
+    "Navigate to the language listing page."
+    luteclient.visit("/")
+    luteclient.page.hover("#menu_settings")
+    luteclient.page.locator("#lang_index").first.click()
+    time.sleep(0.2)
+
+
+@then(parsers.parse("the language table contains:\n{content}"))
+def check_language_table(luteclient, content):
+    "Check the language table."
+    luteclient.visit("/language/index")
+    time.sleep(0.2)
+    assert content == luteclient.get_language_table_content()
+
+
 # Books
 
 
@@ -279,6 +308,12 @@ def when_set_book_table_filter(luteclient, filt):
     "Set the filter, wait a sec."
     luteclient.page.locator("input").first.fill(filt)
     time.sleep(0.2)
+
+
+@when(parsers.parse('I delete the book "{title}"'))
+def when_delete_book(luteclient, title):
+    "Delete a book from the home page listing."
+    luteclient.delete_book(title)
 
 
 @then(parsers.parse("the book table contains:\n{content}"))
@@ -324,6 +359,31 @@ def import_term_file(luteclient, content):
     luteclient.page.click("#btnSubmit")
 
 
+@when(parsers.parse('I set the term table filter to "{filt}"'))
+def when_set_term_table_filter(luteclient, filt):
+    "Set the term table search filter."
+    luteclient.visit("/term/index")
+    time.sleep(0.3)
+
+    # Click the showHideFilters button to reveal the DataTables search input
+    show_hide = luteclient.page.locator("#showHideFilters")
+    if show_hide.is_visible():
+        show_hide.click()
+        time.sleep(0.3)
+
+    search_input = luteclient.page.locator('input[aria-controls="termtable"]').first
+    search_input.wait_for(state="visible", timeout=5000)
+    search_input.fill(filt)
+    time.sleep(0.3)
+
+
+@when("I clear the term table filter")
+def when_clear_term_table_filter(luteclient):
+    """Clear DataTables state from localStorage to prevent filter leakage."""
+    luteclient.page.evaluate("localStorage.clear()")
+    time.sleep(0.2)
+
+
 @then(parsers.parse("the term table contains:\n{content}"))
 def check_term_table(luteclient, content):
     "Check the table."
@@ -334,6 +394,15 @@ def check_term_table(luteclient, content):
     if content == "-":
         content = "No data available in table"
     assert content == luteclient.get_term_table_content()
+
+
+@then(parsers.parse("the filtered term table contains:\n{content}"))
+def check_filtered_term_table(luteclient, content):
+    "Check the filtered table."
+    time.sleep(0.2)
+    if content == "-":
+        content = "No data available in table"
+    assert content == luteclient.get_filtered_term_table_content()
 
 
 @when("click Export CSV")

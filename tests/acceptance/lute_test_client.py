@@ -106,6 +106,26 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
         self.page.click("#submit")
 
+    def get_language_table_content(self):
+        "Get language table content."
+        self.visit("/")
+        self.page.hover("#menu_settings")
+        self.page.locator("#lang_index").first.click()
+        rows = self.page.locator("#languagetable tbody tr")
+        rowcount = rows.count()
+        content = []
+
+        for i in range(rowcount):
+            row = rows.nth(i)
+            tds = row.locator("td")
+            tdcount = tds.count()
+            rowtext = [tds.nth(j).inner_text().strip() for j in range(tdcount)]
+            ret = "; ".join(rowtext).strip()
+            ret = ret.replace("\u200B", "").replace("\n", "").replace("\\n", "")
+            content.append(ret)
+
+        return "\n".join([c for c in content if c.strip() != ""]).strip()
+
     ################################3
     # Books
 
@@ -164,6 +184,19 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             content.append(ret)
 
         return "\n".join([c for c in content if c.strip() != ""]).strip()
+
+    def delete_book(self, title):
+        "Delete a book from the book table"
+        self.visit("/")
+        self.page.locator("input").first.fill(title)
+        time.sleep(0.3)
+
+        row = self.page.locator("#booktable tbody tr", has_text=title).first
+        self.page.on("dialog", lambda dialog: dialog.accept())
+
+        # Use evaluate to execute the click directly in the DOM
+        row.locator("a", has_text="Delete").evaluate("node => node.click()")
+        time.sleep(0.3)
 
     def get_book_page_start_dates(self):
         "get content from sql check"
@@ -377,6 +410,53 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             rowstring.append(rowval)
 
         # print(f"RAW ROWSTRINGs = {rowstring}", flush=True)
+        return "\n".join([r for r in rowstring if r.strip() != ""]).strip()
+
+    def get_filtered_term_table_content(self):
+        "Get term table content without triggering a navigation."
+        # Do NOT call self.visit("/") here, so the filter remains intact.
+        rows = self.page.query_selector_all("#termtable tbody tr")
+        rowstring = []
+
+        def _delimited_tags(td):
+            tags = td.query_selector_all(".tagify__tag")
+            values = [t.inner_text().strip() for t in tags]
+            values = [v for v in values if v not in ["", "\u200B"]]
+            return ", ".join(values)
+
+        for row in rows:
+            tds = row.query_selector_all("td")
+            rowtext = [td.inner_text().strip() for td in tds]
+            check = "; ".join(rowtext).strip()
+
+            if check == "No data available in table":
+                rowstring.append(check)
+                continue
+
+            rowtext = [""]
+            rowtext.append(tds[1].inner_text().strip())
+            rowtext.append(_delimited_tags(tds[2]))
+            rowtext.append(tds[3].inner_text().strip())
+            rowtext.append(tds[6].inner_text().strip())
+            rowtext.append(_delimited_tags(tds[4]))
+
+            select_element = row.query_selector("select")
+            selected_value = select_element.input_value()
+            selected_option = select_element.query_selector(
+                f'option[value="{selected_value}"]'
+            )
+            selected_text = (
+                selected_option.inner_text().strip() if selected_option else ""
+            )
+            rowtext.append(selected_text)
+
+            rowtext = [
+                r.replace("\u200B", "").replace("\n", "").replace("\\n", "")
+                for r in rowtext
+            ]
+            rowval = "; ".join(rowtext).strip()
+            rowstring.append(rowval)
+
         return "\n".join([r for r in rowstring if r.strip() != ""]).strip()
 
     ################################3
@@ -644,3 +724,15 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             f"{self.home}/dev_api/temp_file_content/{filename}", timeout=1
         )
         return response.text
+
+    def get_backup_settings(self):
+        "Read the backup settings form values from the settings page."
+        self.visit("/settings/index")
+        time.sleep(0.2)
+        return {
+            "backup_enabled": self.page.locator("#backup_enabled").is_checked(),
+            "backup_dir": self.page.locator("#backup_dir").input_value(),
+            "backup_auto": self.page.locator("#backup_auto").is_checked(),
+            "backup_warn": self.page.locator("#backup_warn").is_checked(),
+            "backup_count": int(self.page.locator("#backup_count").input_value()),
+        }
