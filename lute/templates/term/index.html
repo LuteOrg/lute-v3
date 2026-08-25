@@ -257,12 +257,7 @@
 
       let old_state = (cellData ?? '');
       div.addEventListener('blur', function(e) {
-        // contenteditable puts each line into its own div.
-        const new_content = div.innerHTML
-              .replace(/<div>/g, '\r\n')
-              .replace(/<\/div>/g, '')
-              .replace(/<br\s*\/?>/g, '\r\n')
-              .trim();
+        const new_content = div.innerText.trim();
         if (old_state.trim() !== new_content) {
           const row = table.row(e.target.parentElement);
           post_update(td, rowData["WoID"], 'translation', new_content);
