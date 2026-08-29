@@ -2,7 +2,7 @@ name: Mandarin Chinese
 dictionaries:
   - for: terms
     type: embedded
-    url: https://chinese.yabla.com/chinese-english-pinyin-dictionary.php?define=[LUTE]
+    url: https://www.mdbg.net/chinese/dictionary?page=worddict&email=&wdrst=0&wdqb=[LUTE]
   - for: sentences
     type: popup
     url: https://www.deepl.com/translator#ch/en/[LUTE]

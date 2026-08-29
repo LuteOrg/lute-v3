@@ -16,8 +16,7 @@ import requests
 
 import pytest
 from pytest_bdd import given, when, then, parsers
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-from splinter import Browser
+from playwright.sync_api import sync_playwright
 from tests.acceptance.lute_test_client import LuteTestClient
 
 
@@ -69,67 +68,55 @@ def fixture_env_check(request):
 def session_chrome_browser(request, _environment_check):
     """
     Create a chrome browser.
-
-    For some weird reason, this performs **MUCH**
-    better than the default "browser" fixture provided by
-    splinter/pytest-splinter:
-
-    "with self.browser.get_iframe('wordframe') as iframe"
-      - Without this custom fixture: 5+ seconds!
-      - With this fixture: 0.03 seconds
-
-    The times were consistent with various options: headless,
-    non, virus scanning on/off, etc.
     """
-    chrome_options = ChromeOptions()
-
     headless = request.config.getoption("--headless")
-    if headless:
-        chrome_options.add_argument("--headless")  # Enable headless mode
 
-        # Set the window size and ensure no devtools, or errors happen:
-        #
-        # selenium.common.exceptions.ElementClickInterceptedException:
-        # Message: element click intercepted: Element <button id="submit" ... >
-        #   is not clickable at poi...
-        #
-        # Possibly running headless is opening devtools or using
-        # a smaller browser window, which affects the layout and
-        # hides some elements.  When run in non-headless, all is fine.
+    playwright = sync_playwright().start()
 
-        # https://stackoverflow.com/questions/54023497/
-        #   python-selenium-chrome-driver-disable-devtools
-        chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
+    launch_options = {
+        "timeout": 4000,
+        "headless": headless,
+        # Chromium-specific launch args
+        "args": ["--disable-blink-features=AutomationControlled"],
+    }
 
-        # https://stackoverflow.com/questions/43541925/
-        #   how-can-i-set-the-browser-window-size-when-using-google-chrome-headless
-        chrome_options.add_argument("window-size=1920,1080")
+    browser = playwright.chromium.launch(**launch_options)
+
+    # Device emulation
+    context_kwargs = {"viewport": {"width": 1920, "height": 1080}}
 
     mobile = request.config.getoption("--mobile")
     if mobile:
-        useragent = [
-            "Mozilla/5.0 (Linux; Android 4.2.1; en-us; Nexus 5 Build/JOP40D)",
-            "AppleWebKit/535.19 (KHTML, like Gecko)",
-            "Chrome/18.0.1025.166 Mobile Safari/535.19",
-        ]
-        mobile_emulation = {
-            "deviceMetrics": {"width": 375, "height": 812, "pixelRatio": 3.0},
-            "userAgent": " ".join(useragent),
-        }
-        chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
+        context_kwargs = playwright.devices["iPhone SE"]
+        ### user_agent = " ".join(
+        ###     [
+        ###         "Mozilla/5.0 (Linux; Android 4.2.1; en-us; Nexus 5 Build/JOP40D)",
+        ###         "AppleWebKit/535.19 (KHTML, like Gecko)",
+        ###         "Chrome/18.0.1025.166 Mobile Safari/535.19",
+        ###     ]
+        ### )
+        ### context_kwargs.update(
+        ###     {
+        ###         "user_agent": user_agent,
+        ###         "viewport": {"width": 375, "height": 667},  # iPhone SE
+        ###         # "device_scale_factor": 2,
+        ###         "is_mobile": True,
+        ###         "has_touch": True,
+        ###     }
+        ### )
 
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    context = browser.new_context(**context_kwargs)
+    context.set_default_timeout(4000)
+    page = context.new_page()
 
-    # Initialize the browser with ChromeOptions
-    browser = Browser("chrome", options=chrome_options)
-
-    # Set up and clean up the browser
     def fin():
-        browser.quit()
+        context.close()
+        browser.close()
+        playwright.stop()
 
     request.addfinalizer(fin)
 
-    return browser
+    return page  # This is your "browser" equivalent
 
 
 @pytest.fixture(name="luteclient")
@@ -138,8 +125,9 @@ def fixture_lute_client(request, chromebrowser):
     Start the lute browser.
     """
     useport = request.config.getoption("--port")
+    mobile = request.config.getoption("--mobile")
     url = f"http://localhost:{useport}"
-    c = LuteTestClient(chromebrowser, url)
+    c = LuteTestClient(chromebrowser, url, mobile)
     yield c
 
 
@@ -165,7 +153,7 @@ def terminate_test():
 @when(parsers.parse("sleep for {seconds}"))
 def _sleep(seconds):
     "Hack helper."
-    time.sleep(int(seconds))
+    time.sleep(float(seconds))
 
 
 @given("a running site")
@@ -175,7 +163,7 @@ def given_running_site(luteclient):
     assert resp.status_code == 200, f"{luteclient.home} is up"
     luteclient.visit("/")
     luteclient.clear_book_filter()
-    assert luteclient.browser.is_text_present("Lute")
+    assert "Lute" in luteclient.page.content()
 
 
 @given('I disable the "japanese" parser')
@@ -205,17 +193,17 @@ def given_visit(luteclient, p):
 
 @when(parsers.parse('I click the "{linktext}" link'))
 def when_click_link_text(luteclient, linktext):
-    luteclient.browser.links.find_by_text(linktext).click()
+    luteclient.page.click(f'text="{linktext}"')
 
 
 @then(parsers.parse("the page title is {title}"))
 def then_title(luteclient, title):
-    assert luteclient.browser.title == title
+    assert luteclient.page.title() == title
 
 
 @then(parsers.parse('the page contains "{text}"'))
 def then_page_contains(luteclient, text):
-    assert text in luteclient.browser.html
+    assert text in luteclient.page.content()
 
 
 # Language
@@ -232,11 +220,11 @@ def given_demo_langs_loaded(luteclient):
 def given_demo_stories_loaded(luteclient):
     "Load the demo stories."
     luteclient.load_demo_stories()
-    _sleep(1)  # Hack!
+    _sleep(0.2)  # Hack!
     luteclient.visit("/")
-    _sleep(1)  # Hack!
+    _sleep(0.2)  # Hack!
     luteclient.clear_book_filter()
-    _sleep(0.5)  # Hack!
+    _sleep(0.2)  # Hack!
 
 
 @given("I clear the book filter")
@@ -260,7 +248,7 @@ def given_update_language(luteclient, lang, content):
 def given_book(luteclient, lang, title, c):
     "Make a book."
     luteclient.make_book(title, c, lang)
-    _sleep(1)  # Hack!
+    _sleep(0.2)  # Hack!
 
 
 @given(parsers.parse('a {lang} book "{title}" from file {filename}'))
@@ -269,35 +257,34 @@ def given_book_from_file(luteclient, lang, title, filename):
     thisdir = os.path.dirname(os.path.realpath(__file__))
     fullpath = os.path.join(thisdir, "sample_files", filename)
     luteclient.make_book_from_file(title, fullpath, lang)
-    _sleep(1)  # Hack!
+    _sleep(0.2)  # Hack!
 
 
 @given(parsers.parse("a {lang} book from url {url}"))
 def given_book_from_url(luteclient, lang, url):
     "Book is made from url in dev_api."
     luteclient.make_book_from_url(url, lang)
-    _sleep(1)  # Hack!
+    _sleep(0.2)  # Hack!
 
 
 @given(parsers.parse('the book table loads "{title}"'))
 def given_book_table_wait(luteclient, title):
     "The book table is loaded via ajax, so there's a delay."
-    _sleep(1)  # Hack!
-    assert title in luteclient.browser.html
+    _sleep(0.2)  # Hack!
+    assert title in luteclient.page.content()
 
 
 @when(parsers.parse('I set the book table filter to "{filt}"'))
 def when_set_book_table_filter(luteclient, filt):
     "Set the filter, wait a sec."
-    b = luteclient.browser
-    b.find_by_tag("input").fill(filt)
-    time.sleep(1)
+    luteclient.page.locator("input").first.fill(filt)
+    time.sleep(0.2)
 
 
 @then(parsers.parse("the book table contains:\n{content}"))
 def check_book_table(luteclient, content):
     "Check the table, e.g. content like 'Hola; Spanish; ; 4 (0%);'"
-    time.sleep(1)
+    time.sleep(0.2)
     assert content == luteclient.get_book_table_content()
 
 
@@ -325,25 +312,25 @@ def given_new_term(luteclient, lang, content):
 def import_term_file(luteclient, content):
     "Import the term file."
     luteclient.visit("/")
-    luteclient.browser.find_by_css("#menu_terms").mouse_over()
-    luteclient.browser.find_by_id("term_import_index").first.click()
+    luteclient.page.hover("#menu_terms")
+    luteclient.page.click("#term_import_index")
     fd, path = tempfile.mkstemp()
     with os.fdopen(fd, "w") as tmp:
         # do stuff with temp file
         tmp.write(content)
-    luteclient.browser.attach_file("text_file", path)
-    luteclient.browser.find_by_id("create_terms").click()
-    luteclient.browser.find_by_id("update_terms").click()
-    luteclient.browser.find_by_id("btnSubmit").click()
+    luteclient.page.set_input_files("#text_file", path)
+    luteclient.page.click("#create_terms")
+    luteclient.page.click("#update_terms")
+    luteclient.page.click("#btnSubmit")
 
 
 @then(parsers.parse("the term table contains:\n{content}"))
 def check_term_table(luteclient, content):
     "Check the table."
     luteclient.visit("/")
-    luteclient.browser.find_by_css("#menu_terms").mouse_over()
-    luteclient.browser.find_by_id("term_index").first.click()
-    time.sleep(1)
+    luteclient.page.hover("#menu_terms")
+    luteclient.page.click("#term_index")
+    time.sleep(0.2)
     if content == "-":
         content = "No data available in table"
     assert content == luteclient.get_term_table_content()
@@ -352,8 +339,8 @@ def check_term_table(luteclient, content):
 @when("click Export CSV")
 def click_export_csv(luteclient):
     "Export the term csv"
-    luteclient.browser.find_by_css("#term_actions").mouse_over()
-    luteclient.click_link("Export CSV")
+    luteclient.page.hover("#term_actions")
+    luteclient.page.locator("#term_action_export_csv").click()
 
 
 @then(parsers.parse("exported CSV file contains:\n{content}"))
@@ -386,45 +373,43 @@ def then_read_content(luteclient, content):
 @when(parsers.parse("I change the current text content to:\n{content}"))
 def when_change_content(luteclient, content):
     "Change the content."
-    assert "Reading" in luteclient.browser.title, "sanity check"
-    b = luteclient.browser
-    b.find_by_css("div.hamburger-btn").first.click()
-    b.find_by_id("page-operations-title").click()
-    b.find_by_id("editText").click()
-    b.find_by_id("text").fill(content)
-    b.find_by_id("submit").click()
+    assert "Reading" in luteclient.page.title(), "sanity check"
+    p = luteclient.page
+    p.locator("div.hamburger-btn").first.click()
+    p.locator("#page-operations-title").click()
+    p.locator("#editText").click()
+    p.locator("#text").fill(content)
+    p.locator("#submit").click()
 
 
 @when(parsers.parse("I add a page {position} current with content:\n{content}"))
 def when_add_page(luteclient, position, content):
-    "Change the content."
-    assert "Reading" in luteclient.browser.title, "sanity check"
-    b = luteclient.browser
-    b.find_by_css("div.hamburger-btn").first.click()
-    b.find_by_id("page-operations-title").click()
-
+    "Add a page."
+    assert "Reading" in luteclient.page.title(), "sanity check"
+    p = luteclient.page
+    p.click("div.hamburger-btn")
+    p.click("#page-operations-title")
     assert position in ["before", "after"], "sanity check"
-    linkid = "readmenu_add_page_before"
-    if position == "after":
-        linkid = "readmenu_add_page_after"
-    b.find_by_id(linkid).click()
-    b.find_by_id("text").fill(content)
-    b.find_by_id("submit").click()
-    b.reload()
+    linkid = (
+        "#readmenu_add_page_before"
+        if position == "before"
+        else "#readmenu_add_page_after"
+    )
+    p.click(linkid)
+    p.fill("#text", content)
+    p.click("#submit")
+    p.reload()
 
 
 @when(parsers.parse("I go to the {position} page"))
 def when_go_to_page(luteclient, position):
     "Go to page."
-    assert "Reading" in luteclient.browser.title, "sanity check"
+    assert "Reading" in luteclient.page.title(), "sanity check"
     assert position in ["previous", "next"], "sanity check"
 
-    linkid = "navNext"
-    if position == "previous":
-        linkid = "navPrev"
-    b = luteclient.browser
-    b.find_by_id(linkid).first.click()
-    time.sleep(0.5)  # Assume this is necessary for ajax reload.
+    linkid = "#navPrev" if position == "previous" else "#navNext"
+    luteclient.page.click(linkid)
+    time.sleep(0.2)  # Assume this is necessary for ajax reload.
     # Don't reload, as it seems to nullify the nav click.
     # b.reload()
 
@@ -432,22 +417,20 @@ def when_go_to_page(luteclient, position):
 @given(parsers.parse("I peek at page {pagenum}"))
 def given_peek_at_page(luteclient, pagenum):
     "Peek at a page of the current book."
-    currurl = luteclient.browser.url
+    currurl = luteclient.page.url
     peekurl = re.sub(r"/page/.*", f"/peek/{pagenum}", currurl)
-    luteclient.browser.visit(peekurl)
+    luteclient.visit(peekurl)
 
 
 @when(parsers.parse("I delete the current page"))
 def when_delete_current_page(luteclient):
     "Delete the current page."
-    assert "Reading" in luteclient.browser.title, "sanity check"
-    b = luteclient.browser
-    b.find_by_css("div.hamburger-btn").first.click()
-    b.find_by_id("page-operations-title").click()
-    b.find_by_id("readmenu_delete_page").first.click()
-    alert = b.get_alert()
-    alert.accept()
-    b.reload()
+    assert "Reading" in luteclient.page.title(), "sanity check"
+    luteclient.page.click("div.hamburger-btn")
+    luteclient.page.click("#page-operations-title")
+    luteclient.page.on("dialog", lambda dialog: dialog.accept())
+    luteclient.page.click("#readmenu_delete_page")
+    luteclient.page.reload()
 
 
 # Reading, terms
@@ -470,8 +453,8 @@ def when_post_bulk_edits_while_reading(luteclient, content):
 @then(parsers.parse('the reading page term form frame contains "{text}"'))
 def then_reading_page_term_form_iframe_contains(luteclient, text):
     "Have to get and read the iframe content, it's not in the main browser page."
-    with luteclient.browser.get_iframe("wordframe") as iframe:
-        assert text in iframe.html
+    iframe = luteclient.page.frame(name="wordframe")
+    assert text in iframe.content()
 
 
 # Reading, word actions
@@ -486,12 +469,12 @@ def when_click_word(luteclient, word):
 @then(parsers.parse('the reading page term form shows term "{text}"'))
 def then_reading_page_term_form_iframe_shows_term(luteclient, text):
     "Have to get and read the iframe content, it's not in the main browser page."
-    with luteclient.browser.get_iframe("wordframe") as iframe:
-        time.sleep(0.4)  # Hack, test failing.
-        term_field = iframe.find_by_css("#text").first
-        zws = "\u200B"
-        val = term_field.value.replace(zws, "")
-        assert val == text, "check field value"
+    iframe = luteclient.page.frame(name="wordframe")
+    time.sleep(0.2)  # Hack, test failing.
+    term_field = iframe.locator("#text").first
+    zws = "\u200B"
+    val = term_field.input_value().replace(zws, "")
+    assert val == text, "check field value"
 
 
 @then("the bulk edit term form is shown")
@@ -503,9 +486,9 @@ def then_reading_page_bulk_edit_term_form_is_shown(luteclient):
 @then("the term form is hidden")
 def then_reading_page_term_form_is_hidden(luteclient):
     "Set to blankn"
-    iframe_element = luteclient.browser.find_by_id("wordframeid").first
-    iframe_src = iframe_element["src"]
-    blanks = ["about:blank", "http://localhost:5001/read/empty"]
+    iframe_element = luteclient.page.locator("#wordframeid").first
+    iframe_src = iframe_element.get_attribute("src")
+    blanks = ["about:blank", "http://localhost:5001/read/empty", "/read/empty"]
     assert iframe_src in blanks, "Is blank"
 
 
@@ -538,9 +521,9 @@ def when_click_word_press_hotkey(luteclient, word, hotkey):
 @when(parsers.parse('I hover over "{word}"'))
 def when_hover(luteclient, word):
     "Hover over a term."
-    els = luteclient.browser.find_by_text(word)
-    assert len(els) == 1, f'have single "{word}"'
-    els[0].mouse_over()
+    els = luteclient.page.locator(f"text={word}")
+    assert els.count() == 1, f'have single "{word}"'
+    els.first.hover()
 
 
 @when(parsers.parse('I press hotkey "{hotkey}"'))
@@ -561,12 +544,12 @@ def given_set_hotkey(luteclient, hotkey, value):
 @when(parsers.parse("I click the footer green check"))
 def when_click_footer_check(luteclient):
     "Click footer."
-    luteclient.browser.find_by_id("footerMarkRestAsKnownNextPage").click()
+    luteclient.page.click("#footerMarkRestAsKnownNextPage")
     time.sleep(0.1)  # Leave this, remove and test fails.
 
 
 @when(parsers.parse("I click the footer next page"))
 def when_click_footer_next_page(luteclient):
     "Click footer."
-    luteclient.browser.find_by_id("footerNextPage").click()
+    luteclient.page.click("#footerNextPage")
     time.sleep(0.1)  # Leave this, remove and test fails.

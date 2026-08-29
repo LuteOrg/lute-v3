@@ -11,7 +11,7 @@ from lute.settings.current import (
 
 
 def test_refresh_refreshes_current_settings(app_context):
-    "Current settigns are loaded."
+    "Current settings are loaded."
     if "backup_dir" in current_settings:
         del current_settings["backup_dir"]
     refresh_global_settings(db.session)

@@ -34,6 +34,7 @@ class UserSettingsForm(FlaskForm):
 
     open_popup_in_new_tab = BooleanField("Open popup in new tab")
     stop_audio_on_term_form_open = BooleanField("Stop audio on term form open")
+    show_streak_on_home = BooleanField("Show reading streak on home page")
     stats_calc_sample_size = IntegerField(
         "Book stats page sample size",
         validators=[InputRequired(), NumberRange(min=1, max=500)],

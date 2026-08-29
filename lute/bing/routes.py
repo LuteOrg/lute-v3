@@ -7,6 +7,7 @@ import datetime
 import hashlib
 import re
 import urllib.request
+import json
 from flask import (
     Blueprint,
     request,
@@ -48,6 +49,7 @@ def bing_search_page(langid, text, searchstring):
 def bing_search(langid, text, searchstring):
     "Do an image search."
 
+    # pylint: disable=too-many-locals
     # Searching for images slows acceptance tests.  If NO_BING_IMAGES
     # environment setting, don't do a search.
     if "NO_BING_IMAGES" in os.environ:
@@ -55,15 +57,23 @@ def bing_search(langid, text, searchstring):
             "imagesearch/index.html", langid=langid, text=text, images=[]
         )
 
-    # dump("searching for " + text + " in " + language.getLgName())
     search = urllib.parse.quote(text)
     params = searchstring.replace("[LUTE]", search)
     params = params.replace("###", search)  # TODO remove_old_###_placeholder: remove
-    url = "https://www.bing.com/images/search?" + params
+
+    url = "https://www.bing.com/images/async?" + params + "&first=1&count=35&mmasync=1"
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/120.0.0.0 Safari/537.36"
+        )
+    }
     content = ""
     error_msg = ""
     try:
-        with urllib.request.urlopen(url) as s:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req) as s:
             content = s.read().decode("utf-8")
     except urllib.error.URLError as e:
         content = ""
@@ -76,21 +86,34 @@ def bing_search(langid, text, searchstring):
     # <img class="mimg vimgld" ... data-src="https:// ...">
     # or
     # <img class="mimg rms_img" ... src="https://tse4.mm.bing ..." >
+    images = []
+    for m_data in re.findall(r' m="({.*?})"', content):
+        try:
+            data = json.loads(m_data.replace("&quot;", '"'))
+            murl = data.get("murl", "")
+            if murl and murl.startswith("http"):
+                images.append({"html": '<img src="' + murl + '">', "src": murl})
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
 
-    def is_search_img(img):
-        return not ('src="/' in img) and ("rms_img" in img or "vimgld" in img)
+    if not images:
 
-    def build_struct(image):
-        src = "missing"
-        normalized_source = image.replace("data-src=", "src=")
-        m = re.search(r'src="(.*?)"', normalized_source)
-        if m:
-            src = m.group(1)
-        return {"html": image, "src": src}
+        def is_search_img(img):
+            if 'src="/' in img:
+                return False
+            normalized = img.replace("data-src=", "src=")
+            return bool(re.search(r'src="https?://', normalized))
 
-    raw_images = list(re.findall(r"(<img .*?>)", content, re.I))
+        def build_struct(image):
+            src = "missing"
+            normalized_source = image.replace("data-src=", "src=")
+            m = re.search(r'src="(.*?)"', normalized_source)
+            if m:
+                src = m.group(1)
+            return {"html": image, "src": src}
 
-    images = [build_struct(i) for i in raw_images if is_search_img(i)]
+        raw_images = list(re.findall(r"(<img .*?>)", content, re.I))
+        images = [build_struct(i) for i in raw_images if is_search_img(i)]
 
     # Reduce image load count so we don't kill subpage loading.
     # Also bing seems to throttle images if the count is higher (??).
@@ -131,8 +154,25 @@ def bing_save():
 
     imgdir, filename = _get_dir_and_filename(langid, text)
     destfile = os.path.join(imgdir, filename)
-    with urllib.request.urlopen(src) as response, open(destfile, "wb") as out_file:
-        out_file.write(response.read())
+
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/120.0.0.0 Safari/537.36"
+        ),
+        "Referer": "https://www.bing.com/",
+        "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+    }
+
+    try:
+        req = urllib.request.Request(src, headers=headers)
+        with urllib.request.urlopen(req) as response, open(destfile, "wb") as out_file:
+            out_file.write(response.read())
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        # Some sites won't allow direct calls :-( not sure what to do.
+        # Return a failure.
+        return jsonify({"reason": str(e)}), 500
 
     ret = {
         "url": f"/userimages/{langid}/{filename}",

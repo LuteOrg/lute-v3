@@ -72,11 +72,15 @@
         type: 'POST',
         dataType: 'json',
         success: function(data) {
-          // console.log("Saved: " + data + "\nStatus: " + status);
+          // console.log("success: " + data);
           _update_term_form_image(data.filename, data.url);
           $('.saved').removeClass('saved');
           $('.highlight').addClass('saved').removeClass('highlight');
-        }
+        },
+        error: function(data) {
+          // console.log("Got error: " + data.responseJSON);
+          alert("Unable to save image: " + data.responseJSON?.reason);
+        },
       });
     }
 

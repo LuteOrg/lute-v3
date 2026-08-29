@@ -37,6 +37,10 @@
   <canvas id="wordCountChart"></canvas>
 </div>
 
+{% if reading_streak > 0 %}
+  <h2>Reading Streak: {{ reading_streak }} day{{ reading_streak != 1 and 's' or '' }}</h2>
+{% endif %}
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     fetch('/stats/data')

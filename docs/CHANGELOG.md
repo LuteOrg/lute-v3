@@ -1,4 +1,44 @@
 
+# 3.10.3 (2026-07-06)
+
+Bugfix:
+
+* #692: rename js variable, fix sentence translation.  By @marcomachado in #694
+
+
+# 3.10.2 (2026-06-27)
+
+Fixes:
+
+* #685: fix random/bad images in term image search.  By ignacio and @marcomachado in #691
+* #608: fix encoding issue when importing some epubs.  By @sakolkar in #617
+* #630: add "mimetype" to css links to ensure layout works.  By @VeryUsual in #671
+* Fix audio player visibility in Night theme.  By @p-value-sharma in #665
+* Fix URL import encoding for pages without charset in HTTP header.  By @vikarag in #660
+
+Feature changes:
+
+* New Dusk theme.  By @schlick7 in #658
+* #655: move cursor to the term input field for new terms.  By @swayam-rajput in #662
+* #668: add simple reading streak.  By @VeryUsual in #676
+* Allow .m4b audio files.  By @MilanTodorovic in #684
+
+Code tweaks:
+
+* #331: refactor javascript to manage language dictionaries as structs.  By @goodolcuppa in #638
+* Remove duplicate code for audio file formats.  By @marcomachado in #690
+
+Language tweaks (PR numbers refer to the lute-language-defs repo, https://github.com/LuteOrg/lute-language-defs):
+
+* Add Toki Pona.  By @lacorrep in #11
+* Add Cebuano.  By @bemitc in #10
+* Update Belarusian word_chars to include Ёё.  By @PlagaMedicum in #14
+* Add more embedded URLs for Belarusian terms in definition.yaml.  By @PlagaMedicum in #12
+* Update Dutch and Spanish dictionaries.  By @evolving-dev in #8
+* Add google translate for Tibetan.  By @tomer-gom in #7
+* Change Mandarin default dictionary from yabla to MDBG.  By @DorusKeijzer in #654
+
+
 # 3.10.1 (2025-03-10)
 
 * #594: add parents.pronunciation to anki mapping.

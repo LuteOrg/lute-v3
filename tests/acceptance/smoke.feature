@@ -6,7 +6,7 @@ Feature: Smoke test.
         And demo languages
 
 
-    Scenario: Smoke test
+    Scenario: Basic smoke test
         # Book created and loaded.
         Given a Spanish book "Hola" with content:
             Hola, adios amigo.

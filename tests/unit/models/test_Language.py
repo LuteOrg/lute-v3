@@ -29,7 +29,7 @@ def test_demo_has_preloaded_languages(app_context):
 
 def test_new_language_has_sane_defaults():
     """
-    Only validates the call to __init__.  Sqlalchemy mappings aren't used during the constuctor.
+    Only validates the call to __init__.  Sqlalchemy mappings aren't used during the constructor.
     """
     lang = Language()
     assert lang.character_substitutions == "´='|`='|’='|‘='|...=…|..=‥"
