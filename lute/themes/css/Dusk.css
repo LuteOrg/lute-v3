@@ -1,0 +1,201 @@
+/*Modification of Dark Slate theme*/
+
+body {
+  --status-0-color: #8095FF;
+  --status-1-color: #b46b7a;
+  --status-2-color: #BA8050;
+  --status-3-color: #BD9C7B;
+  --status-4-color: #756D6B;
+  --status-5-color: transparent;
+
+  --status-99-color: #419252;
+
+  --background-color: #48484a;
+  --light-grey: #c4c8ce;
+  --font-color: #EBEBEB;
+  --dark-grey: #333333;
+  --border-bottom-color: #333333;
+
+  --form-border-color: var(--light-grey);
+
+span.status5 {
+  border-bottom: 2px dashed var(--border-bottom-color);
+}
+
+  background-color: var(--background-color); /* dark grey paper */
+  color: var(--font-color); /* light grey font */
+}
+
+.flash-notice {
+  background-color: #b46b7a;
+}
+
+.menu-item > span {
+    color: var(--font-color) !important;
+}
+
+a.home-link {
+    color: var(--font-color) !important;
+}
+
+a {
+  color: #ACACF9;
+}
+
+a:link {
+  color: #ACACF9;
+}
+
+a:visited {
+  color: #ACACF9;
+}
+
+a:hover {
+  color: #FF5C5C;
+}
+
+div#thetext p { line-height: 1.5; }
+span.textitem {
+    font-family: Georgia;
+    border-radius: 3px;
+}
+span.status0 { background-color: transparent; color: var(--status-0-color); }
+span.status1 { background-color: var(--status-1-color); color: #eff1f2; padding:0 0.1rem;} /* pink highlight */
+span.status2 { background-color: var(--status-2-color); color: #eff1f2; padding:0 0.1rem;} /* orange highlight */
+span.status3 { background-color: var(--status-3-color); color: #eff1f2; padding:0 0.1rem;} /* yellow highlight */
+span.status4 { background-color: var(--status-4-color); color: #eff1f2; padding:0 0.1rem;} /* gray highlight */
+span.status5 { background-color: var(--status-5-color); color: #eff1f2; } /* dotted underline */
+
+input[type="text"],
+textarea,
+.ui-widget-content,
+.sub-menu {
+    border-color: var(--light-grey); /* light grey */
+    background-color: var(--dark-grey); /* dark grey */
+    color: var(--light-grey); /* light grey font */
+}
+
+.tagify {
+  --tags-border-color: var(--light-grey);
+  background-color: var(--dark-grey);
+  color: var(--light-grey);
+  --placeholder-color-focus: var(--light-grey);
+}
+
+.tagify--focus {
+  --tags-border-color: var(--tagify__tag-bg);
+}
+
+#status {
+  --status-select-color: var(--light-grey);
+  --status-hover-color: #a2a2a2;
+}
+
+#status label[for="status-5"]::after,
+#status label[for="status-6"]::after,
+#status #status-5:checked + label::after,
+#status #status-6:checked + label::after {
+    filter: invert(0.85);
+}
+
+#status label[for="status-6"]:hover {
+  background-color: #bc6b60;
+}
+
+.status-bar-container {
+  background-color: #fff;
+  border-color: var(--light-grey);
+}
+
+.status-bar-container-empty {
+  background-color: var(--background-color);
+  border-color: var(--light-grey);
+}
+
+.status-bar-container span {
+  color: var(--dark-grey);
+}
+
+span.hamburger {
+  background-color: #F3F4F4;
+}
+
+#reading_menu .reading-menu-item:hover {
+  color: var(--background-color);
+}
+
+/*Audio Player Changes*/
+.audio-player-container {
+  border: 3px solid #293137;
+  border-radius: 5px;
+  background-color: var(--audio-color-3);
+
+
+  --audio-color-1: #6da9e9;
+  --audio-color-2: #333333;
+  --audio-color-3: #48484a;
+  --audio-color-4: #48484a;
+  --audio-color-5: #48484a;
+  --button-size-small: 28px;
+  --button-size-big: 64px;
+
+  position: relative;
+}
+
+.sticky-player .audio-player-container {
+  border: 3px solid #293137;
+  border-style: solid none none none;
+  border-radius: 0px;
+/*End Audio Player Changes*/
+
+/*Start of Mobile Changes*/
+@media screen and (max-width: 980px) {
+
+/*Audio Player*/
+  #play-btn {
+  height: 48px;
+  width: 48px;
+}
+
+#pin {
+  left: 0.0rem;
+  top: 0.0rem;
+  width: 0px;
+  height: 0px;
+  /* background-color: transparent; */
+  background-color: #333333;
+  border-radius: 0px;
+}
+
+#read_pane_left {
+        margin-top: 5rem;
+}
+
+#reading-header {
+        height: 4.5rem;
+}
+
+.sticky-player .audio-player-container {
+  border: 3px solid #293137;
+  border-style: solid none none none;
+
+}
+
+/*Start hacky alignment*/
+.audio-player-right-container {
+  grid-template-columns: 14rem;
+  align-items: left;
+  justify-items: left;
+}
+
+.rewind-container {
+  grid-template-columns: min-content 1.9rem;
+}
+/*stop hacky alignment*/
+
+/*Other*/
+.menu {
+    gap: 1.0rem;
+}
+
+#luteTitle {margin-right: 1.5rem;}

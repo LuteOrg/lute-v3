@@ -195,7 +195,7 @@ const LuteAnki = (function() {
     );
 
     // Maps all results to the error message, or success.
-    // For the exmaple in the function docs, this would return
+    // For the example in the function docs, this would return
     // [ "success", "... duplicate" ]
     const flat_results = results.flat().map(entry => 
       entry && typeof entry === "object" && "error" in entry ?

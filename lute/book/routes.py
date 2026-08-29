@@ -18,7 +18,7 @@ from lute.book.service import (
     BookDataFromUrl,
 )
 from lute.book.datatables import get_data_tables_list
-from lute.book.forms import NewBookForm, EditBookForm
+from lute.book.forms import NewBookForm, EditBookForm, ALLOWED_AUDIO_EXTENSIONS
 from lute.book.stats import Service as StatsService
 import lute.utils.formutils
 from lute.db import db
@@ -144,6 +144,7 @@ def new():
         tags=repo.get_book_tags(),
         rtl_map=json.dumps(_language_is_rtl_map()),
         show_language_selector=True,
+        allowed_extensions=ALLOWED_AUDIO_EXTENSIONS,
     )
 
 
@@ -169,6 +170,7 @@ def edit(bookid):
         title_direction="rtl" if lang.right_to_left else "ltr",
         form=form,
         tags=repo.get_book_tags(),
+        allowed_extensions=ALLOWED_AUDIO_EXTENSIONS,
     )
 
 

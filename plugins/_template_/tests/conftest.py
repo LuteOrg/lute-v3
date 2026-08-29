@@ -21,7 +21,7 @@ def pytest_sessionstart(session):  # pylint: disable=unused-argument
 
 def _get_test_language():
     """
-    Retrieve the language definition file for testing ths plugin from definition.yaml
+    Retrieve the language definition file for testing this plugin from definition.yaml
     """
     thisdir = os.path.dirname(os.path.realpath(__file__))
     definition_file = os.path.join(thisdir, "..", "definition.yaml")
