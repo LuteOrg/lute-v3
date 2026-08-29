@@ -18,7 +18,7 @@ from flask import (
 )
 from lute.db import db
 from lute.models.repositories import UserSettingRepository
-from lute.backup.service import Service
+from lute.backup.service import Service, BackupException
 
 
 bp = Blueprint("backup", __name__, url_prefix="/backup")
@@ -51,6 +51,23 @@ def download_backup(filename):
     settings = _get_settings()
     fullpath = os.path.join(settings.backup_dir, filename)
     return send_file(fullpath, as_attachment=True)
+
+
+@bp.route("/upload", methods=["POST"])
+def upload_backup():
+    """
+    Upload a backup file into the backup directory.
+    """
+    settings = _get_settings()
+    service = Service(db.session)
+    try:
+        filename = service.save_uploaded_backup(
+            settings, request.files.get("backup_file")
+        )
+        flash(f"Backup uploaded: {filename}", "notice")
+    except BackupException as e:
+        flash(str(e), "error")
+    return redirect("/backup/index", 302)
 
 
 @bp.route("/backup", methods=["GET"])
@@ -88,6 +105,45 @@ def do_backup():
         f = service.create_backup(c, settings, is_manual=is_manual)
         flash(f"Backup created: {f}", "notice")
         return jsonify(f)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        tb = traceback.format_exc()
+        return jsonify({"errmsg": str(e) + " -- " + tb}), 500
+
+
+@bp.route("/do_restore", methods=["POST"])
+def do_restore():
+    """
+    Ajax endpoint to restore a backup file.
+    """
+    prms = request.form.to_dict()
+    filename = prms.get("filename", "")
+
+    c = current_app.env_config
+    settings = _get_settings()
+    service = Service(db.session)
+    try:
+        service.restore_backup(c, settings, filename)
+        flash(f"Backup restored: {filename}", "notice")
+        return jsonify(filename)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        tb = traceback.format_exc()
+        return jsonify({"errmsg": str(e) + " -- " + tb}), 500
+
+
+@bp.route("/do_delete", methods=["POST"])
+def do_delete():
+    """
+    Ajax endpoint to delete a backup file.
+    """
+    prms = request.form.to_dict()
+    filename = prms.get("filename", "")
+
+    settings = _get_settings()
+    service = Service(db.session)
+    try:
+        deleted_filename = service.delete_backup(settings, filename)
+        flash(f"Backup deleted: {deleted_filename}", "notice")
+        return jsonify(deleted_filename)
     except Exception as e:  # pylint: disable=broad-exception-caught
         tb = traceback.format_exc()
         return jsonify({"errmsg": str(e) + " -- " + tb}), 500

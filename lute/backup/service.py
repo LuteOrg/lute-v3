@@ -6,8 +6,10 @@ import os
 import re
 import shutil
 import gzip
+import sqlite3
 from datetime import datetime
 import time
+import tempfile
 from typing import List, Union
 
 from lute.models.repositories import UserSettingRepository
@@ -31,7 +33,7 @@ class DatabaseBackupFile:
             raise BackupException(f"No backup file at {filepath}.")
 
         name = os.path.basename(filepath)
-        if not re.match(r"(manual_)?lute_backup_", name):
+        if not name.endswith(".db.gz"):
             raise BackupException(f"Not a valid lute database backup at {filepath}.")
 
         self.filepath = filepath
@@ -112,6 +114,69 @@ class Service:
         self._remove_excess_backups(settings.backup_count, settings.backup_dir)
         return f
 
+    def restore_backup(self, app_config, settings, filename):
+        """
+        Restore the database from the given backup file.
+        """
+        backupfile = self._get_backup_file(settings.backup_dir, filename)
+        backup_dir = settings.backup_dir
+
+        fd, tempname = tempfile.mkstemp(
+            suffix=".restore", dir=os.path.dirname(app_config.dbfilename)
+        )
+        os.close(fd)
+
+        try:
+            with gzip.open(backupfile.filepath, "rb") as in_file, open(
+                tempname, "wb"
+            ) as out_file:
+                shutil.copyfileobj(in_file, out_file)
+
+            self._validate_lute_database(tempname)
+
+            suffix = f"pre_restore_{datetime.now().strftime('%Y-%m-%d_%H%M%S')}"
+            self.create_backup(
+                app_config,
+                settings,
+                is_manual=True,
+                suffix=suffix,
+            )
+
+            bind = self.session.get_bind()
+            self.session.close()
+            self.session.remove()
+            bind.dispose()
+            os.replace(tempname, app_config.dbfilename)
+            self._set_backup_dir(app_config.dbfilename, backup_dir)
+        finally:
+            if os.path.exists(tempname):
+                os.remove(tempname)
+
+    def save_uploaded_backup(self, settings, upload):
+        "Save an uploaded database backup file."
+        if upload is None or upload.filename == "":
+            raise BackupException("No backup file selected.")
+
+        filename = os.path.basename(upload.filename)
+        if not filename.endswith(".db.gz"):
+            raise BackupException("Invalid backup filename.")
+        if not filename.startswith("manual_"):
+            filename = f"manual_{filename}"
+
+        os.makedirs(settings.backup_dir, exist_ok=True)
+        dest = os.path.join(settings.backup_dir, filename)
+        if os.path.exists(dest):
+            raise BackupException(f"Backup already exists: {filename}")
+
+        upload.save(dest)
+        return filename
+
+    def delete_backup(self, settings, filename):
+        "Delete a backup file."
+        backupfile = self._get_backup_file(settings.backup_dir, filename)
+        os.remove(backupfile.filepath)
+        return backupfile.name
+
     def should_run_auto_backup(self, backup_settings):
         """
         True (if applicable) if last backup was old.
@@ -189,5 +254,46 @@ class Service:
         return [
             DatabaseBackupFile(os.path.join(outdir, f))
             for f in os.listdir(outdir)
-            if re.match(r"(manual_)?lute_backup_", f)
+            if f.endswith(".db.gz")
         ]
+
+    def _get_backup_file(self, outdir, filename) -> DatabaseBackupFile:
+        "Return a validated backup file."
+        fullpath = os.path.join(outdir, os.path.basename(filename))
+        return DatabaseBackupFile(fullpath)
+
+    def _validate_lute_database(self, dbfilename):
+        "Raise if dbfilename is not a valid Lute database."
+        required_tables = {
+            "_migrations": ["filename"],
+            "settings": ["StKey", "StKeyType", "StValue"],
+            "books": ["BkID", "BkLgID", "BkTitle"],
+            "languages": ["LgID", "LgName"],
+            "words": ["WoID", "WoLgID", "WoText"],
+        }
+        try:
+            with sqlite3.connect(dbfilename) as conn:
+                integrity = conn.execute("pragma integrity_check").fetchone()
+                if integrity is None or integrity[0] != "ok":
+                    raise BackupException("Backup database failed integrity check.")
+
+                for table, columns in required_tables.items():
+                    rows = conn.execute(f'pragma table_info("{table}")').fetchall()
+                    found_columns = {row[1] for row in rows}
+                    missing_columns = set(columns) - found_columns
+                    if missing_columns:
+                        raise BackupException("Backup is not a valid Lute database.")
+        except sqlite3.Error as e:
+            raise BackupException("Backup is not a valid SQLite database.") from e
+
+    def _set_backup_dir(self, dbfilename, backup_dir):
+        "Preserve the local backup_dir after restore."
+        with sqlite3.connect(dbfilename) as conn:
+            cur = conn.cursor()
+            sql = """
+            update settings
+            set StValue = ?
+            where StKey = 'backup_dir' and StKeyType = 'user'
+            """
+            cur.execute(sql, (backup_dir,))
+            conn.commit()
