@@ -212,7 +212,32 @@ class Service:
             msg = f"Could not parse {url} (error: {str(e)})"
             raise BookImportException(message=msg, cause=e) from e
 
-        soup = BeautifulSoup(s, "html.parser")
+        # Decode the HTML explicitly.  Handing raw bytes to BeautifulSoup
+        # makes it guess the encoding via chardet, which sometimes
+        # misdetects UTF-8 pages as e.g. MacRoman, turning ' into ‚Äô
+        # and — into ‚Äî (issue seen with cnn.com pages).  Prefer the
+        # charset declared in the Content-Type header, then UTF-8, and
+        # only fall back to BeautifulSoup's own detection if both fail.
+        # "iso-8859-1" is skipped because requests uses it as a default
+        # when no charset is declared, which is often wrong.
+        html = None
+        header_enc = (response.encoding or "").strip().lower()
+        candidates = [header_enc, "utf-8"]
+        for enc in candidates:
+            if not enc or enc == "iso-8859-1":
+                continue
+            try:
+                html = s.decode(enc)
+                break
+            except (UnicodeDecodeError, LookupError):
+                continue
+
+        if html is not None:
+            soup = BeautifulSoup(html, "html.parser")
+        else:
+            # Page is neither the declared charset nor UTF-8; let bs4
+            # do its full (imperfect) detection as before.
+            soup = BeautifulSoup(s, "html.parser")
         extracted_text = []
 
         # Add elements in order found.
