@@ -41,6 +41,14 @@ class UserSettingsForm(FlaskForm):
         render_kw={"title": "Number of pages to use for book stats calculation."},
     )
 
+    default_words_per_page = IntegerField(
+    "Default words per page",
+    validators=[InputRequired(), NumberRange(min=1, max=1500)],
+    render_kw={
+        "title": "Default number of words per page when creating a new book."
+    },
+)
+
     term_popup_promote_parent_translation = BooleanField(
         "Promote parent translation to term translation if possible"
     )

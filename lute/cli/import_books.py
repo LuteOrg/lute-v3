@@ -10,6 +10,9 @@ from lute.book.model import Book, Repository
 from lute.db import db
 from lute.models.repositories import LanguageRepository
 
+#needed so that import from csv uses the settings that we set
+from lute.settings.current import refresh_global_settings
+
 
 def import_books_from_csv(file, language, tags, commit):
     """
@@ -26,6 +29,8 @@ def import_books_from_csv(file, language, tags, commit):
                 database. If false, a list of books to be imported will be
                 printed out, but no changes will be made.
     """
+    #needed so that import from csv uses the settings that we set
+    refresh_global_settings(db.session)
     repo = Repository(db.session)
     lang_repo = LanguageRepository(db.session)
 

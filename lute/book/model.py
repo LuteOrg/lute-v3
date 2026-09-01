@@ -8,6 +8,7 @@ from lute.models.repositories import (
     BookTagRepository,
     LanguageRepository,
 )
+from lute.settings.current import current_settings
 
 
 def token_group_generator(tokens, group_type, threshold=500):
@@ -77,7 +78,9 @@ class Book:  # pylint: disable=too-many-instance-attributes
         self.audio_bookmarks = None
         self.book_tags = []
 
-        self.threshold_page_tokens = 250
+        self.threshold_page_tokens = int(
+            current_settings.get("default_words_per_page", 250)
+        )
         self.split_by = "paragraphs"
 
         # The source file used for the book text.
