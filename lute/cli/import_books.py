@@ -6,6 +6,8 @@ import csv
 import os
 import sys
 
+csv.field_size_limit(sys.maxsize)
+
 from lute.book.model import Book, Repository
 from lute.db import db
 from lute.models.repositories import LanguageRepository
