@@ -573,7 +573,7 @@ Feature: Term import
             language,term,status
             Spanish,gato,7
         Then import should fail with message:
-            Status must be one of 1, 2, 3, 4, 5, I, W, or blank
+            Status must be one of 0, 1, 2, 3, 4, 5, 98, 99, I, W, or blank
 
 
     Scenario: Term is required
