@@ -38,17 +38,17 @@ class Service:
         texts = self._last_n_pages(book, txindex, sample_size)
         return texts
 
-    def calc_status_distribution(self, book):
+    def calc_status_distribution(self, book, full_book=False):
         """
         Calculate statuses and count of unique words per status.
 
-        Does a full render of a small number of pages
-        to calculate the distribution.
+        Does a render of pages to calculate the distribution.
+        If full_book is True, processes all pages. Otherwise uses sample size.
         """
-
-        # DebugTimer.clear_total_summary()
-        # dt = DebugTimer("get_status_distribution", display=False)
-        texts = self._get_sample_texts(book)
+        if full_book:
+            texts = book.texts
+        else:
+            texts = self._get_sample_texts(book)
 
         # Getting the individual paragraphs per page, and then combining,
         # is much faster than combining all pages into one giant page.
@@ -98,19 +98,21 @@ class Service:
         self.session.query(BookStats).filter_by(BkID=bk_id).delete()
         self.session.commit()
 
-    def get_stats(self, book):
+    def get_stats(self, book, full_book=False, force_recalc=False):
         "Gets stats from the cache if available, or calculates."
         bk_id = book.id
-        stats = self.session.query(BookStats).filter_by(BkID=bk_id).first()
+        stats = None
+        if not force_recalc:
+            stats = self.session.query(BookStats).filter_by(BkID=bk_id).first()
         if stats is None or stats.status_distribution is None:
-            newstats = self._calculate_stats(book)
+            newstats = self._calculate_stats(book, full_book=full_book)
             self._update_stats(book, newstats)
             stats = self.session.query(BookStats).filter_by(BkID=bk_id).first()
         return stats
 
-    def _calculate_stats(self, book):
+    def _calculate_stats(self, book, full_book=False):
         "Calc stats for the book using the status distribution."
-        status_distribution = self.calc_status_distribution(book)
+        status_distribution = self.calc_status_distribution(book, full_book=full_book)
         unknowns = status_distribution[0]
         allunique = sum(status_distribution.values())
 
