@@ -6,6 +6,15 @@ Feature: Creating and managing terms
         Then the term table contains:
             No data available in table
 
+    Scenario: I can search for a term in the term index
+        Given a new Spanish term:
+            text: gato
+            translation: cat
+        When I set the term table filter to "gato"
+        Then the filtered term table contains:
+            ; gato; ; cat; Spanish; ; New (1)
+        When I clear the term table filter
+
     Scenario: Create a single term from the term form
         Given a new Spanish term:
             text: gato

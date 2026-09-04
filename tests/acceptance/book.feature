@@ -91,6 +91,16 @@ Feature: Books and stats are available
         Then the book table contains:
             Hola; Spanish; ; 4;
 
+    Scenario: I can delete a book from the home page table
+        Given a Spanish book "Hola" with content:
+            Hola. Tengo un gato.
+        Given I visit "/"
+        When I set the book table filter to "Hola"
+        Then the book table contains:
+            Hola; Spanish; ; 4;
+        When I delete the book "Hola"
+        Then the page contains "Lute"
+
     # Dealing with production bug.
     Scenario: Japanese book with multiple paragraphs works.
         Given I visit "/"
