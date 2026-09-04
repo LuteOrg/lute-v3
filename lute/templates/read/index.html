@@ -92,6 +92,7 @@
   {% include "read/audio_player.html" %}
 
   <h1 id="thetexttitle" {% if is_rtl %}dir="rtl" {% endif %} class="hide">{{ book.title }}</h1>
+
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
     ...
   </div>
@@ -479,6 +480,17 @@
       url,
       function(data, status) {
         $('#thetext').html(data);
+
+		var html = $('#thetext').html();
+
+		html = html.replace(/\n\s*<span(?:[^>]*)>\s*(#+)\s*<\/span>(<span(?:[^>]*)>\s*.*\s*<\/span>)+(\s*\n)+/gmiu, function(_, hashes, text) {
+					console.log(_, hashes, text);
+			var level = Math.min(hashes.length, 4);
+			return '<h' + level + '>' + text.trim() + '</h' + level + '>';
+		}).replace(/(<h\d>(\s*\n)+)*<span class="textitem">.?<\/span>(\s*\n)*/gmiu, "$1");
+
+		$('#thetext').html(html);
+
         add_status_classes();
         reset_cursor();
         start_hover_mode();

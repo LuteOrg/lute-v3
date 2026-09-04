@@ -750,18 +750,18 @@ h1 {
 }
 
 h2 {
-    margin: 0.8rem 0;
+    margin: 2rem 0 0.8rem 2.5rem;
 }
 
 h3
 {
-    margin: 0px 0 0px 0;
+    margin: 1.8rem 0 0.7rem 1.2rem;
     padding: 0;
 }
 
 h4
 {
-    margin: 5px 0 10px 0;
+    margin: 1.4rem 0 0.6rem 0.4rem;
     padding: 0;
 }
 
@@ -813,7 +813,7 @@ span.textsentence {
 
 /* A word shown in the reading pane. */
 span.textitem {
-    font-size: 16px;
+    /* font-size: 16px; */
     color: var(--font-color);
 
     /* disallow select, only allow mouse-down-drag-up to define multiword
@@ -825,11 +825,10 @@ span.textitem {
     border-bottom: 1px solid transparent;
 }
 
-/* .click */
-/* { */
-    /* cursor: pointer; */
+span.click {
+    cursor: pointer;
     /* color: #C00000; */
-/* } */
+}
 
 .hide
 {

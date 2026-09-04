@@ -29,7 +29,7 @@ addClickHandler(".column-two", setColumnCount, 2);
 
 
 function incrementFontSize(delta) {
-  const textItems = document.querySelectorAll("span.textitem");
+  const textItems = document.querySelectorAll("span > span.textitem");
   const s = window.getComputedStyle(textItems[0]);
   const fontDefault = parseFloat(s.fontSize);
   const STORAGE_KEY = "fontSize";
