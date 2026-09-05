@@ -379,9 +379,8 @@ def when_set_term_table_filter(luteclient, filt):
 
 @when("I clear the term table filter")
 def when_clear_term_table_filter(luteclient):
-    """Clear DataTables state from localStorage to prevent filter leakage."""
-    luteclient.page.evaluate("localStorage.clear()")
-    time.sleep(0.2)
+    "Clear the term table search filter."
+    when_set_term_table_filter(luteclient, "")
 
 
 @then(parsers.parse("the term table contains:\n{content}"))
