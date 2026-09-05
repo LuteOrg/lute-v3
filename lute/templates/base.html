@@ -66,7 +66,7 @@
         <img src="{{ url_for('static', filename='img/lute.png') }}" class="lutelogo" alt="LUTE Logo">
       </a>
       <div class="title-container">
-        <h1 id="luteTitle" title="Learning Using Texts">
+        <h1 id="luteTitle" title="Learning using texts">
           {% if self.header() | trim %}
           {% block header %}{% endblock %}
           {% else %}
@@ -85,7 +85,7 @@
       <div class="menu-item">
         <span id="menu_books">Books</span>
         <ul class="sub-menu">
-          <li><a id="book_new" href="/book/new">Create new Book</a></li>
+          <li><a id="book_new" href="/book/new">Create new book</a></li>
           <li><a href="/book/import_webpage">Import web page</a></li>
           <li><a href="/book/archived">Book archive</a></li>
         </ul>
@@ -94,8 +94,8 @@
         <span id="menu_terms">Terms</span>
         <ul class="sub-menu">
           <li><a id="term_index" href="/term/index">Terms</a></li>
-          <li><a id="term_import_index" href="/termimport/index">Import Terms</a></li>
-          <li><a href="/termtag/index">Term Tags</a></li>
+          <li><a id="term_import_index" href="/termimport/index">Import terms</a></li>
+          <li><a href="/termtag/index">Term tags</a></li>
         </ul>
       </div>
       {% endif %}
