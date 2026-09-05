@@ -573,7 +573,23 @@ Feature: Term import
             language,term,status
             Spanish,gato,7
         Then import should fail with message:
-            Status must be one of 1, 2, 3, 4, 5, I, W, or blank
+            Status must be one of 0, 1, 2, 3, 4, 5, 98, 99, I, W, or blank
+
+
+    Scenario: Import accepts exported status codes (round trip)
+        Given import file:
+            language,term,translation,status
+            Spanish,gato,cat,99
+            Spanish,perro,dog,98
+            Spanish,pajaro,bird,0
+            Spanish,casa,house,
+        When import with create true, update true
+        Then import should succeed with 4 created, 0 updated, 0 skipped
+        And sql "select WoText, WoStatus from words order by WoText" should return:
+            casa; 1
+            gato; 99
+            pajaro; 0
+            perro; 98
 
 
     Scenario: Term is required

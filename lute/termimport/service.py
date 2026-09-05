@@ -110,11 +110,15 @@ class Service:
         "Convert status to db value."
         status_map = {
             "": 1,
+            "0": Status.UNKNOWN,
             "1": 1,
             "2": 2,
             "3": 3,
             "4": 4,
             "5": 5,
+            # Term export writes the raw db status codes (StID).
+            "98": Status.IGNORED,
+            "99": Status.WELLKNOWN,
             "W": Status.WELLKNOWN,
             "I": Status.IGNORED,
         }
@@ -133,7 +137,7 @@ class Service:
         for s in set(statuses):
             if self._get_status(s) is None:
                 raise BadImportFileError(
-                    "Status must be one of 1, 2, 3, 4, 5, I, W, or blank"
+                    "Status must be one of 0, 1, 2, 3, 4, 5, 98, 99, I, W, or blank"
                 )
 
     def _validate_terms_exist(self, import_data):
