@@ -21,7 +21,7 @@ Flask-WTF==1.2.1
 flit==3.9.0
 flit_core==3.9.0
 greenlet==3.0.0
-h11==0.14.0
+h11==0.16.0
 identify==2.5.31
 idna==3.4
 importlib-metadata==6.8.0
@@ -31,9 +31,9 @@ isort==5.12.0
 itsdangerous==2.1.2
 jaconv==0.3.4
 jieba==0.42.1
-Jinja2==3.1.2
+Jinja2==3.1.5
 lazy-object-proxy==1.9.0
-Mako==1.2.4
+Mako==1.3.12
 MarkupSafe==2.1.3
 mccabe==0.7.0
 mypy-extensions==1.0.0
@@ -53,7 +53,7 @@ pre-commit==3.5.0
 pycparser==2.21
 pyee==11.0.1
 pylint==2.17.5
-pypdf==3.17.4
+pypdf==6.14.2
 pypinyin==0.51.0
 PySocks==1.7.1
 pytest==7.4.2
@@ -67,7 +67,7 @@ selenium==4.14.0
 six==1.16.0
 sniffio==1.3.0
 sortedcontainers==2.4.0
-soupsieve==2.5
+soupsieve==2.8.4
 SQLAlchemy==2.0.21
 subtitle-parser==1.3.0
 text-unidecode==1.3
@@ -78,10 +78,10 @@ tomlkit==0.12.1
 trio==0.22.2
 trio-websocket==0.11.1
 typing_extensions==4.8.0
-urllib3==1.26.18
-virtualenv==20.24.6
-waitress==2.1.2
-Werkzeug==2.3.7
+urllib3==2.6.3
+virtualenv==20.26.6
+waitress==3.0.1
+Werkzeug==3.0.6
 wrapt==1.15.0
 wsproto==1.2.0
 WTForms==3.0.1
