@@ -2,6 +2,8 @@
 Common fixtures used by many tests.
 """
 
+import gc
+import time
 import os
 import yaml
 import pytest
@@ -54,6 +56,27 @@ def fixture_config():
     yield ac
 
 
+def _remove_db_file(dbfilename):
+    """
+    Delete the test db file, retrying briefly on Windows.
+
+    On Windows the file can stay momentarily locked after the prior
+    test's connections close (virus scanner / search indexer / lazy
+    handle release), so a single os.unlink can raise PermissionError.
+    Retry a few times before giving up.
+    """
+    if not os.path.exists(dbfilename):
+        return
+    for attempt in range(10):
+        try:
+            os.unlink(dbfilename)
+            return
+        except PermissionError:
+            gc.collect()
+            time.sleep(0.1)
+    os.unlink(dbfilename)  # final attempt: let it raise if still locked
+
+
 @pytest.fixture(name="app")
 def fixture_app():
     """
@@ -67,11 +90,18 @@ def fixture_app():
     """
     config_file = AppConfig.default_config_filename()
     c = AppConfig(config_file)
-    if os.path.exists(c.dbfilename):
-        os.unlink(c.dbfilename)
+    _remove_db_file(c.dbfilename)
     extra_config = {"WTF_CSRF_ENABLED": False, "TESTING": True}
     app = create_app(config_file, extra_config=extra_config)
     yield app
+
+    # Dispose the engine's connection pool so the sqlite file handle is
+    # released.  Without this, the next test's os.unlink(dbfilename) fails
+    # on Windows with PermissionError (the file is still held open).
+    with app.app_context():
+        db.session.remove()
+        db.engine.dispose()
+    gc.collect()
 
 
 @pytest.fixture(name="app_context")
