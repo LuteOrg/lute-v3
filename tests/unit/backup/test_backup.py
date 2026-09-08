@@ -277,6 +277,16 @@ def test_list_backups_returns_both(
     assert any(backup.is_manual for backup in backups)
 
 
+def test_list_backups_returns_empty_when_dir_missing_or_unset(app_context):
+    "A missing or unset backup dir yields [] instead of raising."
+    service = Service(db.session)
+    missing = os.path.join(os.path.dirname(__file__), "no_such_backup_dir")
+    assert not os.path.exists(missing)
+    assert service.list_backups(missing) == []
+    assert service.list_backups(None) == []
+    assert service.list_backups("") == []
+
+
 def test_backup_listing_sorts_by_modified(
     bkp_dir, auto_backup_file, manual_backup_file
 ):  # pylint: disable=unused-argument
