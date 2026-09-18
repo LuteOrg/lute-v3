@@ -545,7 +545,6 @@
   let update_filter_storage = function() {
     const store = {
       filtDisplay: $('#filterControls').css('display'),
-      filtLanguage: $('#filtLanguage').val(),
       filtParentsOnly: $('#filtParentsOnly').prop('checked'),
       filtAgeMin: $('#filtAgeMin').val(),
       filtAgeMax: $('#filtAgeMax').val(),
@@ -594,7 +593,7 @@
 
     $('#filterControls').css('display', store.filtDisplay);
     update_filter_button_src(store.filtDisplay == "none");
-    $('#filtLanguage').val(parseInt(store.filtLanguage ?? '0'));
+    setup_language_filter()
     $('#filtParentsOnly').prop('checked', store.filtParentsOnly ?? false);
     if ((store.filtAgeMin ?? '') != '')
       $('#filtAgeMin').val(parseInt(store.filtAgeMin));
@@ -607,6 +606,16 @@
       $('#filtTermIDs').val(store.filtTermIDs);
       $('#filtTermIDs_row').css('display', 'table-row');
       $('#filtTermIDs_message').text('(Filtered from reading pane)');
+    }
+  };
+
+  let setup_language_filter = function() {
+    const current_language_id = {{ current_language_id }};
+    const dropdown = $('#filtLanguage');
+    dropdown.val(current_language_id);
+    const language_count = $("#filtLanguage option").length;
+    if (language_count == 1) {
+      dropdown.css("display", "none");
     }
   };
 
