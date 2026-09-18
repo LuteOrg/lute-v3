@@ -156,6 +156,7 @@ class Service:
         "Get paragraphs, set text.start_date if needed."
         text = dbbook.text_at_page(pagenum)
         text.load_sentences()
+
         svc = StatsService(self.session)
         svc.mark_stale(dbbook)
 
@@ -170,6 +171,7 @@ class Service:
         lang = text.book.language
         rs = RenderService(self.session)
         paragraphs = rs.get_paragraphs(text.text, lang)
+
         self._save_new_status_0_terms(paragraphs)
 
         return paragraphs

@@ -10,6 +10,7 @@ from lute.term.routes import handle_term_form
 from lute.settings.current import current_settings
 from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
+from lute.tts.routes import get_lang_code
 from lute.db import db
 
 
@@ -36,6 +37,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         page_count=book.page_count,
         show_highlights=show_highlights,
         lang_id=lang.id,
+        lang_code=get_lang_code(lang.name),
         track_page_open=track_page_open,
         term_dicts=term_dicts,
     )
