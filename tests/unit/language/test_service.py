@@ -2,7 +2,9 @@
 Language service tests.
 """
 
-from lute.language.service import Service
+import os
+
+from lute.language.service import LangDef, Service
 from lute.db import db
 from lute.utils.debug_helpers import DebugTimer
 from tests.dbasserts import assert_sql_result
@@ -90,3 +92,41 @@ def test_load_all_defs_loads_lang_and_stories(app_context):
     for n in langnames:
         lang_id = service.load_language_def(n)
         assert lang_id > 0, "Loaded"
+
+
+def test_get_books_parses_optional_source_url(tmp_path):
+    """Sets the Book.source_uri if present, otherwise it's left blank."""
+
+    def _write_story(filename, content):
+        path = os.path.join(tmp_path, filename)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(content)
+
+    # LangDef._get_name reads definition.yaml; provide a minimal one.
+    (tmp_path / "definition.yaml").write_text("name: TestLang\n", encoding="utf-8")
+    _write_story(
+        "with_source.txt",
+        "# title: With Source\n# source_url: https://example.com/story\nHello.\n",
+    )
+    _write_story(
+        "without_source.txt",
+        "# title: Without Source\nWorld.\n",
+    )
+    _write_story(
+        "blank_source.txt",
+        "# title: Blank Source\n# source_url:    \nGoodbye.\n",
+    )
+
+    ld = LangDef(str(tmp_path))
+    books = {b.title: b for b in ld.books}
+
+    assert books["With Source"].source_uri == "https://example.com/story"
+    assert books["With Source"].text.strip() == "Hello."
+
+    assert books["Without Source"].source_uri is None
+    assert books["Without Source"].text.strip() == "World."
+
+    assert (
+        books["Blank Source"].source_uri is None
+    ), "a blank line isn't recorded as an empty string"
+    assert books["Blank Source"].text.strip() == "Goodbye."
