@@ -182,8 +182,8 @@ function getWordFrameHeightPercentage() {
 }
 
 function applyInitialPaneSizes() {
-  widthDefault = getTextWidthPercentage();
-  trHeightDefault = getWordFrameHeightPercentage();
+  if (widthDefault === undefined) widthDefault = getTextWidthPercentage();
+  if (trHeightDefault === undefined) trHeightDefault = getWordFrameHeightPercentage();
 
   const width = getFromLocalStorage("textWidth", widthDefault);
   const height = getFromLocalStorage("trHeight", trHeightDefault);
