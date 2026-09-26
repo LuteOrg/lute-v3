@@ -1,0 +1,159 @@
+# Spanish translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-08-23 15:31+0200\n"
+"PO-Revision-Date: 2025-08-23 15:32+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
+
+#: lute/templates/base.html:80
+msgid "Home"
+msgstr "Inicio"
+
+#: lute/templates/base.html:85
+msgid "Books"
+msgstr "Libros"
+
+#: lute/templates/base.html:87
+msgid "Create new Book"
+msgstr "Crear nuevo Libro"
+
+#: lute/templates/base.html:88
+msgid "Import web page"
+msgstr "Importar página web"
+
+#: lute/templates/base.html:89
+msgid "Book archive"
+msgstr "Archivo de libros"
+
+#: lute/templates/base.html:93 lute/templates/base.html:95
+msgid "Terms"
+msgstr "Términos"
+
+#: lute/templates/base.html:96
+msgid "Import Terms"
+msgstr "Importar Términos"
+
+#: lute/templates/base.html:97
+msgid "Term Tags"
+msgstr "Etiquetas de Términos"
+
+#: lute/templates/base.html:102 lute/templates/base.html:105
+msgid "Settings"
+msgstr "Configuración"
+
+#: lute/templates/base.html:104
+msgid "Languages"
+msgstr "Idiomas"
+
+#: lute/templates/base.html:106
+msgid "Keyboard shortcuts"
+msgstr "Atajos de teclado"
+
+#: lute/templates/base.html:107
+msgid "Anki exports"
+msgstr "Exportaciones Anki"
+
+#: lute/templates/base.html:112
+msgid "Backup"
+msgstr "Copia de seguridad"
+
+#: lute/templates/base.html:116
+#, python-format
+msgid "Last backup was %(time)s."
+msgstr "Última copia de seguridad fue %(time)s."
+
+#: lute/templates/base.html:121
+msgid "Backups"
+msgstr "Copias de seguridad"
+
+#: lute/templates/base.html:122
+msgid "Create backup"
+msgstr "Crear copia de seguridad"
+
+#: lute/templates/base.html:127
+msgid "About"
+msgstr "Acerca de"
+
+#: lute/templates/base.html:129
+msgid "Version and software info"
+msgstr "Información de versión y software"
+
+#: lute/templates/base.html:130
+msgid "Statistics"
+msgstr "Estadísticas"
+
+#: lute/templates/base.html:131
+msgid "Docs"
+msgstr "Documentación"
+
+#: lute/templates/base.html:136
+msgid "Language"
+msgstr "Idioma"
+
+#: lute/templates/index.html:3
+msgid "Lute index"
+msgstr "Índice de Lute"
+
+#: lute/templates/index.html:17
+#, python-format
+msgid ""
+"The Lute database has been loaded with a <a "
+"href=\"/read/%(tutorial_id)s/page/1\" style=\"text-decoration: "
+"underline;\">brief tutorial</a>, and some languages and short texts for "
+"you to try out."
+msgstr ""
+"La base de datos de Lute ha sido cargada con un <a "
+"href=\"/read/%(tutorial_id)s/page/1\" style=\"text-decoration: "
+"underline;\">breve tutorial</a>, y algunos idiomas y textos cortos para "
+"que puedas probar."
+
+#: lute/templates/index.html:18
+msgid ""
+"When you're done trying out the demo, <a href=\"/wipe_database\" style"
+"=\"text-decoration: underline;\">click here</a> to clear out the "
+"database. <i>Note: this removes everything in the db.</i>"
+msgstr ""
+"Cuando hayas terminado de probar la demo, <a href=\"/wipe_database\" style"
+"=\"text-decoration: underline;\">haz clic aquí</a> para limpiar la "
+"base de datos. <i>Nota: esto elimina todo en la base de datos.</i>"
+
+#: lute/templates/index.html:19
+msgid ""
+"Or instead, <a href=\"/remove_demo_flag\" style=\"text-decoration: "
+"underline;\">dismiss</a> this message."
+msgstr ""
+"O en su lugar, <a href=\"/remove_demo_flag\" style=\"text-decoration: "
+"underline;\">descartar</a> este mensaje."
+
+#: lute/templates/index.html:25
+#, python-format
+msgid "Warning: %(msg)s"
+msgstr "Advertencia: %(msg)s"
+
+#: lute/templates/index.html:25
+msgid "Create a backup."
+msgstr "Crear una copia de seguridad."
+
+#: lute/templates/index.html:30
+msgid ""
+"To get started using Lute, first <a "
+"href=\"/language/list_predefined\">load a predefined language and sample "
+"text</a>, or <a href=\"/language/new\">create your language.</a>"
+msgstr ""
+"Para empezar a usar Lute, primero <a "
+"href=\"/language/list_predefined\">carga un idioma predefinido y texto de muestra</a>, "
+"o <a href=\"/language/new\">crea tu idioma.</a>"
+
