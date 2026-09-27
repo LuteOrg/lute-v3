@@ -45,6 +45,18 @@ class JapaneseParser(AbstractParser):
 
         mecab_path = current_settings.get("mecab_path", "") or ""
         mecab_path = mecab_path.strip()
+
+        # If the saved path doesn't exist, try to find a working one.
+        if mecab_path and not os.path.exists(mecab_path):
+            mecab_path = ""
+
+        # If mecab_path is empty, check if we already auto-detected
+        # a working path on a previous call.  This avoids re-running
+        # the expensive MeCab() initialization on every call.
+        if not mecab_path and JapaneseParser._old_mecab_path:
+            # Use the previously auto-detected path.
+            mecab_path = JapaneseParser._old_mecab_path
+
         path_unchanged = mecab_path == JapaneseParser._old_mecab_path
         if path_unchanged and JapaneseParser._is_supported is not None:
             return JapaneseParser._is_supported
@@ -54,7 +66,22 @@ class JapaneseParser(AbstractParser):
         if mecab_path != "":
             os.environ[env_key] = mecab_path
         else:
-            os.environ.pop(env_key, None)
+            # Try to auto-detect mecab on common paths
+            auto_paths = [
+                "/opt/homebrew/lib/libmecab.dylib",
+                "/opt/homebrew/opt/mecab/lib/libmecab.dylib",
+                "/usr/local/lib/libmecab.dylib",
+                "/usr/lib/libmecab.dylib",
+                "/opt/homebrew/lib/libmecab.so",
+                "/usr/local/lib/libmecab.so",
+            ]
+            for ap in auto_paths:
+                if os.path.exists(ap):
+                    os.environ[env_key] = ap
+                    mecab_path = ap
+                    break
+            if mecab_path == "":
+                os.environ.pop(env_key, None)
 
         mecab_works = False
 
