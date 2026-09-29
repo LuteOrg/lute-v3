@@ -17,17 +17,24 @@ def test_dictionary_popup_reuses_window(luteclient):
     context = luteclient.page.context
     initial_page_count = len(context.pages)
     dict_btn = luteclient.page.locator(".dict-btn-external").first
-    with luteclient.page.expect_popup():
+    with luteclient.page.expect_popup() as popup_info:
         dict_btn.click()
+    popup = popup_info.value
+    popup.wait_for_load_state()
 
     assert len(context.pages) == initial_page_count + 1, "new page opened"
+    assert popup.url.endswith("/dummy_dict/Spanish/Hola"), "term looked up"
 
     luteclient.click_word("Adios")
+    luteclient.page.wait_for_function(
+        "LookupButton.TERM_FORM_CONTAINER.querySelector('#text').value == 'Adios'"
+    )
     dict_btn_2 = luteclient.page.locator(".dict-btn-external").first
     dict_btn_2.click()
 
     luteclient.sleep(1)  # wait for window
     assert len(context.pages) == initial_page_count + 1, "same window reused"
+    assert popup.url.endswith("/dummy_dict/Spanish/Adios"), "new term looked up"
 
 
 def test_dictionary_popup_closed_on_unload(luteclient):
