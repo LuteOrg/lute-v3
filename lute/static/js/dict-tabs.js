@@ -238,7 +238,7 @@ class DictButton extends LookupButton {
     let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no'
     if (LUTE_USER_SETTINGS.open_popup_in_new_tab)
       settings = null;
-    LutePopups.open_popup(url, settings);
+    LutePopups.open_popup(lookup_url, settings);
   }
 
   _load_frame(dicturl, text) {
