@@ -110,6 +110,18 @@
   </thead>
 </table>
 
+<!-- the config widget for datatables.  Moved into the datatables table footer during setup. -->
+<div id="datatables_config_widget">
+  <img
+    src="{{ url_for('static', filename='icn/settings-gear-icon.svg') }}"
+    title="configuration"
+    id="datatables_config_toggle"
+    style="width: 1rem"
+    />
+</div>
+
+<div id="datatables_config_items" style="display: none;"></div>
+
 <script type="text/javascript" src="/static/js/never_cache/lute-tagify-utils.js" charset="utf-8"></script>
 
 <script>
@@ -303,17 +315,29 @@
       layout: {
         topStart: 'pageLength',
         topEnd: 'search',
-        bottomStart: ['info', 'buttons'],
+        bottomStart: [
+          function() {
+            return $('#datatables_config_widget');
+          },
+          'info',
+          'buttons'
+        ],
         bottomEnd: 'paging'
       },
       responsive: true,
       select: false,
       lengthMenu: [ 25, 50, 100, 500, 1000 ],
 
-      // The button is included but the div.dt-buttons is hidden,
-      // so that the button actions can be trigged by a link
-      // in the "Actions" list.
+      // The buttons are moved into the config widget (the gear icon) during
+      // setup.  The Export CSV action is also triggered by a link in the
+      // "Actions" list.
       buttons: [
+         {
+           extend: 'colvis',
+           text: 'Columns',
+           // Omit the checkbox column and the hidden TermID/LanguageID columns.
+           columns: [1, 2, 3, 4, 5, 6, 7],
+         },
          {
            extend: 'download',
            url: '/term/export_terms',
@@ -645,6 +669,16 @@
     };
   };
 
+  let move_datatables_controls_to_config_widget = function() {
+    const widget = $('#datatables_config_items');
+    const append_children = [ '.dt-buttons', '.dt-length' ];
+    for (let c of append_children) {
+      const el = $(`div${c}`);
+      el.css({ padding: '0.2rem', margin: '0rem', display: 'inline' });
+      widget.append(el);
+    }
+  }
+
   $(document).ready(function () {
     // Handlers.
     $('#showHideFilters').click(handle_show_hide_filter_click);
@@ -682,6 +716,11 @@
     // Setting up the datatable now, so the filters are
     // taken into account.
     setup_term_datatable(dt_saved_state_key, "{{ initial_search or '' }}");
+
+    move_datatables_controls_to_config_widget();
+    $("#datatables_config_toggle").click(function() {
+      $("#datatables_config_items").toggle();
+    });
 
     if (LUTE_USER_SETTINGS["use_ankiconnect"] == false) {
       $("#term_action_post_anki").css('display', 'none');
