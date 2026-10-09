@@ -647,6 +647,18 @@ let handle_copy = function(span_attribute) {
   copy_text_to_clipboard(tis);
 }
 
+let handle_copy_selected = function() {
+  const selected = $('span.kwordmarked, span.newmultiterm, span.wordhover').toArray();
+  // Drag-selected ranges include intervening spaces, so use normal text assembly.
+  if ($('span.newmultiterm').length > 0) {
+    copy_text_to_clipboard(selected);
+    return;
+  }
+  // Shift-clicked selections only include word spans, so add readable spacing.
+  const text = selected.map(s => $(s).text()).join(' ').replace(/\u200B/g, '').trim();
+  _copy_prepared_text_to_clipboard(text, selected);
+}
+
 /** Get the text from the text items, adding "\n" between paragraphs. */
 let _get_textitems_text = function(textitemspans) {
   if (textitemspans.length == 0)
@@ -703,8 +715,7 @@ let _hide_element_message_tooltips = function() {
 };
 
 
-let copy_text_to_clipboard = function(textitemspans) {
-  const copytext = _get_textitems_text(textitemspans);
+let _copy_prepared_text_to_clipboard = function(copytext, textitemspans) {
   if (copytext == '')
     return;
 
@@ -728,6 +739,10 @@ let copy_text_to_clipboard = function(textitemspans) {
 
   const last_el = textitemspans[textitemspans.length - 1];
   _show_element_message_tooltip(last_el, null, "Copied to clipboard.", 1000);
+}
+
+let copy_text_to_clipboard = function(textitemspans) {
+  _copy_prepared_text_to_clipboard(_get_textitems_text(textitemspans), textitemspans);
 }
 
 
@@ -1037,6 +1052,7 @@ function handle_keydown (e) {
     "hotkey_PageTermList": () => open_term_list_for_current_page(),
     "hotkey_PostTermsToAnki": () => send_selected_terms_to_anki(),
     "hotkey_Bookmark": () => handle_bookmark(),
+    "hotkey_CopySelected": () => handle_copy_selected(),
     "hotkey_CopySentence": () => handle_copy('sentence-id'),
     "hotkey_CopyPara": () => handle_copy('paragraph-id'),
     "hotkey_CopyPage": () => handle_copy(null),
