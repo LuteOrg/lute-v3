@@ -112,7 +112,7 @@ def get_values_and_media_mapping(term, sentence_lookup, mapping):
             ]
             image_srcs = []
             for t, imgfilename in id_images:
-                new_filename = f"LUTE_TERM_{t.id}.jpg"
+                new_filename = f"lute_term_{t.id}.jpg"
                 image_url = f"/userimages/{t.language.id}/{imgfilename}"
                 media_mappings[new_filename] = image_url
                 image_srcs.append(f'<img src="{new_filename}">')

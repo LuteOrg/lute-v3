@@ -175,9 +175,9 @@ const LuteAnki = (function() {
    * e.g.
    * [
    *   // This is the result for "export_1"
-   *   ["LUTE_TERM_1.jpg", 1738896726062],
+   *   ["lute_term_1.jpg", 1738896726062],
    *   // This is the result for "export_2"
-   *   ["LUTE_TERM_2.jpg", { "result": null, "error": "... duplicate" }]
+   *   ["lute_term_2.jpg", { "result": null, "error": "... duplicate" }]
    * ]
    *
    * This maps the export names to the addNote actions, e.g. for the above, returns
