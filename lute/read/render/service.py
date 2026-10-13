@@ -45,6 +45,10 @@ class Service:
         sql = sql.bindparams(language_id=language.id)
         return self.session.execute(sql).all()
 
+    def find_all_multi_word_term_text_lcs_in_content(self, text_lcs, language):
+        "Find multiword terms, return list of text_lcs."
+        return self._find_all_multi_word_term_text_lcs_in_content(text_lcs, language)
+
     def _find_all_multi_word_term_text_lcs_in_content(self, text_lcs, language):
         "Find multiword terms, return list of text_lcs."
 
