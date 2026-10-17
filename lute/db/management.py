@@ -7,6 +7,7 @@ from sqlalchemy import text
 from flask import current_app
 from lute.models.setting import UserSetting
 from lute.settings.hotkey_data import initial_hotkey_defaults
+from lute.settings.setting_defaults import user_setting_defaults
 from lute.models.repositories import UserSettingRepository
 
 
@@ -81,34 +82,12 @@ def add_default_user_settings(session, default_user_backup_path):
                 session.add(s)
         session.commit()
 
-    # These keys are rendered into the global javascript namespace var
-    # LUTE_USER_SETTINGS, so if any of these keys change, check the usage
-    # of that variable as well.
-    keys_and_defaults = {
-        "backup_enabled": True,
-        "backup_auto": True,
-        "backup_warn": True,
-        "backup_dir": default_user_backup_path,
-        "backup_count": 5,
-        "lastbackup": None,
-        "mecab_path": None,
-        "japanese_reading": "hiragana",
-        "current_theme": "-",
-        "custom_styles": "/* Custom css to modify Lute's appearance. */",
-        "show_highlights": True,
-        "current_language_id": 0,
-        # Behaviour:
-        "open_popup_in_new_tab": False,
-        "stop_audio_on_term_form_open": True,
-        "show_streak_on_home": False,
-        "stats_calc_sample_size": 5,
-        # Term popups:
-        "term_popup_promote_parent_translation": True,
-        "term_popup_show_components": True,
-        # Anki:
-        "use_ankiconnect": False,
-        "ankiconnect_url": "http://127.0.0.1:8765",
-    }
+    # The keys and defaults (and their types) are defined in
+    # lute.settings.setting_defaults, the single source shared with
+    # lute.settings.current.  These keys are rendered into the global
+    # javascript namespace var LUTE_USER_SETTINGS, so if any key changes,
+    # check the usage of that variable as well.
+    keys_and_defaults = user_setting_defaults(default_user_backup_path)
     add_initial_vals_if_needed(keys_and_defaults)
 
     # Revise the mecab path if necessary.

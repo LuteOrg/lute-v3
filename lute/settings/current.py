@@ -8,6 +8,7 @@ They're written to at load (or when the settings change).
 """
 
 from lute.models.setting import UserSetting
+from lute.settings.setting_defaults import bool_setting_keys
 
 # The current user settings, key/value dict.
 current_settings = {}
@@ -33,15 +34,9 @@ def refresh_global_settings(session):
     for h in hotkeys:
         current_hotkeys[h.value] = h.key
 
-    # Convert some ints into bools.
-    boolkeys = [
-        "open_popup_in_new_tab",
-        "stop_audio_on_term_form_open",
-        "show_highlights",
-        "term_popup_promote_parent_translation",
-        "term_popup_show_components",
-        "use_ankiconnect",
-        "show_streak_on_home",
-    ]
-    for k in boolkeys:
-        current_settings[k] = current_settings[k] == "1"
+    # Convert stored string values of boolean settings into real bools.
+    # The set of boolean keys comes from the shared setting definitions, so
+    # integer settings are never accidentally coerced to bools.
+    for k in bool_setting_keys():
+        if k in current_settings:
+            current_settings[k] = current_settings[k] == "1"
