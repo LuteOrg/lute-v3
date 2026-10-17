@@ -186,6 +186,12 @@ class Service:
 
     def list_backups(self, outdir) -> List[DatabaseBackupFile]:
         "List all backup files."
+        # Return an empty list if the backup dir isn't set or doesn't exist,
+        # rather than raising FileNotFoundError.  Otherwise the web UI returns
+        # a 500 error when the configured backup path is invalid on the
+        # running platform (e.g. a Windows path used inside a Linux container).
+        if not outdir or not os.path.exists(outdir):
+            return []
         return [
             DatabaseBackupFile(os.path.join(outdir, f))
             for f in os.listdir(outdir)
