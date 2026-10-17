@@ -277,21 +277,31 @@ class Repository:
 
     def _build_db_term(self, term):
         "Convert a term business object to a DBTerm."
-        # pylint: disable=too-many-branches
         if term.text is None:
             raise ValueError("Text not set for term")
 
-        t = None
+        t = self._resolve_dbterm(term)
+        self._copy_scalar_fields(t, term)
+        self._apply_flash_message(t, term)
+        termtags = self._sync_term_tags(t, term)
+        termparents = self._sync_parents(t, term, termtags)
+        self._reconcile_parent_status(t, term, termparents)
+        return t
+
+    def _resolve_dbterm(self, term):
+        "Find the existing DBTerm to update, or create a new one."
         if term.id is not None:
             # This is an existing term, so use it directly.
-            t = self.session.get(DBTerm, term.id)
-        else:
-            # New term, or finding by text.
-            spec = self._search_spec_term(term.language_id, term.text)
-            term_repo = TermRepository(self.session)
-            t = term_repo.find_by_spec(spec) or DBTerm()
-            t.language = spec.language
+            return self.session.get(DBTerm, term.id)
+        # New term, or finding by text.
+        spec = self._search_spec_term(term.language_id, term.text)
+        term_repo = TermRepository(self.session)
+        t = term_repo.find_by_spec(spec) or DBTerm()
+        t.language = spec.language
+        return t
 
+    def _copy_scalar_fields(self, t, term):
+        "Copy the simple attributes from the business term to the DBTerm."
         t.text = term.text
         t.original_text = term.text
         t.status = term.status
@@ -300,20 +310,26 @@ class Repository:
         t.sync_status = term.sync_status
         t.set_current_image(term.current_image)
 
+    def _apply_flash_message(self, t, term):
+        "Set or clear the DBTerm's flash message."
         if term.flash_message is not None:
             t.set_flash_message(term.flash_message)
         else:
             t.pop_flash_message()
 
+    def _sync_term_tags(self, t, term):
+        "Replace the DBTerm's tags with the business term's tags."
         tt_repo = TermTagRepository(self.session)
-        termtags = []
-        for s in list(set(term.term_tags)):
-            termtags.append(tt_repo.find_or_create_by_text(s))
+        termtags = [
+            tt_repo.find_or_create_by_text(s) for s in list(set(term.term_tags))
+        ]
         t.remove_all_term_tags()
         for tt in termtags:
             t.add_term_tag(tt)
+        return termtags
 
-        termparents = []
+    def _sync_parents(self, t, term, termtags):
+        "Replace the DBTerm's parents, returning the resolved parent DBTerms."
         lang = t.language
         create_parents = [
             p
@@ -322,25 +338,29 @@ class Repository:
             and p != ""
             and lang.get_lowercase(term.text) != lang.get_lowercase(p)
         ]
-        # print('creating parents: ' + ', '.join(create_parents))
-        for p in create_parents:
-            termparents.append(self._find_or_create_parent(p, lang, term, termtags))
+        termparents = [
+            self._find_or_create_parent(p, lang, term, termtags) for p in create_parents
+        ]
         t.remove_all_parents()
         for tp in termparents:
             t.add_parent(tp)
+        return termparents
 
+    def _reconcile_parent_status(self, t, term, termparents):
+        "Sync status between a term and its single parent, if syncing applies."
         if len(termparents) != 1:
             t.sync_status = False
+            return
 
-        if t.sync_status and len(termparents) == 1:
-            p = termparents[0]
-            # pylint: disable=protected-access
-            if term._status_explicitly_set or p.status == 0:
-                p.status = t.status
-            else:
-                t.status = p.status
+        if not t.sync_status:
+            return
 
-        return t
+        p = termparents[0]
+        # pylint: disable=protected-access
+        if term._status_explicitly_set or p.status == 0:
+            p.status = t.status
+        else:
+            t.status = p.status
 
     def _find_or_create_parent(self, pt, language, term, termtags) -> DBTerm:
         p = self._find_by_spec(language.id, pt)
