@@ -1,11 +1,28 @@
 "Data cleanup tests."
 
 from datetime import datetime
+import pytest
 from sqlalchemy import text as sqltext
 from lute.db import db
 from lute.db.data_cleanup import clean_data
+from lute.models.language import Language
 from tests.utils import make_text
 from tests.dbasserts import assert_sql_result
+
+
+def test_cleanup_does_not_hide_unexpected_parser_errors(spanish, monkeypatch):
+    "Only regular expression errors can be skipped during word count cleanup."
+    text = make_text("test", "Hola amigo.", spanish)
+    text.word_count = None
+    db.session.add(text)
+    db.session.commit()
+
+    def fail_parse(*args):
+        raise ValueError("Unexpected parser failure")
+
+    monkeypatch.setattr(Language, "get_parsed_tokens", fail_parse)
+    with pytest.raises(ValueError, match="Unexpected parser failure"):
+        clean_data(db.session, lambda message: None)
 
 
 # Cleaning up missing sentence.SeTextLC records.

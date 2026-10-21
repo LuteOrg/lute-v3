@@ -5,6 +5,7 @@ Sometimes required as data management changes.
 These cleanup routines will be called by the app_factory.
 """
 
+import re
 from sqlalchemy import select, text as sqltext
 from lute.models.language import Language
 from lute.models.book import Text, Sentence
@@ -55,7 +56,16 @@ def _set_texts_word_count(session, output_function):
     pr = ProgressReporter(len(recalc), output_function)
     for t in recalc:
         pr.increment()
-        pt = t.book.language.get_parsed_tokens(t.text)
+        try:
+            pt = t.book.language.get_parsed_tokens(t.text)
+        except re.error as error:
+            output_function(
+                f"Could not calculate word count for text {t.id}: invalid regular "
+                f"expression for language '{t.book.language.name}': {error}. "
+                "Please correct the language settings and restart Lute."
+            )
+            # Leave the count unset so a later startup can retry after correction.
+            continue
         words = [w for w in pt if w.is_word]
         t.word_count = len(words)
         session.add(t)
