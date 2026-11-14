@@ -3,13 +3,14 @@
 """
 
 from sqlalchemy import text
-from flask import Blueprint, request, jsonify, render_template, redirect
+from sqlalchemy.exc import IntegrityError
+from flask import Blueprint, request, jsonify, render_template, redirect, flash
 from lute.models.term import TermTag
 from lute.models.repositories import TermTagRepository
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.termtag.datatables import get_data_tables_list
 from lute.db import db
-from lute.termtag.forms import TermTagForm
+from lute.termtag.forms import DUPLICATE_TAG_MSG, TermTagForm
 
 bp = Blueprint("termtag", __name__, url_prefix="/termtag")
 
@@ -36,10 +37,17 @@ def _handle_form(termtag, form_template_name):
     form = TermTagForm(obj=termtag)
 
     if form.validate_on_submit():
-        form.populate_obj(termtag)
-        db.session.add(termtag)
-        db.session.commit()
-        return redirect("/termtag/index", 302)
+        try:
+            form.populate_obj(termtag)
+            db.session.add(termtag)
+            db.session.commit()
+            return redirect("/termtag/index", 302)
+        except IntegrityError as e:
+            db.session.rollback()
+            msg = e.orig
+            if "tags.TgText" in f"{e.orig}":
+                msg = DUPLICATE_TAG_MSG
+            flash(msg, "error")
 
     return render_template(form_template_name, form=form, termtag=termtag)
 
