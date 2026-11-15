@@ -619,8 +619,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         }});"""
         # print(script, flush=True)
         # pylint: disable=protected-access
-        el = self.page.locator("#thetext")
-        self.page.evaluate(script, el)
+        self.page.evaluate(script)
         time.sleep(0.2)  # Or it's too fast.
         # print(script)
         # Have to refresh the content to query the dom.
