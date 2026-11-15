@@ -51,6 +51,7 @@ dev = [
   "pip>=23.0.1",
   "pipdeptree>=2.13.0,<3",
   "pylint>=2.17.5,<4",
+  "pytest>=7.0.0,<9",
   "pytest-bdd>=7.0.0,<8",
   "playwright>=1.39.0,<2",
   "pre-commit>=3.5.0,<4",
