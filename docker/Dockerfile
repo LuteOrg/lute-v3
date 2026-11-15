@@ -17,7 +17,7 @@ COPY README_PyPi.md .
 COPY lute /lute
 ENV PIP_ROOT_USER_ACTION=ignore
 ENV FLIT_ROOT_INSTALL=1
-RUN pip install flit
+RUN pip install "flit<4" "flit_core<4"
 RUN flit install --only-deps --deps=production
 COPY lute/config/config.yml.docker /lute/config/config.yml
 
