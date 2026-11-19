@@ -20,6 +20,7 @@ from flask import (
     send_from_directory,
     jsonify,
 )
+from flask_babel import Babel
 from sqlalchemy.event import listens_for
 from sqlalchemy.pool import Pool
 
@@ -289,6 +290,15 @@ def _add_base_routes(app, app_config):
         )
 
 
+# UI languages with a translation in lute/translations.
+SUPPORTED_UI_LOCALES = ["en", "fr"]
+
+
+def _get_ui_locale():
+    "Use the browser's preferred language, defaulting to English."
+    return request.accept_languages.best_match(SUPPORTED_UI_LOCALES) or "en"
+
+
 def _create_app(app_config, extra_config):
     """
     Create the app using the given configuration,
@@ -320,6 +330,7 @@ def _create_app(app_config, extra_config):
     app.env_config = app_config
 
     db.init_app(app)
+    Babel(app, locale_selector=_get_ui_locale)
 
     @listens_for(Pool, "connect")
     def _pragmas_on_connect(dbapi_con, con_record):  # pylint: disable=unused-argument
